@@ -1,27 +1,20 @@
 A
 dir
-/trunk/tiki/lib/pear/tests/XML_Parser
+/trunk/tiki/lib/pear/tests/XML_Tree
 
 
 
 
 A
 dir
-/trunk/tiki/lib/pear/tests/XML_Parser/tests
+/trunk/tiki/lib/pear/tests/XML_Tree/tests
 
 
 
 
 A
 dir
-/trunk/tiki/lib/pear/tests
-
-
-
-
-A
-dir
-/trunk/tiki/lib/pear/XML
+/trunk/tiki/lib/pear/XML/Tree
 
 
 
