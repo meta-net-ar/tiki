@@ -1,34 +1,6 @@
 A
 dir
-/trunk/_smarty/demo/configs
-
-
-
-
-A
-dir
-/trunk/_smarty/demo/templates
-
-
-
-
-M
-dir
-/trunk/_smarty
-
-
-
-
-A
-dir
-/trunk/_smarty/demo
-
-
-
-
-A
-dir
-/trunk/_smarty/misc
+/trunk/_smarty/libs/core
 
 
 
