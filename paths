@@ -1,69 +1,41 @@
 A
 dir
-/branches/PHPLENS_COM/_adodb/tests
+/trunk/_adodb/pear/Auth
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb/drivers
+/trunk/_adodb/xsl
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb/xsl
+/trunk/_adodb/contrib
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb/datadict
+/trunk/_adodb/pear
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb/pear
+/trunk/_adodb/pear/Auth/Container
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb/lang
-
-
-
-
-A
-dir
-/branches/PHPLENS_COM/_adodb/pear/Auth
-
-
-
-
-A
-dir
-/branches/PHPLENS_COM/_adodb/contrib
-
-
-
-
-A
-dir
-/branches/PHPLENS_COM/_adodb/pear/Auth/Container
-
-
-
-
-A
-dir
-/branches/PHPLENS_COM/_adodb/docs
+/trunk/_adodb/docs
 
 
 
