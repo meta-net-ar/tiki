@@ -1,27 +1,27 @@
 A
 dir
-/branches/SMARTY_PHP/_smarty/libs/internals
+/trunk/_smarty/unit_test/configs
 
 
 
 
 A
 dir
-/branches/SMARTY_PHP/_smarty/unit_test/configs
+/trunk/_smarty/unit_test/templates
 
 
 
 
 A
 dir
-/branches/SMARTY_PHP/_smarty/unit_test
+/trunk/_smarty/libs/internals
 
 
 
 
 A
 dir
-/branches/SMARTY_PHP/_smarty/unit_test/templates
+/trunk/_smarty/unit_test
 
 
 
