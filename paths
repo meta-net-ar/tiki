@@ -1,6 +1,13 @@
 A
 dir
-/trunk/tiki/templates/debug
+/trunk/tiki/lib/ircbot
+
+
+
+
+M
+dir
+/trunk/tiki
 
 
 
