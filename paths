@@ -1,20 +1,6 @@
 M
 dir
-/trunk/tiki/dump
-
-
-
-
-M
-dir
-/trunk/tiki/img/wiki_up
-
-
-
-
-M
-dir
-/trunk/tiki/backups
+/trunk/tiki/lib/Galaxia/processes
 
 
 
