@@ -1,62 +1,55 @@
 A
 dir
-/branches/PHPLAYERS/_phplayers/LOGOS
+/trunk/_phplayers/lib
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers/images
+/trunk/_phplayers/LOGOS
 
 
 
 
 A
 dir
-/branches/PHPLAYERS
+/trunk/_phplayers/images
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers/libjs
+/trunk/_phplayers/templates
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers/templates
+/trunk/_phplayers/THEMES
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers/lib
+/trunk/_phplayers/libjs
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers/THEMES
+/trunk/_phplayers
 
 
 
 
 A
 dir
-/branches/PHPLAYERS/_phplayers
-
-
-
-
-A
-dir
-/branches/PHPLAYERS/_phplayers/DUMPS
+/trunk/_phplayers/DUMPS
 
 
 
