@@ -1,69 +1,41 @@
 A
 dir
-/branches/PHPLENS_COM/_adodb/cute_icons_for_site
+/trunk/_adodb
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/drivers
+/trunk/_adodb/datadict
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/datadict
+/trunk/_adodb/tests
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/cute_icons_for_site
+/trunk/_adodb/lang
 
 
 
 
 A
 dir
-/branches/PHPLENS_COM/_adodb
+/trunk/_adodb/drivers
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/tests
-
-
-
-
-A
-dir
-/branches/ADODB/_adodb/lang
-
-
-
-
-A
-dir
-/branches/ADODB/_adodb
-
-
-
-
-A
-dir
-/branches/PHPLENS_COM
-
-
-
-
-A
-dir
-/branches/ADODB
+/trunk/_adodb/cute_icons_for_site
 
 
 
