@@ -1,125 +1,118 @@
 A
 dir
-/branches/avendor/tiki
+/trunk/tiki/Smarty/misc
 
 
 
 
 A
 dir
-/branches/avendor/tiki/lang/sp
+/trunk/tiki/templates
 
 
 
 
 A
 dir
-/branches/avendor/tiki/templates/modules
+/trunk/tiki/img
 
 
 
 
 A
 dir
-/branches/avendor/tiki/doc
+/trunk/tiki/lang
 
 
 
 
 A
 dir
-/branches/avendor/tiki/lang
+/trunk/tiki/dump
 
 
 
 
 A
 dir
-/branches/avendor/tiki/dump
+/trunk/tiki/db
 
 
 
 
 A
 dir
-/branches/avendor/tiki/db
+/trunk/tiki/Smarty/plugins
 
 
 
 
 A
 dir
-/branches/avendor/tiki/Smarty/plugins
+/trunk/tiki
 
 
 
 
 A
 dir
-/branches/avendor/tiki/lang/en
+/trunk/tiki/lang/sp
 
 
 
 
 A
 dir
-/branches/avendor/tiki/modules/cache
+/trunk/tiki/templates/modules
 
 
 
 
 A
 dir
-/branches/avendor/tiki/lib
+/trunk/tiki/doc
 
 
 
 
 A
 dir
-/branches/avendor/tiki/modules
+/trunk/tiki/styles
 
 
 
 
 A
 dir
-/branches/avendor/tiki/Smarty/misc
+/trunk/tiki/Smarty
 
 
 
 
 A
 dir
-/branches/avendor/tiki/styles
+/trunk/tiki/lang/en
 
 
 
 
 A
 dir
-/branches/avendor/tiki/templates
+/trunk/tiki/modules/cache
 
 
 
 
 A
 dir
-/branches/avendor/tiki/Smarty
+/trunk/tiki/lib
 
 
 
 
 A
 dir
-/branches/avendor/tiki/img
-
-
-
-
-A
-dir
-/branches/avendor
+/trunk/tiki/modules
 
 
 
