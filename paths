@@ -1,6 +1,41 @@
 A
 dir
-/trunk/tiki/styles/slideshows
+/trunk/tiki/templates/styles/subsilver
+
+
+
+
+A
+dir
+/trunk/tiki/templates/styles
+
+
+
+
+A
+dir
+/trunk/tiki/templates/styles/default2
+
+
+
+
+A
+dir
+/trunk/tiki/templates/styles/dblue
+
+
+
+
+A
+dir
+/trunk/tiki/templates/styles/jalist
+
+
+
+
+A
+dir
+/trunk/tiki/templates/styles/default
 
 
 
