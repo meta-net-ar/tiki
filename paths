@@ -1,41 +1,27 @@
 A
 dir
-/trunk/tiki/lib/usermodules
+/trunk/tiki/lib/menubuilder
 
 
 
 
 A
 dir
-/trunk/tiki/lib/stats
+/trunk/tiki/lib/blogs
 
 
 
 
 A
 dir
-/trunk/tiki/lib/backups
+/trunk/tiki/lib/filegals
 
 
 
 
 A
 dir
-/trunk/tiki/lib/categories
-
-
-
-
-A
-dir
-/trunk/tiki/lib/faqs
-
-
-
-
-A
-dir
-/trunk/tiki/lib/templates
+/trunk/tiki/lib/commcenter
 
 
 
