@@ -1,20 +1,20 @@
 A
 dir
-/branches/ADODB/_adodb/perf
+/trunk/_adodb/session
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/session
+/trunk/_adodb/perf
 
 
 
 
 A
 dir
-/branches/ADODB/_adodb/session/old
+/trunk/_adodb/session/old
 
 
 
