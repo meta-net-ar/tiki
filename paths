@@ -1,27 +1,13 @@
 A
 dir
-/trunk/_mods/templates/sdl_menu
+/trunk/_mods/taglines/rcogley
 
 
 
 
 A
 dir
-/trunk/_mods/templates/sdl_menu/templates/modules
-
-
-
-
-A
-dir
-/trunk/_mods/templates/sdl_menu/lib
-
-
-
-
-A
-dir
-/trunk/_mods/templates/sdl_menu/templates
+/trunk/_mods/taglines
 
 
 
