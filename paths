@@ -1,13 +1,27 @@
 A
 dir
-/trunk/_mods/templates/sdl_collection/templates
+/trunk/_mods/templates/sdl_menu
 
 
 
 
 A
 dir
-/trunk/_mods/templates/sdl_collection/templates/modules
+/trunk/_mods/templates/sdl_menu/templates/modules
+
+
+
+
+A
+dir
+/trunk/_mods/templates/sdl_menu/lib
+
+
+
+
+A
+dir
+/trunk/_mods/templates/sdl_menu/templates
 
 
 
