@@ -1,13 +1,13 @@
 D
 dir
-/trunk/tiki/db/pgsql
+/trunk/tiki/lib/jHotDraw
 
 
 
 
 D
 dir
-/trunk/tiki/db/oracle
+/trunk/tiki/lib/tabs
 
 
 
