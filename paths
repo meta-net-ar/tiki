@@ -1,34 +1,41 @@
 A
 dir
-/trunk/tiki/lib/notifications
+/trunk/tiki/lib/hotwords
 
 
 
 
 A
 dir
-/trunk/tiki/lib/bookmarks
+/trunk/tiki/lib/banners
 
 
 
 
 A
 dir
-/trunk/tiki/lib/shoutbox
+/trunk/tiki/lib/userfiles
 
 
 
 
 A
 dir
-/trunk/tiki/lib/rss
+/trunk/tiki/lib/admin
 
 
 
 
 A
 dir
-/trunk/tiki/lib/polls
+/trunk/tiki/lib/chat
+
+
+
+
+A
+dir
+/trunk/tiki/lib/dcs
 
 
 
