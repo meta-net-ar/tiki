@@ -1,13 +1,34 @@
 A
 dir
-/trunk/_smarty/libs
+/trunk/_smarty/demo/configs
 
 
 
 
 A
 dir
-/trunk/_smarty/libs/plugins
+/trunk/_smarty/demo/templates
+
+
+
+
+M
+dir
+/trunk/_smarty
+
+
+
+
+A
+dir
+/trunk/_smarty/demo
+
+
+
+
+A
+dir
+/trunk/_smarty/misc
 
 
 
