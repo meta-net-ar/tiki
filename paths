@@ -1,27 +1,13 @@
-A
-dir
-/trunk/tiki/db/oracle
-
-
-
-
-A
-dir
-/trunk/tiki/lib/jHotDraw
-
-
-
-
-A
-dir
-/trunk/tiki/lib/tabs
-
-
-
-
-A
+D
 dir
 /trunk/tiki/db/pgsql
+
+
+
+
+D
+dir
+/trunk/tiki/db/oracle
 
 
 
