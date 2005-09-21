@@ -1,55 +1,20 @@
 A
 dir
-/trunk/_mods/features/solve/templates
+/trunk/_mods/features/solve/db
 
 
 
 
 A
 dir
-/trunk/_mods/features/solve/styles/napkin/images
+/trunk/_mods/features/solve/lib
 
 
 
 
 A
 dir
-/trunk/_mods/features/solve/styles/napkin
-
-
-
-
-A
-dir
-/trunk/_mods/features/solve/templates/styles/napkin/modules
-
-
-
-
-A
-dir
-/trunk/_mods/features/solve/templates/styles
-
-
-
-
-A
-dir
-/trunk/_mods/features/solve/templates/styles/napkin
-
-
-
-
-A
-dir
-/trunk/_mods/features/solve
-
-
-
-
-A
-dir
-/trunk/_mods/features/solve/styles
+/trunk/_mods/features/solve/lib/solve
 
 
 
