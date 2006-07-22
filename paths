@@ -1,6 +1,6 @@
 D
 dir
-/trunk/tiki/lib/pear/Text/Wiki/Parse
+/trunk/tiki/lib/pear/Text/Wiki/Render/Xhtml
 
 
 
