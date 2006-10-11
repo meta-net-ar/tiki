@@ -1,6 +1,34 @@
 A
 dir
-/trunk/_mods/features/aulawiki/images/workspaces
+/trunk/_mods/features/aulawiki/modules/conf
+
+
+
+
+D
+dir
+/trunk/_mods/features/aulawiki/templates/styles/aulawiki
+
+
+
+
+A
+dir
+/trunk/_mods/features/aulawiki/templates/styles/workspaces
+
+
+
+
+A
+dir
+/trunk/_mods/features/aulawiki/lib/workspaces
+
+
+
+
+A
+dir
+/trunk/_mods/features/aulawiki/templates/styles/workspaces/modules
 
 
 
