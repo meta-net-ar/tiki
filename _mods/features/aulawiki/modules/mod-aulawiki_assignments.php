@@ -10,7 +10,7 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 	header("location: index.php");
 	exit;
 }
-include_once ('lib/aulawiki/workspacelib.php');
+include_once ('lib/workspaces/workspacelib.php');
 require_once ('lib/aulawiki/assignmentslib.php');
 
 global $dbTiki;
