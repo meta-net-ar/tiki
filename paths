@@ -1,6 +1,27 @@
 A
 dir
-/trunk/_mods/features/mapeditor/templates
+/trunk/_mods/features/mapeditor/lib/map
+
+
+
+
+A
+dir
+/trunk/_mods/features/mapeditor/lib
+
+
+
+
+A
+dir
+/trunk/_mods/features/mapeditor/lib/tree
+
+
+
+
+A
+dir
+/trunk/_mods/features/mapeditor/db
 
 
 
