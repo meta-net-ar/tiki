@@ -121,6 +121,7 @@ _adodb/session/session_schema.xml -text
 _adodb/toexport.inc.php -text
 _adodb/tohtml.inc.php -text
 _fckeditor/README_tikiwiki.txt -text
+_fckeditor/_htaccess -text
 _fckeditor/editor/_source/classes/fckcontextmenu.js -text
 _fckeditor/editor/_source/classes/fckdocumentfragment_gecko.js -text
 _fckeditor/editor/_source/classes/fckdocumentfragment_ie.js -text
