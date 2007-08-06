@@ -1,76 +1,13 @@
 A
 dir
-/trunk/tiki/lib/mootools/src/Window
+/trunk/tiki/lib/mypage
 
 
 
 
 A
 dir
-/trunk/tiki/lib/mootools/src/Drag
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Plugins
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Remote
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Native
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Class
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Element
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Core
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Effects
-
-
-
-
-A
-dir
-/trunk/tiki/lib/mootools/src/Misc
+/trunk/tiki/components
 
 
 
