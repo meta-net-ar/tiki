@@ -1,6 +1,27 @@
 A
 dir
-/trunk/tiki/lib/mootools/extensions/tabs
+/trunk/tiki/lib/mootools/extensions/windoo/src/Windoo
+
+
+
+
+A
+dir
+/trunk/tiki/lib/mootools/extensions/windoo/src/Effects
+
+
+
+
+A
+dir
+/trunk/tiki/lib/mootools/extensions/windoo/src/Drag
+
+
+
+
+A
+dir
+/trunk/tiki/lib/mootools/extensions/windoo/src
 
 
 
