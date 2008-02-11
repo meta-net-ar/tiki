@@ -586,6 +586,7 @@ _fckeditor/editor/plugins/simplecommands/fckplugin.js -text
 _fckeditor/editor/plugins/simplecommands/index.php -text
 _fckeditor/editor/plugins/tablecommands/fckplugin.js -text
 _fckeditor/editor/plugins/tablecommands/index.php -text
+_fckeditor/editor/skins/_fckviewstrips.html -text
 _fckeditor/editor/skins/default/fck_dialog.css -text
 _fckeditor/editor/skins/default/fck_editor.css -text
 _fckeditor/editor/skins/default/fck_strip.gif -text
