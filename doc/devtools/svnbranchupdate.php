@@ -26,19 +26,6 @@ if( has_uncommited_changes( '.' ) )
 info( "Updating..." );
 update_working_copy( '.' );
 
-$conflicts = get_conflicts( '.' );
-if( $conflicts->length > 0 )
-{
-	$message = "Conflicts occured during the local copy update before merging. Fix the conflicts and start again.";
-	foreach( $conflicts as $path )
-	{
-		$path = $path->parentNode->getAttribute( 'path' );
-		$message .= "\n\t$path";
-	}
-
-	error( $message );
-}
-
 $revision = (int) get_info($source)->entry->commit['revision'];
 
 // Do merge
