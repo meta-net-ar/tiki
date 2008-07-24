@@ -4279,6 +4279,7 @@ tests/test_cvs_file.txt -text
 /tiki-integrator.php -text
 /tiki-interactive_trans.php -text
 /tiki-jscalendar.php -text
+/tiki-jsplugin.php -text
 /tiki-lastchanges.php -text
 /tiki-layout_options.php -text
 /tiki-likepages.php -text
