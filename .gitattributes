@@ -41,9 +41,7 @@ db/oracle/index.php -text
 db/oracle/md5.sql -text
 db/profiles/_default.prf -text
 db/profiles/basicEnabled.prf -text
-db/profiles/default-inserts.sql -text
 db/profiles/index.php -text
-db/profiles/mk_profile.sh -text
 db/profiles/slash.prf -text
 db/tiki-2.0-mysql.sql -text
 db/tiki-2.0-mysqli.sql -text
@@ -86,6 +84,7 @@ doc/devtools/parse_tiki.php -text
 doc/devtools/phpstrip.sh -text
 doc/devtools/premerge_report.sh -text
 doc/devtools/recover_wiki_from_google.pl -text
+doc/devtools/release.php -text
 doc/devtools/removehtaccess.sh -text
 doc/devtools/restorehelp.php -text
 doc/devtools/search_smarty_prefs-2.0.php -text
@@ -2249,7 +2248,6 @@ lib/pear/Net/URL.php -text
 lib/pear/Net/index.php -text
 lib/pear/OS/Guess.php -text
 lib/pear/PEAR.php -text
-lib/pear/PEAR/Autoloader.php -text
 lib/pear/PEAR/Builder.php -text
 lib/pear/PEAR/ChannelFile.php -text
 lib/pear/PEAR/ChannelFile/Parser.php -text
@@ -3352,9 +3350,9 @@ styles/slideshows/tiki.css -text
 styles/tikineat.css -text
 styles/tikinewt.css -text
 styles/tikinewt/bg_vertline.png -text
-styles/transitions/1.8to1.9.css -text
-styles/transitions/1.8to2.0.css -text
 styles/transitions/1.9to2.0.css -text
+styles/transitions/1.9to3.0.css -text
+styles/transitions/2.0to3.0.css -text
 styles/transitions/index.php -text
 temp/.htaccess -text
 temp/README -text
