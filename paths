@@ -1,36 +1,36 @@
-A
+R
 dir
-/branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/URI
-
-
-
-
-A
-dir
-/branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/HTML
-
-
-
-
-A
-dir
+/trunk/lib/HTMLPurifier/DefinitionCache/Serializer/CSS
 /branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/CSS
+13963
 
 
-
-
-A
+R
 dir
+/trunk/lib/HTMLPurifier/DefinitionCache/Serializer/HTML
+/branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/HTML
+13963
+
+
+R
+dir
+/trunk/lib/HTMLPurifier/DefinitionCache/Serializer/Test
 /branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/Test
+13963
 
 
+R
+dir
+/trunk/lib/HTMLPurifier/DefinitionCache/Serializer/URI
+/branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer/URI
+13963
 
 
 A
 dir
+/trunk/lib/HTMLPurifier/DefinitionCache/Serializer
 /branches/2.0/lib/HTMLPurifier/DefinitionCache/Serializer
-
-
+13963
 
 
 
