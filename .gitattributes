@@ -1204,6 +1204,8 @@ import/mediawiki_dump.xsd -text
 /index.php -text
 installer/.htaccess -text
 installer/index.php -text
+installer/installlib.php -text
+installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
 lang/.htaccess -text
