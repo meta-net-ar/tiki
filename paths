@@ -1,43 +1,8 @@
 D
 dir
-/mods/trunk/themes/planetfall/theme/templates
+/mods/trunk/themes/planetfall/theme
 
 
-
-
-A
-dir
-/mods/trunk/themes/planetfall/styles
-/mods/trunk/themes/planetfall/theme/styles
-13911
-
-
-A
-dir
-/mods/trunk/themes/planetfall/templates
-/mods/trunk/themes/planetfall/theme/templates
-13911
-
-
-R
-dir
-/mods/trunk/themes/planetfall/templates/styles
-/mods/trunk/themes/planetfall/theme/templates/styles
-14512
-
-
-D
-dir
-/mods/trunk/themes/planetfall/theme/styles
-
-
-
-
-R
-dir
-/mods/trunk/themes/planetfall/styles/planetfall
-/mods/trunk/themes/planetfall/theme/styles/planetfall
-14512
 
 
 
