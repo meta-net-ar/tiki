@@ -2006,6 +2006,10 @@ lib/mods/index.php -text
 lib/mods/modslib.php -text
 lib/modules/index.php -text
 lib/modules/modlib.php -text
+lib/mootools/Autocompleter.Request.js -text
+lib/mootools/Autocompleter.css -text
+lib/mootools/Autocompleter.js -text
+lib/mootools/Observer.js -text
 lib/mootools/README.tikiwiki -text
 lib/mootools/extensions/grid/AjaxQueue.js -text
 lib/mootools/extensions/grid/LiveGrid.js -text
@@ -2992,6 +2996,7 @@ modules/mod-online_users.php -text
 modules/mod-quick_edit.php -text
 modules/mod-random_images.php -text
 modules/mod-random_pages.php -text
+modules/mod-semantic_links.php -text
 modules/mod-shoutbox.php -text
 modules/mod-since_last_visit.php -text
 modules/mod-since_last_visit_new.php -text
@@ -3592,6 +3597,7 @@ templates/modules/mod-search_box.tpl -text
 templates/modules/mod-search_new.tpl -text
 templates/modules/mod-search_wiki_page.tpl -text
 templates/modules/mod-search_wiki_page_new.tpl -text
+templates/modules/mod-semantic_links.tpl -text
 templates/modules/mod-shoutbox.tpl -text
 templates/modules/mod-shoutbox.tpl.nocache -text
 templates/modules/mod-since_last_visit.tpl -text
