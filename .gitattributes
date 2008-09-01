@@ -1666,6 +1666,7 @@ lib/Horde/Yaml/Loader.php -text
 lib/Horde/Yaml/Node.php -text
 lib/admin/adminlib.php -text
 lib/admin/index.php -text
+lib/admin/magic-enumerations.php -text
 lib/admin/magiclib.php -text
 lib/ajax/LICENSE.txt -text
 lib/ajax/README.txt -text
@@ -2008,6 +2009,10 @@ lib/mods/index.php -text
 lib/mods/modslib.php -text
 lib/modules/index.php -text
 lib/modules/modlib.php -text
+lib/mootools/Autocompleter.Request.js -text
+lib/mootools/Autocompleter.css -text
+lib/mootools/Autocompleter.js -text
+lib/mootools/Observer.js -text
 lib/mootools/README.tikiwiki -text
 lib/mootools/extensions/grid/AjaxQueue.js -text
 lib/mootools/extensions/grid/LiveGrid.js -text
@@ -2779,6 +2784,7 @@ lib/wiki-plugins/wikiplugin_example.php -text
 lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
+lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
 lib/wiki-plugins/wikiplugin_include.php -text
 lib/wiki-plugins/wikiplugin_jabber.php -text
@@ -2797,6 +2803,7 @@ lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
 lib/wiki-plugins/wikiplugin_proposal.php -text
 lib/wiki-plugins/wikiplugin_quote.php -text
+lib/wiki-plugins/wikiplugin_redirect.php -text
 lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
@@ -2835,6 +2842,7 @@ lib/wiki/histlib.php -text
 lib/wiki/index.php -text
 lib/wiki/pluginslib.php -text
 lib/wiki/quantifylib.php -text
+lib/wiki/semanticlib.php -text
 lib/wiki/wiki-ajax.js -text
 lib/wiki/wiki-ajax.php -text
 lib/wiki/wikilib.php -text
@@ -2992,6 +3000,7 @@ modules/mod-online_users.php -text
 modules/mod-quick_edit.php -text
 modules/mod-random_images.php -text
 modules/mod-random_pages.php -text
+modules/mod-semantic_links.php -text
 modules/mod-shoutbox.php -text
 modules/mod-since_last_visit.php -text
 modules/mod-since_last_visit_new.php -text
@@ -3592,6 +3601,7 @@ templates/modules/mod-search_box.tpl -text
 templates/modules/mod-search_new.tpl -text
 templates/modules/mod-search_wiki_page.tpl -text
 templates/modules/mod-search_wiki_page_new.tpl -text
+templates/modules/mod-semantic_links.tpl -text
 templates/modules/mod-shoutbox.tpl -text
 templates/modules/mod-shoutbox.tpl.nocache -text
 templates/modules/mod-since_last_visit.tpl -text
@@ -3717,6 +3727,7 @@ templates/tiki-admin-include-profiles.tpl -text
 templates/tiki-admin-include-rss.tpl -text
 templates/tiki-admin-include-score.tpl -text
 templates/tiki-admin-include-search.tpl -text
+templates/tiki-admin-include-semantic.tpl -text
 templates/tiki-admin-include-textarea.tpl -text
 templates/tiki-admin-include-trackers.tpl -text
 templates/tiki-admin-include-userfiles.tpl -text
@@ -3944,6 +3955,7 @@ templates/tiki-pagehistory.tpl -text
 templates/tiki-pagination.tpl -text
 templates/tiki-pandora.tpl -text
 templates/tiki-pick_avatar.tpl -text
+templates/tiki-plugin_blocked.tpl -text
 templates/tiki-plugin_help.tpl -text
 templates/tiki-plugin_poll.tpl -text
 templates/tiki-plugin_sql.tpl -text
@@ -4121,6 +4133,7 @@ tests/test_cvs_file.txt -text
 /tiki-admin_include_rss.php -text
 /tiki-admin_include_score.php -text
 /tiki-admin_include_search.php -text
+/tiki-admin_include_semantic.php -text
 /tiki-admin_include_textarea.php -text
 /tiki-admin_include_trackers.php -text
 /tiki-admin_include_userfiles.php -text
