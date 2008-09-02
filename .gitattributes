@@ -1210,6 +1210,7 @@ installer/schema/20080827_bigfeaturetype.sql -text
 installer/schema/20080829_pagealiasdata.sql -text
 installer/schema/20080829_pluginvalidation.sql -text
 installer/schema/20080901_pluginvalidation.sql -text
+installer/schema/20080902_trackerparsedesc.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
