@@ -3727,6 +3727,7 @@ templates/tiki-admin-include-messages.tpl -text
 templates/tiki-admin-include-metatags.tpl -text
 templates/tiki-admin-include-module.tpl -text
 templates/tiki-admin-include-multimedia.tpl -text
+templates/tiki-admin-include-plugins.tpl -text
 templates/tiki-admin-include-polls.tpl -text
 templates/tiki-admin-include-profiles.tpl -text
 templates/tiki-admin-include-rss.tpl -text
@@ -4065,6 +4066,7 @@ templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_filter.tpl -text
+templates/tracker_item_field_googlemap_value.tpl -text
 templates/tracker_item_field_input.tpl -text
 templates/tracker_item_field_value.tpl -text
 templates/translated-lang.tpl -text
@@ -4133,6 +4135,7 @@ tests/test_cvs_file.txt -text
 /tiki-admin_include_metatags.php -text
 /tiki-admin_include_module.php -text
 /tiki-admin_include_multimedia.php -text
+/tiki-admin_include_plugins.php -text
 /tiki-admin_include_polls.php -text
 /tiki-admin_include_profiles.php -text
 /tiki-admin_include_rss.php -text
