@@ -1211,6 +1211,8 @@ installer/schema/20080829_pagealiasdata.sql -text
 installer/schema/20080829_pluginvalidation.sql -text
 installer/schema/20080901_pluginvalidation.sql -text
 installer/schema/20080902_trackerparsedesc.sql -text
+installer/schema/20080905_feature_tip.sql -text
+installer/schema/20080916_webservice_registry.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2152,6 +2154,7 @@ lib/notifications/index.php -text
 lib/notifications/notificationemaillib.php -text
 lib/notifications/notificationlib.php -text
 lib/objectlib.php -text
+lib/ointegratelib.php -text
 lib/overlib.js -text
 lib/pclzip.lib.php -text
 lib/pear/Auth.php -text
@@ -2762,6 +2765,7 @@ lib/webmail/mimeDecode.php -text
 lib/webmail/net_pop3.php -text
 lib/webmail/tikimaillib.php -text
 lib/webmail/webmaillib.php -text
+lib/webservicelib.php -text
 lib/wiki-plugins/index.php -text
 lib/wiki-plugins/wikiplugin_agentinfo.php -text
 lib/wiki-plugins/wikiplugin_alink.php -text
@@ -2792,6 +2796,7 @@ lib/wiki-plugins/wikiplugin_flash.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
+lib/wiki-plugins/wikiplugin_iframe.php -text
 lib/wiki-plugins/wikiplugin_include.php -text
 lib/wiki-plugins/wikiplugin_jabber.php -text
 lib/wiki-plugins/wikiplugin_lang.php -text
@@ -2842,6 +2847,7 @@ lib/wiki-plugins/wikiplugin_userlist.php -text
 lib/wiki-plugins/wikiplugin_versions.php -text
 lib/wiki-plugins/wikiplugin_vote.php -text
 lib/wiki-plugins/wikiplugin_wantedpages.php -text
+lib/wiki-plugins/wikiplugin_webservice.php -text
 lib/wiki-plugins/wikiplugin_youtube.php -text
 lib/wiki/exportlib.php -text
 lib/wiki/histlib.php -text
@@ -3371,7 +3377,6 @@ styles/slideshows/clear.css -text
 styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
-styles/spanky.css -text
 styles/tikineat.css -text
 styles/tikinewt.css -text
 styles/transitions/1.9to2.0.css -text
@@ -3739,6 +3744,7 @@ templates/tiki-admin-include-textarea.tpl -text
 templates/tiki-admin-include-trackers.tpl -text
 templates/tiki-admin-include-userfiles.tpl -text
 templates/tiki-admin-include-webmail.tpl -text
+templates/tiki-admin-include-webservices.tpl -text
 templates/tiki-admin-include-wiki.tpl -text
 templates/tiki-admin-include-wikiatt.tpl -text
 templates/tiki-admin-include-wysiwyg.tpl -text
@@ -4147,6 +4153,7 @@ tests/test_cvs_file.txt -text
 /tiki-admin_include_trackers.php -text
 /tiki-admin_include_userfiles.php -text
 /tiki-admin_include_webmail.php -text
+/tiki-admin_include_webservices.php -text
 /tiki-admin_include_wiki.php -text
 /tiki-admin_include_wikiatt.php -text
 /tiki-admin_include_wysiwyg.php -text
