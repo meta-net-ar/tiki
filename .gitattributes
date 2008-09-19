@@ -2699,6 +2699,7 @@ lib/tikilib.php -text
 lib/tikiticketlib.php -text
 lib/trackers/dynamic_list.js -text
 lib/trackers/index.php -text
+lib/trackers/reportlib.php -text
 lib/trackers/trackerlib.php -text
 lib/trackers/trkWithMirrorTablesLib.php -text
 lib/tree/categ_admin_tree.php -text
@@ -4167,6 +4168,7 @@ templates/tiki-theme_control.tpl -text
 templates/tiki-theme_control_objects.tpl -text
 templates/tiki-theme_control_sections.tpl -text
 templates/tiki-top_bar.tpl -text
+templates/tiki-tracker_reports.tpl -text
 templates/tiki-upload_file.tpl -text
 templates/tiki-upload_image.tpl -text
 templates/tiki-user_assigned_modules.tpl -text
@@ -4582,6 +4584,7 @@ tests/test_cvs_file.txt -text
 /tiki-theme_control_objects.php -text
 /tiki-theme_control_sections.php -text
 /tiki-tracker_http_request.php -text
+/tiki-tracker_reports.php -text
 /tiki-tracker_rss.php -text
 /tiki-upload_file.php -text
 /tiki-upload_image.php -text
