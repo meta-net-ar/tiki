@@ -127,6 +127,7 @@ dump/index.php -text
 /favicon.png -text
 /fgal_listing_conf.php -text
 files/index.php -text
+files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 /freetag_apply.php -text
 /freetag_list.php -text
 /function.js_maxlength.php -text
@@ -2795,6 +2796,7 @@ lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
+lib/wiki-plugins/wikiplugin_googledoc.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
 lib/wiki-plugins/wikiplugin_iframe.php -text
 lib/wiki-plugins/wikiplugin_include.php -text
@@ -2854,6 +2856,7 @@ lib/wiki/histlib.php -text
 lib/wiki/index.php -text
 lib/wiki/pluginslib.php -text
 lib/wiki/quantifylib.php -text
+lib/wiki/renderlib.php -text
 lib/wiki/semanticlib.php -text
 lib/wiki/wiki-ajax.js -text
 lib/wiki/wiki-ajax.php -text
@@ -3796,6 +3799,7 @@ templates/tiki-admin_trackers.tpl -text
 templates/tiki-admingroups.tpl -text
 templates/tiki-adminusers.tpl -text
 templates/tiki-ajax_header.tpl -text
+templates/tiki-all_languages.tpl -text
 templates/tiki-approve_staging_page.tpl -text
 templates/tiki-article_types.tpl -text
 templates/tiki-articles-js.tpl -text
@@ -4183,6 +4187,7 @@ tests/test_cvs_file.txt -text
 /tiki-admin_trackers.php -text
 /tiki-admingroups.php -text
 /tiki-adminusers.php -text
+/tiki-all_languages.php -text
 /tiki-approve_staging_page.php -text
 /tiki-article_types.php -text
 /tiki-articles_rss.php -text
