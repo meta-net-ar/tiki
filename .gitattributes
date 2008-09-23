@@ -3143,6 +3143,8 @@ pics/icons/mime/zip.png -text
 pics/icons/minus_small.png -text
 pics/icons/module.png -text
 pics/icons/monitor.png -text
+pics/icons/more_info.gif -text
+pics/icons/multiple_cal.png -text
 pics/icons/new.png -text
 pics/icons/newspaper_go.png -text
 pics/icons/no_eye.png -text
@@ -3804,12 +3806,15 @@ templates/tiki-browse_gallery.tpl -text
 templates/tiki-browse_image.tpl -text
 templates/tiki-calendar.tpl -text
 templates/tiki-calendar_box.tpl -text
+templates/tiki-calendar_box_multiple.tpl -text
 templates/tiki-calendar_calmode.tpl -text
 templates/tiki-calendar_daymode.tpl -text
 templates/tiki-calendar_edit_item.tpl -text
 templates/tiki-calendar_import.tpl -text
 templates/tiki-calendar_listmode.tpl -text
 templates/tiki-calendar_nav.tpl -text
+templates/tiki-calendar_params_ical.tpl -text
+templates/tiki-calendar_weekmode.tpl -text
 templates/tiki-categpermissions.tpl -text
 templates/tiki-change_password.tpl -text
 templates/tiki-charts.tpl -text
@@ -4199,6 +4204,7 @@ tests/test_cvs_file.txt -text
 /tiki-calendar_edit_item.php -text
 /tiki-calendar_export_ical.php -text
 /tiki-calendar_import.php -text
+/tiki-calendar_params_ical.php -text
 /tiki-calendar_setup.php -text
 /tiki-calendars_rss.php -text
 /tiki-categpermissions.php -text
