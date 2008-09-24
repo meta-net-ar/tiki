@@ -1,8 +1,15 @@
-D
+A
 dir
-/branches/experimental/upgrade/lib/compat
+/trunk/installer/schema
+/branches/experimental/upgrade/installer/schema
+14836
 
 
+A
+dir
+/trunk/installer/script
+/branches/experimental/upgrade/installer/script
+14836
 
 
 
