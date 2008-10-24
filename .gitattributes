@@ -1563,6 +1563,12 @@ lib/contribution/contributionlib.php -text
 lib/contribution/index.php -text
 lib/copyrights/copyrightslib.php -text
 lib/copyrights/index.php -text
+lib/core/lib/JitFilter.php -text
+lib/core/test/AllTests.php -text
+lib/core/test/JitFilter/AccessTest.php -text
+lib/core/test/JitFilter/AllTests.php -text
+lib/core/test/JitFilter/FilterTest.php -text
+lib/core/test/JitFilter/IteratorTest.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/db/tikitable.php -text
