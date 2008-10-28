@@ -1227,7 +1227,13 @@ installer/schema/20081014_trust_input_perm_tiki.sql -text
 installer/schema/20081018_filter_perms_tiki.sql -text
 installer/schema/20081019_score_tiki.sql -text
 installer/schema/20081022_application_menu_tiki.sql -text
-installer/schema/20081024_fulltext_file.sql -text
+installer/schema/20081024_fulltext_file_tiki.sql -text
+installer/schema/20081027_calendar_tiki.sql -text
+installer/schema/20081027_file_galleries_tiki.sql -text
+installer/schema/20081027_groupalert.sql -text
+installer/schema/20081027_surveys_tiki.sql -text
+installer/schema/20081027_trackers_tiki.sql -text
+installer/schema/20081027_wysiwyg_history_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1654,6 +1660,7 @@ lib/graph-engine/pdflib.php -text
 lib/graph-engine/ps.php -text
 lib/graph2/ARIALBD.TTF -text svneol=unset#unset
 lib/graph2/graph.php -text
+lib/groupalert/groupalertlib.php -text
 lib/hawhaw/hawhaw.inc -text
 lib/hawhaw/hawiki.inc -text
 lib/hawhaw/hawiki_cfg.inc -text
@@ -2430,6 +2437,8 @@ lib/smarty_tiki/function.count.php -text
 lib/smarty_tiki/function.ed.php -text
 lib/smarty_tiki/function.editform.php -text
 lib/smarty_tiki/function.elapsed.php -text
+lib/smarty_tiki/function.fgal_browse.php -text
+lib/smarty_tiki/function.fileinfo.php -text
 lib/smarty_tiki/function.gallery.php -text
 lib/smarty_tiki/function.help.php -text
 lib/smarty_tiki/function.helplink.php -text
@@ -2450,8 +2459,10 @@ lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.reindex_file_pixel.php -text
 lib/smarty_tiki/function.rss.php -text
 lib/smarty_tiki/function.sameurl.php -text
+lib/smarty_tiki/function.select_all.php -text
 lib/smarty_tiki/function.set.php -text
 lib/smarty_tiki/function.show_sort.php -text
+lib/smarty_tiki/function.thumb.php -text
 lib/smarty_tiki/function.tikicon.php -text
 lib/smarty_tiki/function.tree.php -text
 lib/smarty_tiki/function.var_dump.php -text
