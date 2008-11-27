@@ -1237,9 +1237,14 @@ installer/schema/20081027_wysiwyg_history_tiki.sql -text
 installer/schema/20081029_tracker_index_tiki.sql -text
 installer/schema/20081102_application_menu_structures_tiki.sql -text
 installer/schema/20081105_calendar_items_allday_tiki.sql -text
+installer/schema/20081105_calendar_items_allday_update.sql -text
 installer/schema/20081107_menu42_tiki.sql -text
 installer/schema/20081112_tiki_p_tracker_view_comments_tiki.sql -text
 installer/schema/20081114_tiki_banner_tiki.sql -text
+installer/schema/20081119_tiki_p_export_tracker_tiki.sql -text
+installer/schema/20081120_showCategories_tiki.sql -text
+installer/schema/20081120_tiki_poll_structures_update.sql -text
+installer/schema/20081125_tiki_tracker_types.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2139,6 +2144,7 @@ lib/pear/Net/DNS/RR/SRV.php -text
 lib/pear/Net/DNS/RR/TSIG.php -text
 lib/pear/Net/DNS/RR/TXT.php -text
 lib/pear/Net/DNS/Resolver.php -text
+lib/pear/Net/Ping.php -text
 lib/pear/Net/Socket.php -text
 lib/pear/Net/URL.php -text
 lib/pear/Net/index.php -text
@@ -2709,6 +2715,7 @@ lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
 lib/wiki-plugins/wikiplugin_sf.php -text
+lib/wiki-plugins/wikiplugin_sharethis.php -text
 lib/wiki-plugins/wikiplugin_sheet.php -text
 lib/wiki-plugins/wikiplugin_showpages.php -text
 lib/wiki-plugins/wikiplugin_skype.php -text
@@ -3302,6 +3309,7 @@ templates/bidi.tpl -text
 templates/blog-heading.tpl -text
 templates/browse_file_gallery.tpl -text
 templates/browsedcategory.tpl -text
+templates/categSelectAll.tpl -text
 templates/categobjects.tpl -text
 templates/categorize.tpl -text
 templates/categpath.tpl -text
@@ -3597,7 +3605,6 @@ templates/styles/simple/modules/mod-search_wiki_page_new.tpl -text
 templates/styles/simple/modules/mod-shoutbox.tpl -text
 templates/styles/simple/modules/mod-switch_lang.tpl -text
 templates/styles/simple/modules/mod-switch_lang2.tpl -text
-templates/styles/simple/tiki-blog_post.tpl -text
 templates/styles/simple/tiki-print_article.tpl -text
 templates/styles/simple/tiki-view_blog.tpl -text
 templates/styles/simple/tiki-view_blog_post.tpl -text
@@ -3607,8 +3614,6 @@ templates/styles/tikineat/tiki-site_header.tpl -text
 templates/styles/tikineat/tiki-top_bar.tpl -text
 templates/styles/tikineat/tiki.tpl -text
 templates/styles/tikinewt/index.php -text
-templates/tables/index.php -text
-templates/tables/tiki_pages.tpl -text
 templates/textareasize.tpl -text
 templates/tiki-action_calendar.tpl -text
 templates/tiki-admin-include-ads.tpl -text
@@ -3765,6 +3770,7 @@ templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
 templates/tiki-export_tracker.tpl -text
+templates/tiki-export_tracker_item.tpl -text
 templates/tiki-export_users.tpl -text
 templates/tiki-faq_questions.tpl -text
 templates/tiki-featured_link.tpl -text
@@ -3980,6 +3986,7 @@ templates/tiki-view_tracker_more_info.tpl -text
 templates/tiki-webmail.tpl -text
 templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
+templates/tiki-wiki_topline.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_item_field_googlemap_value.tpl -text
