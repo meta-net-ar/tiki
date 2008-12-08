@@ -1,20 +1,13 @@
 A
 dir
-/third_party/slideshow/css
+/trunk/lib/slideshow_tiki
 
 
 
 
-A
+D
 dir
-/third_party/slideshow/js
-
-
-
-
-A
-dir
-/third_party/slideshow
+/trunk/lib/slideshow
 
 
 
