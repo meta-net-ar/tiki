@@ -3269,6 +3269,9 @@ pics/trans.png -text
 styles/BiDi/BiDi.css -text
 styles/BiDi/index.php -text
 styles/amette/gradient.png -text
+styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
+styles/coelesce/search.jpg -text svneol=unset#image/jpeg
+styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/down.png -text
 styles/darkroom/right.css -text
