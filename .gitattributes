@@ -3576,6 +3576,7 @@ templates/modules/mod-wiki_last_comments.tpl -text
 templates/modules/mod-wiki_last_comments.tpl.nocache -text
 templates/modules/user_module.tpl -text
 templates/multiplayer.tpl -text
+templates/page-controls-footer.tpl -text
 templates/pagehistory.tpl -text
 templates/plugins/plugin-topfriends.tpl -text
 templates/poll.tpl -text
