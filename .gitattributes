@@ -3985,6 +3985,7 @@ templates/tiki-view_blog_post.tpl -text
 templates/tiki-view_cache.tpl -text
 templates/tiki-view_chart.tpl -text
 templates/tiki-view_chart_item.tpl -text
+templates/tiki-view_comments.tpl -text
 templates/tiki-view_faq.tpl -text
 templates/tiki-view_forum.tpl -text
 templates/tiki-view_forum_thread.tpl -text
@@ -4411,6 +4412,7 @@ tests/test_cvs_file.txt -text
 /tiki-view_cache.php -text
 /tiki-view_chart.php -text
 /tiki-view_chart_item.php -text
+/tiki-view_comments.php -text
 /tiki-view_faq.php -text
 /tiki-view_forum.php -text
 /tiki-view_forum_thread.php -text
