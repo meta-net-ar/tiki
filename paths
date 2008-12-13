@@ -1,6 +1,27 @@
-D
+A
 dir
-/branches/experimental/declfilter
+/trunk/lib/core/test/Multilingual
+
+
+
+
+A
+dir
+/trunk/lib/core/test/Multilingual/Aligner
+
+
+
+
+A
+dir
+/trunk/lib/core/lib/Multilingual
+
+
+
+
+A
+dir
+/trunk/lib/core/lib/Multilingual/Aligner
 
 
 
