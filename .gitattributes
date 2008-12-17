@@ -1542,6 +1542,7 @@ lib/Horde/Yaml/Exception.php -text
 lib/Horde/Yaml/Loader.php -text
 lib/Horde/Yaml/Node.php -text
 lib/TikiPageControls.php -text
+lib/TikiPageControls_Blog.php -text
 lib/TikiPageControls_Wiki.php -text
 lib/admin/adminlib.php -text
 lib/admin/index.php -text
