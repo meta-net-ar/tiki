@@ -4396,6 +4396,7 @@ tests/test_cvs_file.txt -text
 /tiki-replicate_console.php -text
 /tiki-rollback.php -text
 /tiki-rss_error.php -text
+/tiki-search.php -text
 /tiki-search_stats.php -text
 /tiki-searchindex.php -text
 /tiki-searchresults.php -text
