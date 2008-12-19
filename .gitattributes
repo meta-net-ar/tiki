@@ -2536,6 +2536,7 @@ lib/smarty_tiki/modifier.htmldecode.php -text
 lib/smarty_tiki/modifier.iconify.php -text
 lib/smarty_tiki/modifier.isodate.php -text
 lib/smarty_tiki/modifier.kbsize.php -text
+lib/smarty_tiki/modifier.langname.php -text
 lib/smarty_tiki/modifier.lcfirst.php -text
 lib/smarty_tiki/modifier.max_user_inscriptions.php -text
 lib/smarty_tiki/modifier.nlbr.php -text
@@ -2558,6 +2559,7 @@ lib/smarty_tiki/modifier.truncate.php -text
 lib/smarty_tiki/modifier.userlink.php -text
 lib/smarty_tiki/modifier.username.php -text
 lib/smarty_tiki/modifier.utf8unicode.php -text
+lib/smarty_tiki/modifier.yesno.php -text
 lib/smarty_tiki/outputfilter.highlight.php -text
 lib/smarty_tiki/outputfilter.ticket.php -text
 lib/smarty_tiki/prefilter.ticket.php -text
@@ -4018,6 +4020,7 @@ templates/tiki-userfiles.tpl -text
 templates/tiki-usermenu.tpl -text
 templates/tiki-userversions.tpl -text
 templates/tiki-view-sheets.tpl -text
+templates/tiki-view_articles-titleonly.tpl -text
 templates/tiki-view_articles.tpl -text
 templates/tiki-view_banner.tpl -text
 templates/tiki-view_blog.tpl -text
