@@ -1712,6 +1712,7 @@ lib/ical/iCal/TimeZone.php -text
 lib/ical/iCal/ToDo.php -text
 lib/ical/iCal/ValueDataType.php -text
 lib/ical/iCal/iCalendar.php -text
+lib/imageannotation/annotation-js.js -text
 lib/imagegals/imagegallib.js -text
 lib/imagegals/imagegallib.php -text
 lib/imagegals/index.php -text
@@ -3266,6 +3267,7 @@ styles/darkroom/down.png -text
 styles/darkroom/right.css -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
 styles/feb12/pagebg.jpg -text svneol=unset#image/jpeg
+styles/imageannotation/default.css -text
 styles/index.php -text
 styles/integrator/README -text
 styles/integrator/default.css -text
@@ -4114,6 +4116,7 @@ tests/test_cvs_file.txt -text
 /tiki-admingroups.php -text
 /tiki-adminusers.php -text
 /tiki-all_languages.php -text
+/tiki-annotation_edit.php -text
 /tiki-approve_staging_page.php -text
 /tiki-article_types.php -text
 /tiki-articles_rss.php -text
