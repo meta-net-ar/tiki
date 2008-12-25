@@ -2299,6 +2299,24 @@ lib/pear/XML/Dump.php -text
 lib/pear/XML/RPC.php -text
 lib/pear/XML/Server.php -text
 lib/pear/XML/index.php -text
+lib/pear/XML_Parser/Parser.php -text
+lib/pear/XML_Parser/Parser/Simple.php -text
+lib/pear/XML_Parser/examples/xml_parser_file.php -text
+lib/pear/XML_Parser/examples/xml_parser_file.xml -text
+lib/pear/XML_Parser/examples/xml_parser_funcmode.php -text
+lib/pear/XML_Parser/examples/xml_parser_handler.php -text
+lib/pear/XML_Parser/examples/xml_parser_simple1.php -text
+lib/pear/XML_Parser/examples/xml_parser_simple1.xml -text
+lib/pear/XML_Parser/examples/xml_parser_simple2.php -text
+lib/pear/XML_Parser/examples/xml_parser_simple2.xml -text
+lib/pear/XML_Parser/examples/xml_parser_simple_handler.php -text
+lib/pear/XML_Parser/tests/001.phpt -text
+lib/pear/XML_Parser/tests/002.phpt -text
+lib/pear/XML_Parser/tests/003.phpt -text
+lib/pear/XML_Parser/tests/004.phpt -text
+lib/pear/XML_Parser/tests/005.phpt -text
+lib/pear/XML_Parser/tests/test2.xml -text
+lib/pear/XML_Parser/tests/test3.xml -text
 lib/pear/index.php -text
 lib/phplayers_tiki/index.php -text
 lib/phplayers_tiki/lib/index.php -text
@@ -2797,6 +2815,7 @@ lib/wiki/semanticlib.php -text
 lib/wiki/wiki-ajax.js -text
 lib/wiki/wiki-ajax.php -text
 lib/wiki/wikilib.php -text
+lib/wiki/xmllib.php -text
 lib/wiki3d/Balancer.class -text svneol=unset#unset
 lib/wiki3d/Balancer.java -text
 lib/wiki3d/Camera.class -text svneol=unset#unset
@@ -3819,6 +3838,8 @@ templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
+templates/tiki-export_comment_xml.tpl -text
+templates/tiki-export_page_xml.tpl -text
 templates/tiki-export_tracker.tpl -text
 templates/tiki-export_tracker_item.tpl -text
 templates/tiki-export_users.tpl -text
@@ -3866,6 +3887,7 @@ templates/tiki-ical.tpl -text
 templates/tiki-imexport_languages.tpl -text
 templates/tiki-import-sheets.tpl -text
 templates/tiki-import_structuredtext.tpl -text
+templates/tiki-import_xml_zip.tpl -text
 templates/tiki-index_p.tpl -text
 templates/tiki-information.tpl -text
 templates/tiki-install.tpl -text
@@ -4066,6 +4088,7 @@ tests/.htaccess -text
 tests/index.php -text
 tests/messu-compose.tpl -text
 tests/test_cvs_file.txt -text
+tests/testfile.txt -text
 /textareasize.php -text
 /tiki-action_calendar.php -text
 /tiki-admin.php -text
@@ -4284,6 +4307,7 @@ tests/test_cvs_file.txt -text
 /tiki-import_sheet.php -text
 /tiki-import_structuredtext.php -text
 /tiki-import_tracker.php -text
+/tiki-import_xml_zip.php -text
 /tiki-index.php -text
 /tiki-index_p.php -text
 /tiki-index_raw.php -text
@@ -4367,7 +4391,6 @@ tests/test_cvs_file.txt -text
 /tiki-page.php -text
 /tiki-page_loader.php -text
 /tiki-pagehistory.php -text
-/tiki-pagesetup.php -text
 /tiki-parsemode_setup.php -text
 /tiki-phpinfo.php -text
 /tiki-pick_avatar.php -text
