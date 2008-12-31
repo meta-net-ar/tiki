@@ -1584,6 +1584,12 @@ lib/contribution/contributionlib.php -text
 lib/contribution/index.php -text
 lib/copyrights/copyrightslib.php -text
 lib/copyrights/index.php -text
+lib/core/lib/AccessControl.php -text
+lib/core/lib/AccessControl/Accessor.php -text
+lib/core/lib/AccessControl/Exception.php -text
+lib/core/lib/AccessControl/Resolver.php -text
+lib/core/lib/AccessControl/Resolver/Stack.php -text
+lib/core/lib/AccessControl/Resolver/Static.php -text
 lib/core/lib/DeclFilter.php -text
 lib/core/lib/DeclFilter/CatchAllFilterRule.php -text
 lib/core/lib/DeclFilter/CatchAllUnsetRule.php -text
@@ -1609,6 +1615,11 @@ lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
 lib/core/lib/TikiFilter/RawUnsafe.php -text
 lib/core/lib/TikiFilter/Word.php -text
+lib/core/test/AccessControl/AllTests.php -text
+lib/core/test/AccessControl/BaseTest.php -text
+lib/core/test/AccessControl/Resolver/AllTests.php -text
+lib/core/test/AccessControl/Resolver/StackTest.php -text
+lib/core/test/AccessControl/Resolver/StaticTest.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/DeclFilter/AllTests.php -text
 lib/core/test/DeclFilter/BaseTest.php -text
