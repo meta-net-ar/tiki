@@ -1,13 +1,13 @@
 M
 dir
-/branches/experimental/ui-revamp
+/branches/experimental/perms
 
 
 
 
 A
 dir
-/branches/experimental/ui-revamp/templates/print
+/branches/experimental/perms/templates/print
 /trunk/templates/print
 16177
 
