@@ -1,13 +1,13 @@
 M
 dir
-/branches/experimental/annotation
+/branches/experimental/ui-revamp
 
 
 
 
 A
 dir
-/branches/experimental/annotation/templates/print
+/branches/experimental/ui-revamp/templates/print
 /trunk/templates/print
 16177
 
