@@ -4061,6 +4061,7 @@ templates/tiki-view_banner.tpl -text
 templates/tiki-view_blog.tpl -text
 templates/tiki-view_blog_post.tpl -text
 templates/tiki-view_cache.tpl -text
+templates/tiki-view_categories.tpl -text
 templates/tiki-view_chart.tpl -text
 templates/tiki-view_chart_item.tpl -text
 templates/tiki-view_comments.tpl -text
@@ -4493,6 +4494,7 @@ tests/testfile.txt -text
 /tiki-view_blog_post.php -text
 /tiki-view_blog_post_image.php -text
 /tiki-view_cache.php -text
+/tiki-view_categories.php -text
 /tiki-view_chart.php -text
 /tiki-view_chart_item.php -text
 /tiki-view_comments.php -text
