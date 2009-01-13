@@ -1912,6 +1912,13 @@ lib/integrator/index.php -text
 lib/integrator/integrator.php -text
 lib/jgraphpad/index.php -text
 lib/jgraphpad/jgraphpad.jar -text
+lib/jquery/index.php -text
+lib/jquery/jquery.js -text
+lib/jquery/jquery.lite.js -text
+lib/jquery/jquery.min.js -text
+lib/jquery/jquery.pack.js -text
+lib/jquery_tiki/index.php -text
+lib/jquery_tiki/tiki-jquery.js -text
 lib/live_support/index.php -text
 lib/live_support/live-support.js -text svneol=unset#application/octet-stream
 lib/live_support/lsadminlib.php -text
