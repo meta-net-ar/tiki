@@ -1252,6 +1252,7 @@ installer/schema/20081211_score_tiki.sql -text
 installer/schema/20081212_tiki_p_view_backlinks_tiki.sql -text
 installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
+installer/schema/20090120_lost_2.0to3.0.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1722,8 +1723,6 @@ lib/graph-engine/graph.multiline.php -text
 lib/graph-engine/graph.pie.php -text
 lib/graph-engine/pdflib.php -text
 lib/graph-engine/ps.php -text
-lib/graph2/ARIALBD.TTF -text svneol=unset#unset
-lib/graph2/graph.php -text
 lib/groupalert/groupalertlib.php -text
 lib/groupalert/index.php -text
 lib/hawhaw/hawhaw.inc -text
@@ -2326,6 +2325,7 @@ lib/phplayers_tiki/tiki-phplayers.php -text
 lib/polls/index.php -text
 lib/polls/polllib.php -text
 lib/polls/polllib_shared.php -text
+lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
 lib/profilelib/listlib.php -text
 lib/profilelib/profilelib.php -text
@@ -2740,6 +2740,8 @@ lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
+lib/wiki-plugins/wikiplugin_footnote.php -text
+lib/wiki-plugins/wikiplugin_footnotearea.php -text
 lib/wiki-plugins/wikiplugin_ftp.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
@@ -2759,6 +2761,7 @@ lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
 lib/wiki-plugins/wikiplugin_mouseover.php -text
+lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
 lib/wiki-plugins/wikiplugin_picture.php -text
@@ -4226,6 +4229,7 @@ tests/testfile.txt -text
 /tiki-calendars_rss.php -text
 /tiki-categpermissions.php -text
 /tiki-change_password.php -text
+/tiki-channel.php -text
 /tiki-charts.php -text
 /tiki-cms_rankings.php -text
 /tiki-confirm_user_email.php -text
@@ -4451,6 +4455,7 @@ tests/testfile.txt -text
 /tiki-searchindex.php -text
 /tiki-searchresults.php -text
 /tiki-section_options.php -text
+/tiki-sefurl.php -text
 /tiki-send_blog_post.php -text
 /tiki-send_newsletters.php -text
 /tiki-send_objects.php -text
