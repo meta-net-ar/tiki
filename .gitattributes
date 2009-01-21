@@ -1252,6 +1252,8 @@ installer/schema/20081211_score_tiki.sql -text
 installer/schema/20081212_tiki_p_view_backlinks_tiki.sql -text
 installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
+installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
+installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1605,6 +1607,9 @@ lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
 lib/core/lib/TikiFilter/RawUnsafe.php -text
 lib/core/lib/TikiFilter/Word.php -text
+lib/core/lib/WikiParser/PluginArgumentParser.php -text
+lib/core/lib/WikiParser/PluginParser.php -text
+lib/core/lib/WikiParser/PluginRunner.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/DeclFilter/AllTests.php -text
 lib/core/test/DeclFilter/BaseTest.php -text
@@ -1629,6 +1634,9 @@ lib/core/test/TikiFilter/CallbackTest.php -text
 lib/core/test/TikiFilter/MapTest.php -text
 lib/core/test/TikiFilter/WordTest.php -text
 lib/core/test/TikiFilter/XssTest.php -text
+lib/core/test/WikiParser/AllTests.php -text
+lib/core/test/WikiParser/PluginArgumentParserTest.php -text
+lib/core/test/WikiParser/PluginParserTest.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/db/tikitable.php -text
@@ -2756,6 +2764,7 @@ lib/phplayers_tiki/tiki-phplayers.php -text
 lib/polls/index.php -text
 lib/polls/polllib.php -text
 lib/polls/polllib_shared.php -text
+lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
 lib/profilelib/listlib.php -text
 lib/profilelib/profilelib.php -text
@@ -3169,6 +3178,8 @@ lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
+lib/wiki-plugins/wikiplugin_footnote.php -text
+lib/wiki-plugins/wikiplugin_footnotearea.php -text
 lib/wiki-plugins/wikiplugin_ftp.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
@@ -3405,6 +3416,7 @@ modules/mod-random_images.php -text
 modules/mod-random_pages.php -text
 modules/mod-semantic_links.php -text
 modules/mod-shoutbox.php -text
+modules/mod-shoutjax.php -text
 modules/mod-since_last_visit.php -text
 modules/mod-since_last_visit_new.php -text
 modules/mod-switch_lang.php -text
@@ -3747,9 +3759,11 @@ styles/BiDi/index.php -text
 styles/amette/gradient.png -text
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/down.png -text
+styles/darkroom/options/small-type.css -text
 styles/darkroom/right.css -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
-styles/feb12/pagebg.jpg -text svneol=unset#image/jpeg
+styles/feb12/header.jpg -text svneol=unset#image/jpeg
+styles/feb12/page.jpg -text svneol=unset#image/jpeg
 styles/index.php -text
 styles/integrator/README -text
 styles/integrator/default.css -text
@@ -4024,6 +4038,7 @@ templates/modules/mod-search_wiki_page_new.tpl -text
 templates/modules/mod-semantic_links.tpl -text
 templates/modules/mod-shoutbox.tpl -text
 templates/modules/mod-shoutbox.tpl.nocache -text
+templates/modules/mod-shoutjax.tpl -text
 templates/modules/mod-since_last_visit.tpl -text
 templates/modules/mod-since_last_visit_new.tpl -text
 templates/modules/mod-switch_lang.tpl -text
@@ -4510,6 +4525,7 @@ templates/wiki-plugins/error_tracker.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
+templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroup.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroups.tpl -text
@@ -4521,7 +4537,6 @@ templates/wiki-plugins/wikiplugin_vote.tpl -text
 templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
-templates/wikiplugin_listpagenames.tpl -text
 tests/.htaccess -text
 tests/index.php -text
 tests/messu-compose.tpl -text
@@ -4643,6 +4658,7 @@ tests/testfile.txt -text
 /tiki-calendars_rss.php -text
 /tiki-categpermissions.php -text
 /tiki-change_password.php -text
+/tiki-channel.php -text
 /tiki-charts.php -text
 /tiki-cms_rankings.php -text
 /tiki-confirm_user_email.php -text
@@ -4867,6 +4883,7 @@ tests/testfile.txt -text
 /tiki-searchindex.php -text
 /tiki-searchresults.php -text
 /tiki-section_options.php -text
+/tiki-sefurl.php -text
 /tiki-send_blog_post.php -text
 /tiki-send_newsletters.php -text
 /tiki-send_objects.php -text
@@ -4874,6 +4891,7 @@ tests/testfile.txt -text
 /tiki-setup_base.php -text
 /tiki-sheets.php -text
 /tiki-shoutbox.php -text
+/tiki-shoutjax.php -text
 /tiki-show_all_images.php -text
 /tiki-show_calendar.php -text
 /tiki-show_user_avatar.php -text
