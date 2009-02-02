@@ -1254,6 +1254,7 @@ installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
 installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
 installer/schema/20090120_sefurl_rules_tiki.sql -text
+installer/schema/20090129_callendar_search_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1602,13 +1603,17 @@ lib/core/lib/JitFilter/Element.php -text
 lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
+lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
 lib/core/lib/TikiFilter/RawUnsafe.php -text
 lib/core/lib/TikiFilter/Word.php -text
 lib/core/lib/WikiParser/PluginArgumentParser.php -text
+lib/core/lib/WikiParser/PluginDefinition.php -text
+lib/core/lib/WikiParser/PluginMatcher.php -text
 lib/core/lib/WikiParser/PluginParser.php -text
+lib/core/lib/WikiParser/PluginRepository.php -text
 lib/core/lib/WikiParser/PluginRunner.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/DeclFilter/AllTests.php -text
@@ -1629,6 +1634,8 @@ lib/core/test/Multilingual/Aligner/BilingualAlignerTest.php -text
 lib/core/test/Multilingual/Aligner/SentenceSegmentorTest.php -text
 lib/core/test/Multilingual/Aligner/ShortestPathFinderTest.php -text
 lib/core/test/Multilingual/AllTests.php -text
+lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
+lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/core/test/TikiFilter/AllTests.php -text
 lib/core/test/TikiFilter/CallbackTest.php -text
 lib/core/test/TikiFilter/MapTest.php -text
@@ -1636,7 +1643,10 @@ lib/core/test/TikiFilter/WordTest.php -text
 lib/core/test/TikiFilter/XssTest.php -text
 lib/core/test/WikiParser/AllTests.php -text
 lib/core/test/WikiParser/PluginArgumentParserTest.php -text
+lib/core/test/WikiParser/PluginMatcherTest.php -text
 lib/core/test/WikiParser/PluginParserTest.php -text
+lib/core/test/WikiParser/PluginRepositoryTest.php -text
+lib/core/test/WikiParser/wikiplugin_foo.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/db/tikitable.php -text
@@ -3195,6 +3205,7 @@ lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
+lib/wiki-plugins/wikiplugin_mediaplayer.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
