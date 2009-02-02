@@ -1931,9 +1931,7 @@ lib/jgraphpad/index.php -text
 lib/jgraphpad/jgraphpad.jar -text
 lib/jquery/index.php -text
 lib/jquery/jquery.js -text
-lib/jquery/jquery.lite.js -text
 lib/jquery/jquery.min.js -text
-lib/jquery/jquery.pack.js -text
 lib/jquery/jquery.ui/AUTHORS.txt -text
 lib/jquery/jquery.ui/GPL-LICENSE.txt -text
 lib/jquery/jquery.ui/MIT-LICENSE.txt -text
