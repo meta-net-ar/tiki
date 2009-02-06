@@ -3815,6 +3815,7 @@ templates/find.tpl -text
 templates/footer.tpl -text
 templates/freetag.tpl -text
 templates/freetag_list.tpl -text
+templates/header_jquery.tpl -text
 templates/header_simple.tpl -text
 templates/index.php -text
 templates/information.tpl -text
