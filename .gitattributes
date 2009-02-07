@@ -1,4 +1,5 @@
 * text=auto !eol
+/.project -text
 /INSTALL -text
 /README -text
 /_htaccess -text
@@ -3764,6 +3765,7 @@ styles/transitions/1.9to2.2.css -text
 styles/transitions/1.9to3.0.css -text
 styles/transitions/2.0to3.0.css -text
 styles/transitions/index.php -text
+/svn-commit.tmp -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
