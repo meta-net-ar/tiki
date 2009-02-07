@@ -1258,6 +1258,7 @@ installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/schema/20090129_callendar_search_tiki.sql -text
 installer/schema/20090203_null_tiki.sql -text
 installer/schema/20090205_menucase_tiki.sql -text
+installer/schema/20090206_content_tpl_menu_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -3765,7 +3766,6 @@ styles/transitions/1.9to2.2.css -text
 styles/transitions/1.9to3.0.css -text
 styles/transitions/2.0to3.0.css -text
 styles/transitions/index.php -text
-/svn-commit.tmp -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
