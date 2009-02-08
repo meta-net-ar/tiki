@@ -1291,6 +1291,7 @@ lang/fi/index.php -text
 lang/fi/language.php -text
 lang/fj/index.php -text
 lang/fj/language.php -text
+lang/flagmapping.php -text
 lang/fr/custom.php_example -text
 lang/fr/index.php -text
 lang/fr/language.php -text
@@ -4279,7 +4280,6 @@ templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
 templates/tiki-export_comment_xml.tpl -text
 templates/tiki-export_page_xml.tpl -text
-templates/tiki-export_tracker.tpl -text
 templates/tiki-export_tracker_item.tpl -text
 templates/tiki-export_users.tpl -text
 templates/tiki-faq_questions.tpl -text
