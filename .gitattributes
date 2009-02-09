@@ -1174,6 +1174,7 @@ img/stop2.jpg -text
 img/tiki.jpg -text
 img/tiki/index.php -text
 img/tiki/powertw.gif -text
+img/tiki/tiki3.png -text
 img/tiki/tikibutton.png -text
 img/tiki/tikibutton2.png -text
 img/tiki/tikibutton3.png -text
@@ -1256,6 +1257,8 @@ installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
 installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/schema/20090129_callendar_search_tiki.sql -text
 installer/schema/20090203_null_tiki.sql -text
+installer/schema/20090205_menucase_tiki.sql -text
+installer/schema/20090206_content_tpl_menu_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1288,6 +1291,7 @@ lang/fi/index.php -text
 lang/fi/language.php -text
 lang/fj/index.php -text
 lang/fj/language.php -text
+lang/flagmapping.php -text
 lang/fr/custom.php_example -text
 lang/fr/index.php -text
 lang/fr/language.php -text
@@ -2751,6 +2755,7 @@ lib/wiki-plugins/wikiplugin_draw.php -text
 lib/wiki-plugins/wikiplugin_equation.php -text
 lib/wiki-plugins/wikiplugin_events.php -text
 lib/wiki-plugins/wikiplugin_example.php -text
+lib/wiki-plugins/wikiplugin_fade.php -text
 lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
@@ -2838,67 +2843,13 @@ lib/wiki/wiki-ajax.js -text
 lib/wiki/wiki-ajax.php -text
 lib/wiki/wikilib.php -text
 lib/wiki/xmllib.php -text
-lib/wiki3d/Balancer.class -text svneol=unset#unset
-lib/wiki3d/Balancer.java -text
-lib/wiki3d/Camera.class -text svneol=unset#unset
-lib/wiki3d/Camera.java -text
-lib/wiki3d/Config.class -text svneol=unset#unset
-lib/wiki3d/Config.java -text
-lib/wiki3d/Face.class -text svneol=unset#unset
-lib/wiki3d/Face.java -text
-lib/wiki3d/Graph.class -text svneol=unset#unset
-lib/wiki3d/Graph.java -text
-lib/wiki3d/Matrix3D.class -text svneol=unset#unset
-lib/wiki3d/Matrix3D.java -text
-lib/wiki3d/Navigator.class -text svneol=unset#unset
-lib/wiki3d/Navigator.java -text
-lib/wiki3d/Node.class -text svneol=unset#unset
-lib/wiki3d/Node.java -text
+lib/wiki3d/CHANGELOG -text
+lib/wiki3d/CREDITS.txt -text
+lib/wiki3d/LGPL.txt -text
+lib/wiki3d/LICENSE.txt -text
 lib/wiki3d/README.txt -text
-lib/wiki3d/SpeedVector.class -text svneol=unset#unset
-lib/wiki3d/SpeedVector.java -text
-lib/wiki3d/Vertex.class -text svneol=unset#unset
-lib/wiki3d/Vertex.java -text
-lib/wiki3d/XmlReader.class -text svneol=unset#unset
-lib/wiki3d/XmlReader.java -text
-lib/wiki3d/morcego-0.3.jar -text
-lib/wiki3d/morcego-0.4.0.jar -text
-lib/wiki3d/src/java/br/arca/morcego/Config.java -text
-lib/wiki3d/src/java/br/arca/morcego/Morcego.java -text
-lib/wiki3d/src/java/br/arca/morcego/component/DescriptionBox.java -text
-lib/wiki3d/src/java/br/arca/morcego/component/LocalImage.java -text
-lib/wiki3d/src/java/br/arca/morcego/image/Arca.jpg -text
-lib/wiki3d/src/java/br/arca/morcego/image/Logo.jpg -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Camera.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Matrix2x3.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Matrix3x3.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/PositionedObject.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/PunctualBody.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Spring.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Vector3D.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/VisibleObject.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Animator.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Balancer.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Feeder.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Renderer.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Rotator.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Graph.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/GraphElement.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/GraphElementFactory.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Link.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Node.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/NodeFactory.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/link/SolidLink.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/node/RoundNode.java -text
-lib/wiki3d/src/java/br/arca/morcego/transport/Transport.java -text
-lib/wiki3d/src/java/br/arca/morcego/transport/XmlrpcTransport.java -text
-lib/wiki3d/src/java/org/apache/xmlrpc/XmlRpcAppletClient.java -text
-lib/wiki3d/src/test/br/arca/morcego/BalancerTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/CameraTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/ConfigTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/Matrix3DTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/Vertex3DTest.java -text
-lib/wiki3d/xmlrpc-1.2-b1.jar -text
+lib/wiki3d/morcego-0.6.0.jar -text
+lib/wiki3d/pom.xml -text
 lib/x/index.php -text
 lib/x/x.js -text
 lib/x/x_anim.js -text
@@ -3340,6 +3291,7 @@ styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/down.png -text
 styles/darkroom/options/small-type.css -text
 styles/darkroom/right.css -text
+styles/darkroom/right.png -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
 styles/feb12/header.jpg -text svneol=unset#image/jpeg
 styles/feb12/page.jpg -text svneol=unset#image/jpeg
