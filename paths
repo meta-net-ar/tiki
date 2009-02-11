@@ -1,6 +1,27 @@
-M
+A
 dir
-/branches/experimental/ui-revamp2
+/branches/experimental/coe/lib/fckeditor_tiki/plugins/mediawiki
+
+
+
+
+A
+dir
+/branches/experimental/coe/lib/fckeditor_tiki/plugins/mediawiki/lang
+
+
+
+
+A
+dir
+/branches/experimental/coe/lib/fckeditor_tiki/plugins/mediawiki/dialogs
+
+
+
+
+A
+dir
+/branches/experimental/coe/lib/fckeditor_tiki/plugins/mediawiki/images
 
 
 
