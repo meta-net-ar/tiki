@@ -3041,6 +3041,7 @@ pics/icons/flag_blue.png -text
 pics/icons/folder.png -text
 pics/icons/folder_add.png -text
 pics/icons/folder_go.png -text
+pics/icons/green_question.png -text
 pics/icons/group.png -text
 pics/icons/group_key.png -text
 pics/icons/help.png -text
@@ -3219,6 +3220,7 @@ pics/large/gnome-settings-font48x48.png -text
 pics/large/gnome-sound-recorder48x48.png -text
 pics/large/google_maps.png -text
 pics/large/google_maps48x48.png -text
+pics/large/green_question48x48.png -text
 pics/large/i18n.png -text
 pics/large/i18n48x48.png -text
 pics/large/icon-configuration.png -text
