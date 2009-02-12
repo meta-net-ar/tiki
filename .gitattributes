@@ -2950,6 +2950,7 @@ modules/mod-users_rank.php -text
 modules/mod-whats_related.php -text
 modules/mod-who_is_there.php -text
 modules/mod-wiki_last_comments.php -text
+modules/mod-youtube.php -text
 pics/help_icon.png -text
 pics/icons/accept.png -text
 pics/icons/add.png -text
@@ -3591,6 +3592,7 @@ templates/modules/mod-who_is_there.tpl -text
 templates/modules/mod-who_is_there.tpl.nocache -text
 templates/modules/mod-wiki_last_comments.tpl -text
 templates/modules/mod-wiki_last_comments.tpl.nocache -text
+templates/modules/mod-youtube.tpl -text
 templates/modules/user_module.tpl -text
 templates/multiplayer.tpl -text
 templates/pagehistory.tpl -text
