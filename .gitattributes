@@ -2522,6 +2522,7 @@ lib/smarty_tiki/function.breadcrumbs.php -text
 lib/smarty_tiki/function.button.php -text
 lib/smarty_tiki/function.content.php -text
 lib/smarty_tiki/function.cookie.php -text
+lib/smarty_tiki/function.cookie_jar.php -text
 lib/smarty_tiki/function.count.php -text
 lib/smarty_tiki/function.ed.php -text
 lib/smarty_tiki/function.editform.php -text
