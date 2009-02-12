@@ -3101,6 +3101,7 @@ pics/icons/no_information.png -text
 pics/icons/note_add.png -text
 pics/icons/ofolder.png -text
 pics/icons/omodule.png -text
+pics/icons/ovmodule.png -text
 pics/icons/package.png -text
 pics/icons/package_go.png -text
 pics/icons/page.png -text
@@ -3183,6 +3184,7 @@ pics/icons/user_delete.png -text
 pics/icons/user_go.png -text
 pics/icons/user_gray.png -text
 pics/icons/user_red.png -text
+pics/icons/vmodule.png -text
 pics/icons/wiki3d.png -text
 pics/icons/world.png -text
 pics/icons/world_add.png -text
