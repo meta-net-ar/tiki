@@ -1239,7 +1239,6 @@ installer/schema/20081027_wysiwyg_history_tiki.sql -text
 installer/schema/20081029_tracker_index_tiki.sql -text
 installer/schema/20081102_application_menu_structures_tiki.sql -text
 installer/schema/20081105_calendar_items_allday_tiki.sql -text
-installer/schema/20081105_calendar_items_allday_update_tiki.sql -text
 installer/schema/20081107_menu42_tiki.sql -text
 installer/schema/20081112_tiki_p_tracker_view_comments_tiki.sql -text
 installer/schema/20081114_tiki_banner_tiki.sql -text
@@ -1260,7 +1259,9 @@ installer/schema/20090129_callendar_search_tiki.sql -text
 installer/schema/20090203_null_tiki.sql -text
 installer/schema/20090205_menucase_tiki.sql -text
 installer/schema/20090206_content_tpl_menu_tiki.sql -text
+installer/schema/20090206_poll_tiki.sql -text
 installer/schema/20090211_mailnotification_tiki.sql -text
+installer/schema/20090212_forum_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -3750,6 +3751,9 @@ pics/trans.png -text
 /show_image.php -text
 styles/BiDi/BiDi.css -text
 styles/BiDi/index.php -text
+styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
+styles/coelesce/search_wide.jpg -text svneol=unset#image/jpeg
+styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/down.png -text
 styles/darkroom/options/small-type.css -text
@@ -3786,6 +3790,15 @@ styles/slideshows/clear.css -text
 styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
+styles/strasa/box_bottom.gif -text
+styles/strasa/box_top.gif -text
+styles/strasa/headerbg.jpg -text svneol=unset#image/jpeg
+styles/strasa/info_icon.png -text svneol=unset#image/png
+styles/strasa/link_icon.png -text svneol=unset#image/png
+styles/strasa/login.jpg -text svneol=unset#image/jpeg
+styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
+styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
+styles/strasa/register.jpg -text svneol=unset#image/jpeg
 styles/tikineat.css -text
 styles/tikineat/options/blue.css -text
 styles/tikineat/options/mono.css -text
@@ -4533,6 +4546,7 @@ templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
 tests/.htaccess -text
+tests/example.txt -text
 tests/index.php -text
 tests/messu-compose.tpl -text
 tests/test_cvs_file.txt -text
