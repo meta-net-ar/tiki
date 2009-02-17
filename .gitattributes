@@ -1244,7 +1244,7 @@ installer/schema/20081112_tiki_p_tracker_view_comments_tiki.sql -text
 installer/schema/20081114_tiki_banner_tiki.sql -text
 installer/schema/20081119_tiki_p_export_tracker_tiki.sql -text
 installer/schema/20081120_showCategories_tiki.sql -text
-installer/schema/20081120_tiki_poll_structures_update.sql -text
+installer/schema/20081120_tiki_poll_structures_update_tiki.sql -text
 installer/schema/20081125_tiki_tracker_types.sql -text
 installer/schema/20081127_calendar_recurrence_tiki.sql -text
 installer/schema/20081130_tiki_users_permission_tiki.sql -text
@@ -3205,6 +3205,7 @@ lib/wiki-plugins/wikiplugin_content.php -text
 lib/wiki-plugins/wikiplugin_cookie.php -text
 lib/wiki-plugins/wikiplugin_copyright.php -text
 lib/wiki-plugins/wikiplugin_countdown.php -text
+lib/wiki-plugins/wikiplugin_dbreport.php -text
 lib/wiki-plugins/wikiplugin_div.php -text
 lib/wiki-plugins/wikiplugin_dl.php -text
 lib/wiki-plugins/wikiplugin_draw.php -text
@@ -3223,6 +3224,7 @@ lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_googledoc.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
+lib/wiki-plugins/wikiplugin_html.php -text
 lib/wiki-plugins/wikiplugin_iframe.php -text
 lib/wiki-plugins/wikiplugin_image.php -text
 lib/wiki-plugins/wikiplugin_img.php -text
