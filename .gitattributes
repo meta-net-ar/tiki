@@ -1174,6 +1174,7 @@ img/stop2.jpg -text
 img/tiki.jpg -text
 img/tiki/index.php -text
 img/tiki/powertw.gif -text
+img/tiki/tiki3.png -text
 img/tiki/tikibutton.png -text
 img/tiki/tikibutton2.png -text
 img/tiki/tikibutton3.png -text
@@ -1237,13 +1238,12 @@ installer/schema/20081027_wysiwyg_history_tiki.sql -text
 installer/schema/20081029_tracker_index_tiki.sql -text
 installer/schema/20081102_application_menu_structures_tiki.sql -text
 installer/schema/20081105_calendar_items_allday_tiki.sql -text
-installer/schema/20081105_calendar_items_allday_update_tiki.sql -text
 installer/schema/20081107_menu42_tiki.sql -text
 installer/schema/20081112_tiki_p_tracker_view_comments_tiki.sql -text
 installer/schema/20081114_tiki_banner_tiki.sql -text
 installer/schema/20081119_tiki_p_export_tracker_tiki.sql -text
 installer/schema/20081120_showCategories_tiki.sql -text
-installer/schema/20081120_tiki_poll_structures_update.sql -text
+installer/schema/20081120_tiki_poll_structures_update_tiki.sql -text
 installer/schema/20081125_tiki_tracker_types.sql -text
 installer/schema/20081127_calendar_recurrence_tiki.sql -text
 installer/schema/20081130_tiki_users_permission_tiki.sql -text
@@ -1252,6 +1252,17 @@ installer/schema/20081211_score_tiki.sql -text
 installer/schema/20081212_tiki_p_view_backlinks_tiki.sql -text
 installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
+installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
+installer/schema/20090120_sefurl_rules_tiki.sql -text
+installer/schema/20090129_callendar_search_tiki.sql -text
+installer/schema/200902026_admin_menu_tiki.sql -text
+installer/schema/20090203_null_tiki.sql -text
+installer/schema/20090205_menucase_tiki.sql -text
+installer/schema/20090206_content_tpl_menu_tiki.sql -text
+installer/schema/20090206_poll_tiki.sql -text
+installer/schema/20090211_mailnotification_tiki.sql -text
+installer/schema/20090212_forum_tiki.sql -text
+installer/schema/20090220_admin_section_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1284,6 +1295,7 @@ lang/fi/index.php -text
 lang/fi/language.php -text
 lang/fj/index.php -text
 lang/fj/language.php -text
+lang/flagmapping.php -text
 lang/fr/custom.php_example -text
 lang/fr/index.php -text
 lang/fr/language.php -text
@@ -1600,11 +1612,18 @@ lib/core/lib/JitFilter/Element.php -text
 lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
+lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
 lib/core/lib/TikiFilter/RawUnsafe.php -text
 lib/core/lib/TikiFilter/Word.php -text
+lib/core/lib/WikiParser/PluginArgumentParser.php -text
+lib/core/lib/WikiParser/PluginDefinition.php -text
+lib/core/lib/WikiParser/PluginMatcher.php -text
+lib/core/lib/WikiParser/PluginParser.php -text
+lib/core/lib/WikiParser/PluginRepository.php -text
+lib/core/lib/WikiParser/PluginRunner.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/DeclFilter/AllTests.php -text
 lib/core/test/DeclFilter/BaseTest.php -text
@@ -1624,11 +1643,20 @@ lib/core/test/Multilingual/Aligner/BilingualAlignerTest.php -text
 lib/core/test/Multilingual/Aligner/SentenceSegmentorTest.php -text
 lib/core/test/Multilingual/Aligner/ShortestPathFinderTest.php -text
 lib/core/test/Multilingual/AllTests.php -text
+lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
+lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/core/test/TikiFilter/AllTests.php -text
 lib/core/test/TikiFilter/CallbackTest.php -text
 lib/core/test/TikiFilter/MapTest.php -text
 lib/core/test/TikiFilter/WordTest.php -text
 lib/core/test/TikiFilter/XssTest.php -text
+lib/core/test/TikiTestCase.php -text
+lib/core/test/WikiParser/AllTests.php -text
+lib/core/test/WikiParser/PluginArgumentParserTest.php -text
+lib/core/test/WikiParser/PluginMatcherTest.php -text
+lib/core/test/WikiParser/PluginParserTest.php -text
+lib/core/test/WikiParser/PluginRepositoryTest.php -text
+lib/core/test/WikiParser/wikiplugin_foo.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/db/tikitable.php -text
@@ -1719,8 +1747,6 @@ lib/graph-engine/graph.multiline.php -text
 lib/graph-engine/graph.pie.php -text
 lib/graph-engine/pdflib.php -text
 lib/graph-engine/ps.php -text
-lib/graph2/ARIALBD.TTF -text svneol=unset#unset
-lib/graph2/graph.php -text
 lib/groupalert/groupalertlib.php -text
 lib/groupalert/index.php -text
 lib/hawhaw/hawhaw.inc -text
@@ -2324,6 +2350,7 @@ lib/phplayers_tiki/tiki-phplayers.php -text
 lib/polls/index.php -text
 lib/polls/polllib.php -text
 lib/polls/polllib_shared.php -text
+lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
 lib/profilelib/listlib.php -text
 lib/profilelib/profilelib.php -text
@@ -2479,10 +2506,12 @@ lib/smarty_tiki/block.compact.php -text
 lib/smarty_tiki/block.display.php -text
 lib/smarty_tiki/block.itemfield.php -text
 lib/smarty_tiki/block.pagination_links.php -text
+lib/smarty_tiki/block.popup_link.php -text
 lib/smarty_tiki/block.remarksbox.php -text
 lib/smarty_tiki/block.repeat.php -text
 lib/smarty_tiki/block.self_link.php -text
 lib/smarty_tiki/block.sortlinks.php -text
+lib/smarty_tiki/block.tabs.php -text
 lib/smarty_tiki/block.textarea.php -text
 lib/smarty_tiki/block.tikimodule.php -text
 lib/smarty_tiki/block.title.php -text
@@ -2559,6 +2588,7 @@ lib/smarty_tiki/modifier.nlbr.php -text
 lib/smarty_tiki/modifier.quoted.php -text
 lib/smarty_tiki/modifier.sefurl.php -text
 lib/smarty_tiki/modifier.star.php -text
+lib/smarty_tiki/modifier.stringfix.php -text
 lib/smarty_tiki/modifier.substring.php -text
 lib/smarty_tiki/modifier.tasklink.php -text
 lib/smarty_tiki/modifier.tiki_date_format.php -text
@@ -2726,22 +2756,29 @@ lib/wiki-plugins/wikiplugin_content.php -text
 lib/wiki-plugins/wikiplugin_cookie.php -text
 lib/wiki-plugins/wikiplugin_copyright.php -text
 lib/wiki-plugins/wikiplugin_countdown.php -text
+lib/wiki-plugins/wikiplugin_dbreport.php -text
 lib/wiki-plugins/wikiplugin_div.php -text
 lib/wiki-plugins/wikiplugin_dl.php -text
 lib/wiki-plugins/wikiplugin_draw.php -text
 lib/wiki-plugins/wikiplugin_equation.php -text
 lib/wiki-plugins/wikiplugin_events.php -text
 lib/wiki-plugins/wikiplugin_example.php -text
+lib/wiki-plugins/wikiplugin_fade.php -text
+lib/wiki-plugins/wikiplugin_fancylist.php -text
 lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
+lib/wiki-plugins/wikiplugin_footnote.php -text
+lib/wiki-plugins/wikiplugin_footnotearea.php -text
 lib/wiki-plugins/wikiplugin_ftp.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_googledoc.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
+lib/wiki-plugins/wikiplugin_html.php -text
 lib/wiki-plugins/wikiplugin_iframe.php -text
+lib/wiki-plugins/wikiplugin_image.php -text
 lib/wiki-plugins/wikiplugin_img.php -text
 lib/wiki-plugins/wikiplugin_include.php -text
 lib/wiki-plugins/wikiplugin_jabber.php -text
@@ -2751,10 +2788,12 @@ lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
+lib/wiki-plugins/wikiplugin_mediaplayer.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
 lib/wiki-plugins/wikiplugin_mouseover.php -text
+lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
 lib/wiki-plugins/wikiplugin_picture.php -text
@@ -2814,67 +2853,13 @@ lib/wiki/wiki-ajax.js -text
 lib/wiki/wiki-ajax.php -text
 lib/wiki/wikilib.php -text
 lib/wiki/xmllib.php -text
-lib/wiki3d/Balancer.class -text svneol=unset#unset
-lib/wiki3d/Balancer.java -text
-lib/wiki3d/Camera.class -text svneol=unset#unset
-lib/wiki3d/Camera.java -text
-lib/wiki3d/Config.class -text svneol=unset#unset
-lib/wiki3d/Config.java -text
-lib/wiki3d/Face.class -text svneol=unset#unset
-lib/wiki3d/Face.java -text
-lib/wiki3d/Graph.class -text svneol=unset#unset
-lib/wiki3d/Graph.java -text
-lib/wiki3d/Matrix3D.class -text svneol=unset#unset
-lib/wiki3d/Matrix3D.java -text
-lib/wiki3d/Navigator.class -text svneol=unset#unset
-lib/wiki3d/Navigator.java -text
-lib/wiki3d/Node.class -text svneol=unset#unset
-lib/wiki3d/Node.java -text
+lib/wiki3d/CHANGELOG -text
+lib/wiki3d/CREDITS.txt -text
+lib/wiki3d/LGPL.txt -text
+lib/wiki3d/LICENSE.txt -text
 lib/wiki3d/README.txt -text
-lib/wiki3d/SpeedVector.class -text svneol=unset#unset
-lib/wiki3d/SpeedVector.java -text
-lib/wiki3d/Vertex.class -text svneol=unset#unset
-lib/wiki3d/Vertex.java -text
-lib/wiki3d/XmlReader.class -text svneol=unset#unset
-lib/wiki3d/XmlReader.java -text
-lib/wiki3d/morcego-0.3.jar -text
-lib/wiki3d/morcego-0.4.0.jar -text
-lib/wiki3d/src/java/br/arca/morcego/Config.java -text
-lib/wiki3d/src/java/br/arca/morcego/Morcego.java -text
-lib/wiki3d/src/java/br/arca/morcego/component/DescriptionBox.java -text
-lib/wiki3d/src/java/br/arca/morcego/component/LocalImage.java -text
-lib/wiki3d/src/java/br/arca/morcego/image/Arca.jpg -text
-lib/wiki3d/src/java/br/arca/morcego/image/Logo.jpg -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Camera.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Matrix2x3.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Matrix3x3.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/PositionedObject.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/PunctualBody.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Spring.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/Vector3D.java -text
-lib/wiki3d/src/java/br/arca/morcego/physics/VisibleObject.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Animator.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Balancer.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Feeder.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Renderer.java -text
-lib/wiki3d/src/java/br/arca/morcego/run/Rotator.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Graph.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/GraphElement.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/GraphElementFactory.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Link.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/Node.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/NodeFactory.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/link/SolidLink.java -text
-lib/wiki3d/src/java/br/arca/morcego/structure/node/RoundNode.java -text
-lib/wiki3d/src/java/br/arca/morcego/transport/Transport.java -text
-lib/wiki3d/src/java/br/arca/morcego/transport/XmlrpcTransport.java -text
-lib/wiki3d/src/java/org/apache/xmlrpc/XmlRpcAppletClient.java -text
-lib/wiki3d/src/test/br/arca/morcego/BalancerTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/CameraTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/ConfigTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/Matrix3DTest.java -text
-lib/wiki3d/src/test/br/arca/morcego/Vertex3DTest.java -text
-lib/wiki3d/xmlrpc-1.2-b1.jar -text
+lib/wiki3d/morcego-0.6.0.jar -text
+lib/wiki3d/pom.xml -text
 lib/x/index.php -text
 lib/x/x.js -text
 lib/x/x_anim.js -text
@@ -2971,6 +2956,7 @@ modules/mod-random_images.php -text
 modules/mod-random_pages.php -text
 modules/mod-semantic_links.php -text
 modules/mod-shoutbox.php -text
+modules/mod-shoutjax.php -text
 modules/mod-since_last_visit.php -text
 modules/mod-since_last_visit_new.php -text
 modules/mod-switch_lang.php -text
@@ -3243,6 +3229,8 @@ pics/large/gnome-settings-font48x48.png -text
 pics/large/gnome-sound-recorder48x48.png -text
 pics/large/google_maps.png -text
 pics/large/google_maps48x48.png -text
+pics/large/goto.png -text
+pics/large/goto48x48.png -text
 pics/large/i18n.png -text
 pics/large/i18n48x48.png -text
 pics/large/icon-configuration.png -text
@@ -3258,6 +3246,12 @@ pics/large/metatags48x48.png -text
 pics/large/mplayer48x48.png -text
 pics/large/multimedia.png -text
 pics/large/multimedia48x48.png -text
+pics/large/plugins.png -text
+pics/large/plugins48x48.png -text
+pics/large/profiles.png -text
+pics/large/profiles48x48.png -text
+pics/large/semantic.png -text
+pics/large/semantic48x48.png -text
 pics/large/stock_about.png -text
 pics/large/stock_about48x48.png -text
 pics/large/stock_bold.png -text
@@ -3287,6 +3281,8 @@ pics/large/users.png -text
 pics/large/users48x48.png -text
 pics/large/vcard.png -text
 pics/large/vcard48x48.png -text
+pics/large/webservices.png -text
+pics/large/webservices48x48.png -text
 pics/large/wikipages.png -text
 pics/large/wikipages48x48.png -text
 pics/large/wysiwyg.png -text
@@ -3310,12 +3306,17 @@ pics/trans.png -text
 /show_image.php -text
 styles/BiDi/BiDi.css -text
 styles/BiDi/index.php -text
-styles/amette/gradient.png -text
+styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
+styles/coelesce/search_wide.jpg -text svneol=unset#image/jpeg
+styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/down.png -text
+styles/darkroom/options/small-type.css -text
 styles/darkroom/right.css -text
+styles/darkroom/right.png -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
-styles/feb12/pagebg.jpg -text svneol=unset#image/jpeg
+styles/feb12/header.jpg -text svneol=unset#image/jpeg
+styles/feb12/page.jpg -text svneol=unset#image/jpeg
 styles/imageannotation/default.css -text
 styles/index.php -text
 styles/integrator/README -text
@@ -3323,7 +3324,6 @@ styles/integrator/default.css -text
 styles/integrator/doxygen.css -text
 styles/integrator/index.php -text
 styles/lite/lite.css -text
-styles/simple-amette.css -text
 styles/simple.css -text
 styles/simple/admin_move.gif -text
 styles/simple/bg.png -text
@@ -3346,6 +3346,16 @@ styles/slideshows/clear.css -text
 styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
+styles/strasa/box_bottom.gif -text
+styles/strasa/box_top.gif -text
+styles/strasa/headerbg.jpg -text svneol=unset#image/jpeg
+styles/strasa/info_icon.png -text svneol=unset#image/png
+styles/strasa/link_icon.png -text svneol=unset#image/png
+styles/strasa/list_icon.png -text
+styles/strasa/login.jpg -text svneol=unset#image/jpeg
+styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
+styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
+styles/strasa/register.jpg -text svneol=unset#image/jpeg
 styles/tikineat.css -text
 styles/tikineat/options/blue.css -text
 styles/tikineat/options/mono.css -text
@@ -3591,6 +3601,7 @@ templates/modules/mod-search_wiki_page_new.tpl -text
 templates/modules/mod-semantic_links.tpl -text
 templates/modules/mod-shoutbox.tpl -text
 templates/modules/mod-shoutbox.tpl.nocache -text
+templates/modules/mod-shoutjax.tpl -text
 templates/modules/mod-since_last_visit.tpl -text
 templates/modules/mod-since_last_visit_new.tpl -text
 templates/modules/mod-switch_lang.tpl -text
@@ -3722,6 +3733,7 @@ templates/tiki-admin-include-profiles.tpl -text
 templates/tiki-admin-include-rss.tpl -text
 templates/tiki-admin-include-score.tpl -text
 templates/tiki-admin-include-search.tpl -text
+templates/tiki-admin-include-sefurl.tpl -text
 templates/tiki-admin-include-semantic.tpl -text
 templates/tiki-admin-include-textarea.tpl -text
 templates/tiki-admin-include-trackers.tpl -text
@@ -4077,6 +4089,7 @@ templates/wiki-plugins/error_tracker.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
+templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroup.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroups.tpl -text
@@ -4088,8 +4101,9 @@ templates/wiki-plugins/wikiplugin_vote.tpl -text
 templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
-templates/wikiplugin_listpagenames.tpl -text
+/testGD.php -text
 tests/.htaccess -text
+tests/example.txt -text
 tests/index.php -text
 tests/messu-compose.tpl -text
 tests/test_cvs_file.txt -text
@@ -4147,6 +4161,7 @@ tests/testfile.txt -text
 /tiki-admin_include_rss.php -text
 /tiki-admin_include_score.php -text
 /tiki-admin_include_search.php -text
+/tiki-admin_include_sefurl.php -text
 /tiki-admin_include_semantic.php -text
 /tiki-admin_include_textarea.php -text
 /tiki-admin_include_trackers.php -text
@@ -4211,6 +4226,7 @@ tests/testfile.txt -text
 /tiki-calendars_rss.php -text
 /tiki-categpermissions.php -text
 /tiki-change_password.php -text
+/tiki-channel.php -text
 /tiki-charts.php -text
 /tiki-cms_rankings.php -text
 /tiki-confirm_user_email.php -text
@@ -4435,6 +4451,7 @@ tests/testfile.txt -text
 /tiki-searchindex.php -text
 /tiki-searchresults.php -text
 /tiki-section_options.php -text
+/tiki-sefurl.php -text
 /tiki-send_blog_post.php -text
 /tiki-send_newsletters.php -text
 /tiki-send_objects.php -text
@@ -4442,6 +4459,7 @@ tests/testfile.txt -text
 /tiki-setup_base.php -text
 /tiki-sheets.php -text
 /tiki-shoutbox.php -text
+/tiki-shoutjax.php -text
 /tiki-show_all_images.php -text
 /tiki-show_calendar.php -text
 /tiki-show_user_avatar.php -text
@@ -4459,6 +4477,7 @@ tests/testfile.txt -text
 /tiki-take_survey.php -text
 /tiki-tc.php -text
 /tiki-tell_a_friend.php -text
+/tiki-testGD.php -text
 /tiki-theme_control.php -text
 /tiki-theme_control_objects.php -text
 /tiki-theme_control_sections.php -text
