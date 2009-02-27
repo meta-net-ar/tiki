@@ -1255,12 +1255,14 @@ installer/schema/20090106_group_watch_tiki.sql -text
 installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
 installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/schema/20090129_callendar_search_tiki.sql -text
+installer/schema/200902026_admin_menu_tiki.sql -text
 installer/schema/20090203_null_tiki.sql -text
 installer/schema/20090205_menucase_tiki.sql -text
 installer/schema/20090206_content_tpl_menu_tiki.sql -text
 installer/schema/20090206_poll_tiki.sql -text
 installer/schema/20090211_mailnotification_tiki.sql -text
 installer/schema/20090212_forum_tiki.sql -text
+installer/schema/20090220_admin_section_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2508,6 +2510,7 @@ lib/smarty_tiki/block.remarksbox.php -text
 lib/smarty_tiki/block.repeat.php -text
 lib/smarty_tiki/block.self_link.php -text
 lib/smarty_tiki/block.sortlinks.php -text
+lib/smarty_tiki/block.tabs.php -text
 lib/smarty_tiki/block.textarea.php -text
 lib/smarty_tiki/block.tikimodule.php -text
 lib/smarty_tiki/block.title.php -text
@@ -2584,6 +2587,7 @@ lib/smarty_tiki/modifier.nlbr.php -text
 lib/smarty_tiki/modifier.quoted.php -text
 lib/smarty_tiki/modifier.sefurl.php -text
 lib/smarty_tiki/modifier.star.php -text
+lib/smarty_tiki/modifier.stringfix.php -text
 lib/smarty_tiki/modifier.substring.php -text
 lib/smarty_tiki/modifier.tasklink.php -text
 lib/smarty_tiki/modifier.tiki_date_format.php -text
@@ -2759,6 +2763,7 @@ lib/wiki-plugins/wikiplugin_equation.php -text
 lib/wiki-plugins/wikiplugin_events.php -text
 lib/wiki-plugins/wikiplugin_example.php -text
 lib/wiki-plugins/wikiplugin_fade.php -text
+lib/wiki-plugins/wikiplugin_fancylist.php -text
 lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
@@ -3223,6 +3228,8 @@ pics/large/gnome-settings-font48x48.png -text
 pics/large/gnome-sound-recorder48x48.png -text
 pics/large/google_maps.png -text
 pics/large/google_maps48x48.png -text
+pics/large/goto.png -text
+pics/large/goto48x48.png -text
 pics/large/i18n.png -text
 pics/large/i18n48x48.png -text
 pics/large/icon-configuration.png -text
@@ -3342,6 +3349,7 @@ styles/strasa/box_top.gif -text
 styles/strasa/headerbg.jpg -text svneol=unset#image/jpeg
 styles/strasa/info_icon.png -text svneol=unset#image/png
 styles/strasa/link_icon.png -text svneol=unset#image/png
+styles/strasa/list_icon.png -text
 styles/strasa/login.jpg -text svneol=unset#image/jpeg
 styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
 styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
@@ -3723,6 +3731,7 @@ templates/tiki-admin-include-profiles.tpl -text
 templates/tiki-admin-include-rss.tpl -text
 templates/tiki-admin-include-score.tpl -text
 templates/tiki-admin-include-search.tpl -text
+templates/tiki-admin-include-sefurl.tpl -text
 templates/tiki-admin-include-semantic.tpl -text
 templates/tiki-admin-include-textarea.tpl -text
 templates/tiki-admin-include-trackers.tpl -text
@@ -4090,6 +4099,7 @@ templates/wiki-plugins/wikiplugin_vote.tpl -text
 templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
+/testGD.php -text
 tests/.htaccess -text
 tests/example.txt -text
 tests/index.php -text
@@ -4149,6 +4159,7 @@ tests/testfile.txt -text
 /tiki-admin_include_rss.php -text
 /tiki-admin_include_score.php -text
 /tiki-admin_include_search.php -text
+/tiki-admin_include_sefurl.php -text
 /tiki-admin_include_semantic.php -text
 /tiki-admin_include_textarea.php -text
 /tiki-admin_include_trackers.php -text
@@ -4463,6 +4474,7 @@ tests/testfile.txt -text
 /tiki-take_survey.php -text
 /tiki-tc.php -text
 /tiki-tell_a_friend.php -text
+/tiki-testGD.php -text
 /tiki-theme_control.php -text
 /tiki-theme_control_objects.php -text
 /tiki-theme_control_sections.php -text
