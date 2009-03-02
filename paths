@@ -1,55 +1,13 @@
 D
 dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/demos/datepicker
+/branches/experimental/jquery/lib/jquery/jquery.ui/demos
 
 
 
 
 D
 dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/demos/droppable
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/demos/effects_easings
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/tests/static
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/demos/tabs
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/tests/visual
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/tests/unit/resizable
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery-autocomplete/demo
+/branches/experimental/jquery/lib/jquery/jquery.ui/tests/unit
 
 
 
