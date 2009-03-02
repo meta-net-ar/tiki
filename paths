@@ -1,13 +1,6 @@
 D
 dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/demos
-
-
-
-
-D
-dir
-/branches/experimental/jquery/lib/jquery/jquery.ui/tests/unit
+/branches/experimental/jquery/lib/jquery/jquery.ui/tests
 
 
 
