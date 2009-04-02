@@ -62,7 +62,6 @@ db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
 db/tiki_2.0to3.0.sql -text
 /display_banner.php -text
-doc/99_tiki-apache.conf -text
 doc/devtools/.htaccess -text
 doc/devtools/README.txt -text
 doc/devtools/add1tiki2multi.py -text
@@ -82,8 +81,6 @@ doc/devtools/findstyledef.pl -text svneol=unset#application/octet-stream
 doc/devtools/findstyledef.sh -text svneol=unset#application/octet-stream
 doc/devtools/ggg-trace.php -text
 doc/devtools/index.php -text
-doc/devtools/lastcvs.sh -text
-doc/devtools/make_ajax_template.pl -text
 doc/devtools/mergelang.pl -text
 doc/devtools/mods.sh -text
 doc/devtools/myspell_dic_2_tikiWiki_sql.pl -text
@@ -123,10 +120,7 @@ doc/devtools/tikimerge.sh -text
 doc/devtools/tikirelease.sh -text
 doc/devtools/tikireleasediff.sh -text
 doc/devtools/tikiwiki.spec -text
-doc/devtools/twcvsbackup.cron -text
 doc/devtools/usergeo.php -text
-doc/htaccess -text
-doc/htaccess.readme -text
 doc/index.php -text
 doc/readme.txt -text
 dump/index.php -text
@@ -301,36 +295,7 @@ img/avatars/index.php -text
 img/background.png -text
 img/clip.gif -text
 img/cord.png -text
-img/css.gif -text
 img/css1.png -text
-img/custom/article.jpeg -text
-img/custom/article2.jpeg -text
-img/custom/article3.jpeg -text
-img/custom/article4.jpeg -text
-img/custom/chat.jpeg -text
-img/custom/filegal.jpeg -text
-img/custom/files1.jpeg -text
-img/custom/files2.jpeg -text
-img/custom/forums.jpeg -text
-img/custom/forums2.jpeg -text
-img/custom/forums3.jpeg -text
-img/custom/galleries1.jpeg -text
-img/custom/galleries2.jpeg -text
-img/custom/galleries3.jpeg -text
-img/custom/galleries4.jpeg -text
-img/custom/galleries5.jpeg -text
-img/custom/index.php -text
-img/custom/permissions.jpeg -text
-img/custom/users.jpg -text
-img/custom/weblog.jpeg -text
-img/custom/weblog3.jpeg -text
-img/custom/weblogs.jpeg -text
-img/custom/weblogs2.jpeg -text
-img/custom/wiki.jpeg -text
-img/custom/wiki2.jpeg -text
-img/custom/wiki3.jpeg -text
-img/custom/wiki4.jpeg -text
-img/custom/wiki5.jpeg -text
 img/edge.gif -text
 img/flagged.gif -text
 img/flags/Afghanistan.gif -text
@@ -585,7 +550,6 @@ img/flags/flagnames.php -text
 img/flags/index.php -text
 img/flags/readme.txt -text
 img/flags/the_former_Yugoslav_Republic_of_Macedonia.gif -text
-img/google.gif -text
 img/googleg.gif -text
 img/gradient.png -text
 img/gradient2.png -text
@@ -631,7 +595,6 @@ img/icn/wav.gif -text
 img/icn/wri.gif -text
 img/icn/xls.gif -text
 img/icn/zip.gif -text
-img/icon_back_top.gif -text
 img/icons/1stars.gif -text
 img/icons/2stars.gif -text
 img/icons/3stars.gif -text
@@ -1112,7 +1075,6 @@ img/icons2/zweistern.gif -text
 img/index.php -text
 img/leftbar.gif -text
 img/mainbar.gif -text
-img/mysql.gif -text
 img/mytiki/admin.gif -text
 img/mytiki/bookmarks.gif -text
 img/mytiki/files.gif -text
@@ -1130,8 +1092,6 @@ img/mytiki/prefs.gif -text
 img/mytiki/stock_contact.png -text
 img/mytiki/tasks.gif -text
 img/mytiki/webmail.gif -text
-img/pear.png -text
-img/php.gif -text
 img/php.png -text
 img/poweredbyhawhaw.gif -text
 img/rdf.gif -text
@@ -1139,17 +1099,6 @@ img/replied.gif -text
 img/rightbar.gif -text
 img/rss.png -text
 img/rss_podcast_80_15.png -text
-img/silk/announce.png -text
-img/silk/announce_new.png -text
-img/silk/hot.png -text
-img/silk/hot_new.png -text
-img/silk/locked.png -text
-img/silk/locked_new.png -text
-img/silk/page.png -text
-img/silk/page_new.png -text
-img/silk/readme.txt -text
-img/silk/sticky.png -text
-img/silk/sticky_new.png -text
 img/smarty.gif -text
 img/smiles/icon_arrow.gif -text
 img/smiles/icon_biggrin.gif -text
@@ -1177,8 +1126,6 @@ img/smiles/icon_twisted.gif -text
 img/smiles/icon_wink.gif -text
 img/smiles/index.php -text
 img/spinner.gif -text
-img/stop.jpg -text
-img/stop2.jpg -text
 img/tiki.jpg -text
 img/tiki/index.php -text
 img/tiki/powertw.gif -text
@@ -1218,6 +1165,8 @@ installer/.htaccess -text
 installer/index.php -text
 installer/installlib.php -text
 installer/schema/20080227_invite_tiki.sql -text
+installer/schema/20090205_forum_and_comments_locking_tiki.sql -text
+installer/schema/20090205_menus_items_icons_tiki.sql -text
 installer/schema/20090301_browsertitle_tiki.sql -text
 installer/schema/20090304_tiki_p_view_backlink_without_s_tiki.sql -text
 installer/schema/20090306_menu_perms_tiki.sql -text
@@ -1226,6 +1175,8 @@ installer/schema/20090310_application_menu_tiki.sql -text
 installer/schema/20090310_feature_search_show_object_filter_tiki.sql -text
 installer/schema/20090311_remove_mod_menu_application_menu_tiki.sql -text
 installer/schema/20090316_index_tiki.sql -text
+installer/schema/20090323_maxUserImpressions_banners_tiki.sql -text
+installer/schema/20090401_newsletters_included_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1588,6 +1539,7 @@ lib/core/lib/WikiParser/PluginParser.php -text
 lib/core/lib/WikiParser/PluginRepository.php -text
 lib/core/lib/WikiParser/PluginRunner.php -text
 lib/core/test/AcceptanceTests/AllTests.php -text
+lib/core/test/AcceptanceTests/MultilingualTest.php -text
 lib/core/test/AcceptanceTests/SearchTest.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/DeclFilter/AllTests.php -text
@@ -1616,6 +1568,7 @@ lib/core/test/TikiFilter/CallbackTest.php -text
 lib/core/test/TikiFilter/MapTest.php -text
 lib/core/test/TikiFilter/WordTest.php -text
 lib/core/test/TikiFilter/XssTest.php -text
+lib/core/test/TikiSeleniumTestCase.php -text
 lib/core/test/TikiTestCase.php -text
 lib/core/test/WikiParser/AllTests.php -text
 lib/core/test/WikiParser/PluginArgumentParserTest.php -text
@@ -1755,6 +1708,9 @@ lib/ical/iCal/TimeZone.php -text
 lib/ical/iCal/ToDo.php -text
 lib/ical/iCal/ValueDataType.php -text
 lib/ical/iCal/iCalendar.php -text
+lib/iepngfix/DD_belatedPNG-min.js -text
+lib/iepngfix/DD_belatedPNG.js -text
+lib/iepngfix/index.php -text
 lib/imagegals/imagegallib.js -text
 lib/imagegals/imagegallib.php -text
 lib/imagegals/index.php -text
@@ -2480,6 +2436,7 @@ lib/setup/prefs.php -text
 lib/setup/sections.php -text
 lib/setup/set_paths.php -text
 lib/setup/site_closed.php -text
+lib/setup/smarty.php -text
 lib/setup/stats.php -text
 lib/setup/theme.php -text
 lib/setup/tikisetup.class.php -text
@@ -2574,6 +2531,7 @@ lib/smarty_tiki/block.ajax_href.php -text
 lib/smarty_tiki/block.compact.php -text
 lib/smarty_tiki/block.display.php -text
 lib/smarty_tiki/block.itemfield.php -text
+lib/smarty_tiki/block.jq.php -text
 lib/smarty_tiki/block.pagination_links.php -text
 lib/smarty_tiki/block.popup_link.php -text
 lib/smarty_tiki/block.remarksbox.php -text
@@ -2597,6 +2555,7 @@ lib/smarty_tiki/function.breadcrumbs.php -text
 lib/smarty_tiki/function.button.php -text
 lib/smarty_tiki/function.content.php -text
 lib/smarty_tiki/function.cookie.php -text
+lib/smarty_tiki/function.cookie_jar.php -text
 lib/smarty_tiki/function.count.php -text
 lib/smarty_tiki/function.ed.php -text
 lib/smarty_tiki/function.editform.php -text
@@ -2677,6 +2636,8 @@ lib/smarty_tiki/modifier.utf8unicode.php -text
 lib/smarty_tiki/modifier.yesno.php -text
 lib/smarty_tiki/outputfilter.highlight.php -text
 lib/smarty_tiki/outputfilter.ticket.php -text
+lib/smarty_tiki/prefilter.jq.php -text
+lib/smarty_tiki/prefilter.log_tpl.php -text
 lib/smarty_tiki/prefilter.ticket.php -text
 lib/smarty_tiki/prefilter.tr.php -text
 lib/smarty_tiki/resource.style.php -text
@@ -3097,9 +3058,12 @@ modules/mod-webmail_inbox.php -text
 modules/mod-whats_related.php -text
 modules/mod-who_is_there.php -text
 modules/mod-wiki_last_comments.php -text
+modules/mod-youtube.php -text
 pics/help_icon.png -text
 pics/icons/accept.png -text
 pics/icons/add.png -text
+pics/icons/announce.png -text
+pics/icons/announce_new.png -text
 pics/icons/application_add.png -text
 pics/icons/application_form_magnify.png -text
 pics/icons/application_get.png -text
@@ -3155,15 +3119,19 @@ pics/icons/exclamation.png -text
 pics/icons/eye.png -text
 pics/icons/eye_arrow_down.png -text
 pics/icons/eye_group.png -text
+pics/icons/eye_group_arrow_down.png -text
 pics/icons/eye_magnifier.png -text
 pics/icons/feed.png -text
 pics/icons/flag_blue.png -text
 pics/icons/folder.png -text
 pics/icons/folder_add.png -text
 pics/icons/folder_go.png -text
+pics/icons/green_question.png -text
 pics/icons/group.png -text
 pics/icons/group_key.png -text
 pics/icons/help.png -text
+pics/icons/hot.png -text
+pics/icons/hot_new.png -text
 pics/icons/house.png -text
 pics/icons/house_go.png -text
 pics/icons/image.png -text
@@ -3182,6 +3150,8 @@ pics/icons/lock_add.png -text
 pics/icons/lock_break.png -text
 pics/icons/lock_delete.png -text
 pics/icons/lock_gray.png -text
+pics/icons/lock_new.png -text
+pics/icons/lock_red.png -text
 pics/icons/magnifier.png -text
 pics/icons/mime/c.png -text
 pics/icons/mime/cpp.png -text
@@ -3218,12 +3188,14 @@ pics/icons/no_information.png -text
 pics/icons/note_add.png -text
 pics/icons/ofolder.png -text
 pics/icons/omodule.png -text
+pics/icons/ovmodule.png -text
 pics/icons/package.png -text
 pics/icons/package_go.png -text
 pics/icons/page.png -text
 pics/icons/page_edit.png -text
 pics/icons/page_gear.png -text
 pics/icons/page_link.png -text
+pics/icons/page_new.png -text
 pics/icons/page_translate_from.png -text
 pics/icons/page_translate_to.png -text
 pics/icons/page_white_acrobat.png -text
@@ -3252,6 +3224,8 @@ pics/icons/shape_square_edit.png -text
 pics/icons/star.png -text
 pics/icons/star_grey.png -text
 pics/icons/star_half.png -text
+pics/icons/sticky.png -text
+pics/icons/sticky_new.png -text
 pics/icons/sum.png -text
 pics/icons/table.png -text
 pics/icons/tag_blue.png -text
@@ -3300,6 +3274,7 @@ pics/icons/user_delete.png -text
 pics/icons/user_go.png -text
 pics/icons/user_gray.png -text
 pics/icons/user_red.png -text
+pics/icons/vmodule.png -text
 pics/icons/wiki3d.png -text
 pics/icons/world.png -text
 pics/icons/world_add.png -text
@@ -3341,6 +3316,7 @@ pics/large/google_maps.png -text
 pics/large/google_maps48x48.png -text
 pics/large/goto.png -text
 pics/large/goto48x48.png -text
+pics/large/green_question48x48.png -text
 pics/large/i18n.png -text
 pics/large/i18n48x48.png -text
 pics/large/icon-configuration.png -text
@@ -3462,17 +3438,18 @@ styles/slideshows/clear.css -text
 styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
-styles/strasa/box_bottom.gif -text
-styles/strasa/box_top.gif -text
-styles/strasa/fold-topright.jpg -text
-styles/strasa/headerbg.jpg -text svneol=unset#image/jpeg
-styles/strasa/headermenuitem-hover.png -text
 styles/strasa/info_icon.png -text svneol=unset#image/png
 styles/strasa/link_icon.png -text svneol=unset#image/png
 styles/strasa/list_icon.png -text
-styles/strasa/login.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold.css -text
+styles/strasa/options/cold/box_bottom.gif -text
+styles/strasa/options/cold/box_top.gif -text
 styles/strasa/options/cold/cold.png -text
+styles/strasa/options/cold/fold-topright.jpg -text
+styles/strasa/options/cold/headerbg.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cold/headermenuitem-hover.png -text
+styles/strasa/options/cold/login.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cold/register.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/box_bottom.gif -text
 styles/strasa/options/mono/box_top.gif -text
@@ -3488,7 +3465,6 @@ styles/strasa/options/mono/register.jpg -text
 styles/strasa/options/warm.css -text
 styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
 styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
-styles/strasa/register.jpg -text svneol=unset#image/jpeg
 styles/strasa/strasa.png -text
 styles/thenews/options/narrow_left_column/narrow_left_column.png -text
 styles/thenews/thenews.png -text
@@ -3498,6 +3474,8 @@ styles/transitions/1.8to2.2.css -text
 styles/transitions/1.9to2.2.css -text
 styles/transitions/1.9to3.0.css -text
 styles/transitions/2.0to3.0.css -text
+styles/transitions/2.0to4.0.css -text
+styles/transitions/3.0to4.0.css -text
 styles/transitions/index.php -text
 temp/.htaccess -text
 temp/README -text
@@ -3780,6 +3758,7 @@ templates/modules/mod-who_is_there.tpl -text
 templates/modules/mod-who_is_there.tpl.nocache -text
 templates/modules/mod-wiki_last_comments.tpl -text
 templates/modules/mod-wiki_last_comments.tpl.nocache -text
+templates/modules/mod-youtube.tpl -text
 templates/modules/user_module.tpl -text
 templates/multiplayer.tpl -text
 templates/pagehistory.tpl -text
@@ -3825,7 +3804,6 @@ templates/styles/simple/modules/mod-search_wiki_page_new.tpl -text
 templates/styles/simple/modules/mod-shoutbox.tpl -text
 templates/styles/simple/modules/mod-switch_lang.tpl -text
 templates/styles/simple/modules/mod-switch_lang2.tpl -text
-templates/styles/simple/tiki-print_article.tpl -text
 templates/styles/simple/tiki-view_blog.tpl -text
 templates/styles/simple/tiki-view_blog_post.tpl -text
 templates/styles/tikinewt/index.php -text
@@ -4092,6 +4070,7 @@ templates/tiki-newsreader_servers.tpl -text
 templates/tiki-notepad_list.tpl -text
 templates/tiki-notepad_read.tpl -text
 templates/tiki-notepad_write.tpl -text
+templates/tiki-object_watches.tpl -text
 templates/tiki-objectpermissions.tpl -text
 templates/tiki-old_polls.tpl -text
 templates/tiki-openid_register.tpl -text
@@ -4541,6 +4520,7 @@ tests/testfile.txt -text
 /tiki-notepad_list.php -text
 /tiki-notepad_read.php -text
 /tiki-notepad_write.php -text
+/tiki-object_watches.php -text
 /tiki-objectpermissions.php -text
 /tiki-old_polls.php -text
 /tiki-orphan_pages.php -text
@@ -4649,6 +4629,7 @@ tests/testfile.txt -text
 /tiki-view_tracker_more_info.php -text
 /tiki-wap.php -text
 /tiki-webmail.php -text
+/tiki-webmail_ajax.php -text
 /tiki-webmail_contacts.php -text
 /tiki-webmail_download_attachment.php -text
 /tiki-wiki3d.php -text
