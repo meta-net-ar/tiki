@@ -18,9 +18,6 @@ backups/index.php -text
 /copyrights.php -text
 css/admin.css -text
 css/calendar.css -text
-css/cssmenu.css -text
-css/cssmenu_horiz.css -text
-css/cssmenu_vert.css -text
 css/freetags.css -text
 css/ie6.css -text
 css/jscalendar.css -text
@@ -131,7 +128,6 @@ files/index.php -text
 files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 /freetag_apply.php -text
 /freetag_list.php -text
-/function.js_maxlength.php -text
 games/README -text
 games/flash/README -text
 games/flash/index.php -text
@@ -1176,7 +1172,14 @@ installer/schema/20090310_feature_search_show_object_filter_tiki.sql -text
 installer/schema/20090311_remove_mod_menu_application_menu_tiki.sql -text
 installer/schema/20090316_index_tiki.sql -text
 installer/schema/20090323_maxUserImpressions_banners_tiki.sql -text
+installer/schema/20090330_quicktags_renames_tiki.sql -text
 installer/schema/20090401_newsletters_included_tiki.sql -text
+installer/schema/20090401_replace_shoutjax_with_shoutbox_tiki.sql -text
+installer/schema/20090401_replace_switch_lang2_with_switch_lang_tiki.sql -text
+installer/schema/20090416_plugin_security_tiki.php -text
+installer/schema/20090416_plugin_security_tiki.sql -text
+installer/schema/20090416_quicktags_kil_email_tiki.sql -text
+installer/schema/20090416_quicktags_plugin_helpers_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2918,6 +2921,7 @@ lib/xmlrpc.inc -text
 lib/xmlrpcs.inc -text
 lib/ziplib.php -text
 /license.txt -text
+maps/index.php -text
 /messu-archive.php -text
 /messu-broadcast.php -text
 /messu-compose.php -text
@@ -3183,6 +3187,7 @@ pics/icons/monitor.png -text
 pics/icons/more_info.gif -text
 pics/icons/multiple_cal.png -text
 pics/icons/new.png -text
+pics/icons/newspaper_add.png -text
 pics/icons/newspaper_go.png -text
 pics/icons/no_eye.png -text
 pics/icons/no_eye_arrow_down.png -text
@@ -3201,6 +3206,7 @@ pics/icons/page_new.png -text
 pics/icons/page_translate_from.png -text
 pics/icons/page_translate_to.png -text
 pics/icons/page_white_acrobat.png -text
+pics/icons/page_white_actionscript.png -text
 pics/icons/page_white_code.png -text
 pics/icons/page_white_link.png -text
 pics/icons/page_white_picture.png -text
@@ -3210,9 +3216,11 @@ pics/icons/pencil.png -text
 pics/icons/pencil_add.png -text
 pics/icons/picture.png -text
 pics/icons/picture_add.png -text
+pics/icons/pictures.png -text
 pics/icons/plus_small.png -text
 pics/icons/printer.png -text
 pics/icons/printer_add.png -text
+pics/icons/quotes.png -text
 pics/icons/readme.txt -text
 pics/icons/resultset_down.png -text
 pics/icons/resultset_first.png -text
@@ -4214,6 +4222,7 @@ templates/wiki-plugins/wikiplugin_vote.tpl -text
 templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
+templates_c/index.php -text
 tests/.htaccess -text
 tests/example.txt -text
 tests/index.php -text
@@ -4268,7 +4277,6 @@ tests/testfile.txt -text
 /tiki-admin_include_metatags.php -text
 /tiki-admin_include_module.php -text
 /tiki-admin_include_multimedia.php -text
-/tiki-admin_include_plugins.php -text
 /tiki-admin_include_polls.php -text
 /tiki-admin_include_profiles.php -text
 /tiki-admin_include_rss.php -text
@@ -4532,6 +4540,7 @@ tests/testfile.txt -text
 /tiki-parsemode_setup.php -text
 /tiki-phpinfo.php -text
 /tiki-pick_avatar.php -text
+/tiki-plugins.php -text
 /tiki-poll_form.php -text
 /tiki-poll_results.php -text
 /tiki-print.php -text
@@ -4574,7 +4583,6 @@ tests/testfile.txt -text
 /tiki-setup_base.php -text
 /tiki-sheets.php -text
 /tiki-shoutbox.php -text
-/tiki-shoutjax.php -text
 /tiki-show_all_images.php -text
 /tiki-show_calendar.php -text
 /tiki-show_user_avatar.php -text
