@@ -3794,6 +3794,7 @@ templates/tiki-admin-include-webmail.tpl -text
 templates/tiki-admin-include-webservices.tpl -text
 templates/tiki-admin-include-wiki.tpl -text
 templates/tiki-admin-include-wikiatt.tpl -text
+templates/tiki-admin-include-workspaces.tpl -text
 templates/tiki-admin-include-wysiwyg.tpl -text
 templates/tiki-admin.tpl -text
 templates/tiki-admin_actionlog.tpl -text
