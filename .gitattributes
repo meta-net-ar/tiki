@@ -212,70 +212,6 @@ images/star_orange.gif -text
 images/star_purple.gif -text
 images/star_red.gif -text
 images/star_yellow.gif -text
-images/workspaces/config.gif -text
-images/workspaces/copy.gif -text
-images/workspaces/degrada.gif -text
-images/workspaces/degrada2.gif -text
-images/workspaces/degrada2gris.gif -text
-images/workspaces/degrada2verde.gif -text
-images/workspaces/degrada3.gif -text
-images/workspaces/delete.gif -text
-images/workspaces/edu_article.gif -text
-images/workspaces/edu_assignments.gif -text
-images/workspaces/edu_blog.gif -text
-images/workspaces/edu_calendar.gif -text
-images/workspaces/edu_faq.gif -text
-images/workspaces/edu_filegallery.gif -text
-images/workspaces/edu_folder.png -text
-images/workspaces/edu_folder_closed.png -text
-images/workspaces/edu_folder_dim.png -text
-images/workspaces/edu_folder_open.png -text
-images/workspaces/edu_forum.gif -text
-images/workspaces/edu_group.gif -text
-images/workspaces/edu_group.jpg -text
-images/workspaces/edu_group_add.gif -text
-images/workspaces/edu_group_new.gif -text
-images/workspaces/edu_group_remove.gif -text
-images/workspaces/edu_imagegallery.gif -text
-images/workspaces/edu_nav_down.gif -text
-images/workspaces/edu_nav_left.gif -text
-images/workspaces/edu_nav_right.gif -text
-images/workspaces/edu_nav_up.gif -text
-images/workspaces/edu_paste.gif -text
-images/workspaces/edu_quiz.gif -text
-images/workspaces/edu_role.gif -text
-images/workspaces/edu_sheet.gif -text
-images/workspaces/edu_stop.gif -text
-images/workspaces/edu_structure.gif -text
-images/workspaces/edu_survey.gif -text
-images/workspaces/edu_tracker.gif -text
-images/workspaces/edu_user_new.gif -text
-images/workspaces/edu_wikipage.gif -text
-images/workspaces/edu_workspace.gif -text
-images/workspaces/edu_workspace.png -text
-images/workspaces/edu_workspaceActive.png -text
-images/workspaces/edu_workspaceActiveFOLDER.png -text
-images/workspaces/edu_workspaceFOLDER.png -text
-images/workspaces/edu_workspaceInactive.png -text
-images/workspaces/edu_workspace_grey.png -text
-images/workspaces/edu_workspace_inactive.png -text
-images/workspaces/edu_zones.png -text
-images/workspaces/edu_zones_add.png -text
-images/workspaces/edu_zones_edit.png -text
-images/workspaces/edu_zones_remove.png -text
-images/workspaces/grayarrow.gif -text
-images/workspaces/help.png -text
-images/workspaces/info.png -text
-images/workspaces/key.gif -text
-images/workspaces/module.png -text
-images/workspaces/module_add.png -text
-images/workspaces/module_edit.png -text
-images/workspaces/module_remove.png -text
-images/workspaces/page.gif -text
-images/workspaces/pageNueva.gif -text
-images/workspaces/redarrow.gif -text
-images/workspaces/user_blue.gif -text
-images/workspaces/user_red.gif -text
 img/.htaccess -text
 img/adodb.png -text
 img/avatars/README -text
@@ -1196,7 +1132,6 @@ installer/schema/20081211_score_tiki.sql -text
 installer/schema/20081212_tiki_p_view_backlinks_tiki.sql -text
 installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
-installer/schema/20090120_lost_2.0to3.0_tiki.sql -text
 installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/schema/20090129_callendar_search_tiki.sql -text
 installer/schema/200902026_admin_menu_tiki.sql -text
@@ -1225,6 +1160,8 @@ installer/schema/20090416_plugin_security_tiki.sql -text
 installer/schema/20090416_quicktags_kil_email_tiki.sql -text
 installer/schema/20090416_quicktags_plugin_helpers_tiki.sql -text
 installer/schema/20090427_filegal_optionalize_tiki.sql -text
+installer/schema/20090513_swffix_tiki.sql -text
+installer/schema/20090515_score_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1761,6 +1698,8 @@ lib/images/abstract.php -text
 lib/images/gd.php -text
 lib/images/icons/3ds.png -text
 lib/images/icons/3ds.svg -text
+lib/images/icons/7z.png -text
+lib/images/icons/7z.svg -text
 lib/images/icons/abw.png -text
 lib/images/icons/abw.svg -text
 lib/images/icons/ac3.png -text
@@ -1783,6 +1722,8 @@ lib/images/icons/dvi.png -text
 lib/images/icons/dvi.svg -text
 lib/images/icons/fig.png -text
 lib/images/icons/fig.svg -text
+lib/images/icons/flv.png -text
+lib/images/icons/flv.svg -text
 lib/images/icons/gif.png -text
 lib/images/icons/gif.svg -text
 lib/images/icons/gzip.png -text
@@ -1805,12 +1746,26 @@ lib/images/icons/mov.png -text
 lib/images/icons/mov.svg -text
 lib/images/icons/mp3.png -text
 lib/images/icons/mp3.svg -text
+lib/images/icons/mp4.png -text
+lib/images/icons/mp4.svg -text
 lib/images/icons/mpeg.png -text
 lib/images/icons/mpeg.svg -text
 lib/images/icons/mpg.png -text
 lib/images/icons/mpg.svg -text
+lib/images/icons/odg.png -text
+lib/images/icons/odg.svg -text
+lib/images/icons/odp.png -text
+lib/images/icons/odp.svg -text
+lib/images/icons/ods.png -text
+lib/images/icons/ods.svg -text
+lib/images/icons/odt.png -text
+lib/images/icons/odt.svg -text
 lib/images/icons/ogg.png -text
 lib/images/icons/ogg.svg -text
+lib/images/icons/ogm.png -text
+lib/images/icons/ogm.svg -text
+lib/images/icons/ogv.png -text
+lib/images/icons/ogv.svg -text
 lib/images/icons/pbm.png -text
 lib/images/icons/pbm.svg -text
 lib/images/icons/pdf.png -text
@@ -1845,6 +1800,8 @@ lib/images/icons/rpm.png -text
 lib/images/icons/rpm.svg -text
 lib/images/icons/rtf.png -text
 lib/images/icons/rtf.svg -text
+lib/images/icons/svg.png -text
+lib/images/icons/svg.svg -text
 lib/images/icons/swf.png -text
 lib/images/icons/swf.svg -text
 lib/images/icons/swfl.png -text
@@ -2906,6 +2863,7 @@ lib/wiki-plugins/wikiplugin_objecthits.php -text
 lib/wiki-plugins/wikiplugin_picture.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
+lib/wiki-plugins/wikiplugin_profile.php -text
 lib/wiki-plugins/wikiplugin_proposal.php -text
 lib/wiki-plugins/wikiplugin_quote.php -text
 lib/wiki-plugins/wikiplugin_rcontent.php -text
@@ -2914,7 +2872,6 @@ lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
 lib/wiki-plugins/wikiplugin_sf.php -text
-lib/wiki-plugins/wikiplugin_share.php -text
 lib/wiki-plugins/wikiplugin_sharethis.php -text
 lib/wiki-plugins/wikiplugin_sheet.php -text
 lib/wiki-plugins/wikiplugin_showpages.php -text
@@ -3201,6 +3158,19 @@ pics/icons/mime/jpg.png -text
 pics/icons/mime/mid.png -text
 pics/icons/mime/mp3.png -text
 pics/icons/mime/mpg.png -text
+pics/icons/mime/odb.png -text
+pics/icons/mime/odc.png -text
+pics/icons/mime/odf.png -text
+pics/icons/mime/odg.png -text
+pics/icons/mime/odi.png -text
+pics/icons/mime/odm.png -text
+pics/icons/mime/odp.png -text
+pics/icons/mime/ods.png -text
+pics/icons/mime/odt.png -text
+pics/icons/mime/otc.png -text
+pics/icons/mime/otf.png -text
+pics/icons/mime/otg.png -text
+pics/icons/mime/oth.png -text
 pics/icons/mime/pdf.png -text
 pics/icons/mime/php.png -text
 pics/icons/mime/png.png -text
@@ -3246,6 +3216,9 @@ pics/icons/pencil_add.png -text
 pics/icons/picture.png -text
 pics/icons/picture_add.png -text
 pics/icons/pictures.png -text
+pics/icons/plugin.png -text
+pics/icons/plugin_add.png -text
+pics/icons/plugin_edit.png -text
 pics/icons/plus_small.png -text
 pics/icons/printer.png -text
 pics/icons/printer_add.png -text
@@ -3413,6 +3386,7 @@ pics/large/wysiwyg48x48.png -text
 pics/large/xfce4-appfinder.png -text
 pics/large/xfce4-appfinder48x48.png -text
 pics/next.gif -text
+pics/next_anim.gif -text
 pics/overlay-disabled_item.png -text
 pics/prev.gif -text
 pics/trans.png -text
@@ -3464,6 +3438,7 @@ styles/strasa/info_icon.png -text svneol=unset#image/png
 styles/strasa/link_icon.png -text svneol=unset#image/png
 styles/strasa/list_icon.png -text
 styles/strasa/login.jpg -text
+styles/strasa/loginlong.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold.css -text
 styles/strasa/options/cold/box_bottom.gif -text
 styles/strasa/options/cold/box_top.gif -text
@@ -3472,6 +3447,7 @@ styles/strasa/options/cold/fold-topright.jpg -text
 styles/strasa/options/cold/headerbg.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold/headermenuitem-hover.png -text
 styles/strasa/options/cold/login.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cold/loginlong.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold/register.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/box_bottom.gif -text
@@ -3483,9 +3459,13 @@ styles/strasa/options/mono/info_icon.png -text
 styles/strasa/options/mono/link_icon.png -text
 styles/strasa/options/mono/list_icon.png -text
 styles/strasa/options/mono/login.jpg -text
+styles/strasa/options/mono/loginlong.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/mono/mono.png -text
+styles/strasa/options/mono/pics/icons/folder.png -text
+styles/strasa/options/mono/pics/icons/index.php -text
+styles/strasa/options/mono/pics/icons/ofolder.png -text
+styles/strasa/options/mono/pics/index.php -text
 styles/strasa/options/mono/register.jpg -text
-styles/strasa/options/warm.css -text
 styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
 styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
 styles/strasa/register.jpg -text
@@ -4193,10 +4173,12 @@ templates/tracker_item_field_value.tpl -text
 templates/translated-lang.tpl -text
 templates/wiki-discussion.tpl -text
 templates/wiki-plugins/error_tracker.tpl -text
+templates/wiki-plugins/wikiplugin_bloglist.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
 templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
+templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_rss.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroup.tpl -text
