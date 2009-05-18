@@ -20,6 +20,7 @@ css/admin.css -text
 css/calendar.css -text
 css/freetags.css -text
 css/ie6.css -text
+css/ie8.css -text
 css/jscalendar.css -text
 css/spanky.css -text
 db/.htaccess -text
@@ -1053,6 +1054,7 @@ img/spinner.gif -text
 img/tiki.jpg -text
 img/tiki/index.php -text
 img/tiki/powertw.gif -text
+img/tiki/tiki3.gif -text
 img/tiki/tiki3.png -text
 img/tiki/tikibutton.png -text
 img/tiki/tikibutton2.png -text
@@ -1168,6 +1170,7 @@ installer/tiki-installer.php -text
 lang/.htaccess -text
 lang/ar/index.php -text
 lang/ar/language.php -text
+lang/ca/custom.php_example -text
 lang/ca/index.php -text
 lang/ca/language.php -text
 lang/cn/index.php -text
@@ -1186,6 +1189,7 @@ lang/en-uk/index.php -text
 lang/en-uk/language.php -text
 lang/en/index.php -text
 lang/en/language.php -text
+lang/es/custom.php_example -text
 lang/es/index.php -text
 lang/es/language.php -text
 lang/fa/index.php -text
@@ -3434,6 +3438,9 @@ styles/strasa/cold.png -text
 styles/strasa/fold-topright.jpg -text
 styles/strasa/headerbg.jpg -text
 styles/strasa/headermenuitem-hover.png -text
+styles/strasa/ie6.css -text
+styles/strasa/ie7.css -text
+styles/strasa/ie8.css -text
 styles/strasa/info_icon.png -text svneol=unset#image/png
 styles/strasa/link_icon.png -text svneol=unset#image/png
 styles/strasa/list_icon.png -text
