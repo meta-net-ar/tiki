@@ -3363,6 +3363,7 @@ pics/large/icon-configuration.png -text
 pics/large/icon-configuration48x48.png -text
 pics/large/intertiki.png -text
 pics/large/intertiki48x48.png -text
+pics/large/kaltura48x48.png -text
 pics/large/maps.png -text
 pics/large/maps48x48.png -text
 pics/large/messages.png -text
@@ -3929,6 +3930,7 @@ templates/tiki-browse_categories.tpl -text
 templates/tiki-browse_freetags.tpl -text
 templates/tiki-browse_gallery.tpl -text
 templates/tiki-browse_image.tpl -text
+templates/tiki-browse_video_gallery.tpl -text
 templates/tiki-calendar.tpl -text
 templates/tiki-calendar_box.tpl -text
 templates/tiki-calendar_box_multiple.tpl -text
@@ -4185,6 +4187,7 @@ templates/tiki-user_watches.tpl -text
 templates/tiki-userfiles.tpl -text
 templates/tiki-usermenu.tpl -text
 templates/tiki-userversions.tpl -text
+templates/tiki-video_galleries.tpl -text
 templates/tiki-view-sheets.tpl -text
 templates/tiki-view_articles-titleonly.tpl -text
 templates/tiki-view_articles.tpl -text
@@ -4345,6 +4348,7 @@ tests/testfile.txt -text
 /tiki-browse_freetags.php -text
 /tiki-browse_gallery.php -text
 /tiki-browse_image.php -text
+/tiki-browse_video_gallery.php -text
 /tiki-calendar.php -text
 /tiki-calendar_edit_item.php -text
 /tiki-calendar_export_ical.php -text
@@ -4627,6 +4631,7 @@ tests/testfile.txt -text
 /tiki-usermenu.php -text
 /tiki-users3d_xmlrpc.php -text
 /tiki-userversions.php -text
+/tiki-video_galleries.php -text
 /tiki-view_articles.php -text
 /tiki-view_banner.php -text
 /tiki-view_blog.php -text
