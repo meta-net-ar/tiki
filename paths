@@ -1,5 +1,12 @@
 M
 dir
+/branches/experimental/coe/lib/jquery/jquery-autocomplete
+
+
+
+
+M
+dir
 /branches/experimental/coe/lib/jquery
 
 
@@ -8,20 +15,6 @@ dir
 M
 dir
 /branches/experimental/coe
-
-
-
-
-M
-dir
-/branches/experimental/coe/lib/jquery/cluetip
-
-
-
-
-M
-dir
-/branches/experimental/coe/lib/jquery/jquery-autocomplete
 
 
 
@@ -50,6 +43,13 @@ dir
 M
 dir
 /branches/experimental/coe/lib/jquery_tiki
+
+
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery/cluetip
 
 
 
