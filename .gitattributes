@@ -4363,6 +4363,7 @@ tests/testfile.txt -text
 /tiki-browse_freetags.php -text
 /tiki-browse_gallery.php -text
 /tiki-browse_image.php -text
+/tiki-browse_video.php -text
 /tiki-browse_video_gallery.php -text
 /tiki-calendar.php -text
 /tiki-calendar_edit_item.php -text
