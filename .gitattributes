@@ -4419,6 +4419,7 @@ tests/testfile.txt -text
 /tiki-edit_templates.php -text
 /tiki-edit_topic.php -text
 /tiki-edit_translation.php -text
+/tiki-edit_video.php -text
 /tiki-edit_wiki_section.php -text
 /tiki-editdrawing.php -text
 /tiki-editpage.php -text
