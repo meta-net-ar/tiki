@@ -46,6 +46,7 @@ db/tiki-4.0-pgsql.sql -text
 db/tiki-4.0-sqlite.sql -text
 db/tiki-4.0-sybase.sql -text
 db/tiki-db-adodb.php -text
+db/tiki-db-native-mysqli.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
 db/tiki-secdb_3.0_mysql.sql -text
@@ -2760,6 +2761,7 @@ lib/tikidate-php5.php -text
 lib/tikidate.php -text
 lib/tikidblib-adodb.php -text
 lib/tikidblib-debug.php -text
+lib/tikidblib-native-mysqli.php -text
 lib/tikidblib-pdo.php -text
 lib/tikidblib.php -text
 lib/tikifck.php -text
