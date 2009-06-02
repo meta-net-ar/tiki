@@ -2608,7 +2608,9 @@ lib/smarty_tiki/block.remarksbox.php -text
 lib/smarty_tiki/block.repeat.php -text
 lib/smarty_tiki/block.self_link.php -text
 lib/smarty_tiki/block.sortlinks.php -text
+lib/smarty_tiki/block.tab.php -text
 lib/smarty_tiki/block.tabs.php -text
+lib/smarty_tiki/block.tabset.php -text
 lib/smarty_tiki/block.textarea.php -text
 lib/smarty_tiki/block.tikimodule.php -text
 lib/smarty_tiki/block.title.php -text
@@ -3543,7 +3545,6 @@ templates/bidi.tpl -text
 templates/blog-heading.tpl -text
 templates/browse_file_gallery.tpl -text
 templates/browsedcategory.tpl -text
-templates/categSelectAll.tpl -text
 templates/categobjects.tpl -text
 templates/categorize.tpl -text
 templates/categpath.tpl -text
