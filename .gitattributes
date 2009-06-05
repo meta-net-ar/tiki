@@ -1171,6 +1171,7 @@ installer/schema/20090513_calendar_priority_tiki.sql -text
 installer/schema/20090513_swffix_tiki.sql -text
 installer/schema/20090513_wiki_similar_permission_tiki.sql -text
 installer/schema/20090515_score_tiki.sql -text
+installer/schema/20090602_webmail_protocols_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2610,7 +2611,6 @@ lib/smarty_tiki/block.repeat.php -text
 lib/smarty_tiki/block.self_link.php -text
 lib/smarty_tiki/block.sortlinks.php -text
 lib/smarty_tiki/block.tab.php -text
-lib/smarty_tiki/block.tabs.php -text
 lib/smarty_tiki/block.tabset.php -text
 lib/smarty_tiki/block.textarea.php -text
 lib/smarty_tiki/block.tikimodule.php -text
@@ -3011,6 +3011,8 @@ modules/cache/index.php -text
 modules/index.php -text
 modules/mod-action_calendar.php -text
 modules/mod-adsense.php -text
+modules/mod-article_archives.php -text
+modules/mod-article_by_rating.php -text
 modules/mod-article_topics.php -text
 modules/mod-articles.php -text
 modules/mod-assistant.php -text
@@ -3466,6 +3468,7 @@ styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/darkroom.png -text
 styles/darkroom/options/small-type.css -text
 styles/darkroom/options/small-type/small-type.png -text
+styles/empty.css -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
 styles/feb12/feb12.png -text
 styles/feb12/header.jpg -text svneol=unset#image/jpeg
@@ -3693,6 +3696,8 @@ templates/modules/mod-action_calendar.tpl -text
 templates/modules/mod-admin_menu.tpl -text
 templates/modules/mod-adsense.tpl -text
 templates/modules/mod-application_menu.tpl.nocache -text
+templates/modules/mod-article_archives.tpl -text
+templates/modules/mod-article_by_rating.tpl -text
 templates/modules/mod-article_topics.tpl -text
 templates/modules/mod-articles.tpl -text
 templates/modules/mod-assistant.tpl -text
