@@ -3832,6 +3832,7 @@ templates/styles/index.php -text
 templates/styles/tikinewt/index.php -text
 templates/textareasize.tpl -text
 templates/tiki-action_calendar.tpl -text
+templates/tiki-admin-config-workspaces.tpl -text
 templates/tiki-admin-include-ads.tpl -text
 templates/tiki-admin-include-anchors.tpl -text
 templates/tiki-admin-include-blogs.tpl -text
