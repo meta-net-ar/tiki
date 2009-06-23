@@ -3607,6 +3607,7 @@ templates/mail/newsletter_welcome_subject.tpl -text
 templates/mail/notification_subject.tpl -text
 templates/mail/password_reminder.tpl -text
 templates/mail/password_reminder_subject.tpl -text
+templates/mail/report.tpl -text
 templates/mail/submission_notification.tpl -text
 templates/mail/submission_notification_subject.tpl -text
 templates/mail/tellAFriend.tpl -text
@@ -3680,6 +3681,8 @@ templates/modules/mod-action_calendar.tpl -text
 templates/modules/mod-admin_menu.tpl -text
 templates/modules/mod-adsense.tpl -text
 templates/modules/mod-application_menu.tpl.nocache -text
+templates/modules/mod-article_archives.tpl -text
+templates/modules/mod-article_by_rating.tpl -text
 templates/modules/mod-article_topics.tpl -text
 templates/modules/mod-articles.tpl -text
 templates/modules/mod-assistant.tpl -text
@@ -3762,6 +3765,7 @@ templates/modules/mod-since_last_visit_new.tpl -text
 templates/modules/mod-switch_lang.tpl -text
 templates/modules/mod-switch_theme.tpl -text
 templates/modules/mod-switch_theme.tpl.nocache -text
+templates/modules/mod-terminology.tpl -text
 templates/modules/mod-tikitests.tpl -text
 templates/modules/mod-top_active_blogs.tpl -text
 templates/modules/mod-top_articles.tpl -text
@@ -4054,6 +4058,7 @@ templates/tiki-list_file_gallery.tpl -text
 templates/tiki-list_gallery.tpl -text
 templates/tiki-list_games.tpl -text
 templates/tiki-list_integrator_repositories.tpl -text
+templates/tiki-list_object_permissions.tpl -text
 templates/tiki-list_posts.tpl -text
 templates/tiki-list_quizzes.tpl -text
 templates/tiki-list_submissions.tpl -text
@@ -4217,13 +4222,16 @@ templates/tracker_item_field_value.tpl -text
 templates/translated-lang.tpl -text
 templates/wiki-discussion.tpl -text
 templates/wiki-plugins/error_tracker.tpl -text
+templates/wiki-plugins/wikiplugin_bloglist.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
 templates/wiki-plugins/wikiplugin_invite.tpl -text
 templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
+templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_rss.tpl -text
+templates/wiki-plugins/wikiplugin_stat.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroup.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroups.tpl -text
 templates/wiki-plugins/wikiplugin_trackerfilter.tpl -text
