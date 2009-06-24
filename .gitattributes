@@ -117,6 +117,7 @@ doc/devtools/usergeo.php -text
 doc/index.php -text
 doc/readme.txt -text
 dump/index.php -text
+/favicon.ico -text
 /favicon.png -text
 /fgal_listing_conf.php -text
 files/index.php -text
@@ -4582,6 +4583,7 @@ tests/testfile.txt -text
 /tiki-list_gallery.php -text
 /tiki-list_games.php -text
 /tiki-list_integrator_repositories.php -text
+/tiki-list_object_permissions.php -text
 /tiki-list_posts.php -text
 /tiki-list_quizzes.php -text
 /tiki-list_submissions.php -text
@@ -4635,6 +4637,7 @@ tests/testfile.txt -text
 /tiki-notepad_list.php -text
 /tiki-notepad_read.php -text
 /tiki-notepad_write.php -text
+/tiki-object_watches.php -text
 /tiki-objectpermissions.php -text
 /tiki-old_polls.php -text
 /tiki-orphan_pages.php -text
@@ -4644,6 +4647,7 @@ tests/testfile.txt -text
 /tiki-parsemode_setup.php -text
 /tiki-phpinfo.php -text
 /tiki-pick_avatar.php -text
+/tiki-plugins.php -text
 /tiki-poll_form.php -text
 /tiki-poll_results.php -text
 /tiki-print.php -text
@@ -4718,6 +4722,8 @@ tests/testfile.txt -text
 /tiki-user_contacts_prefs.php -text
 /tiki-user_information.php -text
 /tiki-user_preferences.php -text
+/tiki-user_reports.php -text
+/tiki-user_reports_send.php -text
 /tiki-user_tasks.php -text
 /tiki-user_watches.php -text
 /tiki-userfiles.php -text
@@ -4745,6 +4751,7 @@ tests/testfile.txt -text
 /tiki-view_tracker_more_info.php -text
 /tiki-wap.php -text
 /tiki-webmail.php -text
+/tiki-webmail_ajax.php -text
 /tiki-webmail_contacts.php -text
 /tiki-webmail_download_attachment.php -text
 /tiki-wiki3d.php -text
