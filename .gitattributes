@@ -62,7 +62,6 @@ db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
 db/tiki_2.0to3.0.sql -text
 /display_banner.php -text
-doc/99_tiki-apache.conf -text
 doc/devtools/.htaccess -text
 doc/devtools/README.txt -text
 doc/devtools/add1tiki2multi.py -text
@@ -82,8 +81,6 @@ doc/devtools/findstyledef.pl -text svneol=unset#application/octet-stream
 doc/devtools/findstyledef.sh -text svneol=unset#application/octet-stream
 doc/devtools/ggg-trace.php -text
 doc/devtools/index.php -text
-doc/devtools/lastcvs.sh -text
-doc/devtools/make_ajax_template.pl -text
 doc/devtools/mergelang.pl -text
 doc/devtools/mods.sh -text
 doc/devtools/myspell_dic_2_tikiWiki_sql.pl -text
@@ -93,8 +90,6 @@ doc/devtools/phpstrip.sh -text
 doc/devtools/premerge_report.sh -text
 doc/devtools/recover_wiki_from_google.pl -text
 doc/devtools/release.php -text
-doc/devtools/release_changelog.php -text
-doc/devtools/release_copyright.php -text
 doc/devtools/removehtaccess.sh -text
 doc/devtools/restorehelp.php -text
 doc/devtools/search_smarty_prefs-2.0.php -text
@@ -123,10 +118,7 @@ doc/devtools/tikimerge.sh -text
 doc/devtools/tikirelease.sh -text
 doc/devtools/tikireleasediff.sh -text
 doc/devtools/tikiwiki.spec -text
-doc/devtools/twcvsbackup.cron -text
 doc/devtools/usergeo.php -text
-doc/htaccess -text
-doc/htaccess.readme -text
 doc/index.php -text
 doc/readme.txt -text
 dump/index.php -text
@@ -136,7 +128,6 @@ files/index.php -text
 files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 /freetag_apply.php -text
 /freetag_list.php -text
-/function.js_maxlength.php -text
 games/README -text
 games/flash/README -text
 games/flash/index.php -text
@@ -3585,6 +3576,7 @@ styles/transitions/1.9to2.2.css -text
 styles/transitions/1.9to3.0.css -text
 styles/transitions/2.0to3.0.css -text
 styles/transitions/index.php -text
+/svn-commit.tmp -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
@@ -4379,7 +4371,6 @@ tests/testfile.txt -text
 /tiki-admin_include_metatags.php -text
 /tiki-admin_include_module.php -text
 /tiki-admin_include_multimedia.php -text
-/tiki-admin_include_plugins.php -text
 /tiki-admin_include_polls.php -text
 /tiki-admin_include_profiles.php -text
 /tiki-admin_include_rss.php -text
@@ -4683,9 +4674,7 @@ tests/testfile.txt -text
 /tiki-setup_base.php -text
 /tiki-sheets.php -text
 /tiki-shoutbox.php -text
-/tiki-shoutjax.php -text
 /tiki-show_all_images.php -text
-/tiki-show_calendar.php -text
 /tiki-show_user_avatar.php -text
 /tiki-slideshow.php -text
 /tiki-slideshow2.php -text
