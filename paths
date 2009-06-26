@@ -1,71 +1,127 @@
 R
 dir
-/branches/experimental/ws/lib/pear/Text/Wiki/Parse/Default
-/trunk/lib/pear/Text/Wiki/Parse/Default
-19807
-
-
-A
-dir
-/branches/experimental/ws/lib/pear/Text
-/trunk/lib/pear/Text
-19807
-
-
-R
-dir
-/branches/experimental/ws/lib/pear/Text/Wiki/Render
+/branches/experimental/coe/lib/pear/Text/Wiki/Render
 /trunk/lib/pear/Text/Wiki/Render
 19807
 
 
 R
 dir
-/branches/experimental/ws/lib/pear/Text/Wiki/Parse/Mediawiki
-/trunk/lib/pear/Text/Wiki/Parse/Mediawiki
+/branches/experimental/coe/lib/pear/Text/Wiki/Parse
+/trunk/lib/pear/Text/Wiki/Parse
 19807
 
 
 R
 dir
-/branches/experimental/ws/lib/pear/Text/Wiki
-/trunk/lib/pear/Text/Wiki
+/branches/experimental/coe/lib/pear/Text/Wiki/Parse/Default
+/trunk/lib/pear/Text/Wiki/Parse/Default
+19807
+
+
+R
+dir
+/branches/experimental/coe/lib/pear/Text/Wiki/Render/Tiki
+/trunk/lib/pear/Text/Wiki/Render/Tiki
+19807
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery/jquery-autocomplete
+
+
+
+
+A
+dir
+/branches/experimental/coe/lib/pear/Text
+/trunk/lib/pear/Text
 19807
 
 
 A
 dir
-/branches/experimental/ws/lib/importer
+/branches/experimental/coe/lib/importer
 /trunk/lib/importer
 19807
 
 
 R
 dir
-/branches/experimental/ws/lib/importer/test
-/trunk/lib/importer/test
-19807
-
-
-R
-dir
-/branches/experimental/ws/lib/pear/Text/Wiki/Render/Tiki
-/trunk/lib/pear/Text/Wiki/Render/Tiki
+/branches/experimental/coe/lib/pear/Text/Wiki/Parse/Mediawiki
+/trunk/lib/pear/Text/Wiki/Parse/Mediawiki
 19807
 
 
 D
 dir
-/branches/experimental/ws/import
+/branches/experimental/coe/import
 
 
 
 
 R
 dir
-/branches/experimental/ws/lib/pear/Text/Wiki/Parse
-/trunk/lib/pear/Text/Wiki/Parse
+/branches/experimental/coe/lib/importer/test
+/trunk/lib/importer/test
 19807
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery/superfish
+
+
+
+
+R
+dir
+/branches/experimental/coe/lib/pear/Text/Wiki
+/trunk/lib/pear/Text/Wiki
+19807
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery/reflection-jquery
+
+
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery
+
+
+
+
+M
+dir
+/branches/experimental/coe/styles/strasa/options/mono/pics
+
+
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery_tiki
+
+
+
+
+M
+dir
+/branches/experimental/coe
+
+
+
+
+M
+dir
+/branches/experimental/coe/lib/jquery/cluetip
+
+
 
 
 
