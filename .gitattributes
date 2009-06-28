@@ -1171,6 +1171,7 @@ installer/schema/20090515_score_tiki.sql -text
 installer/schema/20090602_webmail_protocols_tiki.sql -text
 installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
+installer/schema/20090626_change_pear_auth_preferences_to_ldap.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1478,6 +1479,7 @@ lib/ajax/tiki-ajax.js -text
 lib/ajax/tikitohtml.php -text
 lib/articles/artlib.php -text
 lib/articles/index.php -text
+lib/auth/ldap.php -text
 lib/bablotron.php -text
 lib/ban/banlib.php -text
 lib/ban/index.php -text
@@ -1575,6 +1577,7 @@ lib/core/test/WikiParser/PluginMatcherTest.php -text
 lib/core/test/WikiParser/PluginParserTest.php -text
 lib/core/test/WikiParser/PluginRepositoryTest.php -text
 lib/core/test/WikiParser/wikiplugin_foo.php -text
+lib/core/test/create_dump_db_file.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/dcs/dcslib.php -text
@@ -2314,6 +2317,16 @@ lib/pear/Net/DNS/RR/SRV.php -text
 lib/pear/Net/DNS/RR/TSIG.php -text
 lib/pear/Net/DNS/RR/TXT.php -text
 lib/pear/Net/DNS/Resolver.php -text
+lib/pear/Net/LDAP2.php -text
+lib/pear/Net/LDAP2/Entry.php -text
+lib/pear/Net/LDAP2/Filter.php -text
+lib/pear/Net/LDAP2/LDIF.php -text
+lib/pear/Net/LDAP2/RootDSE.php -text
+lib/pear/Net/LDAP2/Schema.php -text
+lib/pear/Net/LDAP2/SchemaCache.interface.php -text
+lib/pear/Net/LDAP2/Search.php -text
+lib/pear/Net/LDAP2/SimpleFileSchemaCache.php -text
+lib/pear/Net/LDAP2/Util.php -text
 lib/pear/Net/Ping.php -text
 lib/pear/Net/Socket.php -text
 lib/pear/Net/URL.php -text
