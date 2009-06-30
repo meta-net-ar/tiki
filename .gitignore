@@ -24,6 +24,8 @@ lib/Galaxia/processes/*
 lib/core/test/foo.txt
 lib/core/test/temp/cache/*
 lib/smarty
+lib/workspaces/.wsController.php.swp
+lib/workspaces/.wslib.php.swp
 /maps
 maps/*
 /mods
