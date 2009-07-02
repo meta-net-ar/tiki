@@ -5,14 +5,13 @@
 /ZendPlatform
 /ZendStudioServer
 backups/*
+bin/.htaccess
 db/.htaccess
 db/local.php
-db/virtuals.inc
 /dummy.php
 dump/*
 images/.htaccess
 img/.htaccess
-img/trackers/*
 img/wiki/*.gif
 img/wiki/*.pad_xml
 img/wiki_up/*
@@ -24,7 +23,6 @@ lib/core/test/foo.txt
 lib/core/test/temp/cache/*
 lib/smarty
 /maps
-maps/*
 /mods
 modules/.htaccess
 modules/cache
@@ -39,7 +37,6 @@ temp/cache/fgals_*
 temp/cache/fgals_perms_*
 temp/cache/menu_*
 temp/cache/profile????????????????????????????????
-temp/cache/thumbnail_*
 temp/cache/wiki-*
 temp/cache/wikiplugin_*
 temp/dbg-watch.*
