@@ -1715,6 +1715,7 @@ lib/htmlparser/htmlparser.inc -text
 lib/htmlparser/index.php -text
 lib/htmlparser/readme.eng.txt -text
 lib/htmlparser/rebuildgrammar.php -text
+lib/htmlpurifier_tiki/HTMLPurifier.tiki.php -text
 lib/ical/File.php -text
 lib/ical/iCal.php -text
 lib/ical/iCal/Alarm.php -text
@@ -3156,6 +3157,7 @@ modules/mod-freetags_morelikethis.php -text
 modules/mod-freetags_most_popular.php -text
 modules/mod-freetags_prefered.php -text
 modules/mod-google.php -text
+modules/mod-groups_emulation.php -text
 modules/mod-last_actions.php -text
 modules/mod-last_articles.php -text
 modules/mod-last_blog_posts.php -text
@@ -3847,6 +3849,7 @@ templates/modules/mod-freetags_morelikethis.tpl -text
 templates/modules/mod-freetags_most_popular.tpl -text
 templates/modules/mod-freetags_prefered.tpl -text
 templates/modules/mod-google.tpl -text
+templates/modules/mod-groups_emulation.tpl -text
 templates/modules/mod-last_actions.tpl -text
 templates/modules/mod-last_actions.tpl.nocache -text svneol=unset#application/octet-stream
 templates/modules/mod-last_articles.tpl -text
@@ -4547,6 +4550,7 @@ tests/testfile.txt -text
 /tiki-edit_wiki_section.php -text
 /tiki-editdrawing.php -text
 /tiki-editpage.php -text
+/tiki-emulate_groups_switch.php -text
 /tiki-error_simple.php -text
 /tiki-export_sheet.php -text
 /tiki-export_tracker.php -text
