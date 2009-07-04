@@ -4189,6 +4189,7 @@ templates/tiki-theme_control_sections.tpl -text
 templates/tiki-upload_file.tpl -text
 templates/tiki-upload_file_progress.tpl -text
 templates/tiki-upload_image.tpl -text
+templates/tiki-upload_video.tpl -text
 templates/tiki-user_assigned_modules.tpl -text
 templates/tiki-user_bookmarks.tpl -text
 templates/tiki-user_contacts_prefs.tpl -text
@@ -4637,6 +4638,7 @@ tests/testfile.txt -text
 /tiki-tracker_rss.php -text
 /tiki-upload_file.php -text
 /tiki-upload_image.php -text
+/tiki-upload_video.php -text
 /tiki-usage_chart.php -text
 /tiki-user_assigned_modules.php -text
 /tiki-user_bookmarks.php -text
