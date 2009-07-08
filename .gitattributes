@@ -1,4 +1,5 @@
 * text=auto !eol
+/AllTests.php -text
 /INSTALL -text
 /README -text
 /_htaccess -text
@@ -1172,6 +1173,7 @@ installer/schema/20090605_tiki_p_modify_tracker_items_pending_closed_tiki.sql -t
 installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
 installer/schema/20090626_change_pear_auth_preferences_to_ldap.sql -text
+installer/schema/20090707_tiki_p_delete_account_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1540,7 +1542,9 @@ lib/core/test/AcceptanceTests/AllTests.php -text
 lib/core/test/AcceptanceTests/ListPagesTest.php -text
 lib/core/test/AcceptanceTests/MultilingualTest.php -text
 lib/core/test/AcceptanceTests/SearchTest.php -text
+lib/core/test/AcceptanceTests/TikiLibrariesAccessTest.php -text
 lib/core/test/AllTests.php -text
+lib/core/test/AllTestsAcceptance.php -text
 lib/core/test/DeclFilter/AllTests.php -text
 lib/core/test/DeclFilter/BaseTest.php -text
 lib/core/test/DeclFilter/CatchAllFilterTest.php -text
@@ -1577,6 +1581,7 @@ lib/core/test/WikiParser/PluginParserTest.php -text
 lib/core/test/WikiParser/PluginRepositoryTest.php -text
 lib/core/test/WikiParser/wikiplugin_foo.php -text
 lib/core/test/create_dump_db_file.php -text
+lib/core/test/restore_db_dump.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/dcs/dcslib.php -text
