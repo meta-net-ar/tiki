@@ -1529,6 +1529,13 @@ lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
+lib/core/lib/Perms.php -text
+lib/core/lib/Perms/Accessor.php -text
+lib/core/lib/Perms/Resolver.php -text
+lib/core/lib/Perms/Resolver/Default.php -text
+lib/core/lib/Perms/Resolver/Static.php -text
+lib/core/lib/Perms/ResolverFactory.php -text
+lib/core/lib/Perms/ResolverFactory/TestFactory.php -text
 lib/core/lib/TikiDb.php -text
 lib/core/lib/TikiDb/Adodb.php -text
 lib/core/lib/TikiDb/ErrorHandler.php -text
@@ -1571,6 +1578,11 @@ lib/core/test/Multilingual/Aligner/ShortestPathFinderTest.php -text
 lib/core/test/Multilingual/AllTests.php -text
 lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
 lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
+lib/core/test/Perms/AccessorTest.php -text
+lib/core/test/Perms/BaseTest.php -text
+lib/core/test/Perms/Resolver/DefaultTest.php -text
+lib/core/test/Perms/Resolver/StaticTest.php -text
+lib/core/test/Perms/ResolverFactory/TestFactoryTest.php -text
 lib/core/test/TikiAcceptanceTestDBRestorer.php -text
 lib/core/test/TikiFilter/CallbackTest.php -text
 lib/core/test/TikiFilter/MapTest.php -text
