@@ -3086,6 +3086,10 @@ lib/workspaces/index.php -text
 lib/workspaces/wsController.php -text
 lib/workspaces/wslib.php -text
 lib/workspaces/wstools/scriptCreator.php -text
+lib/workspaces/wstools/tests/Makefile -text
+lib/workspaces/wstools/tests/README -text
+lib/workspaces/wstools/tests/unitesting.php -text
+lib/workspaces/wstools/tests/wsInsertionTest.php -text
 lib/workspaces/wstools/unitesting.php -text
 lib/x/index.php -text
 lib/x/x.js -text
