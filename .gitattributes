@@ -1537,6 +1537,7 @@ lib/core/lib/Perms/Resolver/Default.php -text
 lib/core/lib/Perms/Resolver/Static.php -text
 lib/core/lib/Perms/ResolverFactory.php -text
 lib/core/lib/Perms/ResolverFactory/GlobalFactory.php -text
+lib/core/lib/Perms/ResolverFactory/StaticFactory.php -text
 lib/core/lib/Perms/ResolverFactory/TestFactory.php -text
 lib/core/lib/TikiDb.php -text
 lib/core/lib/TikiDb/Adodb.php -text
