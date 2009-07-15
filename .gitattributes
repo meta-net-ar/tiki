@@ -1536,6 +1536,7 @@ lib/core/lib/Perms/Resolver.php -text
 lib/core/lib/Perms/Resolver/Default.php -text
 lib/core/lib/Perms/Resolver/Static.php -text
 lib/core/lib/Perms/ResolverFactory.php -text
+lib/core/lib/Perms/ResolverFactory/CategoryFactory.php -text
 lib/core/lib/Perms/ResolverFactory/GlobalFactory.php -text
 lib/core/lib/Perms/ResolverFactory/ObjectFactory.php -text
 lib/core/lib/Perms/ResolverFactory/StaticFactory.php -text
@@ -1586,6 +1587,7 @@ lib/core/test/Perms/AccessorTest.php -text
 lib/core/test/Perms/BaseTest.php -text
 lib/core/test/Perms/Resolver/DefaultTest.php -text
 lib/core/test/Perms/Resolver/StaticTest.php -text
+lib/core/test/Perms/ResolverFactory/CategoryFactoryTest.php -text
 lib/core/test/Perms/ResolverFactory/GlobalFactoryTest.php -text
 lib/core/test/Perms/ResolverFactory/ObjectFactoryTest.php -text
 lib/core/test/Perms/ResolverFactory/TestFactoryTest.php -text
