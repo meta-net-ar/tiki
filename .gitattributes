@@ -4356,6 +4356,7 @@ templates/tiki-webmail.tpl -text
 templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki-wiki_topline.tpl -text
+templates/tiki-workspaces-index.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_item_field_googlemap_value.tpl -text
@@ -4666,6 +4667,7 @@ tests/testfile.txt -text
 /tiki-magic.php -text
 /tiki-mailin-code.php -text
 /tiki-mailin.php -text
+/tiki-manage-workspaces.php -text
 /tiki-map.php -text
 /tiki-map_download.phtml -text
 /tiki-map_edit.php -text
@@ -4684,6 +4686,7 @@ tests/testfile.txt -text
 /tiki-module.php -text
 /tiki-module_controls.php -text
 /tiki-modules.php -text
+/tiki-my-workspaces.php -text
 /tiki-my_tiki.php -text
 /tiki-mytiki_shared.php -text
 /tiki-newsletter_archives.php -text
@@ -4814,6 +4817,7 @@ tests/testfile.txt -text
 /tiki-wiki_rankings.php -text
 /tiki-wiki_rss.php -text
 /tiki-wikiplugin_edit.php -text
+/tiki-workspaces-index.php -text
 /tiki-xmlrpc_services.php -text
 tiki_tests/index.php -text
 tiki_tests/tests/.htaccess -text
