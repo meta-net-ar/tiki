@@ -1174,6 +1174,7 @@ installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
 installer/schema/20090626_change_pear_auth_preferences_to_ldap.sql -text
 installer/schema/20090707_tiki_p_delete_account_tiki.sql -text
+installer/schema/20090713_tiki_importer_permission_and_menu_entry.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1244,6 +1245,8 @@ lang/ru/language.php -text
 lang/sb/language.php -text
 lang/sk/index.php -text
 lang/sk/language.php -text
+lang/sl/index.php -text
+lang/sl/language.php -text
 lang/sp/index.php -text
 lang/sr-latn/index.php -text
 lang/sr-latn/language.php -text
@@ -1528,6 +1531,11 @@ lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
+lib/core/lib/TikiDb.php -text
+lib/core/lib/TikiDb/Adodb.php -text
+lib/core/lib/TikiDb/ErrorHandler.php -text
+lib/core/lib/TikiDb/Exception.php -text
+lib/core/lib/TikiDb/Pdo.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
@@ -1905,7 +1913,13 @@ lib/images/imagick_old.php -text
 lib/importer/mediawiki_dump.xsd -text
 lib/importer/test/AllTests.php -text
 lib/importer/test/fixtures/mediawiki_contributor.xml -text
+lib/importer/test/fixtures/mediawiki_invalid.xml -text
+lib/importer/test/fixtures/mediawiki_page.xml -text
+lib/importer/test/fixtures/mediawiki_page_as_array.php -text
+lib/importer/test/fixtures/mediawiki_revision.xml -text
+lib/importer/test/fixtures/mediawiki_sample.xml -text
 lib/importer/test/tikiimporter_test.php -text
+lib/importer/test/tikiimporter_testcase.php -text
 lib/importer/test/tikiimporter_wiki_mediawiki_test.php -text
 lib/importer/test/tikiimporter_wiki_test.php -text
 lib/importer/tikiimporter.php -text
@@ -2887,11 +2901,7 @@ lib/tikiaccesslib.php -text
 lib/tikidate-pear-date.php -text
 lib/tikidate-php5.php -text
 lib/tikidate.php -text
-lib/tikidblib-adodb.php -text
-lib/tikidblib-debug.php -text
 lib/tikidblib-native-mysqli.php -text
-lib/tikidblib-pdo.php -text
-lib/tikidblib.php -text
 lib/tikifck.php -text
 lib/tikihelp/content.html -text
 lib/tikihelp/css/index.php -text
@@ -4391,7 +4401,6 @@ templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
 templates_c/index.php -text
-/test_php_beautifier.php -text
 tests/.htaccess -text
 tests/example.txt -text
 tests/force-error_sql.php -text
