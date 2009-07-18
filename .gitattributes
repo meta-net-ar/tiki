@@ -1543,6 +1543,7 @@ lib/core/lib/Perms/ResolverFactory/StaticFactory.php -text
 lib/core/lib/Perms/ResolverFactory/TestFactory.php -text
 lib/core/lib/TikiDb.php -text
 lib/core/lib/TikiDb/Adodb.php -text
+lib/core/lib/TikiDb/Bridge.php -text
 lib/core/lib/TikiDb/ErrorHandler.php -text
 lib/core/lib/TikiDb/Exception.php -text
 lib/core/lib/TikiDb/Pdo.php -text
@@ -1607,6 +1608,7 @@ lib/core/test/bootstrap.php -text
 lib/core/test/create_dump_db_file.php -text
 lib/core/test/phpunit.xml -text
 lib/core/test/restore_db_dump.php -text
+lib/core/test/upgrade_test_database_dump_file.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/dcs/dcslib.php -text
@@ -2606,9 +2608,9 @@ lib/score/scorelib.php -text
 lib/search/index.php -text
 lib/search/refresh-functions.php -text
 lib/search/refresh.php -text
-lib/search/searchlib.php -text
+lib/search/searchlib-mysql.php -text
+lib/search/searchlib-tiki.php -text
 lib/search/searchstatslib.php -text
-lib/searchlib.php -text
 lib/setup/absolute_urls.php -text
 lib/setup/babelfish.php -text
 lib/setup/breadcrumb.php -text
