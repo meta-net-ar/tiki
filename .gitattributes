@@ -1535,6 +1535,7 @@ lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
 lib/core/lib/Perms.php -text
 lib/core/lib/Perms/Accessor.php -text
 lib/core/lib/Perms/Check.php -text
+lib/core/lib/Perms/Check/Creator.php -text
 lib/core/lib/Perms/Check/Direct.php -text
 lib/core/lib/Perms/Check/Indirect.php -text
 lib/core/lib/Perms/Resolver.php -text
@@ -1591,6 +1592,7 @@ lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
 lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/core/test/Perms/AccessorTest.php -text
 lib/core/test/Perms/BaseTest.php -text
+lib/core/test/Perms/Check/CreatorTest.php -text
 lib/core/test/Perms/Check/DirectTest.php -text
 lib/core/test/Perms/Check/IndirectTest.php -text
 lib/core/test/Perms/CheckSequenceTest.php -text
