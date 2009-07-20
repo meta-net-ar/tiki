@@ -1534,6 +1534,9 @@ lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
 lib/core/lib/Perms.php -text
 lib/core/lib/Perms/Accessor.php -text
+lib/core/lib/Perms/Check.php -text
+lib/core/lib/Perms/Check/Direct.php -text
+lib/core/lib/Perms/Check/Indirect.php -text
 lib/core/lib/Perms/Resolver.php -text
 lib/core/lib/Perms/Resolver/Default.php -text
 lib/core/lib/Perms/Resolver/Static.php -text
@@ -1588,6 +1591,9 @@ lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
 lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/core/test/Perms/AccessorTest.php -text
 lib/core/test/Perms/BaseTest.php -text
+lib/core/test/Perms/Check/DirectTest.php -text
+lib/core/test/Perms/Check/IndirectTest.php -text
+lib/core/test/Perms/CheckSequenceTest.php -text
 lib/core/test/Perms/Resolver/DefaultTest.php -text
 lib/core/test/Perms/Resolver/StaticTest.php -text
 lib/core/test/Perms/ResolverFactory/CategoryFactoryTest.php -text
