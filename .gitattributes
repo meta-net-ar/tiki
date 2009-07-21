@@ -1598,6 +1598,7 @@ lib/core/test/Perms/Check/CreatorTest.php -text
 lib/core/test/Perms/Check/DirectTest.php -text
 lib/core/test/Perms/Check/IndirectTest.php -text
 lib/core/test/Perms/CheckSequenceTest.php -text
+lib/core/test/Perms/MixedTest.php -text
 lib/core/test/Perms/Resolver/DefaultTest.php -text
 lib/core/test/Perms/Resolver/StaticTest.php -text
 lib/core/test/Perms/ResolverFactory/CategoryFactoryTest.php -text
