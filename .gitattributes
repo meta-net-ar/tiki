@@ -49,6 +49,7 @@ db/tiki-4.0-sybase.sql -text
 db/tiki-db-adodb.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
+db/tiki-pgsql-test.sql -text
 db/tiki-secdb_3.0_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
@@ -1177,6 +1178,7 @@ installer/schema/20090707_tiki_p_delete_account_tiki.sql -text
 installer/schema/20090713_tiki_importer_permission_and_menu_entry_tiki.sql -text
 installer/schema/20090715_sefurl_for_filegalleries_tiki.sql -text
 installer/schema/20090720_perspectives_tiki.sql -text
+installer/schema/20090721_webmail_ext_public_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -2929,6 +2931,7 @@ lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_googledoc.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
+lib/wiki-plugins/wikiplugin_groupmailcore.php -text
 lib/wiki-plugins/wikiplugin_html.php -text
 lib/wiki-plugins/wikiplugin_iframe.php -text
 lib/wiki-plugins/wikiplugin_image.php -text
@@ -3071,6 +3074,7 @@ modules/mod-directory_last_sites.php -text
 modules/mod-directory_stats.php -text
 modules/mod-directory_top_sites.php -text
 modules/mod-featured_links.php -text
+modules/mod-file_galleries.php -text
 modules/mod-forums_best_voted_topics.php -text
 modules/mod-forums_last_posts.php -text
 modules/mod-forums_last_topics.php -text
@@ -3764,6 +3768,7 @@ templates/modules/mod-directory_stats.tpl -text
 templates/modules/mod-directory_top_sites.tpl -text
 templates/modules/mod-events.tpl -text
 templates/modules/mod-featured_links.tpl -text
+templates/modules/mod-file_galleries.tpl -text
 templates/modules/mod-forums_best_voted_topics.tpl -text
 templates/modules/mod-forums_last_posts.tpl -text svneol=unset#application/octet-stream
 templates/modules/mod-forums_last_topics.tpl -text
