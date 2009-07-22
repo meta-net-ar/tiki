@@ -1171,7 +1171,10 @@ installer/schema/20090602_webmail_protocols_tiki.sql -text
 installer/schema/20090605_tiki_p_modify_tracker_items_pending_closed_tiki.sql -text
 installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
-installer/schema/20090626_change_pear_auth_preferences_to_ldap.sql -text
+installer/schema/20090626_change_pear_auth_preferences_to_ldap_tiki.sql -text
+installer/schema/20090713_tiki_importer_permission_and_menu_entry_tiki.sql -text
+installer/schema/20090715_sefurl_for_filegalleries_tiki.sql -text
+installer/schema/20090720_perspectives_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1242,6 +1245,8 @@ lang/ru/language.php -text
 lang/sb/language.php -text
 lang/sk/index.php -text
 lang/sk/language.php -text
+lang/sl/index.php -text
+lang/sl/language.php -text
 lang/sp/index.php -text
 lang/sr-latn/index.php -text
 lang/sr-latn/language.php -text
@@ -1525,6 +1530,11 @@ lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
+lib/core/lib/TikiDb/Adodb.php -text
+lib/core/lib/TikiDb/Bridge.php -text
+lib/core/lib/TikiDb/ErrorHandler.php -text
+lib/core/lib/TikiDb/Exception.php -text
+lib/core/lib/TikiDb/Pdo.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
@@ -1554,7 +1564,6 @@ lib/core/test/JitFilter/AccessTest.php -text
 lib/core/test/JitFilter/AllTests.php -text
 lib/core/test/JitFilter/FilterTest.php -text
 lib/core/test/JitFilter/IteratorTest.php -text
-lib/core/test/JustAFewTests.php -text
 lib/core/test/Multilingual/Aligner/AllTests.php -text
 lib/core/test/Multilingual/Aligner/BilingualAlignerTest.php -text
 lib/core/test/Multilingual/Aligner/SentenceSegmentorTest.php -text
@@ -1872,10 +1881,13 @@ lib/images/icons/zip.svg -text
 lib/images/images.php -text
 lib/images/imagick_new.php -text
 lib/images/imagick_old.php -text
-lib/importer/TikiImporter.php -text
-lib/importer/TikiImporter_Wiki.php -text
-lib/importer/TikiImporter_Wiki_Mediawiki.php -text
 lib/importer/mediawiki_dump.xsd -text
+lib/importer/test/fixtures/mediawiki_contributor.xml -text
+lib/importer/test/fixtures/mediawiki_invalid.xml -text
+lib/importer/test/fixtures/mediawiki_page.xml -text
+lib/importer/test/fixtures/mediawiki_page_as_array.php -text
+lib/importer/test/fixtures/mediawiki_revision.xml -text
+lib/importer/test/fixtures/mediawiki_sample.xml -text
 lib/importerlib.php -text
 lib/index.php -text
 lib/init/index.php -text
@@ -2522,6 +2534,7 @@ lib/pear/XML_Parser/tests/005.phpt -text
 lib/pear/XML_Parser/tests/test2.xml -text
 lib/pear/XML_Parser/tests/test3.xml -text
 lib/pear/index.php -text
+lib/perspectivelib.php -text
 lib/phplayers_tiki/index.php -text
 lib/phplayers_tiki/lib/index.php -text
 lib/phplayers_tiki/lib/layersmenu-common.inc.php -text
@@ -2565,9 +2578,7 @@ lib/score/scorelib.php -text
 lib/search/index.php -text
 lib/search/refresh-functions.php -text
 lib/search/refresh.php -text
-lib/search/searchlib.php -text
 lib/search/searchstatslib.php -text
-lib/searchlib.php -text
 lib/setup/absolute_urls.php -text
 lib/setup/babelfish.php -text
 lib/setup/breadcrumb.php -text
@@ -2851,10 +2862,6 @@ lib/tikiaccesslib.php -text
 lib/tikidate-pear-date.php -text
 lib/tikidate-php5.php -text
 lib/tikidate.php -text
-lib/tikidblib-adodb.php -text
-lib/tikidblib-debug.php -text
-lib/tikidblib-pdo.php -text
-lib/tikidblib.php -text
 lib/tikifck.php -text
 lib/tikihelp/content.html -text
 lib/tikihelp/css/index.php -text
@@ -3163,6 +3170,7 @@ modules/mod-months_links.php -text
 modules/mod-num_submissions.php -text
 modules/mod-old_articles.php -text
 modules/mod-online_users.php -text
+modules/mod-perspective.php -text
 modules/mod-quick_edit.php -text
 modules/mod-random_images.php -text
 modules/mod-random_pages.php -text
@@ -3861,6 +3869,7 @@ templates/modules/mod-num_submissions.tpl -text
 templates/modules/mod-old_articles.tpl -text
 templates/modules/mod-online_users.tpl -text
 templates/modules/mod-online_users.tpl.nocache -text
+templates/modules/mod-perspective.tpl -text
 templates/modules/mod-quick_edit.tpl -text
 templates/modules/mod-random_images.tpl -text
 templates/modules/mod-random_pages.tpl -text
@@ -4725,6 +4734,7 @@ tests/testfile.txt -text
 /tiki-survey_stats.php -text
 /tiki-survey_stats_survey.php -text
 /tiki-switch_lang.php -text
+/tiki-switch_perspective.php -text
 /tiki-switch_theme.php -text
 /tiki-syslog.php -text
 /tiki-take_quiz.php -text
