@@ -4334,6 +4334,7 @@ templates/tiki-user_tasks_edit.tpl -text
 templates/tiki-user_tasks_list.tpl -text
 templates/tiki-user_tasks_view.tpl -text
 templates/tiki-user_watches.tpl -text
+templates/tiki-user_ws.tpl -text
 templates/tiki-userfiles.tpl -text
 templates/tiki-usermenu.tpl -text
 templates/tiki-userversions.tpl -text
@@ -4787,6 +4788,7 @@ tests/testfile.txt -text
 /tiki-user_reports_send.php -text
 /tiki-user_tasks.php -text
 /tiki-user_watches.php -text
+/tiki-user_ws.php -text
 /tiki-userfiles.php -text
 /tiki-usermenu.php -text
 /tiki-users3d_xmlrpc.php -text
