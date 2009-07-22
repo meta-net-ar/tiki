@@ -2781,6 +2781,8 @@ lib/smarty_tiki/modifier.how_many_user_inscriptions.php -text
 lib/smarty_tiki/modifier.htmldecode.php -text
 lib/smarty_tiki/modifier.iconify.php -text
 lib/smarty_tiki/modifier.isodate.php -text
+lib/smarty_tiki/modifier.kaltura_date_format.php -text
+lib/smarty_tiki/modifier.kaltura_media_type.php -text
 lib/smarty_tiki/modifier.kbsize.php -text
 lib/smarty_tiki/modifier.langname.php -text
 lib/smarty_tiki/modifier.lcfirst.php -text
@@ -4190,6 +4192,7 @@ templates/tiki-list_file_gallery.tpl -text
 templates/tiki-list_gallery.tpl -text
 templates/tiki-list_games.tpl -text
 templates/tiki-list_integrator_repositories.tpl -text
+templates/tiki-list_kaltura_entries.tpl -text
 templates/tiki-list_object_permissions.tpl -text
 templates/tiki-list_posts.tpl -text
 templates/tiki-list_quizzes.tpl -text
@@ -4632,6 +4635,7 @@ tests/testfile.txt -text
 /tiki-list_gallery.php -text
 /tiki-list_games.php -text
 /tiki-list_integrator_repositories.php -text
+/tiki-list_kaltura_entries.php -text
 /tiki-list_object_permissions.php -text
 /tiki-list_posts.php -text
 /tiki-list_quizzes.php -text
