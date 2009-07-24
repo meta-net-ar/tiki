@@ -3157,6 +3157,7 @@ modules/mod-youtube.php -text
 pics/help_icon.png -text
 pics/icons/accept.png -text
 pics/icons/add.png -text
+pics/icons/anchor.png -text
 pics/icons/announce.png -text
 pics/icons/announce_new.png -text
 pics/icons/application_add.png -text
@@ -3194,6 +3195,7 @@ pics/icons/control_play.png -text
 pics/icons/control_stop.png -text
 pics/icons/cross.png -text
 pics/icons/cross_admin.png -text
+pics/icons/cut.png -text
 pics/icons/database.png -text
 pics/icons/database_gear.png -text
 pics/icons/database_go.png -text
@@ -3301,11 +3303,13 @@ pics/icons/ovmodule.png -text
 pics/icons/package.png -text
 pics/icons/package_go.png -text
 pics/icons/page.png -text
+pics/icons/page_copy.png -text
 pics/icons/page_edit.png -text
 pics/icons/page_edit_section.png -text
 pics/icons/page_gear.png -text
 pics/icons/page_link.png -text
 pics/icons/page_new.png -text
+pics/icons/page_paste.png -text
 pics/icons/page_translate_from.png -text
 pics/icons/page_translate_to.png -text
 pics/icons/page_white_acrobat.png -text
