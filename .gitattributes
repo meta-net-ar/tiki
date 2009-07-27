@@ -1893,6 +1893,7 @@ lib/importer/test/fixtures/mediawiki_page_as_array.php -text
 lib/importer/test/fixtures/mediawiki_revision.xml -text
 lib/importer/test/fixtures/mediawiki_revision_invalid_syntax.xml -text
 lib/importer/test/fixtures/mediawiki_sample.xml -text
+lib/importer/test/fixtures/mediawiki_upload.xml -text
 lib/importerlib.php -text
 lib/index.php -text
 lib/init/index.php -text
