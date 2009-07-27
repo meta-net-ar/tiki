@@ -25,6 +25,7 @@ css/jscalendar.css -text
 css/spanky.css -text
 db/.htaccess -text
 db/case_patch.php -text
+db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
 db/convertscripts/mysql3tooci8.php -text
@@ -1177,6 +1178,7 @@ installer/schema/20090713_tiki_importer_permission_and_menu_entry_tiki.sql -text
 installer/schema/20090715_sefurl_for_filegalleries_tiki.sql -text
 installer/schema/20090720_perspectives_tiki.sql -text
 installer/schema/20090721_webmail_ext_public_tiki.sql -text
+installer/schema/20090727_user_votings_index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1889,6 +1891,7 @@ lib/importer/test/fixtures/mediawiki_invalid.xml -text
 lib/importer/test/fixtures/mediawiki_page.xml -text
 lib/importer/test/fixtures/mediawiki_page_as_array.php -text
 lib/importer/test/fixtures/mediawiki_revision.xml -text
+lib/importer/test/fixtures/mediawiki_revision_invalid_syntax.xml -text
 lib/importer/test/fixtures/mediawiki_sample.xml -text
 lib/importerlib.php -text
 lib/index.php -text
