@@ -1519,6 +1519,7 @@ lib/contribution/contributionlib.php -text
 lib/contribution/index.php -text
 lib/copyrights/copyrightslib.php -text
 lib/copyrights/index.php -text
+lib/core/lib/Category/Manipulator.php -text
 lib/core/lib/DeclFilter.php -text
 lib/core/lib/DeclFilter/CatchAllFilterRule.php -text
 lib/core/lib/DeclFilter/CatchAllUnsetRule.php -text
@@ -1575,6 +1576,7 @@ lib/core/test/AcceptanceTests/SearchTest.php -text
 lib/core/test/AcceptanceTests/TikiLibrariesAccessTest.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/AllTestsAcceptance.php -text
+lib/core/test/Category/ManipulatorTest.php -text
 lib/core/test/DeclFilter/BaseTest.php -text
 lib/core/test/DeclFilter/CatchAllFilterTest.php -text
 lib/core/test/DeclFilter/CatchAllUnsetTest.php -text
