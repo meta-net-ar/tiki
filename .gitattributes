@@ -26,6 +26,7 @@ css/jscalendar.css -text
 css/spanky.css -text
 db/.htaccess -text
 db/case_patch.php -text
+db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
 db/convertscripts/mysql3tooci8.php -text
@@ -1924,6 +1925,7 @@ lib/importer/test/fixtures/mediawiki_invalid.xml -text
 lib/importer/test/fixtures/mediawiki_page.xml -text
 lib/importer/test/fixtures/mediawiki_page_as_array.php -text
 lib/importer/test/fixtures/mediawiki_revision.xml -text
+lib/importer/test/fixtures/mediawiki_revision_invalid_syntax.xml -text
 lib/importer/test/fixtures/mediawiki_sample.xml -text
 lib/importer/test/tikiimporter_test.php -text
 lib/importer/test/tikiimporter_testcase.php -text
