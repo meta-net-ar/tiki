@@ -3182,6 +3182,7 @@ pics/icons/arrow_small.png -text
 pics/icons/assign.png -text
 pics/icons/attach.png -text
 pics/icons/bell.png -text
+pics/icons/book.png -text
 pics/icons/book_open.png -text
 pics/icons/box.png -text
 pics/icons/bricks.png -text
@@ -3191,6 +3192,7 @@ pics/icons/calendar_add.png -text
 pics/icons/chart_curve.png -text
 pics/icons/chart_line.png -text
 pics/icons/chart_organisation.png -text
+pics/icons/clock.png -text
 pics/icons/comment_add.png -text
 pics/icons/comment_approve.png -text
 pics/icons/comment_reject.png -text
@@ -3204,7 +3206,9 @@ pics/icons/cut.png -text
 pics/icons/database.png -text
 pics/icons/database_gear.png -text
 pics/icons/database_go.png -text
+pics/icons/database_lightning.png -text
 pics/icons/database_refresh.png -text
+pics/icons/database_table.png -text
 pics/icons/delete.png -text
 pics/icons/disk.png -text
 pics/icons/disk_lock.png -text
@@ -3230,12 +3234,16 @@ pics/icons/folder_add.png -text
 pics/icons/folder_go.png -text
 pics/icons/green_question.png -text
 pics/icons/group.png -text
+pics/icons/group_gear.png -text
+pics/icons/group_go.png -text
 pics/icons/group_key.png -text
 pics/icons/help.png -text
 pics/icons/hot.png -text
 pics/icons/hot_new.png -text
 pics/icons/house.png -text
 pics/icons/house_go.png -text
+pics/icons/html.png -text
+pics/icons/html_add.png -text
 pics/icons/image.png -text
 pics/icons/image_add.png -text
 pics/icons/information.png -text
@@ -3255,6 +3263,7 @@ pics/icons/lock_gray.png -text
 pics/icons/lock_new.png -text
 pics/icons/lock_red.png -text
 pics/icons/magnifier.png -text
+pics/icons/map.png -text
 pics/icons/mime/c.png -text
 pics/icons/mime/cpp.png -text
 pics/icons/mime/default.png -text
@@ -3320,6 +3329,7 @@ pics/icons/page_translate_to.png -text
 pics/icons/page_white_acrobat.png -text
 pics/icons/page_white_actionscript.png -text
 pics/icons/page_white_code.png -text
+pics/icons/page_white_flash.png -text
 pics/icons/page_white_link.png -text
 pics/icons/page_white_picture.png -text
 pics/icons/page_white_stack.png -text
@@ -3346,6 +3356,7 @@ pics/icons/resultset_next_fast.png -text
 pics/icons/resultset_previous.png -text
 pics/icons/resultset_previous_fast.png -text
 pics/icons/resultset_up.png -text
+pics/icons/rss.png -text
 pics/icons/shading.png -text
 pics/icons/shape_square_edit.png -text
 pics/icons/star.png -text
@@ -3360,6 +3371,7 @@ pics/icons/tag_blue_add.png -text
 pics/icons/task_received.png -text
 pics/icons/task_shared.png -text
 pics/icons/task_submitted.png -text
+pics/icons/television.png -text
 pics/icons/text_align_center.png -text
 pics/icons/text_align_justify.png -text
 pics/icons/text_align_left.png -text
