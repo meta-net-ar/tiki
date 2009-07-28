@@ -4145,6 +4145,7 @@ templates/tiki-minical_prefs.tpl -text
 templates/tiki-mods.tpl -text
 templates/tiki-mods_admin.tpl -text
 templates/tiki-mods_config.tpl -text
+templates/tiki-my-workspaces.tpl -text
 templates/tiki-my_tiki.tpl -text
 templates/tiki-mytiki_bar.tpl -text
 templates/tiki-mytiki_mootabs.tpl -text
