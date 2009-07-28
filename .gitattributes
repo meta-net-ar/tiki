@@ -26,6 +26,7 @@ css/jscalendar.css -text
 css/spanky.css -text
 db/.htaccess -text
 db/case_patch.php -text
+db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
 db/convertscripts/mysql3tooci8.php -text
@@ -37,9 +38,6 @@ db/fulltext.sql -text
 db/index.php -text
 db/oracle/index.php -text
 db/oracle/md5.sql -text
-db/profiles/_default.prf -text
-db/profiles/basicEnabled.prf -text
-db/profiles/index.php -text
 db/tiki-4.0-mysql.sql -text
 db/tiki-4.0-mysqli.sql -text
 db/tiki-4.0-oci8.sql -text
@@ -1056,13 +1054,11 @@ img/smiles/index.php -text
 img/spinner.gif -text
 img/tiki.jpg -text
 img/tiki/index.php -text
-img/tiki/powertw.gif -text
 img/tiki/tiki3.gif -text
 img/tiki/tiki3.png -text
 img/tiki/tikibutton.png -text
 img/tiki/tikibutton2.png -text
 img/tiki/tikibutton3.png -text
-img/tiki/tikibutton4.png -text
 img/tiki/tikilogo.png -text
 img/trackers/index.php -text
 img/valid-xhtml10.png -text
@@ -1179,6 +1175,7 @@ installer/schema/20090713_tiki_importer_permission_and_menu_entry_tiki.sql -text
 installer/schema/20090715_sefurl_for_filegalleries_tiki.sql -text
 installer/schema/20090720_perspectives_tiki.sql -text
 installer/schema/20090721_webmail_ext_public_tiki.sql -text
+installer/schema/20090727_user_votings_index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1925,6 +1922,7 @@ lib/importer/test/fixtures/mediawiki_page_as_array.php -text
 lib/importer/test/fixtures/mediawiki_revision.xml -text
 lib/importer/test/fixtures/mediawiki_revision_invalid_syntax.xml -text
 lib/importer/test/fixtures/mediawiki_sample.xml -text
+lib/importer/test/fixtures/mediawiki_upload.xml -text
 lib/importer/test/tikiimporter_test.php -text
 lib/importer/test/tikiimporter_testcase.php -text
 lib/importer/test/tikiimporter_wiki_mediawiki_test.php -text
@@ -3089,6 +3087,7 @@ modules/mod-freetags_current.php -text
 modules/mod-freetags_morelikethis.php -text
 modules/mod-freetags_most_popular.php -text
 modules/mod-freetags_prefered.php -text
+modules/mod-func-switch_lang.php -text
 modules/mod-google.php -text
 modules/mod-groups_emulation.php -text
 modules/mod-last_actions.php -text
@@ -3128,7 +3127,6 @@ modules/mod-semantic_links.php -text
 modules/mod-shoutbox.php -text
 modules/mod-since_last_visit.php -text
 modules/mod-since_last_visit_new.php -text
-modules/mod-switch_lang.php -text
 modules/mod-switch_theme.php -text
 modules/mod-terminology.php -text
 modules/mod-top_active_blogs.php -text
@@ -4648,7 +4646,6 @@ tests/testfile.txt -text
 /tiki-mobile.php -text
 /tiki-mods.php -text
 /tiki-mods_admin.php -text
-/tiki-module.php -text
 /tiki-module_controls.php -text
 /tiki-modules.php -text
 /tiki-my_tiki.php -text
