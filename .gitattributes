@@ -4138,6 +4138,7 @@ templates/tiki-login.tpl -text
 templates/tiki-login_confirm_email.tpl -text
 templates/tiki-magic.tpl -text
 templates/tiki-mailin.tpl -text
+templates/tiki-manage-workspaces.tpl -text
 templates/tiki-mindmap.tpl -text
 templates/tiki-minical.tpl -text
 templates/tiki-minical_prefs.tpl -text
