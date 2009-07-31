@@ -1177,6 +1177,7 @@ installer/schema/20090720_perspectives_tiki.sql -text
 installer/schema/20090721_webmail_ext_public_tiki.sql -text
 installer/schema/20090727_category_permissions.sql -text
 installer/schema/20090727_user_votings_index.php -text
+installer/schema/20090730_p_list_newsletters_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
@@ -1971,6 +1972,9 @@ lib/jquery/cluetip/jquery.cluetip.css -text
 lib/jquery/cluetip/jquery.cluetip.js -text
 lib/jquery/cluetip/lib/jquery.bgiframe.min.js -text
 lib/jquery/cluetip/lib/jquery.hoverIntent.js -text
+lib/jquery/colorbox/README -text
+lib/jquery/colorbox/jquery.colorbox-min.js -text
+lib/jquery/colorbox/jquery.colorbox.js -text
 lib/jquery/index.php -text
 lib/jquery/jquery-autocomplete/changelog.txt -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.css -text
