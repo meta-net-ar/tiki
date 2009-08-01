@@ -2934,8 +2934,8 @@ lib/userslib.php -text
 lib/videogals/includes.php -text
 lib/videogals/kaltura.css -text
 lib/videogals/kaltura.js -text
-lib/videogals/kaltura_client.php4 -text
-lib/videogals/kaltura_client_base.php4 -text
+lib/videogals/kaltura_client.php -text
+lib/videogals/kaltura_client_base.php -text
 lib/videogals/kaltura_helpers.php -text
 lib/videogals/kalturaapi_php5_lib.php -text
 lib/videogals/videogallib.php -text
@@ -3004,6 +3004,7 @@ lib/wiki-plugins/wikiplugin_invite.php -text
 lib/wiki-plugins/wikiplugin_jabber.php -text
 lib/wiki-plugins/wikiplugin_jq.php -text
 lib/wiki-plugins/wikiplugin_js.php -text
+lib/wiki-plugins/wikiplugin_kaltura.php -text
 lib/wiki-plugins/wikiplugin_lang.php -text
 lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
@@ -4179,6 +4180,7 @@ templates/tiki-information.tpl -text
 templates/tiki-install.tpl -text
 templates/tiki-integrator.tpl -text
 templates/tiki-interactive_trans.tpl -text
+templates/tiki-kaltura_video.tpl -text
 templates/tiki-lastchanges.tpl -text
 templates/tiki-likepages.tpl -text
 templates/tiki-list_articles.tpl -text
@@ -4314,7 +4316,6 @@ templates/tiki-theme_control_sections.tpl -text
 templates/tiki-upload_file.tpl -text
 templates/tiki-upload_file_progress.tpl -text
 templates/tiki-upload_image.tpl -text
-templates/tiki-upload_video.tpl -text
 templates/tiki-user_assigned_modules.tpl -text
 templates/tiki-user_bookmarks.tpl -text
 templates/tiki-user_contacts_prefs.tpl -text
@@ -4621,6 +4622,7 @@ tests/testfile.txt -text
 /tiki-interactive_trans.php -text
 /tiki-jscalendar.php -text
 /tiki-jsplugin.php -text
+/tiki-kaltura_video.php -text
 /tiki-lastchanges.php -text
 /tiki-layout_options.php -text
 /tiki-likepages.php -text
@@ -4768,7 +4770,6 @@ tests/testfile.txt -text
 /tiki-tracker_rss.php -text
 /tiki-upload_file.php -text
 /tiki-upload_image.php -text
-/tiki-upload_video.php -text
 /tiki-usage_chart.php -text
 /tiki-user_assigned_modules.php -text
 /tiki-user_bookmarks.php -text
