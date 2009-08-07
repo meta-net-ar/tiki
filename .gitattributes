@@ -26,6 +26,7 @@ css/jscalendar.css -text
 css/spanky.css -text
 db/.htaccess -text
 db/case_patch.php -text
+db/convertscripts/convert_pgsql.bat -text
 db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
@@ -1161,6 +1162,7 @@ installer/schema/20090513_swffix_tiki.sql -text
 installer/schema/20090513_wiki_similar_permission_tiki.sql -text
 installer/schema/20090515_score_tiki.sql -text
 installer/schema/20090602_webmail_protocols_tiki.sql -text
+installer/schema/20090605_tiki_p_modify_tracker_items_pending_closed_tiki.sql -text
 installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
 installer/schema/20090626_change_pear_auth_preferences_to_ldap_tiki.sql -text
@@ -1177,6 +1179,11 @@ installer/schema/20090804_menu_search_tiki.sql -text
 installer/schema/20090805_kill_newsreader_tiki.sql -text
 installer/schema/20090805_remove_drawings_prefs_etc_tiki.sql -text
 installer/schema/20090805_remove_games_tiki.sql -text
+installer/schema/20090806_group_permissions_tiki.sql -text
+installer/schema/20090806_perms_featurechecks_tiki.sql -text
+installer/schema/20090806_remove_charts_tiki.sql -text
+installer/schema/20090806_remove_latin_collations_tiki.sql -text
+installer/schema/20090806_strasa_option_rename_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 lang/.htaccess -text
@@ -1504,8 +1511,6 @@ lib/calendar/index.php -text
 lib/calendar/tikicalendarlib.php -text
 lib/categories/categlib.php -text
 lib/categories/index.php -text
-lib/charts/chartlib.php -text
-lib/charts/index.php -text
 lib/class_calendar.php -text
 lib/class_rdf_parser.php -text
 lib/class_rss_parser.php -text
@@ -1516,6 +1521,7 @@ lib/contribution/contributionlib.php -text
 lib/contribution/index.php -text
 lib/copyrights/copyrightslib.php -text
 lib/copyrights/index.php -text
+lib/core/lib/Category/Manipulator.php -text
 lib/core/lib/DeclFilter.php -text
 lib/core/lib/DeclFilter/CatchAllFilterRule.php -text
 lib/core/lib/DeclFilter/CatchAllUnsetRule.php -text
@@ -1532,6 +1538,10 @@ lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
+lib/core/lib/Perms.php -text
+lib/core/lib/Perms/Check/Creator.php -text
+lib/core/lib/Perms/Check/Direct.php -text
+lib/core/lib/Perms/Check/Indirect.php -text
 lib/core/lib/TikiDb.php -text
 lib/core/lib/TikiDb/Adodb.php -text
 lib/core/lib/TikiDb/Bridge.php -text
@@ -1555,42 +1565,9 @@ lib/core/test/AcceptanceTests/MultilingualTest.php -text
 lib/core/test/AcceptanceTests/MultilinguallibTest.php -text
 lib/core/test/AcceptanceTests/SearchTest.php -text
 lib/core/test/AcceptanceTests/TikiLibrariesAccessTest.php -text
-lib/core/test/AllTests.php -text
 lib/core/test/AllTestsAcceptance.php -text
-lib/core/test/DeclFilter/AllTests.php -text
-lib/core/test/DeclFilter/BaseTest.php -text
-lib/core/test/DeclFilter/CatchAllFilterTest.php -text
-lib/core/test/DeclFilter/CatchAllUnsetTest.php -text
-lib/core/test/DeclFilter/ConfigureTest.php -text
-lib/core/test/DeclFilter/KeyPatternFilterTest.php -text
-lib/core/test/DeclFilter/KeyPatternUnsetTest.php -text
-lib/core/test/DeclFilter/StaticKeyFilterTest.php -text
-lib/core/test/DeclFilter/StaticKeyUnsetTest.php -text
-lib/core/test/JitFilter/AccessTest.php -text
-lib/core/test/JitFilter/AllTests.php -text
-lib/core/test/JitFilter/FilterTest.php -text
-lib/core/test/JitFilter/IteratorTest.php -text
-lib/core/test/Multilingual/Aligner/AllTests.php -text
-lib/core/test/Multilingual/Aligner/BilingualAlignerTest.php -text
-lib/core/test/Multilingual/Aligner/SentenceSegmentorTest.php -text
-lib/core/test/Multilingual/Aligner/ShortestPathFinderTest.php -text
-lib/core/test/Multilingual/AllTests.php -text
-lib/core/test/Multilingual/MachineTranslation/AllTests.php -text
-lib/core/test/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/core/test/TikiAcceptanceTestDBRestorer.php -text
-lib/core/test/TikiFilter/AllTests.php -text
-lib/core/test/TikiFilter/CallbackTest.php -text
-lib/core/test/TikiFilter/MapTest.php -text
-lib/core/test/TikiFilter/WordTest.php -text
-lib/core/test/TikiFilter/XssTest.php -text
 lib/core/test/TikiSeleniumTestCase.php -text
-lib/core/test/TikiTestCase.php -text
-lib/core/test/WikiParser/AllTests.php -text
-lib/core/test/WikiParser/PluginArgumentParserTest.php -text
-lib/core/test/WikiParser/PluginMatcherTest.php -text
-lib/core/test/WikiParser/PluginParserTest.php -text
-lib/core/test/WikiParser/PluginRepositoryTest.php -text
-lib/core/test/WikiParser/wikiplugin_foo.php -text
 lib/core/test/create_dump_db_file.php -text
 lib/core/test/restore_db_dump.php -text
 lib/core/test/upgrade_test_database_dump_file.php -text
@@ -1909,20 +1886,8 @@ lib/images/icons/zip.svg -text
 lib/images/images.php -text
 lib/images/imagick_new.php -text
 lib/images/imagick_old.php -text
+lib/importer/index.php -text
 lib/importer/mediawiki_dump.xsd -text
-lib/importer/test/AllTests.php -text
-lib/importer/test/fixtures/mediawiki_contributor.xml -text
-lib/importer/test/fixtures/mediawiki_invalid.xml -text
-lib/importer/test/fixtures/mediawiki_page.xml -text
-lib/importer/test/fixtures/mediawiki_page_as_array.php -text
-lib/importer/test/fixtures/mediawiki_revision.xml -text
-lib/importer/test/fixtures/mediawiki_revision_invalid_syntax.xml -text
-lib/importer/test/fixtures/mediawiki_sample.xml -text
-lib/importer/test/fixtures/mediawiki_upload.xml -text
-lib/importer/test/tikiimporter_test.php -text
-lib/importer/test/tikiimporter_testcase.php -text
-lib/importer/test/tikiimporter_wiki_mediawiki_test.php -text
-lib/importer/test/tikiimporter_wiki_test.php -text
 lib/importer/tikiimporter.php -text
 lib/importer/tikiimporter_wiki.php -text
 lib/importer/tikiimporter_wiki_mediawiki.php -text
@@ -1964,6 +1929,7 @@ lib/jquery/cluetip/lib/jquery.hoverIntent.js -text
 lib/jquery/colorbox/README -text
 lib/jquery/colorbox/jquery.colorbox-min.js -text
 lib/jquery/colorbox/jquery.colorbox.js -text
+lib/jquery/colorbox/styles/colorbox.css -text
 lib/jquery/index.php -text
 lib/jquery/jquery-autocomplete/changelog.txt -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.css -text
@@ -2054,6 +2020,16 @@ lib/jquery/tablesorter/themes/green/bg.png -text
 lib/jquery/tablesorter/themes/green/desc.png -text
 lib/jquery/tablesorter/themes/green/green.zip -text
 lib/jquery/tablesorter/themes/green/style.css -text
+lib/jquery/treeTable/CHANGELOG -text
+lib/jquery/treeTable/MIT_LICENSE -text
+lib/jquery/treeTable/README.markdown -text
+lib/jquery/treeTable/src/images/toggle-collapse-dark.png -text
+lib/jquery/treeTable/src/images/toggle-collapse-light.png -text
+lib/jquery/treeTable/src/images/toggle-expand-dark.png -text
+lib/jquery/treeTable/src/images/toggle-expand-light.png -text
+lib/jquery/treeTable/src/javascripts/jquery.treeTable.js -text
+lib/jquery/treeTable/src/javascripts/jquery.treeTable.min.js -text
+lib/jquery/treeTable/src/stylesheets/jquery.treeTable.css -text
 lib/jquery_tiki/index.php -text
 lib/jquery_tiki/tablesorter/themes/tiki/asc.gif -text
 lib/jquery_tiki/tablesorter/themes/tiki/bg.gif -text
@@ -2196,7 +2172,6 @@ lib/pear/Date/index.php -text
 lib/pear/HTTP/Request.php -text
 lib/pear/HTTP/Request/Listener.php -text
 lib/pear/HTTP/index.php -text
-lib/pear/NNTP.php -text
 lib/pear/Net/DIME.php -text
 lib/pear/Net/DNS.php -text
 lib/pear/Net/DNS/Header.php -text
@@ -2417,6 +2392,7 @@ lib/setup/menus.php -text
 lib/setup/openid.php -text
 lib/setup/output_compression.php -text
 lib/setup/patches.php -text
+lib/setup/perms.php -text
 lib/setup/phplayers.php -text
 lib/setup/polls.php -text
 lib/setup/prefs.php -text
@@ -2583,6 +2559,7 @@ lib/smarty_tiki/modifier.langname.php -text
 lib/smarty_tiki/modifier.lcfirst.php -text
 lib/smarty_tiki/modifier.max_user_inscriptions.php -text
 lib/smarty_tiki/modifier.nlbr.php -text
+lib/smarty_tiki/modifier.pagename.php -text
 lib/smarty_tiki/modifier.quoted.php -text
 lib/smarty_tiki/modifier.sefurl.php -text
 lib/smarty_tiki/modifier.star.php -text
@@ -2626,17 +2603,6 @@ lib/swfobject/src/expressInstall.fla -text
 lib/swfobject/src/swfobject.js -text
 lib/swfobject/swfobject.js -text
 lib/swfobject/test.swf -text
-lib/tabs/aqua-tab-active.png -text
-lib/tabs/aqua-tab.png -text
-lib/tabs/aqua.css -text svneol=unset#application/octet-stream
-lib/tabs/cookie.js -text svneol=unset#application/octet-stream
-lib/tabs/global.js -text svneol=unset#application/octet-stream
-lib/tabs/index.php -text
-lib/tabs/mozilla.css -text svneol=unset#application/octet-stream
-lib/tabs/tabs.js -text svneol=unset#application/octet-stream
-lib/tabs/utils.js -text svneol=unset#application/octet-stream
-lib/tabs/viewport.js -text svneol=unset#application/octet-stream
-lib/tabs/winxp.css -text svneol=unset#application/octet-stream
 lib/taglines/index.php -text
 lib/taglines/taglinelib.php -text
 lib/tail/index.php -text
@@ -2645,6 +2611,69 @@ lib/tasks/index.php -text
 lib/tasks/tasklib.php -text
 lib/templates/index.php -text
 lib/templates/templateslib.php -text
+lib/test/AllTests.php -text
+lib/test/README -text
+lib/test/TikiTestCase.php -text
+lib/test/core/AllTests.php -text
+lib/test/core/Category/ManipulatorTest.php -text
+lib/test/core/DeclFilter/BaseTest.php -text
+lib/test/core/DeclFilter/CatchAllFilterTest.php -text
+lib/test/core/DeclFilter/CatchAllUnsetTest.php -text
+lib/test/core/DeclFilter/ConfigureTest.php -text
+lib/test/core/DeclFilter/KeyPatternFilterTest.php -text
+lib/test/core/DeclFilter/KeyPatternUnsetTest.php -text
+lib/test/core/DeclFilter/StaticKeyFilterTest.php -text
+lib/test/core/DeclFilter/StaticKeyUnsetTest.php -text
+lib/test/core/JitFilter/AccessTest.php -text
+lib/test/core/JitFilter/FilterTest.php -text
+lib/test/core/JitFilter/IteratorTest.php -text
+lib/test/core/Multilingual/Aligner/AllTests.php -text
+lib/test/core/Multilingual/Aligner/BilingualAlignerTest.php -text
+lib/test/core/Multilingual/Aligner/SentenceSegmentorTest.php -text
+lib/test/core/Multilingual/Aligner/ShortestPathFinderTest.php -text
+lib/test/core/Multilingual/AllTests.php -text
+lib/test/core/Multilingual/MachineTranslation/AllTests.php -text
+lib/test/core/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
+lib/test/core/Perms/AccessorTest.php -text
+lib/test/core/Perms/BaseTest.php -text
+lib/test/core/Perms/Check/CreatorTest.php -text
+lib/test/core/Perms/Check/DirectTest.php -text
+lib/test/core/Perms/Check/IndirectTest.php -text
+lib/test/core/Perms/CheckSequenceTest.php -text
+lib/test/core/Perms/MixedTest.php -text
+lib/test/core/Perms/Resolver/DefaultTest.php -text
+lib/test/core/Perms/Resolver/StaticTest.php -text
+lib/test/core/Perms/ResolverFactory/CategoryFactoryTest.php -text
+lib/test/core/Perms/ResolverFactory/GlobalFactoryTest.php -text
+lib/test/core/Perms/ResolverFactory/ObjectFactoryTest.php -text
+lib/test/core/Perms/ResolverFactory/TestFactoryTest.php -text
+lib/test/core/TikiFilter/CallbackTest.php -text
+lib/test/core/TikiFilter/MapTest.php -text
+lib/test/core/TikiFilter/WordTest.php -text
+lib/test/core/TikiFilter/XssTest.php -text
+lib/test/core/WikiParser/PluginArgumentParserTest.php -text
+lib/test/core/WikiParser/PluginMatcherTest.php -text
+lib/test/core/WikiParser/PluginParserTest.php -text
+lib/test/core/WikiParser/PluginRepositoryTest.php -text
+lib/test/core/WikiParser/wikiplugin_foo.php -text
+lib/test/core/bootstrap.php -text
+lib/test/core/phpunit.xml -text
+lib/test/importer/AllTests.php -text
+lib/test/importer/fixtures/index.php -text
+lib/test/importer/fixtures/mediawiki_contributor.xml -text
+lib/test/importer/fixtures/mediawiki_invalid.xml -text
+lib/test/importer/fixtures/mediawiki_invalid_upload.xml -text
+lib/test/importer/fixtures/mediawiki_page.xml -text
+lib/test/importer/fixtures/mediawiki_page_as_array.php -text
+lib/test/importer/fixtures/mediawiki_revision.xml -text
+lib/test/importer/fixtures/mediawiki_revision_invalid_syntax.xml -text
+lib/test/importer/fixtures/mediawiki_sample.xml -text
+lib/test/importer/index.php -text
+lib/test/importer/tikiimporter_test.php -text
+lib/test/importer/tikiimporter_testcase.php -text
+lib/test/importer/tikiimporter_wiki_mediawiki_test.php -text
+lib/test/importer/tikiimporter_wiki_test.php -text
+lib/test/index.php -text
 lib/themecontrol/index.php -text
 lib/themecontrol/tcontrol.php -text
 lib/tiki-dynamic-js.php -text
@@ -2793,7 +2822,9 @@ lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
+lib/wiki-plugins/wikiplugin_mcalendar.php -text
 lib/wiki-plugins/wikiplugin_mediaplayer.php -text
+lib/wiki-plugins/wikiplugin_memberlist.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
@@ -2979,7 +3010,6 @@ modules/mod-top_articles.php -text
 modules/mod-top_file_galleries.php -text
 modules/mod-top_files.php -text
 modules/mod-top_forum_posters.php -text
-modules/mod-top_games.php -text
 modules/mod-top_image_galleries.php -text
 modules/mod-top_images.php -text
 modules/mod-top_images_th.php -text
@@ -3438,16 +3468,16 @@ styles/strasa/link_icon.png -text svneol=unset#image/png
 styles/strasa/list_icon.png -text
 styles/strasa/login.jpg -text
 styles/strasa/loginlong.jpg -text svneol=unset#image/jpeg
-styles/strasa/options/cold.css -text
-styles/strasa/options/cold/box_bottom.gif -text
-styles/strasa/options/cold/box_top.gif -text
-styles/strasa/options/cold/cold.png -text
-styles/strasa/options/cold/fold-topright.jpg -text
-styles/strasa/options/cold/headerbg.jpg -text svneol=unset#image/jpeg
-styles/strasa/options/cold/headermenuitem-hover.png -text
-styles/strasa/options/cold/login.jpg -text svneol=unset#image/jpeg
-styles/strasa/options/cold/loginlong.jpg -text svneol=unset#image/jpeg
-styles/strasa/options/cold/register.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cool.css -text
+styles/strasa/options/cool/box_bottom.gif -text
+styles/strasa/options/cool/box_top.gif -text
+styles/strasa/options/cool/cool.png -text
+styles/strasa/options/cool/fold-topright.jpg -text
+styles/strasa/options/cool/headerbg.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cool/headermenuitem-hover.png -text
+styles/strasa/options/cool/login.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cool/loginlong.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/cool/register.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/box_bottom.gif -text
 styles/strasa/options/mono/box_top.gif -text
@@ -3491,6 +3521,7 @@ templates/browse_file_gallery.tpl -text
 templates/browsedcategory.tpl -text
 templates/categobjects.tpl -text
 templates/categorize.tpl -text
+templates/category_tree_entry.tpl -text
 templates/categpath.tpl -text
 templates/comment-body.tpl -text
 templates/comment-footer.tpl -text
@@ -3730,7 +3761,6 @@ templates/modules/mod-top_articles.tpl -text
 templates/modules/mod-top_file_galleries.tpl -text
 templates/modules/mod-top_files.tpl -text
 templates/modules/mod-top_forum_posters.tpl -text
-templates/modules/mod-top_games.tpl -text
 templates/modules/mod-top_image_galleries.tpl -text
 templates/modules/mod-top_images.tpl -text
 templates/modules/mod-top_images_th.tpl -text
@@ -3838,12 +3868,9 @@ templates/tiki-admin_banning.tpl -text
 templates/tiki-admin_bar.tpl -text
 templates/tiki-admin_calendars.tpl -text
 templates/tiki-admin_categories.tpl -text
-templates/tiki-admin_chart_items.tpl -text
-templates/tiki-admin_charts.tpl -text
 templates/tiki-admin_content_templates.tpl -text
 templates/tiki-admin_contribution.tpl -text
 templates/tiki-admin_cookies.tpl -text
-templates/tiki-admin_drawings.tpl -text
 templates/tiki-admin_dsn.tpl -text
 templates/tiki-admin_external_wikis.tpl -text
 templates/tiki-admin_features.tpl -text
@@ -3905,7 +3932,6 @@ templates/tiki-calendar_params_ical.tpl -text
 templates/tiki-calendar_weekmode.tpl -text
 templates/tiki-categpermissions.tpl -text
 templates/tiki-change_password.tpl -text
-templates/tiki-charts.tpl -text
 templates/tiki-contact.tpl -text
 templates/tiki-contacts.tpl -text
 templates/tiki-create_webhelp.tpl -text
@@ -3928,6 +3954,7 @@ templates/tiki-edit_banner.tpl -text
 templates/tiki-edit_blog.tpl -text
 templates/tiki-edit_css.tpl -text
 templates/tiki-edit_help.tpl -text
+templates/tiki-edit_help_tool.tpl -text
 templates/tiki-edit_image.tpl -text
 templates/tiki-edit_languages.tpl -text
 templates/tiki-edit_programmed_content.tpl -text
@@ -4011,7 +4038,6 @@ templates/tiki-list_contents.tpl -text
 templates/tiki-list_faqs.tpl -text
 templates/tiki-list_file_gallery.tpl -text
 templates/tiki-list_gallery.tpl -text
-templates/tiki-list_games.tpl -text
 templates/tiki-list_integrator_repositories.tpl -text
 templates/tiki-list_object_permissions.tpl -text
 templates/tiki-list_posts.tpl -text
@@ -4040,13 +4066,8 @@ templates/tiki-mods_admin.tpl -text
 templates/tiki-mods_config.tpl -text
 templates/tiki-my_tiki.tpl -text
 templates/tiki-mytiki_bar.tpl -text
-templates/tiki-mytiki_mootabs.tpl -text
 templates/tiki-newsletter_archives.tpl -text
 templates/tiki-newsletters.tpl -text
-templates/tiki-newsreader_groups.tpl -text
-templates/tiki-newsreader_news.tpl -text
-templates/tiki-newsreader_read.tpl -text
-templates/tiki-newsreader_servers.tpl -text
 templates/tiki-notepad_list.tpl -text
 templates/tiki-notepad_read.tpl -text
 templates/tiki-notepad_write.tpl -text
@@ -4094,8 +4115,6 @@ templates/tiki-register_site.tpl -text
 templates/tiki-remind_password.tpl -text
 templates/tiki-removepage.tpl -text
 templates/tiki-rename_page.tpl -text
-templates/tiki-replicate.tpl -text
-templates/tiki-replicate_console.tpl -text
 templates/tiki-rollback.tpl -text
 templates/tiki-search_stats.tpl -text
 templates/tiki-searchindex.tpl -text
@@ -4156,8 +4175,6 @@ templates/tiki-view_banner.tpl -text
 templates/tiki-view_blog.tpl -text
 templates/tiki-view_blog_post.tpl -text
 templates/tiki-view_cache.tpl -text
-templates/tiki-view_chart.tpl -text
-templates/tiki-view_chart_item.tpl -text
 templates/tiki-view_faq.tpl -text
 templates/tiki-view_forum.tpl -text
 templates/tiki-view_forum_thread.tpl -text
@@ -4177,11 +4194,13 @@ templates/translated-lang.tpl -text
 templates/wiki-discussion.tpl -text
 templates/wiki-plugins/error_tracker.tpl -text
 templates/wiki-plugins/wikiplugin_bloglist.tpl -text
+templates/wiki-plugins/wikiplugin_datachannel.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
 templates/wiki-plugins/wikiplugin_invite.tpl -text
 templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
+templates/wiki-plugins/wikiplugin_memberlist.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_rss.tpl -text
@@ -4214,8 +4233,6 @@ tests/testfile.txt -text
 /tiki-admin_bar.php -text
 /tiki-admin_calendars.php -text
 /tiki-admin_categories.php -text
-/tiki-admin_chart_items.php -text
-/tiki-admin_charts.php -text
 /tiki-admin_content_templates.php -text
 /tiki-admin_contribution.php -text
 /tiki-admin_cookies.php -text
@@ -4320,7 +4337,6 @@ tests/testfile.txt -text
 /tiki-calendars_rss.php -text
 /tiki-change_password.php -text
 /tiki-channel.php -text
-/tiki-charts.php -text
 /tiki-cms_rankings.php -text
 /tiki-confirm_user_email.php -text
 /tiki-contact.php -text
@@ -4531,11 +4547,8 @@ tests/testfile.txt -text
 /tiki-register_ajax.php -text
 /tiki-register_site.php -text
 /tiki-remind_password.php -text
-/tiki-remote_backup.php -text
 /tiki-removepage.php -text
 /tiki-rename_page.php -text
-/tiki-replicate.php -text
-/tiki-replicate_console.php -text
 /tiki-rollback.php -text
 /tiki-rss_error.php -text
 /tiki-search_stats.php -text
@@ -4596,8 +4609,6 @@ tests/testfile.txt -text
 /tiki-view_blog_post.php -text
 /tiki-view_blog_post_image.php -text
 /tiki-view_cache.php -text
-/tiki-view_chart.php -text
-/tiki-view_chart_item.php -text
 /tiki-view_faq.php -text
 /tiki-view_forum.php -text
 /tiki-view_forum_thread.php -text
