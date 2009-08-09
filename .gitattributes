@@ -2338,6 +2338,8 @@ lib/prefs/feature.php -text
 lib/prefs/global.php -text
 lib/prefs/sender.php -text
 lib/prefs/smarty.php -text
+lib/prefs/wikiplugin.php -text
+lib/prefs/wikiplugininline.php -text
 lib/prefslib.php -text
 lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
