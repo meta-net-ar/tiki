@@ -3802,6 +3802,7 @@ templates/poll.tpl -text
 templates/prefs/flag.tpl -text
 templates/prefs/list.tpl -text
 templates/prefs/shared-dependencies.tpl -text
+templates/prefs/shared-flags.tpl -text
 templates/prefs/text.tpl -text
 templates/print/print-decorator_indexed.tpl -text
 templates/print/print-decorator_indexrow.tpl -text
