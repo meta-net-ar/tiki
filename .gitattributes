@@ -30,10 +30,11 @@ db/convertscripts/convert_pgsql.bat -text
 db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
-db/convertscripts/mysql3tooci8.php -text
-db/convertscripts/mysql3topgsql72.php -text
-db/convertscripts/mysql3tosqlite.php -text
-db/convertscripts/mysql3tosybase.php -text
+db/convertscripts/mysql_to_oci8.php -text
+db/convertscripts/mysql_to_pgsql.php -text
+db/convertscripts/mysql_to_sqlite.php -text
+db/convertscripts/mysql_to_sybase.php -text
+db/convertscripts/tikiversion.php -text
 db/features.csv -text
 db/fulltext.sql -text
 db/index.php -text
@@ -41,10 +42,8 @@ db/oracle/index.php -text
 db/oracle/md5.sql -text
 db/tiki-4.0-mysql.sql -text
 db/tiki-4.0-mysqli.sql -text
-db/tiki-4.0-oci8.sql -text
 db/tiki-4.0-pgsql.sql -text
 db/tiki-4.0-sqlite.sql -text
-db/tiki-4.0-sybase.sql -text
 db/tiki-db-adodb.php -text
 db/tiki-db-native-mysqli.php -text
 db/tiki-db-pdo.php -text
@@ -1185,6 +1184,7 @@ installer/schema/20090806_remove_charts_tiki.sql -text
 installer/schema/20090806_remove_latin_collations_tiki.sql -text
 installer/schema/20090806_strasa_option_rename_tiki.sql -text
 installer/schema/20090807_transitions_tiki.sql -text
+installer/schema/20090808_add_wiki_minor_edits_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 lang/.htaccess -text
