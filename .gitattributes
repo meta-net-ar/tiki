@@ -2332,9 +2332,11 @@ lib/phplayers_tiki/tiki-phplayers.php -text
 lib/polls/index.php -text
 lib/polls/polllib.php -text
 lib/polls/polllib_shared.php -text
+lib/prefs/auth.php -text
 lib/prefs/error.php -text
 lib/prefs/feature.php -text
 lib/prefs/global.php -text
+lib/prefs/sender.php -text
 lib/prefs/smarty.php -text
 lib/prefslib.php -text
 lib/profilelib/channellib.php -text
@@ -3799,6 +3801,7 @@ templates/plugins/plugin-topfriends.tpl -text
 templates/poll.tpl -text
 templates/prefs/flag.tpl -text
 templates/prefs/list.tpl -text
+templates/prefs/shared-dependencies.tpl -text
 templates/prefs/text.tpl -text
 templates/print/print-decorator_indexed.tpl -text
 templates/print/print-decorator_indexrow.tpl -text
