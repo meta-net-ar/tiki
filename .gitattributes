@@ -1173,6 +1173,7 @@ installer/schema/20090617_add_new_table_for_reports_tiki.sql -text
 installer/schema/20090623_actionlog_view_article_tiki.sql -text
 installer/schema/20090626_change_pear_auth_preferences_to_ldap.sql -text
 installer/schema/20090804_kaltura_permissions_tiki.sql -text
+installer/schema/20090811_kaltura_editor_pref_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
