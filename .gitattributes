@@ -1184,6 +1184,10 @@ installer/schema/20090806_remove_latin_collations_tiki.sql -text
 installer/schema/20090806_strasa_option_rename_tiki.sql -text
 installer/schema/20090807_transitions_tiki.sql -text
 installer/schema/20090808_add_wiki_minor_edits_tiki.sql -text
+installer/schema/20090809_marc_needs_more_space_tiki.sql -text
+installer/schema/20090811_filegals_container_tiki.sql -text
+installer/schema/20090811_quizzes_tiki.sql -text
+installer/schema/20090811_rename_quicktags_to_toolbars_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 lang/.htaccess -text
@@ -2074,7 +2078,6 @@ lib/notifications/notificationemaillib.php -text
 lib/notifications/notificationlib.php -text
 lib/objectlib.php -text
 lib/ointegratelib.php -text
-lib/pclzip.lib.php -text
 lib/pear/Auth.php -text
 lib/pear/Auth/Anonymous.php -text
 lib/pear/Auth/Auth.php -text
@@ -2345,8 +2348,6 @@ lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
 lib/profilelib/listlib.php -text
 lib/profilelib/profilelib.php -text
-lib/quicktags/index.php -text
-lib/quicktags/quicktagslib.php -text
 lib/quizzes/index.php -text
 lib/quizzes/quizlib.php -text
 lib/rankings/index.php -text
@@ -2501,6 +2502,7 @@ lib/smarty_tiki/function.content.php -text
 lib/smarty_tiki/function.cookie.php -text
 lib/smarty_tiki/function.cookie_jar.php -text
 lib/smarty_tiki/function.count.php -text
+lib/smarty_tiki/function.debugger.php -text
 lib/smarty_tiki/function.ed.php -text
 lib/smarty_tiki/function.editform.php -text
 lib/smarty_tiki/function.elapsed.php -text
@@ -2525,7 +2527,6 @@ lib/smarty_tiki/function.poll.php -text
 lib/smarty_tiki/function.popup_init.php -text
 lib/smarty_tiki/function.preference.php -text
 lib/smarty_tiki/function.query.php -text
-lib/smarty_tiki/function.quicktags.php -text
 lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.redirect.php -text
 lib/smarty_tiki/function.reindex_file_pixel.php -text
@@ -2538,6 +2539,7 @@ lib/smarty_tiki/function.show_help.php -text
 lib/smarty_tiki/function.show_sort.php -text
 lib/smarty_tiki/function.thumb.php -text
 lib/smarty_tiki/function.tikicon.php -text
+lib/smarty_tiki/function.toolbars.php -text
 lib/smarty_tiki/function.tree.php -text
 lib/smarty_tiki/function.treetable.php -text
 lib/smarty_tiki/function.var_dump.php -text
@@ -2735,6 +2737,8 @@ lib/tikilib.php -text
 lib/tikisession-adodb.php -text
 lib/tikisession-pdo.php -text
 lib/tikiticketlib.php -text
+lib/toolbars/index.php -text
+lib/toolbars/toolbarslib.php -text
 lib/trackers/dynamic_list.js -text
 lib/trackers/index.php -text
 lib/trackers/trackerlib.php -text
@@ -2782,6 +2786,7 @@ lib/wiki-plugins/wikiplugin_backlinks.php -text
 lib/wiki-plugins/wikiplugin_banner.php -text
 lib/wiki-plugins/wikiplugin_bloglist.php -text
 lib/wiki-plugins/wikiplugin_box.php -text
+lib/wiki-plugins/wikiplugin_calendar.php -text
 lib/wiki-plugins/wikiplugin_category.php -text
 lib/wiki-plugins/wikiplugin_catorphans.php -text
 lib/wiki-plugins/wikiplugin_catpath.php -text
@@ -2902,6 +2907,9 @@ lib/wiki3d/LICENSE.txt -text
 lib/wiki3d/README.txt -text
 lib/wiki3d/morcego-0.6.0.jar -text
 lib/wiki3d/pom.xml -text
+lib/workspaces/index.php -text
+lib/workspaces/wslib.php -text
+lib/workspaces/wstools/scriptCreator.php -text
 lib/x/index.php -text
 lib/x/x.js -text
 lib/x/x_anim.js -text
@@ -3410,6 +3418,8 @@ pics/large/webservices.png -text
 pics/large/webservices48x48.png -text
 pics/large/wikipages.png -text
 pics/large/wikipages48x48.png -text
+pics/large/workspaces.png -text
+pics/large/workspaces48x48.png -text
 pics/large/wysiwyg.png -text
 pics/large/wysiwyg48x48.png -text
 pics/large/xfce4-appfinder.png -text
@@ -3536,6 +3546,8 @@ templates/comments_button.tpl -text
 templates/confirm.tpl -text
 templates/contribution.tpl -text
 templates/copyrights.tpl -text svneol=unset#application/octet-stream
+templates/database-connection-error.tpl -text
+templates/debug/function.debugger.tpl -text
 templates/debug/index.php -text
 templates/debug/tiki-debug_console_help.tpl -text
 templates/debug/tiki-debug_console_tab.tpl -text
@@ -3870,6 +3882,7 @@ templates/tiki-admin-include-webmail.tpl -text
 templates/tiki-admin-include-webservices.tpl -text
 templates/tiki-admin-include-wiki.tpl -text
 templates/tiki-admin-include-wikiatt.tpl -text
+templates/tiki-admin-include-workspaces.tpl -text
 templates/tiki-admin-include-wysiwyg.tpl -text
 templates/tiki-admin.tpl -text
 templates/tiki-admin_actionlog.tpl -text
@@ -3900,7 +3913,6 @@ templates/tiki-admin_newsletters.tpl -text
 templates/tiki-admin_notifications.tpl -text
 templates/tiki-admin_poll_options.tpl -text
 templates/tiki-admin_polls.tpl -text
-templates/tiki-admin_quicktags.tpl -text
 templates/tiki-admin_rssmodules.tpl -text
 templates/tiki-admin_security.tpl -text
 templates/tiki-admin_shoutbox_words.tpl -text
@@ -3908,6 +3920,7 @@ templates/tiki-admin_structures.tpl -text
 templates/tiki-admin_survey_questions.tpl -text
 templates/tiki-admin_surveys.tpl -text
 templates/tiki-admin_system.tpl -text
+templates/tiki-admin_toolbars.tpl -text
 templates/tiki-admin_topics.tpl -text
 templates/tiki-admin_tracker_fields.tpl -text
 templates/tiki-admin_trackers.tpl -text
@@ -3945,7 +3958,6 @@ templates/tiki-contact.tpl -text
 templates/tiki-contacts.tpl -text
 templates/tiki-create_webhelp.tpl -text
 templates/tiki-custom_home.tpl -text
-templates/tiki-debug_console.tpl -text
 templates/tiki-directory_add_site.tpl -text
 templates/tiki-directory_admin.tpl -text
 templates/tiki-directory_admin_bar.tpl -text
@@ -4066,12 +4078,14 @@ templates/tiki-login.tpl -text
 templates/tiki-login_confirm_email.tpl -text
 templates/tiki-magic.tpl -text
 templates/tiki-mailin.tpl -text
+templates/tiki-manage-workspaces.tpl -text
 templates/tiki-mindmap.tpl -text
 templates/tiki-minical.tpl -text
 templates/tiki-minical_prefs.tpl -text
 templates/tiki-mods.tpl -text
 templates/tiki-mods_admin.tpl -text
 templates/tiki-mods_config.tpl -text
+templates/tiki-my-workspaces.tpl -text
 templates/tiki-my_tiki.tpl -text
 templates/tiki-mytiki_bar.tpl -text
 templates/tiki-newsletter_archives.tpl -text
@@ -4192,6 +4206,7 @@ templates/tiki-webmail.tpl -text
 templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki-wiki_topline.tpl -text
+templates/tiki-workspaces-index.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_item_field_googlemap_value.tpl -text
@@ -4289,6 +4304,7 @@ tests/testfile.txt -text
 /tiki-admin_include_webservices.php -text
 /tiki-admin_include_wiki.php -text
 /tiki-admin_include_wikiatt.php -text
+/tiki-admin_include_workspaces.php -text
 /tiki-admin_include_wysiwyg.php -text
 /tiki-admin_integrator.php -text
 /tiki-admin_integrator_rules.php -text
@@ -4303,7 +4319,6 @@ tests/testfile.txt -text
 /tiki-admin_notifications.php -text
 /tiki-admin_poll_options.php -text
 /tiki-admin_polls.php -text
-/tiki-admin_quicktags.php -text
 /tiki-admin_rssmodules.php -text
 /tiki-admin_security.php -text
 /tiki-admin_shoutbox_words.php -text
@@ -4311,6 +4326,7 @@ tests/testfile.txt -text
 /tiki-admin_survey_questions.php -text
 /tiki-admin_surveys.php -text
 /tiki-admin_system.php -text
+/tiki-admin_toolbars.php -text
 /tiki-admin_topics.php -text
 /tiki-admin_tracker_fields.php -text
 /tiki-admin_trackers.php -text
@@ -4351,7 +4367,6 @@ tests/testfile.txt -text
 /tiki-cookie-jar.php -text
 /tiki-create_webhelp.php -text
 /tiki-custom_home.php -text
-/tiki-debug_console.php -text
 /tiki-directories_rss.php -text svneol=unset#application/octet-stream
 /tiki-directory_add_site.php -text
 /tiki-directory_add_tiki_site.php -text
@@ -4495,6 +4510,7 @@ tests/testfile.txt -text
 /tiki-magic.php -text
 /tiki-mailin-code.php -text
 /tiki-mailin.php -text
+/tiki-manage-workspaces.php -text
 /tiki-map.php -text
 /tiki-map_download.phtml -text
 /tiki-map_edit.php -text
@@ -4512,6 +4528,7 @@ tests/testfile.txt -text
 /tiki-mods_admin.php -text
 /tiki-module_controls.php -text
 /tiki-modules.php -text
+/tiki-my-workspaces.php -text
 /tiki-my_tiki.php -text
 /tiki-mytiki_shared.php -text
 /tiki-newsletter_archives.php -text
@@ -4634,6 +4651,7 @@ tests/testfile.txt -text
 /tiki-wiki_rankings.php -text
 /tiki-wiki_rss.php -text
 /tiki-wikiplugin_edit.php -text
+/tiki-workspaces-index.php -text
 /tiki-xmlrpc_services.php -text
 tiki_tests/index.php -text
 tiki_tests/tests/.htaccess -text
