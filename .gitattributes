@@ -1574,6 +1574,7 @@ lib/core/test/AcceptanceTests/ListPagesTest.php -text
 lib/core/test/AcceptanceTests/MultilingualTest.php -text
 lib/core/test/AcceptanceTests/SearchTest.php -text
 lib/core/test/AllTests.php -text
+lib/core/test/Category/ManipulatorTest.php -text
 lib/core/test/JustAFewTests.php -text
 lib/core/test/Perms/AccessorTest.php -text
 lib/core/test/Perms/BaseTest.php -text
@@ -1591,7 +1592,9 @@ lib/core/test/Perms/ResolverFactory/TestFactoryTest.php -text
 lib/core/test/TikiAcceptanceTestDBRestorer.php -text
 lib/core/test/TikiSeleniumTestCase.php -text
 lib/core/test/TikiTestCase.php -text
+lib/core/test/bootstrap.php -text
 lib/core/test/create_dump_db_file.php -text
+lib/core/test/phpunit.xml -text
 lib/core/test/upgrade_test_database_dump_file.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
@@ -1924,6 +1927,9 @@ lib/jquery/cluetip/jquery.cluetip.css -text
 lib/jquery/cluetip/jquery.cluetip.js -text
 lib/jquery/cluetip/lib/jquery.bgiframe.min.js -text
 lib/jquery/cluetip/lib/jquery.hoverIntent.js -text
+lib/jquery/colorbox/README -text
+lib/jquery/colorbox/jquery.colorbox-min.js -text
+lib/jquery/colorbox/jquery.colorbox.js -text
 lib/jquery/index.php -text
 lib/jquery/jquery-autocomplete/changelog.txt -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.css -text
