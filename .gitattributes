@@ -2970,8 +2970,8 @@ modules/mod-freetags_prefered.php -text
 modules/mod-func-adsense.php -text
 modules/mod-func-assistant.php -text
 modules/mod-func-category_transition.php -text
+modules/mod-func-google.php -text
 modules/mod-func-switch_lang.php -text
-modules/mod-google.php -text
 modules/mod-groups_emulation.php -text
 modules/mod-last_actions.php -text
 modules/mod-last_articles.php -text
@@ -3517,6 +3517,7 @@ styles/thenews/options/narrow_left_column/narrow_left_column.png -text
 styles/thenews/thenews.png -text
 styles/tikinewt.css -text
 styles/tikinewt/tikinewt.png -text
+/svn-commit.tmp -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
