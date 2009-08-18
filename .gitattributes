@@ -1165,6 +1165,7 @@ installer/schema/20090715_sefurl_for_filegalleries_tiki.sql -text
 installer/schema/20090720_perspectives_tiki.sql -text
 installer/schema/20090721_webmail_ext_public_tiki.sql -text
 installer/schema/20090727_category_permissions_tiki.sql -text
+installer/schema/20090727_user_votings_index.php -text
 installer/schema/20090727_user_votings_index_tiki.sql -text
 installer/schema/20090730_p_list_newsletters_tiki.sql -text
 installer/schema/20090803_perspective_permission_tiki.sql -text
@@ -1574,6 +1575,19 @@ lib/core/test/AcceptanceTests/MultilingualTest.php -text
 lib/core/test/AcceptanceTests/SearchTest.php -text
 lib/core/test/AllTests.php -text
 lib/core/test/JustAFewTests.php -text
+lib/core/test/Perms/AccessorTest.php -text
+lib/core/test/Perms/BaseTest.php -text
+lib/core/test/Perms/Check/CreatorTest.php -text
+lib/core/test/Perms/Check/DirectTest.php -text
+lib/core/test/Perms/Check/IndirectTest.php -text
+lib/core/test/Perms/CheckSequenceTest.php -text
+lib/core/test/Perms/MixedTest.php -text
+lib/core/test/Perms/Resolver/DefaultTest.php -text
+lib/core/test/Perms/Resolver/StaticTest.php -text
+lib/core/test/Perms/ResolverFactory/CategoryFactoryTest.php -text
+lib/core/test/Perms/ResolverFactory/GlobalFactoryTest.php -text
+lib/core/test/Perms/ResolverFactory/ObjectFactoryTest.php -text
+lib/core/test/Perms/ResolverFactory/TestFactoryTest.php -text
 lib/core/test/TikiAcceptanceTestDBRestorer.php -text
 lib/core/test/TikiSeleniumTestCase.php -text
 lib/core/test/TikiTestCase.php -text
@@ -2351,9 +2365,7 @@ lib/search/refresh-functions.php -text
 lib/search/refresh.php -text
 lib/search/searchlib-mysql.php -text
 lib/search/searchlib-tiki.php -text
-lib/search/searchlib.php -text
 lib/search/searchstatslib.php -text
-lib/searchlib.php -text
 lib/setup/absolute_urls.php -text
 lib/setup/babelfish.php -text
 lib/setup/breadcrumb.php -text
