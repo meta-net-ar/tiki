@@ -1558,6 +1558,11 @@ lib/core/lib/StandardAnalyzer/Readme.txt -text
 lib/core/lib/StandardAnalyzer/TokenFilter/EnglishStemmer.php -text
 lib/core/lib/StandardAnalyzer/TokenFilter/EnglishStemmer/PorterStemmer.php -text
 lib/core/lib/StandardAnalyzer/Zend_License.txt -text
+lib/core/lib/TikiDb.php -text
+lib/core/lib/TikiDb/Adodb.php -text
+lib/core/lib/TikiDb/ErrorHandler.php -text
+lib/core/lib/TikiDb/Exception.php -text
+lib/core/lib/TikiDb/Pdo.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
 lib/core/lib/TikiFilter/PreventXss.php -text
