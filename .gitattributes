@@ -2768,13 +2768,8 @@ lib/userprefs/index.php -text
 lib/userprefs/scrambleEmail.php -text
 lib/userprefs/userprefslib.php -text
 lib/userslib.php -text
-lib/videogals/includes.php -text
-lib/videogals/kaltura.css -text
-lib/videogals/kaltura.js -text
 lib/videogals/kaltura_client.php -text
 lib/videogals/kaltura_client_base.php -text
-lib/videogals/kaltura_helpers.php -text
-lib/videogals/kalturaapi_php5_lib.php -text
 lib/videogals/videogallib.php -text
 lib/webmail/API.txt -text
 lib/webmail/class.rc4crypt.php -text
