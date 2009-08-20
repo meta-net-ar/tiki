@@ -1577,18 +1577,6 @@ lib/core/lib/WikiParser/PluginMatcher.php -text
 lib/core/lib/WikiParser/PluginParser.php -text
 lib/core/lib/WikiParser/PluginRepository.php -text
 lib/core/lib/WikiParser/PluginRunner.php -text
-lib/core/test/AcceptanceTests/AllTests.php -text
-lib/core/test/AcceptanceTests/ListPagesTest.php -text
-lib/core/test/AcceptanceTests/MultilingualTest.php -text
-lib/core/test/AcceptanceTests/MultilinguallibTest.php -text
-lib/core/test/AcceptanceTests/SearchTest.php -text
-lib/core/test/AcceptanceTests/TikiLibrariesAccessTest.php -text
-lib/core/test/AllTestsAcceptance.php -text
-lib/core/test/TikiAcceptanceTestDBRestorer.php -text
-lib/core/test/TikiSeleniumTestCase.php -text
-lib/core/test/create_dump_db_file.php -text
-lib/core/test/restore_db_dump.php -text
-lib/core/test/upgrade_test_database_dump_file.php -text
 lib/csslib.php -text
 lib/db/tiki_registration_fields.php -text
 lib/dcs/dcslib.php -text
@@ -2622,8 +2610,20 @@ lib/tasks/index.php -text
 lib/tasks/tasklib.php -text
 lib/templates/index.php -text
 lib/templates/templateslib.php -text
+lib/test/AcceptanceTests/AllTests.php -text
+lib/test/AcceptanceTests/ListPagesTest.php -text
+lib/test/AcceptanceTests/MultilingualTest.php -text
+lib/test/AcceptanceTests/MultilinguallibTest.php -text
+lib/test/AcceptanceTests/SearchTest.php -text
+lib/test/AcceptanceTests/TikiLibrariesAccessTest.php -text
+lib/test/AcceptanceTests/utils/create_dump_db_file.php -text
+lib/test/AcceptanceTests/utils/restore_db_dump.php -text
+lib/test/AcceptanceTests/utils/upgrade_test_database_dump_file.php -text
 lib/test/AllTests.php -text
+lib/test/AllTestsAcceptance.php -text
 lib/test/README -text
+lib/test/TikiAcceptanceTestDBRestorer.php -text
+lib/test/TikiSeleniumTestCase.php -text
 lib/test/TikiTestCase.php -text
 lib/test/core/AllTests.php -text
 lib/test/core/Category/ManipulatorTest.php -text
@@ -2669,6 +2669,13 @@ lib/test/core/WikiParser/PluginRepositoryTest.php -text
 lib/test/core/WikiParser/wikiplugin_foo.php -text
 lib/test/core/bootstrap.php -text
 lib/test/core/phpunit.xml -text
+lib/test/core/temp/cache/569487e68e42b1b751d730660679a2b4 -text
+lib/test/core/temp/cache/72da5437e5ca43ae3afa4198274086c2 -text
+lib/test/core/temp/cache/b5232c1a71a08d878cb29f45acfd10fc -text
+lib/test/core/temp/cache/c974802d4741febf958d5de25fbe5199 -text
+lib/test/core/temp/cache/d9da17542751bb5edd637639beeacdb0 -text
+lib/test/core/temp/cache/e2697f0e2d63f550fa5677ff7f8257ce -text
+lib/test/core/temp/cache/ef3f446e1fe3ea6ff0cef46983b191f3 -text
 lib/test/importer/AllTests.php -text
 lib/test/importer/fixtures/index.php -text
 lib/test/importer/fixtures/mediawiki_contributor.xml -text
@@ -2890,6 +2897,7 @@ lib/wiki-plugins/wikiplugin_trackertimeline.php -text
 lib/wiki-plugins/wikiplugin_translated.php -text
 lib/wiki-plugins/wikiplugin_usercount.php -text
 lib/wiki-plugins/wikiplugin_userlist.php -text
+lib/wiki-plugins/wikiplugin_userpref.php -text
 lib/wiki-plugins/wikiplugin_versions.php -text
 lib/wiki-plugins/wikiplugin_vote.php -text
 lib/wiki-plugins/wikiplugin_wantedpages.php -text
@@ -2953,16 +2961,13 @@ modules/cache/README -text
 modules/cache/index.php -text
 modules/index.php -text
 modules/mod-action_calendar.php -text
-modules/mod-adsense.php -text
 modules/mod-article_archives.php -text
 modules/mod-article_by_rating.php -text
 modules/mod-article_topics.php -text
 modules/mod-articles.php -text
 modules/mod-assistant.php -text
 modules/mod-blog_last_comments.php -text
-modules/mod-breadcrumb.php -text
 modules/mod-calendar_new.php -text
-modules/mod-categories.php -text
 modules/mod-change_category.php -text
 modules/mod-comm_received_objects.php -text
 modules/mod-directory_last_sites.php -text
@@ -2981,9 +2986,12 @@ modules/mod-freetags_current.php -text
 modules/mod-freetags_morelikethis.php -text
 modules/mod-freetags_most_popular.php -text
 modules/mod-freetags_prefered.php -text
+modules/mod-func-adsense.php -text
+modules/mod-func-breadcrumb.php -text
+modules/mod-func-categories.php -text
 modules/mod-func-category_transition.php -text
+modules/mod-func-google.php -text
 modules/mod-func-switch_lang.php -text
-modules/mod-google.php -text
 modules/mod-groups_emulation.php -text
 modules/mod-last_actions.php -text
 modules/mod-last_articles.php -text
@@ -3204,7 +3212,9 @@ pics/icons/no_eye_arrow_down.png -text
 pics/icons/no_information.png -text
 pics/icons/note_add.png -text
 pics/icons/ofolder.png -text
+pics/icons/oleftcol.png -text svneol=unset#image/png
 pics/icons/omodule.png -text
+pics/icons/orightcol.png -text svneol=unset#image/png
 pics/icons/ovmodule.png -text
 pics/icons/package.png -text
 pics/icons/package_go.png -text
@@ -3449,6 +3459,7 @@ pics/trans.png -text
 /show_image.php -text
 styles/BiDi/BiDi.css -text
 styles/BiDi/index.php -text
+styles/coelesce/arrows-295c8e.png -text svneol=unset#image/png
 styles/coelesce/arrows-467aa7.png -text svneol=unset#image/png
 styles/coelesce/coelesce.png -text
 styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
@@ -3524,6 +3535,7 @@ styles/thenews/arrows-005faa.png -text svneol=unset#image/png
 styles/thenews/options/narrow_left_column/narrow_left_column.png -text
 styles/thenews/thenews.png -text
 styles/tikinewt.css -text
+styles/tikinewt/arrows-6d819d.png -text svneol=unset#image/png
 styles/tikinewt/tikinewt.png -text
 temp/.htaccess -text
 temp/README -text
