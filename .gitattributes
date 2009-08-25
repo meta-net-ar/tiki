@@ -2505,7 +2505,6 @@ lib/smarty_tiki/function.fileinfo.php -text
 lib/smarty_tiki/function.gallery.php -text
 lib/smarty_tiki/function.help.php -text
 lib/smarty_tiki/function.helplink.php -text
-lib/smarty_tiki/function.html_select_date.php -text
 lib/smarty_tiki/function.html_select_time.php -text
 lib/smarty_tiki/function.icon.php -text
 lib/smarty_tiki/function.initials_filter_links.php -text
@@ -2961,15 +2960,10 @@ modules/mod-articles.php -text
 modules/mod-assistant.php -text
 modules/mod-blog_last_comments.php -text
 modules/mod-calendar_new.php -text
-modules/mod-change_category.php -text
 modules/mod-comm_received_objects.php -text
 modules/mod-directory_last_sites.php -text
 modules/mod-directory_stats.php -text
 modules/mod-directory_top_sites.php -text
-modules/mod-featured_links.php -text
-modules/mod-file_galleries.php -text
-modules/mod-forums_best_voted_topics.php -text
-modules/mod-forums_last_posts.php -text
 modules/mod-forums_last_topics.php -text
 modules/mod-forums_most_commented_forums.php -text
 modules/mod-forums_most_read_topics.php -text
@@ -2983,7 +2977,14 @@ modules/mod-func-adsense.php -text
 modules/mod-func-breadcrumb.php -text
 modules/mod-func-categories.php -text
 modules/mod-func-category_transition.php -text
+modules/mod-func-change_category.php -text
+modules/mod-func-featured_links.php -text
+modules/mod-func-file_galleries.php -text
+modules/mod-func-forums_best_voted_topics.php -text
+modules/mod-func-forums_last_posts.php -text
 modules/mod-func-google.php -text
+modules/mod-func-logged_users.php -text
+modules/mod-func-menupage.php -text
 modules/mod-func-switch_lang.php -text
 modules/mod-groups_emulation.php -text
 modules/mod-last_actions.php -text
@@ -3007,8 +3008,6 @@ modules/mod-last_tracker_comments.php -text
 modules/mod-last_tracker_items.php -text
 modules/mod-last_visitors.php -text
 modules/mod-live_support.php -text
-modules/mod-logged_users.php -text
-modules/mod-menupage.php -text
 modules/mod-messages_unread_messages.php -text
 modules/mod-minichat.php -text
 modules/mod-months_links.php -text
@@ -3306,6 +3305,7 @@ pics/icons/text_underline.png -text
 pics/icons/text_uppercase.png -text
 pics/icons/textfield.png -text
 pics/icons/thumb_up.png -text
+pics/icons/tick.png -text
 pics/icons/timeline_marker.png -text
 pics/icons/tree_collapse.png -text
 pics/icons/tree_collapse_corner.png -text
@@ -3717,7 +3717,7 @@ templates/modules/mod-events.tpl -text
 templates/modules/mod-featured_links.tpl -text
 templates/modules/mod-file_galleries.tpl -text
 templates/modules/mod-forums_best_voted_topics.tpl -text
-templates/modules/mod-forums_last_posts.tpl -text svneol=unset#application/octet-stream
+templates/modules/mod-forums_last_posts.tpl -text
 templates/modules/mod-forums_last_topics.tpl -text
 templates/modules/mod-forums_most_commented_forums.tpl -text
 templates/modules/mod-forums_most_read_topics.tpl -text
@@ -4260,6 +4260,7 @@ tests/messu-compose.tpl -text
 tests/test_cvs_file.txt -text
 tests/test_php_beautifier.php -text
 tests/testfile.txt -text
+tests/upgrade_categperm.php -text
 /textareasize.php -text
 /tiki-action_calendar.php -text
 /tiki-admin.php -text
