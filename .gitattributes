@@ -3221,6 +3221,39 @@ styles/integrator/default.css -text
 styles/integrator/doxygen.css -text
 styles/integrator/index.php -text
 styles/lite/lite.css -text
+styles/moz4/action_edit.png -text svneol=unset#image/png
+styles/moz4/action_print.png -text svneol=unset#image/png
+styles/moz4/action_translate.png -text svneol=unset#image/png
+styles/moz4/arrow.png -text svneol=unset#image/png
+styles/moz4/background-feature.jpg -text svneol=unset#image/jpeg
+styles/moz4/background-tile.png -text svneol=unset#image/png
+styles/moz4/bodybox-bot.png -text svneol=unset#image/png
+styles/moz4/bodybox-top.png -text svneol=unset#image/png
+styles/moz4/botbar-med.png -text svneol=unset#image/png
+styles/moz4/botbar-short.png -text svneol=unset#image/png
+styles/moz4/botbar.png -text svneol=unset#image/png
+styles/moz4/cc-ie6.png -text svneol=unset#image/png
+styles/moz4/cc.png -text svneol=unset#image/png
+styles/moz4/footer-border.png -text svneol=unset#image/png
+styles/moz4/header-background.png -text svneol=unset#image/png
+styles/moz4/header-nav-divider.png -text svneol=unset#image/png
+styles/moz4/header-nav-menu-backgrounds.png -text svneol=unset#image/png
+styles/moz4/hr1.png -text svneol=unset#image/png
+styles/moz4/hr2.png -text svneol=unset#image/png
+styles/moz4/mozilla-logo.png -text svneol=unset#image/png
+styles/moz4/screencast-bar.png -text svneol=unset#image/png
+styles/moz4/screencast-player-close.png -text svneol=unset#image/png
+styles/moz4/screencast-player-frame.png -text svneol=unset#image/png
+styles/moz4/search-button.png -text svneol=unset#image/png
+styles/moz4/searchbar-ie6.png -text svneol=unset#image/png
+styles/moz4/searchbar.png -text svneol=unset#image/png
+styles/moz4/searchmodule.png -text svneol=unset#image/png
+styles/moz4/searchsubmit-ie6.png -text svneol=unset#image/png
+styles/moz4/searchsubmit.png -text svneol=unset#image/png
+styles/moz4/side-menu-divider.png -text svneol=unset#image/png
+styles/moz4/topbar-med.png -text svneol=unset#image/png
+styles/moz4/topbar-short.png -text svneol=unset#image/png
+styles/moz4/topbar.png -text svneol=unset#image/png
 styles/slides/index.php -text
 styles/slides/wiredot.png -text svneol=unset#unset
 styles/slideshows/clear.css -text
