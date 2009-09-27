@@ -3635,6 +3635,8 @@ templates/structures_toc_level.tpl -text
 templates/styles/coelesce/tiki-site_header_login.tpl -text
 templates/styles/index.php -text
 templates/styles/moz4/comment-header.tpl -text
+templates/styles/moz4/tiki-show_page.tpl -text
+templates/styles/moz4/tiki-wiki_topline.tpl -text
 templates/styles/strasa/tiki-site_header.tpl -text
 templates/styles/tikinewt/index.php -text
 templates/textareasize.tpl -text
