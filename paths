@@ -1,90 +1,6 @@
 M
 dir
-/branches/experimental/kaltura_integration_two/lib/test/core/DeclFilter
-
-
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/lib/test/core/JitFilter
-
-
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/lib/jquery_tiki
-
-
-
-
-A
-dir
-/branches/experimental/kaltura_integration_two/lib/test/core/Transition
-/trunk/lib/test/core/Transition
-22005
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/lib/test/core/Multilingual
-
-
-
-
-A
-dir
-/branches/experimental/kaltura_integration_two/lib/fckeditor_tiki/fckeditor-icons
-/trunk/lib/fckeditor_tiki/fckeditor-icons
-22005
-
-
-A
-dir
-/branches/experimental/kaltura_integration_two/lib/test/core/Perms/Reflection
-/trunk/lib/test/core/Perms/Reflection
-22005
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/lib/test/importer/fixtures
-
-
-
-
-D
-dir
-/branches/experimental/kaltura_integration_two/lib/Galaxia
-
-
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/templates
-
-
-
-
-M
-dir
 /branches/experimental/kaltura_integration_two/styles/strasa/options/mono/pics
-
-
-
-
-A
-dir
-/branches/experimental/kaltura_integration_two/lib/fckeditor_tiki/plugins/tikiswitch
-/trunk/lib/fckeditor_tiki/plugins/tikiswitch
-22005
-
-
-M
-dir
-/branches/experimental/kaltura_integration_two/lib/test/core/Category
 
 
 
@@ -112,21 +28,56 @@ dir
 
 M
 dir
+/branches/experimental/kaltura_integration_two/lib/jquery_tiki
+
+
+
+
+M
+dir
 /branches/experimental/kaltura_integration_two
 
 
 
 
-A
+M
 dir
-/branches/experimental/kaltura_integration_two/lib/core/lib/Perms/Reflection
-/trunk/lib/core/lib/Perms/Reflection
-22005
+/branches/experimental/kaltura_integration_two/lib/test/core/Category
 
 
-D
+
+
+M
 dir
-/branches/experimental/kaltura_integration_two/lib/fckeditor_tiki/plugins/tikiimage/templates
+/branches/experimental/kaltura_integration_two/lib/test/core/DeclFilter
+
+
+
+
+M
+dir
+/branches/experimental/kaltura_integration_two/lib/test/core/Multilingual
+
+
+
+
+M
+dir
+/branches/experimental/kaltura_integration_two/lib/test/importer/fixtures
+
+
+
+
+M
+dir
+/branches/experimental/kaltura_integration_two/lib/test/core/JitFilter
+
+
+
+
+M
+dir
+/branches/experimental/kaltura_integration_two/templates
 
 
 
