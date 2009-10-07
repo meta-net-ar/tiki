@@ -1170,6 +1170,7 @@ installer/schema/20090513_wiki_similar_permission_tiki.sql -text
 installer/schema/20090515_score_tiki.sql -text
 installer/schema/20090811_quizzes_tiki.sql -text
 installer/schema/20090913_plugin_security_addedby_tiki.sql -text
+installer/schema/20091007_update_database_structure_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
