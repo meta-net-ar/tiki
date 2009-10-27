@@ -1903,6 +1903,7 @@ lib/jquery/cluetip/lib/jquery.bgiframe.min.js -text
 lib/jquery/cluetip/lib/jquery.hoverIntent.js -text
 lib/jquery/index.php -text
 lib/jquery/jquery-autocomplete/changelog.txt -text
+lib/jquery/jquery-autocomplete/indicator.gif -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.css -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.js -text
 lib/jquery/jquery-autocomplete/jquery.autocomplete.min.js -text
