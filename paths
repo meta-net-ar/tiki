@@ -1,69 +1,83 @@
 M
 dir
-/branches/4.x/lib/test/core/TikiFilter
+/trunk/lib/test/core/Category
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/core/JitFilter
+/trunk/lib/test/core/JitFilter
 
 
 
 
 M
 dir
-/branches/4.x/templates
+/trunk/lib/test/core/DeclFilter
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/core/Category
+/trunk/templates
 
 
 
 
 M
 dir
-/branches/4.x/styles/strasa/options/mono/pics
+/trunk/styles/strasa/options/mono/pics
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/core/DeclFilter
+/trunk/lib/test/core/Multilingual
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/core/Perms
+/trunk/lib/test/core/Perms
 
 
 
 
 M
 dir
-/branches/4.x/lib/jquery_tiki
+/trunk/lib/test/importer/fixtures
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/core/Multilingual
+/trunk/lib/jquery_tiki
 
 
 
 
 M
 dir
-/branches/4.x/lib/test/importer/fixtures
+/trunk
+
+
+
+
+M
+dir
+/trunk/lib/test/core/TikiFilter
+
+
+
+
+M
+dir
+/trunk/lib/test/core/WikiParser
 
 
 
