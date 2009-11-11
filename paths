@@ -1,90 +1,55 @@
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/templates
+/mods/trunk/themes/clubcard_tiki_4/templates/styles
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/black
+/mods/trunk/themes/clubcard_tiki_4
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09
+/mods/trunk/themes/clubcard_tiki_4/styles/clubcard/options/wide
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/green
+/mods/trunk/themes/clubcard_tiki_4/styles/clubcard
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/copper
+/mods/trunk/themes/clubcard_tiki_4/styles
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/blue
+/mods/trunk/themes/clubcard_tiki_4/templates
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles
+/mods/trunk/themes/clubcard_tiki_4/templates/styles/clubcard
 
 
 
 
 A
 dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options
-
-
-
-
-A
-dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/red
-
-
-
-
-A
-dir
-/mods/trunk/themes/andreas09_tiki_4
-
-
-
-
-A
-dir
-/mods/trunk/themes/andreas09_tiki_4/templates/styles/andreas09
-
-
-
-
-A
-dir
-/mods/trunk/themes/andreas09_tiki_4/templates/styles
-
-
-
-
-A
-dir
-/mods/trunk/themes/andreas09_tiki_4/styles/andreas09/options/purple
+/mods/trunk/themes/clubcard_tiki_4/styles/clubcard/options
 
 
 
