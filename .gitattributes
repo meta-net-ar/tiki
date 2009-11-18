@@ -21,17 +21,15 @@ css/calendar.css -text
 css/freetags.css -text
 css/ie6.css -text
 css/ie8.css -text
+css/index.php -text
 css/jscalendar.css -text
 db/.htaccess -text
-db/case_patch.php -text
 db/convertscripts/convert_pgsql.bat -text
 db/convertscripts/convertsqls.bat -text
 db/convertscripts/convertsqls.sh -text
 db/convertscripts/index.php -text
 db/convertscripts/mysql_to_pgsql.php -text
-db/convertscripts/mysql_to_sqlite.php -text
 db/convertscripts/tikiversion.php -text
-db/fulltext.sql -text
 db/index.php -text
 db/tiki-4.0-mysql.sql -text
 db/tiki-4.0-mysqli.sql -text
@@ -42,7 +40,7 @@ db/tiki-db-native-mysqli.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
 db/tiki-pgsql-test.sql -text
-db/tiki-secdb_3.0_mysql.sql -text
+db/tiki-secdb_4.0_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
@@ -112,6 +110,8 @@ dump/index.php -text
 /favicon.png -text
 /fgal_listing_conf.php -text
 files/index.php -text
+files/templates/index.php -text
+files/templates/listpages/index.php -text
 files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 /freetag_apply.php -text
 /freetag_list.php -text
@@ -981,8 +981,14 @@ img/icons2/world.gif -text
 img/icons2/zweistern.gif -text
 img/index.php -text
 img/leftbar.gif -text
+img/leftbarlight.gif -text
+img/listprogress-bar.png -text
+img/listprogress-slider.png -text
+img/loading-light.gif -text
+img/loading.gif -text
 img/magnifying-glass-micro-icon.png -text
 img/mainbar.gif -text
+img/mainbarlight.gif -text
 img/mytiki/admin.gif -text
 img/mytiki/bookmarks.gif -text
 img/mytiki/files.gif -text
@@ -1000,13 +1006,20 @@ img/mytiki/prefs.gif -text
 img/mytiki/stock_contact.png -text
 img/mytiki/tasks.gif -text
 img/mytiki/webmail.gif -text
+img/overlay-85.png -text
+img/overlay-light.png -text
 img/php.png -text
 img/poweredbyhawhaw.gif -text
 img/rdf.gif -text
 img/replied.gif -text
 img/rightbar.gif -text
+img/rightbarlight.gif -text
 img/rss.png -text
 img/rss_podcast_80_15.png -text
+img/screencast-bar.png -text
+img/screencast-no-video.png -text
+img/screencast-player-close.png -text
+img/screencast-player-frame.png -text
 img/separator.gif -text
 img/smarty.gif -text
 img/smiles/icon_arrow.gif -text
@@ -1163,6 +1176,7 @@ installer/schema/20090727_category_permissions_tiki.sql -text
 installer/schema/20090727_user_votings_index_tiki.sql -text
 installer/schema/20090730_p_list_newsletters_tiki.sql -text
 installer/schema/20090803_perspective_permission_tiki.sql -text
+installer/schema/20090804_kaltura_permissions_tiki.sql -text
 installer/schema/20090804_menu_search_tiki.sql -text
 installer/schema/20090805_kill_newsreader_tiki.sql -text
 installer/schema/20090805_remove_drawings_prefs_etc_tiki.sql -text
@@ -1177,8 +1191,10 @@ installer/schema/20090807_transitions_tiki.sql -text
 installer/schema/20090808_add_wiki_minor_edits_tiki.sql -text
 installer/schema/20090809_marc_needs_more_space_tiki.sql -text
 installer/schema/20090811_filegals_container_tiki.sql -text
+installer/schema/20090811_kaltura_editor_pref_tiki.sql -text
 installer/schema/20090811_quizzes_tiki.sql -text
 installer/schema/20090811_rename_quicktags_to_toolbars_tiki.sql -text
+installer/schema/20090823_kaltura_menu_options_tiki.sql -text
 installer/schema/20090826_group_expiration_tiki.sql -text
 installer/schema/20090904_wysiwyg_newsletters_tiki.sql -text
 installer/schema/20090911_tracker_item_change_user_tiki.sql -text
@@ -1191,11 +1207,51 @@ installer/schema/20090921_workspaces_tiki.sql -text
 installer/schema/20090923_mod_change_category_defaults_tiki.php -text
 installer/schema/20090925_online_logged_users_modules_merge_tiki.sql -text
 installer/schema/20090927_top_images_modules_merge_tiki.sql -text
+installer/schema/20090928_galaxia_leftovers_tiki.sql -text
+installer/schema/20090928_last_images_modules_merge_tiki.sql -text
+installer/schema/20090928_transition_guards_text_tiki.sql -text
+installer/schema/20091004_last_tracker_items_modules_merge_tiki.php -text
+installer/schema/20091007_update_database_structure_tiki.sql -text
+installer/schema/20091008_reg_group_includes_anon_tiki.sql -text
+installer/schema/20091011_serurl_dl_order_tiki.sql -text
+installer/schema/20091013_fix_perms_tiki.sql -text
+installer/schema/20091015_application_menu_admin_renames_tiki.sql -text
+installer/schema/20091016_categorization_tracker_item_tiki.sql -text
+installer/schema/20091019_article_by_rating_modules_merge_tiki.php -text
+installer/schema/20091019_last_articles_modules_merge_tiki.php -text
+installer/schema/20091019_users_perms_types_tidying_tiki.sql -text
+installer/schema/20091020_bigger_user_prefs_tiki.sql -text
+installer/schema/20091020_faq_created_tiki.sql -text
+installer/schema/20091020_kaltura_tiki.sql -text
+installer/schema/20091020_moz_screencast_tiki.sql -text
+installer/schema/20091020_remove_charts_tiki.sql -text
+installer/schema/20091020_sefurl_trackeritem_tiki.sql -text
+installer/schema/20091021_moz_pagelist_tiki.sql -text
+installer/schema/20091023_bookmarks_name_lengthen_tiki.sql -text
+installer/schema/20091023_nul_categ_tiki.sql -text
+installer/schema/20091023_report_tiki.sql -text
+installer/schema/20091027_multiple_session_handler_tiki.sql -text
+installer/schema/20091028_quota_tiki.sql -text
+installer/schema/20091030_wiki_watch_tiki.sql -text
+installer/schema/20091103_upgrade_categperm_tiki.php -text
+installer/schema/20091105_auth_tokens_tiki.sql -text
+installer/schema/20091111_fgal_size_tiki.sql -text
+installer/schema/20091112_rename_mnu_application_menu_tiki.sql -text
+installer/schema/20091112_template_type_tiki.sql -text
+installer/schema/20091113_old_categ_perm_tiki.sql -text
+installer/schema/20091118_sefurl_tiki.sql -text
+installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 lang/.htaccess -text
 lang/ar/index.php -text
 lang/ar/language.php -text
+lang/as/index.php -text
+lang/as/language.php -text
+lang/bn-BD/index.php -text
+lang/bn-BD/language.php -text
+lang/bn-IN/index.php -text
+lang/bn-IN/language.php -text
 lang/ca/custom.php_example -text
 lang/ca/index.php -text
 lang/ca/language.php -text
@@ -1203,6 +1259,8 @@ lang/cn/index.php -text
 lang/cn/language.php -text
 lang/cs/index.php -text
 lang/cs/language.php -text
+lang/cy/index.php -text
+lang/cy/language.php -text
 lang/da/index.php -text
 lang/da/language.php -text
 lang/de/index.php -text
@@ -1215,9 +1273,15 @@ lang/en-uk/index.php -text
 lang/en-uk/language.php -text
 lang/en/index.php -text
 lang/en/language.php -text
+lang/eo/index.php -text
+lang/eo/language.php -text
 lang/es/custom.php_example -text
 lang/es/index.php -text
 lang/es/language.php -text
+lang/et/index.php -text
+lang/et/language.php -text
+lang/eu/index.php -text
+lang/eu/language.php -text
 lang/fa/index.php -text
 lang/fa/language.php -text
 lang/fi/index.php -text
@@ -1228,26 +1292,58 @@ lang/flagmapping.php -text
 lang/fr/custom.php_example -text
 lang/fr/index.php -text
 lang/fr/language.php -text
+lang/fur/index.php -text
+lang/fur/language.php -text
+lang/fy-NL/index.php -text
+lang/fy-NL/language.php -text
+lang/ga-IE/index.php -text
+lang/ga-IE/language.php -text
 lang/gl/index.php -text
 lang/gl/language.php -text
 lang/he/index.php -text
 lang/he/language.php -text
+lang/hi-IN/index.php -text
+lang/hi-IN/language.php -text
 lang/hr/index.php -text
 lang/hr/language.php -text
 lang/hu/index.php -text
 lang/hu/language.php -text
 lang/index.php -text
+lang/is/index.php -text
+lang/is/language.php -text
 lang/it/index.php -text
 lang/it/language.php -text
 lang/ja/index.php -text
 lang/ja/language.php -text
+lang/kk/index.php -text
+lang/kk/language.php -text
+lang/kn/index.php -text
+lang/kn/language.php -text
 lang/ko/index.php -text
 lang/ko/language.php -text
 lang/langmapping.php -text
+lang/lt/index.php -text
+lang/lt/language.php -text
+lang/lv/index.php -text
+lang/lv/language.php -text
+lang/mk/index.php -text
+lang/mk/language.php -text
+lang/mn/index.php -text
+lang/mn/language.php -text
+lang/mr/index.php -text
+lang/mr/language.php -text
+lang/ms/index.php -text
+lang/ms/language.php -text
 lang/nl/index.php -text
 lang/nl/language.php -text
 lang/no/index.php -text
 lang/no/language.php -text
+lang/oc/index.php -text
+lang/oc/language.php -text
+lang/or/index.php -text
+lang/or/language.php -text
+lang/pa-IN/index.php -text
+lang/pa-IN/language.php -text
 lang/pl/index.php -text
 lang/pl/language.php -text
 lang/po/index.php -text
@@ -1255,14 +1351,24 @@ lang/pt-br/index.php -text
 lang/pt-br/language.php -text
 lang/pt/index.php -text
 lang/pt/language.php -text
+lang/rm/index.php -text
+lang/rm/language.php -text
+lang/ro/index.php -text
+lang/ro/language.php -text
 lang/ru/index.php -text
 lang/ru/language.php -text
+lang/rw/index.php -text
+lang/rw/language.php -text
 lang/sb/language.php -text
+lang/si/index.php -text
+lang/si/language.php -text
 lang/sk/index.php -text
 lang/sk/language.php -text
 lang/sl/index.php -text
 lang/sl/language.php -text
 lang/sp/index.php -text
+lang/sq/index.php -text
+lang/sq/language.php -text
 lang/sr-latn/index.php -text
 lang/sr-latn/language.php -text
 lang/sr/ChangeLog -text
@@ -1271,12 +1377,24 @@ lang/sr/language.php -text
 lang/sv/index.php -text
 lang/sv/language.php -text
 lang/sw/index.php -text
+lang/ta-LK/index.php -text
+lang/ta-LK/language.php -text
+lang/ta/index.php -text
+lang/ta/language.php -text
+lang/te/index.php -text
+lang/te/language.php -text
+lang/th/index.php -text
+lang/th/language.php -text
+lang/tr/index.php -text
+lang/tr/language.php -text
 lang/tv/index.php -text
 lang/tv/language.php -text
 lang/tw/index.php -text
 lang/tw/language.php -text
 lang/uk/index.php -text
 lang/uk/language.php -text
+lang/vi/index.php -text
+lang/vi/language.php -text
 lib/.htaccess -text
 lib/Babelfish.php -text
 lib/Date/Calc.php -text
@@ -1301,7 +1419,9 @@ lib/ajax/tiki-ajax.js -text
 lib/ajax/tikitohtml.php -text
 lib/articles/artlib.php -text
 lib/articles/index.php -text
+lib/auth/index.php -text
 lib/auth/ldap.php -text
+lib/auth/tokens.php -text
 lib/bablotron.php -text
 lib/ban/banlib.php -text
 lib/ban/index.php -text
@@ -1314,6 +1434,8 @@ lib/bookmarks/index.php -text
 lib/breadcrumblib.php -text
 lib/cache/cachelib.php -text
 lib/cache/index.php -text
+lib/cache/memcachelib.php -text
+lib/cache/pagecache.php -text
 lib/calendar/calendarlib.php -text
 lib/calendar/calrecurrence.php -text
 lib/calendar/index.php -text
@@ -1344,15 +1466,26 @@ lib/core/lib/DeclFilter/UnsetRule.php -text
 lib/core/lib/JitFilter.php -text
 lib/core/lib/JitFilter/Element.php -text
 lib/core/lib/Multilingual/Aligner/BilingualAligner.php -text
+lib/core/lib/Multilingual/Aligner/SentenceAlignments.php -text
 lib/core/lib/Multilingual/Aligner/SentenceSegmentor.php -text
 lib/core/lib/Multilingual/Aligner/ShortestPathFinder.php -text
 lib/core/lib/Multilingual/MachineTranslation/GoogleTranslateWrapper.php -text
 lib/core/lib/Perms.php -text
 lib/core/lib/Perms/Accessor.php -text
+lib/core/lib/Perms/Applier.php -text
 lib/core/lib/Perms/Check.php -text
+lib/core/lib/Perms/Check/Alternate.php -text
 lib/core/lib/Perms/Check/Creator.php -text
 lib/core/lib/Perms/Check/Direct.php -text
 lib/core/lib/Perms/Check/Indirect.php -text
+lib/core/lib/Perms/Reflection/Category.php -text
+lib/core/lib/Perms/Reflection/Container.php -text
+lib/core/lib/Perms/Reflection/Factory.php -text
+lib/core/lib/Perms/Reflection/Global.php -text
+lib/core/lib/Perms/Reflection/Object.php -text
+lib/core/lib/Perms/Reflection/PermissionComparator.php -text
+lib/core/lib/Perms/Reflection/PermissionSet.php -text
+lib/core/lib/Perms/Reflection/Quick.php -text
 lib/core/lib/Perms/Resolver.php -text
 lib/core/lib/Perms/Resolver/Default.php -text
 lib/core/lib/Perms/Resolver/Static.php -text
@@ -1373,6 +1506,7 @@ lib/core/lib/TikiDb/Adodb.php -text
 lib/core/lib/TikiDb/Bridge.php -text
 lib/core/lib/TikiDb/ErrorHandler.php -text
 lib/core/lib/TikiDb/Exception.php -text
+lib/core/lib/TikiDb/MasterSlaveDispatch.php -text
 lib/core/lib/TikiDb/Pdo.php -text
 lib/core/lib/TikiFilter.php -text
 lib/core/lib/TikiFilter/Callback.php -text
@@ -1922,6 +2056,7 @@ lib/mime/mimelib.php -text
 lib/mime/mimetypes.php -text
 lib/minical/index.php -text
 lib/minical/minicallib.php -text
+lib/minify/JSMin.php -text
 lib/mods/index.php -text
 lib/mods/modslib.php -text
 lib/modules/index.php -text
@@ -1936,6 +2071,8 @@ lib/notifications/notificationemaillib.php -text
 lib/notifications/notificationlib.php -text
 lib/objectlib.php -text
 lib/ointegratelib.php -text
+lib/pagelist/pagelistlib.php -text
+lib/pdflib.php -text
 lib/pear/Auth.php -text
 lib/pear/Auth/Anonymous.php -text
 lib/pear/Auth/Auth.php -text
@@ -2028,6 +2165,10 @@ lib/pear/Date/TimeZone.php -text
 lib/pear/Date/index.php -text
 lib/pear/HTTP/Request.php -text
 lib/pear/HTTP/Request/Listener.php -text
+lib/pear/HTTP/WebDAV/Client.php -text
+lib/pear/HTTP/WebDAV/Client/Stream.php -text
+lib/pear/HTTP/WebDAV/Tools/_parse_lock_response.php -text
+lib/pear/HTTP/WebDAV/Tools/_parse_propfind_response.php -text
 lib/pear/HTTP/index.php -text
 lib/pear/Net/DIME.php -text
 lib/pear/Net/DNS.php -text
@@ -2193,37 +2334,86 @@ lib/phplayers_tiki/tiki-phplayers.php -text
 lib/polls/index.php -text
 lib/polls/polllib.php -text
 lib/polls/polllib_shared.php -text
+lib/prefs/allowmsg.php -text
+lib/prefs/art.php -text
+lib/prefs/article.php -text
+lib/prefs/articles.php -text
 lib/prefs/auth.php -text
 lib/prefs/available.php -text
+lib/prefs/blog.php -text
+lib/prefs/blogues.php -text
+lib/prefs/bot.php -text
+lib/prefs/box.php -text
+lib/prefs/cas.php -text
+lib/prefs/categories.php -text
+lib/prefs/categorypath.php -text
+lib/prefs/center.php -text
 lib/prefs/change.php -text
+lib/prefs/cms.php -text
 lib/prefs/contact.php -text
 lib/prefs/count.php -text
 lib/prefs/default.php -text
+lib/prefs/desc.php -text
+lib/prefs/direct.php -text
+lib/prefs/directory.php -text
 lib/prefs/error.php -text
+lib/prefs/faq.php -text
+lib/prefs/faqs.php -text
 lib/prefs/feature.php -text
+lib/prefs/fgal.php -text
+lib/prefs/file.php -text
+lib/prefs/footer.php -text
+lib/prefs/forum.php -text
+lib/prefs/forums.php -text
 lib/prefs/freetags.php -text
 lib/prefs/global.php -text
+lib/prefs/header.php -text
+lib/prefs/https.php -text
+lib/prefs/iepngfix.php -text
+lib/prefs/jquery.php -text
 lib/prefs/lang.php -text
 lib/prefs/language.php -text
+lib/prefs/layout.php -text
 lib/prefs/load.php -text
 lib/prefs/log.php -text
 lib/prefs/mail.php -text
+lib/prefs/main.php -text
+lib/prefs/map.php -text
+lib/prefs/memcache.php -text
+lib/prefs/menus.php -text
+lib/prefs/messu.php -text
+lib/prefs/metatag.php -text
+lib/prefs/middle.php -text
+lib/prefs/multidomain.php -text
+lib/prefs/nextprev.php -text
 lib/prefs/page.php -text
+lib/prefs/pagination.php -text
+lib/prefs/poll.php -text
+lib/prefs/print.php -text
 lib/prefs/proxy.php -text
 lib/prefs/quantify.php -text
 lib/prefs/record.php -text
 lib/prefs/restrict.php -text
+lib/prefs/search.php -text
 lib/prefs/sender.php -text
 lib/prefs/session.php -text
 lib/prefs/show.php -text
 lib/prefs/site.php -text
+lib/prefs/sitead.php -text
+lib/prefs/sitelogo.php -text
+lib/prefs/sitemycode.php -text
+lib/prefs/slide.php -text
 lib/prefs/smarty.php -text
+lib/prefs/style.php -text
 lib/prefs/tiki.php -text
+lib/prefs/tracker.php -text
 lib/prefs/use.php -text
 lib/prefs/user.php -text
+lib/prefs/webmail.php -text
 lib/prefs/wiki.php -text
 lib/prefs/wikiplugin.php -text
 lib/prefs/wikiplugininline.php -text
+lib/prefs/wysiwyg.php -text
 lib/prefslib.php -text
 lib/profilelib/channellib.php -text
 lib/profilelib/installlib.php -text
@@ -2249,6 +2439,8 @@ lib/rss/rsslib.php -text
 lib/score/events.php -text
 lib/score/index.php -text
 lib/score/scorelib.php -text
+lib/screencasts/screencast.swf -text
+lib/screencasts/screencastlib.php -text
 lib/search/index.php -text
 lib/search/refresh-functions.php -text
 lib/search/refresh.php -text
@@ -2374,7 +2566,6 @@ lib/smarty_tiki/block.title.php -text
 lib/smarty_tiki/block.tr.php -text
 lib/smarty_tiki/block.translation.php -text
 lib/smarty_tiki/block.wiki.php -text
-lib/smarty_tiki/block.ws_help.php -text
 lib/smarty_tiki/compiler.assign.php -text
 lib/smarty_tiki/compiler.assign_content.php -text
 lib/smarty_tiki/function.article.php -text
@@ -2412,6 +2603,7 @@ lib/smarty_tiki/function.popup.php -text
 lib/smarty_tiki/function.popup_init.php -text
 lib/smarty_tiki/function.preference.php -text
 lib/smarty_tiki/function.query.php -text
+lib/smarty_tiki/function.quotabar.php -text
 lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.redirect.php -text
 lib/smarty_tiki/function.reindex_file_pixel.php -text
@@ -2502,6 +2694,7 @@ lib/tasks/tasklib.php -text
 lib/templates/index.php -text
 lib/templates/templateslib.php -text
 lib/test/AcceptanceTests/AllTests.php -text
+lib/test/AcceptanceTests/CollaborativeMultilingualTerminologyTest.php -text
 lib/test/AcceptanceTests/ListPagesTest.php -text
 lib/test/AcceptanceTests/MultilingualTest.php -text
 lib/test/AcceptanceTests/MultilinguallibTest.php -text
@@ -2516,7 +2709,8 @@ lib/test/README -text
 lib/test/TikiAcceptanceTestDBRestorer.php -text
 lib/test/TikiSeleniumTestCase.php -text
 lib/test/TikiTestCase.php -text
-lib/test/core/AllTests.php -text
+lib/test/auth/AuthTokensTest.php -text
+lib/test/bootstrap.php -text
 lib/test/core/Category/ManipulatorTest.php -text
 lib/test/core/DeclFilter/BaseTest.php -text
 lib/test/core/DeclFilter/CatchAllFilterTest.php -text
@@ -2529,20 +2723,24 @@ lib/test/core/DeclFilter/StaticKeyUnsetTest.php -text
 lib/test/core/JitFilter/AccessTest.php -text
 lib/test/core/JitFilter/FilterTest.php -text
 lib/test/core/JitFilter/IteratorTest.php -text
-lib/test/core/Multilingual/Aligner/AllTests.php -text
 lib/test/core/Multilingual/Aligner/BilingualAlignerTest.php -text
+lib/test/core/Multilingual/Aligner/SentenceAlignmentsTest.php -text
 lib/test/core/Multilingual/Aligner/SentenceSegmentorTest.php -text
 lib/test/core/Multilingual/Aligner/ShortestPathFinderTest.php -text
-lib/test/core/Multilingual/AllTests.php -text
-lib/test/core/Multilingual/MachineTranslation/AllTests.php -text
 lib/test/core/Multilingual/MachineTranslation/GoogleTranslateWrapperTest.php -text
 lib/test/core/Perms/AccessorTest.php -text
+lib/test/core/Perms/ApplierTest.php -text
 lib/test/core/Perms/BaseTest.php -text
+lib/test/core/Perms/Check/AlternateTest.php -text
 lib/test/core/Perms/Check/CreatorTest.php -text
 lib/test/core/Perms/Check/DirectTest.php -text
 lib/test/core/Perms/Check/IndirectTest.php -text
 lib/test/core/Perms/CheckSequenceTest.php -text
 lib/test/core/Perms/MixedTest.php -text
+lib/test/core/Perms/Reflection/FactoryTest.php -text
+lib/test/core/Perms/Reflection/PermissionComparatorTest.php -text
+lib/test/core/Perms/Reflection/PermissionSetTest.php -text
+lib/test/core/Perms/Reflection/QuickTest.php -text
 lib/test/core/Perms/Resolver/DefaultTest.php -text
 lib/test/core/Perms/Resolver/StaticTest.php -text
 lib/test/core/Perms/ResolverFactory/CategoryFactoryTest.php -text
@@ -2579,6 +2777,7 @@ lib/test/importer/tikiimporter_testcase.php -text
 lib/test/importer/tikiimporter_wiki_mediawiki_test.php -text
 lib/test/importer/tikiimporter_wiki_test.php -text
 lib/test/index.php -text
+lib/test/phpunit.xml -text
 lib/themecontrol/index.php -text
 lib/themecontrol/tcontrol.php -text
 lib/tiki-dynamic-js.php -text
@@ -2635,9 +2834,11 @@ lib/tikihelp/toolbar.html -text
 lib/tikihelplib.php -text
 lib/tikilib.php -text
 lib/tikisession-adodb.php -text
+lib/tikisession-memcache.php -text
 lib/tikisession-pdo.php -text
 lib/tikiticketlib.php -text
 lib/toolbars/index.php -text
+lib/toolbars/tiki-admin_toolbars.js -text
 lib/toolbars/toolbarslib.php -text
 lib/trackers/dynamic_list.js -text
 lib/trackers/index.php -text
@@ -2659,6 +2860,11 @@ lib/userprefs/index.php -text
 lib/userprefs/scrambleEmail.php -text
 lib/userprefs/userprefslib.php -text
 lib/userslib.php -text
+lib/videogals/KalturaClientBase_v3.php -text
+lib/videogals/KalturaClientReadme.txt -text
+lib/videogals/KalturaClient_v3.php -text
+lib/videogals/videogallib.php -text
+lib/webdav/webdavlib.php -text
 lib/webmail/API.txt -text
 lib/webmail/class.rc4crypt.php -text
 lib/webmail/contactlib.php -text
@@ -2677,6 +2883,7 @@ lib/wiki-plugins/wikiplugin_agentinfo.php -text
 lib/wiki-plugins/wikiplugin_alink.php -text
 lib/wiki-plugins/wikiplugin_aname.php -text
 lib/wiki-plugins/wikiplugin_annotation.php -text
+lib/wiki-plugins/wikiplugin_archivebuilder.php -text
 lib/wiki-plugins/wikiplugin_article.php -text
 lib/wiki-plugins/wikiplugin_articles.php -text
 lib/wiki-plugins/wikiplugin_attach.php -text
@@ -2727,9 +2934,11 @@ lib/wiki-plugins/wikiplugin_invite.php -text
 lib/wiki-plugins/wikiplugin_jabber.php -text
 lib/wiki-plugins/wikiplugin_jq.php -text
 lib/wiki-plugins/wikiplugin_js.php -text
+lib/wiki-plugins/wikiplugin_kaltura.php -text
 lib/wiki-plugins/wikiplugin_lang.php -text
 lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
+lib/wiki-plugins/wikiplugin_listprogress.php -text
 lib/wiki-plugins/wikiplugin_lm.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
@@ -2743,6 +2952,7 @@ lib/wiki-plugins/wikiplugin_mouseover.php -text
 lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
+lib/wiki-plugins/wikiplugin_pagelist.php -text
 lib/wiki-plugins/wikiplugin_picture.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
@@ -2756,11 +2966,13 @@ lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rm.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
+lib/wiki-plugins/wikiplugin_screencast.php -text
 lib/wiki-plugins/wikiplugin_sf.php -text
 lib/wiki-plugins/wikiplugin_sharethis.php -text
 lib/wiki-plugins/wikiplugin_sheet.php -text
 lib/wiki-plugins/wikiplugin_showpages.php -text
 lib/wiki-plugins/wikiplugin_skype.php -text
+lib/wiki-plugins/wikiplugin_smarty.php -text
 lib/wiki-plugins/wikiplugin_snarf.php -text
 lib/wiki-plugins/wikiplugin_sort.php -text
 lib/wiki-plugins/wikiplugin_split.php -text
@@ -2769,8 +2981,10 @@ lib/wiki-plugins/wikiplugin_stat.php -text
 lib/wiki-plugins/wikiplugin_sub.php -text
 lib/wiki-plugins/wikiplugin_subscribegroup.php -text
 lib/wiki-plugins/wikiplugin_subscribegroups.php -text
+lib/wiki-plugins/wikiplugin_subscribenewsletter.php -text
 lib/wiki-plugins/wikiplugin_sup.php -text
 lib/wiki-plugins/wikiplugin_survey.php -text
+lib/wiki-plugins/wikiplugin_tabs.php -text
 lib/wiki-plugins/wikiplugin_tag.php -text
 lib/wiki-plugins/wikiplugin_thumb.php -text
 lib/wiki-plugins/wikiplugin_titlesearch.php -text
@@ -2812,10 +3026,7 @@ lib/wiki3d/LICENSE.txt -text
 lib/wiki3d/README.txt -text
 lib/wiki3d/morcego-0.6.0.jar -text
 lib/wiki3d/pom.xml -text
-lib/workspaces/index.php -text
-lib/workspaces/wslib.php -text
-lib/workspaces/wstools/scriptCreator.php -text
-lib/workspaces/wstools/test.php -text
+lib/wikiplugin_screencast.js -text
 lib/x/index.php -text
 lib/x/x.js -text
 lib/x/x_anim.js -text
@@ -2853,21 +3064,20 @@ modules/cache/.htaccess -text svneol=unset#application/octet-stream
 modules/cache/README -text
 modules/cache/index.php -text
 modules/index.php -text
-modules/mod-action_calendar.php -text
-modules/mod-article_archives.php -text
-modules/mod-article_by_rating.php -text
-modules/mod-article_topics.php -text
-modules/mod-articles.php -text
 modules/mod-assistant.php -text
-modules/mod-calendar_new.php -text
-modules/mod-comm_received_objects.php -text
 modules/mod-forums_last_topics.php -text
+modules/mod-func-action_calendar.php -text
 modules/mod-func-adsense.php -text
+modules/mod-func-article_archives.php -text
+modules/mod-func-article_topics.php -text
+modules/mod-func-articles.php -text
 modules/mod-func-blog_last_comments.php -text
 modules/mod-func-breadcrumb.php -text
+modules/mod-func-calendar_new.php -text
 modules/mod-func-categories.php -text
 modules/mod-func-category_transition.php -text
 modules/mod-func-change_category.php -text
+modules/mod-func-comm_received_objects.php -text
 modules/mod-func-directory_last_sites.php -text
 modules/mod-func-directory_stats.php -text
 modules/mod-func-directory_top_sites.php -text
@@ -2884,23 +3094,54 @@ modules/mod-func-freetags_morelikethis.php -text
 modules/mod-func-freetags_most_popular.php -text
 modules/mod-func-freetags_prefered.php -text
 modules/mod-func-google.php -text
+modules/mod-func-groups_emulation.php -text
+modules/mod-func-last_actions.php -text
+modules/mod-func-last_blog_posts.php -text
+modules/mod-func-last_category_objects.php -text
 modules/mod-func-last_created_blogs.php -text
 modules/mod-func-last_created_faqs.php -text
 modules/mod-func-last_created_quizzes.php -text
 modules/mod-func-last_file_galleries.php -text
+modules/mod-func-last_files.php -text
+modules/mod-func-last_image_galleries.php -text
+modules/mod-func-last_images.php -text
+modules/mod-func-last_modif_events.php -text
+modules/mod-func-last_modif_pages.php -text
 modules/mod-func-last_modified_blogs.php -text
+modules/mod-func-last_submissions.php -text
+modules/mod-func-last_tracker_comments.php -text
+modules/mod-func-last_tracker_items.php -text
+modules/mod-func-last_validated_faq_questions.php -text
+modules/mod-func-last_visitors.php -text
 modules/mod-func-live_support.php -text
+modules/mod-func-login_box.php -text
+modules/mod-func-logo.php -text
 modules/mod-func-menupage.php -text
 modules/mod-func-messages_unread_messages.php -text
+modules/mod-func-minichat.php -text
+modules/mod-func-months_links.php -text
 modules/mod-func-num_submissions.php -text
 modules/mod-func-old_articles.php -text
 modules/mod-func-perspective.php -text
 modules/mod-func-quick_edit.php -text
 modules/mod-func-random_images.php -text
 modules/mod-func-random_pages.php -text
+modules/mod-func-register.php -text
+modules/mod-func-rsslist.php -text
+modules/mod-func-search_box.php -text
+modules/mod-func-search_new.php -text
+modules/mod-func-search_wiki_page.php -text
+modules/mod-func-search_wiki_page_new.php -text
+modules/mod-func-semantic_links.php -text
+modules/mod-func-shoutbox.php -text
+modules/mod-func-since_last_visit.php -text
+modules/mod-func-since_last_visit_new.php -text
 modules/mod-func-switch_lang.php -text
 modules/mod-func-switch_theme.php -text
+modules/mod-func-terminology.php -text
+modules/mod-func-tikitests.php -text
 modules/mod-func-top_active_blogs.php -text
+modules/mod-func-top_articles.php -text
 modules/mod-func-top_file_galleries.php -text
 modules/mod-func-top_files.php -text
 modules/mod-func-top_forum_posters.php -text
@@ -2911,44 +3152,21 @@ modules/mod-func-top_pages.php -text
 modules/mod-func-top_quizzes.php -text
 modules/mod-func-top_visited_blogs.php -text
 modules/mod-func-top_visited_faqs.php -text
+modules/mod-func-translation.php -text
+modules/mod-func-upcoming_events.php -text
 modules/mod-func-user_blogs.php -text
+modules/mod-func-user_bookmarks.php -text
 modules/mod-func-user_image_galleries.php -text
 modules/mod-func-user_pages.php -text
+modules/mod-func-user_tasks.php -text
+modules/mod-func-user_tasks_public.php -text
+modules/mod-func-usergroup_tracker.php -text
 modules/mod-func-users_rank.php -text
+modules/mod-func-webmail_inbox.php -text
 modules/mod-func-whats_related.php -text
 modules/mod-func-who_is_there.php -text
-modules/mod-groups_emulation.php -text
-modules/mod-last_actions.php -text
-modules/mod-last_articles.php -text
-modules/mod-last_blog_posts.php -text
-modules/mod-last_category_objects.php -text
-modules/mod-last_files.php -text
-modules/mod-last_image_galleries.php -text
-modules/mod-last_images.php -text
-modules/mod-last_images_th.php -text
-modules/mod-last_modif_events.php -text
-modules/mod-last_modif_pages.php -text
-modules/mod-last_modif_tracker_items.php -text
-modules/mod-last_submissions.php -text
-modules/mod-last_tracker_comments.php -text
-modules/mod-last_tracker_items.php -text
-modules/mod-last_visitors.php -text
-modules/mod-minichat.php -text
-modules/mod-months_links.php -text
-modules/mod-semantic_links.php -text
-modules/mod-shoutbox.php -text
-modules/mod-since_last_visit.php -text
-modules/mod-since_last_visit_new.php -text
-modules/mod-terminology.php -text
-modules/mod-top_articles.php -text
-modules/mod-translation.php -text
-modules/mod-upcoming_events.php -text
-modules/mod-user_bookmarks.php -text
-modules/mod-user_tasks.php -text
-modules/mod-user_tasks_public.php -text
-modules/mod-webmail_inbox.php -text
-modules/mod-wiki_last_comments.php -text
-modules/mod-youtube.php -text
+modules/mod-func-wiki_last_comments.php -text
+modules/mod-func-youtube.php -text
 pics/help_icon.png -text
 pics/icons/accept.png -text
 pics/icons/add.png -text
@@ -2983,6 +3201,7 @@ pics/icons/chart_curve.png -text
 pics/icons/chart_line.png -text
 pics/icons/chart_organisation.png -text
 pics/icons/clock.png -text
+pics/icons/close.png -text
 pics/icons/comment_add.png -text
 pics/icons/comment_approve.png -text
 pics/icons/comment_reject.png -text
@@ -3019,6 +3238,7 @@ pics/icons/eye_group.png -text
 pics/icons/eye_group_arrow_down.png -text
 pics/icons/eye_magnifier.png -text
 pics/icons/feed.png -text
+pics/icons/find.png -text
 pics/icons/flag_blue.png -text
 pics/icons/folder.png -text
 pics/icons/folder_add.png -text
@@ -3101,6 +3321,7 @@ pics/icons/newspaper_go.png -text
 pics/icons/no_eye.png -text
 pics/icons/no_eye_arrow_down.png -text
 pics/icons/no_information.png -text
+pics/icons/noparse.png -text
 pics/icons/note_add.png -text
 pics/icons/ofolder.png -text
 pics/icons/oleftcol.png -text svneol=unset#image/png
@@ -3127,6 +3348,7 @@ pics/icons/page_white_link.png -text
 pics/icons/page_white_picture.png -text
 pics/icons/page_white_stack.png -text
 pics/icons/palette.png -text
+pics/icons/palette_bg.png -text
 pics/icons/pencil.png -text
 pics/icons/pencil_add.png -text
 pics/icons/pencil_go.png -text
@@ -3142,6 +3364,7 @@ pics/icons/printer.png -text
 pics/icons/printer_add.png -text
 pics/icons/quotes.png -text
 pics/icons/readme.txt -text
+pics/icons/resultset.png -text
 pics/icons/resultset_down.png -text
 pics/icons/resultset_first.png -text
 pics/icons/resultset_last.png -text
@@ -3257,6 +3480,8 @@ pics/large/display-capplet.png -text
 pics/large/display-capplet48x48.png -text
 pics/large/evolution.png -text
 pics/large/evolution48x48.png -text
+pics/large/feed-icon-48x48.png -text
+pics/large/feed-icon.png -text
 pics/large/file-manager.png -text
 pics/large/file-manager48x48.png -text
 pics/large/gftp.png -text
@@ -3283,6 +3508,8 @@ pics/large/icon-configuration.png -text
 pics/large/icon-configuration48x48.png -text
 pics/large/intertiki.png -text
 pics/large/intertiki48x48.png -text
+pics/large/kaltura.png -text
+pics/large/kaltura48x48.png -text
 pics/large/maps.png -text
 pics/large/maps48x48.png -text
 pics/large/messages.png -text
@@ -3331,8 +3558,6 @@ pics/large/webservices.png -text
 pics/large/webservices48x48.png -text
 pics/large/wikipages.png -text
 pics/large/wikipages48x48.png -text
-pics/large/workspaces.png -text
-pics/large/workspaces48x48.png -text
 pics/large/wysiwyg.png -text
 pics/large/wysiwyg48x48.png -text
 pics/large/xfce4-appfinder.png -text
@@ -3359,16 +3584,20 @@ styles/coelesce/arrows-295c8e.png -text svneol=unset#image/png
 styles/coelesce/arrows-467aa7.png -text svneol=unset#image/png
 styles/coelesce/coelesce.png -text
 styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
+styles/coelesce/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/coelesce/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/coelesce/search_wide.jpg -text svneol=unset#image/jpeg
 styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/darkroom.png -text
+styles/darkroom/options/fixed_width/474747_5e5e5e_40.png -text svneol=unset#image/png
 styles/darkroom/options/small-type.css -text
 styles/darkroom/options/small-type/small-type.png -text
+styles/darkroom/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/darkroom/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/empty.css -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
 styles/feb12/feb12.png -text
-styles/feb12/header.jpg -text svneol=unset#image/jpeg
 styles/feb12/page.jpg -text svneol=unset#image/jpeg
 styles/index.php -text
 styles/integrator/README -text
@@ -3383,6 +3612,8 @@ styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
 styles/strasa/arrows-467aa7.png -text svneol=unset#image/png
+styles/strasa/arrows-a2ecff.png -text svneol=unset#image/png
+styles/strasa/body-bgd.png -text
 styles/strasa/box_bottom.gif -text
 styles/strasa/box_top.gif -text
 styles/strasa/cold.png -text
@@ -3407,6 +3638,11 @@ styles/strasa/options/cool/headermenuitem-hover.png -text
 styles/strasa/options/cool/login.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cool/loginlong.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cool/register.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/fixed_width.css -text
+styles/strasa/options/fixed_width/body-bg.png -text svneol=unset#image/png
+styles/strasa/options/fixed_width/box_bottom.gif -text
+styles/strasa/options/fixed_width/box_top.gif -text
+styles/strasa/options/fixed_width/fixed_width.png -text svneol=unset#image/png
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/arrows-000000.png -text svneol=unset#image/png
 styles/strasa/options/mono/box_bottom.gif -text
@@ -3423,17 +3659,25 @@ styles/strasa/options/mono/mono.png -text
 styles/strasa/options/mono/pics/icons/folder.png -text
 styles/strasa/options/mono/pics/icons/index.php -text
 styles/strasa/options/mono/pics/icons/ofolder.png -text
+styles/strasa/options/mono/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/strasa/options/mono/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/strasa/options/mono/pics/index.php -text
 styles/strasa/options/mono/register.jpg -text
 styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
 styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
+styles/strasa/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/strasa/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/strasa/register.jpg -text
 styles/strasa/strasa.png -text
 styles/thenews/arrows-005faa.png -text svneol=unset#image/png
 styles/thenews/options/narrow_left_column/narrow_left_column.png -text
+styles/thenews/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/thenews/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/thenews/thenews.png -text
 styles/tikinewt.css -text
 styles/tikinewt/arrows-6d819d.png -text svneol=unset#image/png
+styles/tikinewt/pics/icons/oleftcol.png -text svneol=unset#image/png
+styles/tikinewt/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/tikinewt/tikinewt.png -text
 temp/.htaccess -text
 temp/README -text
@@ -3441,6 +3685,7 @@ temp/cache/index.php -text
 temp/index.php -text
 temp/mail_attachs/README -text
 temp/mail_attachs/index.php -text
+temp/public/.htaccess -text
 templates/.htaccess -text
 templates/antibot.tpl -text
 templates/attachments.tpl -text
@@ -3500,6 +3745,7 @@ templates/mail/confirm_user_email.tpl -text
 templates/mail/confirm_user_email_after_approval.tpl -text
 templates/mail/confirm_user_email_after_approval_subject.tpl -text
 templates/mail/confirm_user_email_subject.tpl -text
+templates/mail/fgal_quota_exceeded.tpl -text
 templates/mail/forum_outbound.tpl -text
 templates/mail/forum_post_notification.tpl -text
 templates/mail/index.php -text
@@ -3597,18 +3843,15 @@ templates/module-error.tpl -text
 templates/module.tpl -text
 templates/modules/index.php -text
 templates/modules/mod-action_calendar.tpl -text
-templates/modules/mod-admin_menu.tpl -text
 templates/modules/mod-adsense.tpl -text
 templates/modules/mod-application_menu.tpl.nocache -text
 templates/modules/mod-article_archives.tpl -text
-templates/modules/mod-article_by_rating.tpl -text
 templates/modules/mod-article_topics.tpl -text
 templates/modules/mod-articles.tpl -text
 templates/modules/mod-assistant.tpl -text
 templates/modules/mod-blog_last_comments.tpl -text
 templates/modules/mod-breadcrumb.tpl -text
 templates/modules/mod-breadcrumb.tpl.nocache -text
-templates/modules/mod-calendar.tpl -text
 templates/modules/mod-calendar.tpl.nocache -text
 templates/modules/mod-calendar_new.tpl -text
 templates/modules/mod-categories.tpl -text
@@ -3618,7 +3861,6 @@ templates/modules/mod-comm_received_objects.tpl -text
 templates/modules/mod-directory_last_sites.tpl -text
 templates/modules/mod-directory_stats.tpl -text
 templates/modules/mod-directory_top_sites.tpl -text
-templates/modules/mod-events.tpl -text
 templates/modules/mod-featured_links.tpl -text
 templates/modules/mod-file_galleries.tpl -text
 templates/modules/mod-forums_best_voted_topics.tpl -text
@@ -3636,7 +3878,6 @@ templates/modules/mod-google.tpl -text
 templates/modules/mod-groups_emulation.tpl -text
 templates/modules/mod-last_actions.tpl -text
 templates/modules/mod-last_actions.tpl.nocache -text svneol=unset#application/octet-stream
-templates/modules/mod-last_articles.tpl -text
 templates/modules/mod-last_blog_posts.tpl -text
 templates/modules/mod-last_category_objects.tpl -text
 templates/modules/mod-last_created_blogs.tpl -text
@@ -3646,14 +3887,13 @@ templates/modules/mod-last_file_galleries.tpl -text
 templates/modules/mod-last_files.tpl -text
 templates/modules/mod-last_image_galleries.tpl -text
 templates/modules/mod-last_images.tpl -text
-templates/modules/mod-last_images_th.tpl -text
 templates/modules/mod-last_modif_events.tpl -text
 templates/modules/mod-last_modif_pages.tpl -text
-templates/modules/mod-last_modif_tracker_items.tpl -text
 templates/modules/mod-last_modified_blogs.tpl -text
 templates/modules/mod-last_submissions.tpl -text
 templates/modules/mod-last_tracker_comments.tpl -text
 templates/modules/mod-last_tracker_items.tpl -text
+templates/modules/mod-last_validated_faq_questions.tpl -text
 templates/modules/mod-last_visitors.tpl -text
 templates/modules/mod-live_support.tpl -text
 templates/modules/mod-logged_users.tpl.nocache -text
@@ -3731,9 +3971,11 @@ templates/poll.tpl -text
 templates/prefs/flag.tpl -text
 templates/prefs/list.tpl -text
 templates/prefs/multilist.tpl -text
+templates/prefs/radio.tpl -text
 templates/prefs/shared-dependencies.tpl -text
 templates/prefs/shared-flags.tpl -text
 templates/prefs/text.tpl -text
+templates/prefs/textarea.tpl -text
 templates/print/print-decorator_indexed.tpl -text
 templates/print/print-decorator_indexrow.tpl -text
 templates/print/print-index_footer.tpl -text
@@ -3745,6 +3987,8 @@ templates/print/print-page_header.tpl -text
 templates/print/print-title_trackeritem.tpl -text
 templates/print/print-title_wiki.tpl -text
 templates/remarksbox.tpl -text
+templates/send_newsletter_footer.tpl -text
+templates/send_newsletter_header.tpl -text
 templates/sent_newsletters.tpl -text
 templates/setup_fckeditor.tpl -text
 templates/structures_toc-endul.tpl -text
@@ -3765,6 +4009,7 @@ templates/tiki-admin-include-calendar.tpl -text
 templates/tiki-admin-include-category.tpl -text
 templates/tiki-admin-include-cms.tpl -text
 templates/tiki-admin-include-community.tpl -text
+templates/tiki-admin-include-connect.tpl -text
 templates/tiki-admin-include-copyright.tpl -text
 templates/tiki-admin-include-directory.tpl -text
 templates/tiki-admin-include-faqs.tpl -text
@@ -3777,6 +4022,7 @@ templates/tiki-admin-include-general.tpl -text
 templates/tiki-admin-include-gmap.tpl -text
 templates/tiki-admin-include-i18n.tpl -text
 templates/tiki-admin-include-intertiki.tpl -text
+templates/tiki-admin-include-kaltura.tpl -text
 templates/tiki-admin-include-list-sections.tpl -text
 templates/tiki-admin-include-login.tpl -text
 templates/tiki-admin-include-look.tpl -text
@@ -3801,7 +4047,6 @@ templates/tiki-admin-include-webmail.tpl -text
 templates/tiki-admin-include-webservices.tpl -text
 templates/tiki-admin-include-wiki.tpl -text
 templates/tiki-admin-include-wikiatt.tpl -text
-templates/tiki-admin-include-workspaces.tpl -text
 templates/tiki-admin-include-wysiwyg.tpl -text
 templates/tiki-admin.tpl -text
 templates/tiki-admin_actionlog.tpl -text
@@ -3828,6 +4073,7 @@ templates/tiki-admin_modules.tpl -text
 templates/tiki-admin_newsletter_subscriptions.tpl -text
 templates/tiki-admin_newsletters.tpl -text
 templates/tiki-admin_notifications.tpl -text
+templates/tiki-admin_pagelist.tpl -text
 templates/tiki-admin_poll_options.tpl -text
 templates/tiki-admin_polls.tpl -text
 templates/tiki-admin_rssmodules.tpl -text
@@ -3858,6 +4104,7 @@ templates/tiki-browse_categories.tpl -text
 templates/tiki-browse_freetags.tpl -text
 templates/tiki-browse_gallery.tpl -text
 templates/tiki-browse_image.tpl -text
+templates/tiki-browse_video.tpl -text
 templates/tiki-calendar.tpl -text
 templates/tiki-calendar_box.tpl -text
 templates/tiki-calendar_box_multiple.tpl -text
@@ -3892,6 +4139,7 @@ templates/tiki-edit_banner.tpl -text
 templates/tiki-edit_blog.tpl -text
 templates/tiki-edit_css.tpl -text
 templates/tiki-edit_help.tpl -text
+templates/tiki-edit_help_plugins.tpl -text
 templates/tiki-edit_help_tool.tpl -text
 templates/tiki-edit_image.tpl -text
 templates/tiki-edit_languages.tpl -text
@@ -3905,6 +4153,7 @@ templates/tiki-edit_submission.tpl -text
 templates/tiki-edit_templates.tpl -text
 templates/tiki-edit_topic.tpl -text
 templates/tiki-edit_translation.tpl -text
+templates/tiki-edit_video.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
@@ -3941,6 +4190,8 @@ templates/tiki-information.tpl -text
 templates/tiki-install.tpl -text
 templates/tiki-integrator.tpl -text
 templates/tiki-interactive_trans.tpl -text
+templates/tiki-kaltura_upload.tpl -text
+templates/tiki-kaltura_video.tpl -text
 templates/tiki-lastchanges.tpl -text
 templates/tiki-likepages.tpl -text
 templates/tiki-list_articles.tpl -text
@@ -3953,6 +4204,13 @@ templates/tiki-list_faqs.tpl -text
 templates/tiki-list_file_gallery.tpl -text
 templates/tiki-list_gallery.tpl -text
 templates/tiki-list_integrator_repositories.tpl -text
+templates/tiki-list_kaltura_browse_entries.tpl -text
+templates/tiki-list_kaltura_entries.tpl -text
+templates/tiki-list_kaltura_entries_actions.tpl -text
+templates/tiki-list_kaltura_entries_add_info.tpl -text
+templates/tiki-list_kaltura_media_entries.tpl -text
+templates/tiki-list_kaltura_mix_entries.tpl -text
+templates/tiki-list_kaltura_playlists.tpl -text
 templates/tiki-list_object_permissions.tpl -text
 templates/tiki-list_posts.tpl -text
 templates/tiki-list_quizzes.tpl -text
@@ -3971,14 +4229,12 @@ templates/tiki-live_support_transcripts.tpl -text
 templates/tiki-login.tpl -text
 templates/tiki-login_confirm_email.tpl -text
 templates/tiki-mailin.tpl -text
-templates/tiki-manage-workspaces.tpl -text
 templates/tiki-mindmap.tpl -text
 templates/tiki-minical.tpl -text
 templates/tiki-minical_prefs.tpl -text
 templates/tiki-mods.tpl -text
 templates/tiki-mods_admin.tpl -text
 templates/tiki-mods_config.tpl -text
-templates/tiki-my-workspaces.tpl -text
 templates/tiki-my_tiki.tpl -text
 templates/tiki-mytiki_bar.tpl -text
 templates/tiki-newsletter_archives.tpl -text
@@ -4033,7 +4289,6 @@ templates/tiki-rollback.tpl -text
 templates/tiki-search_stats.tpl -text
 templates/tiki-searchindex.tpl -text
 templates/tiki-searchresults.tpl -text
-templates/tiki-send_blog_post.tpl -text
 templates/tiki-send_newsletters.tpl -text
 templates/tiki-send_objects.tpl -text
 templates/tiki-sheets.tpl -text
@@ -4098,7 +4353,6 @@ templates/tiki-webmail.tpl -text
 templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki-wiki_topline.tpl -text
-templates/tiki-workspaces-index.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_item_field_googlemap_value.tpl -text
@@ -4122,6 +4376,8 @@ templates/wiki-plugins/wikiplugin_rss.tpl -text
 templates/wiki-plugins/wikiplugin_stat.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroup.tpl -text
 templates/wiki-plugins/wikiplugin_subscribegroups.tpl -text
+templates/wiki-plugins/wikiplugin_subscribenewsletter.tpl -text
+templates/wiki-plugins/wikiplugin_tabs.tpl -text
 templates/wiki-plugins/wikiplugin_trackerfilter.tpl -text
 templates/wiki-plugins/wikiplugin_trackerprefill.tpl -text
 templates/wiki-plugins/wikiplugin_trackerstat.tpl -text
@@ -4132,14 +4388,8 @@ templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
 templates_c/index.php -text
 tests/.htaccess -text
-tests/example.txt -text
-tests/force-error_sql.php -text
 tests/index.php -text
-tests/messu-compose.tpl -text
-tests/test_cvs_file.txt -text
-tests/test_php_beautifier.php -text
 tests/testfile.txt -text
-tests/upgrade_categperm.php -text
 /textareasize.php -text
 /tiki-action_calendar.php -text
 /tiki-admin.php -text
@@ -4163,6 +4413,7 @@ tests/upgrade_categperm.php -text
 /tiki-admin_include_category.php -text
 /tiki-admin_include_cms.php -text
 /tiki-admin_include_community.php -text
+/tiki-admin_include_connect.php -text
 /tiki-admin_include_copyright.php -text
 /tiki-admin_include_directory.php -text
 /tiki-admin_include_faqs.php -text
@@ -4175,6 +4426,7 @@ tests/upgrade_categperm.php -text
 /tiki-admin_include_gmap.php -text
 /tiki-admin_include_i18n.php -text
 /tiki-admin_include_intertiki.php -text
+/tiki-admin_include_kaltura.php -text
 /tiki-admin_include_login.php -text
 /tiki-admin_include_look.php -text
 /tiki-admin_include_maps.php -text
@@ -4198,7 +4450,6 @@ tests/upgrade_categperm.php -text
 /tiki-admin_include_webservices.php -text
 /tiki-admin_include_wiki.php -text
 /tiki-admin_include_wikiatt.php -text
-/tiki-admin_include_workspaces.php -text
 /tiki-admin_include_wysiwyg.php -text
 /tiki-admin_integrator.php -text
 /tiki-admin_integrator_rules.php -text
@@ -4211,6 +4462,7 @@ tests/upgrade_categperm.php -text
 /tiki-admin_newsletter_subscriptions.php -text
 /tiki-admin_newsletters.php -text
 /tiki-admin_notifications.php -text
+/tiki-admin_pagelist.php -text
 /tiki-admin_poll_options.php -text
 /tiki-admin_polls.php -text
 /tiki-admin_rssmodules.php -text
@@ -4226,6 +4478,7 @@ tests/upgrade_categperm.php -text
 /tiki-admin_trackers.php -text
 /tiki-admingroups.php -text
 /tiki-adminusers.php -text
+/tiki-ajax_services.php -text
 /tiki-all_languages.php -text
 /tiki-approve_staging_page.php -text
 /tiki-article_types.php -text
@@ -4325,7 +4578,6 @@ tests/upgrade_categperm.php -text
 /tiki-gmap_usermap.php -text
 /tiki-graph_formula.php -text
 /tiki-graph_sheet.php -text
-/tiki-handlers.php -text
 /tiki-history_sheets.php -text
 /tiki-image_galleries_rss.php -text
 /tiki-image_gallery_rss.php -text
@@ -4340,11 +4592,12 @@ tests/upgrade_categperm.php -text
 /tiki-index_raw.php -text
 /tiki-information.php -text
 /tiki-install.php -text
-/tiki-install_disable.php -text
 /tiki-integrator.php -text
 /tiki-interactive_trans.php -text
 /tiki-jscalendar.php -text
 /tiki-jsplugin.php -text
+/tiki-kaltura_upload.php -text
+/tiki-kaltura_video.php -text
 /tiki-lastchanges.php -text
 /tiki-layout_options.php -text
 /tiki-likepages.php -text
@@ -4358,6 +4611,7 @@ tests/upgrade_categperm.php -text
 /tiki-list_file_gallery.php -text
 /tiki-list_gallery.php -text
 /tiki-list_integrator_repositories.php -text
+/tiki-list_kaltura_entries.php -text
 /tiki-list_object_permissions.php -text
 /tiki-list_posts.php -text
 /tiki-list_quizzes.php -text
@@ -4382,7 +4636,6 @@ tests/upgrade_categperm.php -text
 /tiki-logout.php -text
 /tiki-mailin-code.php -text
 /tiki-mailin.php -text
-/tiki-manage-workspaces.php -text
 /tiki-map.php -text
 /tiki-map_download.phtml -text
 /tiki-map_edit.php -text
@@ -4400,7 +4653,6 @@ tests/upgrade_categperm.php -text
 /tiki-mods_admin.php -text
 /tiki-module_controls.php -text
 /tiki-modules.php -text
-/tiki-my-workspaces.php -text
 /tiki-my_tiki.php -text
 /tiki-mytiki_shared.php -text
 /tiki-newsletter_archives.php -text
@@ -4439,7 +4691,6 @@ tests/upgrade_categperm.php -text
 /tiki-received_pages.php -text
 /tiki-referer_stats.php -text
 /tiki-register.php -text
-/tiki-register_ajax.php -text
 /tiki-register_site.php -text
 /tiki-remind_password.php -text
 /tiki-removepage.php -text
@@ -4451,7 +4702,6 @@ tests/upgrade_categperm.php -text
 /tiki-searchresults.php -text
 /tiki-section_options.php -text
 /tiki-sefurl.php -text
-/tiki-send_blog_post.php -text
 /tiki-send_mail.php -text
 /tiki-send_newsletters.php -text
 /tiki-send_objects.php -text
@@ -4463,7 +4713,6 @@ tests/upgrade_categperm.php -text
 /tiki-show_user_avatar.php -text
 /tiki-slideshow.php -text
 /tiki-slideshow2.php -text
-/tiki-special_chars.php -text
 /tiki-sqllog.php -text
 /tiki-stats.php -text
 /tiki-survey_stats.php -text
@@ -4484,6 +4733,7 @@ tests/upgrade_categperm.php -text
 /tiki-tracker_rss.php -text
 /tiki-upload_file.php -text
 /tiki-upload_image.php -text
+/tiki-upload_screencast_ajax.php -text
 /tiki-usage_chart.php -text
 /tiki-user_assigned_modules.php -text
 /tiki-user_bookmarks.php -text
@@ -4523,7 +4773,6 @@ tests/upgrade_categperm.php -text
 /tiki-wiki_rankings.php -text
 /tiki-wiki_rss.php -text
 /tiki-wikiplugin_edit.php -text
-/tiki-workspaces-index.php -text
 /tiki-xmlrpc_services.php -text
 tiki_tests/index.php -text
 tiki_tests/tests/.htaccess -text

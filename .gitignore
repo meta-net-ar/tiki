@@ -1,7 +1,7 @@
-/*
 /.buildpath
 /.cache
 /.htaccess
+/.lastup
 /.project
 /.settings
 /ZendPlatform
@@ -21,6 +21,7 @@ img/wiki/*.pad_xml
 img/wiki_up/*
 installer/.htaccess
 lang/.htaccess
+/last.log
 lib/.htaccess
 lib/smarty
 /maps
@@ -31,11 +32,13 @@ modules/cache
 modules/cache/*
 /phpmyadmin
 /project.index
+/svn-commit.tmp
 temp/.htaccess
 temp/article*
 temp/cache
 temp/cache/*
 temp/dbg-watch.*
+temp/public/minified_*
 temp/sf*
 temp/topic.*
 templates/.htaccess
