@@ -1,8 +1,15 @@
 A
 dir
-/branches/experimental/moz-metrics
-/trunk
-23451
+/branches/experimental/moz-metrics/js
+
+
+
+
+A
+dir
+/branches/experimental/moz-metrics/lib/metrics
+
+
 
 
 
