@@ -3949,6 +3949,7 @@ templates/tiki-list_cache.tpl -text
 templates/tiki-list_comments.tpl -text
 templates/tiki-list_contents.tpl -text
 templates/tiki-list_faqs.tpl -text
+templates/tiki-list_file_gallery.tpl -text
 templates/tiki-list_gallery.tpl -text
 templates/tiki-list_integrator_repositories.tpl -text
 templates/tiki-list_kaltura_browse_entries.tpl -text
@@ -4365,6 +4366,7 @@ tests/upgrade_categperm.php -text
 /tiki-list_comments.php -text
 /tiki-list_contents.php -text
 /tiki-list_faqs.php -text
+/tiki-list_file_gallery.php -text
 /tiki-list_gallery.php -text
 /tiki-list_integrator_repositories.php -text
 /tiki-list_kaltura_entries.php -text
@@ -4492,6 +4494,7 @@ tests/upgrade_categperm.php -text
 /tiki-theme_control_sections.php -text
 /tiki-tracker_http_request.php -text
 /tiki-tracker_rss.php -text
+/tiki-upload_file.php -text
 /tiki-upload_image.php -text
 /tiki-upload_screencast_ajax.php -text
 /tiki-usage_chart.php -text
