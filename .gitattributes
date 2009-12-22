@@ -1597,6 +1597,9 @@ lib/filegals/file_gallery.js -text
 lib/filegals/filegallib.php -text
 lib/filegals/index.php -text
 lib/filegals/max_upload_size.php -text
+lib/filegals/tiki-list_file_gallery.php -text
+lib/filegals/tiki-list_file_gallery.tpl -text
+lib/filegals/tiki-upload_file.php -text
 lib/freetag/freetaglib.php -text
 lib/freetag/index.php -text
 lib/graph-engine/abstract.gridbased.php -text
