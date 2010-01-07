@@ -4095,6 +4095,7 @@ templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_video.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage-include-edit.tpl -text
+templates/tiki-editpage-include-edit_translation.tpl -text
 templates/tiki-editpage-include-show_diff.tpl -text
 templates/tiki-editpage-include-wiki_editor.tpl -text
 templates/tiki-editpage.tpl -text
