@@ -1265,6 +1265,7 @@ installer/schema/20100101_search_modules_merge_tiki.sql -text
 installer/schema/20100101_search_wiki_page_modules_merge_tiki.sql -text
 installer/schema/20100104_tiki_p_tracker_revote_ratings_tiki.sql -text
 installer/schema/20100106_forum_att_list_nb_tiki.sql -text
+installer/schema/20100107_payment_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -1969,6 +1970,12 @@ lib/notifications/notificationlib.php -text
 lib/objectlib.php -text
 lib/ointegratelib.php -text
 lib/pagelist/pagelistlib.php -text
+lib/payment/behavior/extend_membership.php -text
+lib/payment/behavior/index.php -text
+lib/payment/behavior/sample.php -text
+lib/payment/index.php -text
+lib/payment/paymentlib.php -text
+lib/payment/paypallib.php -text
 lib/pdflib.php -text
 lib/pear/Auth.php -text
 lib/pear/Auth/Anonymous.php -text
@@ -2008,7 +2015,7 @@ lib/pear/Auth/OpenID/Discover.php -text
 lib/pear/Auth/OpenID/DumbStore.php -text
 lib/pear/Auth/OpenID/Extension.php -text
 lib/pear/Auth/OpenID/FileStore.php -text
-lib/pear/Auth/OpenID/HMACSHA1.php -text
+lib/pear/Auth/OpenID/HMAC.php -text
 lib/pear/Auth/OpenID/Interface.php -text
 lib/pear/Auth/OpenID/KVForm.php -text
 lib/pear/Auth/OpenID/MemcachedStore.php -text
@@ -2285,6 +2292,7 @@ lib/prefs/ldap.php -text
 lib/prefs/lib.php -text
 lib/prefs/load.php -text
 lib/prefs/log.php -text
+lib/prefs/login.php -text
 lib/prefs/long.php -text
 lib/prefs/lowercase.php -text
 lib/prefs/mail.php -text
@@ -2305,6 +2313,7 @@ lib/prefs/page.php -text
 lib/prefs/pagination.php -text
 lib/prefs/pam.php -text
 lib/prefs/pass.php -text
+lib/prefs/payment.php -text
 lib/prefs/permission.php -text
 lib/prefs/poll.php -text
 lib/prefs/print.php -text
@@ -2314,6 +2323,7 @@ lib/prefs/record.php -text
 lib/prefs/restrict.php -text
 lib/prefs/rnd.php -text
 lib/prefs/rss.php -text
+lib/prefs/rssfeed.php -text
 lib/prefs/search.php -text
 lib/prefs/section.php -text
 lib/prefs/sender.php -text
@@ -2485,6 +2495,7 @@ lib/smarty_tiki/block.display.php -text
 lib/smarty_tiki/block.itemfield.php -text
 lib/smarty_tiki/block.jq.php -text
 lib/smarty_tiki/block.pagination_links.php -text
+lib/smarty_tiki/block.permission.php -text
 lib/smarty_tiki/block.popup_link.php -text
 lib/smarty_tiki/block.remarksbox.php -text
 lib/smarty_tiki/block.repeat.php -text
@@ -2530,6 +2541,7 @@ lib/smarty_tiki/function.listfilter.php -text
 lib/smarty_tiki/function.memusage.php -text
 lib/smarty_tiki/function.menu.php -text
 lib/smarty_tiki/function.metric.php -text
+lib/smarty_tiki/function.payment.php -text
 lib/smarty_tiki/function.phplayers.php -text
 lib/smarty_tiki/function.poll.php -text
 lib/smarty_tiki/function.popup.php -text
@@ -2643,6 +2655,7 @@ lib/test/TikiAcceptanceTestDBRestorer.php -text
 lib/test/TikiSeleniumTestCase.php -text
 lib/test/TikiTestCase.php -text
 lib/test/auth/AuthTokensTest.php -text
+lib/test/auth/MembershipTest.php -text
 lib/test/bootstrap.php -text
 lib/test/core/Category/ManipulatorTest.php -text
 lib/test/core/DeclFilter/BaseTest.php -text
@@ -2880,6 +2893,7 @@ lib/wiki-plugins/wikiplugin_map.php -text
 lib/wiki-plugins/wikiplugin_mcalendar.php -text
 lib/wiki-plugins/wikiplugin_mediaplayer.php -text
 lib/wiki-plugins/wikiplugin_memberlist.php -text
+lib/wiki-plugins/wikiplugin_memberpayment.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
@@ -2888,6 +2902,7 @@ lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
 lib/wiki-plugins/wikiplugin_pagelist.php -text
+lib/wiki-plugins/wikiplugin_payment.php -text
 lib/wiki-plugins/wikiplugin_picture.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
@@ -2901,6 +2916,7 @@ lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
 lib/wiki-plugins/wikiplugin_screencast.php -text
+lib/wiki-plugins/wikiplugin_scroll.php -text
 lib/wiki-plugins/wikiplugin_sf.php -text
 lib/wiki-plugins/wikiplugin_sharethis.php -text
 lib/wiki-plugins/wikiplugin_sheet.php -text
@@ -3967,6 +3983,7 @@ templates/tiki-admin-include-metatags.tpl -text
 templates/tiki-admin-include-metrics.tpl -text
 templates/tiki-admin-include-module.tpl -text
 templates/tiki-admin-include-multimedia.tpl -text
+templates/tiki-admin-include-payment.tpl -text
 templates/tiki-admin-include-performance.tpl -text
 templates/tiki-admin-include-polls.tpl -text
 templates/tiki-admin-include-profiles.tpl -text
@@ -4191,6 +4208,11 @@ templates/tiki-orphan_pages.tpl -text
 templates/tiki-page.tpl -text
 templates/tiki-page_bar.tpl -text
 templates/tiki-pagehistory.tpl -text
+templates/tiki-payment-list.tpl -text
+templates/tiki-payment-paypal.tpl -text
+templates/tiki-payment-single.tpl -text
+templates/tiki-payment-user.tpl -text
+templates/tiki-payment.tpl -text
 templates/tiki-pick_avatar.tpl -text
 templates/tiki-plugin_blocked.tpl -text
 templates/tiki-plugin_help.tpl -text
@@ -4293,6 +4315,7 @@ templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki-wiki_topline.tpl -text
 templates/tiki_full.tpl -text
+templates/tracker_error.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_item_field_googlemap_value.tpl -text
 templates/tracker_item_field_input.tpl -text
@@ -4311,6 +4334,7 @@ templates/wiki-plugins/wikiplugin_groupstat.tpl -text
 templates/wiki-plugins/wikiplugin_invite.tpl -text
 templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
 templates/wiki-plugins/wikiplugin_memberlist.tpl -text
+templates/wiki-plugins/wikiplugin_memberpayment.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_rss.tpl -text
@@ -4376,6 +4400,7 @@ tests/testfile.txt -text
 /tiki-admin_include_metrics.php -text
 /tiki-admin_include_module.php -text
 /tiki-admin_include_multimedia.php -text
+/tiki-admin_include_payment.php -text
 /tiki-admin_include_performance.php -text
 /tiki-admin_include_polls.php -text
 /tiki-admin_include_profiles.php -text
@@ -4616,6 +4641,7 @@ tests/testfile.txt -text
 /tiki-page.php -text
 /tiki-page_loader.php -text
 /tiki-pagehistory.php -text
+/tiki-payment.php -text
 /tiki-phpinfo.php -text
 /tiki-pick_avatar.php -text
 /tiki-plugins.php -text
