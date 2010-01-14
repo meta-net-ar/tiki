@@ -1,62 +1,13 @@
 A
 dir
-/mods/trunk/features/aulawiki_tiki_4/templates/styles
+/mods/trunk/features/aulawiki_tiki_4/templates/styles/workspaces
 
 
 
 
 A
 dir
-/mods/trunk/features/aulawiki_tiki_4/templates/modules
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/images/workspaces
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/lib/workspaces
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/styles/workspaces
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/images/aulawiki
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/lib/aulawiki
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/lib/smarty_tiki
-
-
-
-
-A
-dir
-/mods/trunk/features/aulawiki_tiki_4/modules/conf
+/mods/trunk/features/aulawiki_tiki_4/styles/workspaces/options
 
 
 
