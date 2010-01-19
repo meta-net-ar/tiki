@@ -24,23 +24,10 @@ css/ie8.css -text
 css/index.php -text
 css/jscalendar.css -text
 db/.htaccess -text
-db/convertscripts/convert_pgsql.bat -text
-db/convertscripts/convert_sqlite.bat -text
-db/convertscripts/convertsqls.bat -text
-db/convertscripts/convertsqls.sh -text
-db/convertscripts/index.php -text
-db/convertscripts/mysql_to_pgsql.php -text
-db/convertscripts/mysql_to_sqlite.php -text
-db/convertscripts/tikiversion.php -text
 db/index.php -text
-db/tiki-5.0-mysql.sql -text
-db/tiki-5.0-mysqli.sql -text
 db/tiki-db-adodb.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
-db/tiki-pgsql-test.sql -text
-db/tiki-secdb_4.0_mysql.sql -text
-db/tiki-secdb_4.1_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
@@ -1180,7 +1167,6 @@ installer/schema/20090727_user_votings_index_tiki.sql -text
 installer/schema/20090730_p_list_newsletters_tiki.sql -text
 installer/schema/20090803_perspective_permission_tiki.sql -text
 installer/schema/20090804_kaltura_permissions_tiki.sql -text
-installer/schema/20090804_menu_search_tiki.sql -text
 installer/schema/20090805_kill_newsreader_tiki.sql -text
 installer/schema/20090805_remove_drawings_prefs_etc_tiki.sql -text
 installer/schema/20090805_remove_games_tiki.sql -text
@@ -1268,6 +1254,14 @@ installer/schema/20100106_forum_att_list_nb_tiki.sql -text
 installer/schema/20100107_payment_tiki.sql -text
 installer/schema/20100113_forum_display_tiki.sql -text
 installer/schema/20100114_tiki_actionlog_merge_tiki.sql -text
+installer/schema/20100115_admin_modules_menu_tiki.sql -text
+installer/schema/20100115_main_menu_wiki_listpages_name_change_tiki.sql -text
+installer/schema/20100115_tiki_p_admin_modules_tiki.sql -text
+installer/schema/20100115_translations_in_progress.sql -text
+installer/schema/20100117_old_doc_tw_o_url_tiki.sql -text
+installer/schema/20100118_blog_use_author_tiki.sql -text
+installer/schema/20100118_image_plugins_kill_tiki.php -text
+installer/schema/20100118_search_tiki_kil_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -2281,6 +2275,7 @@ lib/prefs/freetags.php -text
 lib/prefs/generate.php -text
 lib/prefs/global.php -text
 lib/prefs/header.php -text
+lib/prefs/home.php -text
 lib/prefs/http.php -text
 lib/prefs/https.php -text
 lib/prefs/iepngfix.php -text
@@ -2388,10 +2383,7 @@ lib/score/scorelib.php -text
 lib/screencasts/screencast.swf -text
 lib/screencasts/screencastlib.php -text
 lib/search/index.php -text
-lib/search/refresh-functions.php -text
-lib/search/refresh.php -text
-lib/search/searchlib-mysql.php -text
-lib/search/searchlib-tiki.php -text
+lib/search/searchlib.php -text
 lib/search/searchstatslib.php -text
 lib/setup/absolute_urls.php -text
 lib/setup/babelfish.php -text
@@ -2553,7 +2545,6 @@ lib/smarty_tiki/function.query.php -text
 lib/smarty_tiki/function.quotabar.php -text
 lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.redirect.php -text
-lib/smarty_tiki/function.reindex_file_pixel.php -text
 lib/smarty_tiki/function.rss.php -text
 lib/smarty_tiki/function.sameurl.php -text
 lib/smarty_tiki/function.sefurl.php -text
@@ -2880,7 +2871,6 @@ lib/wiki-plugins/wikiplugin_groupmailcore.php -text
 lib/wiki-plugins/wikiplugin_groupstat.php -text
 lib/wiki-plugins/wikiplugin_html.php -text
 lib/wiki-plugins/wikiplugin_iframe.php -text
-lib/wiki-plugins/wikiplugin_image.php -text
 lib/wiki-plugins/wikiplugin_img.php -text
 lib/wiki-plugins/wikiplugin_include.php -text
 lib/wiki-plugins/wikiplugin_invite.php -text
@@ -2907,7 +2897,6 @@ lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
 lib/wiki-plugins/wikiplugin_pagelist.php -text
 lib/wiki-plugins/wikiplugin_payment.php -text
-lib/wiki-plugins/wikiplugin_picture.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
 lib/wiki-plugins/wikiplugin_profile.php -text
@@ -2940,7 +2929,6 @@ lib/wiki-plugins/wikiplugin_sup.php -text
 lib/wiki-plugins/wikiplugin_survey.php -text
 lib/wiki-plugins/wikiplugin_tabs.php -text
 lib/wiki-plugins/wikiplugin_tag.php -text
-lib/wiki-plugins/wikiplugin_thumb.php -text
 lib/wiki-plugins/wikiplugin_titlesearch.php -text
 lib/wiki-plugins/wikiplugin_toc.php -text
 lib/wiki-plugins/wikiplugin_topfriends.php -text
@@ -3469,8 +3457,6 @@ pics/large/messages48x48.png -text
 pics/large/metatags.png -text
 pics/large/metatags48x48.png -text
 pics/large/mplayer48x48.png -text
-pics/large/multimedia.png -text
-pics/large/multimedia48x48.png -text
 pics/large/plugins.png -text
 pics/large/plugins48x48.png -text
 pics/large/profiles.png -text
@@ -3522,7 +3508,6 @@ pics/trans.png -text
 /plugins_help.php -text
 /poll_categorize.php -text
 /received_article_image.php -text
-/reindex_file.php -text
 /remote.php -text
 /robots.txt -text
 /select_banner.php -text
@@ -3917,7 +3902,6 @@ templates/modules/mod-wiki_last_comments.tpl -text
 templates/modules/mod-wiki_last_comments.tpl.nocache -text
 templates/modules/mod-youtube.tpl -text
 templates/modules/user_module.tpl -text
-templates/multiplayer.tpl -text
 templates/pagehistory.tpl -text
 templates/plugins/plugin-topfriends.tpl -text
 templates/poll.tpl -text
@@ -3986,7 +3970,6 @@ templates/tiki-admin-include-messages.tpl -text
 templates/tiki-admin-include-metatags.tpl -text
 templates/tiki-admin-include-metrics.tpl -text
 templates/tiki-admin-include-module.tpl -text
-templates/tiki-admin-include-multimedia.tpl -text
 templates/tiki-admin-include-payment.tpl -text
 templates/tiki-admin-include-performance.tpl -text
 templates/tiki-admin-include-polls.tpl -text
@@ -4093,6 +4076,7 @@ templates/tiki-directory_footer.tpl -text
 templates/tiki-directory_ranking.tpl -text
 templates/tiki-directory_search.tpl -text
 templates/tiki-directory_validate_sites.tpl -text
+templates/tiki-edit-page-include-prompt_for_edit_or_translate.tpl -text
 templates/tiki-edit_article.tpl -text
 templates/tiki-edit_banner.tpl -text
 templates/tiki-edit_blog.tpl -text
@@ -4253,7 +4237,6 @@ templates/tiki-removepage.tpl -text
 templates/tiki-rename_page.tpl -text
 templates/tiki-rollback.tpl -text
 templates/tiki-search_stats.tpl -text
-templates/tiki-searchindex.tpl -text
 templates/tiki-searchresults.tpl -text
 templates/tiki-send_newsletters.tpl -text
 templates/tiki-send_objects.tpl -text
@@ -4403,7 +4386,6 @@ tests/testfile.txt -text
 /tiki-admin_include_metatags.php -text
 /tiki-admin_include_metrics.php -text
 /tiki-admin_include_module.php -text
-/tiki-admin_include_multimedia.php -text
 /tiki-admin_include_payment.php -text
 /tiki-admin_include_performance.php -text
 /tiki-admin_include_polls.php -text
@@ -4761,9 +4743,6 @@ tiki_tests/tiki-tests_record.php -text
 tiki_tests/tiki-tests_replay.php -text
 tiki_tests/tiki-tests_show_xpath.php -text
 tiki_tests/tikitestslib.php -text
-tikimovies/controller.swf -text svneol=unset#unset
-tikimovies/multiplayer.swf -text svneol=unset#unset
-tikimovies/multiplayer.xml -text
 whelp/index.php -text
 /x_maps.php -text
 /xmlrpc.php -text
