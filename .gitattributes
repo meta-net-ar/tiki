@@ -1167,6 +1167,7 @@ installer/schema/20090727_user_votings_index_tiki.sql -text
 installer/schema/20090730_p_list_newsletters_tiki.sql -text
 installer/schema/20090803_perspective_permission_tiki.sql -text
 installer/schema/20090804_kaltura_permissions_tiki.sql -text
+installer/schema/20090804_menu_search_tiki.sql -text
 installer/schema/20090805_kill_newsreader_tiki.sql -text
 installer/schema/20090805_remove_drawings_prefs_etc_tiki.sql -text
 installer/schema/20090805_remove_games_tiki.sql -text
@@ -1262,7 +1263,6 @@ installer/schema/20100117_old_doc_tw_o_url_tiki.sql -text
 installer/schema/20100118_blog_use_author_tiki.sql -text
 installer/schema/20100118_forum_display_tiki.sql -text
 installer/schema/20100118_image_plugins_kill_tiki.php -text
-installer/schema/20100118_search_tiki_kil_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -1331,6 +1331,7 @@ lang/hi-IN/index.php -text
 lang/hi-IN/language.php -text
 lang/hr/index.php -text
 lang/hr/language.php -text
+lang/ht/language.php -text
 lang/hu/index.php -text
 lang/hu/language.php -text
 lang/id/index.php -text
@@ -1682,6 +1683,7 @@ lib/featured_links/flinkslib.php -text
 lib/featured_links/index.php -text
 lib/feedcreator/feedcreator.class.php -text
 lib/feedcreator/lgpl.txt -text
+lib/filegals/backlinks.js -text
 lib/filegals/filegallib.php -text
 lib/filegals/index.php -text
 lib/filegals/max_upload_size.php -text
@@ -2384,7 +2386,10 @@ lib/score/scorelib.php -text
 lib/screencasts/screencast.swf -text
 lib/screencasts/screencastlib.php -text
 lib/search/index.php -text
-lib/search/searchlib.php -text
+lib/search/refresh-functions.php -text
+lib/search/refresh.php -text
+lib/search/searchlib-mysql.php -text
+lib/search/searchlib-tiki.php -text
 lib/search/searchstatslib.php -text
 lib/setup/absolute_urls.php -text
 lib/setup/babelfish.php -text
@@ -2480,9 +2485,6 @@ lib/sheet/panel.js -text
 lib/sheet/style.css -text
 lib/shoutbox/index.php -text
 lib/shoutbox/shoutboxlib.php -text
-lib/slideshow_tiki/slideshow.fullsize.js -text
-lib/slideshow_tiki/thumbnails-a.png -text
-lib/slideshow_tiki/thumbnails-b.png -text
 lib/smarty_tiki/block.add_help.php -text
 lib/smarty_tiki/block.ajax_href.php -text
 lib/smarty_tiki/block.compact.php -text
@@ -2546,6 +2548,7 @@ lib/smarty_tiki/function.query.php -text
 lib/smarty_tiki/function.quotabar.php -text
 lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.redirect.php -text
+lib/smarty_tiki/function.reindex_file_pixel.php -text
 lib/smarty_tiki/function.rss.php -text
 lib/smarty_tiki/function.sameurl.php -text
 lib/smarty_tiki/function.sefurl.php -text
@@ -2935,6 +2938,7 @@ lib/wiki-plugins/wikiplugin_toc.php -text
 lib/wiki-plugins/wikiplugin_topfriends.php -text
 lib/wiki-plugins/wikiplugin_tr.php -text
 lib/wiki-plugins/wikiplugin_tracker.php -text
+lib/wiki-plugins/wikiplugin_trackercomments.php -text
 lib/wiki-plugins/wikiplugin_trackerfilter.php -text
 lib/wiki-plugins/wikiplugin_trackeritemfield.php -text
 lib/wiki-plugins/wikiplugin_trackerlist.php -text
@@ -2991,6 +2995,7 @@ lib/xmlrpc.inc -text
 lib/xmlrpcs.inc -text
 lib/ziplib.php -text
 /license.txt -text
+/list-file_backlinks_ajax.php -text
 /list-tracker_field_values_ajax.php -text
 maps/index.php -text
 /messu-archive.php -text
@@ -3135,6 +3140,8 @@ pics/icons/book.png -text
 pics/icons/book_open.png -text
 pics/icons/box.png -text
 pics/icons/bricks.png -text
+pics/icons/bug.png -text
+pics/icons/bug_error.png -text
 pics/icons/bullet_toggle_plus.png -text
 pics/icons/bullet_white.png -text
 pics/icons/calendar_add.png -text
@@ -3509,6 +3516,7 @@ pics/trans.png -text
 /plugins_help.php -text
 /poll_categorize.php -text
 /received_article_image.php -text
+/reindex_file.php -text
 /remote.php -text
 /robots.txt -text
 /select_banner.php -text
@@ -4063,6 +4071,7 @@ templates/tiki-change_password.tpl -text
 templates/tiki-choose_page_language.tpl -text
 templates/tiki-contact.tpl -text
 templates/tiki-contacts.tpl -text
+templates/tiki-create_multilang_pages.tpl -text
 templates/tiki-create_webhelp.tpl -text
 templates/tiki-custom_home.tpl -text
 templates/tiki-directory_add_site.tpl -text
@@ -4099,7 +4108,6 @@ templates/tiki-edit_topic.tpl -text
 templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_video.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
-templates/tiki-editpage-include-edit.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
 templates/tiki-export_comment_xml.tpl -text
@@ -4111,7 +4119,6 @@ templates/tiki-faq_questions.tpl -text
 templates/tiki-featured_link.tpl -text
 templates/tiki-file_archives.tpl -text
 templates/tiki-file_galleries.tpl -text
-templates/tiki-file_gallery_slideshow.tpl -text
 templates/tiki-file_info_box.tpl -text
 templates/tiki-forum_import.tpl -text
 templates/tiki-forum_queue.tpl -text
@@ -4238,6 +4245,7 @@ templates/tiki-removepage.tpl -text
 templates/tiki-rename_page.tpl -text
 templates/tiki-rollback.tpl -text
 templates/tiki-search_stats.tpl -text
+templates/tiki-searchindex.tpl -text
 templates/tiki-searchresults.tpl -text
 templates/tiki-send_newsletters.tpl -text
 templates/tiki-send_objects.tpl -text
@@ -4301,6 +4309,7 @@ templates/tiki-view_tracker_more_info.tpl -text
 templates/tiki-webmail.tpl -text
 templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
+templates/tiki-wiki_structure_bar.tpl -text
 templates/tiki-wiki_topline.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_error.tpl -text
@@ -4468,6 +4477,7 @@ tests/testfile.txt -text
 /tiki-contact.php -text
 /tiki-contacts.php -text
 /tiki-cookie-jar.php -text
+/tiki-create_multilang_pages.php -text
 /tiki-create_webhelp.php -text
 /tiki-custom_home.php -text
 /tiki-directories_rss.php -text svneol=unset#application/octet-stream
