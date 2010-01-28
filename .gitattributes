@@ -1258,11 +1258,12 @@ installer/schema/20100114_tiki_actionlog_merge_tiki.sql -text
 installer/schema/20100115_admin_modules_menu_tiki.sql -text
 installer/schema/20100115_main_menu_wiki_listpages_name_change_tiki.sql -text
 installer/schema/20100115_tiki_p_admin_modules_tiki.sql -text
-installer/schema/20100115_translations_in_progress.sql -text
+installer/schema/20100115_translations_in_progress_tiki.sql -text
 installer/schema/20100117_old_doc_tw_o_url_tiki.sql -text
 installer/schema/20100118_blog_use_author_tiki.sql -text
 installer/schema/20100118_forum_display_tiki.sql -text
 installer/schema/20100118_image_plugins_kill_tiki.php -text
+installer/schema/20100126_file_lastDownload_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -2073,6 +2074,10 @@ lib/pear/HTTP/WebDAV/Client/Stream.php -text
 lib/pear/HTTP/WebDAV/Tools/_parse_lock_response.php -text
 lib/pear/HTTP/WebDAV/Tools/_parse_propfind_response.php -text
 lib/pear/HTTP/index.php -text
+lib/pear/Minify/CSS.php -text
+lib/pear/Minify/CSS/Compressor.php -text
+lib/pear/Minify/CSS/UriRewriter.php -text
+lib/pear/Minify/CommentPreserver.php -text
 lib/pear/Net/DIME.php -text
 lib/pear/Net/DNS.php -text
 lib/pear/Net/DNS/Header.php -text
@@ -2283,6 +2288,7 @@ lib/prefs/http.php -text
 lib/prefs/https.php -text
 lib/prefs/iepngfix.php -text
 lib/prefs/index.php -text
+lib/prefs/javascript.php -text
 lib/prefs/jquery.php -text
 lib/prefs/keep.php -text
 lib/prefs/lang.php -text
@@ -3510,6 +3516,7 @@ pics/large/xfce4-appfinder.png -text
 pics/large/xfce4-appfinder48x48.png -text
 pics/next.gif -text
 pics/next_anim.gif -text
+pics/noavatar.png -text
 pics/overlay-disabled_item.png -text
 pics/prev.gif -text
 pics/trans.png -text
@@ -3639,7 +3646,6 @@ templates/antibot.tpl -text
 templates/attachments.tpl -text
 templates/attachments_tracker.tpl -text
 templates/babelfish.tpl -text
-templates/bidi.tpl -text
 templates/blog-heading.tpl -text
 templates/browse_file_gallery.tpl -text
 templates/browsedcategory.tpl -text
@@ -4105,7 +4111,6 @@ templates/tiki-edit_structure.tpl -text
 templates/tiki-edit_submission.tpl -text
 templates/tiki-edit_templates.tpl -text
 templates/tiki-edit_topic.tpl -text
-templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_video.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
@@ -4318,6 +4323,7 @@ templates/tracker_item_field_googlemap_value.tpl -text
 templates/tracker_item_field_input.tpl -text
 templates/tracker_item_field_value.tpl -text
 templates/tracker_pretty_item.tpl -text
+templates/tracker_sort_input.tpl -text
 templates/translated-lang.tpl -text
 templates/wiki-discussion.tpl -text
 templates/wiki-plugins/error_tracker.tpl -text
