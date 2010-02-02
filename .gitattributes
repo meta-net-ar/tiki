@@ -1265,6 +1265,7 @@ installer/schema/20100118_forum_display_tiki.sql -text
 installer/schema/20100118_image_plugins_kill_tiki.php -text
 installer/schema/20100126_file_lastDownload_tiki.sql -text
 installer/schema/20100128_tiki_p_blog_view_ref_tiki.sql -text
+installer/schema/20100129_clean_up_tiki.sql -text
 installer/schema/20100129_events_kil_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -1970,7 +1971,6 @@ lib/notifications/notificationemaillib.php -text
 lib/notifications/notificationlib.php -text
 lib/objectlib.php -text
 lib/ointegratelib.php -text
-lib/pagelist/pagelistlib.php -text
 lib/payment/behavior/extend_membership.php -text
 lib/payment/behavior/index.php -text
 lib/payment/behavior/sample.php -text
@@ -2390,8 +2390,6 @@ lib/rss/rsslib.php -text
 lib/score/events.php -text
 lib/score/index.php -text
 lib/score/scorelib.php -text
-lib/screencasts/screencast.swf -text
-lib/screencasts/screencastlib.php -text
 lib/search/index.php -text
 lib/search/refresh-functions.php -text
 lib/search/refresh.php -text
@@ -2893,7 +2891,6 @@ lib/wiki-plugins/wikiplugin_kaltura.php -text
 lib/wiki-plugins/wikiplugin_lang.php -text
 lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
-lib/wiki-plugins/wikiplugin_listprogress.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
 lib/wiki-plugins/wikiplugin_mcalendar.php -text
@@ -2907,7 +2904,6 @@ lib/wiki-plugins/wikiplugin_mouseover.php -text
 lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
-lib/wiki-plugins/wikiplugin_pagelist.php -text
 lib/wiki-plugins/wikiplugin_payment.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
@@ -2920,7 +2916,6 @@ lib/wiki-plugins/wikiplugin_redirect.php -text
 lib/wiki-plugins/wikiplugin_regex.php -text
 lib/wiki-plugins/wikiplugin_remarksbox.php -text
 lib/wiki-plugins/wikiplugin_rss.php -text
-lib/wiki-plugins/wikiplugin_screencast.php -text
 lib/wiki-plugins/wikiplugin_scroll.php -text
 lib/wiki-plugins/wikiplugin_sf.php -text
 lib/wiki-plugins/wikiplugin_sharethis.php -text
@@ -2981,7 +2976,6 @@ lib/wiki3d/LICENSE.txt -text
 lib/wiki3d/README.txt -text
 lib/wiki3d/morcego-0.6.0.jar -text
 lib/wiki3d/pom.xml -text
-lib/wikiplugin_screencast.js -text
 lib/x/index.php -text
 lib/x/x.js -text
 lib/x/x_anim.js -text
@@ -4032,7 +4026,6 @@ templates/tiki-admin_modules.tpl -text
 templates/tiki-admin_newsletter_subscriptions.tpl -text
 templates/tiki-admin_newsletters.tpl -text
 templates/tiki-admin_notifications.tpl -text
-templates/tiki-admin_pagelist.tpl -text
 templates/tiki-admin_poll_options.tpl -text
 templates/tiki-admin_polls.tpl -text
 templates/tiki-admin_rssmodules.tpl -text
@@ -4113,6 +4106,7 @@ templates/tiki-edit_structure.tpl -text
 templates/tiki-edit_submission.tpl -text
 templates/tiki-edit_templates.tpl -text
 templates/tiki-edit_topic.tpl -text
+templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_video.tpl -text
 templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
@@ -4435,7 +4429,6 @@ tests/testfile.txt -text
 /tiki-admin_newsletter_subscriptions.php -text
 /tiki-admin_newsletters.php -text
 /tiki-admin_notifications.php -text
-/tiki-admin_pagelist.php -text
 /tiki-admin_poll_options.php -text
 /tiki-admin_polls.php -text
 /tiki-admin_rssmodules.php -text
@@ -4712,7 +4705,6 @@ tests/testfile.txt -text
 /tiki-tracker_rss.php -text
 /tiki-upload_file.php -text
 /tiki-upload_image.php -text
-/tiki-upload_screencast_ajax.php -text
 /tiki-usage_chart.php -text
 /tiki-user_assigned_modules.php -text
 /tiki-user_bookmarks.php -text
