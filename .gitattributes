@@ -18,11 +18,14 @@ backups/index.php -text
 /copyrights.php -text
 css/admin.css -text
 css/calendar.css -text
+css/cssmenus.css -text
 css/freetags.css -text
 css/ie6.css -text
+css/ie7.css -text
 css/ie8.css -text
 css/index.php -text
 css/jscalendar.css -text
+css/metrics.css -text
 db/.htaccess -text
 db/index.php -text
 db/tiki-db-adodb.php -text
@@ -45,11 +48,11 @@ doc/devtools/convert_templates_prefs-2.0.php -text
 doc/devtools/csscheck.sh -text
 doc/devtools/cssmap.pl -text
 doc/devtools/diffsql.cmd -text
-doc/devtools/diffsql.sh -text svneol=unset#application/octet-stream
+doc/devtools/diffsql.sh -text
 doc/devtools/extract-img-db-to-fs.php -text
 doc/devtools/fckpackager.php -text
-doc/devtools/findstyledef.pl -text svneol=unset#application/octet-stream
-doc/devtools/findstyledef.sh -text svneol=unset#application/octet-stream
+doc/devtools/findstyledef.pl -text
+doc/devtools/findstyledef.sh -text
 doc/devtools/ggg-trace.php -text
 doc/devtools/index.php -text
 doc/devtools/mergelang.pl -text
@@ -976,7 +979,6 @@ img/listprogress-bar.png -text
 img/listprogress-slider.png -text
 img/loading-light.gif -text
 img/loading.gif -text
-img/magnifying-glass-micro-icon.png -text
 img/mainbar.gif -text
 img/mainbarlight.gif -text
 img/mytiki/admin.gif -text
@@ -1120,7 +1122,6 @@ installer/schema/20081214_webservice_post_tiki.sql -text
 installer/schema/20090106_group_watch_tiki.sql -text
 installer/schema/20090120_sefurl_rules_tiki.sql -text
 installer/schema/20090129_callendar_search_tiki.sql -text
-installer/schema/200902026_admin_menu_tiki.sql -text
 installer/schema/20090203_null_tiki.sql -text
 installer/schema/20090205_forum_and_comments_locking_tiki.sql -text
 installer/schema/20090205_menucase_tiki.sql -text
@@ -1130,6 +1131,7 @@ installer/schema/20090206_poll_tiki.sql -text
 installer/schema/20090211_mailnotification_tiki.sql -text
 installer/schema/20090212_forum_tiki.sql -text
 installer/schema/20090220_admin_section_tiki.sql -text
+installer/schema/20090226_admin_menu_tiki.sql -text
 installer/schema/20090301_browsertitle_tiki.sql -text
 installer/schema/20090304_tiki_p_view_backlink_without_s_tiki.sql -text
 installer/schema/20090306_menu_perms_tiki.sql -text
@@ -1213,7 +1215,6 @@ installer/schema/20091019_users_perms_types_tidying_tiki.sql -text
 installer/schema/20091020_bigger_user_prefs_tiki.sql -text
 installer/schema/20091020_faq_created_tiki.sql -text
 installer/schema/20091020_kaltura_tiki.sql -text
-installer/schema/20091020_moz_screencast_tiki.sql -text
 installer/schema/20091020_remove_charts_tiki.sql -text
 installer/schema/20091020_sefurl_trackeritem_tiki.sql -text
 installer/schema/20091021_moz_pagelist_tiki.sql -text
@@ -1275,6 +1276,12 @@ installer/schema/20100211_rss_items_tiki.sql -text
 installer/schema/20100211_tiki_perms_menu_item_tiki.sql -text
 installer/schema/20100211_tiki_sheet_add_parseValues_tiki.sql -text
 installer/schema/20100212_rss_automation_tiki.sql -text
+installer/schema/20100213_group_inclusion_key_tiki.sql -text
+installer/schema/20100214_workspaces_remove_menu_items_tiki.sql -text
+installer/schema/20100215_rating_permissions_tiki.sql -text
+installer/schema/20100216_attributes_tiki.sql -text
+installer/schema/20100216_kil_moz_screencast_tiki.sql -text
+installer/schema/20100216_rename_tikisheet_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -1458,6 +1465,7 @@ lib/ajax/lib/activex_off.js -text
 lib/ajax/tiki-ajax.js -text
 lib/articles/artlib.php -text
 lib/articles/index.php -text
+lib/attributes/attributelib.php -text
 lib/auth/PasswordHash.php -text
 lib/auth/index.php -text
 lib/auth/ldap.php -text
@@ -1939,7 +1947,7 @@ lib/jquery_tiki/tablesorter/themes/tiki/desc.gif -text
 lib/jquery_tiki/tablesorter/themes/tiki/style.css -text
 lib/jquery_tiki/tiki-jquery.js -text
 lib/live_support/index.php -text
-lib/live_support/live-support.js -text svneol=unset#application/octet-stream
+lib/live_support/live-support.js -text
 lib/live_support/lsadminlib.php -text
 lib/live_support/lslib.php -text
 lib/logs/logslib.php -text
@@ -2386,6 +2394,7 @@ lib/quizzes/index.php -text
 lib/quizzes/quizlib.php -text
 lib/rankings/index.php -text
 lib/rankings/ranklib.php -text
+lib/rating/ratinglib.php -text
 lib/refererstats/index.php -text
 lib/refererstats/refererlib.php -text
 lib/registration/index.php -text
@@ -2545,6 +2554,7 @@ lib/smarty_tiki/function.fileinfo.php -text
 lib/smarty_tiki/function.gallery.php -text
 lib/smarty_tiki/function.help.php -text
 lib/smarty_tiki/function.helplink.php -text
+lib/smarty_tiki/function.html_body_attributes.php -text
 lib/smarty_tiki/function.html_select_time.php -text
 lib/smarty_tiki/function.icon.php -text
 lib/smarty_tiki/function.initials_filter_links.php -text
@@ -2564,6 +2574,7 @@ lib/smarty_tiki/function.popup_init.php -text
 lib/smarty_tiki/function.preference.php -text
 lib/smarty_tiki/function.query.php -text
 lib/smarty_tiki/function.quotabar.php -text
+lib/smarty_tiki/function.rating.php -text
 lib/smarty_tiki/function.rcontent.php -text
 lib/smarty_tiki/function.redirect.php -text
 lib/smarty_tiki/function.reindex_file_pixel.php -text
@@ -2669,6 +2680,7 @@ lib/test/TikiImporter/RememberToMigrateTest.php -text
 lib/test/TikiLib/WikiParserTest.php -text
 lib/test/TikiSeleniumTestCase.php -text
 lib/test/TikiTestCase.php -text
+lib/test/attributes/AttributeTest.php -text
 lib/test/auth/AuthTokensTest.php -text
 lib/test/auth/MembershipTest.php -text
 lib/test/bootstrap.php -text
@@ -2743,6 +2755,8 @@ lib/test/importer/tikiimporter_wiki_test.php -text
 lib/test/index.php -text
 lib/test/payment/CartTest.php -text
 lib/test/phpunit.xml -text
+lib/test/rating/AggregationTest.php -text
+lib/test/rating/RegisterVoteTest.php -text
 lib/themecontrol/index.php -text
 lib/themecontrol/tcontrol.php -text
 lib/tiki-dynamic-js.php -text
@@ -2755,8 +2769,8 @@ lib/tikidate.php -text
 lib/tikifck.php -text
 lib/tikihelp/content.html -text
 lib/tikihelp/css/index.php -text
-lib/tikihelp/css/menu.css -text svneol=unset#application/octet-stream
-lib/tikihelp/css/toolbar.css -text svneol=unset#application/octet-stream
+lib/tikihelp/css/menu.css -text
+lib/tikihelp/css/toolbar.css -text
 lib/tikihelp/history.html -text
 lib/tikihelp/icons/book_open.png -text
 lib/tikihelp/icons/diffDoc.gif -text
@@ -2783,17 +2797,17 @@ lib/tikihelp/icons/toc.gif -text
 lib/tikihelp/icons/wht_go.gif -text
 lib/tikihelp/index.html -text
 lib/tikihelp/index.php -text
-lib/tikihelp/js/global.js -text svneol=unset#application/octet-stream
-lib/tikihelp/js/highlight.js -text svneol=unset#application/octet-stream
+lib/tikihelp/js/global.js -text
+lib/tikihelp/js/highlight.js -text
 lib/tikihelp/js/index.php -text
-lib/tikihelp/js/toolbar.js -text svneol=unset#application/octet-stream
+lib/tikihelp/js/toolbar.js -text
 lib/tikihelp/menu.html -text
 lib/tikihelp/menu/example.txt -text
-lib/tikihelp/menu/ftiens4.js -text svneol=unset#application/octet-stream
+lib/tikihelp/menu/ftiens4.js -text
 lib/tikihelp/menu/index.php -text
-lib/tikihelp/menu/menuNodes.js -text svneol=unset#application/octet-stream
-lib/tikihelp/menu/options.cfg -text svneol=unset#application/octet-stream
-lib/tikihelp/menu/ua.js -text svneol=unset#application/octet-stream
+lib/tikihelp/menu/menuNodes.js -text
+lib/tikihelp/menu/options.cfg -text
+lib/tikihelp/menu/ua.js -text
 lib/tikihelp/readme.txt -text
 lib/tikihelp/results.html -text
 lib/tikihelp/searchdata.html -text
@@ -3027,7 +3041,7 @@ maps/index.php -text
 /metrics-tab.php -text
 /modsadm.php -text
 modules/.htaccess -text
-modules/cache/.htaccess -text svneol=unset#application/octet-stream
+modules/cache/.htaccess -text
 modules/cache/README -text
 modules/cache/index.php -text
 modules/index.php -text
@@ -3547,38 +3561,61 @@ pics/trans.png -text
 /show_image.php -text
 styles/BiDi/BiDi.css -text
 styles/BiDi/index.php -text
+styles/coelesce.css -text
 styles/coelesce/arrows-295c8e.png -text svneol=unset#image/png
 styles/coelesce/arrows-467aa7.png -text svneol=unset#image/png
 styles/coelesce/coelesce.png -text
+styles/coelesce/ie6.css -text
+styles/coelesce/ie7.css -text
+styles/coelesce/index.php -text
+styles/coelesce/options/fixed_width.css -text
+styles/coelesce/options/index.php -text
 styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
 styles/coelesce/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/coelesce/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/coelesce/search_wide.jpg -text svneol=unset#image/jpeg
 styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
+styles/darkroom.css -text
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/darkroom.png -text
+styles/darkroom/ie6.css -text
+styles/darkroom/ie7.css -text
+styles/darkroom/index.php -text
+styles/darkroom/options/fixed_width.css -text
 styles/darkroom/options/fixed_width/474747_5e5e5e_40.png -text svneol=unset#image/png
 styles/darkroom/options/small-type.css -text
 styles/darkroom/options/small-type/small-type.png -text
 styles/darkroom/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/darkroom/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/empty.css -text
+styles/feb12.css -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
 styles/feb12/feb12.png -text
+styles/feb12/ie6.css -text
+styles/feb12/ie7.css -text
+styles/feb12/index.php -text
+styles/feb12/options/fixed_width.css -text
+styles/feb12/options/index.php -text
 styles/feb12/page.jpg -text svneol=unset#image/jpeg
 styles/index.php -text
 styles/integrator/README -text
 styles/integrator/default.css -text
 styles/integrator/doxygen.css -text
 styles/integrator/index.php -text
+styles/layout/design-reference.css -text
+styles/layout/design.css -text
+styles/layout/index.php -text
+styles/layout/layout-reference.css -text
+styles/layout/layout-tiki3_level.css -text
+styles/layout/layout.css -text
 styles/lite/lite.css -text
-styles/metrics.css -text
 styles/slides/index.php -text
 styles/slides/wiredot.png -text svneol=unset#unset
 styles/slideshows/clear.css -text
 styles/slideshows/index.php -text
 styles/slideshows/slidestyle.css -text
 styles/slideshows/tiki.css -text
+styles/strasa.css -text
 styles/strasa/arrows-467aa7.png -text svneol=unset#image/png
 styles/strasa/arrows-a2ecff.png -text svneol=unset#image/png
 styles/strasa/body-bgd.png -text
@@ -3591,6 +3628,7 @@ styles/strasa/headermenuitem-hover.png -text
 styles/strasa/ie6.css -text
 styles/strasa/ie7.css -text
 styles/strasa/ie8.css -text
+styles/strasa/index.php -text
 styles/strasa/info_icon.png -text svneol=unset#image/png
 styles/strasa/link_icon.png -text svneol=unset#image/png
 styles/strasa/list_icon.png -text
@@ -3611,6 +3649,8 @@ styles/strasa/options/fixed_width/body-bg.png -text svneol=unset#image/png
 styles/strasa/options/fixed_width/box_bottom.gif -text
 styles/strasa/options/fixed_width/box_top.gif -text
 styles/strasa/options/fixed_width/fixed_width.png -text svneol=unset#image/png
+styles/strasa/options/fixed_width/index.php -text
+styles/strasa/options/index.php -text
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/arrows-000000.png -text svneol=unset#image/png
 styles/strasa/options/mono/box_bottom.gif -text
@@ -3633,18 +3673,31 @@ styles/strasa/options/mono/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/strasa/options/mono/pics/index.php -text
 styles/strasa/options/mono/register.jpg -text
 styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
+styles/strasa/pics/icons/index.php -text
 styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
 styles/strasa/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/strasa/pics/icons/orightcol.png -text svneol=unset#image/png
+styles/strasa/pics/index.php -text
 styles/strasa/register.jpg -text
 styles/strasa/strasa.png -text
+styles/thenews.css -text
 styles/thenews/arrows-005faa.png -text svneol=unset#image/png
+styles/thenews/ie6.css -text
+styles/thenews/ie7.css -text
+styles/thenews/index.php -text
+styles/thenews/options/fixed_width.css -text
+styles/thenews/options/index.php -text
+styles/thenews/options/narrow_left_column.css -text
 styles/thenews/options/narrow_left_column/narrow_left_column.png -text
 styles/thenews/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/thenews/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/thenews/thenews.png -text
 styles/tikinewt.css -text
 styles/tikinewt/arrows-6d819d.png -text svneol=unset#image/png
+styles/tikinewt/ie6.css -text
+styles/tikinewt/ie7.css -text
+styles/tikinewt/options/fixed_width.css -text
+styles/tikinewt/options/index.php -text
 styles/tikinewt/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/tikinewt/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/tikinewt/tikinewt.png -text
@@ -3677,6 +3730,7 @@ templates/comments_button.tpl -text
 templates/confirm.tpl -text
 templates/contribution.tpl -text
 templates/copyrights.tpl -text
+templates/credits.tpl -text
 templates/database-connection-error.tpl -text
 templates/debug/function.debugger.tpl -text
 templates/debug/index.php -text
@@ -3703,6 +3757,7 @@ templates/find.tpl -text
 templates/footer.tpl -text
 templates/freetag.tpl -text
 templates/freetag_list.tpl -text
+templates/header.tpl -text
 templates/header_simple.tpl -text
 templates/index.php -text
 templates/information.tpl -text
@@ -3955,6 +4010,7 @@ templates/print/print-page_footer.tpl -text
 templates/print/print-page_header.tpl -text
 templates/print/print-title_trackeritem.tpl -text
 templates/print/print-title_wiki.tpl -text
+templates/rating.tpl -text
 templates/remarksbox.tpl -text
 templates/send_newsletter_footer.tpl -text
 templates/send_newsletter_header.tpl -text
@@ -3965,9 +4021,30 @@ templates/structures_toc-leaf.tpl -text
 templates/structures_toc-startul.tpl -text
 templates/structures_toc.tpl -text
 templates/structures_toc_level.tpl -text
+templates/styles/coelesce/comment-body.tpl -text
+templates/styles/coelesce/comment-header.tpl -text
+templates/styles/coelesce/credits.tpl -text
+templates/styles/coelesce/index.php -text
 templates/styles/coelesce/tiki-site_header_login.tpl -text
+templates/styles/coelesce/tiki-site_header_top.tpl -text
+templates/styles/coelesce/tiki-top_bar.tpl -text
+templates/styles/darkroom/credits.tpl -text
+templates/styles/darkroom/index.php -text
+templates/styles/feb12/credits.tpl -text
+templates/styles/feb12/index.php -text
 templates/styles/index.php -text
+templates/styles/strasa/credits.tpl -text
+templates/styles/strasa/custom_site_footer.tpl -text
+templates/styles/strasa/index.php -text
 templates/styles/strasa/tiki-site_header.tpl -text
+templates/styles/strasa/tiki-site_header_login.tpl -text
+templates/styles/strasa/tiki-site_header_options.tpl -text
+templates/styles/strasa/tiki-site_header_top.tpl -text
+templates/styles/strasa/tiki-view_blog.tpl -text
+templates/styles/strasa/tiki-view_blog_post.tpl -text
+templates/styles/thenews/credits.tpl -text
+templates/styles/thenews/index.php -text
+templates/styles/tikinewt/credits.tpl -text
 templates/styles/tikinewt/index.php -text
 templates/textareasize.tpl -text
 templates/tiki-action_calendar.tpl -text
@@ -4071,6 +4148,7 @@ templates/tiki-backlinks.tpl -text
 templates/tiki-batch_upload.tpl -text
 templates/tiki-batch_upload_files.tpl -text
 templates/tiki-blog_post.tpl -text
+templates/tiki-bot_bar.tpl -text
 templates/tiki-browse_categories.tpl -text
 templates/tiki-browse_freetags.tpl -text
 templates/tiki-browse_gallery.tpl -text
@@ -4277,6 +4355,13 @@ templates/tiki-show_page_raw.tpl -text
 templates/tiki-simple_plugin.tpl -text
 templates/tiki-site_header.tpl -text
 templates/tiki-site_header_login.tpl -text
+templates/tiki-site_header_options.tpl -text
+templates/tiki-site_header_top.tpl -text
+templates/tiki-site_header_top_begin.tpl -text
+templates/tiki-site_header_top_end.tpl -text
+templates/tiki-sitelocbar.tpl -text
+templates/tiki-sitemenu.tpl -text
+templates/tiki-sitesearchbar.tpl -text
 templates/tiki-slideshow.tpl -text
 templates/tiki-sqllog.tpl -text
 templates/tiki-stats.tpl -text
@@ -4295,6 +4380,10 @@ templates/tiki-tests_topbar.tpl -text
 templates/tiki-theme_control.tpl -text
 templates/tiki-theme_control_objects.tpl -text
 templates/tiki-theme_control_sections.tpl -text
+templates/tiki-top_bar.tpl -text
+templates/tiki-top_bar_begin.tpl -text
+templates/tiki-top_bar_custom_code.tpl -text
+templates/tiki-top_bar_end.tpl -text
 templates/tiki-upload_file.tpl -text
 templates/tiki-upload_file_progress.tpl -text
 templates/tiki-upload_image.tpl -text
@@ -4332,6 +4421,7 @@ templates/tiki-webmail_contacts.tpl -text
 templates/tiki-wiki3d.tpl -text
 templates/tiki-wiki_structure_bar.tpl -text
 templates/tiki-wiki_topline.tpl -text
+templates/tiki.tpl -text
 templates/tiki_full.tpl -text
 templates/tracker_error.tpl -text
 templates/tracker_filter.tpl -text
@@ -4502,7 +4592,7 @@ tests/testfile.txt -text
 /tiki-create_multilang_pages.php -text
 /tiki-create_webhelp.php -text
 /tiki-custom_home.php -text
-/tiki-directories_rss.php -text svneol=unset#application/octet-stream
+/tiki-directories_rss.php -text
 /tiki-directory_add_site.php -text
 /tiki-directory_add_tiki_site.php -text
 /tiki-directory_admin.php -text
@@ -4512,7 +4602,7 @@ tests/testfile.txt -text
 /tiki-directory_browse.php -text
 /tiki-directory_ranking.php -text
 /tiki-directory_redirect.php -text
-/tiki-directory_rss.php -text svneol=unset#application/octet-stream
+/tiki-directory_rss.php -text
 /tiki-directory_search.php -text
 /tiki-directory_validate_sites.php -text
 /tiki-download_file.php -text
