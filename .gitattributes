@@ -1278,11 +1278,13 @@ installer/schema/20100211_tiki_sheet_add_parseValues_tiki.sql -text
 installer/schema/20100212_rss_automation_tiki.sql -text
 installer/schema/20100213_group_inclusion_key_tiki.sql -text
 installer/schema/20100214_workspaces_remove_menu_items_tiki.sql -text
+installer/schema/20100215_create_tiki_user_login_cookies_tiki.sql -text
 installer/schema/20100215_rating_permissions_tiki.sql -text
 installer/schema/20100216_attributes_tiki.sql -text
 installer/schema/20100216_kil_moz_screencast_tiki.sql -text
 installer/schema/20100216_rename_tikisheet_tiki.sql -text
 installer/schema/20100217_rating_config_tiki.sql -text
+installer/schema/20100218_auth_token_reuse_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -1520,6 +1522,7 @@ lib/core/lib/Math/Formula/Exception.php -text
 lib/core/lib/Math/Formula/Function.php -text
 lib/core/lib/Math/Formula/Function/Add.php -text
 lib/core/lib/Math/Formula/Function/Mul.php -text
+lib/core/lib/Math/Formula/Function/Str.php -text
 lib/core/lib/Math/Formula/Parser.php -text
 lib/core/lib/Math/Formula/Parser/Exception.php -text
 lib/core/lib/Math/Formula/Runner.php -text
@@ -2407,7 +2410,9 @@ lib/quizzes/quizlib.php -text
 lib/rankings/index.php -text
 lib/rankings/ranklib.php -text
 lib/rating/configlib.php -text
+lib/rating/formula/ArticleInfo.php -text
 lib/rating/formula/RatingAverage.php -text
+lib/rating/formula/RatingSum.php -text
 lib/rating/ratinglib.php -text
 lib/refererstats/index.php -text
 lib/refererstats/refererlib.php -text
@@ -4037,6 +4042,7 @@ templates/send_newsletter_footer.tpl -text
 templates/send_newsletter_header.tpl -text
 templates/sent_newsletters.tpl -text
 templates/setup_fckeditor.tpl -text
+templates/show_copyright.tpl -text
 templates/structures_toc-endul.tpl -text
 templates/structures_toc-leaf.tpl -text
 templates/structures_toc-startul.tpl -text
@@ -4480,6 +4486,7 @@ templates/wiki-plugins/wikiplugin_trackerprefill.tpl -text
 templates/wiki-plugins/wikiplugin_trackerstat.tpl -text
 templates/wiki-plugins/wikiplugin_trackertimeline.tpl -text
 templates/wiki-plugins/wikiplugin_vote.tpl -text
+templates/wiki_authors.tpl -text
 templates/wiki_authors_style.tpl -text
 templates/wiki_edit.tpl -text
 templates/wiki_edit_actions.tpl -text
