@@ -1242,6 +1242,7 @@ installer/schema/20091120_username_pattern_tiki.sql -text
 installer/schema/20091123_upgrade_categperm_2_tiki.php -text
 installer/schema/20091125_wiki_comments_per_page_tiki.sql -text
 installer/schema/20091204_filegal_wiki_syntax_tiki.sql -text
+installer/schema/20100207_repair_file_galleries_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
