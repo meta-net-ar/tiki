@@ -1285,6 +1285,8 @@ installer/schema/20100216_kil_moz_screencast_tiki.sql -text
 installer/schema/20100216_rename_tikisheet_tiki.sql -text
 installer/schema/20100217_rating_config_tiki.sql -text
 installer/schema/20100218_auth_token_reuse_tiki.sql -text
+installer/schema/20100222_add_webmail_fromEmail_field_tiki.sql -text
+installer/schema/20100222_sheet_toolbar_default_tiki.sql -text
 installer/schema/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -2457,7 +2459,6 @@ lib/setup/last_update.php -text
 lib/setup/live_support.php -text
 lib/setup/load_threshold.php -text
 lib/setup/mailin.php -text
-lib/setup/menus.php -text
 lib/setup/openid.php -text
 lib/setup/output_compression.php -text
 lib/setup/patches.php -text
@@ -2931,6 +2932,7 @@ lib/wiki-plugins/wikiplugin_ftp.php -text
 lib/wiki-plugins/wikiplugin_gauge.php -text
 lib/wiki-plugins/wikiplugin_googleanalytics.php -text
 lib/wiki-plugins/wikiplugin_googledoc.php -text
+lib/wiki-plugins/wikiplugin_googlemap.php -text
 lib/wiki-plugins/wikiplugin_group.php -text
 lib/wiki-plugins/wikiplugin_grouplist.php -text
 lib/wiki-plugins/wikiplugin_groupmailcore.php -text
@@ -2948,6 +2950,7 @@ lib/wiki-plugins/wikiplugin_lang.php -text
 lib/wiki-plugins/wikiplugin_lastmod.php -text
 lib/wiki-plugins/wikiplugin_listpages.php -text
 lib/wiki-plugins/wikiplugin_lsdir.php -text
+lib/wiki-plugins/wikiplugin_mail.php -text
 lib/wiki-plugins/wikiplugin_map.php -text
 lib/wiki-plugins/wikiplugin_mcalendar.php -text
 lib/wiki-plugins/wikiplugin_mediaplayer.php -text
@@ -3072,6 +3075,7 @@ modules/cache/README -text
 modules/cache/index.php -text
 modules/index.php -text
 modules/mod-func-action_calendar.php -text
+modules/mod-func-action_similarcontent.php -text
 modules/mod-func-adsense.php -text
 modules/mod-func-article_archives.php -text
 modules/mod-func-article_topics.php -text
@@ -3384,6 +3388,13 @@ pics/icons/resultset_up.png -text
 pics/icons/rss.png -text
 pics/icons/shading.png -text
 pics/icons/shape_square_edit.png -text
+pics/icons/sheet_col_add.png -text svneol=unset#unset
+pics/icons/sheet_col_add_multi.png -text svneol=unset#unset
+pics/icons/sheet_col_delete.png -text svneol=unset#unset
+pics/icons/sheet_get_range.png -text svneol=unset#unset
+pics/icons/sheet_row_add.png -text svneol=unset#unset
+pics/icons/sheet_row_add_multi.png -text svneol=unset#unset
+pics/icons/sheet_row_delete.png -text svneol=unset#unset
 pics/icons/star.png -text
 pics/icons/star_grey.png -text
 pics/icons/star_half.png -text
@@ -3894,6 +3905,7 @@ templates/module-error.tpl -text
 templates/module.tpl -text
 templates/modules/index.php -text
 templates/modules/mod-action_calendar.tpl -text
+templates/modules/mod-action_similarcontent.tpl -text
 templates/modules/mod-adsense.tpl -text
 templates/modules/mod-application_menu.tpl.nocache -text
 templates/modules/mod-article_archives.tpl -text
@@ -4373,6 +4385,7 @@ templates/tiki-rollback.tpl -text
 templates/tiki-search_stats.tpl -text
 templates/tiki-searchindex.tpl -text
 templates/tiki-searchresults.tpl -text
+templates/tiki-secondary_sitemenu.tpl -text
 templates/tiki-send_newsletters.tpl -text
 templates/tiki-send_objects.tpl -text
 templates/tiki-sheets.tpl -text
@@ -4458,6 +4471,7 @@ templates/tracker_item_field_input.tpl -text
 templates/tracker_item_field_value.tpl -text
 templates/tracker_pretty_item.tpl -text
 templates/tracker_sort_input.tpl -text
+templates/tracker_status_input.tpl -text
 templates/translated-lang.tpl -text
 templates/wiki-discussion.tpl -text
 templates/wiki-plugins/error_tracker.tpl -text
@@ -4467,10 +4481,12 @@ templates/wiki-plugins/wikiplugin_datachannel.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
+templates/wiki-plugins/wikiplugin_googlemap.tpl -text
 templates/wiki-plugins/wikiplugin_grouplist.tpl -text
 templates/wiki-plugins/wikiplugin_groupstat.tpl -text
 templates/wiki-plugins/wikiplugin_invite.tpl -text
 templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
+templates/wiki-plugins/wikiplugin_mail.tpl -text
 templates/wiki-plugins/wikiplugin_memberlist.tpl -text
 templates/wiki-plugins/wikiplugin_memberpayment.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
