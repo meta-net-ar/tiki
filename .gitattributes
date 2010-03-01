@@ -3427,6 +3427,7 @@ styles/coelesce/search_wide.jpg -text svneol=unset#image/jpeg
 styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/darkroom.png -text
+styles/darkroom/options/index.php -text
 styles/darkroom/options/small-type.css -text
 styles/darkroom/options/small-type/small-type.png -text
 styles/feb12/columnbg.jpg -text svneol=unset#image/jpeg
@@ -3469,6 +3470,7 @@ styles/strasa/options/cold/headermenuitem-hover.png -text
 styles/strasa/options/cold/login.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold/loginlong.jpg -text svneol=unset#image/jpeg
 styles/strasa/options/cold/register.jpg -text svneol=unset#image/jpeg
+styles/strasa/options/index.php -text
 styles/strasa/options/mono.css -text
 styles/strasa/options/mono/box_bottom.gif -text
 styles/strasa/options/mono/box_top.gif -text
