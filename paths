@@ -1,6 +1,20 @@
 D
 dir
-/mods/trunk/templates
+/mods/trunk/wiki-plugins/ebay
+
+
+
+
+D
+dir
+/mods/trunk/wiki-plugins/book
+
+
+
+
+D
+dir
+/mods/trunk/wiki-plugins/pagename
 
 
 
