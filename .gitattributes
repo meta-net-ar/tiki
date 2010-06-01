@@ -1174,7 +1174,6 @@ installer/schema/20091007_update_database_structure_tiki.sql -text
 installer/schema/20091013_fix_perms_tiki.sql -text
 installer/schema/20091120_username_pattern_tiki.sql -text
 installer/schema/20100226_tracker_dump_perm_tiki.sql -text
-installer/schema/20100302_filegal_images_max_sizes_tiki.sql -text
 installer/shell.php -text
 installer/tiki-installer.php -text
 /jhot.php -text
