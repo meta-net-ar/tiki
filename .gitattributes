@@ -1383,6 +1383,7 @@ installer/schema/20100909_ckeditor_upgrade_tiki.sql -text
 installer/schema/20100909_lengthen_wiki_attachments_filename_tiki.sql -text
 installer/schema/20100910_new_fields_for_tiki_blogs_tiki.sql -text
 installer/schema/20100912_rename_autosave_pref_tiki.sql -text
+installer/schema/20100915_add_edit_languages_menu_option_tiki.sql -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -2882,6 +2883,7 @@ lib/test/index.php -text
 lib/test/language/LanguageTest.php -text
 lib/test/language/fixtures/custom.php -text
 lib/test/language/fixtures/index.php -text
+lib/test/language/fixtures/language_invalid.php -text
 lib/test/language/fixtures/language_modif.php -text
 lib/test/language/fixtures/language_orig.php -text
 lib/test/language/index.php -text
@@ -3808,6 +3810,7 @@ styles/coelesce/coelesce.png -text
 styles/coelesce/ie6.css -text
 styles/coelesce/ie7.css -text
 styles/coelesce/index.php -text
+styles/coelesce/options/community.css -text
 styles/coelesce/options/index.php -text
 styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
 styles/coelesce/pics/icons/oleftcol.png -text svneol=unset#image/png
@@ -4358,6 +4361,7 @@ templates/modules/mod-wiki_last_comments.tpl -text
 templates/modules/mod-wiki_last_comments.tpl.nocache -text
 templates/modules/mod-youtube.tpl -text
 templates/modules/user_module.tpl -text
+templates/object_perms_summary.tpl -text
 templates/pagehistory.tpl -text
 templates/plugins/plugin-topfriends.tpl -text
 templates/poll.tpl -text
