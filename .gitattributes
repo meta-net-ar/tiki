@@ -2476,7 +2476,6 @@ lib/setup/usermenu.php -text
 lib/setup/wiki.php -text
 lib/sharelib.php -text
 lib/sheet/conf/config.inc.php -text
-lib/sheet/control.js -text
 lib/sheet/excel/index.php -text
 lib/sheet/excel/reader.php -text
 lib/sheet/excel/reader_ole.php -text
@@ -2488,8 +2487,6 @@ lib/sheet/excel/writer/parser.php -text
 lib/sheet/excel/writer/validator.php -text
 lib/sheet/excel/writer/workbook.php -text
 lib/sheet/excel/writer/worksheet.php -text
-lib/sheet/formula.js -text
-lib/sheet/grid.js -text
 lib/sheet/grid.php -text
 lib/sheet/include/core/APIC.php -text
 lib/sheet/include/core/APIClass.php -text
@@ -2521,8 +2518,6 @@ lib/sheet/ole/pps.php -text
 lib/sheet/ole/pps/file.php -text
 lib/sheet/ole/pps/index.php -text
 lib/sheet/ole/pps/root.php -text
-lib/sheet/panel.js -text
-lib/sheet/style.css -text
 lib/sheet/tiki-history_sheets.js -text
 lib/shipping/FedEx_v8.wsdl -text
 lib/shipping/provider_fedex.php -text
