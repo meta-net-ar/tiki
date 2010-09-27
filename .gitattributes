@@ -1316,6 +1316,7 @@ installer/schema/20100507_flash_banner_tiki.php -text
 installer/schema/20100611_rss_items_url_tiki.sql -text
 installer/schema/20100624_banning_index_tiki.sql -text
 installer/schema/20100716_user_selector_pref_rename_tiki.sql -text
+installer/schema/20100927_better_column_fix_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
