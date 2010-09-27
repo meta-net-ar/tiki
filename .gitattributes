@@ -4391,7 +4391,6 @@ templates/tiki-edit_templates.tpl -text
 templates/tiki-edit_topic.tpl -text
 templates/tiki-edit_translation.tpl -text
 templates/tiki-edit_video.tpl -text
-templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
 templates/tiki-export_comment_xml.tpl -text
@@ -4821,7 +4820,6 @@ tests/testfile.txt -text
 /tiki-edit_templates.php -text
 /tiki-edit_topic.php -text
 /tiki-edit_translation.php -text
-/tiki-edit_wiki_section.php -text
 /tiki-editpage.php -text
 /tiki-emulate_groups_switch.php -text
 /tiki-error_simple.php -text
