@@ -1427,6 +1427,11 @@ installer/schema/20100919_tiki_page_contribution_tiki.sql -text
 installer/schema/20100920_ckeditor_remove_pref_tiki.sql -text
 installer/schema/20100920_jq_sheet_remove_pref_tiki.sql -text
 installer/schema/20100920_todo_event_tiki.sql -text
+installer/schema/20100923_fix_column_position_tiki.sql -text
+installer/schema/20100923_social_networking_permission_and_menuitem_tiki.sql -text
+installer/schema/20100925_fix_some_default_value_tiki.sql -text
+installer/schema/20100927_better_column_fix_tiki.php -text
+installer/schema/20100928_sefurl_regex_reordering_tiki.sql -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -1592,11 +1597,11 @@ lib/captcha/captchalib.php -text
 lib/captcha/index.php -text
 lib/categories/categlib.php -text
 lib/categories/index.php -text
-lib/ckeditor_tiki/ckeditor-icons/FontName.gif -text
-lib/ckeditor_tiki/ckeditor-icons/FontSize.gif -text
-lib/ckeditor_tiki/ckeditor-icons/Format.gif -text
-lib/ckeditor_tiki/ckeditor-icons/Specialchar.gif -text
-lib/ckeditor_tiki/ckeditor-icons/Style.gif -text
+lib/ckeditor_tiki/ckeditor-icons/font.gif -text
+lib/ckeditor_tiki/ckeditor-icons/fontsize.gif -text svneol=unset#unset
+lib/ckeditor_tiki/ckeditor-icons/format.gif -text svneol=unset#unset
+lib/ckeditor_tiki/ckeditor-icons/specialchar.gif -text svneol=unset#unset
+lib/ckeditor_tiki/ckeditor-icons/styles.gif -text
 lib/ckeditor_tiki/plugins/_tikilink/dialogs/tikilink.js -text
 lib/ckeditor_tiki/plugins/_tikilink/plugin.js -text
 lib/ckeditor_tiki/plugins/autosave/images/ajaxAutoSaveClean.gif -text
@@ -2060,6 +2065,8 @@ lib/images/imagick_old.php -text
 lib/importer/index.php -text
 lib/importer/mediawiki_dump.xsd -text
 lib/importer/tikiimporter.php -text
+lib/importer/tikiimporter_blog.php -text
+lib/importer/tikiimporter_blog_wordpress.php -text
 lib/importer/tikiimporter_wiki.php -text
 lib/importer/tikiimporter_wiki_mediawiki.php -text
 lib/importer/xml.xsd -text
@@ -2419,6 +2426,7 @@ lib/prefs/blogues.php -text
 lib/prefs/bot.php -text
 lib/prefs/box.php -text
 lib/prefs/calendar.php -text
+lib/prefs/captcha.php -text
 lib/prefs/cas.php -text
 lib/prefs/categories.php -text
 lib/prefs/category.php -text
@@ -2906,6 +2914,8 @@ lib/test/core/include_non_autoload_compatible_classes.php -text
 lib/test/core/phpunit.xml -text
 lib/test/freetag/FreetagTest.php -text
 lib/test/freetag/index.php -text
+lib/test/importer/TikiImporterBlogTest.php -text
+lib/test/importer/TikiImporterBlogWordpressTest.php -text
 lib/test/importer/TikiImporterTest.php -text
 lib/test/importer/TikiImporterWikiMediawikiTest.php -text
 lib/test/importer/TikiImporterWikiTest.php -text
@@ -2918,6 +2928,9 @@ lib/test/importer/fixtures/mediawiki_page_as_array.php -text
 lib/test/importer/fixtures/mediawiki_revision.xml -text
 lib/test/importer/fixtures/mediawiki_revision_invalid_syntax.xml -text
 lib/test/importer/fixtures/mediawiki_sample.xml -text
+lib/test/importer/fixtures/wordpress_page.xml -text
+lib/test/importer/fixtures/wordpress_post.xml -text
+lib/test/importer/fixtures/wordpress_sample.xml -text
 lib/test/importer/index.php -text
 lib/test/importer/tikiimporter_testcase.php -text
 lib/test/index.php -text
@@ -3023,9 +3036,9 @@ lib/validators/validator_password.php -text
 lib/validators/validator_regex.php -text
 lib/validators/validator_username.php -text
 lib/validatorslib.php -text
-lib/videogals/KalturaClientBase_v3.php -text
+lib/videogals/KalturaClient.php -text
+lib/videogals/KalturaClientBase.php -text
 lib/videogals/KalturaClientReadme.txt -text
-lib/videogals/KalturaClient_v3.php -text
 lib/videogals/videogallib.php -text
 lib/videogals/watershedlib.php -text
 lib/web.config -text
@@ -3521,6 +3534,7 @@ pics/icons/ovmodule.png -text
 pics/icons/package.png -text
 pics/icons/package_go.png -text
 pics/icons/page.png -text
+pics/icons/page_break.png -text
 pics/icons/page_copy.png -text
 pics/icons/page_edit.png -text
 pics/icons/page_edit_section.png -text
@@ -4162,7 +4176,6 @@ templates/freetag_list.tpl -text
 templates/header.tpl -text
 templates/header_simple.tpl -text
 templates/index.php -text
-templates/information.tpl -text
 templates/list_file_gallery.tpl -text
 templates/list_file_gallery2.tpl -text
 templates/list_file_gallery_content.tpl -text
@@ -4585,7 +4598,6 @@ templates/tiki-browse_categories.tpl -text
 templates/tiki-browse_freetags.tpl -text
 templates/tiki-browse_gallery.tpl -text
 templates/tiki-browse_image.tpl -text
-templates/tiki-browse_video.tpl -text
 templates/tiki-calendar.tpl -text
 templates/tiki-calendar_box.tpl -text
 templates/tiki-calendar_box_multiple.tpl -text
@@ -4639,8 +4651,6 @@ templates/tiki-edit_submission.tpl -text
 templates/tiki-edit_templates.tpl -text
 templates/tiki-edit_topic.tpl -text
 templates/tiki-edit_translation.tpl -text
-templates/tiki-edit_video.tpl -text
-templates/tiki-edit_wiki_section.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
 templates/tiki-export_comment_xml.tpl -text
