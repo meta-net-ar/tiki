@@ -48,7 +48,6 @@ doc/devtools/add1tiki2multi.py -text
 doc/devtools/backupdb.sh -text
 doc/devtools/buildincrement.php -text
 doc/devtools/capitalize_buttons.pl -text
-doc/devtools/cleanCatTrackers.php -text
 doc/devtools/cleanwatch.sh -text
 doc/devtools/convert_templates_prefs-2.0.php -text
 doc/devtools/convert_tpl_ajax.php -text
@@ -1432,6 +1431,7 @@ installer/schema/20100923_social_networking_permission_and_menuitem_tiki.sql -te
 installer/schema/20100925_fix_some_default_value_tiki.sql -text
 installer/schema/20100927_better_column_fix_tiki.php -text
 installer/schema/20100928_sefurl_regex_reordering_tiki.sql -text
+installer/schema/20101008_user_id_for_tiki_language_tiki.sql -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -2091,6 +2091,7 @@ lib/jquery_tiki/tablesorter/themes/tiki/style.css -text
 lib/jquery_tiki/tiki-jquery.js -text
 lib/language/Language.php -text
 lib/language/index.php -text
+lib/language/tiki-edit_languages.js -text
 lib/live_support/index.php -text
 lib/live_support/live-support.js -text
 lib/live_support/lsadminlib.php -text
@@ -3099,7 +3100,6 @@ lib/wiki-plugins/wikiplugin_fade.php -text
 lib/wiki-plugins/wikiplugin_fancylist.php -text
 lib/wiki-plugins/wikiplugin_fancytable.php -text
 lib/wiki-plugins/wikiplugin_file.php -text
-lib/wiki-plugins/wikiplugin_filelink.php -text
 lib/wiki-plugins/wikiplugin_files.php -text
 lib/wiki-plugins/wikiplugin_flash.php -text
 lib/wiki-plugins/wikiplugin_footnote.php -text
