@@ -48,7 +48,6 @@ db/tiki-3.4-sybase.sql -text
 db/tiki-db-adodb.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
-db/tiki-secdb_3.2_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
