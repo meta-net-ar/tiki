@@ -1589,13 +1589,9 @@ lib/ZeroClipboard.js -text
 lib/accounting/accountinglib.php -text
 lib/admin/adminlib.php -text
 lib/admin/index.php -text
-lib/ajax/LICENSE.txt -text
-lib/ajax/README.txt -text
-lib/ajax/ajaxlib.php -text
 lib/ajax/autosave.js -text
 lib/ajax/autosave.php -text
 lib/ajax/lib/activex_off.js -text
-lib/ajax/tiki-ajax.js -text
 lib/articles/artlib.php -text
 lib/articles/index.php -text
 lib/attributes/attributelib.php -text
