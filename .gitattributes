@@ -1414,6 +1414,7 @@ installer/schema/20101207_unique_login_tiki.php -text
 installer/schema/20101208_webservice_soap_tiki.sql -text
 installer/schema/20101210_sync_users_ldap_tiki.sql -text
 installer/schema/20101211_kil_feature_phplayers_tiki.php -text
+installer/schema/20101215_remove_files_tiki.sql -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -1758,6 +1759,7 @@ lib/core/Search/Type/Factory/Interface.php -text
 lib/core/Search/Type/Factory/Lucene.php -text
 lib/core/Search/Type/Interface.php -text
 lib/core/Search/Type/MultivalueText.php -text
+lib/core/Search/Type/PlainText.php -text
 lib/core/Search/Type/ShortText.php -text
 lib/core/Search/Type/Whole.php -text
 lib/core/Search/Type/WikiText.php -text
@@ -2762,6 +2764,7 @@ lib/smarty_tiki/modifier.max_user_inscriptions.php -text
 lib/smarty_tiki/modifier.money_format.php -text
 lib/smarty_tiki/modifier.nlbr.php -text
 lib/smarty_tiki/modifier.number_format.php -text
+lib/smarty_tiki/modifier.output.php -text
 lib/smarty_tiki/modifier.pagename.php -text
 lib/smarty_tiki/modifier.percent.php -text
 lib/smarty_tiki/modifier.quoted.php -text
@@ -3041,9 +3044,7 @@ lib/trackers/dynamic_list.js -text
 lib/trackers/index.php -text
 lib/trackers/trackerlib.php -text
 lib/transitionlib.php -text
-lib/tree/categ_admin_tree.php -text
 lib/tree/categ_browse_tree.php -text
-lib/tree/categ_picker_tree.php -text
 lib/tree/index.php -text
 lib/tree/tree.php -text
 lib/userfiles/index.php -text
@@ -3168,6 +3169,7 @@ lib/wiki-plugins/wikiplugin_mouseover.php -text
 lib/wiki-plugins/wikiplugin_mwtable.php -text
 lib/wiki-plugins/wikiplugin_myspace.php -text
 lib/wiki-plugins/wikiplugin_objecthits.php -text
+lib/wiki-plugins/wikiplugin_param.php -text
 lib/wiki-plugins/wikiplugin_payment.php -text
 lib/wiki-plugins/wikiplugin_perm.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
@@ -3219,7 +3221,6 @@ lib/wiki-plugins/wikiplugin_trade.php -text
 lib/wiki-plugins/wikiplugin_transclude.php -text
 lib/wiki-plugins/wikiplugin_translated.php -text
 lib/wiki-plugins/wikiplugin_twitter.php -text
-lib/wiki-plugins/wikiplugin_urlparam.php -text
 lib/wiki-plugins/wikiplugin_usercount.php -text
 lib/wiki-plugins/wikiplugin_userlink.php -text
 lib/wiki-plugins/wikiplugin_userlist.php -text
