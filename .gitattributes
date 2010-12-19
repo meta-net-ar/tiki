@@ -4565,8 +4565,6 @@ templates/styles/darkroom/index.php -text
 templates/styles/darkshine/index.php -text
 templates/styles/eatlon/index.php -text
 templates/styles/feb12/index.php -text
-templates/styles/fivealive/index.php -text
-templates/styles/fivealive/tiki-bot_bar.tpl -text
 templates/styles/index.php -text
 templates/styles/jqui/index.php -text
 templates/styles/ohia/index.php -text
