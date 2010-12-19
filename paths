@@ -1,6 +1,34 @@
+M
+dir
+/branches/experimental/coe_fgal_relook2
+
+
+
+
+M
+dir
+/branches/experimental/coe_fgal_relook2/lib/ajax
+
+
+
+
 D
 dir
-/branches/experimental/xajax_removal/lib/hawhaw
+/branches/experimental/coe_fgal_relook2/lib/phplayers_tiki
+
+
+
+
+D
+dir
+/branches/experimental/coe_fgal_relook2/lib/ajax/lib
+
+
+
+
+M
+dir
+/branches/experimental/coe_fgal_relook2/lib
 
 
 
