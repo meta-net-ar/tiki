@@ -22,6 +22,10 @@ function module_login_box_info() {
 				'description' => tra('Number of characters for username and password input fields.'),
 				'filter' => 'int'
 			),
+			'mode' => array(
+				'name' => tra('Mode'),
+				'description' => tra('Display mode: module or header. Leave empty for module mode'),
+			),
 		)
 	);
 }
