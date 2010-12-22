@@ -1,13 +1,20 @@
 A
 dir
-/mods/trunk/wiki-plugins/phpfreechat/pics/icons
+/mods/trunk/wiki-plugins/r/lib/codemirror_tiki/css
 
 
 
 
 A
 dir
-/mods/trunk/wiki-plugins/phpfreechat/pics
+/mods/trunk/wiki-plugins/r/lib/codemirror_tiki/js
+
+
+
+
+A
+dir
+/mods/trunk/wiki-plugins/r/lib/codemirror_tiki
 
 
 
