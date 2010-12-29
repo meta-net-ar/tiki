@@ -33,8 +33,6 @@ db/index.php -text
 db/tiki-db-adodb.php -text
 db/tiki-db-pdo.php -text
 db/tiki-db.php -text
-db/tiki-secdb_6.0_mysql.sql -text
-db/tiki-secdb_6.1_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
@@ -1428,6 +1426,9 @@ lang/.htaccess -text
 lang/ar/index.php -text
 lang/ar/language.js -text
 lang/ar/language.php -text
+lang/bg/index.php -text
+lang/bg/language.js -text
+lang/bg/language.php -text
 lang/ca/custom.php_example -text
 lang/ca/index.php -text
 lang/ca/language.js -text
@@ -5186,6 +5187,7 @@ tests/testfile.txt -text
 /tiki-contact.php -text
 /tiki-contacts.php -text
 /tiki-cookie-jar.php -text
+/tiki-copypage.php -text
 /tiki-create_multilang_pages.php -text
 /tiki-create_webhelp.php -text
 /tiki-custom_home.php -text
