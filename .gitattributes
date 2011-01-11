@@ -1418,6 +1418,9 @@ installer/schema/20101215_remove_files_tiki.sql -text
 installer/schema/20101215_template_file_galleries_tiki.sql -text
 installer/schema/20101219_kill_feature_mobile_tiki.sql -text
 installer/schema/20101230_create_top_modules_tiki.php -text
+installer/schema/20110103_include_in_history_tiki.sql -text
+installer/schema/20110104_flagged_revision_log_tiki.sql -text
+installer/schema/20110104_sefurl_trackeritem_tiki.sql -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -1772,6 +1775,7 @@ lib/core/Search/Type/Interface.php -text
 lib/core/Search/Type/MultivalueText.php -text
 lib/core/Search/Type/PlainText.php -text
 lib/core/Search/Type/ShortText.php -text
+lib/core/Search/Type/Timestamp.php -text
 lib/core/Search/Type/Whole.php -text
 lib/core/Search/Type/WikiText.php -text
 lib/core/StandardAnalyzer/Analyzer/Standard.php -text
@@ -2441,6 +2445,7 @@ lib/prefs/feature.php -text
 lib/prefs/feed.php -text
 lib/prefs/fgal.php -text
 lib/prefs/file.php -text
+lib/prefs/flaggedrev.php -text
 lib/prefs/footer.php -text
 lib/prefs/forum.php -text
 lib/prefs/forums.php -text
@@ -3239,6 +3244,7 @@ lib/wiki-plugins/wikiplugin_webservice.php -text
 lib/wiki-plugins/wikiplugin_youtube.php -text
 lib/wiki/editlib.php -text
 lib/wiki/exportlib.php -text
+lib/wiki/flaggedrevisionlib.php -text
 lib/wiki/histlib.php -text
 lib/wiki/index.php -text
 lib/wiki/pluginslib.php -text
@@ -3308,6 +3314,7 @@ modules/mod-func-categories.php -text
 modules/mod-func-category_transition.php -text
 modules/mod-func-change_category.php -text
 modules/mod-func-comm_received_objects.php -text
+modules/mod-func-contributors.php -text
 modules/mod-func-credits.php -text
 modules/mod-func-directory_last_sites.php -text
 modules/mod-func-directory_stats.php -text
@@ -4345,6 +4352,8 @@ templates/mail/user_watch_category_removed.tpl -text
 templates/mail/user_watch_category_removed_subject.tpl -text
 templates/mail/user_watch_category_updated.tpl -text
 templates/mail/user_watch_category_updated_subject.tpl -text
+templates/mail/user_watch_comment.tpl -text
+templates/mail/user_watch_comment_subject.tpl -text
 templates/mail/user_watch_file_gallery_changed_subject.tpl -text
 templates/mail/user_watch_file_gallery_remove_file.tpl -text
 templates/mail/user_watch_file_gallery_upload.tpl -text
@@ -4362,8 +4371,6 @@ templates/mail/user_watch_wiki_new_attach.tpl -text
 templates/mail/user_watch_wiki_new_attach_subject.tpl -text
 templates/mail/user_watch_wiki_page_changed.tpl -text
 templates/mail/user_watch_wiki_page_changed_subject.tpl -text
-templates/mail/user_watch_wiki_page_comment.tpl -text
-templates/mail/user_watch_wiki_page_comment_subject.tpl -text
 templates/mail/user_watch_wiki_page_renamed.tpl -text
 templates/mail/user_watch_wiki_page_renamed_subject.tpl -text
 templates/mail/user_welcome_msg.tpl -text
@@ -4407,6 +4414,7 @@ templates/modules/mod-categories.tpl -text
 templates/modules/mod-category_transition.tpl -text
 templates/modules/mod-change_category.tpl -text
 templates/modules/mod-comm_received_objects.tpl -text
+templates/modules/mod-contributors.tpl -text
 templates/modules/mod-credits.tpl -text
 templates/modules/mod-directory_last_sites.tpl -text
 templates/modules/mod-directory_stats.tpl -text
@@ -4784,6 +4792,7 @@ templates/tiki-featured_link.tpl -text
 templates/tiki-file_archives.tpl -text
 templates/tiki-file_galleries.tpl -text
 templates/tiki-file_info_box.tpl -text
+templates/tiki-flaggedrev_approval_header.tpl -text
 templates/tiki-forum_import.tpl -text
 templates/tiki-forum_queue.tpl -text
 templates/tiki-forums.tpl -text
