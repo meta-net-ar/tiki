@@ -2131,6 +2131,7 @@ lib/mods/index.php -text
 lib/mods/modslib.php -text
 lib/modules/index.php -text
 lib/modules/modlib.php -text
+lib/modules/tiki-admin_modules.js -text
 lib/multilingual/multilinguallib.php -text
 lib/newsletters/index.php -text
 lib/newsletters/nllib.php -text
