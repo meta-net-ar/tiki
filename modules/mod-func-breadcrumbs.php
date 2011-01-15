@@ -14,7 +14,7 @@ if (strpos($_SERVER["SCRIPT_NAME"],basename(__FILE__)) !== false) {
 function module_breadcrumbs_info() {
 	return array(
 		'name' => tra('Breadcrumbs'),
-		'description' => tra('Horizonatal or vertical menu.'),
+		'description' => tra('A hierarchy of where you are. Ex.: Home > Section1 > Subsection C.'),
 		'prefs' => array('feature_breadcrumbs'),
 		'params' => array(),
 	);

@@ -3308,6 +3308,8 @@ modules/mod-func-article_archives.php -text
 modules/mod-func-article_topics.php -text
 modules/mod-func-articles.php -text
 modules/mod-func-assistant.php -text
+modules/mod-func-babelfish_links.php -text
+modules/mod-func-babelfish_logo.php -text
 modules/mod-func-blog_last_comments.php -text
 modules/mod-func-breadcrumb.php -text
 modules/mod-func-breadcrumbs.php -text
@@ -3356,6 +3358,7 @@ modules/mod-func-last_tracker_items.php -text
 modules/mod-func-last_validated_faq_questions.php -text
 modules/mod-func-last_visitors.php -text
 modules/mod-func-live_support.php -text
+modules/mod-func-loadstats.php -text
 modules/mod-func-login_box.php -text
 modules/mod-func-logo.php -text
 modules/mod-func-menu.php -text
@@ -3368,6 +3371,7 @@ modules/mod-func-num_submissions.php -text
 modules/mod-func-old_articles.php -text
 modules/mod-func-payment_outstanding.php -text
 modules/mod-func-perspective.php -text
+modules/mod-func-poweredby.php -text
 modules/mod-func-quick_edit.php -text
 modules/mod-func-quickadmin.php -text
 modules/mod-func-random_images.php -text
@@ -3378,9 +3382,11 @@ modules/mod-func-search.php -text
 modules/mod-func-search_box.php -text
 modules/mod-func-search_wiki_page.php -text
 modules/mod-func-semantic_links.php -text
+modules/mod-func-share.php -text
 modules/mod-func-shoutbox.php -text
 modules/mod-func-since_last_visit.php -text
 modules/mod-func-since_last_visit_new.php -text
+modules/mod-func-svnup.php -text
 modules/mod-func-switch_lang.php -text
 modules/mod-func-switch_theme.php -text
 modules/mod-func-terminology.php -text
@@ -4407,6 +4413,8 @@ templates/modules/mod-article_archives.tpl -text
 templates/modules/mod-article_topics.tpl -text
 templates/modules/mod-articles.tpl -text
 templates/modules/mod-assistant.tpl -text
+templates/modules/mod-babelfish_links.tpl -text
+templates/modules/mod-babelfish_logo.tpl -text
 templates/modules/mod-blog_last_comments.tpl -text
 templates/modules/mod-breadcrumb.tpl -text
 templates/modules/mod-breadcrumb.tpl.nocache -text
@@ -4459,6 +4467,7 @@ templates/modules/mod-last_validated_faq_questions.tpl -text
 templates/modules/mod-last_visitors.tpl -text
 templates/modules/mod-last_youtube_playlist_videos.tpl -text
 templates/modules/mod-live_support.tpl -text
+templates/modules/mod-loadstats.tpl -text
 templates/modules/mod-logged_users.tpl.nocache -text
 templates/modules/mod-login_box.tpl -text
 templates/modules/mod-login_box.tpl.nocache -text
@@ -4475,6 +4484,7 @@ templates/modules/mod-old_articles.tpl -text
 templates/modules/mod-online_users.tpl.nocache -text
 templates/modules/mod-payment_outstanding.tpl -text
 templates/modules/mod-perspective.tpl -text
+templates/modules/mod-poweredby.tpl -text
 templates/modules/mod-quick_edit.tpl -text
 templates/modules/mod-quickadmin.tpl -text
 templates/modules/mod-random_images.tpl -text
@@ -4485,10 +4495,12 @@ templates/modules/mod-search.tpl -text
 templates/modules/mod-search_box.tpl -text
 templates/modules/mod-search_wiki_page.tpl -text
 templates/modules/mod-semantic_links.tpl -text
+templates/modules/mod-share.tpl -text
 templates/modules/mod-shoutbox.tpl -text
 templates/modules/mod-shoutbox.tpl.nocache -text
 templates/modules/mod-since_last_visit.tpl -text
 templates/modules/mod-since_last_visit_new.tpl -text
+templates/modules/mod-svnup.tpl -text
 templates/modules/mod-switch_lang.tpl -text
 templates/modules/mod-switch_theme.tpl -text
 templates/modules/mod-switch_theme.tpl.nocache -text
