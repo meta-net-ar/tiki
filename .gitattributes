@@ -1562,7 +1562,6 @@ lib/Horde/Yaml/Loader.php -text
 lib/Horde/Yaml/Node.php -text
 lib/TikiWebdav/Auth/Default.php -text
 lib/TikiWebdav/Backend/File.php -text
-lib/TikiWebdav/Backend/File.php.sept -text
 lib/TikiWebdav/PathFactories/File.php -text
 lib/TikiWebdav/Server.php -text
 lib/TikiWebdav/autoload.php -text
