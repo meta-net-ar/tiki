@@ -1,8 +1,15 @@
 A
 dir
-/mods/trunk/themes/kubrick_tiki_7
-/users/chibaguy/trunk_themes/themes/kubrick_tiki_trunk
-33322
+/mods/trunk/themes/clubcard_tiki_7
+/users/chibaguy/trunk_themes/themes/clubcard_tiki_trunk
+32501
+
+
+R
+dir
+/mods/trunk/themes/clubcard_tiki_7/styles/clubcard/options
+/users/chibaguy/trunk_themes/themes/clubcard_tiki_trunk/styles/clubcard/options
+34100
 
 
 
