@@ -1,6 +1,7 @@
 /.buildpath
 /.cache
 /.htaccess
+/.idea
 /.lastup
 /.metadata*
 /.project
@@ -28,6 +29,7 @@ lang/.htaccess
 /last.log
 lib/.htaccess
 lib/smarty
+lib/test/local.php
 /maps
 maps/*
 /mods
