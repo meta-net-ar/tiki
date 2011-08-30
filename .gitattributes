@@ -3093,6 +3093,7 @@ lib/wiki-plugins/wikiplugin_sharethis.php -text
 lib/wiki-plugins/wikiplugin_sheet.php -text
 lib/wiki-plugins/wikiplugin_showpages.php -text
 lib/wiki-plugins/wikiplugin_skype.php -text
+lib/wiki-plugins/wikiplugin_slideshow.php -text
 lib/wiki-plugins/wikiplugin_smarty.php -text
 lib/wiki-plugins/wikiplugin_snarf.php -text
 lib/wiki-plugins/wikiplugin_sort.php -text
