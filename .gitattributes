@@ -4625,6 +4625,7 @@ templates/tiki-galleries.tpl -text
 templates/tiki-gmap_locator.tpl -text
 templates/tiki-gmap_usermap.tpl -text
 templates/tiki-graph-sheets.tpl -text
+templates/tiki-history_sheets.php -text
 templates/tiki-history_sheets.tpl -text
 templates/tiki-ical.tpl -text
 templates/tiki-import-sheets.tpl -text
