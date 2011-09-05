@@ -1401,6 +1401,7 @@ installer/schema/20110413_blog_post_priv_default_value_tiki.sql -text
 installer/schema/20110610_readd_sefurl_index_left_tiki.php -text
 installer/schema/20110615_structure_alias_tiki.sql -text
 installer/schema/20110808_tracker_tiki.sql -text
+installer/schema/20110905_multibyte_lc_fix_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
 installer/shell.php -text
@@ -1711,6 +1712,7 @@ lib/core/TikiDb/ErrorHandler.php -text
 lib/core/TikiDb/Exception.php -text
 lib/core/TikiDb/MasterSlaveDispatch.php -text
 lib/core/TikiDb/Pdo.php -text
+lib/core/TikiDb/Table.php -text
 lib/core/TikiFilter.php -text
 lib/core/TikiFilter/AttributeType.php -text
 lib/core/TikiFilter/Callback.php -text
