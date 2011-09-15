@@ -12,7 +12,7 @@ CREATE TABLE `tiki_user_bookmarks_folders` (
 */
 
 /* 
-MyISAM FULLTEXT indexing 
+MyISAM FULLTEXT indexing -> moved to tiki_myisam.sql, which is run after tiki.sql if MyISAM is installed
 CREATE FULLTEXT INDEX ft_articles ON tiki_articles(`title`, `heading`, `body`);
 CREATE FULLTEXT INDEX ft_blog_posts ON tiki_blog_posts(`data`, `title`);
 CREATE FULLTEXT INDEX ft_blogs ON tiki_blogs(`title`, `description`);
