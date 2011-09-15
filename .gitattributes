@@ -3082,6 +3082,7 @@ lib/wiki-plugins/wikiplugin_pluginmanager.php -text
 lib/wiki-plugins/wikiplugin_poll.php -text
 lib/wiki-plugins/wikiplugin_profile.php -text
 lib/wiki-plugins/wikiplugin_proposal.php -text
+lib/wiki-plugins/wikiplugin_quiz.php -text
 lib/wiki-plugins/wikiplugin_quote.php -text
 lib/wiki-plugins/wikiplugin_randominclude.php -text
 lib/wiki-plugins/wikiplugin_rcontent.php -text
@@ -4867,6 +4868,7 @@ templates/wiki-plugins/wikiplugin_memberlist.tpl -text
 templates/wiki-plugins/wikiplugin_memberpayment.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
+templates/wiki-plugins/wikiplugin_quiz.tpl -text
 templates/wiki-plugins/wikiplugin_rss.tpl -text
 templates/wiki-plugins/wikiplugin_snarf.tpl -text
 templates/wiki-plugins/wikiplugin_stat.tpl -text
