@@ -1997,6 +1997,7 @@ lib/core/Tracker/Field/Category.php -text
 lib/core/Tracker/Field/Checkbox.php -text
 lib/core/Tracker/Field/Computed.php -text
 lib/core/Tracker/Field/CountrySelector.php -text
+lib/core/Tracker/Field/Currency.php -text
 lib/core/Tracker/Field/DateTime.php -text
 lib/core/Tracker/Field/Dropdown.php -text
 lib/core/Tracker/Field/DynamicList.php -text
@@ -3030,7 +3031,6 @@ lib/smarty_tiki/modifier.avatarize.php -text
 lib/smarty_tiki/modifier.breakline.php -text
 lib/smarty_tiki/modifier.compactisodate.php -text
 lib/smarty_tiki/modifier.countryflag.php -text
-lib/smarty_tiki/modifier.currency.php -text
 lib/smarty_tiki/modifier.dbg.php -text
 lib/smarty_tiki/modifier.div.php -text
 lib/smarty_tiki/modifier.duration.php -text
@@ -3233,8 +3233,10 @@ lib/test/core/include_non_autoload_compatible_classes.php -text
 lib/test/core/phpunit.xml -text
 lib/test/editlib/EditLibTest.php -text
 lib/test/editlib/ParseToWiki_CharacterTest.php -text
+lib/test/editlib/ParseToWiki_ListTest.php -text
 lib/test/editlib/ParseToWiki_TextTest.php -text
 lib/test/editlib/ParseToWysiwyg_CharacterTest.php -text
+lib/test/editlib/ParseToWysiwyg_ListTest.php -text
 lib/test/editlib/ParseToWysiwyg_TextTest.php -text
 lib/test/editlib/index.php -text
 lib/test/freetag/FreetagTest.php -text
@@ -3800,6 +3802,7 @@ pics/icons/arrow_turn_left.png -text
 pics/icons/arrow_undo.png -text
 pics/icons/assign.png -text
 pics/icons/attach.png -text
+pics/icons/ban_remove.png -text
 pics/icons/basket.png -text
 pics/icons/basket_put.png -text
 pics/icons/basket_remove.png -text
@@ -5492,6 +5495,7 @@ templates/trackerinput/url.tpl -text
 templates/trackerinput/userpreference.tpl -text
 templates/trackerinput/usersubscription.tpl -text
 templates/trackeroutput/computed.tpl -text
+templates/trackeroutput/currency.tpl -text
 templates/trackeroutput/files.tpl -text
 templates/trackeroutput/freetags.tpl -text
 templates/trackeroutput/itemslist.tpl -text
