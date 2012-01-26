@@ -1,6 +1,6 @@
 * text=auto !eol
-/README -text
 old_ver_2_clean/INSTALL -text
+old_ver_2_clean/README -text
 old_ver_2_clean/_htaccess -text
 old_ver_2_clean/about.php -text
 old_ver_2_clean/antibot.php -text
@@ -3944,6 +3944,15 @@ old_ver_2_clean/pics/prev.gif -text
 old_ver_2_clean/pics/trans.png -text
 old_ver_2_clean/plugins_help.php -text
 old_ver_2_clean/poll_categorize.php -text
+old_ver_2_clean/received_article_image.php -text
+old_ver_2_clean/register_ajax.php -text
+old_ver_2_clean/reindex_file.php -text
+old_ver_2_clean/remote.php -text
+old_ver_2_clean/robots.txt -text
+old_ver_2_clean/select_banner.php -text
+old_ver_2_clean/setup.sh -text
+old_ver_2_clean/show_image.php -text
+old_ver_2_clean/snarf_ajax.php -text
 old_ver_2_clean/styles/BiDi/BiDi.css -text
 old_ver_2_clean/styles/BiDi/index.php -text
 old_ver_2_clean/styles/abse/abse.png -text svneol=unset#image/png
@@ -5140,15 +5149,6 @@ old_ver_2_clean/tiki_tests/tiki-tests_replay.php -text
 old_ver_2_clean/tiki_tests/tiki-tests_show_xpath.php -text
 old_ver_2_clean/tiki_tests/tikitestslib.php -text
 old_ver_2_clean/whelp/index.php -text
-/received_article_image.php -text
-/register_ajax.php -text
-/reindex_file.php -text
-/remote.php -text
-/robots.txt -text
-/select_banner.php -text
-/setup.sh -text
-/show_image.php -text
-/snarf_ajax.php -text
 /tiki-accounting.php -text
 /tiki-accounting_account.php -text
 /tiki-accounting_books.php -text
