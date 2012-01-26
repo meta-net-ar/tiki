@@ -1,17 +1,6 @@
 * text=auto !eol
 /INSTALL -text
 /README -text
-/changelog.txt -text
-/comments.php -text
-/commxmlrpc.php -text
-/contribution.php -text
-/copyright.txt -text
-/copyrights.php -text
-/display_banner.php -text
-/favicon.ico -text
-/favicon.png -text
-/fgal_listing_conf.php -text
-/freetag_apply.php -text
 /freetag_list.php -text
 /get_strings.php -text
 /help.php -text
@@ -40,6 +29,12 @@ old_ver_2_clean/banner_click.php -text
 old_ver_2_clean/banner_image.php -text
 old_ver_2_clean/categorize.php -text
 old_ver_2_clean/categorize_list.php -text
+old_ver_2_clean/changelog.txt -text
+old_ver_2_clean/comments.php -text
+old_ver_2_clean/commxmlrpc.php -text
+old_ver_2_clean/contribution.php -text
+old_ver_2_clean/copyright.txt -text
+old_ver_2_clean/copyrights.php -text
 old_ver_2_clean/css/admin.css -text
 old_ver_2_clean/css/calendar-print.css -text
 old_ver_2_clean/css/calendar.css -text
@@ -61,6 +56,7 @@ old_ver_2_clean/db/tiki_1.8to1.9.sql -text
 old_ver_2_clean/db/tiki_1.9to2.0.sql -text
 old_ver_2_clean/db/tiki_2.0to3.0.sql -text
 old_ver_2_clean/db/web.config -text
+old_ver_2_clean/display_banner.php -text
 old_ver_2_clean/doc/devtools/.htaccess -text
 old_ver_2_clean/doc/devtools/README.txt -text
 old_ver_2_clean/doc/devtools/add1tiki2multi.py -text
@@ -130,12 +126,16 @@ old_ver_2_clean/doc/readme.txt -text
 old_ver_2_clean/doc/stable.version -text
 old_ver_2_clean/doc/unstable.version -text
 old_ver_2_clean/dump/index.php -text
+old_ver_2_clean/favicon.ico -text
+old_ver_2_clean/favicon.png -text
+old_ver_2_clean/fgal_listing_conf.php -text
 old_ver_2_clean/files/ZeroClipboard.swf -text
 old_ver_2_clean/files/index.php -text
 old_ver_2_clean/files/templates/index.php -text
 old_ver_2_clean/files/templates/listpages/index.php -text
 old_ver_2_clean/files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 old_ver_2_clean/files/test.swf -text
+old_ver_2_clean/freetag_apply.php -text
 old_ver_2_clean/images/.htaccess -text
 old_ver_2_clean/images/a_pixel.gif -text
 old_ver_2_clean/images/barre.gif -text
