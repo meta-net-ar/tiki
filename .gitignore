@@ -9,10 +9,6 @@
 /ZendPlatform
 /ZendStudioServer
 /_htaccess
-db/.htaccess
-db/local.php
-db/lock
-db/virtuals.inc
 /dummy.php
 dump/*
 files/visorFreemind.swf
@@ -36,6 +32,10 @@ modules/cache
 modules/cache/*
 /nbproject
 old_ver_2_clean/backups/*
+old_ver_2_clean/db/.htaccess
+old_ver_2_clean/db/local.php
+old_ver_2_clean/db/lock
+old_ver_2_clean/db/virtuals.inc
 /phpmyadmin
 /project.index
 /svn-commit.tmp
