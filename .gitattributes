@@ -1,12 +1,6 @@
 * text=auto !eol
 /INSTALL -text
 /README -text
-/antibot.php -text
-/article_image.php -text
-/banner_click.php -text
-/banner_image.php -text
-/categorize.php -text
-/categorize_list.php -text
 /changelog.txt -text
 /comments.php -text
 /commxmlrpc.php -text
@@ -38,8 +32,14 @@
 /modsadm.php -text
 old_ver_2_clean/_htaccess -text
 old_ver_2_clean/about.php -text
+old_ver_2_clean/antibot.php -text
+old_ver_2_clean/article_image.php -text
 old_ver_2_clean/backups/README -text
 old_ver_2_clean/backups/index.php -text
+old_ver_2_clean/banner_click.php -text
+old_ver_2_clean/banner_image.php -text
+old_ver_2_clean/categorize.php -text
+old_ver_2_clean/categorize_list.php -text
 old_ver_2_clean/css/admin.css -text
 old_ver_2_clean/css/calendar-print.css -text
 old_ver_2_clean/css/calendar.css -text
