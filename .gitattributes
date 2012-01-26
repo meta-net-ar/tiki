@@ -1,14 +1,5 @@
 * text=auto !eol
 /README -text
-/messu-broadcast.php -text
-/messu-compose.php -text
-/messu-mailbox.php -text
-/messu-read.php -text
-/messu-read_archive.php -text
-/messu-read_sent.php -text
-/messu-sent.php -text
-/metrics-tab.php -text
-/modsadm.php -text
 old_ver_2_clean/INSTALL -text
 old_ver_2_clean/_htaccess -text
 old_ver_2_clean/about.php -text
@@ -3339,6 +3330,15 @@ old_ver_2_clean/list-file_backlinks_ajax.php -text
 old_ver_2_clean/list-tracker_field_values_ajax.php -text
 old_ver_2_clean/maps/index.php -text
 old_ver_2_clean/messu-archive.php -text
+old_ver_2_clean/messu-broadcast.php -text
+old_ver_2_clean/messu-compose.php -text
+old_ver_2_clean/messu-mailbox.php -text
+old_ver_2_clean/messu-read.php -text
+old_ver_2_clean/messu-read_archive.php -text
+old_ver_2_clean/messu-read_sent.php -text
+old_ver_2_clean/messu-sent.php -text
+old_ver_2_clean/metrics-tab.php -text
+old_ver_2_clean/modsadm.php -text
 old_ver_2_clean/modules/.htaccess -text
 old_ver_2_clean/modules/cache/README -text
 old_ver_2_clean/modules/cache/index.php -text
@@ -3942,6 +3942,8 @@ old_ver_2_clean/pics/noavatar.png -text
 old_ver_2_clean/pics/overlay-disabled_item.png -text
 old_ver_2_clean/pics/prev.gif -text
 old_ver_2_clean/pics/trans.png -text
+old_ver_2_clean/plugins_help.php -text
+old_ver_2_clean/poll_categorize.php -text
 old_ver_2_clean/styles/BiDi/BiDi.css -text
 old_ver_2_clean/styles/BiDi/index.php -text
 old_ver_2_clean/styles/abse/abse.png -text svneol=unset#image/png
@@ -5138,8 +5140,6 @@ old_ver_2_clean/tiki_tests/tiki-tests_replay.php -text
 old_ver_2_clean/tiki_tests/tiki-tests_show_xpath.php -text
 old_ver_2_clean/tiki_tests/tikitestslib.php -text
 old_ver_2_clean/whelp/index.php -text
-/plugins_help.php -text
-/poll_categorize.php -text
 /received_article_image.php -text
 /register_ajax.php -text
 /reindex_file.php -text
