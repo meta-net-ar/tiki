@@ -1,7 +1,6 @@
 * text=auto !eol
 /INSTALL -text
 /README -text
-/about.php -text
 /antibot.php -text
 /article_image.php -text
 /banner_click.php -text
@@ -38,6 +37,7 @@
 /metrics-tab.php -text
 /modsadm.php -text
 old_ver_2_clean/_htaccess -text
+old_ver_2_clean/about.php -text
 old_ver_2_clean/backups/README -text
 old_ver_2_clean/backups/index.php -text
 old_ver_2_clean/css/admin.css -text
