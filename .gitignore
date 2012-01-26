@@ -9,7 +9,6 @@
 /ZendPlatform
 /ZendStudioServer
 /_htaccess
-backups/*
 db/.htaccess
 db/local.php
 db/lock
@@ -36,6 +35,7 @@ modules/.htaccess
 modules/cache
 modules/cache/*
 /nbproject
+old_ver_2_clean/backups/*
 /phpmyadmin
 /project.index
 /svn-commit.tmp

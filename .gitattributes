@@ -5,8 +5,6 @@
 /about.php -text
 /antibot.php -text
 /article_image.php -text
-backups/README -text
-backups/index.php -text
 /banner_click.php -text
 /banner_image.php -text
 /categorize.php -text
@@ -3467,6 +3465,8 @@ modules/mod-func-youtube.php -text
 modules/mod-func-zotero.php -text
 modules/mod-last_youtube_playlist_videos.php -text
 modules/web.config -text
+old_ver_2_clean/backups/README -text
+old_ver_2_clean/backups/index.php -text
 pics/help_icon.png -text
 pics/icons/accept.png -text
 pics/icons/add.png -text
