@@ -10,13 +10,6 @@
 /ZendStudioServer
 /_htaccess
 /dummy.php
-files/visorFreemind.swf
-images/.htaccess
-img/.htaccess
-img/trackers/*
-img/wiki/*.gif
-img/wiki/*.pad_xml
-img/wiki_up/*
 installer/.htaccess
 lang/.htaccess
 /last.log
@@ -36,6 +29,13 @@ old_ver_2_clean/db/local.php
 old_ver_2_clean/db/lock
 old_ver_2_clean/db/virtuals.inc
 old_ver_2_clean/dump/*
+old_ver_2_clean/files/visorFreemind.swf
+old_ver_2_clean/images/.htaccess
+old_ver_2_clean/img/.htaccess
+old_ver_2_clean/img/trackers/*
+old_ver_2_clean/img/wiki/*.gif
+old_ver_2_clean/img/wiki/*.pad_xml
+old_ver_2_clean/img/wiki_up/*
 /phpmyadmin
 /project.index
 /svn-commit.tmp
