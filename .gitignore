@@ -10,7 +10,6 @@
 /ZendStudioServer
 /_htaccess
 /dummy.php
-dump/*
 files/visorFreemind.swf
 images/.htaccess
 img/.htaccess
@@ -36,6 +35,7 @@ old_ver_2_clean/db/.htaccess
 old_ver_2_clean/db/local.php
 old_ver_2_clean/db/lock
 old_ver_2_clean/db/virtuals.inc
+old_ver_2_clean/dump/*
 /phpmyadmin
 /project.index
 /svn-commit.tmp
