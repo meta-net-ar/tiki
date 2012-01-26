@@ -1,15 +1,5 @@
 * text=auto !eol
-/INSTALL -text
 /README -text
-/freetag_list.php -text
-/get_strings.php -text
-/help.php -text
-/htaccess.sh -text
-/index.php -text
-/license.txt -text
-/list-file_backlinks_ajax.php -text
-/list-tracker_field_values_ajax.php -text
-/messu-archive.php -text
 /messu-broadcast.php -text
 /messu-compose.php -text
 /messu-mailbox.php -text
@@ -19,6 +9,7 @@
 /messu-sent.php -text
 /metrics-tab.php -text
 /modsadm.php -text
+old_ver_2_clean/INSTALL -text
 old_ver_2_clean/_htaccess -text
 old_ver_2_clean/about.php -text
 old_ver_2_clean/antibot.php -text
@@ -136,6 +127,10 @@ old_ver_2_clean/files/templates/listpages/index.php -text
 old_ver_2_clean/files/templates/listpages/smarty-tikiwiki-1.0-shortlist.txt -text
 old_ver_2_clean/files/test.swf -text
 old_ver_2_clean/freetag_apply.php -text
+old_ver_2_clean/freetag_list.php -text
+old_ver_2_clean/get_strings.php -text
+old_ver_2_clean/help.php -text
+old_ver_2_clean/htaccess.sh -text
 old_ver_2_clean/images/.htaccess -text
 old_ver_2_clean/images/a_pixel.gif -text
 old_ver_2_clean/images/barre.gif -text
@@ -1116,6 +1111,7 @@ old_ver_2_clean/img/wiki/README -text
 old_ver_2_clean/img/wiki/index.php -text
 old_ver_2_clean/img/wiki_up/README -text
 old_ver_2_clean/img/wiki_up/index.php -text
+old_ver_2_clean/index.php -text
 old_ver_2_clean/installer/.htaccess -text
 old_ver_2_clean/installer/index.php -text
 old_ver_2_clean/installer/installlib.php -text
@@ -3338,7 +3334,11 @@ old_ver_2_clean/lib/xmlrpc.inc -text
 old_ver_2_clean/lib/xmlrpcs.inc -text
 old_ver_2_clean/lib/ziplib.php -text
 old_ver_2_clean/lib/zoterolib.php -text
+old_ver_2_clean/license.txt -text
+old_ver_2_clean/list-file_backlinks_ajax.php -text
+old_ver_2_clean/list-tracker_field_values_ajax.php -text
 old_ver_2_clean/maps/index.php -text
+old_ver_2_clean/messu-archive.php -text
 old_ver_2_clean/modules/.htaccess -text
 old_ver_2_clean/modules/cache/README -text
 old_ver_2_clean/modules/cache/index.php -text
