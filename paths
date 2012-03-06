@@ -1,13 +1,13 @@
-A
+M
 dir
-/third_party/rangy
+/trunk/lib
 
 
 
 
-A
+D
 dir
-/third_party/rangy/uncompressed
+/trunk/lib/rangy
 
 
 
