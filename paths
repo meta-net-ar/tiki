@@ -1,20 +1,20 @@
 A
 dir
-/branches/8.x/lib/phpsec
+/branches/6.x/lib/phpsec
 /branches/9.x/lib/phpsec
 41177
 
 
 R
 dir
-/branches/8.x/lib/phpsec/phpsec
+/branches/6.x/lib/phpsec/phpsec
 /branches/9.x/lib/phpsec/phpsec
 41177
 
 
 M
 dir
-/branches/8.x
+/branches/6.x
 
 
 
