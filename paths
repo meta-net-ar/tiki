@@ -1,6 +1,13 @@
 A
 dir
-/trunk/lib/jcapture_tiki
+/trunk/lib/core/Services/JCapture
+
+
+
+
+A
+dir
+/trunk/templates/jcapture
 
 
 
