@@ -30,6 +30,397 @@ Version 10.0
 ------------------
 
 ----------------------------------------------
+r44320 | jonnybradley | 2012-12-19 17:44:24 +0100 (Wed 19 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: modules plugin was still getting double-quoted in some cases, so remove here to cover all situations (thanks arildb)
+----------------------------------------------
+r44318 | jonnybradley | 2012-12-19 17:20:47 +0100 (Wed 19 Dec 2012) | 1 ligne
+
+[FIX] trackers: Truncate textarea values in list mode if listmax is set (removes html tags first - TODO including formatting one day)
+----------------------------------------------
+r44317 | jonnybradley | 2012-12-19 16:55:01 +0100 (Wed 19 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Insert plugin code with a span instead of a <pre> block to stop extra paragraphs appearing as you edit plugins
+----------------------------------------------
+r44316 | jonnybradley | 2012-12-19 16:41:15 +0100 (Wed 19 Dec 2012) | 2 lignes
+
+[FIX] wysiwyg: Reparsing after double-click-editing a plugin was causing any modules plugins' quotes to duplicate.
+Happening because the data was getting converted to html twice but, for some reason, only affecting {modules} (thanks to many)
+----------------------------------------------
+r44315 | jonnybradley | 2012-12-19 15:56:48 +0100 (Wed 19 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Tracker plugin causes ckeditor to fail, quick fix adding it to the "don't preview" list for now
+----------------------------------------------
+r44308 | jonnybradley | 2012-12-18 18:19:06 +0100 (Tue 18 Dec 2012) | 1 ligne
+
+[FIX] mobile: Don't cache mobile module as it needs to remake the link to the current page each time. Should fix spurious urls being picked up here when anon (thanks marclaporte)
+----------------------------------------------
+r44307 | jonnybradley | 2012-12-18 18:05:42 +0100 (Tue 18 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Rollback r43905 which html decoded all plugin data, seems not to be required anymore (presumably due to fixes upstream) and was now breaking {files} plugin and probably others (thanks arildb)
+----------------------------------------------
+r44305 | jonnybradley | 2012-12-18 16:16:21 +0100 (Tue 18 Dec 2012) | 2 lignes
+
+[FIX] LDAP: Check auth_method is actually LDAP before running ldap_sync_user_and_groups - which made it impossible for anyone other than admin to login etc.
+Also, moved those prefs into one of the LDAP tabs as they are for LDAP. Wording needs improving by someone who understands what they do (thanks RobertPlummer)
+----------------------------------------------
+r44303 | jonnybradley | 2012-12-18 15:40:44 +0100 (Tue 18 Dec 2012) | 1 ligne
+
+[FIX] trackers: Make mandatory category fields work again. Leaving dead code commented out there as a reminder to remove it (and the fn that generates it probably) after 10.0 release
+----------------------------------------------
+r44302 | jonnybradley | 2012-12-17 21:24:37 +0100 (Mon 17 Dec 2012) | 1 ligne
+
+[FIX] trackers: Change heading on tracker structure import as it does not take CSV data. Added a (hopefully) clarifying note (thanks Arild)
+----------------------------------------------
+r44292 | jonnybradley | 2012-12-17 13:19:29 +0100 (Mon 17 Dec 2012) | 1 ligne
+
+[FIX] Replace serialize/unserialize_calls on input with json encode/decode where appropriate, removed some others (thanks for the continued help on this Egix)
+----------------------------------------------
+r44284 | changi67 | 2012-12-14 21:22:22 +0100 (Fri 14 Dec 2012) | 1 ligne
+
+[FIX] Use http instead of https to avoid authentication
+----------------------------------------------
+r44282 | changi67 | 2012-12-14 21:19:12 +0100 (Fri 14 Dec 2012) | 1 ligne
+
+[FIX] Point on the new repository
+----------------------------------------------
+r44278 | jonnybradley | 2012-12-14 16:55:48 +0100 (Fri 14 Dec 2012) | 1 ligne
+
+Update experimental svg-edit external library to current revision as there are lots of fixes in there for us (thanks marclaporte)
+----------------------------------------------
+r44266 | jonnybradley | 2012-12-12 19:36:14 +0100 (Wed 12 Dec 2012) | 1 ligne
+
+[FIX] comments: Use the "on" event handler instead of "live" which was deprecated (ages ago)
+----------------------------------------------
+r44265 | jonnybradley | 2012-12-12 19:26:42 +0100 (Wed 12 Dec 2012) | 1 ligne
+
+[FIX] comments: Remove previous comment form when opening a new one, confusing to have multiple textareas (thanks Bsfez)
+----------------------------------------------
+r44264 | jonnybradley | 2012-12-12 17:39:22 +0100 (Wed 12 Dec 2012) | 1 ligne
+
+[FIX] maps: Set numZoomLevels for google maps so you can zoom in further (thanks marclaporte)
+----------------------------------------------
+r44256 | changi67 | 2012-12-11 21:25:10 +0100 (Tue 11 Dec 2012) | 7 lignes
+
+r44256 | jonnybradley | 2012-12-11 18:09:15 +0100 (Tue 11 Dec 2012) | 1 ligne
+Chemins modifiés :
+   M /branches/10.x/tests/testfile.txt
+
+	test on old repo - shouldn't work...
+
+
+----------------------------------------------
+r44255 | jonnybradley | 2012-12-11 18:55:25 +0100 (Tue 11 Dec 2012) | 1 ligne
+
+test on new repo - should work...
+----------------------------------------------
+r44243 | changi67 | 2012-12-11 11:39:43 +0100 (Tue 11 Dec 2012) | 8 lignes
+
+Revision: 44243
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44243&view=rev
+			 Author:   marclaporte
+			 Date:     2012-12-10 23:46:06 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 PHPIDS integration: Reducing expectation of a feature which is not ready yet
+
+----------------------------------------------
+r44235 | changi67 | 2012-12-11 11:26:29 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+Revision: 44235
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44235&view=rev
+			 Author:   jonnybradley
+			 Date:     2012-12-10 20:16:14 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] jcapture: Record capture user in file gallery
+
+
+----------------------------------------------
+r44233 | changi67 | 2012-12-11 11:22:17 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+Revision: 44233
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44233&view=rev
+			 Author:   lphuberdeau
+			 Date:     2012-12-10 18:48:39 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] Missing _tiki patch suffix
+
+
+----------------------------------------------
+r44232 | changi67 | 2012-12-11 11:21:31 +0100 (Tue 11 Dec 2012) | 8 lignes
+
+Revision: 44232
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44232&view=rev
+			 Author:   ohertel
+			 Date:     2012-12-10 18:36:30 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [fix] add missing index on moduleId on table tiki_user_assigned_modules
+
+----------------------------------------------
+r44231 | changi67 | 2012-12-11 11:20:46 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+Revision: 44231
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44231&view=rev
+			 Author:   lphuberdeau
+			 Date:     2012-12-10 18:34:31 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] Missing translation
+
+
+----------------------------------------------
+r44230 | changi67 | 2012-12-11 11:19:58 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+Revision: 44230
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44230&view=rev
+			 Author:   jonnybradley
+			 Date:     2012-12-10 17:57:53 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] forums: Fix database error following more than one report of a forum post (thanks nkoth)
+
+
+----------------------------------------------
+r44229 | changi67 | 2012-12-11 11:19:20 +0100 (Tue 11 Dec 2012) | 8 lignes
+
+Revision: 44229
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44229&view=rev
+			 Author:   jonnybradley
+			 Date:     2012-12-10 17:47:16 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] forums: Author info icons span was breaking containing span "simplebox"
+
+----------------------------------------------
+r44228 | changi67 | 2012-12-11 11:18:38 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+r44228 | lphuberdeau | 2012-12-10 18:35:30 +0100 (Mon 10 Dec 2012) | 1 ligne
+Chemins modifiés :
+   M /branches/10.x/lib/tikilib.php
+	M /branches/10.x/lib/userprefs/userprefslib.php
+   M /branches/10.x/tiki-show_user_avatar.php
+
+[FIX] User avatar performance issue caused by tiki calling itself
+
+
+----------------------------------------------
+r44227 | changi67 | 2012-12-11 11:17:03 +0100 (Tue 11 Dec 2012) | 9 lignes
+
+Revision: 44227
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44227&view=rev
+			 Author:   jonnybradley
+			 Date:     2012-12-10 14:15:25 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] kaltura: remove causes "Bad NPObject as private data!" error in Firefox - detach then replace seems to work
+
+
+----------------------------------------------
+r44225 | changi67 | 2012-12-11 11:15:07 +0100 (Tue 11 Dec 2012) | 8 lignes
+
+Revision: 44225
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44225&view=rev
+			 Author:   lphuberdeau
+			 Date:     2012-12-10 13:44:09 +0000 (Mon, 10 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX]?\194?\160Inappropriate filter prevents from entering -1 as the max
+
+----------------------------------------------
+r44224 | changi67 | 2012-12-11 11:14:03 +0100 (Tue 11 Dec 2012) | 8 lignes
+
+Revision: 44224
+          http://tikiwiki.svn.sourceforge.net/tikiwiki/?rev=44224&view=rev
+			 Author:   jonnybradley
+			 Date:     2012-12-09 17:15:47 +0000 (Sun, 09 Dec 2012)
+			 Log Message:
+			 -----------
+			 [FIX] graph-engine: Strict abstract param compatibility
+
+----------------------------------------------
+r44213 | jonnybradley | 2012-12-07 18:53:45 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Only remove last empty p tag on saving. Seems to work as an extra one appears from somewhere else (thanks Geoff)
+----------------------------------------------
+r44212 | jonnybradley | 2012-12-07 18:10:26 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[FIX] tabs: Fix "no tabs" mode on editpage (thanks luciash)
+----------------------------------------------
+r44211 | jonnybradley | 2012-12-07 17:50:46 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[FIX] multilingual: Only do getTranslations on supported types - was breaking blogs when using category_i18n_sync (thanks fabricius, found it at last! :)
+----------------------------------------------
+r44210 | jyhem | 2012-12-07 17:45:53 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[FIX][bp/44208] Prevent browser autocompletion so sensitive info is not stored by mistake
+----------------------------------------------
+r44207 | ohertel | 2012-12-07 16:38:47 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[fix] avoid error message when table check fails
+----------------------------------------------
+r44206 | jonnybradley | 2012-12-07 16:37:49 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[FIX] parser: Saving options before plugin execution is required after all as some (trackerlist for instance) resets them and so were breaking in wysiwyg edit - r41705 repair continues... (thanks Geoff)
+----------------------------------------------
+r44205 | jonnybradley | 2012-12-07 16:13:38 +0100 (Fri 07 Dec 2012) | 2 lignes
+
+[FIX] parser: Reset parserlib options after using context_format (also remove unused globals & include)
+Should fix pages such as tiki.org/Stats (where rss and wikiplugin smarty in modules included in a page via a plugin broke almost all other plugins following it) Thanks marclaporte
+----------------------------------------------
+r44203 | arildb | 2012-12-07 14:52:34 +0100 (Fri 07 Dec 2012) | 1 ligne
+
+[bp/r44202][FIX] missing $_SERVER['REQUEST_URI'] on IIS 6
+----------------------------------------------
+r44201 | jonnybradley | 2012-12-06 16:37:22 +0100 (Thu 06 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Remove built-in ckeditor "image properties" context menu option as it appears for tiki plugins which can lead to the plugin being corrupted.
+----------------------------------------------
+r44200 | jonnybradley | 2012-12-06 16:06:25 +0100 (Thu 06 Dec 2012) | 1 ligne
+
+[FIX] wysiwyg: Add a space in front of (or after) a plugin if it's the first (or last) thing on the page when not in html mode. Prevents the caret being stuck inside the plugin making it impossible to add new lines or text.
+----------------------------------------------
+r44197 | marclaporte | 2012-12-06 08:17:57 +0100 (Thu 06 Dec 2012) | 1 ligne
+
+Partial revert of r42708. Now that :: is no longer expropriated as a namespace separator (we are using :_: instead), there is no longer a need to change the several years old syntax for centered text. This was already done for the the Jison parser in r44111
+----------------------------------------------
+r44195 | jonnybradley | 2012-12-05 12:38:59 +0100 (Wed 05 Dec 2012) | 1 ligne
+
+[FIX] kaltura: Enable upload wizard dialog to open more than once
+----------------------------------------------
+r44184 | ohertel | 2012-12-03 21:47:41 +0100 (Mon 03 Dec 2012) | 1 ligne
+
+[fix] typo
+----------------------------------------------
+r44182 | lphuberdeau | 2012-12-03 21:08:49 +0100 (Mon 03 Dec 2012) | 1 ligne
+
+[FIX] Wrong preference check to select the search implementation, also include appropriate filter for forum posts
+----------------------------------------------
+r44180 | lphuberdeau | 2012-12-03 20:07:04 +0100 (Mon 03 Dec 2012) | 1 ligne
+
+[FIX] Speeding up RSS feed - poor implementation caused extreme slowness on sites with many posts, function renamed to break past expectations
+----------------------------------------------
+r44179 | lphuberdeau | 2012-12-03 19:47:50 +0100 (Mon 03 Dec 2012) | 1 ligne
+
+[FIX] Remove hand written service URLs
+----------------------------------------------
+r44174 | lphuberdeau | 2012-12-03 14:39:59 +0100 (Mon 03 Dec 2012) | 1 ligne
+
+[FIX] Flagged revision approval was not in action log
+----------------------------------------------
+r44165 | yonixxx | 2012-12-02 14:49:28 +0100 (Sun 02 Dec 2012) | 1 ligne
+
+[TRA]hebrew translation
+----------------------------------------------
+r44164 | yonixxx | 2012-12-02 14:48:40 +0100 (Sun 02 Dec 2012) | 1 ligne
+
+[TRA]Making default install theme work also fine if  rtl language is selected
+----------------------------------------------
+r44160 | yonixxx | 2012-12-01 20:13:43 +0100 (Sat 01 Dec 2012) | 1 ligne
+
+[TRA]Hebrew language so most of a default install look ok
+----------------------------------------------
+r44159 | yonixxx | 2012-12-01 20:10:23 +0100 (Sat 01 Dec 2012) | 1 ligne
+
+[FIX]Punctuation fix
+----------------------------------------------
+r44158 | yonixxx | 2012-12-01 20:08:15 +0100 (Sat 01 Dec 2012) | 1 ligne
+
+[ENH]Fivealive is now default theme for BiDi as it should be
+----------------------------------------------
+r44157 | yonixxx | 2012-12-01 19:59:53 +0100 (Sat 01 Dec 2012) | 1 ligne
+
+[FIX]Fivealive is now default theme for BiDi to graphics
+----------------------------------------------
+r44156 | yonixxx | 2012-12-01 19:46:16 +0100 (Sat 01 Dec 2012) | 1 ligne
+
+[FIX]Fivealive is now default theme for BiDi to handle rtl languages
+----------------------------------------------
+r44140 | nkoth | 2012-11-30 03:33:00 +0100 (Fri 30 Nov 2012) | 1 ligne
+
+[FIX] Refix just to be safe to avoid any change in execution order in untested case: Use categories in templates  was broken (working in 9.x)
+----------------------------------------------
+r44139 | nkoth | 2012-11-30 03:30:30 +0100 (Fri 30 Nov 2012) | 1 ligne
+
+[FIX] Use categories in templates  was broken (working in 9.x)
+----------------------------------------------
+r44135 | arildb | 2012-11-29 23:40:49 +0100 (Thu 29 Nov 2012) | 4 lignes
+
+[bp/r44104,r44119] Namespace setting changes
+[DOC] Improved doc for setting the namespace separator
+[NEW] Add link to "Center text using ::: instead of ::" option 
+[NEW] Add link to "Page name display stripper:" option 
+----------------------------------------------
+r44121 | jonnybradley | 2012-11-29 13:21:27 +0100 (Thu 29 Nov 2012) | 1 ligne
+
+[FIX] search: Fix check for other rebuild process when running via sudo (as search/shell.php then appears twice in the process list)
+----------------------------------------------
+r44118 | arildb | 2012-11-28 23:43:08 +0100 (Wed 28 Nov 2012) | 6 lignes
+
+[FIX] Use :_: as namespace separator.
+:+: causes error when creating new page with a namespace prefix... 
+Edit: ns:+:ns test
+errorsInvalid page name
+The page name specified contains unallowed characters. 
+It will not be possible to save the page until those are removed: /?#[]@$&+;=<> 
+----------------------------------------------
+r44117 | arildb | 2012-11-28 22:31:06 +0100 (Wed 28 Nov 2012) | 1 ligne
+
+[bp/r44114][FIX] Only attempt to copy namespace from structure parent page, if there is a parent page
+----------------------------------------------
+r44113 | jonnybradley | 2012-11-28 19:45:43 +0100 (Wed 28 Nov 2012) | 1 ligne
+
+[FIX] trackers: Set colspan=2 when obeying samerow option on fields
+----------------------------------------------
+r44107 | lphuberdeau | 2012-11-28 00:44:18 +0100 (Wed 28 Nov 2012) | 1 ligne
+
+[MOD] Changing default namespace separator to :+: as per discussions on mailing list, modify multi_explode (used to split plugin arguments) to ignore the characters that are part of the namespace separator, tests were updated to cover the new cases
+----------------------------------------------
+r44106 | lphuberdeau | 2012-11-28 00:41:50 +0100 (Wed 28 Nov 2012) | 1 ligne
+
+[FIX] Small namespaced link rendering issue
+----------------------------------------------
+r44105 | lphuberdeau | 2012-11-28 00:40:40 +0100 (Wed 28 Nov 2012) | 1 ligne
+
+[FIX] Queries should not contain ending semi-colon, which may fail under some configurations
+----------------------------------------------
+r44102 | jonnybradley | 2012-11-27 20:45:54 +0100 (Tue 27 Nov 2012) | 2 lignes
+
+[FIX] parser: rollback r44060 (and 44096) as the plugin issue was fixed elsewhere (probably in r44061).
+Fixes redirect plugin breaking search indexing - thanks (and apologies) to changi.
+----------------------------------------------
+r44101 | robertplummer | 2012-11-27 20:32:09 +0100 (Tue 27 Nov 2012) | 1 ligne
+
+[FIX] Make button compatible with condition base
+----------------------------------------------
+r44100 | arildb | 2012-11-27 20:12:35 +0100 (Tue 27 Nov 2012) | 3 lignes
+
+[bp/r44002][FIX] Fix the all get_faq references. They were not updated when the faq functions were moved out of TikiLib.
+Ref: http://dev.tiki.org/tiki-view_tracker_item.php?itemId=4343#content2
+
+----------------------------------------------
+r44096 | jonnybradley | 2012-11-27 18:34:28 +0100 (Tue 27 Nov 2012) | 1 ligne
+
+[FIX] parser: Move the point where parser options get saved and reset for plugin execution to just before the actual plugin gets run. $this->option gets used in the meantime for $outputFormat calculation etc.
+----------------------------------------------
+r44092 | jonnybradley | 2012-11-27 17:44:44 +0100 (Tue 27 Nov 2012) | 1 ligne
+
+[FIX] timepicker addon depends on jquery_ui so move include inside that block (was breaking mobile)
+----------------------------------------------
+r44091 | fmg-sf | 2012-11-27 16:27:59 +0100 (Tue 27 Nov 2012) | 1 ligne
+
+[ENH] default to exit after executing a command
+----------------------------------------------
+r44089 | fmg-sf | 2012-11-26 22:32:21 +0100 (Mon 26 Nov 2012) | 1 ligne
+
+[FIX] '/etc/os-release' is intended as generic, not meaning 'openSUSE'
+----------------------------------------------
+r44083 | changi67 | 2012-11-26 22:20:56 +0100 (Mon 26 Nov 2012) | 1 ligne
+
+[FIX] Because some time we made mistake, that script is necessary to move from 5 to 6+ and fix tweetId, it was already fix in 6 but with the same name as in 5 so the script was not executed.
+----------------------------------------------
 r44010 | jonnybradley | 2012-11-18 18:35:40 +0100 (Sun, 18 Nov 2012) | 1 line
 
 [FIX] login: Update lastLogin correctly (waiting <> 'a' does not match NULL sadly - thanks Torsten)

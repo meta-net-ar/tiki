@@ -2076,6 +2076,7 @@ installer/schema/20121009_module_search_box_to_search_tiki.sql -text
 installer/schema/20121016_actionlog_comment_text_tiki.sql -text
 installer/schema/20121210_add_missing_index_user_assigned_modules_tiki.sql -text
 installer/schema/20121210_better_forum_reported_index_tiki.sql -text
+installer/schema/20121213_module_zone_enlarge_tiki.sql -text
 installer/schema/999999991_decode_pages_sources_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
@@ -3908,6 +3909,7 @@ lib/smarty_tiki/function.banner.php -text
 lib/smarty_tiki/function.breadcrumbs.php -text
 lib/smarty_tiki/function.button.php -text
 lib/smarty_tiki/function.categoryName.php -text
+lib/smarty_tiki/function.categoryselector.php -text
 lib/smarty_tiki/function.content.php -text
 lib/smarty_tiki/function.cookie.php -text
 lib/smarty_tiki/function.cookie_jar.php -text
@@ -4599,6 +4601,7 @@ lib/wiki-plugins/wikiplugin_memberlist.php -text
 lib/wiki-plugins/wikiplugin_memberpayment.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
+lib/wiki-plugins/wikiplugin_modulelist.php -text
 lib/wiki-plugins/wikiplugin_mono.php -text
 lib/wiki-plugins/wikiplugin_mouseover.php -text
 lib/wiki-plugins/wikiplugin_mwtable.php -text
@@ -5429,6 +5432,7 @@ templates/canonical.tpl -text
 templates/categobjects.tpl -text
 templates/categobjects_title.tpl -text
 templates/categorize.tpl -text
+templates/category/select.tpl -text
 templates/category_related_objects.tpl -text
 templates/category_tree_entry.tpl -text
 templates/categpath.tpl -text
@@ -5693,6 +5697,7 @@ templates/modules/mod-messages_unread_messages.tpl -text
 templates/modules/mod-messages_unread_messages.tpl.nocache -text
 templates/modules/mod-minichat.tpl -text
 templates/modules/mod-mobile.tpl -text
+templates/modules/mod-mobile.tpl.nocache -text
 templates/modules/mod-months_links.tpl -text
 templates/modules/mod-most_commented.tpl -text
 templates/modules/mod-num_submissions.tpl -text
