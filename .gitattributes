@@ -2834,7 +2834,6 @@ lib/core/WikiPlugin/maketoc.php -text
 lib/core/WikiPlugin/oohtml.php -text
 lib/core/WikiPlugin/textlinkbutton.php -text
 lib/core/index.php -text
-lib/core/zf-1.12.1-lib.phar -text svneol=unset#unset
 lib/credits/creditslib.php -text
 lib/credits/index.php -text
 lib/csslib.php -text
