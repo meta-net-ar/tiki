@@ -1,20 +1,20 @@
 M
 dir
-/tags/9.0/lib/test
+/trunk/lib/core
 
 
 
 
 M
 dir
-/tags/9.0/lib
+/trunk/lib
 
 
 
 
 M
 dir
-/tags/9.0/lib/pear
+/trunk
 
 
 
