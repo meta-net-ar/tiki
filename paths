@@ -1,20 +1,27 @@
 M
 dir
-/branches/10.x/lib/test
+/trunk
 
 
 
 
 M
 dir
-/branches/10.x/lib/pear
+/trunk/lib/test
 
 
 
 
 M
 dir
-/branches/10.x/lib
+/trunk/lib/pear
+
+
+
+
+M
+dir
+/trunk/lib
 
 
 
