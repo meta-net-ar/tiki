@@ -1,20 +1,20 @@
 M
 dir
-/tags/10.0/lib/test
+/tags/6.10/lib/pear
 
 
 
 
 M
 dir
-/tags/10.0/lib/pear
+/tags/6.10/lib
 
 
 
 
 M
 dir
-/tags/10.0/lib
+/tags/6.10/lib/ajax
 
 
 
