@@ -5521,6 +5521,7 @@ templates/blog_post_postbody_title.tpl -text
 templates/blog_post_related_content.tpl -text
 templates/blog_post_status.tpl -text
 templates/blog_wrapper.tpl -text
+templates/bootstrap_menu.tpl -text
 templates/browse_file_gallery.tpl -text
 templates/browsedcategory.tpl -text
 templates/calendar.tpl -text
@@ -5600,6 +5601,7 @@ templates/interactive_translation_box.tpl -text
 templates/jcapture/capture.tpl -text
 templates/jcapture/index.php -text
 templates/kaltura/upload.tpl -text
+templates/layout_bootstrap.tpl -text
 templates/layout_classic.tpl -text
 templates/list_file_gallery.tpl -text
 templates/list_file_gallery_content.tpl -text
