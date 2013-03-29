@@ -5601,8 +5601,9 @@ templates/interactive_translation_box.tpl -text
 templates/jcapture/capture.tpl -text
 templates/jcapture/index.php -text
 templates/kaltura/upload.tpl -text
-templates/layout_bootstrap.tpl -text
 templates/layout_classic.tpl -text
+templates/layouts/classic/layout_view.tpl -text
+templates/layouts/sidebar/layout_view.tpl -text
 templates/list_file_gallery.tpl -text
 templates/list_file_gallery_content.tpl -text
 templates/mail/blogs_send_link.tpl -text
