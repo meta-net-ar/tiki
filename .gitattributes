@@ -3971,6 +3971,8 @@ lib/shoutbox/index.php -text
 lib/shoutbox/shoutboxlib.php -text
 lib/simile_tiki/index.php -text
 lib/simile_tiki/tiki-timeline.js -text
+lib/smarty_tiki/block.accordion.php -text
+lib/smarty_tiki/block.accordion_group.php -text
 lib/smarty_tiki/block.add_help.php -text
 lib/smarty_tiki/block.ajax_href.php -text
 lib/smarty_tiki/block.compact.php -text
