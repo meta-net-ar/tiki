@@ -2696,6 +2696,7 @@ lib/core/Tiki/Command/IndexCatchUpCommand.php -text
 lib/core/Tiki/Command/IndexOptimizeCommand.php -text
 lib/core/Tiki/Command/IndexRebuildCommand.php -text
 lib/core/Tiki/Command/InstallCommand.php -text
+lib/core/Tiki/Command/UnavailableCommand.php -text
 lib/core/Tiki/Command/UpdateCommand.php -text
 lib/core/Tiki/Connect/Abstract.php -text
 lib/core/Tiki/Connect/Client.php -text
@@ -5279,6 +5280,7 @@ styles/jqui/options/good.css -text
 styles/jqui/options/good/arrows-005faa.png -text
 styles/jqui/options/good/arrows-ffffff.png -text
 styles/jqui/options/haus.css -text
+styles/jqui/options/horizons.css -text
 styles/jqui/options/index.php -text
 styles/jqui/options/rising.css -text
 styles/jqui/options/rising/arrows-ea2e11.png -text
