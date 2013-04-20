@@ -1,15 +1,8 @@
 D
 dir
-/third_party/jquery/plugins/superfish
+/third_party/jquery/plugins/tablesorter
 
 
-
-
-A
-dir
-/trunk/img/superfish
-/third_party/jquery/plugins/superfish/images
-45617
 
 
 
