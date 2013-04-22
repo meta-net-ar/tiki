@@ -5055,6 +5055,7 @@ styles/jqui/options/good.css -text
 styles/jqui/options/good/arrows-005faa.png -text
 styles/jqui/options/good/arrows-ffffff.png -text
 styles/jqui/options/haus.css -text
+styles/jqui/options/horizons.css -text
 styles/jqui/options/index.php -text
 styles/jqui/options/rising.css -text
 styles/jqui/options/rising/arrows-ea2e11.png -text
@@ -5351,6 +5352,15 @@ templates/error.tpl -text
 templates/error_raw.tpl -text
 templates/error_simple.tpl -text
 templates/error_ticket.tpl -text
+templates/examples/index.php -text
+templates/examples/shop/add_to_cart.tpl -text
+templates/examples/shop/custom_search_form.tpl -text
+templates/examples/shop/index.php -text
+templates/examples/shop/product_ajax.tpl -text
+templates/examples/shop/product_item.tpl -text
+templates/examples/shop/product_list.tpl -text
+templates/examples/shop/product_list_inner.tpl -text
+templates/examples/shop/readme.txt -text
 templates/fgal_attachments.tpl -text
 templates/fgal_context_menu.tpl -text
 templates/fgal_listing_conf.tpl -text
@@ -5696,6 +5706,8 @@ templates/report/index.php -text
 templates/report/load.tpl -text
 templates/report/preview.tpl -text
 templates/report/wikidata.tpl -text
+templates/search_customsearch/customsearch.tpl -text
+templates/search_customsearch/index.php -text
 templates/searchresults-plain.tpl -text
 templates/send_newsletter_footer.tpl -text
 templates/send_newsletter_header.tpl -text
@@ -6114,8 +6126,6 @@ templates/tracker_calendar_over.tpl -text
 templates/tracker_error.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_pretty_item.tpl -text
-templates/tracker_search/customsearch.tpl -text
-templates/tracker_search/index.php -text
 templates/tracker_sort_input.tpl -text
 templates/tracker_status_input.tpl -text
 templates/tracker_sync/clone_remote.tpl -text
@@ -6214,6 +6224,7 @@ templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
 templates/wiki-plugins/wikiplugin_mail.tpl -text
 templates/wiki-plugins/wikiplugin_memberlist.tpl -text
 templates/wiki-plugins/wikiplugin_memberpayment.tpl -text
+templates/wiki-plugins/wikiplugin_paypal.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_relations.tpl -text
