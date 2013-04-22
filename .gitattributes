@@ -2550,7 +2550,14 @@ lib/core/Search/ContentSource/TrackerItemSource.php -text
 lib/core/Search/ContentSource/UserSource.php -text
 lib/core/Search/ContentSource/WikiSource.php -text
 lib/core/Search/ContentSource/index.php -text
+lib/core/Search/Elastic/Connection.php -text
+lib/core/Search/Elastic/Exception.php -text
+lib/core/Search/Elastic/Index.php -text
+lib/core/Search/Elastic/QueryBuilder.php -text
+lib/core/Search/Elastic/TransportException.php -text
+lib/core/Search/Elastic/TypeFactory.php -text
 lib/core/Search/Expr/And.php -text
+lib/core/Search/Expr/Initial.php -text
 lib/core/Search/Expr/Interface.php -text
 lib/core/Search/Expr/Not.php -text
 lib/core/Search/Expr/Or.php -text
@@ -2560,6 +2567,7 @@ lib/core/Search/Expr/Token.php -text
 lib/core/Search/Expr/Tokenizer.php -text
 lib/core/Search/Expr/index.php -text
 lib/core/Search/Formatter.php -text
+lib/core/Search/Formatter/AppendPagination.php -text
 lib/core/Search/Formatter/ArrayBuilder.php -text
 lib/core/Search/Formatter/Builder.php -text
 lib/core/Search/Formatter/DataSource/Declarative.php -text
