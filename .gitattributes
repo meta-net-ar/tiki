@@ -3597,8 +3597,10 @@ lib/rankings/ranklib.php -text
 lib/rating/configlib.php -text
 lib/rating/formula/ArticleInfo.php -text
 lib/rating/formula/Attribute.php -text
+lib/rating/formula/CategoryPresent.php -text
 lib/rating/formula/RatingAverage.php -text
 lib/rating/formula/RatingSum.php -text
+lib/rating/formula/TrackerField.php -text
 lib/rating/formula/index.php -text
 lib/rating/index.php -text
 lib/rating/ratinglib.php -text
@@ -3985,6 +3987,8 @@ lib/test/auth/fixtures/auth_tokens_dataset_delete_hits.xml -text
 lib/test/auth/fixtures/auth_tokens_dataset_delete_timeout.xml -text
 lib/test/auth/fixtures/index.php -text
 lib/test/auth/index.php -text
+lib/test/bigbluebutton/DynamicConfigurationTest.php -text
+lib/test/bigbluebutton/config.xml -text
 lib/test/bootstrap.php -text
 lib/test/comments/CommentsTest.php -text
 lib/test/comments/index.php -text
@@ -4080,6 +4084,10 @@ lib/test/core/Reports/index.php -text
 lib/test/core/Request/RequestTest.php -text
 lib/test/core/Request/index.php -text
 lib/test/core/Search/ActionStepTest.php -text
+lib/test/core/Search/Elastic/IndexTest.php -text
+lib/test/core/Search/Elastic/ProtocolTest.php -text
+lib/test/core/Search/Elastic/QueryBuilderTest.php -text
+lib/test/core/Search/Elastic/StemmingTest.php -text
 lib/test/core/Search/Expr/ParserTest.php -text
 lib/test/core/Search/Expr/TokenizerTest.php -text
 lib/test/core/Search/Expr/index.php -text
@@ -4478,6 +4486,7 @@ lib/wiki-plugins/wikiplugin_objectlink.php -text
 lib/wiki-plugins/wikiplugin_pagetabs.php -text
 lib/wiki-plugins/wikiplugin_param.php -text
 lib/wiki-plugins/wikiplugin_payment.php -text
+lib/wiki-plugins/wikiplugin_paypal.php -text
 lib/wiki-plugins/wikiplugin_perm.php -text
 lib/wiki-plugins/wikiplugin_perspective.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
