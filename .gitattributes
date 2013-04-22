@@ -65,6 +65,7 @@ admin/index.php -text
 /commxmlrpc.php -text
 /composer.json -text
 /composer.lock -text
+/console.php -text
 /contribution.php -text
 /copyright.txt -text
 /copyrights.php -text
