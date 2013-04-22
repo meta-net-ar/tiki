@@ -1,29 +1,22 @@
-M
+D
 dir
-/users/kstingel/ks-trunk/lib
+/users/kstingel/ks-trunk/templates/tracker_search
 
 
 
 
 A
 dir
-/users/kstingel/ks-trunk/lib/test/bigbluebutton
-/trunk/lib/test/bigbluebutton
+/users/kstingel/ks-trunk/templates/search_customsearch
+/trunk/templates/search_customsearch
 45654
 
 
 A
 dir
-/users/kstingel/ks-trunk/lib/test/core/Search/Elastic
-/trunk/lib/test/core/Search/Elastic
+/users/kstingel/ks-trunk/templates/examples
+/trunk/templates/examples
 45654
-
-
-M
-dir
-/users/kstingel/ks-trunk/lib/test
-
-
 
 
 
