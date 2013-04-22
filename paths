@@ -1,6 +1,27 @@
-D
+M
 dir
-/users/kstingel/ks-trunk/lib/pear
+/users/kstingel/ks-trunk/lib
+
+
+
+
+A
+dir
+/users/kstingel/ks-trunk/lib/test/bigbluebutton
+/trunk/lib/test/bigbluebutton
+45654
+
+
+A
+dir
+/users/kstingel/ks-trunk/lib/test/core/Search/Elastic
+/trunk/lib/test/core/Search/Elastic
+45654
+
+
+M
+dir
+/users/kstingel/ks-trunk/lib/test
 
 
 
