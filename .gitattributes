@@ -6637,6 +6637,7 @@ tests/testfile.txt -text
 /tiki-index_p.php -text
 /tiki-index_raw.php -text
 /tiki-information.php -text
+/tiki-inline_edit.php -text
 /tiki-install.php -text
 /tiki-integrator.php -text
 /tiki-interactive_trans.php -text
