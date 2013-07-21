@@ -2529,7 +2529,9 @@ lib/core/Search/Action/EmailAction.php -text
 lib/core/Search/Action/Factory.php -text
 lib/core/Search/Action/Sequence.php -text
 lib/core/Search/Action/Step.php -text
+lib/core/Search/Action/TrackerItemModify.php -text
 lib/core/Search/Action/UnknownStep.php -text
+lib/core/Search/Action/WikiApprovalAction.php -text
 lib/core/Search/ContentFilter/VersionNumber.php -text
 lib/core/Search/ContentFilter/index.php -text
 lib/core/Search/ContentSource/ActivityStreamSource.php -text
@@ -2558,7 +2560,9 @@ lib/core/Search/Elastic/ResultSet.php -text
 lib/core/Search/Elastic/TransportException.php -text
 lib/core/Search/Elastic/TypeFactory.php -text
 lib/core/Search/Expr/And.php -text
+lib/core/Search/Expr/Initial.php -text
 lib/core/Search/Expr/Interface.php -text
+lib/core/Search/Expr/MoreLikeThis.php -text
 lib/core/Search/Expr/Not.php -text
 lib/core/Search/Expr/Or.php -text
 lib/core/Search/Expr/Parser.php -text
@@ -2568,10 +2572,12 @@ lib/core/Search/Expr/Tokenizer.php -text
 lib/core/Search/Expr/index.php -text
 lib/core/Search/FacetProvider/Interface.php -text
 lib/core/Search/Formatter.php -text
+lib/core/Search/Formatter/AppendPagination.php -text
 lib/core/Search/Formatter/ArrayBuilder.php -text
 lib/core/Search/Formatter/Builder.php -text
 lib/core/Search/Formatter/DataSource/Declarative.php -text
 lib/core/Search/Formatter/DataSource/Interface.php -text
+lib/core/Search/Formatter/DataSource/Trusted.php -text
 lib/core/Search/Formatter/DataSource/index.php -text
 lib/core/Search/Formatter/Plugin/Interface.php -text
 lib/core/Search/Formatter/Plugin/SmartyTemplate.php -text
@@ -2610,6 +2616,7 @@ lib/core/Search/Index/CategoryFilterDecorator.php -text
 lib/core/Search/Index/Interface.php -text
 lib/core/Search/Index/Lucene.php -text
 lib/core/Search/Index/Memory.php -text
+lib/core/Search/Index/TypeAnalysisDecorator.php -text
 lib/core/Search/Index/index.php -text
 lib/core/Search/Indexer.php -text
 lib/core/Search/Query.php -text
@@ -2624,6 +2631,7 @@ lib/core/Search/Query/WeightCalculator/index.php -text
 lib/core/Search/Query/WikiBuilder.php -text
 lib/core/Search/Query/index.php -text
 lib/core/Search/ResultSet.php -text
+lib/core/Search/ResultSet/FacetFilter.php -text
 lib/core/Search/ResultSet/SnippetHelper.php -text
 lib/core/Search/ResultSet/index.php -text
 lib/core/Search/Type/Analyzer.php -text
@@ -2632,6 +2640,7 @@ lib/core/Search/Type/Factory/Interface.php -text
 lib/core/Search/Type/Factory/Lucene.php -text
 lib/core/Search/Type/Factory/index.php -text
 lib/core/Search/Type/Interface.php -text
+lib/core/Search/Type/MultivaluePlain.php -text
 lib/core/Search/Type/MultivalueText.php -text
 lib/core/Search/Type/PlainText.php -text
 lib/core/Search/Type/ShortText.php -text
