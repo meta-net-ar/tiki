@@ -2935,6 +2935,7 @@ lib/db/index.php -text
 lib/db/tiki_registration_fields.php -text
 lib/dcs/dcslib.php -text
 lib/dcs/index.php -text
+lib/debug/Tracer.php -text
 lib/debug/debug-command_dmsg.php -text
 lib/debug/debug-command_features.php -text
 lib/debug/debug-command_perm.php -text
@@ -3286,6 +3287,7 @@ lib/mail/maillib.php -text
 lib/mail/mimelib.php -text
 lib/mailin/index.php -text
 lib/mailin/mailinlib.php -text
+lib/mailin/usermailinlib.php -text
 lib/map/index.php -text
 lib/map/map.js -text
 lib/map/map_query.php -text
