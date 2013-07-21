@@ -4556,6 +4556,7 @@ lib/wiki-plugins/wikiplugin_objectlink.php -text
 lib/wiki-plugins/wikiplugin_pagetabs.php -text
 lib/wiki-plugins/wikiplugin_param.php -text
 lib/wiki-plugins/wikiplugin_payment.php -text
+lib/wiki-plugins/wikiplugin_paypal.php -text
 lib/wiki-plugins/wikiplugin_perm.php -text
 lib/wiki-plugins/wikiplugin_perspective.php -text
 lib/wiki-plugins/wikiplugin_pluginmanager.php -text
