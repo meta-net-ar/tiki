@@ -25,6 +25,2523 @@ When possible, it's also nice to indicate what feature is concerned by the chang
 Before 2.0, there was only [MOD] for both [ENH] and [MOD]:
 
 ----------------------------------------------------------------------
+Version 11.0
+<http://tiki.org/ReleaseNotes110>
+------------------
+
+----------------------------------------------
+r46683 | jonnybradley | 2013-07-15 13:40:48 +0200 (Mon, 15 Jul 2013) | 1 line
+
+[FIX] mobile: Cache mobile pages separately from non-mobile as layout etc can change for devices
+----------------------------------------------
+r46676 | lphuberdeau | 2013-07-14 22:36:10 +0200 (Sun, 14 Jul 2013) | 1 line
+
+[FIX] Backport r46672 Display comment form by default broken
+----------------------------------------------
+r46647 | arildb | 2013-07-14 12:59:58 +0200 (Sun, 14 Jul 2013) | 1 line
+
+[bp/r46646][FIX] More solid fix for convertSortMode error return
+----------------------------------------------
+r46635 | jonnybradley | 2013-07-12 11:23:58 +0200 (Fri, 12 Jul 2013) | 1 line
+
+[FIX] articles: Check the right field for html (body or heading) and set is_html in the parser for newsletter clippings (thanks Bsfez)
+----------------------------------------------
+r46629 | jonnybradley | 2013-07-11 19:51:00 +0200 (Thu, 11 Jul 2013) | 1 line
+
+[FIX] wysiwyg: Maintain wysiwyg_htmltowiki setting if using previous default (n = html) as default changed to y in 11.x - thanks Geoff
+----------------------------------------------
+r46627 | arildb | 2013-07-11 11:54:28 +0200 (Thu, 11 Jul 2013) | 5 lines
+
+[ROLLBACK/r46616] No NEW commits in this branch
+[bp/r46398,r46399][NEW] Added new tab "Tools" in the admin search panel
+[NEW] Added search for string in all text columns, in all tables. Search is limited to admins
+[NEW] Add viewing of table data for report_string_in_db search tool
+
+----------------------------------------------
+r46624 | marclaporte | 2013-07-11 06:52:38 +0200 (Thu, 11 Jul 2013) | 1 line
+
+As per discussion at http://thread.gmane.org/gmane.comp.cms.tiki.devel/29609 and http://tiki.org/Profiles+Team, to have more robust default settings, changing the default from Unified Search to MySQL Full Text Search, which AFAIK, never has any issues, even on shared hosting. Also, improving the documentation and putting Unified Search as an advanced feature. Labelling MySQL Full Text Search as Basic Search and Unified Search as Advanced Search
+----------------------------------------------
+r46621 | arildb | 2013-07-11 00:42:11 +0200 (Thu, 11 Jul 2013) | 1 line
+
+Removed svn:executable keyword
+----------------------------------------------
+r46620 | arildb | 2013-07-11 00:38:24 +0200 (Thu, 11 Jul 2013) | 1 line
+
+Add missing SVN id keyword 
+----------------------------------------------
+r46616 | arildb | 2013-07-11 00:08:35 +0200 (Thu, 11 Jul 2013) | 4 lines
+
+[bp/r46398,r46399][NEW] Added new tab "Tools" in the admin search panel
+[NEW] Added search for string in all text columns, in all tables. Search is limited to admins
+[NEW] Add viewing of table data for report_string_in_db search tool
+
+----------------------------------------------
+r46613 | arildb | 2013-07-10 21:41:43 +0200 (Wed, 10 Jul 2013) | 1 line
+
+[bp/r46612][FIX] https protected sessions on IIS
+----------------------------------------------
+r46610 | jonnybradley | 2013-07-09 14:32:54 +0200 (Tue, 09 Jul 2013) | 1 line
+
+[FIX] filegals: Fix curious "Upload New Version" file picker thing (broken in some themes), as the font-size is set to 600px (huh?!) if the margin or padding is set in relative units it no longer was clickable.
+----------------------------------------------
+r46599 | jyhem | 2013-07-08 19:52:39 +0200 (Mon, 08 Jul 2013) | 1 line
+
+[FIX][bp/r46598] Allow smooth re-import of tracker country type fields
+----------------------------------------------
+r46596 | lphuberdeau | 2013-07-08 18:27:36 +0200 (Mon, 08 Jul 2013) | 1 line
+
+[FIX] Attempt to optimize the process caused elements like actionlog to call off when updating tracker items
+----------------------------------------------
+r46595 | jonnybradley | 2013-07-08 18:11:05 +0200 (Mon, 08 Jul 2013) | 1 line
+
+[FIX] trackers: Make the required_in_group error only appear on the last field to stop page layout breaking, also improve the error message and make it translatable.
+----------------------------------------------
+r46594 | jonnybradley | 2013-07-08 18:09:40 +0200 (Mon, 08 Jul 2013) | 1 line
+
+[FIX] trackers: Add a way to make jquery validate work on mandatory "old style" html date drop-down groups
+----------------------------------------------
+r46576 | arildb | 2013-07-07 14:33:09 +0200 (Sun, 07 Jul 2013) | 1 line
+
+[bp/r46575][FIX] order by must handle "1", which is the convertSortMode error return
+----------------------------------------------
+r46571 | arildb | 2013-07-07 02:46:59 +0200 (Sun, 07 Jul 2013) | 4 lines
+
+[FIX] Hack to fix samerow problem. May apply to other types too.
+The field default value was not used when the option value is empty, which occurs when only "Add Field" is selected.
+Caused samerow='No' to be displayed in the dialog, when no value is set. But samerow has default value = Yes.
+
+----------------------------------------------
+r46569 | arildb | 2013-07-07 00:49:50 +0200 (Sun, 07 Jul 2013) | 1 line
+
+[FIX] Check samerow value correctly
+----------------------------------------------
+r46567 | arildb | 2013-07-06 23:53:07 +0200 (Sat, 06 Jul 2013) | 2 lines
+
+[FIX] tracker field option samerow initializes to true, if the option is not set.
+Should read the field definition. Hardcoded for now.
+----------------------------------------------
+r46566 | jonnybradley | 2013-07-06 18:55:15 +0200 (Sat, 06 Jul 2013) | 1 line
+
+[CSS] utopian/meta: Some tweaks
+----------------------------------------------
+r46565 | lphuberdeau | 2013-07-06 16:48:24 +0200 (Sat, 06 Jul 2013) | 1 line
+
+[FIX]?\194?\160Broken trackerfilter export caused by uninitialized variable, used in global scope prior to this step
+----------------------------------------------
+r46564 | lphuberdeau | 2013-07-06 16:25:02 +0200 (Sat, 06 Jul 2013) | 1 line
+
+[FIX] Handle exception when pretty tracker is misconfigured
+----------------------------------------------
+r46563 | lphuberdeau | 2013-07-06 15:59:24 +0200 (Sat, 06 Jul 2013) | 1 line
+
+[FIX] Bad include
+----------------------------------------------
+r46555 | jonnybradley | 2013-07-05 18:33:13 +0200 (Fri, 05 Jul 2013) | 1 line
+
+[FIX] kaltura: Test kaltura_kcwUIConf properly on admin page, and catch "SERVICE_FORBIDDEN" exceptions properly and present the message politely (and while trying to fix that the error just disappeared!)
+----------------------------------------------
+r46554 | jonnybradley | 2013-07-05 15:42:08 +0200 (Fri, 05 Jul 2013) | 1 line
+
+[FIX] attachments: Attach page to correct page if not in "best language" by passing on no_bl request param.
+----------------------------------------------
+r46552 | yonixxx | 2013-07-05 09:14:55 +0200 (Fri, 05 Jul 2013) | 1 line
+
+[FIX]Article heading are also correcty displayed if ishtml
+----------------------------------------------
+r46549 | jonnybradley | 2013-07-04 20:17:19 +0200 (Thu, 04 Jul 2013) | 3 lines
+
+[FIX] articles: Work out if article body "is_html" better - test for html in case wysiwyg_htmltowiki has been enabled after wysiwyg has been used for articles before.
+Refactor into a new function in artlib and deploy throughout (all tested except received_articles. (thanks Bsfez)
+TODO better for 12...
+----------------------------------------------
+r46547 | jonnybradley | 2013-07-04 19:19:34 +0200 (Thu, 04 Jul 2013) | 1 line
+
+[FIX] articles: Attach the translations to the articles in the plugin so the lang menu works (thanks marclaporte)
+----------------------------------------------
+r46546 | jonnybradley | 2013-07-04 18:34:21 +0200 (Thu, 04 Jul 2013) | 2 lines
+
+[FIX] trackers: Prevent list_items from exhausting memory completely and just return whatever items have been retrieved so far when we're down to 10MB left.
+CAn happen when exporting large trackers leading to just the header being exported.
+----------------------------------------------
+r46545 | jonnybradley | 2013-07-04 18:27:55 +0200 (Thu, 04 Jul 2013) | 1 line
+
+[FIX] installer: Duplicate sefurl trackeritem regex fixer schema as, in at least one tiki, it failed to run leading to tracker items all ending up with just 'item' as the link (thanks marclaporte)
+----------------------------------------------
+r46543 | lphuberdeau | 2013-07-04 17:14:27 +0200 (Thu, 04 Jul 2013) | 1 line
+
+[FIX] Detect data corruption when reading GeoJSON and render the feature as a marker instead (at center of current map)
+----------------------------------------------
+r46532 | jonnybradley | 2013-07-03 20:38:04 +0200 (Wed, 03 Jul 2013) | 1 line
+
+[FIX] installer: Missing global (required in setup_base) in decode_pages_sources upgrade script
+----------------------------------------------
+r46529 | jonnybradley | 2013-07-03 18:18:31 +0200 (Wed, 03 Jul 2013) | 1 line
+
+[FIX] sign: z-index for sign "tips" to come in front of modules in some browsers
+----------------------------------------------
+r46528 | jonnybradley | 2013-07-03 18:05:14 +0200 (Wed, 03 Jul 2013) | 1 line
+
+[FIX] catorphans: Don't use $pages Smarty array as it's used by wiki pages for pagination (thanks marclaporte)
+----------------------------------------------
+r46527 | jonnybradley | 2013-07-03 11:41:28 +0200 (Wed, 03 Jul 2013) | 1 line
+
+[FIX] slides: Fix page names with spaces, accents etc in (thanks marclaporte)
+----------------------------------------------
+r46526 | jonnybradley | 2013-07-03 11:36:13 +0200 (Wed, 03 Jul 2013) | 1 line
+
+[FIX] slides: Fix URL with illegal colon in from being interpreted as a protocol by ensuring it is relative (thanks luciash)
+----------------------------------------------
+r46525 | yonixxx | 2013-07-02 11:39:25 +0200 (Tue, 02 Jul 2013) | 1 line
+
+[FIX]Article submissions updated so it work more like  Edit Article
+----------------------------------------------
+r46523 | jonnybradley | 2013-07-01 18:57:51 +0200 (Mon, 01 Jul 2013) | 1 line
+
+[DOC] wysiwyg: Add pref hint about which toolbar is used in wiki mode WYSIWYG (thanks Bsfez)
+----------------------------------------------
+r46522 | jonnybradley | 2013-07-01 17:49:10 +0200 (Mon, 01 Jul 2013) | 1 line
+
+[FIX] wysiwyg: Add {slideshow} to plugins not to render
+----------------------------------------------
+r46521 | jonnybradley | 2013-07-01 17:15:49 +0200 (Mon, 01 Jul 2013) | 1 line
+
+[FIX] route: Use slideshow page var properly (only 2 parts returned by that regexp)
+----------------------------------------------
+r46519 | jonnybradley | 2013-06-30 19:36:19 +0200 (Sun, 30 Jun 2013) | 1 line
+
+[FIX] search: Parse wiki plugins as html and use other arguments as the plugin params (e.g. for a {list} plugin)
+----------------------------------------------
+r46518 | jonnybradley | 2013-06-30 19:25:14 +0200 (Sun, 30 Jun 2013) | 1 line
+
+[FIX] modules: Fix preview of user modules containing plugins (use same parser options as in modlib)
+----------------------------------------------
+r46517 | yonixxx | 2013-06-27 20:54:33 +0200 (Thu, 27 Jun 2013) | 1 line
+
+[FIX]Loadstat slightly modified to be rtl compatible
+----------------------------------------------
+r46514 | yonixxx | 2013-06-27 20:29:42 +0200 (Thu, 27 Jun 2013) | 1 line
+
+[FIX]Fine tuning
+----------------------------------------------
+r46478 | arildb | 2013-06-26 19:17:09 +0200 (Wed, 26 Jun 2013) | 1 line
+
+[bp/r46477][SEC] Validate email to prevent XSS
+----------------------------------------------
+r46470 | arildb | 2013-06-26 02:28:51 +0200 (Wed, 26 Jun 2013) | 1 line
+
+[bp/r46469][SEC] Use parameterized queries to avoid XSS
+----------------------------------------------
+r46466 | arildb | 2013-06-26 00:38:25 +0200 (Wed, 26 Jun 2013) | 1 line
+
+[bp/r46465][SEC] convertSortMode must always return a string which can follow "order by"
+----------------------------------------------
+r46463 | arildb | 2013-06-25 23:56:28 +0200 (Tue, 25 Jun 2013) | 1 line
+
+[bp/r46462][SEC] Always use parameters in queries to prevent XSS
+----------------------------------------------
+r46447 | jyhem | 2013-06-24 20:14:16 +0200 (Mon, 24 Jun 2013) | 1 line
+
+[FIX][bp/r46446] Fix error 500 due to bad parameter structure
+----------------------------------------------
+r46380 | jyhem | 2013-06-16 21:45:29 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX][bp/r46379] That did not work with category or object permissions
+----------------------------------------------
+r46378 | jonnybradley | 2013-06-16 21:23:09 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] elfinder: Update to github version [Fix display of elfinder-quicklook-titlebar (and make it only appear on mouseover)]
+----------------------------------------------
+r46377 | jonnybradley | 2013-06-16 20:07:07 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Add files to plugins not to render (thanks Geoff)
+----------------------------------------------
+r46376 | arildb | 2013-06-16 19:50:47 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] Revert the position adjustment back to how it was earlier. (Other bug was fixed)
+----------------------------------------------
+r46375 | jonnybradley | 2013-06-16 19:47:27 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] login: Facebook button breaks up display in header and popup modes
+----------------------------------------------
+r46374 | jonnybradley | 2013-06-16 19:22:36 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] installer: Fix language selector which was failing as the cache was being cached afterwards on every page. So move cache clearing to only happen after system requirements page, but before language and other prefs have been set up.
+----------------------------------------------
+r46372 | jonnybradley | 2013-06-16 18:12:31 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Use refactored allowHtml code in the plugins (which depend on auto_save anyway)
+----------------------------------------------
+r46371 | jonnybradley | 2013-06-16 18:07:37 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Update preview code with "improved" allowHtml detection from r46285 - fixes broken html preview, sorry & thanks Geoff
+----------------------------------------------
+r46370 | jonnybradley | 2013-06-16 17:38:12 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] editable: Stop enter key events submitting the form and use tab keypresses a bit better, mileage may vary according to browser
+----------------------------------------------
+r46369 | jonnybradley | 2013-06-16 16:48:16 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] trackers: Respect some perms for editable items (modify_tracker_items etc and field perms so far)
+----------------------------------------------
+r46368 | jonnybradley | 2013-06-16 16:16:09 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] trackers: Dynamic links and (probably) other types of tracker select fields were causing "You are about to leave this page" alert when nothing had changed on create/edit tracker item forms.
+----------------------------------------------
+r46366 | changi67 | 2013-06-16 15:43:11 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] Wrong closing tag
+----------------------------------------------
+r46365 | changi67 | 2013-06-16 15:36:31 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] missing "="
+----------------------------------------------
+r46364 | changi67 | 2013-06-16 15:29:54 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] misplaced closing tags
+----------------------------------------------
+r46363 | changi67 | 2013-06-16 15:26:04 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] remove useless closing tag
+----------------------------------------------
+r46362 | changi67 | 2013-06-16 15:24:51 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] self closing used when it shouldn't
+----------------------------------------------
+r46361 | changi67 | 2013-06-16 15:10:38 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] Unused html closing tag
+----------------------------------------------
+r46360 | changi67 | 2013-06-16 15:06:36 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] Unused tag
+----------------------------------------------
+r46357 | changi67 | 2013-06-16 14:55:27 +0200 (Sun, 16 Jun 2013) | 1 line
+
+[FIX] self closing tag shouldn't
+----------------------------------------------
+r46338 | changi67 | 2013-06-15 21:46:27 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] This directory doesn't exist and cause a Uncaught exception
+----------------------------------------------
+r46335 | changi67 | 2013-06-15 21:38:15 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] Now we have a page which describe all active people in Tiki
+----------------------------------------------
+r46334 | jonnybradley | 2013-06-15 18:46:42 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] forums: Check for specific perms on the forum
+----------------------------------------------
+r46333 | jonnybradley | 2013-06-15 18:29:06 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] blogs: Check for specific perms on the post.
+----------------------------------------------
+r46332 | jonnybradley | 2013-06-15 16:17:53 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] carousel: Set the size of the containing div if displaySize is set to an integer and hide the captions to make the page load tidier. Make a few more params "advanced" and correct some descriptions.
+----------------------------------------------
+r46331 | jonnybradley | 2013-06-15 16:15:14 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Add mouseover to plugins not to render (thanks Geoff)
+----------------------------------------------
+r46330 | jonnybradley | 2013-06-15 14:16:55 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] elfinder: Add copy function which now makes paste and duplicate work (thanks Xavi)
+----------------------------------------------
+r46329 | jonnybradley | 2013-06-15 14:08:57 +0200 (Sat, 15 Jun 2013) | 1 line
+
+[FIX] files: If $newName is supplied use it, otherwise add " copy" to the source name
+----------------------------------------------
+r46323 | jonnybradley | 2013-06-14 21:02:42 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] caching: Redirect to the clear cache page after clearing all caches. Seems my improvements to js minify recently don't now agree with the page being rebuild without cache after tiki-setup has already been run.
+----------------------------------------------
+r46322 | jonnybradley | 2013-06-14 21:00:41 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] Images: Don't use svg icons in preference to the png ones as used before (too big! thanks Xavi)
+----------------------------------------------
+r46320 | jonnybradley | 2013-06-14 18:39:47 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Add 'file' plugin to the list of excluded ones as it nests an {img} plugin inside itself and looks confusing
+----------------------------------------------
+r46318 | jonnybradley | 2013-06-14 16:25:41 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] memcache: Flush memcache when flushing other caches
+----------------------------------------------
+r46317 | jonnybradley | 2013-06-14 16:24:35 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] memcache: Cache and restore javascript and css added to headerlib during page rendering (by plugins etc). Should be generalised and refactored into headerlib when not in freeze.
+----------------------------------------------
+r46316 | jonnybradley | 2013-06-14 12:22:54 +0200 (Fri, 14 Jun 2013) | 1 line
+
+[FIX] memcache: Cache wiki pages using all $_GET params in the key (so different states of page can be cached separately)
+----------------------------------------------
+r46304 | jonnybradley | 2013-06-12 21:31:48 +0200 (Wed, 12 Jun 2013) | 1 line
+
+[FIX] js: Don't set Expires to +10 years and also try not to cache it (so now these two large files don't need to be downloaded every time, 10 years might be a bit much, no?)
+----------------------------------------------
+r46300 | jonnybradley | 2013-06-12 20:58:51 +0200 (Wed, 12 Jun 2013) | 1 line
+
+130612 minify late js file arrivals
+----------------------------------------------
+r46296 | jonnybradley | 2013-06-12 19:32:21 +0200 (Wed, 12 Jun 2013) | 2 lines
+
+[FIX] elfinder: Switch "pseudo vendor" library elFinder to use a new build based on github.com/jonnybradley/elFinder
+Numerous fixes, including: refresh after extract operations, obey startRoot on different volumes, correct display of alerts and various others
+----------------------------------------------
+r46295 | jonnybradley | 2013-06-12 19:16:16 +0200 (Wed, 12 Jun 2013) | 1 line
+
+[MOD] elfinder: Just some debugging code i keep rewriting
+----------------------------------------------
+r46289 | jonnybradley | 2013-06-12 16:36:55 +0200 (Wed, 12 Jun 2013) | 1 line
+
+[ENH] elfinder: (Experimental) Enable 'extract' command using existing filegal 'batch' feature (gallery doesn't update after unzip, fix to come)
+----------------------------------------------
+r46288 | jonnybradley | 2013-06-12 15:35:51 +0200 (Wed, 12 Jun 2013) | 1 line
+
+[MOD] filegals: Leave extension on zip file titles so they're easier to manage and find
+----------------------------------------------
+r46285 | jonnybradley | 2013-06-11 15:53:55 +0200 (Tue, 11 Jun 2013) | 2 lines
+
+[FIX] wysiwyg: Blogs and articles parsing failing in some configs, so make the "allowhtml" input consistently the name not id of the checkbox or hidden (using id was bad) and check for this (as well as we can without database changes) for wiki pages, blogs, articles and content templates.
+Please test!
+----------------------------------------------
+r46284 | jonnybradley | 2013-06-11 14:58:20 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Respect wysiwyg_htmltowiki setting in blog posts, input[name=wysiwyg] is set in block.textarea.php so not needed (thanks arildb)
+----------------------------------------------
+r46282 | jonnybradley | 2013-06-11 14:01:57 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] wysiwyg: When inserting replacement plugin code, use the source directly for the replace and then reparse using setData (should stop added lines around edited plugins)
+----------------------------------------------
+r46281 | jonnybradley | 2013-06-11 13:59:59 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Only append </body> if opening tag found when reparsing source - almost certainly redundant now, to be removed in trunk later (still)
+----------------------------------------------
+r46280 | jonnybradley | 2013-06-11 13:58:07 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] sidebars: No need to use document.getElementById(maincol).baseURI as document.URL is supported by all browsers and maincol is not always present (in filegal manager popup for instance)
+----------------------------------------------
+r46279 | arildb | 2013-06-11 13:22:12 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] Incorrect parenthesis setting
+----------------------------------------------
+r46276 | jonnybradley | 2013-06-11 12:16:31 +0200 (Tue, 11 Jun 2013) | 1 line
+
+[FIX] lang/ca: syntax error (thanks Xavi)
+----------------------------------------------
+r46275 | jonnybradley | 2013-06-10 23:33:08 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg mainly: Make ckeditor obey height params, but also make rows and cols params work again (may have surprise effects in other textareas, like tracker fields (fixed))
+----------------------------------------------
+r46274 | jonnybradley | 2013-06-10 23:19:45 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg plugin: Missing semicolon from r46272 broke js minify (thanks marclaporte)
+----------------------------------------------
+r46272 | jonnybradley | 2013-06-10 21:20:01 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX][REF] wysiwyg plugin: Reposition button according to offsetParent, remove other plugin save/cancel buttons correctly, observe height param and refactor js to tiki-jquery.js
+----------------------------------------------
+r46271 | arildb | 2013-06-10 20:42:37 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] mouseover plugin popups now render html tags
+----------------------------------------------
+r46270 | arildb | 2013-06-10 20:05:56 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] coordinates of mouseover popup is adjusted, so it appears where the mouse is.
+----------------------------------------------
+r46269 | jonnybradley | 2013-06-10 20:04:46 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Prevent empty p tags being added in html wysiwyg rendering, and exclude calendar plugin from wysiwyg rendering
+----------------------------------------------
+r46268 | jonnybradley | 2013-06-10 19:57:25 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Correct rendering of allowhtml input obeying tiki_p_use_HTML perm correctly
+----------------------------------------------
+r46267 | jonnybradley | 2013-06-10 19:24:44 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Eliminate nested spans or divs accumulating around plugins on html pages (thanks Pascal & Geoff)
+----------------------------------------------
+r46263 | jonnybradley | 2013-06-10 17:34:14 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] kaltura: Add a button to be able to recreate the KCW uiConf on demand
+----------------------------------------------
+r46262 | arildb | 2013-06-10 17:31:53 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] notice about invalid index
+----------------------------------------------
+r46261 | arildb | 2013-06-10 17:30:57 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] wysiwyg blog posts are displayed ok in rss feeds
+----------------------------------------------
+r46257 | jonnybradley | 2013-06-10 14:58:33 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX] img: Don't render draw icon if parser is set to  suppress_icons (thanks marclaporte)
+----------------------------------------------
+r46252 | xavidp | 2013-06-10 11:39:33 +0200 (Mon, 10 Jun 2013) | 1 line
+
+[FIX]Usability fix: wording was missleading, and fixed former non-English sentences.
+----------------------------------------------
+r46233 | jonnybradley | 2013-06-07 20:45:22 +0200 (Fri, 07 Jun 2013) | 2 lines
+
+[MOD] wysiwyg plugin: Change the "click anywhere to edit" which prevented links etc being used normally, and use a button instead (thanks marclaporte)
+TODO refactor and tidy...
+----------------------------------------------
+r46232 | jonnybradley | 2013-06-07 19:43:39 +0200 (Fri, 07 Jun 2013) | 1 line
+
+Revert r46228: [FIX] memcache: If memcache was enabled but without any servers being specified... (but keep the pref hint addition)
+----------------------------------------------
+r46231 | jonnybradley | 2013-06-07 18:30:58 +0200 (Fri, 07 Jun 2013) | 1 line
+
+[FIX] wysiwyg plugin: Remove spurious linefeeds that get turned into empty <p> tags (and correct the plugin format)
+----------------------------------------------
+r46229 | jonnybradley | 2013-06-07 16:21:48 +0200 (Fri, 07 Jun 2013) | 1 line
+
+[MOD] performance: Add some helpful info about the PHP realpath_cache and it's usage
+----------------------------------------------
+r46228 | jonnybradley | 2013-06-07 15:53:12 +0200 (Fri, 07 Jun 2013) | 2 lines
+
+[FIX] memcache: If memcache was enabled but without any servers being specified (which is the default) then Tiki became unusable (because prefs are cached), requiring manually editing the database to recover - so, added a checks on critical methods, let the other options be used (such as key_prefix) and display a warning that all is not well.
+Also add a usable default value in the hint for memcache_servers.
+----------------------------------------------
+r46227 | jonnybradley | 2013-06-06 22:51:46 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] No such pref feature_jquery, on by default now if js enabled
+----------------------------------------------
+r46226 | jonnybradley | 2013-06-06 22:45:27 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] events: Correct number of hours per day (for Earth)
+----------------------------------------------
+r46225 | jonnybradley | 2013-06-06 22:44:40 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] datepicker: Handle alt field slightly differently when not a datetimepicker
+----------------------------------------------
+r46224 | jonnybradley | 2013-06-06 22:43:24 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] events: Use 'data' for events (no idea how this ever worked - but thanks marclaporte)
+----------------------------------------------
+r46222 | jonnybradley | 2013-06-06 21:35:54 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Only use the first parent tiki_plugin in case of nested spans (not sure how this happens yet, may need further fixing)
+----------------------------------------------
+r46220 | lphuberdeau | 2013-06-06 21:31:19 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] Multiple notices (backport)
+----------------------------------------------
+r46218 | jonnybradley | 2013-06-06 20:46:29 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Fix for IE8 plugin editing (and possibly other browsers) where the plugin node isn't entirely inside the selection (thanks eromneg)
+----------------------------------------------
+r46216 | jonnybradley | 2013-06-06 20:24:20 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] Leave the sidebars unchanged in the admin modules panel (fix for IE)
+----------------------------------------------
+r46214 | jonnybradley | 2013-06-06 19:47:52 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: When replacing ckeditor dom element use the same type of node (div or span) to prevent extra blank lines appearing either side of divs (thanks eromneg)
+----------------------------------------------
+r46211 | lphuberdeau | 2013-06-06 19:18:59 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[ENH] Adding an option to exclude certain plugin executions during unified indexing
+----------------------------------------------
+r46207 | jonnybradley | 2013-06-06 18:29:11 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[bp/r46205][FIX] Leave the sidebars unchanged in the admin modules panel
+----------------------------------------------
+r46203 | jonnybradley | 2013-06-06 17:56:18 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] modules: Fix css correction for hidden columns by using the correct function (tiki_cookie_jar may not be in use if cookies are allowed)
+----------------------------------------------
+r46202 | jonnybradley | 2013-06-06 17:38:30 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] modules: Pick up module position properly (casualty of change from single char zone names to words)
+----------------------------------------------
+r46199 | xavidp | 2013-06-06 17:27:24 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX]Usability fix based on feedback from training provided to experienced tiki users but newbie tiki admins (the wording might be improved). Thanks ricks99 and and jonnyb for feedback
+----------------------------------------------
+r46198 | jonnybradley | 2013-06-06 17:12:16 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] modules: Make empty module zones more "droppable" in modules admin (thanks alain_desilets re: wish4545)
+----------------------------------------------
+r46197 | jonnybradley | 2013-06-06 16:09:49 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] profiles: Missing dot in version category name on "featured" etc links
+----------------------------------------------
+r46196 | jonnybradley | 2013-06-06 15:32:30 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] modules: Stop save modules button being 100% width, but make it pink so it catches the eye.
+----------------------------------------------
+r46195 | jonnybradley | 2013-06-06 15:30:58 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Exclude {map} plugin from wysiwyg appearance (was just a big grey box)
+----------------------------------------------
+r46191 | jonnybradley | 2013-06-06 15:13:13 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Paste into wiki wysiwyg editor just entered "undefined" -  event attribute had been renamed in cke4
+----------------------------------------------
+r46190 | jonnybradley | 2013-06-06 14:57:55 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] wysiwyg: Only html decode the values of plugin args, not the names, as for {map} it was converting "...123&center=0,0" into "...123[cent symbol]er=0,0" (thanks eromneg)
+----------------------------------------------
+r46185 | jonnybradley | 2013-06-06 12:54:52 +0200 (Thu, 06 Jun 2013) | 3 lines
+
+[bp/r46137][FIX] IFrame plugin could not be edited, due to double quotes.
+PluginMatcher did not properly decode the arguments. This fix affects all plugins.
+Previous patch fro module encoding is removed. (thanks arildb)
+----------------------------------------------
+r46184 | chibaguy | 2013-06-06 06:03:06 +0200 (Thu, 06 Jun 2013) | 1 line
+
+[FIX] [bp/r46183] Bad combination of backgrounds, etc. in login popup box. Thanks, Marc.
+----------------------------------------------
+r46180 | arildb | 2013-06-05 23:57:02 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[bp/r46154][FIX] Fix Subject encoding
+----------------------------------------------
+r46179 | jonnybradley | 2013-06-05 20:44:17 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] menus: Make "arrow" triangles show up on white backgrounds (most Tiki themes have light coloured background columns,  Darkroom and others will need theme specific colourings)
+----------------------------------------------
+r46178 | jonnybradley | 2013-06-05 20:10:26 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[ENH] chosen: Apply Chosen to inline edit selects (thanks again marclapotre)
+----------------------------------------------
+r46177 | jonnybradley | 2013-06-05 19:32:09 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] help: Sort plugins help by translated plugin name (wish 2234)
+----------------------------------------------
+r46176 | jonnybradley | 2013-06-05 18:42:26 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] htaccess: Prevent changelog.txt being viewed from the browser (present in Tiki installs using SVN)
+----------------------------------------------
+r46175 | jonnybradley | 2013-06-05 18:34:43 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] trackers: Add a helpful message in trackerlist output if you try to display fields marked as not public (thanks marclaporte)
+----------------------------------------------
+r46174 | jonnybradley | 2013-06-05 17:49:33 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[ENH] chosen: More not showing "Ctrl" message when chosen is used
+----------------------------------------------
+r46173 | jonnybradley | 2013-06-05 17:40:02 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[ENH] chosen: Don't show "Ctrl" message when chosen is used
+----------------------------------------------
+r46172 | jonnybradley | 2013-06-05 17:25:17 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] sylv: Missing sefurl on some links
+----------------------------------------------
+r46171 | jonnybradley | 2013-06-05 17:07:43 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] captcha: Allow dumb captcha label translation (thanks marclaporte)
+----------------------------------------------
+r46168 | changi67 | 2013-06-05 13:36:16 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[BP/46166@trunk][ENH] Add the possibility to filter list with tags + display number of result
+----------------------------------------------
+r46167 | jonnybradley | 2013-06-05 13:34:45 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] trackers: Clear search_valueformatter cache when modifying a tracker or it's fields so changes appear in list plugins results etc
+----------------------------------------------
+r46165 | jonnybradley | 2013-06-05 13:24:40 +0200 (Wed, 05 Jun 2013) | 1 line
+
+[FIX] trackers: Obey linkToItem option on ItemLink field output
+----------------------------------------------
+r46162 | jonnybradley | 2013-06-04 19:42:36 +0200 (Tue, 04 Jun 2013) | 1 line
+
+[FIX] tcontrol: Use $this instead of $tcontrollib when inside $tcontrollib (was causing Draw to fail for some unknown reason - thanks marclaporte)
+----------------------------------------------
+r46161 | jonnybradley | 2013-06-04 17:32:36 +0200 (Tue, 04 Jun 2013) | 1 line
+
+[FIX] get_style_path: Try non tikidomain "styles" dir if style or option dirs not found (regression from r46108)
+----------------------------------------------
+r46160 | jonnybradley | 2013-06-04 15:58:56 +0200 (Tue, 04 Jun 2013) | 2 lines
+
+[FIX] search: Trim spaces from randommode search modes which prevented search finding anything
+(also add _asc or _desc to end of field names if not already there for extra randomness)
+----------------------------------------------
+r46149 | jonnybradley | 2013-06-03 15:52:50 +0200 (Mon, 03 Jun 2013) | 1 line
+
+[FIX] trackers: Abort import_csv if only one field found and the header contains tab characters
+----------------------------------------------
+r46148 | jonnybradley | 2013-06-03 15:43:07 +0200 (Mon, 03 Jun 2013) | 1 line
+
+[CSS] sign plugin: Add a little border and padding to the hover view
+----------------------------------------------
+r46146 | jonnybradley | 2013-06-03 15:00:12 +0200 (Mon, 03 Jun 2013) | 2 lines
+
+[ENH] codemirror: Add new "mode" of "Off (but switchable)" which makes the highlighter not happen by default on textareas, but {CODE} plugins etc will be (thanks Xavi)
+May need some polishing...
+----------------------------------------------
+r46145 | jonnybradley | 2013-06-03 14:32:13 +0200 (Mon, 03 Jun 2013) | 2 lines
+
+[ENH] chosen: Add a option to use the "Chosen" jquery plugin on select input menus.
+Marked as experimental and default is off (thanks luciash)
+----------------------------------------------
+r46143 | jyhem | 2013-06-03 14:18:21 +0200 (Mon, 03 Jun 2013) | 1 line
+
+[FIX][bp/r46142] When blog is configured to let other authors post, let them view unpublished and private posts
+----------------------------------------------
+r46140 | jyhem | 2013-06-03 13:57:11 +0200 (Mon, 03 Jun 2013) | 1 line
+
+[FIX][bp/r46139] Add post in the correct blog
+----------------------------------------------
+r46135 | arildb | 2013-06-01 22:55:31 +0200 (Sat, 01 Jun 2013) | 3 lines
+
+[FIX] Avoid search crash when using InnoDB
+Turn off MySQL fulltext search if an InnoDB database is created.
+
+----------------------------------------------
+r46134 | arildb | 2013-06-01 21:41:34 +0200 (Sat, 01 Jun 2013) | 1 line
+
+[FIX] Prevent PHP notice when using structures
+----------------------------------------------
+r46130 | arildb | 2013-06-01 20:06:42 +0200 (Sat, 01 Jun 2013) | 1 line
+
+[FIX] Prevent image overflowing into the boundary
+----------------------------------------------
+r46129 | arildb | 2013-06-01 19:12:36 +0200 (Sat, 01 Jun 2013) | 1 line
+
+[FIX] Get rid of strict notices
+----------------------------------------------
+r46128 | arildb | 2013-06-01 18:40:08 +0200 (Sat, 01 Jun 2013) | 2 lines
+
+[FIX] Add inline comment option (again)
+First attempt was wiped after an SVN problem
+----------------------------------------------
+r46127 | arildb | 2013-06-01 17:39:19 +0200 (Sat, 01 Jun 2013) | 1 line
+
+[FIX] validate element
+----------------------------------------------
+r46126 | arildb | 2013-06-01 17:37:30 +0200 (Sat, 01 Jun 2013) | 1 line
+
+[FIX] Make getControllerMap alphabetical
+----------------------------------------------
+r46125 | xavidp | 2013-05-31 18:27:20 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX]editableall set to n by default to preserve the environment
+----------------------------------------------
+r46124 | xavidp | 2013-05-31 18:04:34 +0200 (Fri, 31 May 2013) | 1 line
+
+[ENH]Added a param for lazy users willing to use editable fields already defined in the fields param
+----------------------------------------------
+r46123 | jonnybradley | 2013-05-31 18:03:23 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX] areas: Redirect with response code 301 when using areas
+----------------------------------------------
+r46122 | jonnybradley | 2013-05-31 17:30:04 +0200 (Fri, 31 May 2013) | 2 lines
+
+[FIX] areas: Revert r46064 (allowing paths to be appended on domains for multi-domain) and use $tikiroot or the request_uri instead to work out the path when switching areas.
+Also use any domain to be assigned to the default perspective 0 in order to leave areas with "share common" turned off (thanks marclaporte)
+----------------------------------------------
+r46121 | lphuberdeau | 2013-05-31 17:21:28 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX] Completely broken plugin alias interface
+----------------------------------------------
+r46119 | lphuberdeau | 2013-05-31 16:59:31 +0200 (Fri, 31 May 2013) | 1 line
+
+[ENH] Add field existance validation
+----------------------------------------------
+r46118 | lphuberdeau | 2013-05-31 16:49:44 +0200 (Fri, 31 May 2013) | 1 line
+
+[NEW] Adding listexecute action to modify the content of a tracker item field
+----------------------------------------------
+r46117 | jonnybradley | 2013-05-31 15:43:11 +0200 (Fri, 31 May 2013) | 2 lines
+
+[FIX] bbb: Recordings couldn't be deleted as the param id is restricted to be an integer (bbb recording ids are alphanumeric)
+Part 2 - svn hiccup?
+----------------------------------------------
+r46116 | jonnybradley | 2013-05-31 15:40:00 +0200 (Fri, 31 May 2013) | 2 lines
+
+[FIX] bbb: Recordings couldn't be deleted as the param id is restricted to be an integer (bbb recording ids are alphanumeric)
+Thanks marclaporte
+----------------------------------------------
+r46115 | lphuberdeau | 2013-05-31 15:27:35 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX] Indexing has moved to categorize/uncategorize, causing double indexing and multiple flushes while assigning multiple categories using organize objects
+----------------------------------------------
+r46114 | jonnybradley | 2013-05-31 15:24:30 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX] bbb: $meeting var not found, $meetingName looks most likely candidate
+----------------------------------------------
+r46111 | lphuberdeau | 2013-05-31 14:51:25 +0200 (Fri, 31 May 2013) | 1 line
+
+[ENH] Allow inline editing to be used from trackerlist
+----------------------------------------------
+r46109 | jonnybradley | 2013-05-31 12:14:34 +0200 (Fri, 31 May 2013) | 1 line
+
+[CSS] utopias: Small improvements
+----------------------------------------------
+r46108 | jonnybradley | 2013-05-31 12:14:01 +0200 (Fri, 31 May 2013) | 1 line
+
+[FIX] get_style_path: Allow custom.css and js in styles or styles/tikidomain dir to be used
+----------------------------------------------
+r46094 | jonnybradley | 2013-05-30 12:49:02 +0200 (Thu, 30 May 2013) | 1 line
+
+[FIX] trackers: replace_item was no longer updating lastModif date or user
+----------------------------------------------
+r46091 | arildb | 2013-05-29 22:05:12 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] Update wysiwyg warning. wysiwygis out of experimental. 
+----------------------------------------------
+r46088 | jonnybradley | 2013-05-29 19:45:24 +0200 (Wed, 29 May 2013) | 1 line
+
+[CSS] utopias: Fix for css menu arrow colour and add missing simple option file
+----------------------------------------------
+r46086 | jonnybradley | 2013-05-29 17:15:41 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] console: When using console.php to upgrade databases on multi-tiki installs, $dbs_tiki is no longer set but is used in several patches which then fails fatally, so get it from the local.php first
+----------------------------------------------
+r46085 | jonnybradley | 2013-05-29 17:11:29 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] notices: check for non-standard tiki prefs (used by mod plugin-r)
+----------------------------------------------
+r46084 | jonnybradley | 2013-05-29 16:59:41 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] notices: check for array
+----------------------------------------------
+r46083 | jonnybradley | 2013-05-29 16:59:01 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] access: If a script is called directly $access is not set up, so cannot be used to tell if the script has been run directly
+----------------------------------------------
+r46082 | jonnybradley | 2013-05-29 16:06:47 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] jquery 1.9: A couple more tests for ui-dialog data before closing old one (shame it doesn't fail silently any more)
+----------------------------------------------
+r46081 | jonnybradley | 2013-05-29 16:05:57 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] trackers: ItemLink export/import - output ItemLink label normally when exporting with keepItemlinkId not set, also, ignore empty fields when importing with convertItemLinkValues set (thanks Xavi)
+----------------------------------------------
+r46077 | jonnybradley | 2013-05-29 11:26:17 +0200 (Wed, 29 May 2013) | 1 line
+
+[FIX] jquery 1.9: Other tests for ui-dialog data before closing old one
+----------------------------------------------
+r46076 | jonnybradley | 2013-05-29 11:19:08 +0200 (Wed, 29 May 2013) | 2 lines
+
+[FIX] help dialog: No need to init tabs in the show_help tpl as it's done in js onclick and was causing issues on some servers.
+Also test for ui-dialog data before closing old one (for jquery 1.9+ and optimise jq selector)
+----------------------------------------------
+r46073 | jyhem | 2013-05-28 23:25:04 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX][bp/r46072] When the website insist on being https, do not publish http canonical links
+----------------------------------------------
+r46071 | jonnybradley | 2013-05-28 18:21:13 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX] wysiwyg plugin: Make sure there are no old save/cancel buttons left before adding new ones
+----------------------------------------------
+r46068 | xavidp | 2013-05-28 16:29:17 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX]Clearing Tiki caches finally cleans also folders from PluginR under temp/cache.
+----------------------------------------------
+r46066 | arildb | 2013-05-28 15:29:16 +0200 (Tue, 28 May 2013) | 1 line
+
+[bp/46043-46046][FIX] Load content templates when "templates" ckeditor toolbar button is pressed.
+----------------------------------------------
+r46064 | jonnybradley | 2013-05-28 13:49:59 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX] multi-domain: Use path as well as domain in multi-domain - i.e: example.com/path/to/tiki
+----------------------------------------------
+r46061 | jonnybradley | 2013-05-28 13:26:56 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX] kaltura: Get kaltura.com to make a new contribution wizard as all the old ones seem to be broken (thanks marclaporte)
+----------------------------------------------
+r46060 | jonnybradley | 2013-05-28 13:03:16 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX] kaltura: Typo
+----------------------------------------------
+r46057 | jonnybradley | 2013-05-28 12:02:52 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX] trackers: Fix "chose files" upload button for Win Chrome - inside the FileReader scope $.service() seems not to be set.
+----------------------------------------------
+r46056 | jyhem | 2013-05-28 11:59:36 +0200 (Tue, 28 May 2013) | 1 line
+
+[FIX][bp/r46055] Columns were not sortable, making tool hard to use with many groups
+----------------------------------------------
+r46051 | jonnybradley | 2013-05-27 16:15:41 +0200 (Mon, 27 May 2013) | 1 line
+
+[FIX] trackers: Use category field output instead of values in dynamic lists' rendered output (thanks Bsfez)
+----------------------------------------------
+r46049 | jonnybradley | 2013-05-27 15:52:13 +0200 (Mon, 27 May 2013) | 2 lines
+
+[FIX] trackers: Use category field renderOutput instead of values in dynamic lists - also remove redundant comments (thanks Bsfez)
+Still need to fix item view values for this use case.
+----------------------------------------------
+r46036 | lphuberdeau | 2013-05-24 19:31:37 +0200 (Fri, 24 May 2013) | 1 line
+
+[FIX]?\194?\160Make sure patch works even if the index is missing in the database
+----------------------------------------------
+r46035 | lphuberdeau | 2013-05-24 19:15:19 +0200 (Fri, 24 May 2013) | 1 line
+
+[FIX] Hash the username for the avatar file path to avoid issues with UTF-8 characters in usernames
+----------------------------------------------
+r46029 | jonnybradley | 2013-05-24 12:22:56 +0200 (Fri, 24 May 2013) | 1 line
+
+[FIX] mobile: Photoswipe and it's lib "klass" not happy with our js minify
+----------------------------------------------
+r46028 | jyhem | 2013-05-24 00:04:36 +0200 (Fri, 24 May 2013) | 1 line
+
+[FIX][bp/r46026] allows admins to edit comments (was possible in Tiki 6)
+----------------------------------------------
+r46025 | marclaporte | 2013-05-22 19:31:52 +0200 (Wed, 22 May 2013) | 1 line
+
+Adding recent module prefs to the admin module panel (it was already in look & feel)
+----------------------------------------------
+r46021 | jyhem | 2013-05-21 20:54:29 +0200 (Tue, 21 May 2013) | 1 line
+
+[FIX][bp/r46019] Restore pagination (thanks Torsten)
+----------------------------------------------
+r46018 | jonnybradley | 2013-05-21 20:44:33 +0200 (Tue, 21 May 2013) | 1 line
+
+[ENH] trackers: Make it possible to not have tracker labels (& image filenames etc) showing in RSS feeds
+----------------------------------------------
+r46017 | jonnybradley | 2013-05-21 19:51:59 +0200 (Tue, 21 May 2013) | 2 lines
+
+[FIX] auto_save: Check the user doing the save or preview has permission and is the one currently editing the page. Thanks Marcela B?\195?\169n?\195?\169trix
+Also modernise library use and fix some missing and/or unset vars
+----------------------------------------------
+r46016 | jonnybradley | 2013-05-21 19:47:52 +0200 (Tue, 21 May 2013) | 1 line
+
+[FIX] help: Remove randomly placed "Show Help" link (often found underneath the edit area, but sometimes in previews etc) and simplify jquery
+----------------------------------------------
+r46015 | jonnybradley | 2013-05-21 19:43:59 +0200 (Tue, 21 May 2013) | 1 line
+
+[DOC] A couple of missing param types in comments (show as errors in my IDE)
+----------------------------------------------
+r46014 | jonnybradley | 2013-05-21 18:16:40 +0200 (Tue, 21 May 2013) | 4 lines
+
+[FIX] gd: Test for version of GD lib was failing for v 2.1, so instead test for the required function only available in 2.0.1+
+Stops avatars coming out as black squares
+Left in TikiLib as it's called from other places
+(See http://php.net/manual/en/function.imagecreatetruecolor.php for more info)
+----------------------------------------------
+r46013 | jonnybradley | 2013-05-21 18:13:29 +0200 (Tue, 21 May 2013) | 1 line
+
+[FIX] avatars: Missing global and "_once"
+----------------------------------------------
+r46011 | jonnybradley | 2013-05-21 12:19:15 +0200 (Tue, 21 May 2013) | 1 line
+
+[FIX] IE: Missing per-theme code for IE9 CSS
+----------------------------------------------
+r46006 | jonnybradley | 2013-05-20 18:17:19 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] slider: plugin: Don't reset the $titles param var before using and remove <p> tags from the slide boundaries for valid html
+----------------------------------------------
+r46004 | jonnybradley | 2013-05-20 17:40:30 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] slider: plugin: The navigationFormatter formatting function needs to return a string or a DOM element, so append some spurious text to stop "1" being interpreted as an integer. Works, but is ugly...
+----------------------------------------------
+r46003 | jonnybradley | 2013-05-20 17:32:09 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] wysiwyg: Another go at the selection issue - simplify Tiki code and use ckeditor's API for it all directly, which seems to work ok now (even works on IE9 now!)
+----------------------------------------------
+r46002 | jonnybradley | 2013-05-20 17:00:26 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] composer: infinitecarousel moved back again (curse you composer!)
+----------------------------------------------
+r45999 | jonnybradley | 2013-05-20 16:19:46 +0200 (Mon, 20 May 2013) | 1 line
+
+composer.lock file with updated hash etc for anythingslider 1.9.1 (composer.json was committed earlier by mistake in r45985, apologies)
+----------------------------------------------
+r45997 | jyhem | 2013-05-20 16:01:43 +0200 (Mon, 20 May 2013) | 1 line
+
+[ENH][bp/r45996] Allow restriction to multiple categories
+----------------------------------------------
+r45992 | jyhem | 2013-05-20 15:15:56 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX][bp/r45991] The Id column is now also sortable
+----------------------------------------------
+r45989 | jyhem | 2013-05-20 14:29:49 +0200 (Mon, 20 May 2013) | 1 line
+
+[ENH][bp/r45988] Sorting by articleId works but nobody could figure it out
+----------------------------------------------
+r45987 | jonnybradley | 2013-05-20 12:03:58 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] jquery migration: toggle(fn, fn) is deprecated (confused with toggle effect)
+----------------------------------------------
+r45986 | jonnybradley | 2013-05-20 11:41:21 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] comments: get_user_email() is in userslib
+----------------------------------------------
+r45985 | jonnybradley | 2013-05-20 11:29:16 +0200 (Mon, 20 May 2013) | 1 line
+
+[FIX] comments: Missing global and a typo
+----------------------------------------------
+r45984 | jonnybradley | 2013-05-19 18:01:46 +0200 (Sun, 19 May 2013) | 1 line
+
+[FIX] jquery migration: andSelf() is replaced by addBack() in jq 1.9+
+----------------------------------------------
+r45983 | jonnybradley | 2013-05-19 17:45:05 +0200 (Sun, 19 May 2013) | 1 line
+
+[FIX] wysiwyg: Call the ckeditor dataProcessor.toDataFormat function when showing html mode source now that the "Advanced Content Filter" isn't interfering with our plugins source so that html is formatted properly again (thanks Geoff)
+----------------------------------------------
+r45982 | jonnybradley | 2013-05-19 17:00:08 +0200 (Sun, 19 May 2013) | 1 line
+
+[FIX] wysiwyg: Allow resize in both directions as was previous behaviour (ckeditor 4 defaults to 'vertical')
+----------------------------------------------
+r45980 | jonnybradley | 2013-05-19 16:37:33 +0200 (Sun, 19 May 2013) | 2 lines
+
+[FIX] wysiwyg: Replace outdated (and fragile) tests for ckeditor via DOM element existence with tests in CKEDITOR.instances array.
+Fixes http://dev.tiki.org/item4519 (thanks Geoff)
+----------------------------------------------
+r45979 | jonnybradley | 2013-05-19 16:10:01 +0200 (Sun, 19 May 2013) | 1 line
+
+[FIX] inline edit: Show the "rendered" output of datetime picker fields after saving
+----------------------------------------------
+r45978 | jonnybradley | 2013-05-19 15:55:39 +0200 (Sun, 19 May 2013) | 1 line
+
+[FIX] datetimepicker: Fixes for recent updates to timepicker (during move to composer libs). Several API changes and custom CSS no longer working (or needed)
+----------------------------------------------
+r45977 | jonnybradley | 2013-05-19 15:41:10 +0200 (Sun, 19 May 2013) | 4 lines
+
+[FIX] trackers: Save fields not working any more for some mysterious reason
+(can't see how it has been working for several years without this fix, but it obviously has...)
+As seen on nextdev.tiki.org/tiki-admin_tracker_fields.php
+
+----------------------------------------------
+r45975 | jonnybradley | 2013-05-18 18:51:53 +0200 (Sat, 18 May 2013) | 1 line
+
+[FIX] trackers: TextArea default height jumped from 4 rows to 15 at some point, causing layout issues - 4 was a bit short, so let's try 6? (thanks marclaporte)
+----------------------------------------------
+r45974 | jonnybradley | 2013-05-18 18:37:26 +0200 (Sat, 18 May 2013) | 1 line
+
+[FIX] sefurl admin: Typo in RewriteBase regular expression (thanks marclaporte, sorry it took so long ;)
+----------------------------------------------
+r45973 | jonnybradley | 2013-05-18 18:23:49 +0200 (Sat, 18 May 2013) | 1 line
+
+[FIX] inline edit: Show the rendered output of the field after it's been saved
+----------------------------------------------
+r45972 | jonnybradley | 2013-05-18 16:28:33 +0200 (Sat, 18 May 2013) | 1 line
+
+[ENH] sign plugin: Add an icon and a little css to reveal the info on hover so as to make less visual impact on the page while still keeping the data available
+----------------------------------------------
+r45971 | jonnybradley | 2013-05-17 15:55:07 +0200 (Fri, 17 May 2013) | 1 line
+
+[FIX] inline edit: Partial revert of 45856 to restore the 5 second delay before saving (having read and understood the code more fully now, i see it's to collect multiple edits into fewer AJAX requests)
+----------------------------------------------
+r45970 | jonnybradley | 2013-05-17 15:49:31 +0200 (Fri, 17 May 2013) | 1 line
+
+[FIX] modules: typos
+----------------------------------------------
+r45969 | mroussel | 2013-05-16 20:48:24 +0200 (Thu, 16 May 2013) | 1 line
+
+[FIX] User not in registered group when using CAS
+----------------------------------------------
+r45963 | lphuberdeau | 2013-05-16 15:24:18 +0200 (Thu, 16 May 2013) | 1 line
+
+[ENH] Updating WebODF to the latest version
+----------------------------------------------
+r45959 | jyhem | 2013-05-16 14:46:33 +0200 (Thu, 16 May 2013) | 1 line
+
+[FIX][bp/r45939] Fix warnings which interfere with proper XML syntax in RSS feeds
+----------------------------------------------
+r45956 | marclaporte | 2013-05-16 04:37:20 +0200 (Thu, 16 May 2013) | 1 line
+
+Official name in Composer (harmonize 11x and trunk for composer.json)
+----------------------------------------------
+r45952 | sampaioprimo | 2013-05-15 22:31:21 +0200 (Wed, 15 May 2013) | 1 line
+
+[fix] partially revert r45878. the fatal error is produced only by the call time pass by reference. this param should remain being passed by reference.
+----------------------------------------------
+r45948 | jonnybradley | 2013-05-15 18:04:04 +0200 (Wed, 15 May 2013) | 2 lines
+
+[FIX] tracker plugin: Stop page exploding when there are validation issues with the "generate() on a non-object" error (by including captchalib and assigning the global before use).
+However, the antibot code should not be appearing for registered users even when making a mistake, so partial revert of r45315 to fix the logic here and moving the showmandatory assign out of the "if antibot" clause.
+----------------------------------------------
+r45947 | jonnybradley | 2013-05-15 17:37:51 +0200 (Wed, 15 May 2013) | 1 line
+
+[FIX] tracker plugin: Put the field descriptions in the right place when using a tracker plugin
+----------------------------------------------
+r45946 | jonnybradley | 2013-05-15 17:26:45 +0200 (Wed, 15 May 2013) | 1 line
+
+[FIX] help popup: jquery-ui tabs no longer use "select" method it seems...
+----------------------------------------------
+r45945 | lphuberdeau | 2013-05-15 15:33:22 +0200 (Wed, 15 May 2013) | 1 line
+
+[FIX] Let WebODF render .ods and .odp
+----------------------------------------------
+r45943 | lphuberdeau | 2013-05-15 15:11:10 +0200 (Wed, 15 May 2013) | 1 line
+
+[ENH] Record last index rebuild and report on the admin screen
+----------------------------------------------
+r45940 | xavidp | 2013-05-15 12:21:49 +0200 (Wed, 15 May 2013) | 1 line
+
+[bp/r45938][fix] when a user is removed, remove it's reports preferences and cache. thks sampaioprimo
+----------------------------------------------
+r45936 | jonnybradley | 2013-05-14 13:34:46 +0200 (Tue, 14 May 2013) | 2 lines
+
+[FIX] IE9 css: Remove curious topbar_modules repositioning that makes the top modules 52px too high (as seen on nextdev.tiki.org etc)
+Also remove svn:executable prop and add Id keyword.
+----------------------------------------------
+r45935 | jonnybradley | 2013-05-14 12:55:55 +0200 (Tue, 14 May 2013) | 1 line
+
+[FIX] trackerlist: Perms array should be set up for all users, not just non-admins
+----------------------------------------------
+r45934 | jonnybradley | 2013-05-14 12:34:03 +0200 (Tue, 14 May 2013) | 1 line
+
+[FIX] cookie consent: Correct logic for when cookies not allowed (if tiki_cookie_jar not initialised getCookie was returning null)
+----------------------------------------------
+r45932 | jonnybradley | 2013-05-14 11:50:02 +0200 (Tue, 14 May 2013) | 1 line
+
+[FIX] cookie consent: Don't display the checkbox if the cookie_consent_question is empty (makes it simpler for users)
+----------------------------------------------
+r45931 | jonnybradley | 2013-05-14 11:44:00 +0200 (Tue, 14 May 2013) | 1 line
+
+[FIX] infinitecarousel moved?
+----------------------------------------------
+r45928 | jonnybradley | 2013-05-13 21:05:30 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] googleanalytics: Obey cookie consent pref and cookie (as it is now [optionally] included in tiki.tpl, the cookieconsent plugin cannot be used to check before the cookie is set)
+----------------------------------------------
+r45927 | jonnybradley | 2013-05-13 20:17:22 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] tracker: Similar issue with category checkboxes as with plain checkboxes - last category could never be switch off
+----------------------------------------------
+r45926 | jonnybradley | 2013-05-13 20:02:27 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] tracker: Fix category filter tracker list again - r45881 left it so you could not switch off checkboxes (ever, sorry) so add a hidden input to track switching them off
+----------------------------------------------
+r45923 | lphuberdeau | 2013-05-13 18:00:00 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] Should not include unfiltered input in a preg query
+----------------------------------------------
+r45921 | changi67 | 2013-05-13 17:44:32 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] Recommit this file which was making some trouble
+----------------------------------------------
+r45920 | changi67 | 2013-05-13 17:40:33 +0200 (Mon, 13 May 2013) | 3 lines
+
+[FIX] Try to fix the broken file
+
+
+----------------------------------------------
+r45919 | xavidp | 2013-05-13 13:36:22 +0200 (Mon, 13 May 2013) | 1 line
+
+[bp/r45914][FIX]Usability fix: count number next to numeric options (e.g. 1 to 5 in radio buttons, which can be quite common in surveys) and no column names is missleading for end users. Added a param to allow removing the count number, at least, since the user can display results in bars or percentages which is much less missleading. Backported from trunk since I had not that file when commiting due to the issue with sf.net svn
+----------------------------------------------
+r45918 | chibaguy | 2013-05-13 07:10:12 +0200 (Mon, 13 May 2013) | 1 line
+
+[FIX] [bp/45913] Update cssmenu dropdown arrows to use new Suckerfish method.
+----------------------------------------------
+r45912 | jyhem | 2013-05-12 12:31:25 +0200 (Sun, 12 May 2013) | 1 line
+
+[ROLLBACK/r45910] Ooops
+----------------------------------------------
+r45910 | jyhem | 2013-05-12 04:18:39 +0200 (Sun, 12 May 2013) | 1 line
+
+[FIX][bp/r45909] Correct warnings
+----------------------------------------------
+r45906 | lphuberdeau | 2013-05-10 19:15:51 +0200 (Fri, 10 May 2013) | 1 line
+
+[MOD] Prefer packaged files when downloading dependencies
+----------------------------------------------
+r45903 | jonnybradley | 2013-05-10 16:26:04 +0200 (Fri, 10 May 2013) | 1 line
+
+[FIX] trackerlist: Perms for the tracker seem to be in the $perms array, not in globals at this point
+----------------------------------------------
+r45902 | jonnybradley | 2013-05-10 16:24:41 +0200 (Fri, 10 May 2013) | 1 line
+
+[FAKE] Revert test property (didn't fix the repo)
+----------------------------------------------
+r45901 | jonnybradley | 2013-05-10 16:16:51 +0200 (Fri, 10 May 2013) | 1 line
+
+[FAKE] Setting a property to maybe fix the repo
+----------------------------------------------
+r45900 | lphuberdeau | 2013-05-10 15:07:03 +0200 (Fri, 10 May 2013) | 1 line
+
+[FAKE] Attempting to fix the repo?
+----------------------------------------------
+r45895 | jonnybradley | 2013-05-09 18:40:53 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] Syntax error from r45889 broke 11.x - please test before committing in the stable branch (and correct indentation helps)
+----------------------------------------------
+r45894 | jonnybradley | 2013-05-09 18:21:14 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] trackers: user_tracker_watch_editor is a user pref (oops, use $this not $tikilib)
+----------------------------------------------
+r45893 | jonnybradley | 2013-05-09 18:18:47 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] trackers: user_tracker_watch_editor is a user pref
+----------------------------------------------
+r45892 | jonnybradley | 2013-05-09 18:16:54 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] trackers: Couple of vars not set - $version is mainly a guess
+----------------------------------------------
+r45891 | jonnybradley | 2013-05-09 18:15:40 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] trackers: Preserve the order files are added to the Files field
+----------------------------------------------
+r45890 | xavidp | 2013-05-09 17:18:01 +0200 (Thu, 09 May 2013) | 1 line
+
+A few more strings translated, based on the fr translation
+----------------------------------------------
+r45889 | arildb | 2013-05-09 17:14:49 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] Add missing option to (de)activate inline comments.
+----------------------------------------------
+r45888 | jonnybradley | 2013-05-09 17:03:53 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] wysiwyg plugin: Update for ckeditor 4 (no jquery adaptor)
+----------------------------------------------
+r45886 | jonnybradley | 2013-05-09 16:33:55 +0200 (Thu, 09 May 2013) | 1 line
+
+[FIX] tracker: Fix category filter tracker list - field data was in wrong array of fields (not sure why we need to have 5 or 6 slightly different ones)
+----------------------------------------------
+r45883 | xavidp | 2013-05-09 16:18:55 +0200 (Thu, 09 May 2013) | 2 lines
+
+[FIX]Usability fixes: 
+* calendarid param was lost after each new edition through the convene js interface. * and the icon at the bottom to add the date to the calendar is nowadays only shown after a minimum number of votes have been cast, to prevent new users clicking at the icon when all dates have the icon (at the beginning) assuming that this is the way to indicate their choices (minvotes set to 3 by default, but overridable with a param)
+----------------------------------------------
+r45881 | jonnybradley | 2013-05-08 17:47:47 +0200 (Wed, 08 May 2013) | 1 line
+
+[FIX] tracker: Fix for checkbox when updating other fields (e.g. via inline edit), were getting set to 'n' if not specified
+----------------------------------------------
+r45878 | xavidp | 2013-05-08 10:07:46 +0200 (Wed, 08 May 2013) | 1 line
+
+[FIX]Call-time pass-by-reference has been deprecated in PHP 5, and in PHP 5.4, '&$watches' produced 'Fatal error'. Thanks lph and jonnyb for feedback on this issue.
+----------------------------------------------
+r45875 | jyhem | 2013-05-08 04:26:19 +0200 (Wed, 08 May 2013) | 1 line
+
+[FIX][bp/r45874] Use same default expiration date in profiles as for normal article creation
+----------------------------------------------
+r45872 | jonnybradley | 2013-05-07 18:03:25 +0200 (Tue, 07 May 2013) | 1 line
+
+[FIX] elFinder: Apparently Tiki files can end up with no name or filename somehow, which upsets elFinder deeply, so provide 'Unnamed file' in this case.
+----------------------------------------------
+r45867 | jonnybradley | 2013-05-07 11:48:12 +0200 (Tue, 07 May 2013) | 1 line
+
+[FIX] share: Reduce errors from facebook when more than one share module on a page (sadly doesn't fully eliminate them)
+----------------------------------------------
+r45860 | jyhem | 2013-05-06 18:54:44 +0200 (Mon, 06 May 2013) | 1 line
+
+[FIX][bp/r45859] Actually show newest articles on top
+----------------------------------------------
+r45856 | jonnybradley | 2013-05-06 11:45:53 +0200 (Mon, 06 May 2013) | 1 line
+
+[FIX] inline editing: Report details of back-end (tracker) errors, and reduce delay from 5 to 1 second
+----------------------------------------------
+r45855 | jonnybradley | 2013-05-06 11:36:48 +0200 (Mon, 06 May 2013) | 1 line
+
+[FIX] tracker: Correction for r45854: $categorized_fields is used, but pointlessly so kept as an extra check ('type' = 'e' should be enough)
+----------------------------------------------
+r45854 | jonnybradley | 2013-05-06 11:28:23 +0200 (Mon, 06 May 2013) | 1 line
+
+[FIX] tracker: $categorized_fields is not unused, needed in tracker service functions
+----------------------------------------------
+r45853 | jonnybradley | 2013-05-06 11:27:12 +0200 (Mon, 06 May 2013) | 1 line
+
+[FIX] tracker: Fix for category when updating other fields (e.g. via inline edit), category fields get wiped out if not specified
+----------------------------------------------
+r45852 | jonnybradley | 2013-05-04 11:44:58 +0200 (Sat, 04 May 2013) | 1 line
+
+[FIX] tracker: Fix for category when parentId is empty or 0 (should return all or just roots instead of nothing)
+----------------------------------------------
+r45850 | marclaporte | 2013-05-03 01:44:25 +0200 (Fri, 03 May 2013) | 1 line
+
+Direct links to each search option, from the admin panel
+----------------------------------------------
+r45836 | marclaporte | 2013-05-02 05:22:42 +0200 (Thu, 02 May 2013) | 1 line
+
+Since the Jison Parser is only for programmers for now, removing from the admin panel. The problem is that end users tend to click everything to try stuff, but then, they report bugs and don't know they are Jison Parser bugs
+----------------------------------------------
+r45835 | marclaporte | 2013-05-02 04:41:41 +0200 (Thu, 02 May 2013) | 1 line
+
+Adding some translations to French
+----------------------------------------------
+r45834 | marclaporte | 2013-05-01 22:38:52 +0200 (Wed, 01 May 2013) | 1 line
+
+fix paths for infinitecarousel
+----------------------------------------------
+r45833 | marclaporte | 2013-05-01 22:15:46 +0200 (Wed, 01 May 2013) | 1 line
+
+Adding fullcalendar-resourceviews 1.5.3.4 to vendor_extra/fullcalendar-resourceviews for now to avoid any package issues. 
+----------------------------------------------
+r45832 | marclaporte | 2013-05-01 21:32:48 +0200 (Wed, 01 May 2013) | 1 line
+
+Partial rollback of r45829. fullcalendar zip from Github is not the packaged version we need
+----------------------------------------------
+r45830 | jonnybradley | 2013-05-01 20:26:51 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] tracker icons: Use file title as icon title attribute
+----------------------------------------------
+r45829 | marclaporte | 2013-05-01 19:51:58 +0200 (Wed, 01 May 2013) | 1 line
+
+Restore 2 Composer packages which were causing issues.
+----------------------------------------------
+r45826 | jonnybradley | 2013-05-01 19:09:50 +0200 (Wed, 01 May 2013) | 1 line
+
+[MOD] tracker icons: Trigger an event when the icon picker opens so custom actions can be applied (e.g. in CartoGraf)
+----------------------------------------------
+r45825 | jonnybradley | 2013-05-01 17:57:52 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] elfinder: Translate volumes, gallery and file names (thanks marclaporte)
+----------------------------------------------
+r45823 | jonnybradley | 2013-05-01 17:13:25 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] trackers: Hide trackers with adminOnlyViewEditItem set from non admin users in trackers list
+----------------------------------------------
+r45822 | jonnybradley | 2013-05-01 16:53:09 +0200 (Wed, 01 May 2013) | 3 lines
+
+[FIX] jison parser: Disable feature_jison_wiki_parser in the systemConfiguration, which switches it off and disables the prefs needed to turn it back on.
+This is to reduce support issues resulting from people trying it out by mistake and running into trouble.
+Can be overridden by just commenting the line out, or adding it to a tiki.ini file, for development (thanks marclaporte)
+----------------------------------------------
+r45821 | jonnybradley | 2013-05-01 16:25:34 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] trackerlist: export link fix when no sefurl (and add missing service dialog) thanks marclaporte
+----------------------------------------------
+r45818 | jonnybradley | 2013-05-01 11:35:46 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] trackers webservice: Use the field value for the request
+----------------------------------------------
+r45817 | jonnybradley | 2013-05-01 11:33:05 +0200 (Wed, 01 May 2013) | 1 line
+
+[FIX] rss: Better test for empty
+----------------------------------------------
+r45803 | marclaporte | 2013-04-30 16:28:45 +0200 (Tue, 30 Apr 2013) | 1 line
+
+Removing 2 Composer packages which are causing issues. We'll re-add when the issues are resolved
+----------------------------------------------
+r45802 | jonnybradley | 2013-04-30 00:22:54 +0200 (Tue, 30 Apr 2013) | 1 line
+
+[FIX] search/admin: Check for queue_count before auto-reloading the page when queue processing
+----------------------------------------------
+r45795 | jonnybradley | 2013-04-29 17:56:50 +0200 (Mon, 29 Apr 2013) | 1 line
+
+[FIX] elfinder: Use built in elFinder translations (thanks marclaporte)
+----------------------------------------------
+r45794 | jonnybradley | 2013-04-29 17:54:39 +0200 (Mon, 29 Apr 2013) | 1 line
+
+[FIX] i18n: Add language pref to jqueryTiki object, and move the loading of lang/$language/custom.js to before any in styles (so they can be translated)
+----------------------------------------------
+r45791 | marclaporte | 2013-04-29 17:08:38 +0200 (Mon, 29 Apr 2013) | 1 line
+
+update inline doc to use new php console.php goodness
+----------------------------------------------
+r45790 | lphuberdeau | 2013-04-29 15:55:52 +0200 (Mon, 29 Apr 2013) | 1 line
+
+[FIX] Change the compile ID instead of the compile directory for language changes, remove old hacks in fetch which is not used by all smarty internal calls anymore
+----------------------------------------------
+r45760 | lindonb | 2013-04-29 03:54:24 +0200 (Mon, 29 Apr 2013) | 2 lines
+
+[FIX] Bring back today focus and other various fixes for the various calendar views.
+
+----------------------------------------------
+r45759 | lindonb | 2013-04-29 03:49:27 +0200 (Mon, 29 Apr 2013) | 2 lines
+
+[FIX] Placement of events on weekmode calendar views was off; text and background color for color-coded calendars weren't consistently used. Other small fixes. Also, changes to bring back day focus in the various views - to be followed by related commits to template and css files.
+
+----------------------------------------------
+r45757 | lindonb | 2013-04-29 03:35:24 +0200 (Mon, 29 Apr 2013) | 2 lines
+
+[FIX] Rerun composer.lock 
+
+----------------------------------------------
+r45756 | lindonb | 2013-04-29 03:29:29 +0200 (Mon, 29 Apr 2013) | 2 lines
+
+[FIX] Sync composer.lock with trunk. 
+
+----------------------------------------------
+r45755 | lindonb | 2013-04-29 03:17:49 +0200 (Mon, 29 Apr 2013) | 1 line
+
+[FIX] Sync composer.json with trunk
+----------------------------------------------
+r45751 | marclaporte | 2013-04-28 22:59:54 +0200 (Sun, 28 Apr 2013) | 1 line
+
+Various improvements and documentation to Registration Passcode to block automated spammers. Used double-quotes instead of single quotes, which is better for translations
+----------------------------------------------
+r45748 | jonnybradley | 2013-04-28 21:51:41 +0200 (Sun, 28 Apr 2013) | 1 line
+
+[bp/r45744][FIX] error in 45350 (needed here too, sylvieg?)
+----------------------------------------------
+r45745 | marclaporte | 2013-04-28 20:41:53 +0200 (Sun, 28 Apr 2013) | 1 line
+
+Improve error message for Composer
+----------------------------------------------
+r45741 | jonnybradley | 2013-04-28 15:04:41 +0200 (Sun, 28 Apr 2013) | 3 lines
+
+[FIX] elFinder recommit: New option "startRoot" to select which volume the startPath resides in.
+Zero based index relating to the "roots" array. That volume should contain a legitimate "startPath" entry.
+[Fix now on github, still working on getting it fully upstreamed]
+----------------------------------------------
+r45738 | jonnybradley | 2013-04-27 17:54:58 +0200 (Sat, 27 Apr 2013) | 1 line
+
+[bp/r45737] [FIX] Some calls would include trailing slash, causing // paths
+----------------------------------------------
+r45736 | marclaporte | 2013-04-27 05:23:22 +0200 (Sat, 27 Apr 2013) | 1 line
+
+Revert r42936 as we will use the OpenLayers standard after all 
+----------------------------------------------
+r45735 | luciash | 2013-04-27 05:09:30 +0200 (Sat, 27 Apr 2013) | 1 line
+
+[FIX] wrong place for translation of layer names
+----------------------------------------------
+r45734 | jonnybradley | 2013-04-27 00:17:05 +0200 (Sat, 27 Apr 2013) | 1 line
+
+[FIX] objectperms: Allow section collapse when list not initially collapsed
+----------------------------------------------
+r45733 | jonnybradley | 2013-04-27 00:11:16 +0200 (Sat, 27 Apr 2013) | 1 line
+
+[FIX] setup: Correct paths to jquery-migrate plugin for CDNs and use minified version
+----------------------------------------------
+r45732 | jonnybradley | 2013-04-27 00:07:07 +0200 (Sat, 27 Apr 2013) | 1 line
+
+Add minified jquery migrate plugin to composer
+----------------------------------------------
+r45730 | changi67 | 2013-04-26 21:51:34 +0200 (Fri, 26 Apr 2013) | 2 lines
+
+[FIX] need some use due to composer
+[FIX] Wrong class name
+----------------------------------------------
+r45728 | changi67 | 2013-04-26 21:12:04 +0200 (Fri, 26 Apr 2013) | 1 line
+
+[FIX] Removed references to PHPUnit_Extensions_OutputTestCase as it has been merged into PHPUnit_Framework_TestCase
+----------------------------------------------
+r45726 | jonnybradley | 2013-04-26 20:59:39 +0200 (Fri, 26 Apr 2013) | 2 lines
+
+[FIX] wysiwyg: Fixes for html mode - using the new "Advanced Content Filter" (actually disabling it) as that's what was causing the plugins to disappear.
+Also tidy up conflict between which dataProcessor.toDataFormat to use (tikiplugin or tikiwiki) and a couple of other fixes.
+----------------------------------------------
+r45725 | jonnybradley | 2013-04-26 20:56:43 +0200 (Fri, 26 Apr 2013) | 1 line
+
+[FIX] wysiwyg: Add iframe to the list of plugins not to parse for wysiwyg
+----------------------------------------------
+r45723 | changi67 | 2013-04-26 19:31:12 +0200 (Fri, 26 Apr 2013) | 1 line
+
+no changes phpcs styling - see http://qa.tiki.org
+----------------------------------------------
+r45721 | jonnybradley | 2013-04-26 18:45:29 +0200 (Fri, 26 Apr 2013) | 6 lines
+
+[FIX] wysiwyg: Extensive re-workings for ckeditor4 after the removal of ckeditor3, including:
+* Not using ckeditor's dataProcessor.toHtml and toDataFormat functions as these now seem to eat our plugins (commented out as we should fix this)
+* Using html5 data attributes to store plugin info
+* Better detection of html/wiki modes
+* Better selection and protection of plugins
+* Tested (mildly) on Firefox, Safari and IE8
+----------------------------------------------
+r45716 | jonnybradley | 2013-04-25 22:11:09 +0200 (Thu, 25 Apr 2013) | 1 line
+
+update ckeditor to 4.1.1 (requires kama skin update too)
+----------------------------------------------
+r45715 | jonnybradley | 2013-04-25 21:38:15 +0200 (Thu, 25 Apr 2013) | 1 line
+
+update ckeditor to 4.1.1
+----------------------------------------------
+r45713 | lindonb | 2013-04-25 05:55:01 +0200 (Thu, 25 Apr 2013) | 1 line
+
+[FIX] Load CSS files needed for specific modules (so far just calendar modules) as loading from module php or template files doesn't work since r44022. By placing in tiki-modules, CSS won't be loaded unless module is assigned, although will still be loaded even if module doesn't show due to permissions.
+----------------------------------------------
+r45711 | jonnybradley | 2013-04-24 22:53:17 +0200 (Wed, 24 Apr 2013) | 1 line
+
+[FIX] objectperms: Fix collapse/expand on treetable for perms admin, plus some general code modernisation (could do with more one day)
+----------------------------------------------
+r45710 | jonnybradley | 2013-04-24 21:26:29 +0200 (Wed, 24 Apr 2013) | 1 line
+
+[FIX] various notices
+----------------------------------------------
+r45708 | jonnybradley | 2013-04-24 00:31:31 +0200 (Wed, 24 Apr 2013) | 1 line
+
+[FIX] images: suppress errors on image size functions in gd
+----------------------------------------------
+r45707 | jonnybradley | 2013-04-24 00:30:50 +0200 (Wed, 24 Apr 2013) | 1 line
+
+[FIX] elfinder: Get remote images for the elFinder cache so it can make thumbnails etc
+----------------------------------------------
+r45706 | jonnybradley | 2013-04-23 23:50:19 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] trackers: Add removal of child items in tracker/remove_item service to match clone_item (which clones child items)
+----------------------------------------------
+r45705 | jonnybradley | 2013-04-23 23:48:28 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] trackers: getItemId is not a method of Tracker_Item, so use the itemId in it's info
+----------------------------------------------
+r45703 | yonixxx | 2013-04-23 22:00:23 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[BRA]Link changed to the new branches 11.x
+----------------------------------------------
+r45702 | yonixxx | 2013-04-23 21:17:46 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[BRANCH] Creation, branches/11.x 0 to 45701
+----------------------------------------------
+r45701 | jonnybradley | 2013-04-23 18:48:36 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[ENH] filegals: Add prefs for default max image width and height for new galleries
+----------------------------------------------
+r45700 | jonnybradley | 2013-04-23 17:57:02 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[ENH] trackers: Add new param to Icons field to allow more icons per page, 24 not enough - default to 120
+----------------------------------------------
+r45699 | jonnybradley | 2013-04-23 17:31:52 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] jquery: jquery-ui 1.10 required us to remove the dialog div after destroying it - so dull...
+----------------------------------------------
+r45698 | jonnybradley | 2013-04-23 15:28:54 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] setup: Avoid fatal errors
+----------------------------------------------
+r45697 | jonnybradley | 2013-04-23 15:24:06 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] img: Don't add <br> tags after images to position the "draw" icons (as seen https://tiki.org/TikiFestMontreal-Ottawa11#Photos if logged in)
+----------------------------------------------
+r45696 | luciash | 2013-04-23 07:40:56 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] Composer: added Chosen to composer - forgot to commit the lock file, sorry and thanks jonnyb
+----------------------------------------------
+r45695 | luciash | 2013-04-23 06:18:49 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[NEW] Composer: added Chosen to composer - see http://harvesthq.github.io/chosen/ for more info, integration coming soon
+----------------------------------------------
+r45694 | omstefanov | 2013-04-23 00:11:28 +0200 (Tue, 23 Apr 2013) | 1 line
+
+[FIX] Page Forward and back on List of Group Members, if group consists of more members that fit on a single screen (default=25), now works, staying on 3rd tab, rather than switching to 2nd tab.
+----------------------------------------------
+r45676 | dabright | 2013-04-22 19:31:40 +0200 (Mon, 22 Apr 2013) | 2 lines
+
+[FIX] If the target of the user link is the logged-in user, then display the link regardless of the user_information preference value. There is no security risk in displaying the user's own user link.
+
+----------------------------------------------
+r45675 | chibaguy | 2013-04-22 18:04:23 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] Comments link (when .articletrailer had text:align-right) displayed under action icons (overlapped).
+----------------------------------------------
+r45674 | chibaguy | 2013-04-22 17:53:40 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] Correct box title color when it is a link (make uniform with other box titles).
+----------------------------------------------
+r45673 | chibaguy | 2013-04-22 17:40:50 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] remark box title left and top borders were missing.
+----------------------------------------------
+r45672 | chibaguy | 2013-04-22 17:31:35 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] Padding on #header caused it to be wider than middle. Margin on #header > .content used instead.
+----------------------------------------------
+r45671 | jonnybradley | 2013-04-22 01:30:14 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] utopias: Change siteloginbar from id to class - replace image on attainable with gradient, a few other minor improvements...
+----------------------------------------------
+r45670 | lphuberdeau | 2013-04-22 01:15:39 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX]?\194?\160Term boosting would not apply on search phrases
+----------------------------------------------
+r45669 | lphuberdeau | 2013-04-22 01:06:30 +0200 (Mon, 22 Apr 2013) | 1 line
+
+[FIX] Padding search terms with byte order marks in the lucene query building
+----------------------------------------------
+r45664 | jonnybradley | 2013-04-21 23:31:43 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[NEW] Utopias theme & options for Tiki 11 (& 12 ;)
+----------------------------------------------
+r45663 | lphuberdeau | 2013-04-21 23:01:06 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Specify the file permissions when building the lucene index and disable optimization for the preference search
+----------------------------------------------
+r45662 | lphuberdeau | 2013-04-21 22:56:31 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Incomplete file check would confuse ole.php and console.php, preventing to index sheets from the command line
+----------------------------------------------
+r45661 | lphuberdeau | 2013-04-21 22:15:35 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Hebrew (and likely generally improved utf-8 support) for unified search
+----------------------------------------------
+r45660 | jonnybradley | 2013-04-21 21:58:20 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] composer: Typo (oops)
+----------------------------------------------
+r45659 | lphuberdeau | 2013-04-21 21:42:00 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Name conflict of the preference index rebuild with the unified search rebuild, causing the content re-index to be much longer than needed
+----------------------------------------------
+r45658 | lphuberdeau | 2013-04-21 20:55:30 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX]?\194?\160Rename half performed
+----------------------------------------------
+r45657 | yonixxx | 2013-04-21 20:51:44 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[ENH] removing unused files from the theme
+----------------------------------------------
+r45656 | yonixxx | 2013-04-21 20:39:50 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[THE]Greenvalley theme 100% working rtl and ltr theme
+----------------------------------------------
+r45655 | lphuberdeau | 2013-04-21 20:30:53 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Clean-up implementation for textranges and dateranges
+----------------------------------------------
+r45654 | kstingel | 2013-04-21 19:53:32 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[REF] edit to page level docBlock, modified Package assignment and added description
+----------------------------------------------
+r45653 | lphuberdeau | 2013-04-21 19:51:01 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Re-do the OR query grouping for custom search by introducing subqueries
+----------------------------------------------
+r45652 | jonnybradley | 2013-04-21 18:50:45 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] composer: Restore missing nestedsortable plugin (lost in a storm somewhere), also missing changes in composer.lock from jquery lib move
+----------------------------------------------
+r45651 | jonnybradley | 2013-04-21 18:49:17 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] composer: Remove mysterious include of non-existent js file form toolbarslib
+----------------------------------------------
+r45650 | jonnybradley | 2013-04-21 18:46:32 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] customsearch: Half finished fix for cs groups - text and date ranges working ok, OR groups still TODO (LP?)
+----------------------------------------------
+r45649 | luciash | 2013-04-21 18:46:07 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[NEW] Bootstrap 3 preps: first step towards Bootstrap Themes transition - btn class for the button Smarty function
+----------------------------------------------
+r45648 | lindonb | 2013-04-21 18:10:32 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] composer: Strip out unnecessary tablesorter files
+----------------------------------------------
+r45647 | jonnybradley | 2013-04-21 17:57:26 +0200 (Sun, 21 Apr 2013) | 2 lines
+
+[MOD] Move jquery to composer
+Also update jquery/README.md to show everything is up to date before it is deleted (for the record)
+----------------------------------------------
+r45646 | jonnybradley | 2013-04-21 17:52:37 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] css typo
+----------------------------------------------
+r45645 | jonnybradley | 2013-04-21 17:33:00 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move migrate to composer (hurrah! Last of the jquery plugins)
+----------------------------------------------
+r45644 | lphuberdeau | 2013-04-21 17:28:40 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX]?\194?\160Remove the controller-only pattern that is not really used and make sure when the sefurl for page matches the tiki-controller-action pattern, the page is rejected
+----------------------------------------------
+r45641 | jyhem | 2013-04-21 16:41:36 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Display article type attributes in predictable order
+----------------------------------------------
+r45640 | jonnybradley | 2013-04-21 15:31:35 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move sparkline to composer
+----------------------------------------------
+r45639 | chibaguy | 2013-04-21 05:07:46 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Some themes are missing these calendar module layout styles. Thanks, Lindon.
+----------------------------------------------
+r45637 | jonnybradley | 2013-04-21 02:33:19 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move md5 to composer
+----------------------------------------------
+r45636 | jonnybradley | 2013-04-21 02:28:34 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move pxem to composer
+----------------------------------------------
+r45635 | jonnybradley | 2013-04-21 02:19:50 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move jquery.media to composer
+----------------------------------------------
+r45634 | jonnybradley | 2013-04-21 02:10:58 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move jquery.form to composer
+----------------------------------------------
+r45633 | jonnybradley | 2013-04-21 01:39:14 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[MOD] Move async to composer
+----------------------------------------------
+r45631 | jonnybradley | 2013-04-21 01:24:16 +0200 (Sun, 21 Apr 2013) | 2 lines
+
+[MOD] Move treetable to composer
+NB: The "tree" behaviour of this object is currently not working (as seen in tiki-objectpermissions.php only), but JS errors have now been eliminated and previous functionality will be restored in the next day or two...
+----------------------------------------------
+r45629 | lphuberdeau | 2013-04-21 00:45:17 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] If the directory is not readable, abort
+----------------------------------------------
+r45628 | lphuberdeau | 2013-04-21 00:41:58 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] When a file in the directory cannot be deleted, the folder cannot be
+----------------------------------------------
+r45627 | lphuberdeau | 2013-04-21 00:31:08 +0200 (Sun, 21 Apr 2013) | 1 line
+
+[FIX] Make sure the files are writable before deleting them, and cleaning up a few more useless large directories
+----------------------------------------------
+r45626 | lphuberdeau | 2013-04-20 23:07:59 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[ENH] Refactoring the recent dynamic configuration code for BBB
+----------------------------------------------
+r45625 | luciash | 2013-04-20 22:43:43 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[FIX] colorbox: title: true does not make sense here ( fixes http://dev.tiki.org/item4434 )
+----------------------------------------------
+r45624 | jonnybradley | 2013-04-20 22:01:48 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move tablesorter to composer
+----------------------------------------------
+r45623 | jonnybradley | 2013-04-20 21:43:44 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move superfish to composer
+----------------------------------------------
+r45622 | jonnybradley | 2013-04-20 21:25:53 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move reflection-jquery to composer
+----------------------------------------------
+r45621 | nkoth | 2013-04-20 19:35:29 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[ENH] Provide option to not send newsletter if article clipping results in no items tks Nelson
+----------------------------------------------
+r45620 | jonnybradley | 2013-04-20 19:24:25 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move jquery-json to composer
+----------------------------------------------
+r45619 | jonnybradley | 2013-04-20 18:48:09 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move jquery-validate to composer
+----------------------------------------------
+r45618 | nkoth | 2013-04-20 18:45:43 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[DOC] document purpose fo style from prev commit
+----------------------------------------------
+r45616 | lphuberdeau | 2013-04-20 16:17:41 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[FIX]?\194?\160(attempt)  not populated in pretty tracker registration
+----------------------------------------------
+r45615 | jonnybradley | 2013-04-20 00:23:01 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] Move galleriffic to composer
+----------------------------------------------
+r45614 | jonnybradley | 2013-04-20 00:22:17 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] galleriffic: Replace .content with .gcontent in our copy of galleriffic css
+----------------------------------------------
+r45613 | jonnybradley | 2013-04-20 00:20:19 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD] galleriffic: Add copy of galleriffic css as we need to modify it slightly
+----------------------------------------------
+r45612 | lphuberdeau | 2013-04-20 00:12:28 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[MOD]?\194?\160Adding experimental support for BBB dynamic configuration
+----------------------------------------------
+r45611 | jonnybradley | 2013-04-20 00:11:01 +0200 (Sat, 20 Apr 2013) | 1 line
+
+[FIX] modules: Don't add empty string as an additional module zone
+----------------------------------------------
+r45610 | jonnybradley | 2013-04-19 23:44:53 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[MOD] Move jtrack to composer
+----------------------------------------------
+r45609 | jonnybradley | 2013-04-19 23:37:44 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[MOD] Move photoswipe to composer
+----------------------------------------------
+r45608 | jonnybradley | 2013-04-19 23:06:02 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] mobile: Update mobile tpls and add mobile handling for modulelist, plus some other small fixes
+----------------------------------------------
+r45607 | jonnybradley | 2013-04-19 23:04:06 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] filegals: Check for tooltip pref in js
+----------------------------------------------
+r45606 | jonnybradley | 2013-04-19 21:44:00 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] login: Check for tooltip pref
+----------------------------------------------
+r45605 | jonnybradley | 2013-04-19 21:32:24 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] editing: Restore confirm exit check for wiki and wysiwyg (been away a while). Tested (working) on Fx and webkit only so far...
+----------------------------------------------
+r45604 | jonnybradley | 2013-04-19 18:03:09 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] wysiwyg: Use our custom config (should fix incorrect toolbars, css, rtl, etc)
+----------------------------------------------
+r45603 | jonnybradley | 2013-04-19 18:01:37 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] composer: Commit lock file with info about infinitecarousel (and convert some spaces to tabs)
+----------------------------------------------
+r45600 | lphuberdeau | 2013-04-19 17:48:42 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] When the default locale is german, and possibly others, the generated lucene query was invalid. (seen on windows)
+----------------------------------------------
+r45599 | jonnybradley | 2013-04-19 17:25:12 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] carousel: Missing dir in image path
+----------------------------------------------
+r45598 | nkoth | 2013-04-19 08:38:21 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] Translation "Manage Translation" via globe was not working before
+----------------------------------------------
+r45597 | nkoth | 2013-04-19 07:17:31 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] Prevent error when trying to translate a page via globe icon when no language is set
+----------------------------------------------
+r45596 | nkoth | 2013-04-19 07:16:19 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] Prevent missing dependency error on translation page
+----------------------------------------------
+r45595 | omstefanov | 2013-04-19 05:23:35 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[MOD] Move infinitecarousel to Composer.
+----------------------------------------------
+r45591 | lphuberdeau | 2013-04-19 02:44:42 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[MOD] Moving jquery mobile to composer
+----------------------------------------------
+r45590 | marclaporte | 2013-04-19 00:47:39 +0200 (Fri, 19 Apr 2013) | 1 line
+
+fix a path following change to Composer.
+----------------------------------------------
+r45589 | lphuberdeau | 2013-04-19 00:47:37 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX]?\194?\160Reload the style paths once the style has been fully determined
+----------------------------------------------
+r45587 | marclaporte | 2013-04-19 00:40:35 +0200 (Fri, 19 Apr 2013) | 1 line
+
+removing redundant dirs
+----------------------------------------------
+r45586 | jonnybradley | 2013-04-19 00:11:56 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[FIX] elfinder: Interface to _save function had changed in latest elFinder - minor correction for that
+----------------------------------------------
+r45585 | jonnybradley | 2013-04-19 00:10:40 +0200 (Fri, 19 Apr 2013) | 1 line
+
+[MOD] Moving elfinder to vendor_extra (latest pre-build zip is too old, and current dev branch on github (https://github.com/Studio-42/elFinder) requires other build processes, so using latest nightly build from https://github.com/nao-pon/elFinder-nightly)
+----------------------------------------------
+r45584 | marclaporte | 2013-04-18 23:57:41 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Moving jQuery.s5 from SVN externals to Composer
+----------------------------------------------
+r45583 | lphuberdeau | 2013-04-18 23:20:37 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] jQuery UI dialog is z-index 100, surely menus need to be below that
+----------------------------------------------
+r45582 | lphuberdeau | 2013-04-18 23:16:26 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[ENH] Performance enhancement by keeping a single cache copy of the plugin editor help for all instances rather than one per area-id, which can be dynamically generated (cuts off around 30% of page execution and saves loads of disk space)
+----------------------------------------------
+r45580 | omstefanov | 2013-04-18 22:52:51 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD] Move minicart to Composer.
+----------------------------------------------
+r45579 | omstefanov | 2013-04-18 22:30:43 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Fivealive: Remove unnecessary zindex to prevent LOGOUT button appearing on top of other windows, e.g. minicart.
+----------------------------------------------
+r45577 | lphuberdeau | 2013-04-18 20:17:12 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Encoding in module parameter lists
+----------------------------------------------
+r45576 | lphuberdeau | 2013-04-18 18:14:08 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] More broken sefurl redirection
+----------------------------------------------
+r45575 | lphuberdeau | 2013-04-18 17:51:49 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX]?\194?\160Old paths hardcoded. Looks like those were not real externals. Now managed through autoloading
+----------------------------------------------
+r45574 | lphuberdeau | 2013-04-18 17:26:47 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD]?\194?\160Removing the pear external and moving it to vendor_extra, too hard to manage using composer/pear
+----------------------------------------------
+r45573 | lphuberdeau | 2013-04-18 17:04:20 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD]?\194?\160Moving some of the used to be externals to vendor_extra to preserve a good separation and avoid svn conflicts
+----------------------------------------------
+r45570 | nkoth | 2013-04-18 07:27:38 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Toolbars unexpected behavior - some icons disappeared
+----------------------------------------------
+r45569 | omstefanov | 2013-04-18 06:15:02 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Modules: On Asssign module, Assign button now fixed to return to tab 1, instead of (incorrect) tab 2.
+----------------------------------------------
+r45567 | chibaguy | 2013-04-18 05:59:41 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] W3C validator errors.
+----------------------------------------------
+r45565 | marclaporte | 2013-04-18 05:42:50 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Moving jCapture-applet from SVN externals to Composer
+----------------------------------------------
+r45564 | lphuberdeau | 2013-04-18 04:57:52 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[NEW] Profile install and forget commands, and improvements to empty/missing profile detection
+----------------------------------------------
+r45563 | chibaguy | 2013-04-18 04:38:43 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Too many borders on highlighted buttons. Thanks, Bernard.
+----------------------------------------------
+r45561 | jonnybradley | 2013-04-18 04:18:50 +0200 (Thu, 18 Apr 2013) | 2 lines
+
+[FIX] brosho: Workaround for the hard-coded, and malfunctioning, auto-init in jquery.brosho.js
+(missing file error only happens when you click the link now, and it does say it's experimental!)
+----------------------------------------------
+r45559 | lphuberdeau | 2013-04-18 04:04:55 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Removing some extra, unrequired, parameters for links generated through tracker links
+----------------------------------------------
+r45558 | lphuberdeau | 2013-04-18 03:44:53 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Appropriate permission checks not to propose adding comments if not allowed
+----------------------------------------------
+r45557 | lphuberdeau | 2013-04-18 03:34:07 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] When sefurl is enabled, article creation would redirect to an error page due to bad filtering rules
+----------------------------------------------
+r45556 | jonnybradley | 2013-04-18 03:18:52 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD] Moving colorpicker to composer
+----------------------------------------------
+r45555 | jonnybradley | 2013-04-18 03:06:08 +0200 (Thu, 18 Apr 2013) | 2 lines
+
+[FIX] themegen: Replace jquery.color.js toHEX function with a local getHex as jquery.color.js is no longer compatible with jquery 1.9
+Remove jquery.color.js from third_party - updated version can be added back if/when themegen development restarts
+----------------------------------------------
+r45554 | marclaporte | 2013-04-18 02:35:40 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Moving Simile_Timeline from SVN externals to Composer
+----------------------------------------------
+r45553 | jonnybradley | 2013-04-18 02:33:13 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] colorbox: correct default for new pref (thanks LP)
+----------------------------------------------
+r45552 | lphuberdeau | 2013-04-18 01:51:21 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[ENH] Additional cleanup of extra bundled jquery
+----------------------------------------------
+r45551 | lphuberdeau | 2013-04-18 01:46:44 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[FIX] Preventing error when the value of the select box contains special characters
+----------------------------------------------
+r45550 | marclaporte | 2013-04-18 01:46:41 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Adding mobileesp (latest which is dated April 23, 2012) directly to avoid having an SVN external. I tried to use Composer but the file wasn't easily accessible. Since it's just one file, just putting here.
+----------------------------------------------
+r45549 | marclaporte | 2013-04-18 01:23:46 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Remove MobileESP from the externals. I will add manually in next commit.
+----------------------------------------------
+r45548 | marclaporte | 2013-04-18 01:09:49 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Adding PclZip 2.8.2 directly to avoid having an SVN external. I tried to use Composer but the zip file wasn't easily accessible. Since it's just one file, just putting here.
+----------------------------------------------
+r45547 | jonnybradley | 2013-04-18 01:06:15 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[ENH] Expose other colorbox "themes" (instead of deleting them - number four is rather nice)
+----------------------------------------------
+r45546 | lphuberdeau | 2013-04-18 00:49:43 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD] Moving fullcalendar (resourceview) to composer and fixing for jquery 1.9+
+----------------------------------------------
+r45545 | jonnybradley | 2013-04-18 00:48:09 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD] Moving colorbox to composer
+----------------------------------------------
+r45544 | marclaporte | 2013-04-18 00:47:54 +0200 (Thu, 18 Apr 2013) | 1 line
+
+Remove PCLZip from the externals. I will add manually in next commit
+----------------------------------------------
+r45543 | jonnybradley | 2013-04-18 00:17:14 +0200 (Thu, 18 Apr 2013) | 1 line
+
+[MOD] Moving cluetip to composer
+----------------------------------------------
+r45542 | jonnybradley | 2013-04-17 23:39:35 +0200 (Wed, 17 Apr 2013) | 1 line
+
+[MOD] Moving brosho to composer
+----------------------------------------------
+r45541 | jonnybradley | 2013-04-17 22:27:30 +0200 (Wed, 17 Apr 2013) | 1 line
+
+[MOD] Moving anythingslider to composer
+----------------------------------------------
+r45540 | lphuberdeau | 2013-04-17 20:23:36 +0200 (Wed, 17 Apr 2013) | 1 line
+
+[FIX] Reset preference to default broke by jquery update, rewrote all of it
+----------------------------------------------
+r45537 | nkoth | 2013-04-17 07:41:03 +0200 (Wed, 17 Apr 2013) | 2 lines
+
+[FIX] Country selector showing the flag if set in search results in encoded format which is unreadable
+
+----------------------------------------------
+r45536 | nkoth | 2013-04-17 07:33:22 +0200 (Wed, 17 Apr 2013) | 2 lines
+
+[FIX][MOD] Items link field text value and remote field value should be sortable
+
+----------------------------------------------
+r45535 | nkoth | 2013-04-17 07:30:08 +0200 (Wed, 17 Apr 2013) | 2 lines
+
+[FIX][MOD] Tracker Items List field text content should be sortable
+
+----------------------------------------------
+r45534 | nkoth | 2013-04-17 07:27:34 +0200 (Wed, 17 Apr 2013) | 2 lines
+
+[FIX][ROLLBACK] Rollback r44785 because performance enhancement leads to unmpredictable weird results
+
+----------------------------------------------
+r45530 | lphuberdeau | 2013-04-16 21:30:44 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[ENH] Stripping out more doc/demo/test folders
+----------------------------------------------
+r45529 | lphuberdeau | 2013-04-16 21:13:40 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving svg-edit to composer
+----------------------------------------------
+r45528 | lphuberdeau | 2013-04-16 20:54:14 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving html5shim to composer, which has been renamed to html5shiv since
+----------------------------------------------
+r45526 | lphuberdeau | 2013-04-16 20:38:48 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving rangy to composer
+----------------------------------------------
+r45524 | lphuberdeau | 2013-04-16 20:24:28 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving codemirror to composer (we have 2.25 apparently, 2.38 and 3.11 is out)
+----------------------------------------------
+r45522 | lphuberdeau | 2013-04-16 20:13:30 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving jquery sheet to composer
+----------------------------------------------
+r45521 | lphuberdeau | 2013-04-16 19:58:17 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Moving ckeditor to composer, jquery adapter not present anymore, seems to work without it
+----------------------------------------------
+r45520 | jonnybradley | 2013-04-16 19:53:36 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] trackers: Store streetview "files" in the correct gallery (if it's a user gallery), clone the attribute for remote/streetview files too - and refactor check_user_file_gallery code into filegallib.
+----------------------------------------------
+r45519 | lphuberdeau | 2013-04-16 19:25:44 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[KIL] Removing ckeditor3, which is not used anymore
+----------------------------------------------
+r45517 | lphuberdeau | 2013-04-16 18:17:41 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Adding stemming support for elasticsearch (tons of options, but the current ones seem to be close to what was in lucene)
+----------------------------------------------
+r45516 | jonnybradley | 2013-04-16 18:11:34 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[ENH] maps: Add sort mode to map plugin searchlayer to allow ordering of different elements, e.g. by tracker id to show POI's on top of zones.
+----------------------------------------------
+r45514 | lphuberdeau | 2013-04-16 17:23:16 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[MOD] Including an expression for initial matching, and rewriting it as a range inside lucene (old behavior)
+----------------------------------------------
+r45513 | jonnybradley | 2013-04-16 17:17:08 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[ENH] userfiles: New pref to allow storage of a user's drawings in their own user filegal (requires feature_draw_separate_base_image)
+----------------------------------------------
+r45512 | jonnybradley | 2013-04-16 16:57:01 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] prefs: Missing dependencies
+----------------------------------------------
+r45511 | jonnybradley | 2013-04-16 15:23:04 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] trackers: img plugin perms check was only for global tracker item perms, so not checking if writerCanModify on the tracker (fixed by checking in the field handler)
+----------------------------------------------
+r45510 | jonnybradley | 2013-04-16 06:35:17 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] trackers: Use new fileIds data when cloning Files fields
+----------------------------------------------
+r45509 | jonnybradley | 2013-04-16 06:12:02 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] jquery: Replace missing spinner for autocomplete
+----------------------------------------------
+r45507 | chibaguy | 2013-04-16 05:50:04 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] Improve top_modules login link background color.
+----------------------------------------------
+r45505 | jonnybradley | 2013-04-16 05:10:25 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[ENH] userfiles: Add new pref "userfiles_hidden" so galleries don't appear in userfiles gallery lists, but the files can be viewed (depending on global perms)
+----------------------------------------------
+r45503 | jonnybradley | 2013-04-16 04:05:58 +0200 (Tue, 16 Apr 2013) | 2 lines
+
+[FIX] filegals: Show prefs for userfiles private and quota an obey quota. Also hide fields in gallery edit that non-admins cannot change (like quota etc)
+Missing files...
+----------------------------------------------
+r45502 | jonnybradley | 2013-04-16 03:07:16 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] filegals: Show prefs for userfiles private and quota an obey quota. Also hide fields in gallery edit that non-admins cannot change (like quota etc)
+----------------------------------------------
+r45501 | jonnybradley | 2013-04-16 01:04:33 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] filegals: Incorrect field names for filesize and filetype in new duplicate_file function
+----------------------------------------------
+r45500 | jonnybradley | 2013-04-16 00:54:51 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] elfinder: Files with no 'name" were causing problems, so use filename instead
+----------------------------------------------
+r45499 | jonnybradley | 2013-04-16 00:21:46 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] elfinder: The File Controller needs setUp to be run specifically as it's not a constructor.
+----------------------------------------------
+r45498 | jonnybradley | 2013-04-16 00:19:51 +0200 (Tue, 16 Apr 2013) | 1 line
+
+[FIX] filegals: prefs for some system gallery roots have become out of sync somehow historically - this attempts to repair them
+----------------------------------------------
+r45497 | jonnybradley | 2013-04-15 23:17:25 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[ENH] trackers: Add option for Files fields to duplicate their files into another gallery when the item is cloned (using Tracker service clone_item only so far)
+----------------------------------------------
+r45496 | jonnybradley | 2013-04-15 23:12:05 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] trackers: Sometimes the field values are in the itemData, so return them in getValue()
+----------------------------------------------
+r45495 | jonnybradley | 2013-04-15 20:35:16 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] filegals: Correct filegal path (was always coming up as 'User File Galleries)
+----------------------------------------------
+r45494 | jonnybradley | 2013-04-15 19:37:41 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] jquery: Restore lost jquery-ui-selectmenu and update to latest master from github (marked as version 1.4.0pre but composer needs a "real" version number so added as 1.3.999 for now)
+----------------------------------------------
+r45493 | jonnybradley | 2013-04-15 19:06:10 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] jquery: Remove unused $.cookie plugin js file include (that function is also included in lib/jquery/plugins/cluetip/lib/themeswitchertool.js if anyone needs it)
+----------------------------------------------
+r45492 | jonnybradley | 2013-04-15 19:03:10 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] jquery: Reattach ui theme images to css (base theme is gone, smoothness is the same apparently - http://blog.jqueryui.com/2013/03/jquery-ui-1-10-2/ )
+----------------------------------------------
+r45491 | chibaguy | 2013-04-15 18:46:24 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] No border and background meant for horizontal search display (topbar, etc.) was also being applied to vertical search box (right or left column).
+----------------------------------------------
+r45490 | jonnybradley | 2013-04-15 18:42:34 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] jquery: Remove code trying to ignore "feature_jquery_ui" not being enabled (paths broken and would fail badly in mobile anyway), and reinforce check for toolbars admin requiring jquery-ui
+----------------------------------------------
+r45489 | jonnybradley | 2013-04-15 18:19:52 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] update phpcas to 1.3.2 (thanks marclaporte)
+----------------------------------------------
+r45488 | jonnybradley | 2013-04-15 18:12:30 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] jquery: Add jquery-timepicker-addon to composer (lost in recent jquery-ui changes)
+----------------------------------------------
+r45487 | jonnybradley | 2013-04-15 01:16:32 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[ENH] kaltura: Add html5 player (part 1, more params and tuning to come)
+----------------------------------------------
+r45485 | lphuberdeau | 2013-04-15 01:14:53 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[MOD]?\194?\160Getting jquery-ui and themes to be downloaded through composer, and also adding a clean-up procedure after composer runs to remove large unused directories such as tests and documentation (currently shrinking from 100M+ to around 60M, even though jquery was added
+----------------------------------------------
+r45484 | lphuberdeau | 2013-04-15 00:03:00 +0200 (Mon, 15 Apr 2013) | 1 line
+
+[FIX] Encoding issue on nextdoc
+----------------------------------------------
+r45483 | lphuberdeau | 2013-04-14 22:28:56 +0200 (Sun, 14 Apr 2013) | 1 line
+
+[FIX] Disable the galleriffic keyboard events which conflict with other components in the UI
+----------------------------------------------
+r45482 | chibaguy | 2013-04-14 21:23:29 +0200 (Sun, 14 Apr 2013) | 1 line
+
+[FIX] Text no-wrap meant for horizontal search display (topbar, etc.) was also being applied to vertical search box (right or left column). Thanks, Olaf-Michael.
+----------------------------------------------
+r45481 | jonnybradley | 2013-04-14 16:56:35 +0200 (Sun, 14 Apr 2013) | 1 line
+
+[FIX] Revert previous attempt to suppress errors in svnup as that should be done "outside" the script (i.e. by adding " > /dev/null 2>&1" to the end of the cron command) rather than inside this script. Thanks Jyhem for shell guidance :)
+----------------------------------------------
+r45480 | chibaguy | 2013-04-14 01:03:06 +0200 (Sun, 14 Apr 2013) | 1 line
+
+[FIX] 5px cssmenu arrow top spacing doesn't work because theme font size varies, so there's no point in overriding cssmenus.css. 
+----------------------------------------------
+r45479 | chibaguy | 2013-04-14 00:41:36 +0200 (Sun, 14 Apr 2013) | 1 line
+
+[FIX] Center and right column overlap.
+----------------------------------------------
+r45478 | marclaporte | 2013-04-14 00:17:06 +0200 (Sun, 14 Apr 2013) | 1 line
+
+Remove obsolete SEFURLs
+----------------------------------------------
+r45477 | chibaguy | 2013-04-13 23:57:42 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[FIX] Bad highlight button text color contrast.
+----------------------------------------------
+r45476 | chibaguy | 2013-04-13 23:31:43 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[FIX] Unwanted padding-left on cssmenu child items in left column.
+----------------------------------------------
+r45474 | jonnybradley | 2013-04-13 22:19:59 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[FIX] ignore svnup errors (e.g. chmod on apache temp files but non-root)
+----------------------------------------------
+r45473 | lphuberdeau | 2013-04-13 20:52:12 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[ENH] Cleaning up some javascript
+----------------------------------------------
+r45472 | lphuberdeau | 2013-04-13 19:37:53 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[MOD] Adding support for range filter in elastic search
+----------------------------------------------
+r45471 | lphuberdeau | 2013-04-13 16:35:18 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[MOD] Couple more filters work for elasticsearch
+----------------------------------------------
+r45470 | lphuberdeau | 2013-04-13 14:53:45 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[FIX] Avoiding some notices in the test cases
+----------------------------------------------
+r45468 | lphuberdeau | 2013-04-13 14:47:25 +0200 (Sat, 13 Apr 2013) | 1 line
+
+[ENH] svnup script should leave tiki in a working state
+----------------------------------------------
+r45467 | luciash | 2013-04-12 23:13:12 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] Cluetips suddenly rendered with incorrect width: 0px - this is quick workaround to avoid that, until someone finds why
+----------------------------------------------
+r45463 | luciash | 2013-04-12 22:01:52 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] Browse Freetags: added autocomplete to the freetag search field (thanks to Mark R. Mitchell, libertylion.ch)
+----------------------------------------------
+r45462 | luciash | 2013-04-12 21:25:02 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] List Trackers: added autocomplete to the find field, [NEW] trackerlib: get_trackers_containing function, [FIX] ajax services: listonly trackername was returning all trackers no matter what was requested (thanks to Mark R. Mitchell, libertylion.ch)
+----------------------------------------------
+r45461 | lphuberdeau | 2013-04-12 20:57:54 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX]?\194?\160Javascript error when using advanced options for the dialog
+----------------------------------------------
+r45460 | lphuberdeau | 2013-04-12 20:47:18 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] Static call is allowed
+----------------------------------------------
+r45459 | lphuberdeau | 2013-04-12 20:46:33 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX]?\194?\160Tab content has no reason to be above everything else in coelesce
+----------------------------------------------
+r45458 | luciash | 2013-04-12 20:34:24 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] Last Changes to Pages: added autocomplete to the find field (thanks to Mark R. Mitchell, libertylion.ch)
+----------------------------------------------
+r45457 | luciash | 2013-04-12 20:12:42 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] List Pages: added autocomplete to the find field (thanks to Mark R. Mitchell, libertylion.ch)
+----------------------------------------------
+r45456 | lphuberdeau | 2013-04-12 19:32:19 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] JQuery-UI accordion API change for auto height
+----------------------------------------------
+r45455 | jonnybradley | 2013-04-12 19:22:41 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] admin: Lang files for better label for video admin panel
+----------------------------------------------
+r45454 | jonnybradley | 2013-04-12 19:19:10 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] admin: Better label for video admin panel
+----------------------------------------------
+r45453 | lphuberdeau | 2013-04-12 18:55:50 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] MySQL full text search result page would add &highlight= regardless of the base url it appended to
+----------------------------------------------
+r45452 | lphuberdeau | 2013-04-12 18:44:57 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX]?\194?\160Some configurations would leave the %20 in the string
+----------------------------------------------
+r45451 | lphuberdeau | 2013-04-12 17:54:08 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[FIX] JQuery-UI destroy on dialog no longer destroys the containing element, it returns it to the original state, which was visible for the tracker field admin page
+----------------------------------------------
+r45450 | lphuberdeau | 2013-04-12 16:26:34 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[NEW] coalesce function to allow selecting the first non-empty value in a list
+----------------------------------------------
+r45449 | lphuberdeau | 2013-04-12 16:25:01 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] Error reporting for calculation
+----------------------------------------------
+r45448 | lphuberdeau | 2013-04-12 16:13:00 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[MOD] Additional support for elastic search query building
+----------------------------------------------
+r45447 | lphuberdeau | 2013-04-12 15:14:27 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[MOD] One basic test for indexing works for elastic search
+----------------------------------------------
+r45446 | eromneg | 2013-04-12 14:36:38 +0200 (Fri, 12 Apr 2013) | 1 line
+
+[ENH] trivial cosmetic change to allow the plugin body descriptive text to use the full width of the displayed table
+----------------------------------------------
+r45445 | lphuberdeau | 2013-04-11 22:54:04 +0200 (Thu, 11 Apr 2013) | 1 line
+
+[MOD]?\194?\160Adding substraction and division, for convenience
+----------------------------------------------
+r45444 | lphuberdeau | 2013-04-11 22:39:49 +0200 (Thu, 11 Apr 2013) | 1 line
+
+[NEW] Tracker field to calculate a value from the other fields without using the evil eval()
+----------------------------------------------
+r45443 | lphuberdeau | 2013-04-11 20:24:05 +0200 (Thu, 11 Apr 2013) | 1 line
+
+[ENH] Renaming the preference to be a little more accurate
+----------------------------------------------
+r45442 | lphuberdeau | 2013-04-11 20:18:38 +0200 (Thu, 11 Apr 2013) | 1 line
+
+[KIL]?\194?\160Removing jscalendar completely, which had been replaced by jquery-ui date picker for a long time
+----------------------------------------------
+r45441 | lphuberdeau | 2013-04-11 19:11:47 +0200 (Thu, 11 Apr 2013) | 1 line
+
+[MOD] Adding composer handling as part of the release packaging script
+----------------------------------------------
+r45440 | jonnybradley | 2013-04-10 20:52:54 +0200 (Wed, 10 Apr 2013) | 1 line
+
+[ENH] wysiwyg: Tidying up pref dependencies, removing profile warning (now done by prefs),  changing a few defaults and removing experimental warning on wysiwyg_htmltowiki
+----------------------------------------------
+r45439 | lphuberdeau | 2013-04-10 20:17:21 +0200 (Wed, 10 Apr 2013) | 1 line
+
+[NEW] Initial work on adding elasticsearch support (not much to see yet)
+----------------------------------------------
+r45438 | jonnybradley | 2013-04-10 18:35:11 +0200 (Wed, 10 Apr 2013) | 2 lines
+
+[FIX] wysiwyg: Cache and restore parser's options when rendering plugins.
+Seems to fix the add_br html adding bank lines conundrum - continued recovery from r41705
+----------------------------------------------
+r45437 | jonnybradley | 2013-04-10 18:28:11 +0200 (Wed, 10 Apr 2013) | 1 line
+
+[FIX] wysiwyg: Check page's is_html setting rather than the pref when parsing edit data
+----------------------------------------------
+r45436 | lphuberdeau | 2013-04-10 17:33:11 +0200 (Wed, 10 Apr 2013) | 1 line
+
+[FIX]?\194?\160Broken tests
+----------------------------------------------
+r45435 | jonnybradley | 2013-04-10 16:03:23 +0200 (Wed, 10 Apr 2013) | 1 line
+
+[FIX] history: Notices
+----------------------------------------------
+r45434 | nkoth | 2013-04-09 20:59:38 +0200 (Tue, 09 Apr 2013) | 2 lines
+
+[FIX] Number of items shown was running into default 50 limit for Lucene search results.
+
+----------------------------------------------
+r45433 | jonnybradley | 2013-04-09 15:35:32 +0200 (Tue, 09 Apr 2013) | 1 line
+
+[FIX] tree: Hide treenode flippers before being set (tidier)
+----------------------------------------------
+r45432 | jonnybradley | 2013-04-09 15:27:39 +0200 (Tue, 09 Apr 2013) | 1 line
+
+[FIX] tree: Stop treenodes skipping to the right on load in category module
+----------------------------------------------
+r45431 | jonnybradley | 2013-04-09 12:11:55 +0200 (Tue, 09 Apr 2013) | 1 line
+
+[FIX] services: Close first dialog when opening another one
+----------------------------------------------
+r45430 | fmg-sf | 2013-04-09 01:01:52 +0200 (Tue, 09 Apr 2013) | 1 line
+
+[ENH] unzip implementation: proof of concept (not user friendly yet)
+----------------------------------------------
+r45429 | fmg-sf | 2013-04-09 00:27:04 +0200 (Tue, 09 Apr 2013) | 1 line
+
+[ENH] now an optional section: Check Read/Write/Delete Permissions
+----------------------------------------------
+r45428 | fmg-sf | 2013-04-08 23:49:08 +0200 (Mon, 08 Apr 2013) | 1 line
+
+[ENH] download of Tiki 10.2 added, usage of associative arrays
+----------------------------------------------
+r45427 | jonnybradley | 2013-04-08 20:30:13 +0200 (Mon, 08 Apr 2013) | 1 line
+
+[FIX] paypal: Notices
+----------------------------------------------
+r45425 | jonnybradley | 2013-04-08 20:12:03 +0200 (Mon, 08 Apr 2013) | 1 line
+
+[FIX] elfinder: Selected file returned from elfinder seems to have turned into an object (was a url before), but leaving string based handling in there for now just in case
+----------------------------------------------
+r45424 | jonnybradley | 2013-04-08 19:52:19 +0200 (Mon, 08 Apr 2013) | 1 line
+
+[FIX] maps: selected is a prop not an attr now (jq 1.9+)
+----------------------------------------------
+r45423 | jonnybradley | 2013-04-08 19:49:52 +0200 (Mon, 08 Apr 2013) | 1 line
+
+[FIX] maps: Catch dialog disclose exception when popup not initialised fully
+----------------------------------------------
+r45422 | sylvieg | 2013-04-07 22:50:31 +0200 (Sun, 07 Apr 2013) | 1 line
+
+[FIX]keep view to be able to print on a view=+user
+----------------------------------------------
+r45421 | jonnybradley | 2013-04-07 21:53:47 +0200 (Sun, 07 Apr 2013) | 1 line
+
+[FIX] search: Correct offset_jsvar and quoting in example shop tpl
+----------------------------------------------
+r45420 | jonnybradley | 2013-04-07 21:15:36 +0200 (Sun, 07 Apr 2013) | 1 line
+
+[FIX] search: Restore sort_mode, maxRecords and offset - AJAX pagination still broken
+----------------------------------------------
+r45419 | jonnybradley | 2013-04-07 20:22:29 +0200 (Sun, 07 Apr 2013) | 1 line
+
+[FIX] search: Restore recalllastsearch param operation (was stuck "on" - ignoresession no longer used)
+----------------------------------------------
+r45418 | jonnybradley | 2013-04-06 19:46:10 +0200 (Sat, 06 Apr 2013) | 2 lines
+
+[FIX] paypal: Reinitialise minicart completely when triggering on a pageSearchReady event (via AJAX) to get the events to bind onto the new forms.
+A bit heavy handed but works for now without modifying the minicart code.
+----------------------------------------------
+r45414 | jonnybradley | 2013-04-06 18:30:23 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[FIX] jquery: Only load jquery.bgiframe if IE6 is detected - one more $.browser call removed for most people
+----------------------------------------------
+r45413 | jyhem | 2013-04-06 17:45:27 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[FIX] Option allowing to make freetags less invisible, like in Tiki3
+----------------------------------------------
+r45411 | fmg-sf | 2013-04-06 13:36:47 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[FIX] move folder 'experimental' with unzipper to doc/devtools/ to prevent it from being packaged - part 2
+----------------------------------------------
+r45410 | fmg-sf | 2013-04-06 13:36:08 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[FIX] move folder 'experimental' with unzipper to doc/devtools/ to prevent it from being packaged
+----------------------------------------------
+r45407 | jyhem | 2013-04-06 13:08:58 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[FIX] Don't show Slideshow button if feature not active
+----------------------------------------------
+r45406 | fmg-sf | 2013-04-06 05:37:17 +0200 (Sat, 06 Apr 2013) | 1 line
+
+[NEW] folder 'experimental' as a concept and 1st prototype of preinstaller for download/unzip via browser
+----------------------------------------------
+r45405 | jonnybradley | 2013-04-05 18:35:07 +0200 (Fri, 05 Apr 2013) | 1 line
+
+[FIX] jquery: Global replace of deprecated .attr("checked") calls with prop()
+----------------------------------------------
+r45404 | jonnybradley | 2013-04-05 15:16:24 +0200 (Fri, 05 Apr 2013) | 2 lines
+
+[FIX] trackers: Fix category filter by using getFieldData and the correct field property (minimal repair, could do with modernisation sometime).
+Thanks Michael Risch
+----------------------------------------------
+r45403 | lphuberdeau | 2013-04-04 23:28:24 +0200 (Thu, 04 Apr 2013) | 2 lines
+
+[FIX] Multiple notices
+
+----------------------------------------------
+r45400 | nkoth | 2013-04-04 19:52:03 +0200 (Thu, 04 Apr 2013) | 2 lines
+
+[FIX] If checking for either feature, the order should not matter.
+
+----------------------------------------------
+r45398 | jyhem | 2013-04-04 16:18:46 +0200 (Thu, 04 Apr 2013) | 1 line
+
+[FIX] Command-line messages need to end with a line feed
+----------------------------------------------
+r45397 | jonnybradley | 2013-04-03 13:46:02 +0200 (Wed, 03 Apr 2013) | 2 lines
+
+[FIX] jquery: Remove ancient $.browser based workaround for show/hide animation causing issues on Safari long long ago (seems fine now).
+$.browser is deprecated - 1 down, 46 to go!
+----------------------------------------------
+r45396 | jonnybradley | 2013-04-03 13:19:39 +0200 (Wed, 03 Apr 2013) | 1 line
+
+[FIX] elfinder: Show and close dialog properly from edit tracker item.
+----------------------------------------------
+r45393 | lphuberdeau | 2013-04-02 22:06:24 +0200 (Tue, 02 Apr 2013) | 1 line
+
+[MOD] Register a fake command when it is unavailable to keep it documented
+----------------------------------------------
+r45392 | jonnybradley | 2013-04-02 19:19:55 +0200 (Tue, 02 Apr 2013) | 2 lines
+
+[ENH] comments module: Add new param "language" to filter comments by object language (thanks marclaporte)
+(not to be confused by the standard "lang" visibility param available on all modules)
+----------------------------------------------
+r45391 | jonnybradley | 2013-04-02 18:58:10 +0200 (Tue, 02 Apr 2013) | 1 line
+
+[FIX] wysiwyg: Remove hidden inputs from wysiwyg plugin display
+----------------------------------------------
+r45390 | jonnybradley | 2013-04-02 18:44:41 +0200 (Tue, 02 Apr 2013) | 2 lines
+
+[FIX] jquery: Remove include of r5 hoverIntent and replace with v7 (jq 1.9 compatible) version from new superfish plugin.
+Also make it independent of tooltips.
+----------------------------------------------
+r45389 | jonnybradley | 2013-04-02 18:41:53 +0200 (Tue, 02 Apr 2013) | 1 line
+
+[FIX] paypal: Wrong icon
+----------------------------------------------
+r45388 | jonnybradley | 2013-04-02 14:00:37 +0200 (Tue, 02 Apr 2013) | 2 lines
+
+[FIX] jquery: Hook in the jquery migrate plugin so trunk works again (should be "ready to release at any moment", no?)
+See https://github.com/jquery/jquery-migrate/#readme for more info
+----------------------------------------------
+r45386 | jonnybradley | 2013-04-02 11:47:36 +0200 (Tue, 02 Apr 2013) | 1 line
+
+[NEW] jqui: Horizons option in teal
+----------------------------------------------
+r45385 | changi67 | 2013-04-01 19:16:43 +0200 (Mon, 01 Apr 2013) | 1 line
+
+[FIX] Wrong path
+----------------------------------------------
+r45382 | changi67 | 2013-04-01 18:51:57 +0200 (Mon, 01 Apr 2013) | 1 line
+
+[FIX] Hiding path :)
+----------------------------------------------
+r45381 | changi67 | 2013-04-01 18:47:52 +0200 (Mon, 01 Apr 2013) | 1 line
+
+[FIX] Missing path changes
+----------------------------------------------
+r45379 | changi67 | 2013-04-01 18:36:44 +0200 (Mon, 01 Apr 2013) | 1 line
+
+[UPD] Update path due to jquery folder cleanup
+----------------------------------------------
+r45372 | jonnybradley | 2013-04-01 13:55:14 +0200 (Mon, 01 Apr 2013) | 3 lines
+
+[MOD] tracker rss: Change default for tracker RSS to not showing "Tracker item: #123456 - " in front of the item title.
+Maintain support for both previous attempts to be able do this optionally - showItemId and noId
+(i.e. if you add params &showitemId=y or &noId=n you will get the ugly "Tracker item: #..." text again)
+----------------------------------------------
+r45365 | lindonb | 2013-04-01 01:12:37 +0200 (Mon, 01 Apr 2013) | 2 lines
+
+[FIX] Register passcode: If passcode fails, also prevent user tracker from being created. Correction of [SEC] part fo r45358.
+
+----------------------------------------------
+r45364 | lindonb | 2013-04-01 00:49:21 +0200 (Mon, 01 Apr 2013) | 2 lines
+
+[FIX] login passcode: Revert [SEC] part of r45358. To recommit correctly
+
+----------------------------------------------
+r45363 | lindonb | 2013-03-31 01:58:38 +0100 (Sun, 31 Mar 2013) | 2 lines
+
+[ENH] ReCaptcha: Allow ability to choose a ReCaptcha theme 
+
+----------------------------------------------
+r45362 | lindonb | 2013-03-31 00:20:28 +0100 (Sun, 31 Mar 2013) | 2 lines
+
+[ENH] trackerlist parameter: Allow the url parameter tr_offset to be used. Helpful in allowing pagination for single tracker items displayed using a custom template 
+
+----------------------------------------------
+r45361 | lindonb | 2013-03-30 22:30:17 +0100 (Sat, 30 Mar 2013) | 2 lines
+
+[ENH] tracker output location: Add ability to set list and item view width and height of location maps
+
+----------------------------------------------
+r45360 | rischconsulting | 2013-03-30 13:11:25 +0100 (Sat, 30 Mar 2013) | 1 line
+
+[FIX] static call breaks tiki-install with warning message
+----------------------------------------------
+r45359 | jonnybradley | 2013-03-30 13:06:09 +0100 (Sat, 30 Mar 2013) | 1 line
+
+[FIX] wysiwyg: Restrict wysiwyg plugin rendering further - list and custom_search can easily get too complicated for ckeditor. Maybe we need a list of allowed plugins, rather than excluded?
+----------------------------------------------
+r45358 | lindonb | 2013-03-30 10:06:18 +0100 (Sat, 30 Mar 2013) | 3 lines
+
+[SEC] Register passcode: If passcode fails, also prevent user tracker from being created.
+[FIX] Register antibot: keep antibot widget from disappearing when wrong code is entered when a pretty registration tracker is used. Also avoid error if antibot is not turned on and pretty registration tracker is used.
+
+----------------------------------------------
+r45357 | jonnybradley | 2013-03-29 19:14:48 +0100 (Fri, 29 Mar 2013) | 1 line
+
+[FIX] paypal: Expose minicart's string parameters to customise cart text, and improve functionality when within custom search results via AJAX (works on first load, but not on subsequent searches so far...)
+----------------------------------------------
+r45352 | lphuberdeau | 2013-03-29 17:46:39 +0100 (Fri, 29 Mar 2013) | 1 line
+
+[FIX] Strict static call warning
+----------------------------------------------
+r45350 | sylvieg | 2013-03-29 16:42:43 +0100 (Fri, 29 Mar 2013) | 1 line
+
+[ENH]can attach a usertracker item if the email given at registration is equals to a field of the user tracker
+----------------------------------------------
+r45347 | jonnybradley | 2013-03-29 12:13:22 +0100 (Fri, 29 Mar 2013) | 1 line
+
+[FIX] paypal: Require validation on plugin
+----------------------------------------------
+r45341 | lphuberdeau | 2013-03-27 22:47:06 +0100 (Wed, 27 Mar 2013) | 1 line
+
+[MOD] Adding commands for index rebuild, optimize, process/catch-up (replaces lib/search/shell.php)
+----------------------------------------------
+r45338 | jonnybradley | 2013-03-26 20:44:36 +0100 (Tue, 26 Mar 2013) | 1 line
+
+[FIX] maps: Revert unintentional changes introduced in r43604 multi-file PHPDoc update - there may be others?
+----------------------------------------------
+r45337 | lphuberdeau | 2013-03-25 22:28:58 +0100 (Mon, 25 Mar 2013) | 1 line
+
+[NEW] Adding command to clear caches from command line
+----------------------------------------------
 Version 10.1
 <http://tiki.org/ReleaseNotes101>
 ------------------

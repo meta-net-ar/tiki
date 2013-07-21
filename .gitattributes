@@ -65,6 +65,7 @@ admin/index.php -text
 /commxmlrpc.php -text
 /composer.json -text
 /composer.lock -text
+/console.php -text
 /contribution.php -text
 /copyright.txt -text
 /copyrights.php -text
@@ -83,14 +84,15 @@ css/metrics.css -text
 css/readme.txt -text
 db/.htaccess -text
 db/index.php -text
-db/tiki-db-adodb.php -text
-db/tiki-db-pdo.php -text
+db/install.ini.dist -text
 db/tiki-db.php -text
+db/tiki-secdb_11.0_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
 db/tiki_2.0to3.0.sql -text
 db/tiki_convert_myisam_to_innodb.sql -text
+db/tiki_fulltext_indexes.sql -text
 db/tiki_innodb.sql -text
 db/tiki_myisam.sql -text
 db/web.config -text
@@ -102,6 +104,7 @@ doc/devtools/backup.php -text
 doc/devtools/backupdb.sh -text
 doc/devtools/buildincrement.php -text
 doc/devtools/check_filegal_dir.php -text
+doc/devtools/check_tiki.php -text
 doc/devtools/cleanwatch.sh -text
 doc/devtools/convert_templates_prefs-2.0.php -text
 doc/devtools/convert_tpl_ajax.php -text
@@ -109,6 +112,7 @@ doc/devtools/csscheck.sh -text
 doc/devtools/cssmap.pl -text
 doc/devtools/diffsql.cmd -text
 doc/devtools/diffsql.sh -text
+doc/devtools/experimental/unzip/unzipper.php -text
 doc/devtools/export_translations_to_file.php -text
 doc/devtools/extract-img-db-to-fs.php -text
 doc/devtools/findstyledef.pl -text
@@ -129,12 +133,14 @@ doc/devtools/parser_diff.php -text
 doc/devtools/phpstrip.sh -text
 doc/devtools/prefreport.php -text
 doc/devtools/premerge_report.sh -text
+doc/devtools/provide_tarballs.sh -text
 doc/devtools/rebuild_search_index.php -text
 doc/devtools/recover_wiki_from_google.pl -text
 doc/devtools/release.php -text
 doc/devtools/removehtaccess.sh -text
 doc/devtools/restorehelp.php -text
 doc/devtools/rewritesecdb.php -text
+doc/devtools/satis.json -text
 doc/devtools/search_smarty_prefs-2.0.php -text
 doc/devtools/securitycheck.php -text
 doc/devtools/set_perms.py -text
@@ -674,9 +680,13 @@ img/icons/connect_unwtf.png -text
 img/icons/connect_wtf.png -text
 img/icons/contact.gif -text
 img/icons/contacts.gif -text
+img/icons/control_end.png -text
+img/icons/control_fastforward.png -text
 img/icons/control_pause.png -text
 img/icons/control_play.png -text
 img/icons/control_play_blue.png -text
+img/icons/control_rewind.png -text
+img/icons/control_start.png -text
 img/icons/control_stop.png -text
 img/icons/cool.gif -text
 img/icons/corner-dots.gif -text
@@ -1592,6 +1602,8 @@ img/smiles/icon_twisted.gif -text
 img/smiles/icon_wink.gif -text
 img/smiles/index.php -text
 img/spinner.gif -text
+img/superfish/arrows-ffffff.png -text
+img/superfish/shadow.png -text
 img/tiki.jpg -text
 img/tiki/Tiki_Contribute_Button.png -text
 img/tiki/Tiki_Suite.png -text svneol=unset#image/png
@@ -4819,6 +4831,7 @@ modules/mod-func-random_pages.php -text
 modules/mod-func-register.php -text
 modules/mod-func-rsslist.php -text
 modules/mod-func-search.php -text
+modules/mod-func-search_morelikethis.php -text
 modules/mod-func-search_wiki_page.php -text
 modules/mod-func-semantic_links.php -text
 modules/mod-func-share.php -text
@@ -4980,14 +4993,14 @@ styles/coelesce/arrows-467aa7.png -text svneol=unset#image/png
 styles/coelesce/coelesce.png -text
 styles/coelesce/ie6.css -text
 styles/coelesce/ie7.css -text
+styles/coelesce/img/icons/index.php -text
+styles/coelesce/img/icons/oleftcol.png -text svneol=unset#image/png
+styles/coelesce/img/icons/orightcol.png -text svneol=unset#image/png
+styles/coelesce/img/index.php -text
 styles/coelesce/index.php -text
 styles/coelesce/options/community.css -text
 styles/coelesce/options/index.php -text
 styles/coelesce/pagebg.jpg -text svneol=unset#image/jpeg
-styles/coelesce/pics/icons/index.php -text
-styles/coelesce/pics/icons/oleftcol.png -text svneol=unset#image/png
-styles/coelesce/pics/icons/orightcol.png -text svneol=unset#image/png
-styles/coelesce/pics/index.php -text
 styles/coelesce/search_wide.png -text svneol=unset#image/png
 styles/coelesce/tiki-centerbg.jpg -text svneol=unset#image/jpeg
 styles/darkroom.css -text
@@ -4996,15 +5009,15 @@ styles/darkroom/button.png -text svneol=unset#image/png
 styles/darkroom/darkroom.png -text
 styles/darkroom/ie6.css -text
 styles/darkroom/ie7.css -text
+styles/darkroom/img/icons/index.php -text
+styles/darkroom/img/icons/oleftcol.png -text svneol=unset#image/png
+styles/darkroom/img/icons/orightcol.png -text svneol=unset#image/png
+styles/darkroom/img/index.php -text
 styles/darkroom/index.php -text
 styles/darkroom/options/index.php -text
 styles/darkroom/options/small-type.css -text
 styles/darkroom/options/small-type/index.php -text
 styles/darkroom/options/small-type/small-type.png -text
-styles/darkroom/pics/icons/index.php -text
-styles/darkroom/pics/icons/oleftcol.png -text svneol=unset#image/png
-styles/darkroom/pics/icons/orightcol.png -text svneol=unset#image/png
-styles/darkroom/pics/index.php -text
 styles/darkshine/ad.gif -text
 styles/darkshine/arrows-000000.png -text svneol=unset#image/png
 styles/darkshine/blue.png -text svneol=unset#image/png
@@ -5117,17 +5130,14 @@ styles/greenvalley/greenvalley.png -text
 styles/greenvalley/header_background_ltr.jpg -text
 styles/greenvalley/ie7.css -text
 styles/greenvalley/index.php -text
-styles/greenvalley/logo_top.png -text
-styles/greenvalley/menu_divider.jpg -text
+styles/greenvalley/left.png -text
 styles/greenvalley/menubar-wood.jpg -text
 styles/greenvalley/page_background_ltr.jpg -text
-styles/greenvalley/phonebook_ltr.jpg -text
-styles/greenvalley/pictures_mask3.png -text
+styles/greenvalley/right.png -text
 styles/greenvalley/rtl/greenvalley_BiDi.css -text
 styles/greenvalley/rtl/header_background_rtl.jpg -text
 styles/greenvalley/rtl/index.php -text
 styles/greenvalley/rtl/page_background_rtl.jpg -text
-styles/greenvalley/rtl/phonebook_rtl.jpg -text
 styles/greenvalley/searchform.png -text
 styles/greenvalley/submenu_arrow.png -text
 styles/index.php -text
@@ -5157,6 +5167,7 @@ styles/jqui/options/good.css -text
 styles/jqui/options/good/arrows-005faa.png -text
 styles/jqui/options/good/arrows-ffffff.png -text
 styles/jqui/options/haus.css -text
+styles/jqui/options/horizons.css -text
 styles/jqui/options/index.php -text
 styles/jqui/options/rising.css -text
 styles/jqui/options/rising/arrows-ea2e11.png -text
@@ -5227,7 +5238,11 @@ styles/strasa/ie6.css -text
 styles/strasa/ie7.css -text
 styles/strasa/ie8.css -text
 styles/strasa/img/icons/external_link.gif -text
+styles/strasa/img/icons/folder.png -text svneol=unset#image/png
 styles/strasa/img/icons/index.php -text
+styles/strasa/img/icons/ofolder.png -text svneol=unset#image/png
+styles/strasa/img/icons/oleftcol.png -text svneol=unset#image/png
+styles/strasa/img/icons/orightcol.png -text svneol=unset#image/png
 styles/strasa/img/index.php -text
 styles/strasa/index.php -text
 styles/strasa/info_icon.png -text svneol=unset#image/png
@@ -5272,12 +5287,6 @@ styles/strasa/options/mono/pics/icons/oleftcol.png -text svneol=unset#image/png
 styles/strasa/options/mono/pics/icons/orightcol.png -text svneol=unset#image/png
 styles/strasa/options/mono/pics/index.php -text
 styles/strasa/options/mono/register.jpg -text
-styles/strasa/pics/icons/folder.png -text svneol=unset#image/png
-styles/strasa/pics/icons/index.php -text
-styles/strasa/pics/icons/ofolder.png -text svneol=unset#image/png
-styles/strasa/pics/icons/oleftcol.png -text svneol=unset#image/png
-styles/strasa/pics/icons/orightcol.png -text svneol=unset#image/png
-styles/strasa/pics/index.php -text
 styles/strasa/register.jpg -text
 styles/strasa/strasa.png -text
 styles/strasa/strasa_fixed_width.png -text svneol=unset#image/png
@@ -5285,40 +5294,69 @@ styles/thenews.css -text
 styles/thenews/arrows-005faa.png -text svneol=unset#image/png
 styles/thenews/ie6.css -text
 styles/thenews/ie7.css -text
+styles/thenews/img/icons/index.php -text
+styles/thenews/img/icons/oleftcol.png -text svneol=unset#image/png
+styles/thenews/img/icons/orightcol.png -text svneol=unset#image/png
+styles/thenews/img/index.php -text
 styles/thenews/index.php -text
 styles/thenews/options/index.php -text
 styles/thenews/options/narrow_left_column.css -text
 styles/thenews/options/narrow_left_column/index.php -text
 styles/thenews/options/narrow_left_column/narrow_left_column.png -text
-styles/thenews/pics/icons/index.php -text
-styles/thenews/pics/icons/oleftcol.png -text svneol=unset#image/png
-styles/thenews/pics/icons/orightcol.png -text svneol=unset#image/png
-styles/thenews/pics/index.php -text
 styles/thenews/thenews.png -text
 styles/tikinewt.css -text
 styles/tikinewt/arrows-6d819d.png -text svneol=unset#image/png
 styles/tikinewt/ie6.css -text
 styles/tikinewt/ie7.css -text
+styles/tikinewt/img/icons/index.php -text
+styles/tikinewt/img/icons/oleftcol.png -text svneol=unset#image/png
+styles/tikinewt/img/icons/orightcol.png -text svneol=unset#image/png
+styles/tikinewt/img/index.php -text
 styles/tikinewt/index.php -text
 styles/tikinewt/options/index.php -text
 styles/tikinewt/options/shadows/box_shadow.png -text svneol=unset#image/png
 styles/tikinewt/options/shadows/index.php -text
-styles/tikinewt/pics/icons/index.php -text
-styles/tikinewt/pics/icons/oleftcol.png -text svneol=unset#image/png
-styles/tikinewt/pics/icons/orightcol.png -text svneol=unset#image/png
-styles/tikinewt/pics/index.php -text
 styles/tikinewt/tikinewt.png -text
 styles/twist/arrows-000.png -text svneol=unset#image/png
 styles/twist/background.gif -text
 styles/twist/bullet.gif -text
 styles/twist/header_bg.jpg -text svneol=unset#image/jpeg
+styles/twist/img/icons/folder.png -text svneol=unset#image/png
+styles/twist/img/icons/index.php -text
+styles/twist/img/icons/ofolder.png -text svneol=unset#image/png
+styles/twist/img/index.php -text
 styles/twist/index.php -text
-styles/twist/pics/icons/folder.png -text svneol=unset#image/png
-styles/twist/pics/icons/index.php -text
-styles/twist/pics/icons/ofolder.png -text svneol=unset#image/png
-styles/twist/pics/index.php -text
 styles/twist/topbar_bg.jpg -text svneol=unset#image/jpeg
 styles/twist/twist.png -text svneol=unset#image/png
+styles/utopias.css -text
+styles/utopias/options/another.css -text
+styles/utopias/options/another/another.png -text
+styles/utopias/options/another/bullet-grey.gif -text
+styles/utopias/options/another/bullet.gif -text
+styles/utopias/options/attainable.css -text
+styles/utopias/options/attainable/attainable.png -text
+styles/utopias/options/attainable/bullet-grey.gif -text
+styles/utopias/options/attainable/bullet.gif -text
+styles/utopias/options/attainable/logged-in-cloud.png -text
+styles/utopias/options/attainable/logged-out-cloud.png -text
+styles/utopias/options/foundation.css -text
+styles/utopias/options/foundation/bullet-brown.gif -text
+styles/utopias/options/foundation/bullet-green.gif -text
+styles/utopias/options/foundation/bullet.gif -text
+styles/utopias/options/foundation/foundation.png -text
+styles/utopias/options/greycard.css -text
+styles/utopias/options/greycard/greycard.png -text
+styles/utopias/options/meta.css -text
+styles/utopias/options/north.css -text
+styles/utopias/options/north/north.png -text
+styles/utopias/options/spaces.css -text
+styles/utopias/options/spaces/spaces.png -text
+styles/utopias/options/writer.css -text
+styles/utopias/options/writer/banner-repeat.jpg -text
+styles/utopias/options/writer/bullet-grey.gif -text
+styles/utopias/options/writer/bullet.gif -text
+styles/utopias/options/writer/writer.png -text
+styles/utopias/utopias.png -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
@@ -5329,6 +5367,9 @@ temp/public/.htaccess -text
 temp/public/index.php -text
 temp/web.config -text
 templates/.htaccess -text
+templates/activity/activitystream.tpl -text
+templates/activity/tiki.trackeritem.create.tpl -text
+templates/activity/tiki.trackeritem.update.tpl -text
 templates/addreference.tpl -text
 templates/admin/include_ads.tpl -text
 templates/admin/include_anchors.tpl -text
@@ -5453,6 +5494,15 @@ templates/error.tpl -text
 templates/error_raw.tpl -text
 templates/error_simple.tpl -text
 templates/error_ticket.tpl -text
+templates/examples/index.php -text
+templates/examples/shop/add_to_cart.tpl -text
+templates/examples/shop/custom_search_form.tpl -text
+templates/examples/shop/index.php -text
+templates/examples/shop/product_ajax.tpl -text
+templates/examples/shop/product_item.tpl -text
+templates/examples/shop/product_list.tpl -text
+templates/examples/shop/product_list_inner.tpl -text
+templates/examples/shop/readme.txt -text
 templates/fgal_attachments.tpl -text
 templates/fgal_context_menu.tpl -text
 templates/fgal_listing_conf.tpl -text
@@ -5472,6 +5522,8 @@ templates/interactive_translation_box.tpl -text
 templates/jcapture/capture.tpl -text
 templates/jcapture/index.php -text
 templates/kaltura/upload.tpl -text
+templates/layouts/classic/layout_edit.tpl -text
+templates/layouts/classic/layout_view.tpl -text
 templates/list_file_gallery.tpl -text
 templates/list_file_gallery_content.tpl -text
 templates/mail/blogs_send_link.tpl -text
@@ -5533,6 +5585,11 @@ templates/mail/user_creation_validation_mail.tpl -text
 templates/mail/user_creation_validation_mail_subject.tpl -text
 templates/mail/user_joins_group_notification.tpl -text
 templates/mail/user_joins_group_notification_subject.tpl -text
+templates/mail/user_joins_group_notification_to_leads.tpl -text
+templates/mail/user_joins_group_notification_to_leads_need_app.tpl -text
+templates/mail/user_joins_group_notification_to_leads_subject.tpl -text
+templates/mail/user_left_group_notification_to_leads.tpl -text
+templates/mail/user_left_group_notification_to_leads_subject.tpl -text
 templates/mail/user_validation_mail.tpl -text
 templates/mail/user_validation_mail_subject.tpl -text
 templates/mail/user_validation_msg.tpl -text
@@ -5573,6 +5630,12 @@ templates/mail/user_watch_wiki_page_changed_subject.tpl -text
 templates/mail/user_watch_wiki_page_renamed.tpl -text
 templates/mail/user_watch_wiki_page_renamed_subject.tpl -text
 templates/mail/user_welcome_msg.tpl -text
+templates/managestream/advanced.tpl -text
+templates/managestream/delete.tpl -text
+templates/managestream/list.tpl -text
+templates/managestream/record.tpl -text
+templates/managestream/sample.tpl -text
+templates/managestream/tracker_filter.tpl -text
 templates/map/index.php -text
 templates/map/tiki-map.tpl -text
 templates/map/tiki-map_download.tpl -text
@@ -5693,6 +5756,7 @@ templates/modules/mod-register.tpl -text
 templates/modules/mod-rsslist.tpl -text
 templates/modules/mod-search.tpl -text
 templates/modules/mod-search.tpl.nocache -text
+templates/modules/mod-search_morelikethis.tpl -text
 templates/modules/mod-search_wiki_page.tpl -text
 templates/modules/mod-semantic_links.tpl -text
 templates/modules/mod-share.tpl -text
@@ -5798,6 +5862,8 @@ templates/report/index.php -text
 templates/report/load.tpl -text
 templates/report/preview.tpl -text
 templates/report/wikidata.tpl -text
+templates/search_customsearch/customsearch.tpl -text
+templates/search_customsearch/index.php -text
 templates/searchresults-plain.tpl -text
 templates/send_newsletter_footer.tpl -text
 templates/send_newsletter_header.tpl -text
@@ -5875,6 +5941,7 @@ templates/tiki-admin_keywords.tpl -text
 templates/tiki-admin_layout.tpl -text
 templates/tiki-admin_links.tpl -text
 templates/tiki-admin_mailin.tpl -text
+templates/tiki-admin_mailin_routes.tpl -text
 templates/tiki-admin_menu_options.tpl -text
 templates/tiki-admin_menus.tpl -text
 templates/tiki-admin_metrics.tpl -text
@@ -5995,7 +6062,6 @@ templates/tiki-galleries.tpl -text
 templates/tiki-gmap_usermap.tpl -text
 templates/tiki-graph-sheets.tpl -text
 templates/tiki-history_sheets.tpl -text
-templates/tiki-ical.tpl -text
 templates/tiki-import-sheets.tpl -text
 templates/tiki-import_structuredtext.tpl -text
 templates/tiki-import_xml_zip.tpl -text
@@ -6113,9 +6179,11 @@ templates/tiki-remind_password.tpl -text
 templates/tiki-removepage.tpl -text
 templates/tiki-rename_page.tpl -text
 templates/tiki-report_direct_object_perms.tpl -text
+templates/tiki-report_string_in_db.tpl -text
 templates/tiki-rollback.tpl -text
 templates/tiki-search_replace.tpl -text
 templates/tiki-search_stats.tpl -text
+templates/tiki-searchfacets.tpl -text
 templates/tiki-searchindex.tpl -text
 templates/tiki-searchresults.tpl -text
 templates/tiki-send_newsletters.tpl -text
@@ -6160,6 +6228,7 @@ templates/tiki-user_contacts_prefs.tpl -text
 templates/tiki-user_cssmenu.tpl -text
 templates/tiki-user_drilldownmenu.tpl -text
 templates/tiki-user_information.tpl -text
+templates/tiki-user_mailin.tpl -text
 templates/tiki-user_menu.tpl -text
 templates/tiki-user_preferences.tpl -text
 templates/tiki-user_tasks.tpl -text
@@ -6216,8 +6285,6 @@ templates/tracker_calendar_over.tpl -text
 templates/tracker_error.tpl -text
 templates/tracker_filter.tpl -text
 templates/tracker_pretty_item.tpl -text
-templates/tracker_search/customsearch.tpl -text
-templates/tracker_search/index.php -text
 templates/tracker_sort_input.tpl -text
 templates/tracker_status_input.tpl -text
 templates/tracker_sync/clone_remote.tpl -text
@@ -6316,6 +6383,7 @@ templates/wiki-plugins/wikiplugin_listpagenames.tpl -text
 templates/wiki-plugins/wikiplugin_mail.tpl -text
 templates/wiki-plugins/wikiplugin_memberlist.tpl -text
 templates/wiki-plugins/wikiplugin_memberpayment.tpl -text
+templates/wiki-plugins/wikiplugin_paypal.tpl -text
 templates/wiki-plugins/wikiplugin_profile.tpl -text
 templates/wiki-plugins/wikiplugin_proposal.tpl -text
 templates/wiki-plugins/wikiplugin_relations.tpl -text
@@ -6386,6 +6454,7 @@ tests/testfile.txt -text
 /tiki-admin_layout.php -text
 /tiki-admin_links.php -text
 /tiki-admin_mailin.php -text
+/tiki-admin_mailin_routes.php -text
 /tiki-admin_menu_options.php -text
 /tiki-admin_menus.php -text
 /tiki-admin_metrics.php -text
@@ -6539,7 +6608,6 @@ tests/testfile.txt -text
 /tiki-invite.php -text
 /tiki-invited.php -text
 /tiki-invoice_reports.php -text
-/tiki-jscalendar.php -text
 /tiki-jsmodule.php -text
 /tiki-jsplugin.php -text
 /tiki-kaltura_upload.php -text
@@ -6577,6 +6645,7 @@ tests/testfile.txt -text
 /tiki-live_support_message.php -text
 /tiki-live_support_server.php -text
 /tiki-live_support_transcripts.php -text
+/tiki-log_bigbluebutton_leave.php -text
 /tiki-login.php -text
 /tiki-login_openid.php -text
 /tiki-login_scr.php -text
@@ -6601,6 +6670,7 @@ tests/testfile.txt -text
 /tiki-mods_admin.php -text
 /tiki-module_controls.php -text
 /tiki-modules.php -text
+/tiki-monitor.php -text
 /tiki-my_tiki.php -text
 /tiki-mytiki_shared.php -text
 /tiki-newsletter_archives.php -text
@@ -6646,6 +6716,7 @@ tests/testfile.txt -text
 /tiki-removepage.php -text
 /tiki-rename_page.php -text
 /tiki-report_direct_object_perms.php -text
+/tiki-report_string_in_db.php -text
 /tiki-rollback.php -text
 /tiki-rss_error.php -text
 /tiki-search_replace.php -text
@@ -6700,6 +6771,7 @@ tests/testfile.txt -text
 /tiki-user_cached_bookmark.php -text
 /tiki-user_contacts_prefs.php -text
 /tiki-user_information.php -text
+/tiki-user_mailin.php -text
 /tiki-user_notifications.php -text
 /tiki-user_preferences.php -text
 /tiki-user_reports.php -text
