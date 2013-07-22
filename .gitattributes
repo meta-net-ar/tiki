@@ -2461,6 +2461,8 @@ lib/core/Math/Formula/Exception.php -text
 lib/core/Math/Formula/Function.php -text
 lib/core/Math/Formula/Function/Add.php -text
 lib/core/Math/Formula/Function/And.php -text
+lib/core/Math/Formula/Function/Coalesce.php -text
+lib/core/Math/Formula/Function/Div.php -text
 lib/core/Math/Formula/Function/Equals.php -text
 lib/core/Math/Formula/Function/If.php -text
 lib/core/Math/Formula/Function/Map.php -text
@@ -2470,6 +2472,7 @@ lib/core/Math/Formula/Function/Mul.php -text
 lib/core/Math/Formula/Function/NotEquals.php -text
 lib/core/Math/Formula/Function/Or.php -text
 lib/core/Math/Formula/Function/Str.php -text
+lib/core/Math/Formula/Function/Sub.php -text
 lib/core/Math/Formula/Function/index.php -text
 lib/core/Math/Formula/Parser.php -text
 lib/core/Math/Formula/Parser/Exception.php -text
@@ -2552,6 +2555,10 @@ lib/core/Reports/Send/EmailBuilder/FileGalleryChanged.php -text
 lib/core/Reports/Send/EmailBuilder/ForumPostThread.php -text
 lib/core/Reports/Send/EmailBuilder/ForumPostTopic.php -text
 lib/core/Reports/Send/EmailBuilder/ImageGalleryChanged.php -text
+lib/core/Reports/Send/EmailBuilder/StructureAdd.php -text
+lib/core/Reports/Send/EmailBuilder/StructureMoveDown.php -text
+lib/core/Reports/Send/EmailBuilder/StructureMoveUp.php -text
+lib/core/Reports/Send/EmailBuilder/StructureRemove.php -text
 lib/core/Reports/Send/EmailBuilder/TrackerFileAttachment.php -text
 lib/core/Reports/Send/EmailBuilder/TrackerItemComment.php -text
 lib/core/Reports/Send/EmailBuilder/TrackerItemModified.php -text
@@ -2609,6 +2616,7 @@ lib/core/Search/Expr/Range.php -text
 lib/core/Search/Expr/Token.php -text
 lib/core/Search/Expr/Tokenizer.php -text
 lib/core/Search/Expr/index.php -text
+lib/core/Search/FacetProvider.php -text
 lib/core/Search/FacetProvider/Interface.php -text
 lib/core/Search/Formatter.php -text
 lib/core/Search/Formatter/AppendPagination.php -text
@@ -2661,6 +2669,8 @@ lib/core/Search/Indexer.php -text
 lib/core/Search/Query.php -text
 lib/core/Search/Query/Facet/Interface.php -text
 lib/core/Search/Query/Facet/Term.php -text
+lib/core/Search/Query/FacetWikiBuilder.php -text
+lib/core/Search/Query/Interface.php -text
 lib/core/Search/Query/Order.php -text
 lib/core/Search/Query/Relation.php -text
 lib/core/Search/Query/RelationReplacer.php -text
@@ -2746,6 +2756,8 @@ lib/core/Services/User/index.php -text
 lib/core/Services/Wiki/Controller.php -text
 lib/core/Services/Wiki/index.php -text
 lib/core/Services/Workspace/Controller.php -text
+lib/core/Services/Workspace/ProfileAnalyser.php -text
+lib/core/Services/Workspace/ProfileBuilder.php -text
 lib/core/Services/Workspace/Utilities.php -text
 lib/core/Services/index.php -text
 lib/core/StandardAnalyzer/Analyzer/Standard.php -text
@@ -2815,6 +2827,7 @@ lib/core/Tiki/Event/Lib.php -text
 lib/core/Tiki/Event/Manager.php -text
 lib/core/Tiki/Event/index.php -text
 lib/core/Tiki/MemoryLimit.php -text
+lib/core/Tiki/PageCache.php -text
 lib/core/Tiki/Profile.php -text
 lib/core/Tiki/Profile/ChannelList.php -text
 lib/core/Tiki/Profile/Converter.php -text
@@ -2860,6 +2873,7 @@ lib/core/Tiki/Profile/Transport/Interface.php -text
 lib/core/Tiki/Profile/Transport/Local.php -text
 lib/core/Tiki/Profile/Transport/Repository.php -text
 lib/core/Tiki/Profile/ValueMapConverter.php -text
+lib/core/Tiki/Profile/Writer.php -text
 lib/core/Tiki/Profile/Writer/ExternalWriter.php -text
 lib/core/Tiki/Profile/Writer/Helper.php -text
 lib/core/Tiki/Profile/Writer/ProfileFinder.php -text
@@ -2881,6 +2895,7 @@ lib/core/TikiDb/Bridge.php -text
 lib/core/TikiDb/ErrorHandler.php -text
 lib/core/TikiDb/Exception.php -text
 lib/core/TikiDb/Expr.php -text
+lib/core/TikiDb/Initializer.php -text
 lib/core/TikiDb/Initializer/Adodb.php -text
 lib/core/TikiDb/Initializer/Pdo.php -text
 lib/core/TikiDb/MasterSlaveDispatch.php -text
@@ -2909,6 +2924,7 @@ lib/core/Tracker/Field/Currency.php -text
 lib/core/Tracker/Field/DateTime.php -text
 lib/core/Tracker/Field/Dropdown.php -text
 lib/core/Tracker/Field/DynamicList.php -text
+lib/core/Tracker/Field/Email.php -text
 lib/core/Tracker/Field/Factory.php -text
 lib/core/Tracker/Field/File.php -text
 lib/core/Tracker/Field/Files.php -text
@@ -2929,6 +2945,7 @@ lib/core/Tracker/Field/Kaltura.php -text
 lib/core/Tracker/Field/Language.php -text
 lib/core/Tracker/Field/Ldap.php -text
 lib/core/Tracker/Field/Location.php -text
+lib/core/Tracker/Field/Math.php -text
 lib/core/Tracker/Field/Numeric.php -text
 lib/core/Tracker/Field/PageSelector.php -text
 lib/core/Tracker/Field/Rating.php -text
@@ -2945,6 +2962,7 @@ lib/core/Tracker/Field/UserSubscription.php -text
 lib/core/Tracker/Field/WebService.php -text
 lib/core/Tracker/Field/index.php -text
 lib/core/Tracker/Item.php -text
+lib/core/Tracker/Options.php -text
 lib/core/Tracker/Query.php -text
 lib/core/Tracker/index.php -text
 lib/core/WikiParser/OutputLink.php -text
@@ -3285,6 +3303,7 @@ lib/jquery_tiki/galleriffic/css/white.css -text
 lib/jquery_tiki/index.php -text
 lib/jquery_tiki/inline_edit.js -text
 lib/jquery_tiki/tablesorter/index.php -text
+lib/jquery_tiki/tablesorter/style.css -text
 lib/jquery_tiki/tiki-admin.js -text
 lib/jquery_tiki/tiki-connect.js -text
 lib/jquery_tiki/tiki-jquery.js -text
@@ -3318,6 +3337,7 @@ lib/live_support/index.php -text
 lib/live_support/live-support.js -text
 lib/live_support/lsadminlib.php -text
 lib/live_support/lslib.php -text
+lib/loginlib.php -text
 lib/logs/index.php -text
 lib/logs/logslib.php -text
 lib/logs/logsquerylib.php -text
@@ -4216,6 +4236,7 @@ lib/test/core/Search/Index/LucenePaginationTest.php -text
 lib/test/core/Search/Index/LuceneSortTest.php -text
 lib/test/core/Search/Index/LuceneStemmingTest.php -text
 lib/test/core/Search/Index/LuceneTest.php -text
+lib/test/core/Search/Index/LuceneTypeAnalyzerTest.php -text
 lib/test/core/Search/Index/index.php -text
 lib/test/core/Search/IndexerTest.php -text
 lib/test/core/Search/Query/OrderTest.php -text
