@@ -9,8 +9,6 @@ class Search_MySql_IndexTest extends Search_Index_LuceneTest
 {
 	function setUp()
 	{
-		static $count = 0;
-
 		$this->index = new Search_MySql_Index(TikiDb::get(), 'test_index');
 		$this->index->destroy();
 
