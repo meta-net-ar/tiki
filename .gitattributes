@@ -2716,6 +2716,8 @@ lib/core/Services/ActivityStream/ManageController.php -text
 lib/core/Services/AuthSource/Controller.php -text
 lib/core/Services/AuthSource/OAuthController.php -text
 lib/core/Services/AuthSource/index.php -text
+lib/core/Services/AutoSave/Controller.php -text
+lib/core/Services/AutoSave/index.php -text
 lib/core/Services/BigBlueButton/Controller.php -text
 lib/core/Services/Broker.php -text
 lib/core/Services/Calendar/Controller.php -text
