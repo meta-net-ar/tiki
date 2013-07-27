@@ -2732,6 +2732,8 @@ lib/core/Services/ContentTemplate/Controller.php -text
 lib/core/Services/ContentTemplate/index.php -text
 lib/core/Services/Draw/Controller.php -text
 lib/core/Services/Draw/index.php -text
+lib/core/Services/Edit/Controller.php -text
+lib/core/Services/Edit/index.php -text
 lib/core/Services/Exception.php -text
 lib/core/Services/Exception/Denied.php -text
 lib/core/Services/Exception/Disabled.php -text
