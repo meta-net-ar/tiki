@@ -1,8 +1,29 @@
+A
+dir
+/trunk/lib/core/Services/AutoSave
+/branches/experimental/ckeditor4/lib/core/Services/AutoSave
+46885
+
+
 M
 dir
-/branches/experimental/ckeditor4
+/trunk
 
 
+
+
+A
+dir
+/trunk/templates/edit
+/branches/experimental/ckeditor4/templates/edit
+46902
+
+
+A
+dir
+/trunk/lib/core/Services/Edit
+/branches/experimental/ckeditor4/lib/core/Services/Edit
+46893
 
 
 
