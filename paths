@@ -1,15 +1,22 @@
 A
 dir
-/trunk/lib/core/Services/MustRead
+/branches/12.x/lib/core/Services/Suite
+/trunk/lib/core/Services/Suite
+49699
+
+
+M
+dir
+/branches/12.x
 
 
 
 
 A
 dir
-/trunk/templates/mustread
-
-
+/branches/12.x/templates/suite
+/trunk/templates/suite
+49699
 
 
 
