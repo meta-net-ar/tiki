@@ -6895,6 +6895,15 @@ themes/darkshine/less/bootstrap-variables.less -text
 themes/darkshine/less/index.php -text
 themes/darkshine/less/tiki-selectors.less -text
 themes/darkshine/less/tiki.less -text
+themes/default/css/index.php -text
+themes/default/css/tiki.css -text
+themes/default/fonts/index.php -text
+themes/default/icons/index.php -text
+themes/default/images/index.php -text
+themes/default/index.php -text
+themes/default/less/index.php -text
+themes/default/options/index.php -text
+themes/default/templates/index.php -text
 themes/feb12/css/index.php -text
 themes/feb12/css/tiki.css -text
 themes/feb12/fonts/index.php -text
@@ -7573,6 +7582,7 @@ themes/superhero/less/index.php -text
 themes/superhero/less/tiki.less -text
 themes/superhero/less/variables.less -text
 themes/superhero/templates/index.php -text
+themes/templates/index.php -text
 themes/thenews/css/index.php -text
 themes/thenews/css/tiki.css -text
 themes/thenews/fonts/index.php -text
