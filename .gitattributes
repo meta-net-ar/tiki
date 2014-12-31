@@ -4099,7 +4099,6 @@ lib/prefs/smarty.php -text
 lib/prefs/social.php -text
 lib/prefs/socialnetworks.php -text
 lib/prefs/storedsearch.php -text
-lib/prefs/style.php -text
 lib/prefs/suite.php -text
 lib/prefs/theme.php -text
 lib/prefs/themegenerator.php -text
