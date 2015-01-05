@@ -7614,7 +7614,7 @@ themes/tikinewt/less/tiki-selectors.less -text
 themes/tikinewt/less/tiki.less -text
 themes/tikinewt/less/tikinewt.png -text
 themes/tikinewt/options/index.php -text
-themes/tikinewt/options/shadows/css/shadows.css -text
+themes/tikinewt/options/shadows/css/tiki.css -text
 themes/tikinewt/options/shadows/images/box_shadow.png -text
 themes/tikinewt/options/shadows/images/index.php -text
 themes/tikinewt/templates/index.php -text
