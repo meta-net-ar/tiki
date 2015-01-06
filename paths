@@ -1,36 +1,22 @@
 A
 dir
-/branches/experimental/tiki14_themes/templates/utilities
-/trunk/templates/utilities
-53415
-
-
-A
-dir
-/branches/experimental/tiki14_themes/lib/core/Services/Utilities
-/trunk/lib/core/Services/Utilities
-53415
-
-
-A
-dir
-/branches/experimental/tiki14_themes/templates/access
-/trunk/templates/access
-53415
-
-
-M
-dir
-/branches/experimental/tiki14_themes
+/branches/experimental/tiki14_themes/themes/flatly/options/blue
 
 
 
 
 A
 dir
-/branches/experimental/tiki14_themes/lib/core/Services/Access
-/trunk/lib/core/Services/Access
-53415
+/branches/experimental/tiki14_themes/themes/flatly/options/blue/css
+
+
+
+
+A
+dir
+/branches/experimental/tiki14_themes/themes/flatly/options
+
+
 
 
 
