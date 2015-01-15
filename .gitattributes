@@ -4872,6 +4872,7 @@ lib/test/wiki-plugins/CodeTest.php -text
 lib/test/wiki-plugins/TranslationOfTest.php -text
 lib/test/wiki-plugins/YoutubeTest.php -text
 lib/test/wiki-plugins/index.php -text
+lib/theme/iconsetlib.php -text
 lib/theme/index.php -text
 lib/theme/themecontrollib.php -text
 lib/theme/themelib.php -text
