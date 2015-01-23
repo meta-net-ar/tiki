@@ -6203,7 +6203,6 @@ templates/tiki-admin_integrator.tpl -text
 templates/tiki-admin_integrator_rules.tpl -text
 templates/tiki-admin_invoices.tpl -text
 templates/tiki-admin_keywords.tpl -text
-templates/tiki-admin_layout.tpl -text
 templates/tiki-admin_links.tpl -text
 templates/tiki-admin_mailin.tpl -text
 templates/tiki-admin_mailin_routes.tpl -text
@@ -7715,7 +7714,6 @@ themes/yeti/templates/index.php -text
 /tiki-admin_integrator_rules.php -text
 /tiki-admin_invoices.php -text
 /tiki-admin_keywords.php -text
-/tiki-admin_layout.php -text
 /tiki-admin_links.php -text
 /tiki-admin_mailin.php -text
 /tiki-admin_mailin_routes.php -text
