@@ -4882,7 +4882,6 @@ lib/theme/iconsetlib.php -text
 lib/theme/index.php -text
 lib/theme/themecontrollib.php -text
 lib/theme/themelib.php -text
-lib/themegenlib.php -text
 lib/tiki-dynamic-js.php -text
 lib/tiki-js.js -text
 lib/tikiaccesslib.php -text
