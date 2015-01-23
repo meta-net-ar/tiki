@@ -4881,6 +4881,7 @@ lib/test/wiki-plugins/index.php -text
 lib/theme/iconsetlib.php -text
 lib/theme/index.php -text
 lib/theme/themecontrollib.php -text
+lib/theme/themegenlib.php -text
 lib/theme/themelib.php -text
 lib/tiki-dynamic-js.php -text
 lib/tiki-js.js -text
