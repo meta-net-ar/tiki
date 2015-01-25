@@ -11,7 +11,7 @@
 			{include file='tiki-ajax_header.tpl'}
 		{/if}
 
-		<div class="header_outer">
+		<div class="header_outer {if $prefs.site_layout eq 'moving_headers'}navbar navbar-default{/if}">
 			<div class="header_container">
 				<header class="container header page-header">
 					<div class="row">
