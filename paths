@@ -1,6 +1,34 @@
-M
+A
 dir
-/trunk
+/trunk/vendor_extra/elfinder/php/plugins/Normalizer
+
+
+
+
+A
+dir
+/trunk/vendor_extra/elfinder/php/plugins/Watermark
+
+
+
+
+A
+dir
+/trunk/vendor_extra/elfinder/php/plugins/Sanitizer
+
+
+
+
+A
+dir
+/trunk/vendor_extra/elfinder/php/plugins
+
+
+
+
+A
+dir
+/trunk/vendor_extra/elfinder/php/plugins/AutoResize
 
 
 
