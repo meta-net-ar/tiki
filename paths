@@ -1,22 +1,22 @@
-A
-dir
-/branches/15.x/vendor_extra/kaltura
-
-
-
-
-A
-dir
-/branches/15.x/vendor_extra/kaltura/KalturaPlugins
-/branches/15.x/lib/videogals/KalturaPlugins
-58584
-
-
 D
 dir
-/branches/15.x/lib/videogals/KalturaPlugins
+/trunk/lib/videogals/KalturaPlugins
 
 
+
+
+M
+dir
+/trunk
+
+
+
+
+A
+dir
+/trunk/vendor_extra/kaltura
+/branches/15.x/vendor_extra/kaltura
+58585
 
 
 
