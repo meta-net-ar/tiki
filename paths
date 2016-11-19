@@ -1,13 +1,20 @@
 D
 dir
-/trunk/lib/ckeditor_tiki/ckeditor-icons
+/trunk/lib/ckeditor_tiki/plugins/autosave/images
 
 
 
 
-A
+D
 dir
-/trunk/img/ckeditor
+/trunk/lib/ckeditor_tiki/plugins/inlinesave/images
+
+
+
+
+D
+dir
+/trunk/lib/ckeditor_tiki/plugins/inlinecancel/images
 
 
 
