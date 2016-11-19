@@ -1,20 +1,20 @@
+A
+dir
+/trunk/img/tikihelp
+
+
+
+
+M
+dir
+/trunk/whelp
+
+
+
+
 D
 dir
-/trunk/lib/ckeditor_tiki/plugins/autosave/images
-
-
-
-
-D
-dir
-/trunk/lib/ckeditor_tiki/plugins/inlinesave/images
-
-
-
-
-D
-dir
-/trunk/lib/ckeditor_tiki/plugins/inlinecancel/images
+/trunk/lib/tikihelp/icons
 
 
 
