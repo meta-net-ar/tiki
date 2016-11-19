@@ -1,6 +1,13 @@
 D
 dir
-/trunk/lib/images/icons
+/trunk/lib/ckeditor_tiki/ckeditor-icons
+
+
+
+
+A
+dir
+/trunk/img/ckeditor
 
 
 
