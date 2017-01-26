@@ -119,6 +119,7 @@ if ($isInstalled && ! $installer->requiresUpdate()) {
 	$console->add(new Tiki\Command\RecommendationBatchCommand);
 	$console->add(new Tiki\Command\RefreshRssCommand);
 	$console->add(new Tiki\Command\RssClearCacheCommand);
+	$console->add(new Tiki\Command\SchedulerRunCommand());
 	$console->add(new Tiki\Command\TrackerImportCommand);
 	$console->add(new Tiki\Command\TrackerClearCommand);
 	$console->add(new Tiki\Command\AdminIndexRebuildCommand);

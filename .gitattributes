@@ -2039,6 +2039,7 @@ installer/schema/20160915_extwiki_indexname_length_tiki.sql -text
 installer/schema/20161109_remove_old_password_tiki.php -text
 installer/schema/20161117_favicon_tiki.sql -text
 installer/schema/20161206_larger_comment_field_tiki.sql -text
+installer/schema/20170122_schedulers_tiki.sql -text
 installer/schema/999999991_decode_pages_sources_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
@@ -2498,6 +2499,9 @@ lib/core/Reports/Send/EmailBuilder/index.php -text
 lib/core/Reports/Send/index.php -text
 lib/core/Reports/Users.php -text
 lib/core/Reports/index.php -text
+lib/core/Scheduler/Item.php -text
+lib/core/Scheduler/Task/IndexRebuildTask.php -text
+lib/core/Scheduler/Task/ListExecuteTask.php -text
 lib/core/Search/Action/Action.php -text
 lib/core/Search/Action/ActionStep.php -text
 lib/core/Search/Action/ChangeStatusAction.php -text
@@ -2907,6 +2911,7 @@ lib/core/Tiki/Command/RecommendationBatchCommand.php -text
 lib/core/Tiki/Command/RedactDBCommand.php -text
 lib/core/Tiki/Command/RefreshRssCommand.php -text
 lib/core/Tiki/Command/RssClearCacheCommand.php -text
+lib/core/Tiki/Command/SchedulerRunCommand.php -text
 lib/core/Tiki/Command/TrackerClearCommand.php -text
 lib/core/Tiki/Command/TrackerImportCommand.php -text
 lib/core/Tiki/Command/UnavailableCommand.php -text
@@ -5862,6 +5867,7 @@ templates/tiki-admin_notifications.tpl -text
 templates/tiki-admin_poll_options.tpl -text
 templates/tiki-admin_polls.tpl -text
 templates/tiki-admin_rssmodules.tpl -text
+templates/tiki-admin_schedulers.tpl -text
 templates/tiki-admin_security.tpl -text
 templates/tiki-admin_shoutbox_words.tpl -text
 templates/tiki-admin_structures.tpl -text
@@ -7585,6 +7591,7 @@ themes/yeti/templates/index.php -text
 /tiki-admin_poll_options.php -text
 /tiki-admin_polls.php -text
 /tiki-admin_rssmodules.php -text
+/tiki-admin_schedulers.php -text
 /tiki-admin_security.php -text
 /tiki-admin_shoutbox_words.php -text
 /tiki-admin_structures.php -text
