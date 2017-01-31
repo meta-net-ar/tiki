@@ -1,13 +1,20 @@
 M
 dir
-/branches/experimental/h5p/templates
+/trunk
 
 
 
 
 M
 dir
-/branches/experimental/h5p
+/trunk/templates
+
+
+
+
+D
+dir
+/trunk/vendor
 
 
 
