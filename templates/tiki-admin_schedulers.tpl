@@ -114,7 +114,7 @@
 				<div class="row">
 					<div class="col-md-offset-2 col-md-6">
 						{remarksbox type="note" title="{tr}Information{/tr}"}
-						{tr}Use CRON format to enter the values in "Run Time":<br>Minute, Hour, Day of Month, Month, Day of Week, Year<br>Eg. every 5 minutes: */5 * * * * *{/tr}
+						{tr}Use CRON format to enter the values in "Run Time":<br>Minute, Hour, Day of Month, Month, Day of Week, Year<br>Eg. every 5 minutes: */5 * * * *{/tr}
 						{/remarksbox}
 					</div>
 				</div>
