@@ -171,9 +171,6 @@ if (isset($_REQUEST['add'])) {
 	$cookietab = '2';
 }
 
-//add tablesorter sorting and filtering
-$ts = Table_Check::setVars('admin_schedulers', true);
-
 $smarty->assign('schedulerinfo', $schedulerinfo);
 $smarty->assign('schedulerruns', isset($schedulerRuns) ? $schedulerRuns : array());
 $smarty->assign('schedulerId', $_REQUEST['scheduler']);
@@ -189,8 +186,4 @@ $smarty->assign('uses_tabs', 'y');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $smarty->assign('mid', 'tiki-admin_schedulers.tpl');
-if ($ts['ajax']) {
-	$smarty->display('tiki-admin_schedulers.tpl');
-} else {
-	$smarty->display('tiki.tpl');
-}
+$smarty->display('tiki.tpl');
