@@ -317,6 +317,7 @@
 									</div>
 								</div>
 							</fieldset>
+
 							<br>
 							<fieldset>
 								<legend>{tr}Database user{/tr}</legend>
@@ -324,6 +325,12 @@
 								<div style="padding:5px;">
 									<label for="user">{tr}User name:{/tr}</label> <input type="text" class=form-control id="user" name="user" value="{if (isset($smarty.request.user))}{$smarty.request.user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" placeholder="{tr}databaseUsername{/tr}">
 								</div>
+
+								<div style="display:none; padding:5px;">
+									<input type="checkbox" id="create-new-user" name="create_new_user" checked="checked"/>
+									<label for="create-new-user">{tr}Create a new user just for this TikiWiki instance.{/tr}</label>&nbsp;
+								</div>
+
 								<div style="padding:5px;">
 									{if isset($preconfigpass)}
 										<label for="pass">{tr}Password:{/tr}</label> <input type="text" class=form-control id="pass" name="pass" value="{$preconfigpass|escape:"html"}" >
@@ -332,6 +339,54 @@
 									{/if}
 								</div>
 							</fieldset>
+
+							<br/>
+							<fieldset id="new-user-fieldset" style="display: none;">
+								<legend>{tr}New database user{/tr}</legend>
+								<p>{tr}Enter name and password for new user.{/tr}</p>
+								<div style="padding:5px;">
+									<label for="user">{tr}User name:{/tr}</label> <input type="text" class=form-control id="new-user" name="new_user" value="{if (isset($smarty.request.new_user))}{$smarty.request.new_user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" placeholder="{tr}databaseUsername{/tr}">
+								</div>
+								<div style="padding:5px;">
+									<label for="pass">{tr}Password:{/tr}</label> <input type="password" class=form-control id="new-pass" name="new_pass" value="{if (isset($smarty.request.new_pass))}{$smarty.request.new_pass|escape:"html"}{/if}">
+								</div>
+							</fieldset>
+							<script type='text/javascript'><!--//--><![CDATA[//><!--
+							;(function(){
+								var user = document.getElementById('user');
+								var create_new_user = document.getElementById('create-new-user');
+								var new_user_fs = document.getElementById('new-user-fieldset');
+
+								if(user.value === 'root') {
+									create_new_user.parentElement.style.display = 'block';
+
+									if(create_new_user.checked) {
+										new_user_fs.style.display = 'block';
+									}
+								}
+
+								user.addEventListener('keyup', function(evt){
+									if (user.value === 'root') {
+										create_new_user.parentElement.style.display = 'block';
+										if(create_new_user.checked) {
+											new_user_fs.style.display = 'block';
+										}
+									} else {
+										create_new_user.parentElement.style.display = 'none';
+										new_user_fs.style.display = 'none';
+									}
+								});
+
+								create_new_user.addEventListener('click', function(){
+									if(create_new_user.checked && user.value === 'root') {
+										new_user_fs.style.display = 'block';
+									} else {
+										new_user_fs.style.display = 'none';
+									}
+								});
+							})();//--><!]]></script>
+
+							<br/>
 							<input type="hidden" name="resetdb" value="y">
 							<fieldset>
 								<legend>{tr}Character set{/tr}</legend>
@@ -551,7 +606,7 @@
 									<label for="browsertitle">
 										{tr}Browser title:{/tr}
 									</label>
-									<input class="form-control" type="text" size="40" name="browsertitle" id="browsertitle" value="" placeholder="{tr}My Tiki{/tr}">
+									<input class="form-control" type="text" size="40" name="browsertitle" id="browsertitle" value="{$prefs.browsertitle|escape}" placeholder="{tr}My Tiki{/tr}">
 									<span class="help-block">
 										{tr}This will appear in the browser title bar.{/tr}
 									</span>
@@ -803,7 +858,7 @@
 					{/if}
 					{if isset($smarty.post.update)}
 						<h3>{icon name='information'} {tr}Upgrade{/tr}</h3>
-						<p>{tr}If this is an upgrade, clean the Tiki caches manually (the <strong>templates_c</strong> directory) or by using the <strong>Admin &gt; System</strong> option from the Admin menu.{/tr}</p>
+						<p>{tr}If this is an upgrade, clean the Tiki caches manually (the <strong>temp/templates_c</strong> directory) or by using the <strong>Admin &gt; System</strong> option from the Admin menu.{/tr}</p>
 					{/if}
 					{if $tikidb_is20}
 						<form method="post" action="tiki-install.php" style="float: left">

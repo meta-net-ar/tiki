@@ -7,13 +7,13 @@
   color: #242424;
 }
 a,
-a.btn-link {
+.btn-link {
   color: #c75a28;
 }
 a:hover,
-a.btn-link:hover,
+.btn-link:hover,
 a:focus,
-a.btn-link:focus {
+.btn-link:focus {
   color: #f9a013;
 }
 .btn-default {
@@ -678,6 +678,7 @@ header.header .sitesubtitle {
   border: 1px solid rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
 .cssmenu_horiz li ul > li > a,

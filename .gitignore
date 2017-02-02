@@ -50,7 +50,6 @@ temp/cache/*
 temp/mail_attachs/*
 temp/public/*
 templates/.htaccess
-/templates_c
 tests/.htaccess
 /tiki-*.log
 /tiki-emptycache.php

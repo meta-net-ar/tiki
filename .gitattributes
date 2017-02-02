@@ -113,6 +113,7 @@ doc/devtools/cssmap.pl -text
 doc/devtools/diffsql.cmd -text
 doc/devtools/diffsql.sh -text
 doc/devtools/experimental/index.php -text
+doc/devtools/experimental/prefsdoc.php -text
 doc/devtools/experimental/unzip/index.php -text
 doc/devtools/experimental/unzip/unzipper.php -text
 doc/devtools/export_translations_to_file.php -text
@@ -194,7 +195,6 @@ doc/stable.version -text
 doc/unstable.version -text
 dump/.htaccess -text
 dump/index.php -text
-/favicon.ico -text
 /fgal_listing_conf.php -text
 /freetag_apply.php -text
 /freetag_list.php -text
@@ -1274,90 +1274,6 @@ img/loading.gif -text
 img/mainbar.gif -text
 img/mainbarlight.gif -text
 img/noavatar.png -text
-img/openlayers/art/arrows.svg -text
-img/openlayers/art/index.php -text
-img/openlayers/art/layer-switcher-maximize.svg -text
-img/openlayers/art/layer-switcher-minimize.svg -text
-img/openlayers/art/marker.svg -text
-img/openlayers/art/measuring-stick-off.svg -text
-img/openlayers/art/measuring-stick-on.svg -text
-img/openlayers/art/panning-hand-off.svg -text
-img/openlayers/art/panning-hand-on.svg -text
-img/openlayers/art/slider.svg -text
-img/openlayers/art/zoom-world.svg -text
-img/openlayers/art/zoombar.svg -text
-img/openlayers/blank.gif -text
-img/openlayers/cloud-popup-relative.png -text
-img/openlayers/dark/LICENSE.txt -text
-img/openlayers/dark/cloud-popup-relative.png -text
-img/openlayers/dark/east-mini.png -text
-img/openlayers/dark/index.php -text
-img/openlayers/dark/layer-switcher-maximize.png -text
-img/openlayers/dark/layer-switcher-minimize.png -text
-img/openlayers/dark/north-mini.png -text
-img/openlayers/dark/slider.png -text
-img/openlayers/dark/south-mini.png -text
-img/openlayers/dark/west-mini.png -text
-img/openlayers/dark/zoom-minus-mini.png -text
-img/openlayers/dark/zoom-panel.png -text
-img/openlayers/dark/zoom-plus-mini.png -text
-img/openlayers/dark/zoom-world-mini.png -text
-img/openlayers/dark/zoombar.png -text
-img/openlayers/default/add_point_off.png -text
-img/openlayers/default/add_point_on.png -text
-img/openlayers/default/close.gif -text
-img/openlayers/default/drag-rectangle-off.png -text
-img/openlayers/default/drag-rectangle-on.png -text
-img/openlayers/default/draw_line_off.png -text
-img/openlayers/default/draw_line_on.png -text
-img/openlayers/default/draw_point_off.png -text
-img/openlayers/default/draw_point_on.png -text
-img/openlayers/default/draw_polygon_off.png -text
-img/openlayers/default/draw_polygon_on.png -text
-img/openlayers/default/editing_tool_bar.png -text
-img/openlayers/default/index.php -text
-img/openlayers/default/move_feature_off.png -text
-img/openlayers/default/move_feature_on.png -text
-img/openlayers/default/navigation_history.png -text
-img/openlayers/default/overview_replacement.gif -text
-img/openlayers/default/pan-panel-NOALPHA.png -text
-img/openlayers/default/pan-panel.png -text
-img/openlayers/default/pan_off.png -text
-img/openlayers/default/pan_on.png -text
-img/openlayers/default/panning-hand-off.png -text
-img/openlayers/default/panning-hand-on.png -text
-img/openlayers/default/remove_point_off.png -text
-img/openlayers/default/remove_point_on.png -text
-img/openlayers/default/ruler.png -text
-img/openlayers/default/save_features_off.png -text
-img/openlayers/default/save_features_on.png -text
-img/openlayers/default/view_next_off.png -text
-img/openlayers/default/view_next_on.png -text
-img/openlayers/default/view_previous_off.png -text
-img/openlayers/default/view_previous_on.png -text
-img/openlayers/default/zoom-panel-NOALPHA.png -text
-img/openlayers/default/zoom-panel.png -text
-img/openlayers/drag-rectangle-off.png -text
-img/openlayers/drag-rectangle-on.png -text
-img/openlayers/east-mini.png -text
-img/openlayers/layer-switcher-maximize.png -text
-img/openlayers/layer-switcher-minimize.png -text
-img/openlayers/marker-blue.svg -text
-img/openlayers/marker-gold.svg -text
-img/openlayers/marker-green.svg -text
-img/openlayers/marker.svg -text
-img/openlayers/measuring-stick-off.png -text
-img/openlayers/measuring-stick-on.png -text
-img/openlayers/north-mini.png -text
-img/openlayers/panning-hand-off.png -text
-img/openlayers/panning-hand-on.png -text
-img/openlayers/slider.png -text
-img/openlayers/south-mini.png -text
-img/openlayers/west-mini.png -text
-img/openlayers/zoom-minus-mini.png -text
-img/openlayers/zoom-plus-mini.png -text
-img/openlayers/zoom-world-mini.png -text
-img/openlayers/zoombar.png -text
 img/overlay-25.png -text
 img/overlay-40.png -text
 img/overlay-50.png -text
@@ -1427,30 +1343,30 @@ img/screencast-no-video.png -text
 img/screencast-player-close.png -text
 img/screencast-player-frame.png -text
 img/separator.gif -text
-img/smiles/icon_arrow.png -text
-img/smiles/icon_biggrin.png -text
-img/smiles/icon_confused.png -text
-img/smiles/icon_cool.png -text
-img/smiles/icon_cry.png -text
-img/smiles/icon_eek.png -text
-img/smiles/icon_evil.png -text
-img/smiles/icon_exclaim.png -text
-img/smiles/icon_frown.png -text
-img/smiles/icon_idea.png -text
-img/smiles/icon_lol.png -text
-img/smiles/icon_mad.png -text
-img/smiles/icon_mrgreen.png -text
-img/smiles/icon_neutral.png -text
-img/smiles/icon_question.png -text
-img/smiles/icon_razz.png -text
-img/smiles/icon_redface.png -text
-img/smiles/icon_rolleyes.png -text
-img/smiles/icon_sad.png -text
-img/smiles/icon_santa.png -text
-img/smiles/icon_smile.png -text
-img/smiles/icon_surprised.png -text
-img/smiles/icon_twisted.png -text
-img/smiles/icon_wink.png -text
+img/smiles/icon_arrow.gif -text svneol=unset#image/gif
+img/smiles/icon_biggrin.gif -text svneol=unset#image/gif
+img/smiles/icon_confused.gif -text svneol=unset#image/gif
+img/smiles/icon_cool.gif -text svneol=unset#image/gif
+img/smiles/icon_cry.gif -text svneol=unset#image/gif
+img/smiles/icon_eek.gif -text svneol=unset#image/gif
+img/smiles/icon_evil.gif -text svneol=unset#image/gif
+img/smiles/icon_exclaim.gif -text svneol=unset#image/gif
+img/smiles/icon_frown.gif -text svneol=unset#image/gif
+img/smiles/icon_idea.gif -text svneol=unset#image/gif
+img/smiles/icon_lol.gif -text svneol=unset#image/gif
+img/smiles/icon_mad.gif -text svneol=unset#image/gif
+img/smiles/icon_mrgreen.gif -text svneol=unset#image/gif
+img/smiles/icon_neutral.gif -text svneol=unset#image/gif
+img/smiles/icon_question.gif -text svneol=unset#image/gif
+img/smiles/icon_razz.gif -text svneol=unset#image/gif
+img/smiles/icon_redface.gif -text svneol=unset#image/gif
+img/smiles/icon_rolleyes.gif -text svneol=unset#image/gif
+img/smiles/icon_sad.gif -text svneol=unset#image/gif
+img/smiles/icon_santa.gif -text svneol=unset#image/gif
+img/smiles/icon_smile.gif -text svneol=unset#image/gif
+img/smiles/icon_surprised.gif -text svneol=unset#image/gif
+img/smiles/icon_twisted.gif -text svneol=unset#image/gif
+img/smiles/icon_wink.gif -text svneol=unset#image/gif
 img/smiles/index.php -text
 img/spinner.gif -text
 img/superfish/arrows-ffffff.png -text
@@ -2040,6 +1956,7 @@ installer/schema/20161109_remove_old_password_tiki.php -text
 installer/schema/20161117_favicon_tiki.sql -text
 installer/schema/20161206_larger_comment_field_tiki.sql -text
 installer/schema/20170122_schedulers_tiki.sql -text
+installer/schema/20170129_feature_dump_tiki.sql -text
 installer/schema/999999991_decode_pages_sources_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
@@ -2589,6 +2506,7 @@ lib/core/Search/Formatter/Builder.php -text
 lib/core/Search/Formatter/DataSource/Declarative.php -text
 lib/core/Search/Formatter/DataSource/Interface.php -text
 lib/core/Search/Formatter/DataSource/index.php -text
+lib/core/Search/Formatter/Factory.php -text
 lib/core/Search/Formatter/Plugin/ArrayTemplate.php -text
 lib/core/Search/Formatter/Plugin/Interface.php -text
 lib/core/Search/Formatter/Plugin/SmartyTemplate.php -text
@@ -3135,7 +3053,6 @@ lib/core/TikiFilter/PrepareInput.php -text
 lib/core/TikiFilter/PreventXss.php -text
 lib/core/TikiFilter/RawUnsafe.php -text
 lib/core/TikiFilter/WikiContent.php -text
-lib/core/TikiFilter/Word.php -text
 lib/core/TikiFilter/index.php -text
 lib/core/Tracker/CompilerPass.php -text
 lib/core/Tracker/Definition.php -text
@@ -3504,7 +3421,45 @@ lib/oauthlib.php -text
 lib/objectlib.php -text
 lib/ointegratelib.php -text
 lib/openlayers/OpenLayers.js -text
+lib/openlayers/OpenLayers.light.js -text
+lib/openlayers/OpenLayers.mobile.js -text
+lib/openlayers/art/arrows.svg -text
+lib/openlayers/art/index.php -text
+lib/openlayers/art/layer-switcher-maximize.svg -text
+lib/openlayers/art/layer-switcher-minimize.svg -text
+lib/openlayers/art/marker.svg -text
+lib/openlayers/art/measuring-stick-off.svg -text
+lib/openlayers/art/measuring-stick-on.svg -text
+lib/openlayers/art/panning-hand-off.svg -text
+lib/openlayers/art/panning-hand-on.svg -text
+lib/openlayers/art/slider.svg -text
+lib/openlayers/art/zoom-world.svg -text
+lib/openlayers/art/zoombar.svg -text
 lib/openlayers/authors.txt -text
+lib/openlayers/img/blank.gif -text
+lib/openlayers/img/cloud-popup-relative.png -text
+lib/openlayers/img/drag-rectangle-off.png -text
+lib/openlayers/img/drag-rectangle-on.png -text
+lib/openlayers/img/east-mini.png -text
+lib/openlayers/img/index.php -text
+lib/openlayers/img/layer-switcher-maximize.png -text
+lib/openlayers/img/layer-switcher-minimize.png -text
+lib/openlayers/img/marker-blue.svg -text
+lib/openlayers/img/marker-gold.svg -text
+lib/openlayers/img/marker-green.svg -text
+lib/openlayers/img/marker.svg -text
+lib/openlayers/img/measuring-stick-off.png -text
+lib/openlayers/img/measuring-stick-on.png -text
+lib/openlayers/img/north-mini.png -text
+lib/openlayers/img/panning-hand-off.png -text
+lib/openlayers/img/panning-hand-on.png -text
+lib/openlayers/img/slider.png -text
+lib/openlayers/img/south-mini.png -text
+lib/openlayers/img/west-mini.png -text
+lib/openlayers/img/zoom-minus-mini.png -text
+lib/openlayers/img/zoom-plus-mini.png -text
+lib/openlayers/img/zoom-world-mini.png -text
+lib/openlayers/img/zoombar.png -text
 lib/openlayers/index.php -text
 lib/openlayers/license.txt -text
 lib/openlayers/licenses/APACHE-2.0.txt -text
@@ -3512,6 +3467,66 @@ lib/openlayers/licenses/BSD-LICENSE.txt -text
 lib/openlayers/licenses/MIT-LICENSE.txt -text
 lib/openlayers/licenses/index.php -text
 lib/openlayers/readme.md -text
+lib/openlayers/theme/dark/LICENSE.txt -text
+lib/openlayers/theme/dark/blank.gif -text
+lib/openlayers/theme/dark/cloud-popup-relative.png -text
+lib/openlayers/theme/dark/east-mini.png -text
+lib/openlayers/theme/dark/index.php -text
+lib/openlayers/theme/dark/layer-switcher-maximize.png -text
+lib/openlayers/theme/dark/layer-switcher-minimize.png -text
+lib/openlayers/theme/dark/north-mini.png -text
+lib/openlayers/theme/dark/slider.png -text
+lib/openlayers/theme/dark/south-mini.png -text
+lib/openlayers/theme/dark/west-mini.png -text
+lib/openlayers/theme/dark/zoom-minus-mini.png -text
+lib/openlayers/theme/dark/zoom-panel.png -text
+lib/openlayers/theme/dark/zoom-plus-mini.png -text
+lib/openlayers/theme/dark/zoom-world-mini.png -text
+lib/openlayers/theme/dark/zoombar.png -text
+lib/openlayers/theme/default/google.css -text
+lib/openlayers/theme/default/google.tidy.css -text
+lib/openlayers/theme/default/ie6-style.css -text
+lib/openlayers/theme/default/ie6-style.tidy.css -text
+lib/openlayers/theme/default/img/add_point_off.png -text
+lib/openlayers/theme/default/img/add_point_on.png -text
+lib/openlayers/theme/default/img/blank.gif -text
+lib/openlayers/theme/default/img/close.gif -text
+lib/openlayers/theme/default/img/drag-rectangle-off.png -text
+lib/openlayers/theme/default/img/drag-rectangle-on.png -text
+lib/openlayers/theme/default/img/draw_line_off.png -text
+lib/openlayers/theme/default/img/draw_line_on.png -text
+lib/openlayers/theme/default/img/draw_point_off.png -text
+lib/openlayers/theme/default/img/draw_point_on.png -text
+lib/openlayers/theme/default/img/draw_polygon_off.png -text
+lib/openlayers/theme/default/img/draw_polygon_on.png -text
+lib/openlayers/theme/default/img/editing_tool_bar.png -text
+lib/openlayers/theme/default/img/index.php -text
+lib/openlayers/theme/default/img/move_feature_off.png -text
+lib/openlayers/theme/default/img/move_feature_on.png -text
+lib/openlayers/theme/default/img/navigation_history.png -text
+lib/openlayers/theme/default/img/overview_replacement.gif -text
+lib/openlayers/theme/default/img/pan-panel-NOALPHA.png -text
+lib/openlayers/theme/default/img/pan-panel.png -text
+lib/openlayers/theme/default/img/pan_off.png -text
+lib/openlayers/theme/default/img/pan_on.png -text
+lib/openlayers/theme/default/img/panning-hand-off.png -text
+lib/openlayers/theme/default/img/panning-hand-on.png -text
+lib/openlayers/theme/default/img/remove_point_off.png -text
+lib/openlayers/theme/default/img/remove_point_on.png -text
+lib/openlayers/theme/default/img/ruler.png -text
+lib/openlayers/theme/default/img/save_features_off.png -text
+lib/openlayers/theme/default/img/save_features_on.png -text
+lib/openlayers/theme/default/img/view_next_off.png -text
+lib/openlayers/theme/default/img/view_next_on.png -text
+lib/openlayers/theme/default/img/view_previous_off.png -text
+lib/openlayers/theme/default/img/view_previous_on.png -text
+lib/openlayers/theme/default/img/zoom-panel-NOALPHA.png -text
+lib/openlayers/theme/default/img/zoom-panel.png -text
+lib/openlayers/theme/default/style.css -text
+lib/openlayers/theme/default/style.mobile.css -text
+lib/openlayers/theme/default/style.mobile.tidy.css -text
+lib/openlayers/theme/default/style.tidy.css -text
+lib/openlayers/theme/index.php -text
 lib/openlayers/tiki-notes.txt -text
 lib/openpgp/OpenPGP_Zend_Mail_Transport_Sendmail.php -text
 lib/openpgp/OpenPGP_Zend_Mail_Transport_Smtp.php -text
@@ -4316,6 +4331,7 @@ lib/test/core/Search/Expr/TokenizerTest.php -text
 lib/test/core/Search/Expr/index.php -text
 lib/test/core/Search/Formatter/ArrayBuilderTest.php -text
 lib/test/core/Search/Formatter/DataSourceTest.php -text
+lib/test/core/Search/Formatter/FactoryTest.php -text
 lib/test/core/Search/Formatter/index.php -text
 lib/test/core/Search/FormatterTest.php -text
 lib/test/core/Search/GlobalSource/PermissionSourceTest.php -text
@@ -4705,7 +4721,7 @@ lib/wiki-plugins/wikiplugin_mcalendar.php -text
 lib/wiki-plugins/wikiplugin_mediaplayer.php -text
 lib/wiki-plugins/wikiplugin_memberlist.php -text
 lib/wiki-plugins/wikiplugin_memberpayment.php -text
-lib/wiki-plugins/wikiplugin_meta.php -text
+lib/wiki-plugins/wikiplugin_metatag.php -text
 lib/wiki-plugins/wikiplugin_miniquiz.php -text
 lib/wiki-plugins/wikiplugin_module.php -text
 lib/wiki-plugins/wikiplugin_modulelist.php -text
@@ -5111,6 +5127,10 @@ permissioncheck/yes.bin -text
 /setup.sh -text
 /show_image.php -text
 /snarf_ajax.php -text
+storage/.htaccess -text
+storage/index.php -text
+storage/public/.htaccess -text
+storage/public/index.php -text
 temp/.htaccess -text
 temp/README -text
 temp/cache/index.php -text
@@ -5119,6 +5139,7 @@ temp/mail_attachs/README -text
 temp/mail_attachs/index.php -text
 temp/public/.htaccess -text
 temp/public/index.php -text
+temp/templates_c/index.php -text
 temp/web.config -text
 templates/.htaccess -text
 templates/access/confirm.tpl -text
@@ -6428,8 +6449,6 @@ templates/workspace/edit_template.tpl -text
 templates/workspace/index.php -text
 templates/workspace/list_templates.tpl -text
 templates/workspace/select_permissions.tpl -text
-templates_c/.htaccess -text
-templates_c/index.php -text
 tests/.htaccess -text
 tests/index.php -text
 tests/testfile.txt -text
@@ -6468,7 +6487,6 @@ themes/base_files/feature_css/ie8.css -text
 themes/base_files/feature_css/ie9.css -text
 themes/base_files/feature_css/index.php -text
 themes/base_files/feature_css/jscalendar.css -text
-themes/base_files/feature_css/openlayers.css -text
 themes/base_files/feature_css/svg-edit-draw.css -text
 themes/base_files/feature_css/wizards.css -text
 themes/base_files/iconsets/default.php -text
@@ -6698,6 +6716,7 @@ themes/feb12/less/tiki-selectors.less -text
 themes/feb12/templates/index.php -text
 themes/fivealive-lite/css/fivealive-lite.css -text
 themes/fivealive-lite/css/index.php -text
+themes/fivealive-lite/css/newsletter.css -text
 themes/fivealive-lite/fonts/index.php -text
 themes/fivealive-lite/icons/custom.php -text
 themes/fivealive-lite/icons/fivealive_lite.php -text
