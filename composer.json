@@ -105,7 +105,8 @@
 		"zendframework/zend-mime": "~2.4",
 		"zendframework/zend-mail": "~2.4",
 		"zendframework/zendsearch": "~2.0.0@RC",
-		"adodb/adodb-php": "^5.20"
+		"adodb/adodb-php": "^5.20",
+		"jcbrand/converse.js": "^2.0"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "1.1.0",

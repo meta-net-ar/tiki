@@ -89,6 +89,7 @@ function prefs_wikiplugin_list($partial = false)
 		'userlink' => 'y',
 		'vimeo' => 'y',	
 		'vote' => 'y',
+		'xmpp' => 'y',
 		'youtube' => 'y',
 		'zotero' => 'y',
 	);
