@@ -62,6 +62,11 @@
 							{preference name=captcha_wordLen}
 							{preference name=captcha_width}
 							{preference name=captcha_noise}
+							{if not empty($captcha_error)}
+								{remarksbox type='error' title='{tr}Captcha Problem{/tr}'}
+									{$captcha_error}
+								{/remarksbox}
+							{/if}
 							{preference name=recaptcha_enabled}
 							<div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
 								{preference name=recaptcha_pubkey}
@@ -109,6 +114,7 @@
 					</div>
 					{preference name=user_trackersync_trackers}
 					{preference name=user_trackersync_realname}
+					{preference name=user_trackersync_groups}
 					{preference name=user_trackersync_geo}
 					{preference name=user_trackersync_lang}
 					{preference name=user_tracker_auto_assign_item_field}

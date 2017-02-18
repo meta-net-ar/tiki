@@ -281,13 +281,12 @@ function prefs_feature_list($partial = false)
 		),
 		'feature_search' => array(
 			'name' => tra('Unified Search Index'),
-			'description' => tra('Enables searching for content at the site using a Tiki-managed index.'),
+			'description' => tra('Enables searching for content at the site using a Tiki-managed index.') . '<br>' . tra("It's recommended to set a cron job to periodically rebuild the search index."),
 			'help' => 'Search',
 			'type' => 'flag',
 			'default' => 'y',
 			'tags' => array('basic'),
 			'admin' => 'search',
-			'warning' => tra("Unified Search requires server processing resources and that you properly set the server permissions. It's recommended to set a cron job to periodically rebuild the search index."),
 			'module' => 'search',
 			'view' => 'tiki-searchindex.php',
 			'permission' => array(
@@ -2000,13 +1999,6 @@ function prefs_feature_list($partial = false)
 			'default' => 'y',
 			'tags' => array('basic'),
 		),
-		'feature_iepngfix' => array(
-			'name' => tra('IE Image Fix'),
-            'description' => tra('Correct PNG images alpha transparency in IE6 (experimental)'),
-			'tags' => array('experimental'),
-			'type' => 'flag',
-			'default' => 'n',
-		),
 		'feature_wiki_1like_redirection' => array(
 			'name' => tra("Redirect to similar wiki page"),
             'description' => tra("If a requested page doesn't exist, redirect to a similarly named page"),
@@ -2802,8 +2794,8 @@ function prefs_feature_list($partial = false)
 			'default' => 'n',
 		),
 		'feature_inline_comments' => array(
-			'name' => tra('Inline Comments'),
-			'description' => tra('Enable/disable inline comments.'),
+			'name' => tra('Inline Comments (annotations)'),
+			'description' => tra('Enable/disable inline comments using Apache Annotator.'),
 			'dependencies' => array(
 				'feature_wiki_comments',
 				'feature_wiki_paragraph_formatting',
@@ -2811,6 +2803,7 @@ function prefs_feature_list($partial = false)
 			'type' => 'flag',
 			'default' => 'n',
 			'help' => 'Inline+comments',
+			'keywords' => 'annotation annotatorjs',
 		),
 		'feature_hidden_links' => array(
 			'name' => tra('Display hidden anchor on mouseover of headings'),
