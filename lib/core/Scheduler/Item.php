@@ -21,8 +21,7 @@ class Scheduler_Item
 	const STATUS_INACTIVE = 'inactive';
 
 	static $availableTasks = array(
-		'IndexRebuildTask' => 'IndexRebuild',
-		'ListExecuteTask' => 'ListExecute',
+		'ConsoleCommandTask' => 'ConsoleCommand',
 	);
 
 	public function __construct($id, $name, $description, $task, $params, $run_time, $status, $re_run)
@@ -48,16 +47,9 @@ class Scheduler_Item
 	public function execute()
 	{
 
-		$query = <<<SQL
-SELECT status
-FROM tiki_scheduler_run
-WHERE scheduler_id = ?
-ORDER BY id DESC
-LIMIT 1;
-SQL;
+		$schedlib = TikiLib::lib('scheduler');
 
-		$db = TikiDb::get();
-		$status = $db->getOne($query, [$this->id]);
+		$status = $schedlib->get_run_status($this->id);
 
 		if ($status == 'running') {
 			// @todo add register to log
@@ -70,35 +62,18 @@ SQL;
 		$class = 'Scheduler_Task_' . $this->task;
 		if (class_exists($class)) {
 			$task = new $class();
-			$startTime = time();
 
-			$query = <<<SQL
-INSERT INTO tiki_scheduler_run (scheduler_id, start_time, status)
-VALUES (?, ?, 'running');
-SQL;
-
-			$db->query($query, [$this->id, $startTime]);
-
+			$start_time = $schedlib->start_scheduler_run($this->id);
 			$result = $task->execute($this->params);
 
 			$executionStatus = $result ? 'done' : 'failed';
-			$errorMessage = $task->getError();
-			$endTime = time();
+			$outputMessage = $task->getOutput();
 
-			$query = <<<SQL
-UPDATE tiki_scheduler_run
-SET status = ?, end_time = ?, output = ?
-WHERE scheduler_id = ?
-AND status = 'running'
-AND start_time = ?
-LIMIT 1;
-SQL;
-
-			$db->query($query, [$executionStatus, $endTime, $errorMessage, $this->id, $startTime]);
+			$schedlib->end_scheduler_run($this->id, $executionStatus, $outputMessage, $start_time);
 
 			return array(
 				'status' => $executionStatus,
-				'message' => $errorMessage,
+				'message' => $outputMessage,
 			);
 		}
 

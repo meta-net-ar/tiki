@@ -47,6 +47,8 @@ if (! is_readable($local_php)) {
 
 $console = new Tiki\Command\Application;
 
+Tiki\Command\Application::set($console);
+
 $console->add(new Tiki\Command\ConfigureCommand);
 if (is_file($local_php) || TikiInit::getEnvironmentCredentials()) {
 	require_once 'db/tiki-db.php';

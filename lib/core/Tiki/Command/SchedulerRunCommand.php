@@ -26,43 +26,29 @@ class SchedulerRunCommand extends Command
 		$start_time = time();
 
 		// Get all active schedulers
-		$query = <<<SQL
-SELECT *
-FROM tiki_scheduler
-WHERE status = 'active'
-SQL;
-
-		$db = \TikiDb::get();
-		$rows = $db->fetchAll($query);
+		$schedLib = \TikiLib::lib('scheduler');
+		$activeSchedulers = $schedLib->get_scheduler(null, 'active');
 
 		$runTasks = array();
 		$reRunTasks = array();
 
-		foreach ($rows as $row) {
+		foreach ($activeSchedulers as $scheduler) {
 			// Check which tasks should run on time
-			if ($this->is_time_cron($start_time, $row['run_time'])) {
-				$runTasks[] = $row;
+			if ($this->is_time_cron($start_time, $scheduler['run_time'])) {
+				$runTasks[] = $scheduler;
 				continue;
 			}
 
 			// Check which tasks should run if they failed previously (last execution)
-			if ($row['re_run']) {
-				$reRunTasks[] = $row;
+			if ($scheduler['re_run']) {
+				$reRunTasks[] = $scheduler;
 				continue;
 			}
 		}
 
 		foreach ($reRunTasks as $task) {
 
-			$query = <<<SQL
-SELECT status
-FROM tiki_scheduler_run
-WHERE scheduler_id = ?
-ORDER BY id DESC 
-LIMIT 1;
-SQL;
-
-			$status = $db->getOne($query, [$task['id']]);
+			$status = $schedLib->get_run_status($task['id']);
 			if ($status == 'failed') {
 				$runTasks[] = $task;
 			}

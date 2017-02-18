@@ -46,39 +46,18 @@ function saveScheduler($isUpdate = false)
 		$addTask = false;
 	}
 
+	$schedLib = TikiLib::lib('scheduler');
+
 	if ($addTask) {
 
-		$values = array(
-			$name,
-			$description,
-			$task,
-			$params,
-			$runTime,
-			$status,
-			$reRun,
-		);
-
 		if (!$isUpdate) {
-
-			$query = <<<SQL
-INSERT INTO `tiki_scheduler` (`name`, `description`, `task`, `params`, `run_time`, `status`, `re_run`) VALUES
-(?, ?, ?, ?, ?, ?, ?);
-SQL;
+			$schedLib->set_scheduler($name, $description, $task, $params, $runTime, $status, $reRun);
 			$feedback = sprintf(tra('Scheduler %s was created.'), $name);
 		} else {
-
-			$query = <<<SQL
-UPDATE tiki_scheduler 
-SET name = ?, description = ?, task = ?, params = ?, run_time = ?, status = ?, re_run = ?
-WHERE id = ?;
-SQL;
-
-			$values[] = $_POST['scheduler'];
+			$schedLib->set_scheduler($name, $description, $task, $params, $runTime, $status, $reRun, $_POST['scheduler']);
 			$feedback = sprintf(tra('Scheduler %s was updated.'), $name);
 		}
 
-		$db = TikiDb::get();
-		$db->query($query, $values);
 		Feedback::success($feedback, 'session');
 
 	} else {
@@ -96,7 +75,7 @@ require_once('tiki-setup.php');
 $access = TikiLib::lib('access');
 $access->check_permission(array('tiki_p_admin_schedulers'));
 
-$db = TikiDb::get();
+$schedLib = TikiLib::lib('scheduler');
 
 if (isset($_POST['new_scheduler'])) {
 
@@ -111,29 +90,9 @@ if (isset($_POST['new_scheduler'])) {
 
 } else if (isset($_REQUEST['scheduler']) and $_REQUEST['scheduler']) {
 
-	$sql = <<<SQL
-SELECT *
-FROM tiki_scheduler
-WHERE id = ?
-SQL;
+	$schedulerinfo = $schedLib->get_scheduler($_REQUEST['scheduler']);
 
-	$queryResult = $db->query($sql,[$_REQUEST['scheduler']]);
-
-	if ($row = $queryResult->fetchRow()) {
-		$schedulerinfo = $row;
-
-		$query = <<<SQL
-SELECT *
-FROM tiki_scheduler_run
-WHERE scheduler_id = ?
-ORDER BY id DESC
-LIMIT 10;
-SQL;
-
-		$result = $db->fetchAll($query, [$_REQUEST['scheduler']]);
-		$schedulerRuns = $result;
-
-	} else {
+	if (empty($schedulerinfo)) {
 		$schedulerinfo['name'] = '';
 		$schedulerinfo['description'] = '';
 		$schedulerinfo['task'] = '';
@@ -142,8 +101,11 @@ SQL;
 		$schedulerinfo['re_run'] = '';
 
 		$_REQUEST['scheduler'] = 0;
-	}
+	} else {
 
+		$schedulerRuns = $schedLib->get_scheduler_runs($_REQUEST['scheduler'], 10);
+
+	}
 	$cookietab = '2';
 
 } else {
@@ -157,14 +119,7 @@ SQL;
 	$_REQUEST['scheduler'] = 0;
 }
 
-$query = <<<SQL
-SELECT *
-FROM tiki_scheduler
-SQL;
-
-$db = TikiDb::get();
-$tasks = $db->fetchAll($query);
-
+$tasks = $schedLib->get_scheduler();
 $smarty->assign_by_ref('schedulers', $tasks);
 
 if (isset($_REQUEST['add'])) {

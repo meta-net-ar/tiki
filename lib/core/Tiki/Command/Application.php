@@ -6,6 +6,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class Application extends SymfonyApplication
 {
+	private static $instance;
+
     /**
      * Gets the default input definition.
      *
@@ -19,6 +21,19 @@ class Application extends SymfonyApplication
 		
 		return $definition;
     }
+
+	public static function getInstance()
+	{
+		return self::$instance;
+	}
+
+	/**
+	 * Sets the global Perms instance to use when obtaining accessors.
+	 */
+	public static function set(self $perms)
+	{
+		self::$instance = $perms;
+	}
 
 }
 
