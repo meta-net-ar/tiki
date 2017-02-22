@@ -33,9 +33,11 @@ function wikiplugin_xmpp( $data, $params )
 	$headerlib->add_jq_onready(
 		 'jQuery(window).on("converse-loaded", function (evt, converse) {'
 		.'	converse.initialize({'
-		.'		bosh_service_url: "https://montefuscolo.com.br:5281/http-bind/",'
+		.'		bosh_service_url: "' . $xmpplib->server_http_bind . '",'
+		.'		authentication: "prebind",'
+		.'		prebind_url: "/tiki-json.php?lib=xmpp&action=prebind",'
 		.'		i18n: locales.en,'
-		.'		show_controlbox_by_default: true,'
+		.'		show_controlbox_by_default: false,'
 		.'		roster_groups: false'
 		.'	});'
 		.'});'

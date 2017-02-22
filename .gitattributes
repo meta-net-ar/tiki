@@ -4911,7 +4911,7 @@ lib/wizard/pages/user_wizard_completed.php -text
 lib/wizard/readme.txt -text
 lib/wizard/wizard.php -text
 lib/wizard/wizardlib.php -text
-lib/xmpplib.php -text
+lib/xmpp/xmpplib.php -text
 lib/ziplib.php -text
 lib/zoterolib.php -text
 /license.txt -text
@@ -7744,6 +7744,7 @@ themes/yeti/templates/index.php -text
 /tiki-invited.php -text
 /tiki-invoice_reports.php -text
 /tiki-jsmodule.php -text
+/tiki-json.php -text
 /tiki-jsplugin.php -text
 /tiki-kaltura_upload.php -text
 /tiki-kaltura_video.php -text
