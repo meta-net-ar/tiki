@@ -21,8 +21,8 @@ function wikiplugin_html_info()
 		'params' => array(
 			'tohead' => array(
 				'required' => false,
-				'name' => tra('Move to HTML head'),
-				'description' => tra('Insert the code in the HTML head section rather than in the body.'),
+				'name' => tra('Insert to HTML head'),
+				'description' => tra('Insert the HTML tags to HTML head section of the page instead of rendering them to the content of the page.'),
 				'since' => '17.0',
 				'options' => array(
 					array('text' => '', 'value' => ''), 
@@ -51,6 +51,7 @@ function wikiplugin_html_info()
 
 function wikiplugin_html($data, $params)
 {
+	$headerlib = TikiLib::lib('header');
 	// TODO refactor: defaults for plugins?
 	$defaults = array();
 	$plugininfo = wikiplugin_html_info();
@@ -69,10 +70,11 @@ function wikiplugin_html($data, $params)
 		$html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
 	}
 
+	// if we want to insert some meta tags etc. to the html head instead of rendering them in body content
 	if ( isset($params['tohead']) && $params['tohead'] == 1 ) {
-		// Insert in HTML head rather than in body
-		TikiLib::lib('header')->add_rawhtml($html);
+		$headerlib->add_rawhtml($html);
 	} else {
+
 		return '~np~' . $html . '~/np~';
 	}
 }

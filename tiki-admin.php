@@ -116,105 +116,7 @@ function simple_set_value($feature, $pref = '', $isMultiple = false)
 	$cachelib->invalidate('allperms');
 }
 
-
-/**
- *
- * populates the password blacklist database table with the contents of a file of passwords.
- *
- * @param $filename string the name & path of the saved password
- */
-function loadBlacklist($filename){
-    if (is_readable($filename)){
-        $tikiDb = new TikiDb_Bridge();
-        $query = 'DROP TABLE IF EXISTS tiki_password_blacklist;';
-        $tikiDb->query($query, array());
-        $query = 'CREATE TABLE `tiki_password_blacklist` ( `password` VARCHAR(30) NOT NULL , PRIMARY KEY (`password`) USING HASH)';
-        $tikiDb->query($query, array());
-        $query = "LOAD DATA INFILE '".$filename."' IGNORE INTO TABLE `tiki_password_blacklist` LINES TERMINATED BY '\n' (`password`);";
-        $tikiDb->query($query, array());
-    }else Feedback::error(tr('Unable to Populate Blacklist: File dose not exist or is not readable.'));
-}
-
-
-/**
- * reads available password list files from disk and returns a sorted array of files
- *
- * @param $returnFormatted bool if false, will return a human readable array, if false, will return the same array with only numbers.
- *
- * @return array
- */
-
-function genIndexedBlacks($returnFormatted = true){
-
-    $blacklist_options = array_diff(scandir('lib/pass_blacklists', SCANDIR_SORT_ASCENDING), array('..', '.', 'index.php', '.htaccess', '.svn', '.DS_Store', 'readme.txt'));
-    $fileindex = array();
-    foreach ($blacklist_options as $blacklist_file) {
-        $blacklist_file = substr($blacklist_file, 0, -4);
-        $fileindex[$blacklist_file] = explode('-', $blacklist_file);
-        if ($returnFormatted) $fileindex[$blacklist_file] = readableBlackName($fileindex[$blacklist_file]);
-    }
-    return $fileindex;
-}
-
-/**
- * Formatts a blacklist file name into a human readable description.
- *
- * @param $NameArray array of blacklist file specifycations
- *
- * @return string
- *
- */
-
-function readableBlackName($NameArray){
-
-    $readable = 'Num & Let: ' . $NameArray['0'];
-    $readable .= ', Special: ' . $NameArray['1'];
-    $readable .= ', Min Len: ' . $NameArray['2'];
-    $readable .= ', Custom: ' . $NameArray['3'];
-    $readable .= ', Word Count: ' . $NameArray['4'];
-    return $readable;
-
-}
-
-
-
-/**
- * Obtains blacklists available, and returns one according to which one is best suited to current settings.
- * This function may only be called when valuesare being updated, as it relys on the $_POST vars
- *
- * @var $file[0] bool chracter & number
- * @var $file[1] bool special character
- * @var $file[2] int  minimum number of characters
- * @var $file[3] bool is user generated
- * @var $file[4] int  number of passwords (limit)
- *
- * @return array|bool the file name (without extension) that is best suited to govern the blacklist, or false on no suitable files.
- */
-function selectBestBlacklist(){
-    $fileIndex = genIndexedBlacks(false);
-    $bestFile = false;
-    $chrnum = false;
-    $special = false;
-    if ($_POST['pass_chr_num'] == 'on') $chrnum = true;
-    if ($_POST['pass_chr_special'] == 'on') $special = true;
-    $length = $_POST['min_pass_length'];
-
-    foreach ($fileIndex as $file){
-        if ($file[0] == $chrnum &&       // first qualify the options
-            $file[1] == $special &&
-            $file[2] <= $length ){
-            $count = 2;
-            while ($count < 5) {         // then pick the best option
-                if ($file[$count] >= $bestFile[$count]) {
-                    if ($file[$count] > $bestFile[$count]) $bestFile = $file;
-                    $count++;
-                } else $count = 5;
-            }
-        }
-    }
-
-    return $bestFile;
-}
+$blackL = TikiLib::lib('blacklist');
 
 
 $crumbs[] = new Breadcrumb(tra('Control Panels'), tra('Sections'), 'tiki-admin.php', 'Admin+Home', tra('Help on Configuration Sections', '', true));
@@ -241,20 +143,25 @@ if ( isset ($_REQUEST['pref_filters']) ) {
 
 if (isset($_POST['pass_blacklist'])) {                                                  // if preferences were updated and blacklist feature is enabled (or is being enabled)
     $pass_blacklist_file = $jitPost->pass_blacklist_file->striptags();
+    $userfile = explode('-',$pass_blacklist_file);
+    $userfile = $userfile[3];
+    if ($userfile){                       // if the blacklist is a user generated file
+    	$passDir = 'storage/pass_blacklists/';
+    }else {
+	    $passDir = 'lib/pass_blacklists/';
+    }
     if ($pass_blacklist_file === 'auto') {
         if ($_POST['min_pass_length']  != $GLOBALS['prefs']['min_pass_length'] ||
             $_POST['pass_chr_num']     != $GLOBALS['prefs']['pass_chr_num']    ||
             $_POST['pass_chr_special'] != $GLOBALS['prefs']['pass_chr_special']){       // if blacklist is auto and an option is changed that could effect the selection
-            echo 'here';
-            $prefname = implode('-',selectBestBlacklist());
-            echo 'here';
-            $filename = 'lib/pass_blacklists/' . $prefname . '.txt';
+            $prefname = implode('-',$blackL->selectBestBlacklist($_POST['pass_chr_num'],$_POST['pass_chr_special'],$_POST['min_pass_length']));
+            $filename = $passDir . $prefname . '.txt';
             $tikilib->set_preference('pass_auto_blacklist', $prefname);
-            loadBlacklist(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $filename);
+	        $blackL->loadBlacklist(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $filename);
         }
     }else if ($pass_blacklist_file != $GLOBALS['prefs']['pass_blacklist_file']){        // if manual selection mode has been changed
-        $filename = 'lib/pass_blacklists/' . $pass_blacklist_file . '.txt';
-        loadBlacklist(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $filename);
+        $filename = $passDir . $pass_blacklist_file . '.txt';
+	    $blackL->loadBlacklist(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . $filename);
 
     }
 }

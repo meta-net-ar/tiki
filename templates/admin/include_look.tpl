@@ -218,11 +218,6 @@
 			<div class="adminoptionboxchild" id="feature_tabs_childcontainer">
 				{preference name=layout_tabs_optional}
 			</div>
-			{preference name=feature_iepngfix}
-			<div class="adminoptionboxchild" id="feature_iepngfix_childcontainer">
-				{preference name=iepngfix_selectors}
-				{preference name=iepngfix_elements}
-			</div>
             {preference name=site_favicon_enable}
 			{preference name=image_responsive_class}
 			<div class="adminoptionbox">
@@ -236,11 +231,11 @@
 				<legend>{tr}Separators{/tr}</legend>
 				{preference name=site_crumb_seper}
 				<div class="adminoptionboxchild clearfix">
-					<span class="col-md-8 col-md-push-4 help-block">{tr}Examples:{/tr} &nbsp; &raquo; &nbsp; / &nbsp; &gt; &nbsp; : &nbsp; -> &nbsp; &#8594;</span>
+					<span class="col-md-8 col-md-push-4 help-block">{tr}Examples:{/tr} &nbsp; » &nbsp; / &nbsp; &gt; &nbsp; : &nbsp; -> &nbsp; →</span>
 				</div>
 				{preference name=site_nav_seper}
 				<div class="adminoptionboxchild clearfix">
-					<span class="col-md-8 col-md-push-4 help-block">{tr}Examples:{/tr} &nbsp; | &nbsp; / &nbsp; &brvbar; &nbsp; :</span>
+					<span class="col-md-8 col-md-push-4 help-block">{tr}Examples:{/tr} &nbsp; | &nbsp; / &nbsp; ¦ &nbsp; :</span>
 				</div>
 			</fieldset>
 			{preference name=log_tpl}

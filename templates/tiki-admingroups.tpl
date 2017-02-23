@@ -371,7 +371,7 @@
 				</div>
 				{if $prefs.feature_wizard_user eq 'y' and $groupname == 'Registered'}
 					<div class="form-group">
-						<label for="groups_group" class="control-label col-md-3">{tr}User Wizard Fields{/tr}</label>
+						<label class="control-label col-md-3">{tr}User Wizard Fields{/tr}</label>
 						<div class="col-md-9">
 							{tr}By default, the same fields as in registration are used.{/tr} {tr _0="tiki-admin.php?page=login"}You can choose in the <a href="%0">Login admin panel</a> to show different fields in User Wizard than the ones asked at Registration Time{/tr}.</td>
 						</div>
@@ -401,7 +401,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="groups_group" class="control-label col-md-3">{tr}Expiry{/tr}</label>
+					<label class="control-label col-md-3">{tr}Membership expiry{/tr}</label>
 					<div class="col-md-9">
 						<label>{tr}Anniversary{/tr}</label>
 						<input type="text" name="anniversary" class="form-control" value="{$group_info.anniversary|escape}">
@@ -429,7 +429,7 @@
 				</div>
 			{/if}
 			<div class="form-group">
-				<label for="groups_group" class="control-label col-md-3">{tr}Group{/tr}</label>
+				<label class="control-label col-md-3">{tr}Group{/tr}</label>
 				<div class="col-md-9">
 					<input class="form-control" type="text" size="40" name="emailPattern" value="{$group_info.emailPattern|escape}">
 					<div class="help-block">
@@ -441,7 +441,7 @@
 
 			{if $group ne ''and $groupname neq 'Anonymous'}
 				<div class="form-group">
-					<label for="groups_group" class="control-label col-md-3">{tr}Assign group <em>management</em> permissions{/tr}</label>
+					<label class="control-label col-md-3">{tr}Assign group <em>management</em> permissions{/tr}</label>
 					<div class="col-md-9">
 						{self_link _script="tiki-objectpermissions.php" objectType="group" objectId=$groupname objectName=$groupname permType="group"}
 							{icon _text="{tr}Assign Permissions{/tr}" name="key"}
@@ -505,7 +505,7 @@
 							<div class="table-responsive">
 								<table class="table">
 									<tr>
-										<th class="auto">{if $memberslist}{select_all checkbox_names='members[]'}{/if}</th>
+										<th class="auto">{if $memberslist}{select_all checkbox_names='checked[]'}{/if}</th>
 										<th>{self_link _sort_arg='sort_mode_member' _sort_field='login'}{tr}User{/tr}{/self_link}</th>
 										<th>{self_link _sort_arg='sort_mode_member' _sort_field='created'}{tr}Assigned{/tr}{/self_link}</th>
 										<th>{self_link _sort_arg='sort_mode_member' _sort_field='expire'}{tr}Expires{/tr}{/self_link}</th>
@@ -592,6 +592,7 @@
 							<input type="submit" class="btn btn-default btn-sm confirm-submit" form="addorban" formaction="{bootstrap_modal controller=group action=ban_user}" value="{tr}Ban from group{/tr}">
 						</div>
 						<input type="hidden" name="group" value="{$groupname|escape}">
+						<input type="hidden" name="anchor" value="#contenttabs_admingroups-3">
 							</form>
 					</div>
 				</div>
@@ -602,25 +603,41 @@
 			<h2>{tr}Banned members{/tr} <span class="badge">{$bannedlist|count}</span></h2>
 			{if $bannedlist|count > 0}
 				<div class="table-responsive">
-					<table class="table">
-						<tr>
-							<th>{tr}User{/tr}</th>
-							<th>{tr}Action{/tr}</th>
-						</tr>
-
-						<tr>
-							{foreach from=$bannedlist item=member}
-						<tr>
-							<td class="username">{$member|userlink}</td>
-							<td class="action">
-								<a href="{bootstrap_modal controller=group action=unban_user user=$member group=$groupname}" class="tips" title=":{tr}Unban user{/tr}">
-									{icon name="remove"}
-								</a>
-							</td>
-						</tr>
-						{/foreach}
-					</table>
+					<form id="checkform3" method="post">
+						<table class="table">
+							<tr>
+								<th class="auto">{select_all checkbox_names='user[]'}</th>
+								<th>{tr}User{/tr}</th>
+								<th>{tr}Unban user{/tr}</th>
+							</tr>
+							<tr>
+								{foreach from=$bannedlist item=member}
+							<tr>
+								<td class="checkbox-cell"><input type="checkbox" name="user[]" value="{$member}"></td>
+								<td class="username">{$member|userlink}</td>
+								<td class="action">
+									<a href="{bootstrap_modal controller=group action=unban_user user=$member group=$groupname}" class="tips" title=":{tr _0=$member _1=$group}Unban user %0 from group %1{/tr}">
+										{icon name="ok"}
+									</a>
+								</td>
+							</tr>
+							{/foreach}
+						</table>
+						<input type="hidden" name="group" value="{$groupname}">
+						<input type="hidden" name="anchor" value="#contenttabs_admingroups-4">
 				</div>
+				<div class="input-group col-sm-6">
+					<select class="form-control" name="action">
+						<option value="no_action" selected="selected">
+							{tr}Select action to perform with checked{/tr}...
+						</option>
+						<option value="unban_user">{tr}Unban{/tr}</option>
+					</select>
+					<span class="input-group-btn">
+						<input type="submit" class="btn btn-primary btn-sm confirm-submit" form="checkform3" formaction="{bootstrap_modal controller=group} "value="{tr}OK{/tr}">
+					</span>
+				</div>
+					</form><br>
 			{else}
 				<div class="col-sm-12">
 					<em>{tr}No banned members{/tr}</em>
@@ -635,7 +652,8 @@
 			<form method="post" action="tiki-admingroups.php" enctype="multipart/form-data" class="form-horizontal">
 				<input type="hidden" name="group" value="{$groupname|escape}">
 
-				<h2>{tr}Download CSV export{/tr}</h2>
+				<h2>{tr}Export group users (CSV file){/tr}</h2>
+				<br>
 				<div class="form-group">
 					<label class="col-sm-3 control-label">{tr}Charset encoding{/tr}</label>
 					<div class="col-sm-7">
@@ -648,40 +666,47 @@
 				<div class="form-group">
 					<label class="col-sm-3 control-label">{tr}Fields{/tr}</label>
 					<div class="col-sm-7">
-					   <div class="col-sm-12">
-						   <input type="checkbox" name="username" checked="checked"> {tr}Username{/tr}
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" name="username" checked="checked"> {tr}Username{/tr}
+							</label>
 					   </div>
-						<div class="col-sm-12">
-							<input type="checkbox" name="email"> {tr}Email{/tr}
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" name="email"> {tr}Email{/tr}
+							</label>
 						</div>
-						<div class="col-sm-12">
-							<input type="checkbox" name="lastLogin"> {tr}Last login{/tr}
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" name="lastLogin"> {tr}Last login{/tr}
+							</label>
 						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label"></label>
 					<div class="col-sm-7">
-						<input type="submit" class="btn btn-default btn-sm" name="export" value="{tr}Export{/tr}">
+						<input type="submit" class="btn btn-default" name="export" value="{tr}Export{/tr}">
 					</div>
 				</div>
 				<br>
-				<h2>{tr}Batch upload (CSV file){/tr}</h2>
+				<h2>{tr}Import users to group (CSV file){/tr}</h2>
 				<br>
-				<h3>{tr}Assign users to group:{/tr} {$groupname|escape} </h3>
-				{remarksbox type="tip" title="{tr}Tip{/tr}"}
-					{tr}Each user in the file must already exist.{/tr}<br>{tr}To create users or/and assign them to groups, got to <a href="tiki-adminusers.php">admin->users</a>{/tr}
-				{/remarksbox}
 				<div class="form-group">
-					<label class="col-sm-3 control-label">{tr}CSV File{/tr}<a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a></label>
+					<label class="col-sm-3 control-label">
+						{tr}CSV File{/tr} <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a>
+					</label>
 					<div class="col-sm-7">
-						<input name="csvlist" type="file" >
+						<input name="csvlist" type="file" class="form-control">
+						<div class="help-block">
+							{tr}Imported users must already exist. To create users and assign them to groups, go to <a href="tiki-adminusers.php">admin->users</a>.{/tr}
+						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label"></label>
 					<div class="col-sm-7">
-						<input type="submit" class="btn btn-default btn-sm" name="import" value="{tr}Import{/tr}">
+						<input type="submit" class="btn btn-default" name="import" value="{tr}Import{/tr}">
 					</div>
 				</div>
 			</form>
