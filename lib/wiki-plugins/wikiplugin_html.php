@@ -19,6 +19,19 @@ function wikiplugin_html_info()
 		'tags' => array( 'basic' ),
 		'introduced' => 3,
 		'params' => array(
+			'tohead' => array(
+				'required' => false,
+				'name' => tra('Move to HTML head'),
+				'description' => tra('Insert the code in the HTML head section rather than in the body.'),
+				'since' => '17.0',
+				'options' => array(
+					array('text' => '', 'value' => ''), 
+					array('text' => tra('No'), 'value' => 0),
+					array('text' => tra('Yes'), 'value' => 1),
+				),
+				'filter' => 'digits',
+				'default' => '0',
+			),
 			'wiki' => array(
 				'required' => false,
 				'name' => tra('Wiki Syntax'),
@@ -56,5 +69,10 @@ function wikiplugin_html($data, $params)
 		$html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
 	}
 
-	return '~np~' . $html . '~/np~';
+	if ( isset($params['tohead']) && $params['tohead'] == 1 ) {
+		// Insert in HTML head rather than in body
+		TikiLib::lib('header')->add_rawhtml($html);
+	} else {
+		return '~np~' . $html . '~/np~';
+	}
 }

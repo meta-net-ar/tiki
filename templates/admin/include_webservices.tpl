@@ -123,10 +123,10 @@
 			<div class="table-responsive">
 				<table>
 					<tr>
-						<th>{tr}Name{/tr}</th>
-						<th>{tr}Engine{/tr}</th>
-						<th>{tr}Output{/tr}</th>
-						<th>{tr}Preview{/tr}</th>
+						<th style="width: 25%">{tr}Name{/tr}</th>
+						<th style="width: 25%">{tr}Engine{/tr}</th>
+						<th style="width: 25%">{tr}Output{/tr}</th>
+						<th style="width: 25%">{tr}Preview{/tr}</th>
 					</tr>
 					{foreach from=$storedTemplates item=template}
 						<tr>
@@ -138,15 +138,29 @@
 							<td>{$template->output|escape}</td>
 							<td><input type="submit" class="btn btn-default btn-sm" name="preview" value="{$template->name|escape}"/></td>
 						</tr>
-						<tr><td colspan="4"><pre>{$template->content|escape}</pre></td></tr>
+						<tr><td colspan="4"><pre style="max-height: 30em; overflow: auto; white-space: pre-wrap">{$template->content|escape}</pre></td></tr>
 						{if $preview eq $template->name}
 							<tr><td colspan="4">{$preview_output}</td></tr>
 						{/if}
 					{/foreach}
 					<tr>
-						<td><input type="text" name="nt_name" value="{$nt_name|escape}"/></td>
-						<td><input type="text" name="nt_engine" value="{$nt_engine|escape}"/></td>
-						<td><input type="text" name="nt_output" value="{$nt_output|escape}"/></td>
+						<td style="padding: 0 .5em"><input type="text" name="nt_name" value="{$nt_name|escape}" class="form-control"/></td>
+						<td style="padding: 0 .5em">
+							<select id="nt_engine" name="nt_engine" class="form-control">
+								<option value=""></option>
+								<option value="javascript" {if $nt_engine eq 'javascript'} selected="selected"{/if}>JavaScript</option>
+								<option value="smarty"{if $nt_engine eq 'smarty'} selected="selected"{/if}>Smarty</option>
+								<option value="index"{if $nt_output eq 'index'} selected="selected"{/if}>Index</option>
+							</select>
+						</td>
+						<td style="padding: 0 .5em" colspan="2">
+							<select id="nt_output" name="nt_output" class="form-control">
+								<option value=""></option>
+								<option value="html" {if $nt_output eq 'html'} selected="selected"{/if}>HTML</option>
+								<option value="tikiwiki"{if $nt_output eq 'tikiwiki'} selected="selected"{/if}>Wiki</option>
+								<option value="index"{if $nt_output eq 'index'} selected="selected"{/if}>Index</option>
+							</select>
+						</td>
 					</tr>
 					<tr><td colspan="4"><textarea name="nt_content" rows="10">{$nt_content|escape}</textarea></td></tr>
 					<tr><td colspan="4"><input type="submit" class="btn btn-default btn-sm" name="create_template" value="{tr}Register Template{/tr}"/></td></tr>
