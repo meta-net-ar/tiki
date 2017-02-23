@@ -1024,6 +1024,11 @@ class UnifiedSearchLib
 
 		global $prefs;
 
+		// If incremental update is enabled we cannot rely on the unified_last_rebuild date.
+		if ($prefs['feature_search'] == 'n' || $prefs['unified_incremental_update'] == 'y') {
+			return false;
+		}
+
 		$tikilib = TikiLib::lib('tiki');
 
 		$last_rebuild = $tikilib->get_preference('unified_last_rebuild');
