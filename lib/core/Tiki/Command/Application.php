@@ -27,12 +27,9 @@ class Application extends SymfonyApplication
 		return self::$instance;
 	}
 
-	/**
-	 * Sets the global Perms instance to use when obtaining accessors.
-	 */
-	public static function set(self $perms)
+	public static function setInstance(self $instance)
 	{
-		self::$instance = $perms;
+		self::$instance = $instance;
 	}
 
 }

@@ -75,6 +75,8 @@ require_once('tiki-setup.php');
 $access = TikiLib::lib('access');
 $access->check_permission(array('tiki_p_admin_schedulers'));
 
+$auto_query_args = array();
+
 $schedLib = TikiLib::lib('scheduler');
 
 if (isset($_POST['new_scheduler'])) {
@@ -106,7 +108,12 @@ if (isset($_POST['new_scheduler'])) {
 		$schedulerRuns = $schedLib->get_scheduler_runs($_REQUEST['scheduler'], 10);
 
 	}
-	$cookietab = '2';
+
+	if (isset($_REQUEST['logs'])) {
+		$cookietab = '3';
+	} else {
+		$cookietab = '2';
+	}
 
 } else {
 	$schedulerinfo['name'] = '';

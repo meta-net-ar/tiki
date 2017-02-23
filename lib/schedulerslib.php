@@ -161,4 +161,21 @@ class SchedulersLib extends TikiLib
 
 		return $end_time;
 	}
+
+	/**
+	 * Remove the scheduler and its runs/logs
+	 *
+	 * @param $scheduler_id
+	 */
+	function remove_scheduler($scheduler_id) {
+
+		$schedulersRunTable = $this->table('tiki_scheduler_run');
+		$schedulersRunTable->delete(['scheduler_id' => $scheduler_id]);
+
+		$schedulersTable = $this->table('tiki_scheduler');
+		$schedulersTable->delete(['id' => $scheduler_id]);
+
+		$logslib = TikiLib::lib('logs');
+		$logslib->add_action('Removed', $scheduler_id, 'scheduler');
+	}
 }

@@ -21,9 +21,10 @@ class Scheduler_Task_ConsoleCommandTask
 			return false;
 		}
 
-		$parts = explode(' ', $params);
-		$commandName = $parts[0];
-		$args = array_merge(['console.php'], $parts);
+		$params = 'console.php ' . $params;
+		$args = $this->parseParams($params);
+
+		$commandName = $args[1];
 
 		try {
 			$console = Application::getInstance();
@@ -43,6 +44,13 @@ class Scheduler_Task_ConsoleCommandTask
 			$this->errorMessage = $e->getMessage();
 			return false;
 		}
+	}
+
+	private function parseParams($params) {
+
+		preg_match_all ('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', $params, $args);
+
+		return $args[2];
 	}
 
 	public function getOutput()

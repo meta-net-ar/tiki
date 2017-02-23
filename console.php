@@ -47,7 +47,7 @@ if (! is_readable($local_php)) {
 
 $console = new Tiki\Command\Application;
 
-Tiki\Command\Application::set($console);
+Tiki\Command\Application::setInstance($console);
 
 $console->add(new Tiki\Command\ConfigureCommand);
 if (is_file($local_php) || TikiInit::getEnvironmentCredentials()) {
