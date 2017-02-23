@@ -65,6 +65,7 @@ if (!isset($_REQUEST['parse']) && $response = $webservice->performRequest($_REQU
 			'smarty/tikiwiki',
 			'smarty/html',
 			'javascript/html',
+			'index/index',
 		)
 	);
 
@@ -129,13 +130,27 @@ if (!isset($_REQUEST['parse']) && $response = $webservice->performRequest($_REQU
 			$template->content = $_REQUEST['nt_content'];
 			$template->save();
 			$storedTemplates = $webservice->getTemplates();
+
+			$smarty->assign('nt_name', $template->name);
+			$smarty->assign('nt_engine', $template->engine);
+			$smarty->assign('nt_output', $template->output);
+			$smarty->assign('nt_content', $template->content);
 		}
 	}
 
 	if (isset($_REQUEST['preview']) && $template = $webservice->getTemplate($_REQUEST['preview'])) {
 		$output = $template->render($response, 'html');
+		if ($response->errors) {
+			Feedback::error(implode(', ', $response->errors));
+		}
+
 		$smarty->assign('preview', $_REQUEST['preview']);
 		$smarty->assign('preview_output', $output);
+
+		$smarty->assign('nt_name', $template->name);
+		$smarty->assign('nt_engine', $template->engine);
+		$smarty->assign('nt_output', $template->output);
+		$smarty->assign('nt_content', $template->content);
 	}
 }
 

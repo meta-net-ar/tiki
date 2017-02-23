@@ -30,7 +30,7 @@
 		{remarksbox type="tip" title="{tr}Tip{/tr}"}
 			{tr}Enter the URL of a web services returning either JSON or YAML. Parameters can be specified by enclosing a name between percentage signs. For example: %name%. %service% and %template% are reserved keywords and cannot be used.{/tr}
 		{/remarksbox}
-		<p>{tr}URL:{/tr}<input type="text" name="url" size="75" value="{$url|escape}" /></p>
+		<p>{tr}URL:{/tr}<input type="text" name="url" size="75" value="{$url|escape}" class="form-control"/></p>
 		<p>
 			{tr}Type:{/tr}
 			<select name="wstype">
@@ -40,11 +40,13 @@
 			</select>
 		</p>
 		<p id="ws_postbody">
-			{tr}Body of POST request{/tr}<br>
-			<textarea name="postbody">{$postbody|escape}</textarea><br>
-			{tr}Parameters (%name%):{/tr}
+			<label class="col-sm-4"> {tr}Body of POST request{/tr}</label>
+			<div class="col-sm-8">
+				<textarea name="postbody" class="form-control">{$postbody|escape}</textarea><br>
+				{tr}Parameters (%name%):{/tr}
+			</div>
 		</p>
-		<p id="ws_operation" style="display: none;">{tr}Operation:{/tr}<input type="text" name="operation" size="30" value="{$operation|escape}" /></p>
+		<p id="ws_operation" style="display: none;">{tr}Operation:{/tr}<input type="text" name="operation" size="30" value="{$operation|escape}" class="form-control"/></p>
 		<p><input type="submit" class="btn btn-default btn-sm" name="parse" value="{tr}Lookup{/tr}"/></p>
 	{/if}
 	{if $url}
@@ -53,7 +55,7 @@
 				{foreach from=$params key=name item=value}
 					<div class="form-group">
 						<label>{$name|escape}
-							<input type="text" name="params[{$name|escape}]" value="{$value|escape}" />
+							<input type="text" name="params[{$name|escape}]" value="{$value|escape}" class="form-control"/>
 						</label>
 					</div>
 				{/foreach}
@@ -82,17 +84,17 @@
 				</tr>
 				<tr>
 					<th>{tr}Cache{/tr}</th>
-					<td>{if $response->cacheControl}{$response->cacheControl|escape}{else}<em>{tr}Not specified, default used{/tr}</em>{/if}
+					<td>{if $response->cacheControl}{$response->cacheControl->getFieldValue()|escape}{else}<em>{tr}Not specified, default used{/tr}</em>{/if}
 				</tr>
 				<tr>
 					<th>{tr}Content Type{/tr}</th>
-					<td>{if $response->contentType}{$response->contentType|escape}{else}<strong>{tr}Not specified{/tr}</strong>{/if}
+					<td>{if $response->contentType}{$response->contentType->getMediaType()|escape} ({$response->contentType->getCharset()|escape}){else}<strong>{tr}Not specified{/tr}</strong>{/if}
 				</tr>
 				<tr>
 					<th colspan="2">{tr}Returned Data{/tr}</th>
 				</tr>
 				<tr>
-					<td colspan="2"><pre style="max-height: 40em; max-width: 60em; overflow: auto;">{$data|escape}</pre></td>
+					<td colspan="2"><pre style="max-height: 40em; overflow: auto; white-space: pre-wrap">{$data|escape}</pre></td>
 				</tr>
 				<tr>
 					<th colspan="2">{tr}Proposed Templates{/tr}</th>
@@ -115,7 +117,7 @@
 		{if ! $storedName}
 			<p>{tr}Register this web service. It will be possible to register the templates afterwards. Service name must only contain letters.{/tr}</p>
 			<p>
-				<input type="text" name="new_name" />
+				<input type="text" name="new_name"  class="form-control"/>
 				<input type="submit" class="btn btn-default btn-sm" name="register" value="{tr}Register Service{/tr}" />
 			</p>
 		{else}
@@ -123,10 +125,10 @@
 			<div class="table-responsive">
 				<table>
 					<tr>
-						<th>{tr}Name{/tr}</th>
-						<th>{tr}Engine{/tr}</th>
-						<th>{tr}Output{/tr}</th>
-						<th>{tr}Preview{/tr}</th>
+						<th style="width: 25%">{tr}Name{/tr}</th>
+						<th style="width: 25%">{tr}Engine{/tr}</th>
+						<th style="width: 25%">{tr}Output{/tr}</th>
+						<th style="width: 25%">{tr}Preview{/tr}</th>
 					</tr>
 					{foreach from=$storedTemplates item=template}
 						<tr>
@@ -138,17 +140,31 @@
 							<td>{$template->output|escape}</td>
 							<td><input type="submit" class="btn btn-default btn-sm" name="preview" value="{$template->name|escape}"/></td>
 						</tr>
-						<tr><td colspan="4"><pre>{$template->content|escape}</pre></td></tr>
+						<tr><td colspan="4"><pre style="max-height: 30em; overflow: auto; white-space: pre-wrap">{$template->content|escape}</pre></td></tr>
 						{if $preview eq $template->name}
 							<tr><td colspan="4">{$preview_output}</td></tr>
 						{/if}
 					{/foreach}
 					<tr>
-						<td><input type="text" name="nt_name" value="{$nt_name|escape}"/></td>
-						<td><input type="text" name="nt_engine" value="{$nt_engine|escape}"/></td>
-						<td><input type="text" name="nt_output" value="{$nt_output|escape}"/></td>
+						<td style="padding: 0 .5em"><input type="text" name="nt_name" value="{$nt_name|escape}" class="form-control"/></td>
+						<td style="padding: 0 .5em">
+							<select id="nt_engine" name="nt_engine" class="form-control">
+								<option value=""></option>
+								<option value="javascript" {if $nt_engine eq 'javascript'} selected="selected"{/if}>JavaScript</option>
+								<option value="smarty"{if $nt_engine eq 'smarty'} selected="selected"{/if}>Smarty</option>
+								<option value="index"{if $nt_output eq 'index'} selected="selected"{/if}>Index</option>
+							</select>
+						</td>
+						<td style="padding: 0 .5em" colspan="2">
+							<select id="nt_output" name="nt_output" class="form-control">
+								<option value=""></option>
+								<option value="html" {if $nt_output eq 'html'} selected="selected"{/if}>HTML</option>
+								<option value="tikiwiki"{if $nt_output eq 'tikiwiki'} selected="selected"{/if}>Wiki</option>
+								<option value="index"{if $nt_output eq 'index'} selected="selected"{/if}>Index</option>
+							</select>
+						</td>
 					</tr>
-					<tr><td colspan="4"><textarea name="nt_content" rows="10">{$nt_content|escape}</textarea></td></tr>
+					<tr><td colspan="4"><textarea name="nt_content" rows="10" class="form-control">{$nt_content|escape}</textarea></td></tr>
 					<tr><td colspan="4"><input type="submit" class="btn btn-default btn-sm" name="create_template" value="{tr}Register Template{/tr}"/></td></tr>
 				</table>
 			</div>

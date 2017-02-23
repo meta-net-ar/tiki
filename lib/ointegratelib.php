@@ -18,7 +18,7 @@ class OIntegrate
     /**
      * @param $name
      * @param $engineOutput
-     * @return OIntegrate_Engine_JavaScript|OIntegrate_Engine_Smarty
+     * @return OIntegrate_Engine_JavaScript|OIntegrate_Engine_Smarty|OIntegrate_Engine_Index
      */
     public static function getEngine( $name, $engineOutput ) // {{{
 	{
@@ -28,13 +28,15 @@ class OIntegrate
 			return new OIntegrate_Engine_JavaScript;
 		case 'smarty':
 			return new OIntegrate_Engine_Smarty($engineOutput == 'tikiwiki');
+		case 'index':
+			return new OIntegrate_Engine_Index;
 		}
 	} // }}}
 
     /**
      * @param $from
      * @param $to
-     * @return OIntegrate_Converter_Direct|OIntegrate_Converter_EncodeHtml|OIntegrate_Converter_HtmlToTiki|OIntegrate_Converter_TikiToHtml
+     * @return OIntegrate_Converter_Direct|OIntegrate_Converter_EncodeHtml|OIntegrate_Converter_HtmlToTiki|OIntegrate_Converter_TikiToHtml|OIntegrate_Converter_Indexer
      */
     public static function getConverter( $from, $to ) // {{{
 	{
@@ -53,7 +55,16 @@ class OIntegrate
 			} elseif ( $to == 'tikiwiki' ) {
 				return new OIntegrate_Converter_EncodeHtml;
 			}
+			break;
+		case 'index':
+			if ($to == 'index') {
+				return new OIntegrate_Converter_Indexer;
+			} elseif ( $to == 'html' ) {
+				return new OIntegrate_Converter_Indexer('html');
+			}
+			break;
 		}
+
 	} // }}}
 
     /**
@@ -299,14 +310,14 @@ class OIntegrate_Response
     function render( $engine, $engineOutput, $outputContext, $templateFile ) // {{{
 	{
 		$engine = OIntegrate::getEngine($engine, $engineOutput);
-		if ( ! $output = OIntegrate::getConverter($engineOutput, $outputContext) ) {
-			$this->errors = array( 1001, 'Output converter not found.' );
-			return;
+		if ( ! $engine ) {
+			$this->errors = array( 1000, tr('Engine "%0" not found.', $engineOutput) );
+			return false;
 		}
 
-		if ( ! $engine ) {
-			$this->errors = array( 1000, 'Engine not found' );
-			return;
+		if ( ! $output = OIntegrate::getConverter($engineOutput, $outputContext) ) {
+			$this->errors = array( 1001, tr('Output converter "%0" not found.', $outputContext) );
+			return false;
 		}
 
 		$raw = $engine->process($this->data, $templateFile);
@@ -417,10 +428,12 @@ class OIntegrate_Engine_Smarty implements OIntegrate_Engine // {{{
      */
     function process( $data, $templateFile )
 	{
+		/** @var Smarty $smarty */
 		$smarty = new Smarty;
 		$smarty->security = true;
-		$smarty->template_dir = dirname($templateFile);
-		$smarty->plugins_dir = array();
+		$smarty->setTemplateDir(dirname($templateFile));
+		$smarty->setCompileDir(TIKI_PATH . "/temp/templates_c");
+		$smarty->setPluginsDir([]);
 
 		if ( $this->changeDelimiters ) {
 			$smarty->left_delimiter = '{{';
@@ -431,6 +444,29 @@ class OIntegrate_Engine_Smarty implements OIntegrate_Engine // {{{
 		return $smarty->fetch($templateFile);
 	}
 } // }}}
+
+/**
+ * Engine to pass on raw data and mapping info from the template
+ */
+class OIntegrate_Engine_Index implements OIntegrate_Engine
+{
+    /**
+     * @param array $data
+     * @param string $templateFile
+     * @return array
+	 */
+    function process( $data, $templateFile )
+	{
+		$mappingString = file_get_contents($templateFile);
+		$mapping = json_decode($mappingString, true);
+
+		return [
+			'data' => $data,
+			'mapping' => $mapping,
+		];
+	}
+}
+
 
 /**
  *
@@ -492,3 +528,68 @@ class OIntegrate_Converter_TikiToHtml implements OIntegrate_Converter // {{{
 		return $tikilib->parse_data(htmlentities($content, ENT_QUOTES, 'UTF-8'));
 	}
 } // }}}
+
+/**
+ * Attempt to index the result from the request
+ */
+class OIntegrate_Converter_Indexer implements OIntegrate_Converter
+{
+	private $format;
+
+	function __construct($format = 'none')
+	{
+		$this->format = $format;
+	}
+
+	/**
+     * @param $content
+     * @return mixed|string
+     */
+    function convert( $content )
+	{
+		if ($this->format === 'html') {
+
+			if (! empty($_REQUEST['nt_name'])) {	// preview from admin/webservice page
+
+				$source = new Search_ContentSource_WebserviceSource();
+				$factory = new Search_Type_Factory_Direct();
+				$data = $source->getDocument($_REQUEST['nt_name'], $factory);
+
+				$output = '<h3>' . tr('Parsed Data') . '</h3>';
+				$output .= '<pre style="max-height: 40em; overflow: auto; white-space: pre-wrap">';
+				$output .= htmlentities(
+					print_r($data, true),
+						ENT_QUOTES,
+						'UTF-8'
+				);
+
+			} else {
+
+				$output = '<h3>' . tr('Data') . '</h3>';
+				$output .= '<pre style="max-height: 20em; overflow: auto; white-space: pre-wrap">';
+				$output .= htmlentities(
+					json_encode($content['data'], JSON_PRETTY_PRINT),
+						ENT_QUOTES,
+						'UTF-8'
+				);
+				$output .= '</pre>';
+
+				$output .= '<h3>' . tr('Mapping') . '</h3>';
+				$output .= '<pre style="max-height: 20em; overflow: auto; white-space: pre-wrap">';
+				$output .= htmlentities(
+					json_encode($content['mapping'], JSON_PRETTY_PRINT),
+						ENT_QUOTES,
+						'UTF-8'
+				);
+				$output .= '</pre>';
+
+			}
+
+			return $output;
+		} else {
+
+			return $content;
+		}
+
+	}
+}

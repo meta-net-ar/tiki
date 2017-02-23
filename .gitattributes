@@ -2458,6 +2458,7 @@ lib/core/Search/ContentSource/TrackerFieldSource.php -text
 lib/core/Search/ContentSource/TrackerItemSource.php -text
 lib/core/Search/ContentSource/TrackerSource.php -text
 lib/core/Search/ContentSource/UserSource.php -text
+lib/core/Search/ContentSource/WebserviceSource.php -text
 lib/core/Search/ContentSource/WikiSource.php -text
 lib/core/Search/ContentSource/index.php -text
 lib/core/Search/Elastic/BulkOperation.php -text
@@ -4084,6 +4085,7 @@ lib/smarty_tiki/modifier.money_format.php -text
 lib/smarty_tiki/modifier.namespace.php -text
 lib/smarty_tiki/modifier.nonamespace.php -text
 lib/smarty_tiki/modifier.nonp.php -text
+lib/smarty_tiki/modifier.numStyle.php -text
 lib/smarty_tiki/modifier.number_format.php -text
 lib/smarty_tiki/modifier.output.php -text
 lib/smarty_tiki/modifier.pagename.php -text
@@ -4563,6 +4565,7 @@ lib/transitionlib.php -text
 lib/tree/BrowseTreeMaker.php -text
 lib/tree/index.php -text
 lib/tree/tree.php -text
+lib/user/blacklistlib.php -text
 lib/user/index.php -text
 lib/user/monitorlib.php -text
 lib/user/monitormaillib.php -text
