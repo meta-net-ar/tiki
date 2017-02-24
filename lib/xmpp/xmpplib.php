@@ -17,7 +17,16 @@ class TikiXmppJsonResponse {
 	function get() {
 		global $user;
 		$xmpplib = TikiLib::lib('xmpp');
-		return json_encode($xmpplib->prebind($user));
+
+		try{
+			$result = $xmpplib->prebind($user);
+		} catch (Exception $e) {
+			$code = $e->getCode() ?: 500;
+			$msg = $e->getMessage();
+			$result = array('error' => $msg, 'code' => $code);
+			header("HTTP/1.0 $code $msg");
+		}
+		return json_encode($result);
 	}
 }
 
@@ -61,7 +70,7 @@ class XMPPLib extends TikiLib {
 
 		$userprefslib = TikiLib::lib('userprefs');
 		$cryptlib = TikiLib::lib('crypt');
-		
+
 		$xmpp_username = $user;
 		$xmpp_password = $this->get_user_password($user);
 	
@@ -73,17 +82,22 @@ class XMPPLib extends TikiLib {
 		);
 
 		$xmppPrebind->connect($xmpp_username, $xmpp_password);
+
+		// TODO: figure out why encryption does not work
 		$xmppPrebind->set_encryption_mechanism(XmppPrebind::ENCRYPTION_PLAIN);
-		$xmppPrebind->auth();
-		$sessionInfo = $xmppPrebind->getSessionInfo();
 		
-		return $sessionInfo;
+		try{
+			$xmppPrebind->auth();
+			$result = $xmppPrebind->getSessionInfo();			
+		} catch(XmppPrebindException $e) {
+			throw new Exception($e->getMessage(), 401);
+		}
+		
+		return $result;
 	}
 	
 	function get_tiki_json_object() {
 		return new TikiXmppJsonResponse();
 	}
 }
-
-// $events->bind('tiki.user.login', 'tiki.view');
 

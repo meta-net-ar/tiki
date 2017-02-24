@@ -1,7 +1,7 @@
 <?php 
 
 require_once('tiki-setup.php');
-$method = strtolower($_SERVER['REQUEST_METHOD']) ?: 'get';
+$http_method = strtolower($_SERVER['REQUEST_METHOD']) ?: 'get';
 
 // sanitize lib parameter
 if (!empty($_REQUEST['lib']) 
@@ -30,10 +30,10 @@ if ( file_exists("lib/{$lib}/{$lib}lib.php") ) {
 $thelib = TikiLib::lib($lib);
 if( $thelib && method_exists($thelib, 'get_tiki_json_object') ) {
     $obj = $thelib->get_tiki_json_object();
-    if ( method_exists($obj, $method) ) {
+    if ( method_exists($obj, $http_method) ) {
         ini_set('html_errors', false);
         header('Content-Type: text/plain; charset=UTF-8');
-        $response = call_user_func(array($obj, $method));
+        $response = call_user_func(array($obj, $http_method));
         echo $response;
         die;
     }
