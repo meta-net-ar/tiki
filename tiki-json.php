@@ -27,8 +27,9 @@ if ( file_exists("lib/{$lib}/{$lib}lib.php") ) {
 
 
 // check if lib implements an output
-if( class_exists('TikiJsonResponse') ) {
-    $obj = new TikiJsonResponse();
+$thelib = TikiLib::lib($lib);
+if( $thelib && method_exists($thelib, 'get_tiki_json_object') ) {
+    $obj = $thelib->get_tiki_json_object();
     if ( method_exists($obj, $method) ) {
         ini_set('html_errors', false);
         header('Content-Type: text/plain; charset=UTF-8');

@@ -13,6 +13,15 @@ class TikiXmppPrebind extends XmppPrebind {
 }
 
 
+class TikiXmppJsonResponse {
+	function get() {
+		global $user;
+		$xmpplib = TikiLib::lib('xmpp');
+		return json_encode($xmpplib->prebind($user));
+	}
+}
+
+
 class XMPPLib extends TikiLib {
 	
 	function __construct() {
@@ -70,16 +79,11 @@ class XMPPLib extends TikiLib {
 		
 		return $sessionInfo;
 	}
+	
+	function get_tiki_json_object() {
+		return new TikiXmppJsonResponse();
+	}
 }
 
 // $events->bind('tiki.user.login', 'tiki.view');
 
-class TikiJsonResponse {
-
-	function get() {
-		global $user;
-		$xmpplib = TikiLib::lib('xmpp');
-		return json_encode($xmpplib->prebind($user));
-	}
-
-}
