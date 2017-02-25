@@ -2700,6 +2700,8 @@ lib/core/Services/Report/index.php -text
 lib/core/Services/ResultLoader.php -text
 lib/core/Services/ResultLoader/WebService.php -text
 lib/core/Services/ResultLoader/index.php -text
+lib/core/Services/Scheduler/Controller.php -text
+lib/core/Services/Scheduler/index.php -text
 lib/core/Services/Score/Controller.php -text
 lib/core/Services/Search/Controller.php -text
 lib/core/Services/Search/CustomSearchController.php -text
@@ -5797,6 +5799,7 @@ templates/report/index.php -text
 templates/report/load.tpl -text
 templates/report/preview.tpl -text
 templates/report/wikidata.tpl -text
+templates/scheduler/remove.tpl -text
 templates/score/create_score_event.tpl -text
 templates/search/help.tpl -text
 templates/search/index.php -text
