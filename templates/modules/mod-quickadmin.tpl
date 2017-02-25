@@ -118,7 +118,7 @@
 					</li>
 					<li>
 						<a href="tiki-admin_schedulers.php">
-							{icon name="calendar"} {tr}Schedulers{/tr}
+							{icon name="calendar"} {tr}Scheduler{/tr}
 						</a>
 					</li>
 					{if $prefs.feature_debug_console}

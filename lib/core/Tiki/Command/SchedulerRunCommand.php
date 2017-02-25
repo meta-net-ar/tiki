@@ -17,7 +17,7 @@ class SchedulerRunCommand extends Command
 	{
 		$this
 			->setName('scheduler:run')
-			->setDescription('Run programmed schedulers');
+			->setDescription('Run scheduled tasks');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)

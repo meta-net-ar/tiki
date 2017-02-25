@@ -9,7 +9,7 @@
 	{$libeg = ''}
 	{$liend = ''}
 {/if}
-{title help="Schedulers Management" admpage="login" url="tiki-admin_schedulers.php"}{tr}Schedulers{/tr}{/title}
+{title help="Scheduler Management" admpage="login" url="tiki-admin_schedulers.php"}{tr}Scheduler{/tr}{/title}
 <div class="t_navbar margin-bottom-md">
 	{if isset($schedulerinfo.id)}
 		{button href="?add=1" class="btn btn-default" _text="{tr}Add a new Scheduler{/tr}"}
@@ -19,7 +19,7 @@
 {tabset name='tabs_admin_schedulers'}
 
 	{* ---------------------- tab with list -------------------- *}
-{tab name="{tr}Schedulers{/tr}"}
+{tab name="{tr}Scheduler{/tr}"}
 	<h2>{tr}Schedulers{/tr}</h2>
 	<form class="form-horizontal" name="checkform" id="checkform" method="post">
 		<div id="admin_schedulers-div">
