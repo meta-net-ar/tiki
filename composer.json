@@ -106,7 +106,8 @@
 		"zendframework/zend-mime": "~2.4",
 		"zendframework/zend-mail": "~2.4",
 		"zendframework/zendsearch": "~2.0.0@RC",
-		"adodb/adodb-php": "^5.20"
+		"adodb/adodb-php": "^5.20",
+		"jerome-breton/casperjs-installer": "dev-master"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "1.1.0",
@@ -166,14 +167,18 @@
 		"post-install-cmd": [
 			"Tiki\\Composer\\ThemeInstaller::setup",
 			"Tiki\\Composer\\BootstrapCompiler::build",
-			"Tiki\\Composer\\CleanVendors::clean"
+			"Tiki\\Composer\\CleanVendors::clean",
+			"PhantomInstaller\\Installer::installPhantomJS",
+			"CasperJsInstaller\\Installer::install"
 		],
 		"pre-update-cmd": [
 			"Tiki\\Composer\\ThemeInstaller::setup"
 		],
 		"post-update-cmd": [
 			"Tiki\\Composer\\BootstrapCompiler::build",
-			"Tiki\\Composer\\CleanVendors::clean"
+			"Tiki\\Composer\\CleanVendors::clean",
+			"PhantomInstaller\\Installer::installPhantomJS",
+			"CasperJsInstaller\\Installer::install"
 		]
 	},
 	"repositories": [
