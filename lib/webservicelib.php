@@ -172,7 +172,7 @@ class Tiki_Webservice
      * @param bool $fullReponse
      * @return bool|OIntegrate_Response
      */
-    function performRequest( $params, $fullReponse = false )
+    function performRequest( $params, $fullReponse = false, $clearCache = false )
 	{
 		global $soaplib, $prefs;
 
@@ -223,7 +223,7 @@ class Tiki_Webservice
 					}
 
 				try {
-					$response = $ointegrate->performRequest($built, $builtBody);
+					$response = $ointegrate->performRequest($built, $builtBody, $clearCache);
 				} catch (Exception $e) {
 					Feedback::error(tr('Webservice error on %0 request "%1"', $this->wstype, $this->url) 
 						. '<br>' . $e->getMessage(), 'session');
@@ -363,6 +363,9 @@ class Tiki_Webservice_Template
 				time(),
 			)
 		);
+
+		require_once 'lib/search/refresh-functions.php';
+		refresh_index('webservice', $this->name);
 	}
 
     /**

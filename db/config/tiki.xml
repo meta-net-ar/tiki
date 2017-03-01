@@ -246,6 +246,9 @@
 		<service id="tiki.lib.rss" class="RSSLib">
 			<file>%kernel.root_dir%/lib/rss/rsslib.php</file>
 		</service>
+		<service id="tiki.lib.scheduler" class="SchedulersLib">
+			<file>%kernel.root_dir%/lib/schedulerslib.php</file>
+		</service>
 		<service id="tiki.lib.score" class="ScoreLib">
 			<file>%kernel.root_dir%/lib/score/scorelib.php</file>
 		</service>
@@ -342,6 +345,9 @@
 		</service>
 		<service id="tiki.lib.zotero" class="ZoteroLib">
 			<file>%kernel.root_dir%/lib/zoterolib.php</file>
+		</service>
+		<service id="tiki.lib.blacklist" class="blacklistLib">
+			<file>%kernel.root_dir%/lib/user/blacklistlib.php</file>
 		</service>
 
 		<service id="tiki.wiki.slug.dash" class="Tiki\Wiki\SlugManager\DashGenerator">

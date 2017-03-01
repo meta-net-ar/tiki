@@ -27,11 +27,15 @@ function wikiplugin_xmpp( $data, $params )
 	$headerlib = TikiLib::lib('header');
 	$xmpplib = TikiLib::lib('xmpp');
 
-	$headerlib->add_cssfile('vendor/jcbrand/converse.js/css/converse.css');
 	$headerlib->add_jsfile('vendor/jcbrand/converse.js/dist/converse.js');
 
 	$headerlib->add_jq_onready(
-		 'jQuery(window).on("converse-loaded", function (evt, converse) {'
+		 'jQuery("<link>")'
+		.'    .attr("rel", "stylesheet")'
+		.'    .attr("href", "vendor/jcbrand/converse.js/css/converse.css")'
+		.'    .appendTo(document.body);'
+
+		.'jQuery(window).on("converse-loaded", function (evt, converse) {'
 		.'	converse.initialize({'
 		.'		bosh_service_url: "' . $xmpplib->server_http_bind . '",'
 		.'		authentication: "prebind",'
@@ -43,5 +47,5 @@ function wikiplugin_xmpp( $data, $params )
 		.'});'
 	);
 	
-	return $out;
+	return '';
 }

@@ -16,7 +16,8 @@ if (basename($_SERVER['SCRIPT_NAME']) == basename(__FILE__)) {
 }
 
 if (isset($_REQUEST['name']) && $webservice = Tiki_Webservice::getService($_REQUEST['name'])) {
-	if (isset($_REQUEST['delete']) && empty($_REQUEST['delete'])) {
+	if (isset($_REQUEST['delete'])) {
+		$access->check_authenticity(tr('Are you sure you want to delete the webservice "%0"?', $_REQUEST['name']));
 		$webservice->delete();
 		$webservice = new Tiki_Webservice;
 		$url = '';
@@ -54,7 +55,14 @@ if (!isset($_REQUEST['params'])) {
 	$_REQUEST['params'] = array();
 }
 
-if (!isset($_REQUEST['parse']) && $response = $webservice->performRequest($_REQUEST['params'])) {
+if (!isset($_REQUEST['parse']) &&
+		$response = $webservice->performRequest(
+			$_REQUEST['params'],
+			false,
+			! empty($_REQUEST['nocache'])
+		)
+) {
+
 	$data = $response->data;
 	if (is_array($data)) {
 		unset($data['_template']);
@@ -65,6 +73,7 @@ if (!isset($_REQUEST['parse']) && $response = $webservice->performRequest($_REQU
 			'smarty/tikiwiki',
 			'smarty/html',
 			'javascript/html',
+			'index/index',
 		)
 	);
 
@@ -129,13 +138,27 @@ if (!isset($_REQUEST['parse']) && $response = $webservice->performRequest($_REQU
 			$template->content = $_REQUEST['nt_content'];
 			$template->save();
 			$storedTemplates = $webservice->getTemplates();
+
+			$smarty->assign('nt_name', $template->name);
+			$smarty->assign('nt_engine', $template->engine);
+			$smarty->assign('nt_output', $template->output);
+			$smarty->assign('nt_content', $template->content);
 		}
 	}
 
 	if (isset($_REQUEST['preview']) && $template = $webservice->getTemplate($_REQUEST['preview'])) {
 		$output = $template->render($response, 'html');
+		if ($response->errors) {
+			Feedback::error(implode(', ', $response->errors));
+		}
+
 		$smarty->assign('preview', $_REQUEST['preview']);
 		$smarty->assign('preview_output', $output);
+
+		$smarty->assign('nt_name', $template->name);
+		$smarty->assign('nt_engine', $template->engine);
+		$smarty->assign('nt_output', $template->output);
+		$smarty->assign('nt_content', $template->content);
 	}
 }
 
