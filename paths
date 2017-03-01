@@ -1,27 +1,6 @@
-A
+D
 dir
-/trunk/lib/core/Services/Scheduler
-
-
-
-
-A
-dir
-/trunk/lib/core/Scheduler/Task
-
-
-
-
-A
-dir
-/trunk/templates/scheduler
-
-
-
-
-A
-dir
-/trunk/lib/core/Scheduler
+/branches/experimental/schedulers
 
 
 
