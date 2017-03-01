@@ -13,24 +13,6 @@ class TikiXmppPrebind extends XmppPrebind {
 }
 
 
-class TikiXmppJsonResponse {
-	function get() {
-		global $user;
-		$xmpplib = TikiLib::lib('xmpp');
-
-		try{
-			$result = $xmpplib->prebind($user);
-		} catch (Exception $e) {
-			$code = $e->getCode() ?: 500;
-			$msg = $e->getMessage();
-			$result = array('error' => $msg, 'code' => $code);
-			header("HTTP/1.0 $code $msg");
-		}
-		return json_encode($result);
-	}
-}
-
-
 class XMPPLib extends TikiLib {
 	
 	function __construct() {
@@ -94,10 +76,6 @@ class XMPPLib extends TikiLib {
 		}
 		
 		return $result;
-	}
-	
-	function get_tiki_json_object() {
-		return new TikiXmppJsonResponse();
 	}
 }
 

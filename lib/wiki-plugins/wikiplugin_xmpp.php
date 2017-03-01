@@ -27,19 +27,29 @@ function wikiplugin_xmpp( $data, $params )
 	$headerlib = TikiLib::lib('header');
 	$xmpplib = TikiLib::lib('xmpp');
 
-	$headerlib->add_jsfile('vendor/jcbrand/converse.js/dist/converse.js');
-
+	// Converse.js overwrite Tiki jQuery breaks other libraries, so we have to
+	// save tikiJQuery before loading converse.js. After load converse.js, we
+	// can restore tikiJQuery to $.
+	// TODO: talk to JC and ask to release a version without jQuery bundled
 	$headerlib->add_jq_onready(
-		 'jQuery("<link>")'
+		'var tikiJQuery = $;'
+
+		.'jQuery("<link>")'
 		.'    .attr("rel", "stylesheet")'
 		.'    .attr("href", "vendor/jcbrand/converse.js/css/converse.css")'
 		.'    .appendTo(document.body);'
 
+		.'jQuery("<script>")'
+		.'    .attr("type", "text/javascript")'
+		.'    .attr("src", "vendor/jcbrand/converse.js/dist/converse.js")'
+		.'    .appendTo(document.body);'
+
 		.'jQuery(window).on("converse-loaded", function (evt, converse) {'
+		.'	window.$ = tikiJQuery;'
 		.'	converse.initialize({'
 		.'		bosh_service_url: "' . $xmpplib->server_http_bind . '",'
 		.'		authentication: "prebind",'
-		.'		prebind_url: "/tiki-json.php?lib=xmpp&action=prebind",'
+		.'		prebind_url: $.service("xmpp", "prebind"),'
 		.'		i18n: locales.en,'
 		.'		show_controlbox_by_default: false,'
 		.'		roster_groups: false'

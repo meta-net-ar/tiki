@@ -2732,6 +2732,8 @@ lib/core/Services/Workspace/ProfileAnalyser.php -text
 lib/core/Services/Workspace/ProfileBuilder.php -text
 lib/core/Services/Workspace/Utilities.php -text
 lib/core/Services/Workspace/index.php -text
+lib/core/Services/Xmpp/Controller.php -text
+lib/core/Services/Xmpp/index.php -text
 lib/core/Services/index.php -text
 lib/core/StandardAnalyzer/Analyzer/Standard.php -text
 lib/core/StandardAnalyzer/Analyzer/Standard/English.php -text
@@ -7763,7 +7765,6 @@ themes/yeti/templates/index.php -text
 /tiki-invited.php -text
 /tiki-invoice_reports.php -text
 /tiki-jsmodule.php -text
-/tiki-json.php -text
 /tiki-jsplugin.php -text
 /tiki-kaltura_upload.php -text
 /tiki-kaltura_video.php -text
