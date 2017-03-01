@@ -43,13 +43,8 @@ class Tiki_MemoryLimit
 
 	private function getRaw($memory_limit)
 	{
-		if(!preg_match('/(\d+)([gGmMkK])/', $memory_limit, $match)) {
-			return 0;
-		}
-
-		$s = $match[1];
-		$last = $match[2];
-
+		$s = trim($memory_limit);
+		$last = strtolower($s{strlen($s)-1});
 		switch ( $last ) {
 			case 'g': $s *= 1024;
 			case 'm': $s *= 1024;

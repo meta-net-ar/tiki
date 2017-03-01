@@ -457,6 +457,7 @@
 						<input type="submit" class="btn btn-default btn-sm" name="submit" value="{tr}Reload data from source{/tr}">
 					</div>
 				</form>
+				{jq}
 					$('.sync-refresh').submit(function () {
 						var form = this;
 						$.ajax({
