@@ -847,6 +847,35 @@
             "time": "2014-01-27T14:02:15+00:00"
         },
         {
+            "name": "jcbrand/converse.js",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jcbrand/converse.js.git",
+                "reference": "06668d8733a463ff621ae82a7c05270fb98d7d2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jcbrand/converse.js/zipball/06668d8733a463ff621ae82a7c05270fb98d7d2e",
+                "reference": "06668d8733a463ff621ae82a7c05270fb98d7d2e",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MPL-2.0"
+            ],
+            "description": "Browser based XMPP instant messaging client",
+            "homepage": "http://conversejs.org/",
+            "keywords": [
+                "chat",
+                "messaging",
+                "presence",
+                "xmpp"
+            ],
+            "time": "2017-03-05T10:39:15+00:00"
+        },
+        {
             "name": "jquery/jquery-s5",
             "version": "1.0.1",
             "dist": {

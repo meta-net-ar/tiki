@@ -108,7 +108,7 @@
 		"zendframework/zendsearch": "~2.0.0@RC",
 		"adodb/adodb-php": "^5.20",
 		"cweagans/composer-patches": "^1.6",
-		"jcbrand/converse.js": "^2.0",
+		"jcbrand/converse.js": "^3.0",
 		"candy-chat/xmpp-prebind-php": "dev-master",
 		"adodb/adodb-php": "^5.20"
 	},
