@@ -42,6 +42,10 @@ class XMPPLib extends TikiLib {
 		}
 	}
 	
+	function get_user_jid($user) {
+		return sprintf('%s@%s', $user, $this->server_host);
+	}
+
 	function prebind($user) {
 		global $prefs;
 		$action = $_GET['action'];
@@ -49,9 +53,6 @@ class XMPPLib extends TikiLib {
 		if(empty($this->server_host) ||  empty($this->server_http_bind)){
 			return array();
 		}
-
-		$userprefslib = TikiLib::lib('userprefs');
-		$cryptlib = TikiLib::lib('crypt');
 
 		$xmpp_username = $user;
 		$xmpp_password = $this->get_user_password($user);

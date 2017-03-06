@@ -40,6 +40,15 @@ function prefs_xmpp_list()
 			'hint' => tra('http://xmpp.example.com/http-bind/'),
 			'tags' => array('basic'),
 			'default' => '',
+		),
+		'xmpp_user_password' => array(
+			'name' => tra('XMPP account password'),
+			'description' => tra('XMPP account password'),
+			'keywords' => 'xmpp converse conversejs chat',
+			'type' => 'password',
+			'size' => 40,
+			'tags' => array('basic'),
+			'default' => '',
 		)
 	);
 }

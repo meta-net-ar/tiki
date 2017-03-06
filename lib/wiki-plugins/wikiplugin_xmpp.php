@@ -31,31 +31,33 @@ function wikiplugin_xmpp( $data, $params )
 	// save tikiJQuery before loading converse.js. After load converse.js, we
 	// can restore tikiJQuery to $.
 	// TODO: talk to JC and ask to release a version without jQuery bundled
+	
 	$headerlib->add_jq_onready(
-		'var tikiJQuery = $;'
+		 'var tikiJQuery = $;'
+		.'var xmpp_service_url = $.service("xmpp", "prebind");'
 
 		.'jQuery("<link>")'
-		.'    .attr("rel", "stylesheet")'
-		.'    .attr("href", "vendor/jcbrand/converse.js/css/converse.css")'
-		.'    .appendTo(document.body);'
+		.    '.attr("rel", "stylesheet")'
+		.    '.attr("href", "vendor/jcbrand/converse.js/css/converse.css")'
+		.    '.appendTo("head");'
 
-		.'jQuery("<script>")'
-		.'    .attr("type", "text/javascript")'
-		.'    .attr("src", "vendor/jcbrand/converse.js/dist/converse.js")'
-		.'    .appendTo(document.body);'
+		.'function tiki_restore_jquery() {'
+		.    'window.$ = tikiJQuery;'
+		.'}'
 
-		.'jQuery(window).on("converse-loaded", function (evt, converse) {'
-		.'	window.$ = tikiJQuery;'
-		.'	converse.initialize({'
-		.'		bosh_service_url: "' . $xmpplib->server_http_bind . '",'
-		.'		authentication: "prebind",'
-		.'		prebind_url: $.service("xmpp", "prebind"),'
-		.'		i18n: locales.en,'
-		.'		show_controlbox_by_default: false,'
-		.'		roster_groups: false'
-		.'	});'
-		.'});'
+		.'function tiki_initialiaze_conversejs() {'
+		.    'converse.initialize({'
+		.        'bosh_service_url: "' . $xmpplib->server_http_bind . '",'
+		.        'jid: "' . $xmpplib->get_user_jid($user) . '",'
+		.        'authentication: "prebind",'
+		.        'prebind_url: xmpp_service_url,'
+		.    '});'
+		.'}'
+
+		.'$.getScript("vendor/jcbrand/converse.js/dist/converse.js")'
+		.    '.done(tiki_initialiaze_conversejs)'
+		.    '.always(tiki_restore_jquery);'
 	);
-	
+
 	return '';
 }
