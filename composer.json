@@ -109,8 +109,7 @@
 		"adodb/adodb-php": "^5.20",
 		"cweagans/composer-patches": "^1.6",
 		"jcbrand/converse.js": "^3.0",
-		"candy-chat/xmpp-prebind-php": "dev-master",
-		"adodb/adodb-php": "^5.20"
+		"candy-chat/xmpp-prebind-php": "dev-master"
 	},
 	"require-dev": {
 		"mikey179/vfsStream": "1.1.0",

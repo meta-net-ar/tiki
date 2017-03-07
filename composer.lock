@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd888ecc47fa446c12bb6433703245f6",
+    "content-hash": "b92583d47f21444a26b98bd4c2e56959",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -36,9 +36,7 @@
             },
             "type": "library",
             "extra": {
-                "patches_applied": {
-                    "Remove references to ADOdb Extension": "installer/composer-patches/adodb-php__remove_references_to_adodb_extension.patch"
-                }
+                "patches_applied": []
             },
             "autoload": {
                 "files": [
@@ -238,7 +236,7 @@
                 "prebind",
                 "xmpp"
             ],
-            "time": "2015-02-26 17:32:01"
+            "time": "2015-02-26T17:32:01+00:00"
         },
         {
             "name": "chartjs/Chart.js",
@@ -2185,17 +2183,17 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v2.8.17",
+            "version": "v2.8.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "5b77d49ab76e5b12743b359ef4b4a712e6f5360d"
+                "reference": "e542d4765092d22552b1bf01ddccfb01d98ee325"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/symfony/filesystem/symfony-filesystem-5b77d49ab76e5b12743b359ef4b4a712e6f5360d-zip-793973.zip",
-                "reference": "5b77d49ab76e5b12743b359ef4b4a712e6f5360d",
-                "shasum": "4005c5bafc9a70b4ddbdc1f1da6f51fc21c1987d"
+                "url": "https://composer.tiki.org/dist/symfony/filesystem/symfony-filesystem-e542d4765092d22552b1bf01ddccfb01d98ee325-zip-ebcdf5.zip",
+                "reference": "e542d4765092d22552b1bf01ddccfb01d98ee325",
+                "shasum": "0a5bde94b15f214dedaf71bfa0f71d4183f1ee4a"
             },
             "require": {
                 "php": ">=5.3.9"
@@ -2230,7 +2228,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2017-01-08T20:43:03+00:00"
+            "time": "2017-02-18T17:06:33+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -4300,7 +4298,7 @@
                 "testing",
                 "unit"
             ],
-            "time": "2016-03-14 11:52:02"
+            "time": "2016-03-14T11:52:02+00:00"
         },
         {
             "name": "doctrine/instantiator",
