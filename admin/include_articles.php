@@ -27,5 +27,6 @@ if (isset($_REQUEST['import'])) {
 		print_r($msgs);
 		$smarty->assign_by_ref('msgs', $msgs);
 	}
+	$adminRedirect = true;
 }
 ask_ticket('admin-inc-cms');

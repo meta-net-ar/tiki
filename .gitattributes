@@ -10,15 +10,9 @@ admin/include_articles.php -text
 admin/include_blogs.php -text
 admin/include_calendar.php -text
 admin/include_category.php -text
-admin/include_comments.php -text
-admin/include_community.php -text
 admin/include_connect.php -text
-admin/include_copyright.php -text
-admin/include_directory.php -text
-admin/include_faqs.php -text
 admin/include_features.php -text
 admin/include_fgal.php -text
-admin/include_forums.php -text
 admin/include_freetags.php -text
 admin/include_gal.php -text
 admin/include_general.php -text
@@ -27,7 +21,6 @@ admin/include_intertiki.php -text
 admin/include_login.php -text
 admin/include_look.php -text
 admin/include_maps.php -text
-admin/include_messages.php -text
 admin/include_metatags.php -text
 admin/include_module.php -text
 admin/include_payment.php -text
@@ -3662,6 +3655,7 @@ lib/prefs/footer.php -text
 lib/prefs/forum.php -text
 lib/prefs/forums.php -text
 lib/prefs/freetags.php -text
+lib/prefs/gal.php -text
 lib/prefs/generate.php -text
 lib/prefs/geo.php -text
 lib/prefs/global.php -text
@@ -3717,6 +3711,7 @@ lib/prefs/payment.php -text
 lib/prefs/permission.php -text
 lib/prefs/php.php -text
 lib/prefs/poll.php -text
+lib/prefs/preset.php -text
 lib/prefs/print.php -text
 lib/prefs/profile.php -text
 lib/prefs/proxy.php -text

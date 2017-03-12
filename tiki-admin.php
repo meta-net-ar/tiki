@@ -17,7 +17,7 @@ $adminlib = TikiLib::lib('admin');
 $auto_query_args = array('page');
 
 $access->check_permission('tiki_p_admin');
-$check = $access->check_authenticity(null, false);
+$check = $access->check_authenticity(null, false, true);
 $logslib = TikiLib::lib('logs');
 
 /**
@@ -52,7 +52,6 @@ function simple_set_toggle($feature)
 	global $prefs;
 	$logslib = TikiLib::lib('logs');
 	$tikilib = TikiLib::lib('tiki');
-	$smarty = TikiLib::lib('smarty');
 	if (isset($_REQUEST[$feature]) && $_REQUEST[$feature] == 'on') {
 		if ((!isset($prefs[$feature]) || $prefs[$feature] != 'y')) {
 			// not yet set at all or not set to y
@@ -70,8 +69,7 @@ function simple_set_toggle($feature)
 			}
 		}
 	}
-	$cachelib = TikiLib::lib('cache');
-	$cachelib->invalidate('allperms');
+	TikiLib::lib('cache')->invalidate('allperms');
 }
 
 /**
@@ -88,7 +86,6 @@ function simple_set_value($feature, $pref = '', $isMultiple = false)
 	global $prefs;
 	$logslib = TikiLib::lib('logs');
 	$tikilib = TikiLib::lib('tiki');
-	$smarty = TikiLib::lib('smarty');
 	$old = $prefs[$feature];
 	if (isset($_REQUEST[$feature])) {
 		if ($pref != '') {
@@ -113,8 +110,7 @@ function simple_set_value($feature, $pref = '', $isMultiple = false)
 		add_feedback($feature, ($_REQUEST[$feature]) ? tr('%0 set', $feature) : tr('%0 unset', $feature), 2);
 		$logslib->add_action('feature', $feature, 'system', $old .'=>'.isset($_REQUEST['feature'])?$_REQUEST['feature']:'');
 	}
-	$cachelib = TikiLib::lib('cache');
-	$cachelib->invalidate('allperms');
+	TikiLib::lib('cache')->invalidate('allperms');
 }
 
 $blackL = TikiLib::lib('blacklist');
@@ -142,7 +138,7 @@ if ( isset ($_REQUEST['pref_filters']) ) {
 
 
 
-if (isset($_POST['pass_blacklist'])) {                                                  // if preferences were updated and blacklist feature is enabled (or is being enabled)
+if (isset($_POST['pass_blacklist'])) {    // if preferences were updated and blacklist feature is enabled (or is being enabled)
     $pass_blacklist_file = $jitPost->pass_blacklist_file->striptags();
     $userfile = explode('-',$pass_blacklist_file);
     $userfile = $userfile[3];
@@ -209,7 +205,7 @@ if ( isset( $_REQUEST['lm_preference'] ) ) {
 }
 
 if ( isset( $_REQUEST['lm_criteria'] ) ) {
-	$smarty->assign('ticket', $check['ticket']);
+//	$smarty->assign('ticket', $check['ticket']);
 	set_time_limit(0);
 	try {
 		$smarty->assign('lm_criteria', $_REQUEST['lm_criteria']);
@@ -523,8 +519,7 @@ $admin_icons = array(
 
 if (isset($_REQUEST['page'])) {
 	$adminPage = $_REQUEST['page'];
-	$check = $access->check_authenticity(null, false);
-	$smarty->assign('ticket', $check['ticket']);
+//	$smarty->assign('ticket', !empty($check['ticket']) ? $check['ticket'] : '');
 	// Check if the associated incude_*.php file exists. If not, check to see if it might exist in the Addons.
 	// If it exists, include the associated file and generate the ticket.
 	$utilities = new TikiAddons_Utilities();
@@ -555,7 +550,7 @@ if (isset($_REQUEST['page'])) {
 		}
 	}
 
-	if (!empty($changes) && $check) {
+	if ((!empty($changes) || (isset($adminRedirect) && $adminRedirect)) && $check) {
 		$access->redirect($_SERVER['REQUEST_URI'], '', 200);
 	}
 
