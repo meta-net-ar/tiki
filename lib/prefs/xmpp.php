@@ -41,10 +41,10 @@ function prefs_xmpp_list()
 			'tags' => array('basic'),
 			'default' => '',
 		),
-		'xmpp_user_password' => array(
-			'name' => tra('XMPP account password'),
-			'description' => tra('XMPP account password'),
-			'keywords' => 'xmpp converse conversejs chat',
+		'xmpp_openfire_super_password' => array(
+			'name' => tra('XMPP Super password'),
+			'description' => tra('The password that Openfire accepts for any user.'),
+			'keywords' => 'xmpp openfire super password',
 			'type' => 'password',
 			'size' => 40,
 			'tags' => array('basic'),

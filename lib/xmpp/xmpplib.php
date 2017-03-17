@@ -55,7 +55,14 @@ class XMPPLib extends TikiLib {
 		}
 
 		$xmpp_username = $user;
-		$xmpp_password = $this->get_user_password($user);
+		$xmpp_password = '';
+
+		if(!empty($prefs['xmpp_openfire_super_password'])) {
+			$xmpp_password = $prefs['xmpp_openfire_super_password'];
+		} else {
+			$xmpp_password = $this->get_user_password($user);
+		}
+		
 	
 		$xmppPrebind = new TikiXmppPrebind(
 			$this->server_host,
