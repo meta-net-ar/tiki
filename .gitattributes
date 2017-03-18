@@ -2258,6 +2258,8 @@ lib/core/FutureLink/ReceiveFromPast.php -text
 lib/core/FutureLink/Search.php -text
 lib/core/FutureLink/SendToFuture.php -text
 lib/core/FutureLink/index.php -text
+lib/core/IDS/index.php -text
+lib/core/IDS/log.php -text
 lib/core/JisonParser/Phraser.jison -text
 lib/core/JisonParser/Phraser.js -text
 lib/core/JisonParser/Phraser.php -text
@@ -3821,6 +3823,7 @@ lib/setup/error_reporting.php -text
 lib/setup/events.php -text
 lib/setup/freetags.php -text
 lib/setup/fullscreen.php -text
+lib/setup/ids.php -text
 lib/setup/index.php -text
 lib/setup/integrator.php -text
 lib/setup/javascript.php -text
