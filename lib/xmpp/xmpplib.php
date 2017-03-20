@@ -4,6 +4,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
+require_once 'lib/auth/tokens.php';
 
 
 class TikiXmppPrebind extends XmppPrebind {
@@ -46,23 +47,47 @@ class XMPPLib extends TikiLib {
 		return sprintf('%s@%s', $user, $this->server_host);
 	}
 
+	function check_token($givenUser, $givenToken) {
+		$tokenlib = AuthTokens::build($prefs);
+		$token = $tokenlib->getToken($givenToken);
+
+		if(!$token || $token['entry'] !== 'openfireauthtoken') {
+			return false;
+		}
+		$tokenlib->deleteToken($token['tokenId']);
+		
+		$param = json_decode($token['parameters'], A_ARRAY);
+		return is_array($param)
+			&& !empty($param['user'])
+			&& $param['user'] === $givenUser;
+	}
+
 	function prebind($user) {
 		global $prefs;
-		$action = $_GET['action'];
+		
+		$tikilib = TikiLib::lib('tiki');
+		$tokenlib = AuthTokens::build($prefs);
 
 		if(empty($this->server_host) ||  empty($this->server_http_bind)){
 			return array();
 		}
 
 		$xmpp_username = $user;
-		$xmpp_password = '';
 
-		if(!empty($prefs['xmpp_openfire_super_password'])) {
-			$xmpp_password = $prefs['xmpp_openfire_super_password'];
+		if(!empty($prefs['xmpp_openfire_use_token']) && $prefs['xmpp_openfire_use_token'] === 'y') {
+			$token = $tokenlib->createToken(
+				'openfireauthtoken',
+				array('user' => $user), // parameters
+				array(), // groups
+				array(
+					'timeout' => 300,
+					'createUser' => 'n',
+				)
+			);
+			$xmpp_password = "tt:$token";
 		} else {
 			$xmpp_password = $this->get_user_password($user);
 		}
-		
 	
 		$xmppPrebind = new TikiXmppPrebind(
 			$this->server_host,

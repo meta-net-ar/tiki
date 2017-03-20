@@ -41,12 +41,12 @@ function prefs_xmpp_list()
 			'tags' => array('basic'),
 			'default' => '',
 		),
-		'xmpp_openfire_super_password' => array(
-			'name' => tra('XMPP Super password'),
-			'description' => tra('The password that Openfire accepts for any user.'),
-			'keywords' => 'xmpp openfire super password',
-			'type' => 'password',
-			'size' => 40,
+		'xmpp_openfire_use_token' => array(
+			'name' => tra('XMPP Openfire Token'),
+			'default' => 'n',
+			'description' => tra('Handle user authentication using tokens'),
+			'keywords' => 'xmpp openfire token',
+			'type' => 'flag',
 			'tags' => array('basic'),
 			'default' => '',
 		)

@@ -5,11 +5,24 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
-class Services_Xmpp_Controller 
-{
-	function setUp()
-	{
+class Services_Xmpp_Controller  {
+	function setUp() {
 		Services_Exception_Disabled::check('xmpp_feature');
+	}
+	
+	function action_check_token($input) {
+		$xmpplib = TikiLib::lib('xmpp');
+		$query = $input->stored;
+
+		$user = $input->offsetGet('user');
+		$token = $input->offsetGet('token');
+
+		if( empty($user) || empty($token) ) {
+			return array('valid' => false);
+		}
+
+		$valid = (bool) $xmpplib->check_token($user, $token);
+		return array('valid' => $valid);
 	}
 	
 	function action_prebind($input) {
