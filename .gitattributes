@@ -4932,6 +4932,7 @@ lib/wizard/pages/user_wizard_completed.php -text
 lib/wizard/readme.txt -text
 lib/wizard/wizard.php -text
 lib/wizard/wizardlib.php -text
+lib/xmpp/TikiXmppPrebind.php -text
 lib/xmpp/xmpplib.php -text
 lib/ziplib.php -text
 lib/zoterolib.php -text

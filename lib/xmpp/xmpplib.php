@@ -5,14 +5,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 require_once 'lib/auth/tokens.php';
-
-
-class TikiXmppPrebind extends XmppPrebind {
-	function set_encryption_mechanism($encryption) {
-		$this->encryption = $encryption;
-	}
-}
-
+require_once dirname(__FILE__) . '/TikiXmppPrebind.php';
 
 class XMPPLib extends TikiLib {
 	
@@ -84,7 +77,7 @@ class XMPPLib extends TikiLib {
 					'createUser' => 'n',
 				)
 			);
-			$xmpp_password = "tt:$token";
+			$xmpp_password = "$token";
 		} else {
 			$xmpp_password = $this->get_user_password($user);
 		}
@@ -97,9 +90,6 @@ class XMPPLib extends TikiLib {
 		);
 
 		$xmppPrebind->connect($xmpp_username, $xmpp_password);
-
-		// TODO: figure out why encryption does not work
-		$xmppPrebind->set_encryption_mechanism(XmppPrebind::ENCRYPTION_PLAIN);
 		
 		try{
 			$xmppPrebind->auth();
