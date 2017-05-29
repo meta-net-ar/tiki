@@ -1,15 +1,8 @@
-M
+D
 dir
-/trunk
+/branches/experimental/composer-web-install
 
 
-
-
-A
-dir
-/trunk/lib/core/Tiki/Package
-/branches/experimental/composer-web-install/lib/core/Tiki/Package
-62815
 
 
 
