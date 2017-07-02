@@ -36,6 +36,12 @@ class ProfileInstallCommand extends Command
 				null,
 				InputOption::VALUE_NONE,
 				'Re-apply profiles when already applied.'
+			)
+			->addOption(
+				'dry-run',
+				null,
+				InputOption::VALUE_NONE,
+				'Return user information about what is going to be applied'
 			);
 	}
 
@@ -44,6 +50,7 @@ class ProfileInstallCommand extends Command
 		$profileName = $input->getArgument('profile');
 		$repository = $input->getArgument('repository');
 		$force = $input->getOption('force');
+		$dryRun = $input->getOption('dry-run');
 
 		$profile = \Tiki_Profile::fromNames($repository, $profileName);
 
@@ -64,10 +71,11 @@ class ProfileInstallCommand extends Command
 
 		if (! $isInstalled) {
 			$transaction = $tikilib->begin();
-			if ($installer->install($profile)) {
+			if ($installer->install($profile, 'all', $dryRun) && !$dryRun) {
 				$transaction->commit();
 				$output->writeln('Profile applied.');
 			} else {
+				if (!$dryRun) {
 				$output->writeln("<error>Installation failed:</error>");
 
 				foreach ($installer->getFeedback() as $error) {

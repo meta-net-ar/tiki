@@ -170,6 +170,7 @@ class Tiki_Profile_Installer
 	private $debug = false;
 	private $prefixDependencies = true;
 
+	private $profileChanges = array();
 	private $feedback = array();	// Let users know what's happened
 
 	private $allowedGlobalPreferences = false;
@@ -200,6 +201,37 @@ class Tiki_Profile_Installer
 			return $this->feedback;
 		}
 	} // }}}
+
+	/**
+	 * @param $type - string with feedback type
+	 * @param $newValue - mixed with new values
+	 * @param $oldValue - mixed with old values
+	 * @param $description - mixed with aditional information
+	 * @return none
+	 */
+	function setTrackProfileChanges($type, $newValue = false, $oldValue = false, $description = false) // {{{
+	{
+		$this->profileChanges[] = array(
+			'type' => $type,
+			'new' => $newValue,
+			'old' => $oldValue,
+			'description' => $description,
+		);
+	} // }}}
+
+	/**
+	 * @param $index - (int) index of feedback string to return if present
+	 * @return mixed string or whole array if no index specified
+	 */
+	function getTrackProfileChanges($index = null) // {{{
+	{
+		if (!is_null($index) && $index < count($this->profileChanges)) {
+			return $this->profileChanges[$index];
+		} else {
+			return $this->profileChanges;
+		}
+	} // }}}
+
 	
 	public static function convertType( $type ) // {{{
 	{
@@ -283,8 +315,9 @@ class Tiki_Profile_Installer
 
 		$referenced = array();
 		$knownObjects = array();
-		foreach ( Tiki_Profile_Object::getNamedObjects() as $o )
+		foreach ( Tiki_Profile_Object::getNamedObjects() as $o ) {
 			$knownObjects[] = Tiki_Profile_Object::serializeNamedObject($o);
+		}
 
 		// Build the list of dependencies for each profile
 		$short = array();
@@ -294,13 +327,16 @@ class Tiki_Profile_Installer
 			}
 
 			$short[$key] = array();
-			foreach ( $prf->getRequiredProfiles() as $k => $p )
+			foreach ( $prf->getRequiredProfiles() as $k => $p ){
 				$short[$key][] = $k;
+			}
 
-			foreach ( $prf->getNamedObjects() as $o )
+			foreach ( $prf->getNamedObjects() as $o ){
 				$knownObjects[] = Tiki_Profile_Object::serializeNamedObject($o);
-			foreach ( $prf->getReferences() as $o )
+			}
+			foreach ( $prf->getReferences() as $o ){
 				$referenced[] = Tiki_Profile_Object::serializeNamedObject($o);
+			}
 
 			if ( ! $this->isInstallable($prf) )
 				return false;
@@ -351,11 +387,11 @@ class Tiki_Profile_Installer
 
 	/**
 	 * Install a profile
-	 * 
-	 * @param Tiki_Profile $profile		Profile object
-	 * @param string $empty_cache		all|templates_c|temp_cache|temp_public|modules_cache|prefs (default all)
+	 *
+	 * @param Tiki_Profile $profile Profile object
+	 * @param string $empty_cache all|templates_c|temp_cache|temp_public|modules_cache|prefs (default all)
 	 */
-	function install( Tiki_Profile $profile, $empty_cache = 'all' ) // {{{
+	function install(Tiki_Profile $profile, $empty_cache = 'all', $dryRun = false) // {{{
 	{
 		global $tikidomain;
 		$cachelib = TikiLib::lib('cache');
@@ -432,14 +468,14 @@ class Tiki_Profile_Installer
 		}
 	} // }}}
 
-	private function doInstall( Tiki_Profile $profile ) // {{{
+	private function doInstall(Tiki_Profile $profile, $dryRun = false) // {{{
 	{
 		$this->setFeedback(tra('Applying profile').': '.$profile->profile);
 
 		$this->installed[$profile->getProfileKey()] = $profile;
 
 		$preferences = $profile->getPreferences();
-		$leftovers = $this->applyPreferences($profile, $preferences, true);
+		$leftovers = $this->applyPreferences($profile, $preferences, true, $dryRun);
 
 		require_once 'lib/setup/events.php';
 		tiki_setup_events();
@@ -451,12 +487,16 @@ class Tiki_Profile_Installer
 				// postpone installation of users till after groups/perms are set
 				$description = $object->getDescription();
 				$userhandlers[$description] = $installer;
+				$this->setTrackProfileChanges('user', $object, false, $description);
 				continue;
 			}
-			$installer->install();
-			$description = $object->getDescription();
-			$installer->replaceReferences($description);
-			$this->setFeedback(tra('Added (or modified)').': '.$description);
+
+			if (!$dryRun) {
+				$description = $object->getDescription();
+				$installer->install();
+				$installer->replaceReferences($description);
+				$this->setFeedback(tra('Added (or modified)') . ': ' . $description);
+			}
 		}
 		$groupMap = $profile->getGroupMap();
 		$profile->replaceReferences($groupMap, $this->userData);
@@ -469,15 +509,17 @@ class Tiki_Profile_Installer
 		}
 
 		foreach ($userhandlers as $description => $installer) {
-			$installer->install();
-			$this->setFeedback(tra('Added (or modified)').': '.$description);
+			if (!$dryRun) {
+				$installer->install();
+			}
+			$this->setFeedback(tra('Added (or modified)') . ': ' . $description);
 		}
 
-		$this->applyPreferences($profile, $leftovers);
+		$this->applyPreferences($profile, $leftovers, $dryRun);
 		tiki_setup_events();
 	} // }}}
 
-	private function applyPreferences($profile, $preferences, $leaveUnknown = false)
+	private function applyPreferences($profile, $preferences, $leaveUnknown = false, $dryRun = false)
 	{
 		global $prefs;
 		$tikilib = TikiLib::lib('tiki');
@@ -499,16 +541,24 @@ class Tiki_Profile_Installer
 				}
 
 				if (!isset($prefs[$pref]) || $prefs[$pref] != $value) {
-					$this->setFeedback(tra('Preference set').': '.$pref.'='.$value);
+
+					$this->setFeedback(tra('Preference set') . ': ' . $pref . '=' . $value);
+
+					$oldValue = isset($prefs[$pref]) ? $prefs[$pref] : 'n';
+					$this->setTrackProfileChanges('preference', $value, $oldValue, $pref);
+
 				}
-				$tikilib->set_preference($pref, $value);
+
+				if (!$dryRun) {
+					$tikilib->set_preference($pref, $value);
+				}
 			}
 		}
 
 		return $leftovers;
 	}
 
-	private function setupGroup( $groupName, $info, $permissions, $objects, $groupMap ) // {{{
+	private function setupGroup($groupName, $info, $permissions, $objects, $groupMap, $dryRun = false) // {{{
 	{
 		$userlib = TikiLib::lib('user');
 
@@ -522,8 +572,10 @@ class Tiki_Profile_Installer
 		}
 
 		if ( ! $userlib->group_exists($groupName) ) {
+			$this->setTrackProfileChanges('group', $info, false, $groupName);
 			$userlib->add_group($groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['user_tracker_field'], $info['group_tracker_field'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
 		} else {
+			$this->setTrackProfileChanges('group', $info, $userlib->get_group_info($groupName), $groupName);
 			$userlib->change_group($groupName, $groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], $info['user_tracker_field'], $info['group_tracker_field'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
 		}
 
@@ -535,25 +587,32 @@ class Tiki_Profile_Installer
 		}
 
 		foreach ( $permissions as $perm => $v ) {
-			if ( $v == 'y' )
+			if ( $v == 'y' ){
 				$userlib->assign_permission_to_group($perm, $groupName);
-			else
+			} else {
 				$userlib->remove_permission_from_group($perm, $groupName);
+			}
 			$this->setFeedback(sprintf(tra('Modified permission %s for %s'), $perm, $groupName));
 		}
 
-		foreach ( $objects as $data )
-			foreach ( $data['permissions'] as $perm => $v ) {
+		foreach ( $objects as $data ) {
+			foreach ($data['permissions'] as $perm => $v) {
 				$data['id'] = trim($data['id']);
 				$data['type'] = self::convertType($data['type']);
-				$data['id'] = Tiki_Profile_Installer::convertObject($data['type'], $data['id'], array( 'groupMap' => $groupMap));
+				$data['id'] = Tiki_Profile_Installer::convertObject($data['type'], $data['id'], array('groupMap' => $groupMap));
 
-				if ( $v == 'y' )
+				if ($v == 'y') {
+					$this->setTrackProfileChanges('permission', $v, false, array($perm, $groupName));
 					$userlib->assign_object_permission($groupName, $data['id'], $data['type'], $perm);
-				else
+				} else {
+					$this->setTrackProfileChanges('permission', false, $v, array($perm, $groupName));
 					$userlib->remove_object_permission($groupName, $data['id'], $data['type'], $perm);
-				$this->setFeedback(sprintf(tra('Modified permission %s on %s/%s for %s'), $perm, $data['type'], $data['id'], $groupName));
+				}
+				$this->setFeedback(
+					sprintf(tra('Modified permission %s on %s/%s for %s'), $perm, $data['type'], $data['id'], $groupName)
+				);
 			}
+		}
 
 		global $user;
 		if ( $info['autojoin'] == 'y' && $user ) {
