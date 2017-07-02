@@ -1024,7 +1024,7 @@ class HeaderLib
 
 		$content = file_get_contents($file);
 
-		return Minify_CSS::minify($content, array('prependRelativePath' => $currentdir.'/', 'bubbleCssImports' => true));
+		return Minify_CSSmin::minify($content, array('prependRelativePath' => $currentdir.'/', 'bubbleCssImports' => true));
 	}
 
 
