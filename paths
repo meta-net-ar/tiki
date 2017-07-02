@@ -1,15 +1,29 @@
+A
+dir
+/branches/experimental/move-packages-to-composer/lib/core/Scheduler/Exception
+/trunk/lib/core/Scheduler/Exception
+63124
+
+
 M
 dir
-/trim
+/branches/experimental/move-packages-to-composer
 
 
 
 
-M
+A
 dir
-/trim/data
+/branches/experimental/move-packages-to-composer/lib/core/Tiki/Package
+/trunk/lib/core/Tiki/Package
+63124
 
 
+A
+dir
+/branches/experimental/move-packages-to-composer/lib/test/core/Tiki
+/trunk/lib/test/core/Tiki
+63124
 
 
 
