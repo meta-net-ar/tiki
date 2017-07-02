@@ -173,6 +173,13 @@ function prefs_unified_list()
 				'fieldId' => tr('Field ID (backward compatibility mode with Tiki 7 and 8)'),
 			),
 		),
+		'unified_cache_formatted_result' => array(
+			'name' => tra('Cache formatted results'),
+			'description' => tr('If enabled, formatted search results like the ones used in the LIST plugin will be cached to prevent costly reformatting on each page load.'),
+			'warning' => tr('This could quickly build up a large cache directory. It is recommended to clear Tiki caches often (e.g. once per week) via an automated job if you use this feature.'),
+			'type' => 'flag',
+			'default' => 'n',
+		),
 		'unified_parse_results' => array(
 			'name' => tra('Parse the results'),
 			'description' => tra('Parse the results. May impact performance'),

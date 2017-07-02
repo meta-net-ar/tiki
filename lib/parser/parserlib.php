@@ -1631,7 +1631,13 @@ if ( \$('#$id') ) {
 			$parse_color = 1;
 			$temp = $data;
 			while ($parse_color) { // handle nested colors, parse innermost first
-				$temp = preg_replace("/~~([^~:,]+)(,([^~:]+))?:([^~]*)(?!~~[^~:,]+(?:,[^~:]+)?:[^~]*~~)~~/Ums", "<span style=\"color:$1; background-color:$3\">$4</span>", $temp, -1, $parse_color);
+				$temp = preg_replace_callback(
+					"/~~([^~:,]+)(,([^~:]+))?:([^~]*)(?!~~[^~:,]+(?:,[^~:]+)?:[^~]*~~)~~/Ums",
+					'self::colorAttrEscape',
+					$temp,
+					-1,
+					$parse_color
+				);
 
 				if (! empty($temp)) {
 					$data = $temp;
@@ -1641,7 +1647,11 @@ if ( \$('#$id') ) {
 			// On large pages, the above preg rule can hit a BACKTRACE LIMIT
 			// In case it does, use the simpler color replacement pattern.
 			if (empty($temp)) {
-				$data = preg_replace("/\~\~([^\:\,]+)(,([^\:]+))?:([^~]*)\~\~/Ums", "<span style=\"color:$1; background:$3\">$4</span>", $data);
+				$data = preg_replace_callback(
+					"/\~\~([^\:\,]+)(,([^\:]+))?:([^~]*)\~\~/Ums",
+					'self::colorAttrEscape',
+					$data
+				);
 			}
 		}
 
@@ -1728,7 +1738,7 @@ if ( \$('#$id') ) {
 		//   but hide '<x>' text inside some words like 'style' that are considered as dangerous by the sanitizer.
 		$data = str_replace(array( '&lt;x&gt;', '~np~', '~/np~' ), array( '<x>', '~np~', '~/np~' ), $data);
 
-		if ($this->option['typography']) {
+		if ($this->option['typography'] && ! $this->option['ck_editor']) {
 			$data = typography($data, $this->option['language']);
 		}
 
@@ -1743,7 +1753,22 @@ if ( \$('#$id') ) {
 		return $data;
 	}
 
-
+	/**
+	 * Used as preg_replace_callback methods within in the parse_data() method to escape color style attributes when
+	 * generating HTML for the wiki color syntax - e.g. ~~#909:text~~
+	 *
+	 * @param $matches
+	 * @return string
+	 */
+	private function colorAttrEscape($matches)
+	{
+		$esc = new Zend\Escaper\Escaper();
+		$color = !empty($matches[1]) ? 'color:' . $esc->escapeHtmlAttr($matches[1]): '';
+		$background = !empty($matches[3]) ? 'background-color:' . $esc->escapeHtmlAttr($matches[3]) : '';
+		$semi = !empty($color) && !empty($background) ? ';' : '';
+		$text = !empty($matches[4]) ? $matches[4] : '';
+		return '<span style="' . $color . $semi . $background . '">' . $text . '</span>';
+	}
 
 	/**
 	 *
@@ -1795,7 +1820,7 @@ if ( \$('#$id') ) {
 		$data = $this->parse_data_wikilinks($data, true);
 		$data = $this->parse_data_externallinks($data, true);
 		$data = $this->parse_data_inline_syntax($data, $words);
-		if ($this->option['typography']) {
+		if ($this->option['typography'] && ! $this->option['ck_editor']) {
 			$data = typography($data, $this->option['language']);
 		}
 
@@ -2658,6 +2683,11 @@ if ( \$('#$id') ) {
 		$in_empty_paragraph = 0;
 
 		foreach ($lines as $line) {
+			// Add newlines between lines 
+			if (isset($current_title_num)) { // Exclude the first line
+				$data .= "\n";
+			}
+			
 			$current_title_num = '';
 			$numbering_remove = 0;
 
@@ -3109,7 +3139,7 @@ if ( \$('#$id') ) {
 					}
 				}
 			}
-			$data .= $line . "\n";
+			$data .= $line;
 		}
 
 		if ($this->option['is_html']) {
@@ -3374,13 +3404,20 @@ if ( \$('#$id') ) {
 		$link->setQualifier($reltype);
 		$link->setDescription($description);
 		$link->setWikiLookup(array( $this, 'parser_helper_wiki_info_getter' ));
-		$link->setWikiLinkBuilder(
-			function ($pageLink)
-			{
-				$wikilib = TikiLib::lib('wiki');
-				return $wikilib->sefurl($pageLink);
-			}
-		);
+		if ($ck_editor) {	// prevent page slug being used in wysiwyg editor, needs the page name
+			$link->setWikiLinkBuilder(
+				function ($pageLink) {
+					return $pageLink;
+				}
+			);
+		} else {
+			$link->setWikiLinkBuilder(
+				function ($pageLink) {
+					$wikilib = TikiLib::lib('wiki');
+					return $wikilib->sefurl($pageLink);
+				}
+			);
+		}
 		$link->setExternals($externals);
 		$link->setHandlePlurals($processPlural);
 		$link->setAnchor($anchor);

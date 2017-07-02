@@ -64,7 +64,6 @@ function prefs_print_list()
 			'default' => 'y'
 			
 		),
-		
 		'print_pdf_mpdf_orientation' => array(
 			'name' => tra('PDF Orientation'),
 			'description' => tra('Landscape or Portrait'),
@@ -94,6 +93,48 @@ function prefs_print_list()
 				'A6' => tra('A6'),
 			),
 			'default' => 'A4',
+		),
+			
+		'print_pdf_mpdf_toc' => array(
+			'name' => tra('Table of contents'),
+			'description' => tra('Generate auto table of contents with PDF'),
+			'type' => 'flag',
+			'default' => 'n'
+			
+		),
+		'print_pdf_mpdf_toclinks' => array(
+			'name' => tra('Link TOC with content'),
+			'description' => tra('Link TOC headings with content in PDF'),
+			'type' => 'flag',
+			'default' => 'n'
+			
+		),
+		'print_pdf_mpdf_tocheading' => array(
+			'name' => tra('TOC heading'),
+			'description' => tra('Text heading to be appeared before table of contents'),
+			'type' => 'text',
+			'default' => 'Table of Contents'
+			
+		),	
+		'print_pdf_mpdf_toclevels' => array(
+			'name' => tra('PDF TOC Levels'),
+			'description' => tra('Will be autopicked from content, default will be heading 1, heading 2 and heading 3.For example:H1|H2|H3'),
+			'tags' => array('advanced'),
+			'type' => 'text',
+			'default' => 'H1|H2|H3',
+			'shorthint'=>''
+		),
+		'print_pdf_mpdf_pagetitle' => array(
+			'name' => tra('Show Page title'),
+			'description' => tra('Print wiki page title with pdf'),
+			'type' => 'list',
+			'options' => array(
+				'' => tra('Default'),
+				'y' => tra('Yes'),
+				'n'=>tra('No'),
+				
+			),
+			'default' => '',
 		),
 		'print_pdf_mpdf_header' => array(
 			'name' => tra('PDF header text'),
@@ -175,6 +216,34 @@ function prefs_print_list()
 			'description' => tra('Password protect generated PDF'),
 			'tags' => array('advanced'),
 			'type' => 'password',
+			'default' => '',
+		),
+		'print_pdf_mpdf_watermark' => array(
+			'name' => tra('Watermark text'),
+			'description' => tra('PDF watermark text, if any'),
+			'tags' => array('advanced'),
+			'type' => 'text',
+			'default' => '',
+		),
+		'print_pdf_mpdf_watermark_image' => array(
+			'name' => tra('Watermark Image URL'),
+			'description' => tra('Watermark image will appear under text,enter complete image url'),
+			'tags' => array('advanced'),
+			'type' => 'text',
+			'default' => '',
+		),
+		'print_pdf_mpdf_coverpage_text_settings' => array(
+			'name' => tra('CoverPage text settings'),
+			'description' => tra('Heading|Subheading|Alignment|Background color|Text color|Page border|Border color. Enter settings separated by |,leave blank for default'),
+			'tags' => array('advanced'),
+			'type' => 'text',
+			'default' => '',
+		),
+		'print_pdf_mpdf_coverpage_image_settings' => array(
+			'name' => tra('Coverpage image URL'),
+			'description' => tra('Enter complete URL'),
+			'type' => 'text',
+			'tags' => array('advanced'),
 			'default' => '',
 		),
 		'print_wiki_authors' => array(

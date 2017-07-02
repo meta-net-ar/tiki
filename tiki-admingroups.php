@@ -39,7 +39,6 @@ $inputConfiguration = [
 ];
 
 require_once ('tiki-setup.php');
-
 $access->check_permission('tiki_p_admin');
 
 $auto_query_args = array('group');
@@ -78,9 +77,9 @@ $smarty->assign('trackers', $trackers);
 if ($prefs['feature_user_watches'] == 'y') {
 	if (!empty($user)) {
 		$tikilib = TikiLib::lib('tiki');
-		if ( isset($_REQUEST['watch'] ) ) {
+		if ( isset($_REQUEST['watch']) && $access->checkOrigin()) {
 			$tikilib->add_user_watch($user, 'user_joins_group', $_REQUEST['watch'], 'group');
-		} else if ( isset($_REQUEST['unwatch'] ) ) {
+		} else if ( isset($_REQUEST['unwatch']) && $access->checkOrigin()) {
 			$tikilib->remove_user_watch($user, 'user_joins_group', $_REQUEST['unwatch'], 'group');
 		}
 	}
@@ -93,7 +92,7 @@ if (isset($_REQUEST["home"])) $ag_home = $_REQUEST["home"];
 if (!empty($_REQUEST["defcat"])) $ag_defcat = $_REQUEST["defcat"];
 if (isset($_REQUEST["theme"])) $ag_theme = $_REQUEST["theme"];
 
-if (isset($_REQUEST['clean'])) {
+if (isset($_REQUEST['clean']) && $access->checkOrigin()) {
 	$cachelib = TikiLib::lib('cache');
 	check_ticket('admin-groups');
 	$cachelib->invalidate('grouplist');
@@ -319,7 +318,7 @@ if (!empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
 	echo $data;
 	die;
 }
-if (!empty($_REQUEST['group']) && isset($_REQUEST['import'])) {
+if (!empty($_REQUEST['group']) && isset($_REQUEST['import']) && $access->checkOrigin()) {
 	$fname = $_FILES['csvlist']['tmp_name'];
 	$fhandle = fopen($fname, 'r');
 	$fields = fgetcsv($fhandle, 1000);

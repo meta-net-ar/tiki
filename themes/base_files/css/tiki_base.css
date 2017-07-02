@@ -414,6 +414,11 @@ div.cvsup {
   background: #f9f9f9;
   color: #333333;
 }
+.objectperms .checkBoxHeader:nth-of-type(odd) > div > label,
+.objectperms td.checkBoxCell:nth-of-type(odd),
+.objectperms .checkBoxHeader:nth-of-type(odd) > .checkBoxLabel {
+  background: #ececec;
+}
 .helptool-admin {
   border-left: medium double #777777;
 }
@@ -513,6 +518,11 @@ ul.all_languages > li {
 }
 .cke_editable:hover {
   outline: #555555 dotted 1px;
+}
+.cke_wysiwyg_frame,
+.cke_wysiwyg_div {
+  background: #ffffff !important;
+  color: #333333 !important;
 }
 .tiki_plugin {
   background-color: transparent;
@@ -614,7 +624,8 @@ h6 a.tiki_anchor:hover {
   border-left: 2px solid #777777;
 }
 .mandatory_star {
-  color: #ebccd1;
+  color: #d9534f;
+  font-size: 120%;
 }
 .trackerplugindesc {
   color: #333333;
@@ -878,6 +889,9 @@ div.highlight.adminoptionbox {
   height: 2.2rem;
   width: 2.2rem;
   padding: .2rem;
+}
+input[type="file"] {
+  height: auto;
 }
 address,
 blockquote,
@@ -1738,6 +1752,11 @@ td.numeric {
   text-align: right;
   padding-right: 1px;
 }
+/*	Chrome & safari do not break urls or filenames at all. This causes
+	serous display issues within tables with long urls/filenames.*/
+td.url {
+  word-break: break-all;
+}
 .normal.item th {
   text-align: right;
   padding: .2em .5em;
@@ -1773,22 +1792,9 @@ td.numeric {
 .articletitle h2 {
   margin: 0 0 .3em;
 }
-img.topicimage,
-img.articleimagenofloat,
-img.articleimage {
-  padding: 2px 0;
-  margin-bottom: 10px;
-}
-img.articleimage,
-img.articleimagefloat {
-  margin-right: 4px;
-  float: left;
-  clear: right;
-  padding: 2px 0;
-  margin-bottom: 10px;
-}
-img.articleimage {
-  clear: right;
+.articleheading > div:not(.media-left) {
+  max-width: 100%;
+  overflow: hidden;
 }
 .articletrailer span {
   display: inline-block;
@@ -2872,6 +2878,10 @@ img.pref_dependency {
 .adminanchors .nav li {
   display: inline-block;
 }
+a.admbox.btn.btn-primary.disabled.disabled-clickable {
+  pointer-events: inherit;
+  cursor: pointer;
+}
 .admbox .icon img {
   margin-top: 18px;
 }
@@ -3022,7 +3032,10 @@ table.treetable.objectperms .checkBoxHeader {
   vertical-align: bottom;
   width: 30px;
 }
-tr.subHeader.leaf.collapsed > td:last-of-type,
+table.objectperms th:not(.checkBoxHeader),
+table.objectperms .subHeader td:not(.checkBoxHeader) {
+  text-align: center;
+}
 tr.odd.leaf.collapsed > td:last-of-type,
 tr.even.leaf.collapsed > td:last-of-type {
   text-indent: 15px;
@@ -3031,15 +3044,53 @@ table.treetable .checkBoxHeader > td,
 .table > tbody > tr.subHeader > td {
   vertical-align: bottom;
 }
-table.treetable .checkBoxHeader > div,
+table.objectperms .checkBoxHeader > div,
 table.objectperms > tbody .checkBoxLabel {
-  -webkit-transform: /*translate(0px, -10px)*/ rotate(305deg);
-  transform: /*translate(-20px, -70px)*/ rotate(305deg);
+  -webkit-transform: rotate(305deg);
+  transform: rotate(305deg);
   width: 140px;
   display: block;
   position: absolute;
   left: -15px;
   bottom: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+}
+@-moz-document url-prefix() {
+  table.objectperms .checkBoxHeader > div,
+  table.objectperms > tbody .checkBoxLabel {
+    width: auto;
+  }
+}
+@supports (-ms-ime-align:auto) {
+  table.objectperms .checkBoxHeader > div,
+  table.objectperms > tbody .checkBoxLabel {
+    width: auto;
+  }
+}
+@media all and (-ms-high-contrast: none) {
+  table.objectperms .checkBoxHeader > div,
+  table.objectperms > tbody .checkBoxLabel {
+    width: auto;
+  }
+  /* IE10 */
+  *::-ms-backdrop,
+  table.objectperms .checkBoxHeader > div {
+    width: auto;
+  }
+  /* IE11 */
+}
+table.objectperms .checkBoxHeader > div,
+table.objectperms > tbody .checkBoxLabel {
+  line-height: 2;
+  text-indent: .6em;
+}
+.objectperms .checkBoxHeader > div > label {
+  width: 140px;
+}
+.objectperms .checkBoxHeader > div > input {
+  transform: rotate(-305deg);
 }
 table.treetable.objectperms span.indenter,
 .subHeader .checkBoxHeader .indenter {
@@ -3624,6 +3675,9 @@ body.fullscreen.tiki.navbar-padding {
   .toggle_zone {
     display: none;
   }
+}
+@-ms-viewport {
+  width: auto !important;
 }
 /* becomes height using padding (so it's divided by 2) */
 /* url(icons/loading.gif); */

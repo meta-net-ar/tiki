@@ -17,6 +17,7 @@ admin/include_i18n.php -text
 admin/include_intertiki.php -text
 admin/include_login.php -text
 admin/include_look.php -text
+admin/include_packages.php -text
 admin/include_performance.php -text
 admin/include_profiles.php -text
 admin/include_rating.php -text
@@ -1955,6 +1956,8 @@ installer/schema/20170329_add_color_to_groups_tiki.sql -text
 installer/schema/20170329_larger_category_descriptions_tiki.sql -text
 installer/schema/20170330_merge_hiddenlinks_into_headinglinks_tiki.sql -text
 installer/schema/20170427_update_accounting_journal_cols_tiki.sql -text
+installer/schema/20170531_feature_usability_tiki.sql -text
+installer/schema/20170628_schedulers_menu_tiki_update.sql -text
 installer/schema/999999991_decode_pages_sources_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
@@ -2314,12 +2317,14 @@ lib/core/Math/Formula/Function/MoreThan.php -text
 lib/core/Math/Formula/Function/Mul.php -text
 lib/core/Math/Formula/Function/Not.php -text
 lib/core/Math/Formula/Function/NotEquals.php -text
+lib/core/Math/Formula/Function/NumberFormat.php -text
 lib/core/Math/Formula/Function/Or.php -text
 lib/core/Math/Formula/Function/Pad.php -text
 lib/core/Math/Formula/Function/Random.php -text
 lib/core/Math/Formula/Function/Round.php -text
 lib/core/Math/Formula/Function/SplitList.php -text
 lib/core/Math/Formula/Function/Str.php -text
+lib/core/Math/Formula/Function/StrReplace.php -text
 lib/core/Math/Formula/Function/StrToTime.php -text
 lib/core/Math/Formula/Function/Sub.php -text
 lib/core/Math/Formula/Function/Substring.php -text
@@ -2423,7 +2428,10 @@ lib/core/Reports/Send/EmailBuilder/index.php -text
 lib/core/Reports/Send/index.php -text
 lib/core/Reports/Users.php -text
 lib/core/Reports/index.php -text
+lib/core/Scheduler/Exception/CrontimeFormatException.php -text
+lib/core/Scheduler/Exception/Exception.php -text
 lib/core/Scheduler/Item.php -text
+lib/core/Scheduler/Manager.php -text
 lib/core/Scheduler/Task/CommandTask.php -text
 lib/core/Scheduler/Task/ConsoleCommandTask.php -text
 lib/core/Scheduler/Task/HTTPGetCommandTask.php -text
@@ -2906,6 +2914,7 @@ lib/core/Tiki/FileGallery/Handler/Preloaded.php -text
 lib/core/Tiki/FileGallery/Handler/System.php -text
 lib/core/Tiki/FileGallery/Handler/index.php -text
 lib/core/Tiki/FileGallery/index.php -text
+lib/core/Tiki/Log.php -text
 lib/core/Tiki/MailIn/Account.php -text
 lib/core/Tiki/MailIn/Action/ActionInterface.php -text
 lib/core/Tiki/MailIn/Action/ArticlePut.php -text
@@ -2940,6 +2949,10 @@ lib/core/Tiki/MemoryLimit.php -text
 lib/core/Tiki/Object/Selector.php -text
 lib/core/Tiki/Object/SelectorItem.php -text
 lib/core/Tiki/Object/index.php -text
+lib/core/Tiki/Package/ComposerCli.php -text
+lib/core/Tiki/Package/ComposerManager.php -text
+lib/core/Tiki/Package/ComposerPackage.php -text
+lib/core/Tiki/Package/ComposerPackages.yml -text
 lib/core/Tiki/PageCache.php -text
 lib/core/Tiki/Profile.php -text
 lib/core/Tiki/Profile/ChannelList.php -text
@@ -3417,7 +3430,6 @@ lib/mailin/index.php -text
 lib/mailin/mailinlib.php -text
 lib/mailin/usermailinlib.php -text
 lib/menubuilder/index.php -text
-lib/menubuilder/menu.js -text
 lib/menubuilder/menulib.php -text
 lib/messu/index.php -text
 lib/messu/messulib.php -text
@@ -4214,6 +4226,7 @@ lib/test/TikiLib/TestableTikiLibTest.php -text
 lib/test/TikiLib/TikiLibTest.php -text
 lib/test/TikiLib/UriMergeTest.php -text
 lib/test/TikiLib/UrlEncodeAccentTest.php -text
+lib/test/TikiLib/UserLibTest.php -text
 lib/test/TikiLib/UserWatchesTest.php -text
 lib/test/TikiLib/WikiParserTest.php -text
 lib/test/TikiLib/index.php -text
@@ -4398,6 +4411,12 @@ lib/test/core/Search/paginate.tpl -text
 lib/test/core/Services/Comment/ControllerTest.php -text
 lib/test/core/Services/ResultLoaderTest.php -text
 lib/test/core/Services/index.php -text
+lib/test/core/Tiki/Package/ComposerCliTest.php -text
+lib/test/core/Tiki/Package/ComposerManagerTest.php -text
+lib/test/core/Tiki/Package/Fixtures/CasperJsComposer.json -text
+lib/test/core/Tiki/Package/Fixtures/ComposerPackages.yml -text
+lib/test/core/Tiki/Package/Fixtures/ComposerPackagesBroken.yml -text
+lib/test/core/Tiki/Package/index.php -text
 lib/test/core/TikiDb/TableTest.php -text
 lib/test/core/TikiDb/index.php -text
 lib/test/core/TikiFilter/CallbackTest.php -text
@@ -4773,6 +4792,7 @@ lib/wiki-plugins/wikiplugin_payment.php -text
 lib/wiki-plugins/wikiplugin_paymentlist.php -text
 lib/wiki-plugins/wikiplugin_paypal.php -text
 lib/wiki-plugins/wikiplugin_pdf.php -text
+lib/wiki-plugins/wikiplugin_pdfpage.php -text
 lib/wiki-plugins/wikiplugin_pdfpagebreak.php -text
 lib/wiki-plugins/wikiplugin_perm.php -text
 lib/wiki-plugins/wikiplugin_perspective.php -text
@@ -4918,6 +4938,7 @@ lib/wizard/pages/upgrade_new_in_13.php -text
 lib/wizard/pages/upgrade_new_in_14.php -text
 lib/wizard/pages/upgrade_new_in_15.php -text
 lib/wizard/pages/upgrade_new_in_16.php -text
+lib/wizard/pages/upgrade_new_in_17.php -text
 lib/wizard/pages/upgrade_novice_admin_assistance.php -text
 lib/wizard/pages/upgrade_others.php -text
 lib/wizard/pages/upgrade_permissions_and_logs.php -text
@@ -5230,6 +5251,7 @@ templates/admin/include_messages.tpl -text
 templates/admin/include_metatags.tpl -text
 templates/admin/include_missing_addon_page.tpl -text
 templates/admin/include_module.tpl -text
+templates/admin/include_packages.tpl -text
 templates/admin/include_payment.tpl -text
 templates/admin/include_performance.tpl -text
 templates/admin/include_polls.tpl -text
@@ -6452,6 +6474,7 @@ templates/wizard/upgrade_new_in_13.tpl -text
 templates/wizard/upgrade_new_in_14.tpl -text
 templates/wizard/upgrade_new_in_15.tpl -text
 templates/wizard/upgrade_new_in_16.tpl -text
+templates/wizard/upgrade_new_in_17.tpl -text
 templates/wizard/upgrade_novice_admin_assistance.tpl -text
 templates/wizard/upgrade_others.tpl -text
 templates/wizard/upgrade_permissions_and_logs.tpl -text

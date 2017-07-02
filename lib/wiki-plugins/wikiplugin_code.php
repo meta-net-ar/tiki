@@ -46,8 +46,8 @@ function wikiplugin_code_info()
 			),
 			'wrap' => array(
 				'required' => false,
-				'name' => tra('Word Wrap'),
-				'description' => tra('Enable word wrapping on the code to avoid breaking the layout.'),
+				'name' => tra('Line Wrapping'),
+				'description' => tra('Wrap lines of code which do not fit in the display box\'s width. Enabling avoids overflow or hidden line ends.'),
 				'options' => array(
 					array('text' => '', 'value' => ''),
 					array('text' => tra('Yes'), 'value' => '1'),
@@ -61,6 +61,7 @@ function wikiplugin_code_info()
 				'name' => tra('Colors'),
 				'description' => tra('Any supported language listed at http://codemirror.net/mode/'),
 				'since' => '17',
+				'filter' => 'text',
 				'advanced' => false,
 			),
 			'ln' => array(
@@ -142,18 +143,23 @@ function wikiplugin_code($data, $params)
 
 	$out = $code;
 
-	if (isset($colors) && $colors == '1') {	// remove old geshi setting as it upsets codemirror
-		unset( $colors );
+	if (isset($colors)){
+		if ($colors == '1'){
+			// remove old geshi setting as it upsets codemirror
+			unset( $colors );
+		}else {
+			// codemirror expects language names in lower case
+			$colors = strtolower($colors);
+		}
 	}
 
-	//respect wrap setting when Codemirror is off and set to wrap when Codemirror is on to avoid broken view while
-	//javascript loads
+	// respect wrap parameter when Codemirror is off and line wrap when Codemirror is on to avoid broken view while JavaScript loads.
 	if ((isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') || $wrap == 1) {
 		$pre_style = 'white-space:pre-wrap;'
-		.' white-space:-moz-pre-wrap !important;'
-		.' white-space:-pre-wrap;'
-		.' white-space:-o-pre-wrap;'
-		.' word-wrap:break-word;';
+
+			// If needed, break words
+			. ' overflow-wrap: break-word;' // CSS 3 working draft
+			. ' word-wrap: break-word;'; // Original proprietary Microsoft name
 
 		if (!isset($theme) && isset($prefs['feature_syntax_highlighter_theme'])) {
 			$theme = $prefs['feature_syntax_highlighter_theme'];

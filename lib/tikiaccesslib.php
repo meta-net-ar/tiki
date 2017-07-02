@@ -23,9 +23,13 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 class TikiAccessLib extends TikiLib
 {
 	private $noRedirect = false;
+	//used in CSRF protection methods
 	private $check;
+	private $base;
 	private $origin;
 	private $originSource;
+	private $logMsg = '';
+	private $userMsg = '';
 
 	function preventRedirect($prevent)
 	{
@@ -263,29 +267,6 @@ class TikiAccessLib extends TikiLib
 	}
 
 	/**
-	 *  Check whether script was called directly or included
-	 *  err and die if called directly
-	 *  Typical usage: $access->check_script($_SERVER["SCRIPT_NAME"], basename(__FILE__));
-	 *
-	 *  if feature_redirect_on_error is active, then just goto the Tiki HomePage as configured
-	 *  in Admin->General. -- Damian
-	 *
-	 */
-	function check_script($scriptname, $page)
-	{
-		global $prefs;
-		if (basename($scriptname) == $page) {
-			if ( !isset($prefs['feature_usability']) || $prefs['feature_usability'] == 'n' ) {
-				$msg = tra("This script cannot be called directly");
-				$this->display_error($page, $msg);
-			} else {
-				$msg = tr("Page '%0' cannot be found", $page);
-				$this->display_error($page, $msg, "404");
-			}
-		}
-	}
-
-	/**
 	 * Return session lifetime in seconds
 	 * //TODO - make into a pref once implementation of checkAuthenticity() across Tiki is complete
 	 * @return mixed
@@ -315,57 +296,23 @@ class TikiAccessLib extends TikiLib
 	 * function is to set $access->checkAuthenticity() at the beginning of a file. Then only run the relevant form
 	 * actions based on the $_REQUEST variable if $access->ticketMatch() returns true.
 	 *
-	 * @param string $error
+	 * @param string $error			Used in csrfError() method
 	 * @throws Services_Exception
 	 */
 	function checkAuthenticity($error = 'session')
 	{
-		$originMatch = '';
 		//check ticket
 		$ticketMatch = $this->ticketCheck();
 		if ($this->check === true) {
 			//if ticket matches, check origin
-			$originMatch = $this->originCheck();
 			if ($this->check === true) {
 				//if everything checks, assign ticket in case of redirects (e.g., control panels)
 				TikiLib::lib('smarty')->assign('ticket', $ticketMatch);
 			}
 		}
-		//one of the checks failed
+		//one of the checks failed - send user feedback and log message
 		if ($this->check === false) {
-			//log the failed CSRF check
-			$logMsg = tr('Request to %0 failed CSRF check.', $_SERVER['SCRIPT_NAME']);
-			if ($ticketMatch === false) {
-				$logMsg .= ' ' . tra('Request and server tokens did not match, were missing, or were expired.');
-			}
-			if ($originMatch === false) {
-				if ($this->originSource === 'empty') {
-					$logMsg .= ' ' . tr('Requesting site could not be identified because %0 and %1 were empty.',
-							'HTTP_ORIGIN', 'HTTP_REFERER');
-				} else {
-					//take off query portion in case it's long
-					$url = parse_url($this->origin);
-					$url['port'] = !empty($url['port']) ? ':' . $url['port'] : '';
-					$url = $url['scheme'] . '://' . $url['host'] . $url['port'] . $url['path'];
-					global $base_url;
-					$logMsg = ' ' . tr('The %0 url (%1) does not match this server (%2). This request used a valid CSRF ticket.', $this->originSource,
-							$url, $base_url);
-				}
-			}
-			TikiLib::lib('logs')->add_log('CSRF', $logMsg);
-			//user feedback
-			$userMsg = tra('Potential cross-site request forgery (CSRF) detected. Operation blocked. The security ticket may have expired - reloading the page may help.');
-			switch ($error) {
-				case 'none':
-					break;
-				case 'services':
-					throw new Services_Exception($userMsg, 400);
-					break;
-				case 'session':
-				default:
-					Feedback::error($userMsg, 'session');
-					break;
-			}
+			$this->csrfError($error);
 		}
 	}
 
@@ -377,20 +324,9 @@ class TikiAccessLib extends TikiLib
 	 */
 	private function ticketCheck()
 	{
-		global $jitRequest;
-		if (!empty($_REQUEST['daconfirm'])) {
-			$daconfirm = $_REQUEST['daconfirm'];
-		} elseif (!empty($jitRequest['daconfirm'])) {
-			$daconfirm = $jitRequest->daconfirm->alpha();
-		}
 		//only check ticket and origin if $_REQUEST['daconfirm'] is set
-		if (!empty($daconfirm)) {
-			$ticket = false;
-			if (!empty($_REQUEST['ticket'])) {
-				$ticket = $_REQUEST['ticket'];
-			} elseif (!empty($jitRequest['ticket'])) {
-				$ticket = $jitRequest->ticket->striptags();
-			}
+		if (!empty($_REQUEST['daconfirm'])) {
+			$ticket = !empty($_REQUEST['ticket']) ? $_REQUEST['ticket'] : false;
 			//just in case url decoding is needed
 			if (strpos($ticket, '%') !== false) {
 				$ticket = urldecode($ticket);
@@ -405,11 +341,15 @@ class TikiAccessLib extends TikiLib
 					return $ticket;
 				} else {
 					//ticket is expired
+					$this->userMsg = ' ' . tra('Reloading the page may help.');
+					$this->logMsg = ' ' . tra('Ticket matches but is expired.');
 					$this->check = false;
 					return false;
 				}
 			} else {
 				//ticket doesn't match or is missing
+				$this->userMsg = ' ' . tra('Reloading the page may help.');
+				$this->logMsg = ' ' . tra('Ticket does not match or is missing.');
 				$this->check = false;
 				return false;
 			}
@@ -433,7 +373,7 @@ class TikiAccessLib extends TikiLib
 	 */
 	private function originCheck()
 	{
-		//$base_url is usually host + directory
+		// $base_url is usually host + directory
 		global $base_url;
 		include_once('lib/setup/absolute_urls.php');
 		$this->origin = '';
@@ -441,19 +381,89 @@ class TikiAccessLib extends TikiLib
 		//first check HTTP_ORIGIN
 		if (!empty($_SERVER['HTTP_ORIGIN'])) {
 			//HTTP_ORIGIN is usually host only without trailing slash
-			$this->origin = $_SERVER['HTTP_ORIGIN'] . '/';
+			$this->origin = $_SERVER['HTTP_ORIGIN'];
 			$this->originSource = 'HTTP_ORIGIN';
-		//then check HTTP_REFERER
+			//then check HTTP_REFERER
 		} elseif (!empty($_SERVER['HTTP_REFERER'])) {
 			//HTTP_REFERER is usually the full path (host + directory + file + query)
 			$this->origin = $_SERVER['HTTP_REFERER'];
 			$this->originSource = 'HTTP_REFERER';
 		}
-		//$base_url may need to be the needle or the haystack depending on whether it is being compared to
-		//HTTP_REFERER of HTTP_ORIGIN
-		$this->check = strlen($base_url) >= strlen($this->origin) ? strpos($base_url, $this->origin) === 0
-			: strpos($this->origin, $base_url) === 0;
+		//identify server host + port
+		$base = parse_url($base_url);
+		$baseHost = isset($base['host']) ? $base['host'] : '';
+		$basePort = isset($base['port']) ? ':' . $base['port'] : '';
+		$this->base = $baseHost . $basePort;
+		//identify requesting host + port
+		$origin = parse_url($this->origin);
+		$originHost = isset($origin['host']) ? $origin['host'] : '';
+		$originPort = isset($origin['port']) ? ':' . $origin['port'] : '';
+		$this->origin = $originHost . $originPort;
+		//perform compare
+		$this->check = $this->base === $this->origin;
+
 		return $this->check;
+	}
+
+	/**
+	 * Check http origin/referer and provide error feedback if it doesn't match the site domain
+	 * Differs from checkAuthenticity() in that only the origin/referer is checked, not a ticket
+	 *
+	 * @param string $error			Used in csrfError() method
+	 * @return bool
+	 * @throws Services_Exception
+	 */
+	public function checkOrigin($error = 'session')
+	{
+		$check = $this->originCheck();
+		if (!$check) {
+			if ($this->originSource === 'empty') {
+				$this->userMsg .= ' ' . tra('Required headers are missing.');
+				$this->logMsg .= ' ' . tr('Requesting site could not be identified because %0 and %1 were empty.',
+						'HTTP_ORIGIN', 'HTTP_REFERER');
+			} else {
+				$this->userMsg .= ' ' . tra('Request needs to originate from this site.');
+				$this->logMsg .= ' ' . tr('The %0 host (%1) does not match this server (%2).',
+						$this->originSource, $this->origin, $this->base);
+			}
+			$this->csrfError($error);
+		}
+		return $check;
+	}
+
+	/**
+	 * Generate tiki log entry and user feedback for CSRF errors
+	 *
+	 * @param string $error			Error type: none, services to throw Services_Exception, page to display error page,
+	 * 									session to use Feedback class
+	 * @throws Services_Exception
+	 */
+	private function csrfError($error = 'session')
+	{
+		$this->userMsg = tra('Potential cross-site request forgery (CSRF) detected. Operation blocked.')
+			. $this->userMsg;
+		$this->logMsg = tr('Request to %0 failed CSRF check.', $_SERVER['SCRIPT_NAME'])
+			. $this->logMsg;
+		//log message
+		TikiLib::lib('logs')->add_log('CSRF', $this->logMsg);
+		//user feedback
+		switch ($error) {
+			case 'none':
+				break;
+			case 'services':
+				throw new Services_Exception($this->userMsg, 400);
+				break;
+			case 'page':
+				$smarty = TikiLib::lib('smarty');
+				$smarty->assign('msg', $this->userMsg);
+				$smarty->display('error.tpl');
+				die;
+				break;
+			case 'session':
+			default:
+				Feedback::error($this->userMsg, 'session');
+				break;
+		}
 	}
 
 	/**

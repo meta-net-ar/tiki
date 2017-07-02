@@ -46,6 +46,23 @@ class Search_Formatter
 
 	function getPopulatedList($list, $preload = true)
 	{
+		global $prefs;
+
+		if ($prefs['unified_cache_formatted_result'] === 'y') {
+			$cachelib = TikiLib::lib('cache');
+			$jsonList = $list->jsonSerialize();
+			usort($jsonList['result'], function($a, $b){
+				if ($a['object_id'] == $b['object_id']) {
+        	return 0;
+    		}
+    		return ($a['object_id'] < $b['object_id']) ? -1 : 1;
+			});
+			$cacheKey = json_encode($jsonList).serialize($this->plugin);
+			if ($formattedList = $cachelib->getSerialized($cacheKey, 'searchformat')) {
+				return $formattedList;
+			}
+		}
+
 		$list = Search_ResultSet::create($list);
 		$defaultValues = $this->plugin->getFields();
 
@@ -90,7 +107,13 @@ class Search_Formatter
 			$data[] = $this->plugin->prepareEntry(new Search_Formatter_ValueFormatter($row));
 		}
 
-		return $list->replaceEntries($data);
+		$formattedList = $list->replaceEntries($data);
+
+		if ($prefs['unified_cache_formatted_result'] === 'y') {
+			$cachelib->cacheItem($cacheKey, serialize($formattedList), 'searchformat');
+		}
+
+		return $formattedList;
 	}
 
 	public function renderFilters() {

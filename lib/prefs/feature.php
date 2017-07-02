@@ -578,13 +578,17 @@ function prefs_feature_list($partial = false)
 			'type' => 'flag',
 			'default' => 'n',
 		),
+
+		// Why would this be disabled? FIXME: Disabling is broken (CSS menus display as classic menus). Chealer 2017-06-04
+		// Enhanced by feature_jquery_superfish. Chealer 2017-06-04
 		'feature_cssmenus' => array(
 			'name' => tra('CSS menus'),
-			'description' => tra('CSS (Superfish) Menus.'),
+			'description' => tra('CSS (Superfish) Menus'),
 			'help' => 'Menus',
 			'type' => 'flag',
 			'default' => 'y',
 		),
+
 		'feature_shadowbox' => array(
 			'name' => tra('Shadowbox / ColorBox'),
 			'description' => tra('Display images in a modal popup box'),
@@ -1891,13 +1895,16 @@ function prefs_feature_list($partial = false)
 			),
 			'default' => 'y',	// autocomplete on pages in QuickEdit (more coming soon)
 		),
+
+		// Why would this be disabled? See feature_cssmenus. Chealer 2017-06-04
 		'feature_jquery_superfish' => array(
-			'name' => tra('Superfish'),
-			'description' => tra('Adds animation effects to CSS "Suckerfish" menus.'),
+			'name' => tra('Superfish menu plugin'),
+			'description' => tra('Enhances CSS Superfish menus, notably adding animation effects'),
 			'type' => 'flag',
 			'help' => 'JQuery#Superfish',
 			'default' => 'y',		// Effects on CSS (Suckerfish) menus
 		),
+
 		'feature_jquery_reflection' => array(
 			'name' => tra('Reflection'),
 			'description' => tra('Creates a reflection under an image. Used in Plugin Img with the parameter "class=reflect"'),
@@ -1965,7 +1972,6 @@ function prefs_feature_list($partial = false)
 			'description' => tra('Provides an interactive way to sort and filter data in tables produced with Plugin FancyTable and Plugin TrackerList, as well as administrative tables.'),
 			'type' => 'flag',
 			'help' => 'JQuery#TableSorter',
-			'warning' => tra('This feature can cause problems with JS minify on some systems.'),
 			'default' => 'n',	// sortable tables ([will] override existing) // What does the last comment mean (override existing what)? Why is this disabled by default? Chealer 2017-04-27
 			'keywords' => 'tablesorter',
 		),
@@ -2840,7 +2846,7 @@ function prefs_feature_list($partial = false)
 			'description' => tra('Convert double hyphen \-- to em-dash — and three consecutive dots\... to typographic ellipsis character…'),
 			'type' => 'flag',
 			'tags' => array('basic'),
-			'default' => 'y',
+			'default' => 'n',
 		),
 		'feature_typo_nobreak_spaces' => array(
 			'name' => tra('Smart no-break space'),
@@ -2889,6 +2895,15 @@ function prefs_feature_list($partial = false)
 			'name' => tra('This site is a master server'),
 			'type' => 'flag',
 			'default' => 'n',
+		],
+		'feature_scheduler' => [
+			'name' => tra('Scheduler'),
+			'description' => tra('Provides the ability to run tasks at a scheduled time.'),
+			'help' => 'Scheduler',
+			'type' => 'flag',
+			'view' => 'tiki-admin_schedulers.php',
+			'default' => 'y',
+			'tags' => array('advanced'),
 		],
 	);
 }

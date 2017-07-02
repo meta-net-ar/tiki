@@ -28,7 +28,6 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 function smarty_function_menu($params, $smarty)
 {
 	global $prefs;
-	$headerlib = TikiLib::lib('header');
 
 	$default = array('css' => 'y');
 	if (isset($params['params'])) {
@@ -38,47 +37,21 @@ function smarty_function_menu($params, $smarty)
 	$params = array_merge($default, $params);
 	extract($params, EXTR_SKIP);
 
-	if ($prefs['javascript_enabled'] !== 'y') {
-		$params['css'] = 'y';
-		$params['bootstrap'] = 'n';
-		$params['type'] = 'horiz';
-	}
-
 	if (empty($link_on_section) || $link_on_section == 'y') {
 		$smarty->assign('link_on_section', 'y');
 	} else {
 		 $smarty->assign('link_on_section', 'n');
 	}
+
 	if (empty($translate)) {
 		$translate = 'y';
 	}
 	$smarty->assignByRef('translate', $translate);
+
 	if (empty($menu_cookie)) {
 		$menu_cookie = 'y';
 	}
 	$smarty->assignByRef('menu_cookie', $menu_cookie);
-	if (empty($drilldown)) {
-		$drilldown = 'n';
-	}
-	if ($params['css'] !== 'n' && $prefs['feature_cssmenus'] == 'y') {
-		static $idCssmenu = 0;
-		if (empty($params['type'])) {
-			$params['type'] = 'vert';
-		}
-		$headerlib->add_jsfile('lib/menubuilder/menu.js');
-		$tpl = 'tiki-user_cssmenu.tpl';
-		$smarty->assign('menu_type', $params['type']);
-		if (! isset($css_id)) {//adding $css_id parameter to customize menu id and prevent automatic id renaming when a menu is removed
-			$smarty->assign('idCssmenu', $idCssmenu++);
-		} else {
-			$smarty->assign('idCssmenu', $css_id);
-		}
-		if ($drilldown == 'y') {
-			$smarty->assign('drilldownmenu', $drilldown);
-		}
-	} else {
-		$tpl = 'tiki-user_menu.tpl';
-	}
 
 	list($menu_info, $channels) = get_menu_with_selections($params);
 	$smarty->assign('menu_channels', $channels['data']);
@@ -114,22 +87,42 @@ function smarty_function_menu($params, $smarty)
 		}
 		$smarty->assign('list', $structured);
 		switch ($params['bootstrap']) {
-		case 'navbar':
-			return $smarty->fetch('bootstrap_menu_navbar.tpl');
-		case  'y':
-			if(isset($params['type']) && $params['type'] == "horiz"){
+			case 'navbar':
 				return $smarty->fetch('bootstrap_menu_navbar.tpl');
-			}else{
+			case 'y':
+				if (isset($params['type']) && $params['type'] == "horiz"){
+					return $smarty->fetch('bootstrap_menu_navbar.tpl');
+				} else {
+					return $smarty->fetch('bootstrap_menu.tpl');
+				}
+			default:
 				return $smarty->fetch('bootstrap_menu.tpl');
-			}
-		default:
-			return $smarty->fetch('bootstrap_menu.tpl');
 		}
+	}
+	if ($params['css'] !== 'n' && $prefs['feature_cssmenus'] == 'y') {
+		static $idCssmenu = 0;
+		if (! isset($css_id)) {//adding $css_id parameter to customize menu id and prevent automatic id renaming when a menu is removed
+			$smarty->assign('idCssmenu', $idCssmenu++);
+		} else {
+			$smarty->assign('idCssmenu', $css_id);
+		}
+
+		if (empty($params['type'])) {
+			$params['type'] = 'vert';
+		}
+		$smarty->assign('menu_type', $params['type']);
+
+		if (! empty($drilldown) && $drilldown == 'y') {
+			$smarty->assign('drilldownmenu', 'y');
+		}
+
+		$tpl = 'tiki-user_cssmenu.tpl';
+	} else {
+		$tpl = 'tiki-user_menu.tpl';
 	}
 
 	$data = $smarty->fetch($tpl);
-	$menulib = TikiLib::lib('menu');
-	return $menulib->clean_menu_html($data);
+	return MenuLib::clean_menu_html($data);
 }
 
 function compare_menu_options($a, $b)
@@ -183,11 +176,7 @@ function get_menu_with_selections($params)
 
 	foreach ($channels['data'] as & $item) {
 		if (!empty($menu_info['parse']) && $menu_info['parse'] === 'y') {
-			if (TikiLib::lib('parser')->contains_html_block($item['name'])) {
-				$item['block'] = true;
-			} else {
-				$item['block'] = false;
-			}
+			$item['block'] = TikiLib::lib('parser')->contains_html_block($item['name']); // Only used for CSS menus
 			$item['name'] = preg_replace('/(.*)\n$/', '$1', $item['name']);	// parser adds a newline to everything
 		}
 	}

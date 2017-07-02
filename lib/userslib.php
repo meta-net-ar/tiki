@@ -1144,6 +1144,10 @@ class UsersLib extends TikiLib
 	 */
 	function check_saml_authentication($user_cookie_site) {
 		global $prefs, $base_url;
+		
+		if ($prefs['auth_method'] != 'saml'||!class_exists('OneLogin_Saml2_Auth')) {
+			return;
+		}
 
 		$clicked_on_saml_link = false;
 
@@ -1227,6 +1231,10 @@ class UsersLib extends TikiLib
 	 */
 	function get_saml_auth() {
 		$samlSettingsInfo = $this->get_saml_settings();
+
+		if (!class_exists('OneLogin_Saml2_Auth')) {
+			return;
+		}
 
 		try {
 			$auth = new OneLogin_Saml2_Auth($samlSettingsInfo);
@@ -1598,16 +1606,45 @@ class UsersLib extends TikiLib
 		}
 		$u = array('login' => $user);
 
-		if (isset($attributes[$prefs['auth_ldap_nameattr']])) {
-			$u['realName'] = $attributes[$prefs['auth_ldap_nameattr']];
-		}
+		$userPreferenceToLdapPreferenceMap = array(
+			'realName' => 'auth_ldap_nameattr',
+			'email' => 'auth_ldap_emailattr',
+			'country' => 'auth_ldap_countryattr',
+		);
 
-		if (isset($attributes[$prefs['auth_ldap_emailattr']])) {
-			$u['email'] = $attributes[$prefs['auth_ldap_emailattr']];
-		}
+		foreach ($userPreferenceToLdapPreferenceMap as $preference => $ldapPreference) {
 
-		if (isset($attributes[$prefs['auth_ldap_countryattr']])) {
-			$u['country'] = $attributes[$prefs['auth_ldap_countryattr']];
+			if ($preference == 'email') {
+				$userPreferenceValue = $this->get_user_email($user);
+			} else {
+				$userPreferenceValue = $this->get_user_preference($user, $preference);
+			}
+			$isSetLdapPreferenceValue = isset($attributes[$prefs[$ldapPreference]]);
+			$ldapPreferenceValue = $isSetLdapPreferenceValue ? $attributes[$prefs[$ldapPreference]] : '';
+
+			if ($userPreferenceValue && empty($ldapPreferenceValue)) {
+				$u[$preference] = '';
+			} else {
+				if ($isSetLdapPreferenceValue) {
+					// Ldap attributes can (by default) have multiple values, check if the current user preference is one of
+					// the values of the attribute, in that case keep the same value
+					if (is_array($ldapPreferenceValue)
+						&& $userPreferenceValue
+						&& in_array($userPreferenceValue, $ldapPreferenceValue)
+					) {
+						$u[$preference] = $userPreferenceValue;
+						continue;
+					}
+					if (is_array($ldapPreferenceValue)) {
+						// Ldap attributes can (by default) have multiple values
+						// so we always take the fist form the list is is a multi value field
+						$ldapPreferenceValue = reset($ldapPreferenceValue);
+					}
+					if ($isSetLdapPreferenceValue) {
+						$u[$preference] = $ldapPreferenceValue;
+					}
+				}
+			}
 		}
 
 		if (count($u) > 1) {
@@ -2999,6 +3036,24 @@ class UsersLib extends TikiLib
 	}
 
 	/**
+	 * Helps recognize nicknames which anonymous users have chosen
+	 * A leading tab is for recognizing anonymous entries. Real usernames don't start with a tab
+	 * @param string $username	user nickname or name
+	 * @return string				string which should be displayed
+	 */
+	function distinguish_anonymous_users($username="")
+	{
+		if ( empty($username) ) {
+			return "";
+		}
+		if ( $username[0] == "\t" ) {
+			$username = $username . ' (' . tra('unverified') . ')';
+		}
+		return $username;
+	}
+
+
+	/**
 	 * Creates DOM tag for user info with popup or not depending on prefs etc
 	 * @param string $auser     user to find info for (current user if empty)
 	 * @param string $body      content of the anchor tag (user name if empty)
@@ -4194,7 +4249,7 @@ class UsersLib extends TikiLib
 				'type' => 'file galleries',
 				'admin' => false,
 				'prefs' => array('feature_file_galleries'),
-				'scope' => 'global',
+				'scope' => 'object',
 			),
 			array(
 				'name' => 'tiki_p_view_file_gallery',

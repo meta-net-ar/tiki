@@ -13,62 +13,63 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 }
 function smarty_modifier_tasklink($taskId, $class_name="link", $offset="0", $sort_mode="priority_desc")
 {
-	global $tasklib, $user, $prefs;
-	$userlib = TikiLib::lib('user');
+	global $tasklib, $user, $prefs, $smarty;
 	$tikilib = TikiLib::lib('tiki');
 
 	include_once('lib/tasks/tasklib.php');
 
 	$info = $tasklib->get_task($user, $taskId);
-	$mouseover = '';
 	if ($prefs['feature_community_mouseover'] == 'y') {
 		$description = "";
 
 		$my_length = strlen($info['description']);
-		$my_pos=0;	
-		$my_count=0;	
-		$append = '';
+		$my_pos=0;
+		$line = 0;
 		if ( $my_length > 0 ) {
 			do {
-				$my_count++;
+				$line++;
 				$my_pos = strpos($info['description'], "\n", ($my_pos+1));
-			} while (($my_count <= 15) && ($my_pos!=''));
+			} while (($line <= 15) && ($my_pos!=''));
 		}
 
-		if (($my_length >= 1300) || ($my_count >= 16)) {
-			if ($my_count < 15) {
+		if (($my_length >= 1300) || ($line >= 16)) {
+			if ($line < 15) {
 				$my_pos = 1300;
 			}
 			$description .= substr($info['description'], 0, min(1300, $my_pos+1));
-			$append .= "<br /><center><span class=\'highlight\'>" . tra("Text cut here") . "</span></center>";
+			$append = "<br /><center><span class=\'highlight\'>" . tra("Text cut here") . "</span></center>";
 		} else {
 			$description = $info['description'];
+			$append = '';
 		}
 
-		$description =str_replace("\"", "\'", str_replace("'", "\\'", str_replace("\n", "", (str_replace("\r\n", "<br />", TikiLib::lib('parser')->parse_data($description)))))) . $append;
+		// FIXME: Truncated Tiki syntax cannot be parsed.
+		$description = TikiLib::lib('parser')->parse_data($description) . $append;
 
-		$fillin = tra("Task") . ' ' . tra("from") . ' <b>' . $info['creator'] . '</b> ' . tra("for") .
+		$tooltipContent = tra("Task") . ' ' . tra("from") . ' <b>' . $info['creator'] . '</b> ' . tra("for") .
 			' <b>' . $info['user'] . '</b>.<br />' . tra("Priority") . ': <b>' . $info['priority'] . '</b>, (<b>' .
 					$info['percentage'] . '%</b>) ' . tra('done') . '.<br />';
 
 		if ($info['start'] != 0 ) {
-			$fillin .= tra("Start date:") . " " . $tikilib->date_format("%H:%M -- %d. %e. %Y", $info['start']) . "<br />";
+			$tooltipContent .= tra("Start date:") . " " . $tikilib->date_format("%H:%M -- %d. %e. %Y", $info['start']) . "<br />";
 		} else {
-			$fillin .= tra("Start date:") . " -<br />";
+			$tooltipContent .= tra("Start date:") . " -<br />";
 		}
 
 		if ($info['end']) {
-			$fillin .= tra("End date:") . " " . $tikilib->date_format("%H:%M -- %d. %e. %Y", $info['end']) . "<br />";
+			$tooltipContent .= tra("End date:") . " " . $tikilib->date_format("%H:%M -- %d. %e. %Y", $info['end']) . "<br />";
 		} else {
-			$fillin .= tra("End date:") . " -<br />";
+			$tooltipContent .= tra("End date:") . " -<br />";
 		}
 
-		$fillin .= "<hr />" . $description;
+		$tooltipContent .= "<hr />" . $description;
 
-		$mouseover = " onmouseover=\"return overlib('<table><tr><td>" . $fillin . "</td></tr></table>',HAUTO,VAUTO,CAPTION,'<div style=\"text-align: center;\">&nbsp; " .
-			tra("Task") . ":&nbsp;&nbsp;" . htmlspecialchars($info['title']) . "</div>');\" onmouseout=\"nd()\"";
+		$smarty->loadPlugin('smarty_function_popup');
+		$popupAttributes = smarty_function_popup(array('text' => $tooltipContent, 'fullhtml' => true), $smarty);
+	} else {
+		$popupAttributes = '';
 	}
-	$content = "<a class='" . $class_name . "'" . $mouseover . " href='tiki-user_tasks.php?taskId=" . $taskId . "&amp;tiki_view_mode=view&amp;offset=" .
+	$content = "<a class='" . $class_name . "' " . $popupAttributes . " href='tiki-user_tasks.php?taskId=" . $taskId . "&amp;tiki_view_mode=view&amp;offset=" .
 		$offset . "&amp;sort_mode=" . $sort_mode . "' ";
 	if ($info['status'] == 'c') {
 		$content .= "style=\"text-decoration:line-through;\"";

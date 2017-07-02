@@ -36,7 +36,8 @@ function saveScheduler()
 			die;
 		}
 
-		$class = new $className();
+		$logger = new Tiki_Log('Schedulers', \Psr\Log\LogLevel::ERROR);
+		$class = new $className($logger);
 
 		$taskName = strtolower($class->getTaskName());
 		$taskParams = $class->getParams();
@@ -109,6 +110,8 @@ function saveScheduler()
 require_once('tiki-setup.php');
 
 $access = TikiLib::lib('access');
+$access->checkAuthenticity();
+$access->check_feature('feature_scheduler');
 $access->check_permission(array('tiki_p_admin_schedulers'));
 
 $auto_query_args = array();
@@ -116,7 +119,7 @@ $cookietab = 1;
 
 $schedLib = TikiLib::lib('scheduler');
 
-if (isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset($_POST['scheduler']))) {
+if ((isset($_POST['new_scheduler']) || (isset($_POST['editscheduler']) && isset($_POST['scheduler']))) && $access->ticketMatch()) {
 
 	// If scheduler saved, it redirects to the schedulers page, cleaning the add/edit scheduler form.
 	$schedulerinfo = saveScheduler();

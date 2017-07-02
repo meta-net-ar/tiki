@@ -6,6 +6,7 @@
 // $Id$
 
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class Scheduler_Task_ShellCommandTask extends Scheduler_Task_CommandTask
 {
@@ -17,8 +18,20 @@ class Scheduler_Task_ShellCommandTask extends Scheduler_Task_CommandTask
 			return false;
 		}
 
-		$process = new Process($params['shell_command']);
-		$process->run();
+		$command = $params['shell_command'];
+
+		$this->logger->debug(sprintf(tra('Executing shell command: %s'), $command));
+		$process = new Process($command);
+		if (!empty($params['timeout'])) {
+			$process->setTimeout($params['timeout']);
+			$process->setIdleTimeout($params['timeout']);
+		}
+		try {
+			$process->run();
+		} catch( ProcessTimedOutException $e ) {
+			$this->errorMessage = $e->getMessage();
+			return false;
+		}
 
 		if ($success = $process->isSuccessful()) {
 			$this->errorMessage = $process->getOutput();
@@ -35,6 +48,11 @@ class Scheduler_Task_ShellCommandTask extends Scheduler_Task_CommandTask
 				'name' => tra('Shell command'),
 				'type' => 'text',
 				'required' => true,
+			),
+			'timeout' => array(
+				'name' => tra('Run timeout'),
+				'type' => 'text',
+				'required' => false,
 			),
 		);
 	}

@@ -17,6 +17,9 @@ class Services_H5P_Controller
 		if ($prefs['feature_file_galleries'] != 'y') {
 			throw new Services_Exception_Disabled('feature_file_galleries');
 		}
+		if (! function_exists('curl_init')) {
+			throw new Services_Exception_NotAvailable(tr('H5P requires the CURL extension to be installed in PHP'));
+		}
 	}
 
 	function action_embed($input)
@@ -46,7 +49,7 @@ class Services_H5P_Controller
 							'index' => $index,
 						]),
 						'_text' => tra('Create H5P content'),
-						'_class' => 'create-h5p-content',
+						'_class' => 'create-h5p-content btn-xs',
 					], $smarty),
 				];
 
@@ -91,7 +94,7 @@ class Services_H5P_Controller
 					'index' => $index,
 				]),
 				'_text' => tra('Edit'),
-				'_class' => 'edit-h5p-content',
+				'_class' => 'edit-h5p-content btn-xs',
 			], $smarty);
 
 		}
