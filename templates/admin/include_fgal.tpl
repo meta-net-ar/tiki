@@ -209,7 +209,7 @@
 			{preference name=fgal_asynchronous_indexing}
 			<div class="adminoptionbox">
 				<fieldset>
-					<legend>{tr}Handlers{/tr}{help url="File+Gallery+Config#File_galleries_search_indexing"}</legend>
+					<legend>{tr}Handlers{/tr}{help url="Search-within-files" desc='If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.'}</legend>
 					<div class="adminoptionbox">
 						<div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
 							<ul>
@@ -316,6 +316,13 @@
 						{preference name='h5p_save_content_frequency'}
 					</div>
 					{preference name='h5p_export'}
+
+					{remarksbox type="info" title="{tr}H5P Info{/tr}"}
+						{tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
+						<a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">
+							{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}
+						</a>
+					{/remarksbox}
 				</div>
 			</fieldset>
 
@@ -332,7 +339,7 @@
 			</fieldset>
 
 			<fieldset>
-				<legend>{tr}SCORM{/tr}</legend>
+				<legend>{tr}SCORM{/tr}{help desc="SCORM is a package format for Learning Management Systems. Tiki can create tracker items based on the SCORM metadata. This allows you to manage SCORM packages within Tiki."}</legend>
 				{preference name=scorm_enabled}
 				<div class="adminoptionboxchild" id="scorm_enabled_childcontainer">
 					{preference name=scorm_tracker}

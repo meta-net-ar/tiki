@@ -116,14 +116,14 @@
 							{icon name="module"} {tr}Modules{/tr}
 						</a>
 					</li>
-					{if $prefs.feature_schedulers eq "y"}
+					{if $prefs.feature_scheduler eq "y"}
 					<li>
 						<a href="tiki-admin_schedulers.php">
 							{icon name="calendar"} {tr}Scheduler{/tr}
 						</a>
 					</li>
 					{/if}
-					{if $prefs.feature_debug_console}
+					{if $prefs.feature_debug_console eq 'y'}
 						<li>
 							<a href="{query _type='relative' show_smarty_debug=1}">
 								{icon name="bug"} {tr}Smarty debug window{/tr}

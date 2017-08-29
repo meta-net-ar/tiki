@@ -59,21 +59,9 @@ class PdfGenerator
 				}
 			}
 		} elseif ( $prefs['print_pdf_from_url'] == 'mpdf' ) {
+			self::setupMPDFPathConstants();
 			$path = $prefs['print_pdf_mpdf_path'];
-			if (substr($path, -1) !== '/') {
-				$path .= '/';
-			}
-			if ( ! empty($path) && is_readable($path) && file_exists($path . 'mpdf.php')) {
-				self::setupMPDFCacheLocation();
-
-				//setting up dir for custom fonts and mpdf default fonts
-				define('_MPDF_TTFONTPATH',TIKI_PATH.'/lib/pdf/fontdata/fontttf/');
-		        define('_MPDF_SYSTEM_TTFONTS', $path. '/ttfonts/');
-
-
-				if (!class_exists('mPDF')){
-					include_once($path . 'mpdf.php');
-				}
+			if (class_exists('mPDF')){ // Autoload will take care of loading the mpdf file
 				if (! is_writable(_MPDF_TEMP_PATH) ||! is_writable(_MPDF_TTFONTDATAPATH)) {
 					$this->error = tr('mPDF "%0" and "%1" directories must be writable', 'tmp',
 						'ttfontdata');
@@ -83,9 +71,9 @@ class PdfGenerator
 				}
 			} else {
 				if (!empty($path)) {
-					$this->error = tr('mPDF not found in path "%0"', $path);
+					$this->error = tr('mPDF not found in path "%0", and is not installed using packages.', $path);
 				} else {
-					$this->error = tr('The mPDF path has not been set.');
+					$this->error = tr('The mPDF path has not been set, and is not installed using packages.');
 				}
 			}
 		}
@@ -102,33 +90,39 @@ class PdfGenerator
      */
     function getPdf( $file, array $params, $pdata='' )
 	{
-		global $prefs, $base_url, $tikiroot;
+		return TikiLib::lib('tiki')->allocate_extra(
+			'print_pdf',
+			function () use ( $file, $params, $pdata ) {
+				global $prefs, $base_url, $tikiroot;
 
-		if ( $prefs['auth_token_access'] == 'y' ) {
-			$perms = Perms::get();
+				if ( $prefs['auth_token_access'] == 'y' ) {
+					$perms = Perms::get();
 
-			require_once 'lib/auth/tokens.php';
-			$tokenlib = AuthTokens::build($prefs);
-			$params['TOKEN'] = $tokenlib->createToken(
-				$tikiroot . $file, $params, $perms->getGroups(),
-				array('timeout' => 120)
-			);
-		}
-		if (is_array($params['printpages']) || is_array($params['printstructures'])) {
-			if (is_array($params['printpages'])) { 
-				$params['printpages'] = implode('&', $params['printpages']);
+					require_once 'lib/auth/tokens.php';
+					$tokenlib = AuthTokens::build($prefs);
+					$params['TOKEN'] = $tokenlib->createToken(
+						$tikiroot . $file, $params, $perms->getGroups(),
+						array('timeout' => 120)
+					);
+				}
+				if (is_array($params['printpages']) || is_array($params['printstructures'])) {
+					if (is_array($params['printpages'])) { 
+						$params['printpages'] = implode('&', $params['printpages']);
+					}
+					else  { 
+						$params['printpages'] = implode('&', $params['printstructures']);
+					}
+					//getting parsed data
+					foreach($params['pages'] as $page) { 
+						$pdata.= $page['parsed'];
+					}
+				}
+				$url = $base_url . $file . '?' . http_build_query($params, '', '&');
+				$session_params = session_get_cookie_params();
+				return $this->{$this->mode}( $url,$pdata,$params);
 			}
-			else  { 
-				$params['printpages'] = implode('&', $params['printstructures']);
-			}
-			//getting parsed data
-			foreach($params['pages'] as $page) { 
-				$pdata.= $page['parsed'];
-			}
-		}
-		$url = $base_url . $file . '?' . http_build_query($params, '', '&');
-        $session_params = session_get_cookie_params();
-	return $this->{$this->mode}( $url,$pdata,$params);	}
+		);
+	}
 
     /**
      * @param $url
@@ -229,10 +223,17 @@ class PdfGenerator
 	}
 
 	/**
-	 * Setup mPDF Cache locations to a folder (mpdf) inside the filesystem cache
+	 * Setup mPDF Constants related with PATHS in teh filesystem
+	 * It sets the cache locations to a folder (mpdf) inside the filesystem cache
+	 * It sets a extra folder to load fonts
 	 */
-	static public function setupMPDFCacheLocation()
+	static public function setupMPDFPathConstants()
 	{
+		// Set custom Fonts path
+		if (!defined('_MPDF_SYSTEM_TTFONTS')){
+			define('_MPDF_SYSTEM_TTFONTS',TIKI_PATH.'/lib/pdf/fontdata/fontttf/');
+		}
+
 		// set cache paths
 		$cache = new CacheLibFileSystem();
 		$mPDFBaseCachePath = $cache->folder . '/mpdf/';
@@ -292,11 +293,7 @@ class PdfGenerator
        $this->_getImages($html,$tempImgArr);
        
 	   $this->_parseHTML($html);
-	   self::setupMPDFCacheLocation();
-		if (!class_exists('mPDF')){
-	    	include_once($this->location . 'mpdf.php');
-		}
-		
+	   self::setupMPDFPathConstants();
 
 	  	$mpdf=new mPDF('utf-8',$pdfSettings['pagesize'],'','',$pdfSettings['margin_left'],$pdfSettings['margin_right'] , $pdfSettings['margin_top'] , $pdfSettings['margin_bottom'] , $pdfSettings['margin_header'] , $pdfSettings['margin_footer'] ,$pdfSettings['orientation']);
 
@@ -341,8 +338,23 @@ class PdfGenerator
 		  $themecss=str_replace(array("media print","color : fff"),array("media p","color : #fff"),$themecss);
 		  $basecss=str_replace(array("media print","color : fff"),array("media p","color : #fff"),$basecss);
 		}
-		$cssStyles=str_replace(array(".tiki","opacity: 0;"),array("","fill: #fff;opacity:0.3;stroke:black"),'<style>'.$basecss.$themecss.$printcss.$this->bootstrapReplace().'</style>'); //adding css styles with first page content	
+		
 		$pdfPages=$this->getPDFPages($html,$pdfSettings);
+		$ind=1;
+		foreach($pdfPages as $pdfPage) {
+			$bgColor='';$backgroundImage='';
+			$pdfPage['orientation']=="L"?$orientation='landscape':$orientation='portrait';
+			if($pdfPage['background_image']!='') {
+				$backgroundImage='background-image:url(\''.$pdfPage['background_image'].'\');background-repeat:no-repeat;background-position:center center; ';
+			}
+			if($pdfPage['background']!='') {
+				$bgColor='background-color:'.$pdfPage['background'].';  ';
+			}
+			$pageCSS.='@page page'.$ind.'{size:'.$orientation.';'.$backgroundImage.$bgColor.'} ';
+			$ind++;
+		}
+		
+		$cssStyles=str_replace(array(".tiki","opacity: 0;"),array("","fill: #fff;opacity:0.3;stroke:black"),'<style>'.$basecss.$themecss.$printcss.$pageCSS.$this->bootstrapReplace().'</style>'); //adding css styles with first page content
 		//cover page checking
 		if($pdfSettings['coverpage_text_settings']!='' || ($pdfSettings['coverpage_image_settings']!='' && $pdfSettings['coverpage_image_settings']!='off')) {
 			$coverPage=explode("|",$pdfSettings['coverpage_text_settings']);
@@ -361,6 +373,7 @@ class PdfGenerator
 <div style="text-align:'.$coverPage[2].';margin-top:30%;color:'.$coverPage[4].'"><div style=margin-bottom:10px;font-size:50px>'.$coverPage[0].'</div>'.$coverPage[1].'</div></div></body>');
 
 		}	
+		$pageNo=1;
 		//end of coverpage generation			
 		foreach($pdfPages as $pdfPage){
 		 if(strip_tags(trim($pdfPage['pageContent']))!=''){	
@@ -377,8 +390,9 @@ class PdfGenerator
 			elseif($pdfPage['footer']){
 				$footer=$pdfPage['footer'];	
 			}
-	    	$mpdf->SetHeader(str_ireplace("{PAGETITLE}",$params['page'],$header));
-			$mpdf->AddPage($pdfPage['orientation'],'','','','',$pdfPage['margin_left'],$pdfPage['margin_right'] , $pdfPage['margin_top'] , $pdfPage['margin_bottom'] , $pdfPage['margin_header'] , $pdfPage['margin_footer'],'','','','','','','','','',$pdfPage['pagesize']);
+			
+			$mpdf->SetHeader(str_ireplace("{PAGETITLE}",$params['page'],$header));
+			$mpdf->AddPage($pdfPage['orientation'],'','','','',$pdfPage['margin_left'],$pdfPage['margin_right'] , $pdfPage['margin_top'] , $pdfPage['margin_bottom'] , $pdfPage['margin_header'] , $pdfPage['margin_footer'],'','','','','','','','','page'.$pageNo,$pdfPage['pagesize']);
 			$mpdf->SetFooter(str_ireplace("{PAGETITLE}",$params['page'],$footer)); //footer needs to be reset after page content is added
 		
 			//checking watermark on page
@@ -386,11 +400,26 @@ class PdfGenerator
 			$mpdf->showWatermarkText = true;
 			$mpdf->SetWatermarkImage($pdfPage['watermark_image'], 0.15, '');
 			$mpdf->showWatermarkImage = true;
-			$mpdf->WriteHTML($cssStyles.$pdfPage['pageContent']);
+			//hyperlink check
+			if($pdfPage['hyperlinks']!="") {
+				$pdfPage['pageContent']=$this->processHyperlinks($pdfPage['pageContent'],$pdfPage['hyperlinks'],$pageCounter++);
+			}
+			if($pdfPage['columns']>1) {
+				$mpdf->SetColumns($pdfPage['columns'],'justify');
+			}
+			else {
+				$mpdf->SetColumns(1,'justify');
+			}
+			$backgroundImage='';$bgColor="";
+			if($pdfPage['background']!='') {
+				$bgColor="background-color:".$pdfPage['background'];
+			}	
+			
+			$mpdf->WriteHTML('<html><body style="'.$bgColor.';margin:0px;padding:0px;">'.$cssStyles.$pdfPage['pageContent'].'</body></html>');
+			$pageNo++;
 			$cssStyles=''; //set to blank after added with first page
 		 }
 		}
-		
 		$mpdf->setWatermarkText($pdfSettings['watermark']);
 		$mpdf->SetWatermarkImage($pdfSettings['watermark_image'], 0.15, '');
 		//resetting header,footer and watermark to blank 
@@ -444,6 +473,10 @@ class PdfGenerator
 		$pdfSettings['watermark_image']=$prefs['print_pdf_mpdf_watermark_image'];
 		$pdfSettings['coverpage_text_settings']=str_ireplace("{PAGETITLE}",$params['page'],$prefs['print_pdf_mpdf_coverpage_text_settings']);
 		$pdfSettings['coverpage_image_settings']=str_ireplace("{PAGETITLE}",$params['page'],$prefs['print_pdf_mpdf_coverpage_image_settings']);
+		$pdfSettings['hyperlinks']=$prefs['print_pdf_mpdf_hyperlinks'];
+		$pdfSettings['columns']=$prefs['print_pdf_mpdf_columns'];				
+		$pdfSettings['background']=$prefs['print_pdf_mpdf_background'];				
+		$pdfSettings['background_image']=$prefs['print_pdf_mpdf_background_image'];				
 
 		if($pdfSettings['toc']=='y'){
 			//toc levels
@@ -475,7 +508,7 @@ class PdfGenerator
 			if ($page->hasAttributes()) {
 				foreach ($page->attributes as $attr) {
 					$pages[$attr->nodeName]=$attr->nodeValue;
-					$pageTag.= " ".$attr->nodeName."=\"".$attr->nodeValue."\"";
+						$pageTag.= " ".$attr->nodeName."=\"".htmlentities($attr->nodeValue)."\"";
 				}
 			}
 			$pageTag.=">";
@@ -485,11 +518,11 @@ class PdfGenerator
 				$pages[$setting]=$value;
 			}
 		}
+		
 		if($pages['pagesize']=="Tabloid") {
 			$pages['pagesize']=array(279,432); }
 		elseif($pages['orientation']=='L') {
 			$pages['pagesize']=$pages['pagesize'].'-'.$pages['orientation']; }
-		
 			//dividing content in segments
 			$ppages=explode($pageTag,$mainContent,2);
 			$lpages=explode("</pdfpage>",$ppages[1],2);
@@ -499,11 +532,13 @@ class PdfGenerator
 				$prePage=$pdfSettings;
 				$prePage['pageContent']=$ppages[0];
 				$pageData[]=$prePage;
+				
 			}
 			$pages['pageContent']= $doc->saveXML($page);
 			$pageData[]=$pages;
 			if(trim(strip_tags($lpages[1]))!="") {
 				$mainContent=$lpages[1];
+				
 			}	
 		}
 		//no pages found
@@ -516,7 +551,7 @@ class PdfGenerator
 			$lastPage=$pdfSettings;
 			$lastPage['pageContent']=$lpages[1];
 			$pageData[]=$lastPage;
-		}  
+		}
 		return $pageData;
 	}
 	
@@ -714,8 +749,50 @@ $(".convert-mailto").removeClass("convert-mailto").each(function () {
 			   unlink("temp/#".$tid."_".session_id().".txt");
 			}
 		}
-		
-		
+
+		function processHyperlinks($content,$hyperlinkSetting,$pageCounter){
+			$doc = new DOMDocument();
+			$doc->loadHTML($content);
+			$anchors = $doc->getElementsByTagName('a');
+			$len = $anchors->length;
+			$href='';
+			$hrefDiv=$doc->createElement('div');
+
+			for($i=0,$linkCnt=1; $i<$len; $i++) {
+    			$anchor = $anchors->item(0);
+    			$link = $doc->createElement('span', $anchor->nodeValue);
+				$link->setAttribute('class', $anchor->getAttribute('class'));
+				
+				//checking if links to be added as footnote
+				if($hyperlinkSetting!="off") {
+					// Check if there is a url in the text
+					$linkSup=$doc->createElement("sup");
+					if(preg_match("/(http|https)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/", $anchor->getAttribute('href'), $url)) {					
+						
+						$linkAn=$doc->createElement("anchor","[".$linkCnt."]");
+						$linkAn->setAttribute("href","#".$pageCounter."lnk".$linkCnt);
+						$linkSup->appendChild($linkAn);
+						$link->appendChild($linkSup);	
+						$hrefData=$doc->createElement("a",$anchor->getAttribute('href'));
+						$hrefData->setAttribute("name",$pageCounter."lnk".$linkCnt);
+						$hrefDiv->setAttribute("style","border-top:1px solid #ccc;line-height:1.2em");
+						$hrefDiv->appendChild($doc->createElement("sup","&nbsp;[".$linkCnt."]&nbsp;"));
+						$hrefDiv->appendChild($hrefData);
+						$hrefDiv->appendChild($doc->createElement("br"));
+						$linkCnt++;
+					}
+				}
+				$anchor->parentNode->replaceChild($link, $anchor);
+				
+				
+			}
+
+			$hrefDiv->setAttribute('class',"footnotearea");
+			$doc->getElementsByTagName('body')->item(0)->appendChild($hrefDiv);
+			$content=$doc->saveHTML();
+			return str_replace("anchor","a",$content);
+			
+		}// End of processHyperlinks
 } //END OF PDF CLASS
 
 

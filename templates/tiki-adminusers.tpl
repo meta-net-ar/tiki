@@ -246,7 +246,13 @@
 																{icon name="help" _menu_text='y' _menu_icon='y' alt="{tr}User information{/tr}"}
 															</a>{$liend}
 														{/if}
-
+														{if $users[user].user ne 'admin' and $users[user].user ne $user and $tiki_p_admin eq 'y'}
+															{$libeg}
+																<a href='#' onClick="$('#login-switchuser_1').val('{$users[user].user|username|escape:javascript}'); $('#form_switch_user').submit(); return false;">
+																	{icon name="user" _menu_text='y' _menu_icon='y' alt="{tr}Switch to this user{/tr}"}
+																</a>
+															{$liend}
+														{/if}
 														{if $users[user].user ne 'admin'}
 															{$libeg}<a href="{bootstrap_modal controller=user action=remove_users checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows}">
 																{icon name="remove" _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
@@ -358,6 +364,14 @@
 				<input type="hidden" name="numrows" value="{$numrows|escape}">
 				<input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
 			</form>
+
+			<form id='form_switch_user' action='tiki-login.php' method='post'>
+				{ticket}
+				<input type="hidden" name="su" value="1" class="form-control" />
+				<input type="hidden" name="username" id="login-switchuser_1" value="" class="form-control" />
+			</form>
+
+
 		{if !$ts.enabled}
 			{pagination_links cant=$cant step=$numrows offset=$offset}{/pagination_links}
 		{/if}
@@ -441,9 +455,9 @@
 					{else}
 						{include file='password_jq.tpl' ignorejq='y'}
 						<div class="form-group">
-							<label class="col-sm-3 col-md-2 control-label" for="pass1">{tr}New Password{/tr}</label>
+							<label class="col-sm-3 col-md-2 control-label" for="pass1">{if isset($userinfo.userId)}{tr}New password{/tr}{else}{tr}Password{/tr}{/if}</label>
 							<div class="col-sm-7 col-md-6">
-								<input type="password" class="form-control" placeholder="{tr}New Password{/tr}" name="pass" id="pass1">
+								<input type="password" class="form-control" placeholder="{tr}Password{/tr}" name="pass" id="pass1">
 								<div style="margin-left:5px;">
 									<div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
 									<div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
@@ -454,9 +468,9 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 col-md-2 control-label" for="pass2">{tr}Repeat Password{/tr}</label>
+							<label class="col-sm-3 col-md-2 control-label" for="pass2">{if isset($userinfo.userId)}{tr}Confirm new password{/tr}{else}{tr}Confirm password{/tr}{/if}</label>
 							<div class="col-sm-7 col-md-6">
-								<input type="password" class="form-control" name="passAgain" id="pass2" placeholder="{tr}Repeat Password{/tr}">
+								<input type="password" class="form-control" name="passAgain" id="pass2" placeholder="{tr}Password{/tr}">
 								<div id="mypassword2_text">
 									<div id="match" style="display:none">
 										{icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}

@@ -240,6 +240,14 @@ function wikiplugin_trackercalendar_info()
 				'default' => 0,
 				'filter' => 'int',
 			),
+			'colormap' => array(
+				'required' => false,
+				'name' => tra('Colormap for coloring'),
+				'description' => tr('Colormap to be used when segmenting the information using the coloring field.
+					Each map is composed of value and color separated with a comma, use pipes to separate multiple colormaps: %0', '<code>1,#6cf|2,#6fc</code>'),
+				'since' => '18.0',
+				'filter' => 'text',
+			),
 			'fDayofWeek' => array(
 				'required' => false,
 				'name' => tra('First day of the Week'),
@@ -383,6 +391,7 @@ function wikiplugin_trackercalendar($data, $params)
 		array(
 			'id' => 'trackercalendar' . ++$id,
 			'trackerId' => $jit->trackerId->int(),
+			'colormap' => base64_encode($jit->colormap->none()),
 			'begin' => $jit->begin->word(),
 			'end' => $jit->end->word(),
 			'resource' => $resourceField,

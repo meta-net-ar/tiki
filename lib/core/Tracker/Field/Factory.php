@@ -106,6 +106,8 @@ class Tracker_Field_Factory
 	{
 		if (isset($this->infoMap[$type])) {
 			return $this->infoMap[$type];
+		} else {
+			return [];
 		}
 	}
 	
@@ -121,6 +123,7 @@ class Tracker_Field_Factory
 	function getHandler($field_info, $itemData = array())
 	{
 		if (!isset($field_info['type'])) {
+			// When does a field have no type? Should this not throw an exception? Chealer 2017-05-23 
 			return null;
 		}
 		$type = $field_info['type'];

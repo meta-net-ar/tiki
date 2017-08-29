@@ -9,9 +9,9 @@ function prefs_cas_list()
 {
 	return array(
 		'cas_create_user_tiki' => array(
-			'name' => tra('Create user if not already a registered user'),
-			'description' => tra(''),
+			'name' => tra('Create user if not registered in Tiki'),
 			'type' => 'flag',
+			'description' =>tr('If a user was externally authenticated, but not found in the Tiki user database, Tiki will create an entry in its user database.'),
 			'perspective' => false,
 			'default' => 'n',
 			),
@@ -24,8 +24,8 @@ function prefs_cas_list()
 			),
 		'cas_skip_admin' => array(
 			'name' => tra('Use Tiki authentication for Admin login'),
-			'description' => tra(''),
 			'type' => 'flag',
+			'description' => tra('The user “admin” will be authenticated by <b>only</b> using Tiki’s user database. This option has no effect on users other than “admin”.'),
 			'perspective' => false,
 			'default' => 'n',
 			),
@@ -99,13 +99,13 @@ function prefs_cas_list()
 			'perspective' => false,
 			'options' => array (
 				'0' => tra('Never'),
-				'60' => tra('1 minute'),
-				'120' => tra('2 minutes'),
-				'300' => tra('5 minutes'),
-				'600' => tra('10 minutes'),
-				'900' => tra('15 minutes'),
-				'1800' => tra('30 minutes'),
-				'3600' => tra('1 hour'),
+				'60' => '1 '.tra('minute'),
+				'120' => '2 '.tra('minutes'),
+				'300' => '5 '.tra('minutes'),
+				'600' => '10 '.tra('minutes'),
+				'900' => '15 '.tra('minutes'),
+				'1800' => '30 '.tra('minutes'),
+				'3600' => '1 '.tra('hour'),
 				),
 			'default' => '0',
 			),

@@ -21,9 +21,9 @@ function prefs_user_list($partial = false)
 			'tags' => array('basic'),
 		),
 		'user_unique_email' => array(
-			'name' => tra('User e-mails must be unique'),
-			'description' => tra('User e-mails must be unique'),
+			'name' => tra('User emails must be unique'),
 			'help' => 'User+Preferences',
+			'description' => tra('User e-mails must be unique'),
 			'type' => 'flag',
 			'default' => 'n',
 		),
@@ -43,6 +43,7 @@ function prefs_user_list($partial = false)
 		'user_assigned_modules' => array(
 			'name' => tra('Users can configure modules'),
 			'help' => 'Users+Configure+Modules',
+			'description' => tr('Modules won’t be reflected in the screen until you configure them from MyTiki->Modules, including the admin user'),
 			'tags' => array('experimental'),	// This feature seems broken and will mess the display of the adventurous user. See https://dev.tiki.org/item5871
 			'type' => 'flag',
 			'default' => 'n',
@@ -267,7 +268,7 @@ function prefs_user_list($partial = false)
 			'format' => $fieldFormat,
 		),
 		'user_selector_threshold' => array(
-			'name' => tra('Maximum users n drop-down lists'),
+			'name' => tra('Maximum users in drop-down lists'),
 			'description' => tra('Prevents out-of-memory and performance issues when the user list is very large, by using a jQuery autocomplete text input box.'),
 			'type' => 'text',
 			'size' => '5',

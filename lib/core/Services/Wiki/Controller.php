@@ -91,11 +91,13 @@ class Services_Wiki_Controller
 	 */
 	function action_remove_pages($input)
 	{
+		global $user;
+
 		$check = Services_Exception_BadRequest::checkAccess();
 		//first pass - show confirm modal popup
 		if (!empty($check['ticket'])) {
 			$items = $input->asArray('checked');
-			$fitems = Perms::simpleFilter(['type' => 'wiki page'], 'pageName', 'remove', $items);
+			$fitems = Perms::simpleFilter('wiki page', 'pageName', 'remove', $items);
 			if (count($fitems) > 0) {
 				$v = $input->version->text();
 				if (count($fitems) == 1) {
@@ -176,6 +178,7 @@ class Services_Wiki_Controller
 				if ($all || $extra['one']) {
 					$vdesc = tr('All versions');
 					$verb = 'have';
+					$noversionsleft = true;
 				} elseif ($last) {
 					$vdesc = tr('The last version');
 					$verb = 'has';
@@ -195,6 +198,66 @@ class Services_Wiki_Controller
 					'items' => $items,
 				];
 				Feedback::success($feedback, 'session');
+				// Create a Semantic Alias (301 redirect) if this option was selected by user.
+				$createredirect = !empty($input['create_redirect']) && $input['create_redirect'] === 'y';
+				if ($createredirect && $noversionsleft) {
+					$destinationPage = $input['destpage'];
+					if ($destinationPage == "") {
+						$msg = tr('Redirection page not specified. 301 redirect not created.');
+						$feedback = [
+							'tpl' => 'action',
+							'mes' => $msg
+						];
+						Feedback::warning($feedback, 'session');
+					} else {
+						$appendString = "";
+						foreach ($items as $page) {
+							// Append on the destination page's content the following string,
+							// where $page is the name of the deleted page:
+							// "\r\n~tc~(alias($page))~/tc~"
+							// We use the ~tc~ so that it doesn't make the destination page look ugly
+							$pageHyphensForSpaces = str_replace(" ","-",$page); // Otherwise pages with spaces won't work
+							if (sizeof($items)>1) {
+								$comment = tr('Semantic aliases (301 Redirects) to this page were created when other pages were deleted');
+							} else {
+								$comment = tr('A semantic alias (301 Redirect) to this page was created when page %0 was deleted',$page);
+							}
+							$appendString .= "\r\n~tc~ (alias($pageHyphensForSpaces)) ~/tc~";
+						}
+						if (TikiLib::lib('tiki')->page_exists($destinationPage)) {
+							// Get wiki page content
+							$infoDestinationPage = TikiLib::lib('tiki')->get_page_info($destinationPage);
+							$page_data = $infoDestinationPage['data'];
+							$page_data .= $appendString;
+							TikiLib::lib('tiki')->update_page($destinationPage, $page_data, $comment, $infoDestinationPage['user'], TikiLib::lib('tiki')->get_ip_address());
+							if (sizeof($items)>1) {
+								$msg = tr('301 Redirects to the following page were created:');
+							} else {
+								$msg = tr('A 301 Redirect to the following page was created:');
+							}
+						} else {
+							if (sizeof($items)>1) {
+								$page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when other pages were removed. Please edit and write the definitive contents.");
+							} else {
+								$page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when another page was removed. Please edit and write the definitive contents.");
+							}
+							$page_data .= $appendString;
+							// Create a new page
+							TikiLib::lib('tiki')->create_page($destinationPage, 0, $page_data, TikiLib::lib('tiki')->now, $comment, $user, TikiLib::lib('tiki')->get_ip_address());
+							if (sizeof($items)>1) {
+								$msg = tr('The following page and 301 Redirects to it were created:');
+							} else {
+								$msg = tr('The following page and a 301 Redirect to it were created:');
+							}
+						}
+						$feedback = [
+							'tpl' => 'action',
+							'mes' => $msg,
+							'items' => $destinationPage,
+						];
+						Feedback::note($feedback, 'session');
+					}
+				}
 			}
 			//return to page
 			if ($count === 1 && ($all || $extra['one'])
@@ -299,7 +362,7 @@ class Services_Wiki_Controller
 		//first pass - show confirm modal popup
 		if (!empty($check['ticket'])) {
 			$items = $input->asArray('checked');
-			$fitems = Perms::simpleFilter(['type' => 'wiki page'], 'pageName', 'view', $items);
+			$fitems = Perms::simpleFilter('wiki page', 'pageName', 'view', $items);
 			if (count($fitems) > 0) {
 				if (count($fitems) === 1) {
 					$msg = tr('Print the following page?');
@@ -345,7 +408,7 @@ class Services_Wiki_Controller
 		//first pass - show confirm modal popup
 		if (!empty($check['ticket'])) {
 			$items = $input->asArray('checked');
-			$fitems = Perms::simpleFilter(['type' => 'wiki page'], 'pageName', 'view', $items);
+			$fitems = Perms::simpleFilter('wiki page', 'pageName', 'view', $items);
 			if (count($fitems) > 0) {
 				include_once 'lib/pdflib.php';
 				$pdf = new PdfGenerator();
@@ -409,7 +472,7 @@ class Services_Wiki_Controller
 		//first pass - show confirm modal popup
 		if (!empty($check['ticket'])) {
 			$items = $input->asArray('checked');
-			$fitems = Perms::simpleFilter(['type' => 'wiki page'], 'pageName', 'lock', $items);
+			$fitems = Perms::simpleFilter('wiki page', 'pageName', 'lock', $items);
 			foreach ($fitems as $key => $page) {
 				if (TikiLib::lib('wiki')->is_locked($page)) {
 					unset($fitems[$key]);
@@ -740,4 +803,3 @@ class Services_Wiki_Controller
 		}
 	}
 }
-

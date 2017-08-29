@@ -708,6 +708,41 @@ class TrackerLib extends TikiLib
 		return $this->table('tiki_trackers')->fetchFullRow(array('trackerId' => (int) $trackerId));
 	}
 
+	/**
+	 * Marks fields as empty
+	 * @param array $fields
+	 * @return array
+	 */
+	public function mark_fields_as_empty($fields)
+	{
+		$lastHeader = -1;
+		$elemSinceLastHeader = 0;
+		foreach ($fields as $key => $trac) {
+			if (! (empty($trac['value']) && empty($trac['cat'])
+					&& empty($trac['links']) && $trac['type'] != 's'
+					&& $trac['type'] != 'STARS' && $trac['type'] != 'h'
+					&& $trac['type'] != 'l' && $trac['type'] != 'W')
+					&& ! ($trac['options_array'][0] == 'password' && $trac['type'] == 'p')) {
+				if ($trac['type'] == 'h') {
+					if ($lastHeader > 0 && $elemSinceLastHeader == 0) {
+						$fields[$lastHeader]['field_is_empty'] = true;
+					}
+					$lastHeader = $key;
+					$elemSinceLastHeader = 0;
+				} else {
+					$elemSinceLastHeader++;
+				}
+				// this has a value
+				continue;
+			}
+			$fields[$key]['field_is_empty'] = true;
+		}
+		if ($lastHeader > 0 && $elemSinceLastHeader == 0) {
+			$fields[$lastHeader]['field_is_empty'] = true;
+		}
+		return $fields;
+	}
+
 	// includePermissions: Include the permissions of each tracker in its element's "permissions" subelement
 	public function list_trackers($offset=0, $maxRecords=-1, $sort_mode='name_asc', $find='', $includePermissions = false)
 	{
@@ -1092,6 +1127,13 @@ class TrackerLib extends TikiLib
 
 		if (!empty($filter)) {
 			$mid2 = array();
+			if (!empty($filter['comment'])) {
+				$cat_table .= ' LEFT JOIN `tiki_comments` tc ON tc.`object` = tti.`itemId` AND tc.`objectType` = "trackeritem"';
+				$mid2[] = '(tc.`title` LIKE ? OR tc.`data` LIKE ?)';
+				$bindvars[] = '%'.$filter['comment'].'%';
+				$bindvars[] = '%'.$filter['comment'].'%';
+				unset($filter['comment']);
+			}
 			$this->parse_filter($filter, $mid2, $bindvars);
 			if (!empty($mid2)) {
 				$mid .= ' AND '.implode(' AND ', $mid2);
@@ -1117,7 +1159,6 @@ class TrackerLib extends TikiLib
 		}
 
 		if ( substr($sort_mode, 0, 2) == 'f_' or !empty($filterfield) ) {
-			$cat_table = '';
 			if ( substr($sort_mode, 0, 2) == 'f_' ) {
 				$csort_mode = 'sttif.`value` ';
 				$sort_tables = ' LEFT JOIN (`tiki_tracker_item_fields` sttif)'
@@ -1319,11 +1360,12 @@ class TrackerLib extends TikiLib
 				} elseif ($filter['type'] == 'r' && ($fv || $ev)) {
 					$cv = $fv ? $fv : $ev;
 
+					$cat_table .= " LEFT JOIN tiki_tracker_item_fields ttif{$i}_remote ON ttif$i.`value` = ttif{$i}_remote.`itemId` AND ttif{$i}_remote.`fieldId` = " . intval($filter['options_array'][1]) . ' ';
 					if (is_numeric($cv)) {
-						$mid .= " AND ttif$i.`value` = ? ";
+						$mid .= " AND ( ttif{$i}_remote.`value` LIKE ? OR ttif$i.`value` = ? ) ";
+						$bindvars[] = $ev ? $ev : "%$fv%";
 						$bindvars[] = $cv;
 					} else {
-						$cat_table .= " INNER JOIN tiki_tracker_item_fields ttif{$i}_remote ON ttif$i.`value` = ttif{$i}_remote.`itemId` AND ttif{$i}_remote.`fieldId` = " . intval($filter['options_array'][1]) . ' ';
 						$mid .= " AND ttif{$i}_remote.`value` LIKE ? ";
 						$bindvars[] = $ev ? $ev : "%$fv%";
 					}
@@ -1705,6 +1747,10 @@ class TrackerLib extends TikiLib
 		$itemFields = $this->itemFields();
 		$fields = $this->fields();
 
+		if (! empty($itemId)) {	// check the item really exists
+			$itemId = (int) $this->items()->fetchOne('itemId', [ 'itemId' => $itemId]);
+		}
+
 		$fil = array();
 		if (!empty($itemId)) {
 			$fil = $itemFields->fetchMap('fieldId', 'value', array('itemId' => $itemId));
@@ -2077,6 +2123,8 @@ class TrackerLib extends TikiLib
 		}
 
 		// mandatory fields check
+		$utilities = new \Services_Tracker_Utilities;
+		$definition = Tracker_Definition::get($trackerId);
 		$line = 0;
 		$errors = array();
 		while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter)) !== false) {
@@ -2086,41 +2134,33 @@ class TrackerLib extends TikiLib
 					$data[$i] = utf8_encode($data[$i]);
 				}
 			}
+			$itemId = 0;
 			$datafields = array();
 			for ($i = 0; $i < $max; ++$i) {
+				if ($header[$i] == 'itemId') {
+					$itemId = $data[$i];
+				}
 				if (!preg_match('/ -- $/', $header[$i])) {
 					continue;
 				}
 				$h = preg_replace('/ -- $/', '', $header[$i]);
 				foreach ($fields['data'] as $field) {
 					if ($field['name'] == $h) {
-						$datafields[$field['fieldId']] = $field;
-						$datafields[$field['fieldId']]['value'] = $data[$i];
+						$datafields[$field['permName']] = $data[$i];
 					}
 				}
 			}
-			$line_errors = $this->check_field_values(array('data' => $datafields), array(), $trackerId, '');
-			if( count($line_errors['err_mandatory']) > 0 ) {
-				$names = array();
-				foreach ($line_errors['err_mandatory'] as $f) {
-					$names[] = $f['name'];
-				}
-				$errors[] = tr('Line %0: the following mandatory fields are missing: %1', $line, implode(', ', $names));
-			}
-			foreach ($line_errors['err_value'] as $f) {
-				if (! empty($f['errorMsg'])) {
-					$errors[] = tr('Line %0: invalid value in %1: %2', $line, $f['name'], $f['errorMsg']);
-				} else {
-					$errors[] = tr('Line %0: invalid value in %0', $line, $f['name']);
-				}
+			$lineErrors = $utilities->validateItem($definition, array('itemId' => $itemId, 'fields' => $datafields));
+			foreach ($lineErrors as $error) {
+				$errors[] = tr('Line %0:', $line).' '.$error;
 			}
 		}
 
 		if( count($errors) > 0 ) {
-			Feedback::error(tr('Import file contains errors. Please review and fix before importing.'));
-			foreach( $errors as $error ) {
-				Feedback::error($error);
-			}
+			Feedback::error(array(
+				'title' => tr('Import file contains errors. Please review and fix before importing.'),
+				'mes' => $errors
+			));
 			return 0;
 		}
 
@@ -2642,8 +2682,13 @@ class TrackerLib extends TikiLib
 
 		// ---- save image list before sql query ---------------------------------
 		$fieldList = $this->list_tracker_fields($trackerId, 0, -1, 'name_asc', '');
+
+		$statusTypes = $this->status_types();
+		$statusString = isset($statusTypes[$status]['label'] ) ? $statusTypes[$status]['label'] : '';
+
 		$imgList = array();
 		foreach ($fieldList['data'] as $f) {
+			$data_field[] = array('name'=>tr($f['name']),'value'=>$this->get_item_value($trackerId, $itemId, $f['fieldId']));
 			if ( $f['type'] == 'i' ) {
 				$imgList[] = $this->get_item_value($trackerId, $itemId, $f['fieldId']);
 			}
@@ -2659,6 +2704,9 @@ class TrackerLib extends TikiLib
 				$smarty->assign('mail_user', $user);
 				$smarty->assign('mail_action', 'deleted');
 				$smarty->assign('mail_itemId', $itemId);
+				$smarty->assign('mail_item_desc', $itemId);
+				$smarty->assign('mail_fields', $data_field);
+				$smarty->assign('mail_field_status', $statusString);
 				$smarty->assign('mail_trackerId', $trackerId);
 				$smarty->assign('mail_trackerName', $trackerName);
 				$smarty->assign('mail_data', '');
@@ -5896,10 +5944,18 @@ class TrackerLib extends TikiLib
 		}
 	}
 
+	/**
+	 * Called when accessing contents of a Tracker UserSelector field.
+	 * Purpose is to parse the csv string of usernames stored inside and format an array.
+	 * @param $value csv-formatted string
+	 * @return array of resulting usernames
+	 */
 	public function parse_user_field($value) {
-		return array_map(function($user) {
-			return trim($user);
-		}, str_getcsv($value));
+		return array_filter(
+			array_map(function($user) {
+				return trim($user);
+			}, str_getcsv($value))
+		);
 	}
 }
 

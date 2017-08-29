@@ -118,12 +118,16 @@ class Tracker_Field_ItemsList extends Tracker_Field_Abstract implements Tracker_
 
 	function renderInput($context = array())
 	{
-		if( empty($this->getOption('fieldIdHere')) ) {
+		if (empty($this->getOption('fieldIdHere'))) {
 			return $this->renderOutput();
 		} else {
 			TikiLib::lib('header')->add_jq_onready(
 				'
-$("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . $this->getOption('fieldIdHere') . ']").change(function(e) {
+$("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . $this->getOption('fieldIdHere') . ']").change(function(e, initial) {
+	if(initial == "initial" && $(this).data("triggered-' . $this->getInsertId() . '")) {
+		return;
+	}
+	$(this).data("triggered-' . $this->getInsertId() . '", true);
 	$.getJSON(
 		"tiki-ajax_services.php",
 		{
@@ -142,9 +146,13 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
 			$ddl.trigger("change");
 		}
 	);
-}).trigger("change");
+});
 			'
 			);
+			// this is smart enough to attach only once even if multiple fields attach the same code
+			TikiLib::lib('header')->add_jq_onready('
+$("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . $this->getOption('fieldIdHere') . ']").trigger("change", "initial");
+', 1);
 			return '<div name="' . $this->getInsertId() . '"></div>';
 		}
 	}
@@ -165,7 +173,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
 			$items = array_keys($list);
 		}
 
-		if ($context['list_mode'] === 'csv') {
+		if (isset($context['list_mode']) && $context['list_mode'] === 'csv') {
 			return implode('%%%', $list);
 		} else {
 			return $this->renderTemplate(
@@ -365,7 +373,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
 					$displayFields,
 					$status,
 					' ',
-					$context['list_mode'],
+					isset($context['list_mode']) ? $context['list_mode'] : '',
 					$this->getOption('linkToItems'),
 					$this->getOption('displayFieldIdThereFormat')
 				);

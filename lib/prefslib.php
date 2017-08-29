@@ -92,8 +92,21 @@ class PreferencesLib
 			}
 		}
 
+		/* FIXME: Dependencies are not enforced currently. TODO: Activate disabled code below to enforce dependencies
+		// The value element is deprecated. Use either "configuredValue" or "effectiveValue"  instead.
+		$info['configuredValue'] = $info['effectiveValue'] = $info['value'];
+		*/
 		if ( $deps && isset( $info['dependencies'] ) ) {
 			$info['dependencies'] = $this->getDependencies($info['dependencies']);
+			/* TODO: test
+			if ($info['type'] == 'flag' &&
+				$info['effectiveValue'] = 'y' && // Optimization
+					array_filter(array_column($info['dependencies'], 'met'), function($boolean) {
+						return ! $boolean;
+					})) {
+				$info['effectiveValue'] = 'n';
+			}
+			*/
 		}
 
 		if ( $deps && isset( $info['packages_required'] ) && !empty($info['packages_required']) ) {
@@ -507,7 +520,7 @@ class PreferencesLib
 						'label' => $profile,
 						'type' => 'profile',
 						'link' => 'tiki-admin.php?page=profiles&list=List&profile=' . urlencode($profile),
-						'met' =>
+						'met' => // FIXME: $info is false, the following surely won't behave as intended. This should indicate whether the profile was applied.
 						( $info['type'] == 'flag' && $info['value'] == 'y' )
 							|| ( $info['type'] != 'flag' && ! empty( $info['value'] ) )
 					);
@@ -892,8 +905,11 @@ class PreferencesLib
 	function setFilters($tags)
 	{
 		global $user;
-		$tikilib = TikiLib::lib('tiki');
-		$tikilib->set_user_preference($user, 'pref_filters', implode(',', $tags));
+
+		if (! in_array('basic', $tags)) {
+			$tags[] = 'basic';
+		}
+		TikiLib::lib('tiki')->set_user_preference($user, 'pref_filters', implode(',', $tags));
 	}
 
 	private function getEnabledFilters()

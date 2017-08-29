@@ -10,7 +10,8 @@ function prefs_webcron_list()
 	return array(
 		'webcron_enabled' => array(
 			'name' => tra('Enabled'),
-			'description' => tra(''),
+			'description' => tra('Cron jobs can be triggered from a URL or JavaScript. A token is required to run the cron manually'),
+			'help' => 'Cron#Web_Cron',
 			'type' => 'flag',
 			'default' => 'n',
 		),
@@ -26,7 +27,7 @@ function prefs_webcron_list()
 			'default' => 'both',
 		),
 		'webcron_run_interval' => array(
-			'name' => tra('Run interval (seconds)'),
+			'name' => tra('Run interval'),
 			'description' => tra('The amount of time of each run'),
 			'type' => 'text',
 			'size' => 5,

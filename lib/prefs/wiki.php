@@ -83,7 +83,7 @@ function prefs_wiki_list($partial = false)
 		),
 		'wiki_page_name_above' => array(
 			'name' => tra('Display page name above page'),
-			'description' => tra('Display page name above page instead of inside page.'),
+			'description' => tra('Tiki will display the page name in small text at the top of each page (above the page’s content).'),
 			'type' => 'flag',
 			'default' => 'n',
 		),
@@ -122,7 +122,7 @@ function prefs_wiki_list($partial = false)
 		),
 		'wiki_actions_bar' => array(
 			'name' => tra('Wiki action bar location'),
-			'description' => tra('Buttons: Save, Preview, Cancel, ...'),
+			'description' => tra('Specify the location of the edit buttons (such as Save, Preview, and Cancel) when editing wiki pages.'),
 			'type' => 'list',
 			'options' => array(
 				'top' => tra('Top'),
@@ -467,6 +467,8 @@ function prefs_wiki_list($partial = false)
 		),
 		'wiki_list_backlinks' => array(
 			'name' => tra('Backlinks'),
+			'description' => tra('Allows users to view a list of pages, called backlinks, that link to the current page.'),
+			'help' => 'Backlinks',
 			'type' => 'flag',
 			'default' => 'n',
 		),
@@ -586,6 +588,7 @@ function prefs_wiki_list($partial = false)
 			'name' => tra('Backlink page names maximum displayed length'),
 			'hint' => tra($truncationHint),
 			'type' => 'text',
+			'units' => tra('characters'),
 			'size' => '3',
 			'filter' => 'digits',
 			'dependencies' => array( 'feature_backlinks' ),
@@ -668,7 +671,7 @@ function prefs_wiki_list($partial = false)
 		),
 		'wiki_toc_offset' => array(
 			'name' => tr('Table of contents offset'),
-			'description' => tr('Offset for table of contents. Useful when there is a fixed navbar (Default is 10). If used with inline TOC, will behave as a top margin.'),
+			'description' => tr('Offset for table of contents. Useful when there is a fixed navigation bar. If used with inline TOC, will behave as a top margin.'),
 			'type' => 'text',
 			'filter' => 'digits',
 			'units' => tra('pixels'),

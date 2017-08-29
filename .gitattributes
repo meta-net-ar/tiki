@@ -62,7 +62,7 @@ db/index.php -text
 db/install.ini.dist -text
 db/preconfiguration.php -text
 db/tiki-db.php -text
-db/tiki-secdb_17.0beta_mysql.sql -text
+db/tiki-secdb_17.0_mysql.sql -text
 db/tiki.sql -text
 db/tiki_1.8to1.9.sql -text
 db/tiki_1.9to2.0.sql -text
@@ -163,6 +163,7 @@ doc/devtools/tim/tim-snapshot -text
 doc/devtools/tim/tim-ssh -text
 doc/devtools/tim/tim-svn-cache -text
 doc/devtools/tim/tim.conf -text
+doc/devtools/translate.php -text
 doc/devtools/update.dogfoodserver.sh -text
 doc/devtools/update_english_strings.php -text
 doc/devtools/upto_4.1_delete_all_cetgory_perms.sql -text
@@ -1276,6 +1277,8 @@ img/profiles/profile_thumb_countries_by_region.png -text
 img/profiles/profile_thumb_custom_contact_form.png -text
 img/profiles/profile_thumb_dynamic_items_list.png -text
 img/profiles/profile_thumb_easy_geoblog.png -text
+img/profiles/profile_thumb_execute_on_list.png -text
+img/profiles/profile_thumb_hidable_top_navbar.png -text
 img/profiles/profile_thumb_menu_on_wiki_page.png -text
 img/profiles/profile_thumb_mobile.png -text
 img/profiles/profile_thumb_multilingual_wiki.png -text
@@ -1415,6 +1418,7 @@ img/wiki_up/README -text
 img/wiki_up/index.php -text
 /index.php -text
 installer/.htaccess -text
+installer/Patch.php -text
 installer/composer-patches/adodb-php__remove-the-check-if-the-adodb-php_ext-is-enabled.patch -text
 installer/composer-patches/adodb-php__remove_references_to_adodb_extension.patch -text
 installer/composer-patches/composer-patches.json -text
@@ -1958,9 +1962,14 @@ installer/schema/20170330_merge_hiddenlinks_into_headinglinks_tiki.sql -text
 installer/schema/20170427_update_accounting_journal_cols_tiki.sql -text
 installer/schema/20170531_feature_usability_tiki.sql -text
 installer/schema/20170628_schedulers_menu_tiki_update.sql -text
+installer/schema/20170702_wiki_url_scheme_pref_default_tiki.php -text
+installer/schema/20170717_add_missing_trackeritem_attachment_backlinks_tiki.php -text
+installer/schema/20170726_remove_article_hashes_tiki.sql -text
+installer/schema/20170726_tabular_config_tiki.sql -text
 installer/schema/999999991_decode_pages_sources_tiki.php -text
 installer/schema/99999999_image_plugins_kill_tiki.php -text
 installer/schema/index.php -text
+installer/schema/optional_20170801_initialize_article_nbreads_tiki.php -text
 installer/script/index.php -text
 installer/shell.php -text
 installer/tiki-installer.php -text
@@ -2526,7 +2535,9 @@ lib/core/Search/Formatter/DataSource/Declarative.php -text
 lib/core/Search/Formatter/DataSource/Interface.php -text
 lib/core/Search/Formatter/DataSource/index.php -text
 lib/core/Search/Formatter/Factory.php -text
+lib/core/Search/Formatter/Plugin/AbstractTableTemplate.php -text
 lib/core/Search/Formatter/Plugin/ArrayTemplate.php -text
+lib/core/Search/Formatter/Plugin/CsvTemplate.php -text
 lib/core/Search/Formatter/Plugin/Interface.php -text
 lib/core/Search/Formatter/Plugin/SmartyTemplate.php -text
 lib/core/Search/Formatter/Plugin/WikiTemplate.php -text
@@ -2697,6 +2708,7 @@ lib/core/Services/Kaltura/index.php -text
 lib/core/Services/Language/Controller.php -text
 lib/core/Services/Language/TransifexController.php -text
 lib/core/Services/Language/TranslationController.php -text
+lib/core/Services/Language/TranslationReader.php -text
 lib/core/Services/Language/Utilities.php -text
 lib/core/Services/Language/index.php -text
 lib/core/Services/MailIn/Controller.php -text
@@ -2822,6 +2834,7 @@ lib/core/Tiki/Command/IndexCatchUpCommand.php -text
 lib/core/Tiki/Command/IndexOptimizeCommand.php -text
 lib/core/Tiki/Command/IndexRebuildCommand.php -text
 lib/core/Tiki/Command/InstallCommand.php -text
+lib/core/Tiki/Command/InstallerLockCommand.php -text
 lib/core/Tiki/Command/LessCompileCommand.php -text
 lib/core/Tiki/Command/ListExecuteCommand.php -text
 lib/core/Tiki/Command/MailInPollCommand.php -text
@@ -2829,6 +2842,7 @@ lib/core/Tiki/Command/MailQueueSendCommand.php -text
 lib/core/Tiki/Command/MultiTikiListCommand.php -text
 lib/core/Tiki/Command/MultiTikiMoveCommand.php -text
 lib/core/Tiki/Command/NotificationDigestCommand.php -text
+lib/core/Tiki/Command/PatchCommand.php -text
 lib/core/Tiki/Command/PreferencesDeleteCommand.php -text
 lib/core/Tiki/Command/PreferencesGetCommand.php -text
 lib/core/Tiki/Command/PreferencesSetCommand.php -text
@@ -3394,6 +3408,7 @@ lib/jquery_tiki/tiki-maps-ol3.js -text
 lib/jquery_tiki/tiki-maps.js -text
 lib/jquery_tiki/tiki-toolbars.js -text
 lib/jquery_tiki/tiki-trackers.js -text
+lib/jquery_tiki/tiki-vimeo_upload.js -text
 lib/jquery_tiki/tiki-workspace-ui.js -text
 lib/jquery_tiki/wikiplugin-annotation.js -text
 lib/jquery_tiki/wikiplugin-pivottable.js -text
@@ -3991,7 +4006,6 @@ lib/smarty_tiki/block.trackeritemcheck.php -text
 lib/smarty_tiki/block.translation.php -text
 lib/smarty_tiki/block.wiki.php -text
 lib/smarty_tiki/block.wikiplugin.php -text
-lib/smarty_tiki/compiler.assign.php -text
 lib/smarty_tiki/compiler.assign_content.php -text
 lib/smarty_tiki/function.activity.php -text
 lib/smarty_tiki/function.addonobjectid.php -text
@@ -4090,6 +4104,7 @@ lib/smarty_tiki/function.treetable.php -text
 lib/smarty_tiki/function.user_registration.php -text
 lib/smarty_tiki/function.user_selector.php -text
 lib/smarty_tiki/function.var_dump.php -text
+lib/smarty_tiki/function.vimeo_uploader.php -text
 lib/smarty_tiki/function.wikidiff.php -text
 lib/smarty_tiki/function.wikistructure.php -text
 lib/smarty_tiki/index.php -text
@@ -4414,6 +4429,9 @@ lib/test/core/Search/paginate.tpl -text
 lib/test/core/Services/Comment/ControllerTest.php -text
 lib/test/core/Services/ResultLoaderTest.php -text
 lib/test/core/Services/index.php -text
+lib/test/core/Tiki/Command/ProfileExport/Fixtures/test.yml -text
+lib/test/core/Tiki/Command/ProfileExport/Fixtures/testTrackerItemExportResult.yml -text
+lib/test/core/Tiki/Command/ProfileExport/Fixtures/testTrackerItemExportWithoutFieldsResult.yml -text
 lib/test/core/Tiki/Package/ComposerCliTest.php -text
 lib/test/core/Tiki/Package/ComposerManagerTest.php -text
 lib/test/core/Tiki/Package/Fixtures/CasperJsComposer.json -text
@@ -4675,7 +4693,6 @@ lib/wiki-plugins/wikiplugin_back.php -text
 lib/wiki-plugins/wikiplugin_backlinks.php -text
 lib/wiki-plugins/wikiplugin_banner.php -text
 lib/wiki-plugins/wikiplugin_benchmark.php -text
-lib/wiki-plugins/wikiplugin_benchmark.tpl -text
 lib/wiki-plugins/wikiplugin_bigbluebutton.php -text
 lib/wiki-plugins/wikiplugin_bloglist.php -text
 lib/wiki-plugins/wikiplugin_box.php -text
@@ -4726,9 +4743,7 @@ lib/wiki-plugins/wikiplugin_flash.php -text
 lib/wiki-plugins/wikiplugin_fluidgrid.php -text
 lib/wiki-plugins/wikiplugin_font.php -text
 lib/wiki-plugins/wikiplugin_footnote.php -text
-lib/wiki-plugins/wikiplugin_footnote.tpl -text
 lib/wiki-plugins/wikiplugin_footnotearea.php -text
-lib/wiki-plugins/wikiplugin_footnotearea.tpl -text
 lib/wiki-plugins/wikiplugin_freetagged.php -text
 lib/wiki-plugins/wikiplugin_friend.php -text
 lib/wiki-plugins/wikiplugin_ftp.php -text
@@ -4942,6 +4957,7 @@ lib/wizard/pages/upgrade_new_in_14.php -text
 lib/wizard/pages/upgrade_new_in_15.php -text
 lib/wizard/pages/upgrade_new_in_16.php -text
 lib/wizard/pages/upgrade_new_in_17.php -text
+lib/wizard/pages/upgrade_new_in_18.php -text
 lib/wizard/pages/upgrade_novice_admin_assistance.php -text
 lib/wizard/pages/upgrade_others.php -text
 lib/wizard/pages/upgrade_permissions_and_logs.php -text
@@ -5415,6 +5431,7 @@ templates/goal/show.tpl -text
 templates/goal/show_list.tpl -text
 templates/h5p/edit.tpl -text
 templates/h5p/embed.tpl -text
+templates/h5p/list_libraries.tpl -text
 templates/h5p/list_results.tpl -text
 templates/header.tpl -text
 templates/ids/remove.tpl -text
@@ -6366,6 +6383,7 @@ templates/user_conditions/approval.tpl -text
 templates/user_conditions/index.php -text
 templates/user_registration.tpl -text
 templates/vimeo/index.php -text
+templates/vimeo/jquery_upload.tpl -text
 templates/vimeo/upload.tpl -text
 templates/vimeo/view.tpl -text
 templates/web.config -text
@@ -6379,6 +6397,7 @@ templates/wiki-plugins/wikiplugin_addrelation.tpl -text
 templates/wiki-plugins/wikiplugin_addtocart.tpl -text
 templates/wiki-plugins/wikiplugin_adjustinventory.tpl -text
 templates/wiki-plugins/wikiplugin_appframe_mapcontrol.tpl -text
+templates/wiki-plugins/wikiplugin_benchmark.tpl -text
 templates/wiki-plugins/wikiplugin_bigbluebutton.tpl -text
 templates/wiki-plugins/wikiplugin_bigbluebutton_create.tpl -text
 templates/wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl -text
@@ -6392,6 +6411,8 @@ templates/wiki-plugins/wikiplugin_datachannel.tpl -text
 templates/wiki-plugins/wikiplugin_events.tpl -text
 templates/wiki-plugins/wikiplugin_favorite.tpl -text
 templates/wiki-plugins/wikiplugin_files.tpl -text
+templates/wiki-plugins/wikiplugin_footnote.tpl -text
+templates/wiki-plugins/wikiplugin_footnotearea.tpl -text
 templates/wiki-plugins/wikiplugin_freetagged.tpl -text
 templates/wiki-plugins/wikiplugin_friend.tpl -text
 templates/wiki-plugins/wikiplugin_ftp.tpl -text
@@ -6479,6 +6500,7 @@ templates/wizard/upgrade_new_in_14.tpl -text
 templates/wizard/upgrade_new_in_15.tpl -text
 templates/wizard/upgrade_new_in_16.tpl -text
 templates/wizard/upgrade_new_in_17.tpl -text
+templates/wizard/upgrade_new_in_18.tpl -text
 templates/wizard/upgrade_novice_admin_assistance.tpl -text
 templates/wizard/upgrade_others.tpl -text
 templates/wizard/upgrade_permissions_and_logs.tpl -text
@@ -6556,6 +6578,7 @@ themes/base_files/iconsets/index.php -text
 themes/base_files/iconsets/legacy.php -text
 themes/base_files/index.php -text
 themes/base_files/less/bootswatch_overrides.less -text
+themes/base_files/less/conversejs-tiki.less -text
 themes/base_files/less/external-scripts.less -text
 themes/base_files/less/jquery-ui-tiki.less -text
 themes/base_files/less/newsletter.less -text

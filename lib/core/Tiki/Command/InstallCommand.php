@@ -37,10 +37,10 @@ class InstallCommand extends Command
 		if (! $installed || $force) {
 			$installer->cleanInstall();
 			$output->writeln('Installation completed.');
-			$output->writeln('<info>Queries executed successfully: ' . count($installer->success) . '</info>');
+			$output->writeln('<info>Queries executed successfully: ' . count($installer->queries['successful']) . '</info>');
 
-			if ( count($installer->failures) ) {
-				foreach ( $installer->failures as $key => $error ) {
+			if ( count($installer->queries['failed']) ) {
+				foreach ( $installer->queries['failed'] as $key => $error ) {
 					list( $query, $message, $patch ) = $error;
 
 					$output->writeln("<error>Error $key in $patch\n\t$query\n\t$message</error>");

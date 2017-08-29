@@ -34,6 +34,14 @@
 						{/self_link}
 					{/if}
 				</li>
+                <li>
+					{if $pdf_export eq 'y'}
+						<a href="{$smarty.server.PHP_SELF}?{query pdf='y'}">
+							{icon name="pdf"} {tr}PDF{/tr}
+						</a>
+					{/if}
+				</li>
+                
 				{if $item_info.logs.cant|default:null}
 					<li>
 						<a href="tiki-tracker_view_history.php?itemId={$itemId}">
@@ -90,16 +98,14 @@
 		{/if}
 	</div>
 
-	<div class="categbar" align="right">
-		{if $user and $prefs.feature_user_watches eq 'y'}
-			{if $category_watched eq 'y'}
-				{tr}Watched by categories:{/tr}
-				{section name=i loop=$watching_categories}
-					<a href="tiki-browse_categories.php?parentId={$watching_categories[i].categId}">{$watching_categories[i].name|escape}</a>&nbsp;
-				{/section}
-			{/if}
-		{/if}
+	{if $user and $prefs.feature_user_watches eq 'y' and $category_watched eq 'y'}
+	<div class="categbar">
+		{tr}Watched by categories:{/tr}
+		{section name=i loop=$watching_categories}
+			<a href="tiki-browse_categories.php?parentId={$watching_categories[i].categId}">{$watching_categories[i].name|escape}</a>&nbsp;
+		{/section}
 	</div>
+	{/if}
 
 	{* ------- return/next/previous tab --- *}
 	{if $canView}
@@ -110,7 +116,11 @@
 	{/if}
 
 	{include file='tracker_error.tpl'}
-
+{else}
+	<style>
+	.tab-content .tab-pane {
+    	display:block;
+	}</style>
 {/if} 
 {* print_page *}
 
@@ -230,7 +240,7 @@
 									<input type="submit" class="btn btn-default btn-sm" name="save" value="{tr}Save{/tr}" onclick="needToConfirm=false">
 									{* --------------------------- to return to tracker list after saving --------- *}
 									{if $canView}
-										<input type="submit" class="btn btn-default btn-sm" name="save_return" value="{tr}Save{/tr} &amp; {tr}Back to Items list{/tr}" onclick="needToConfirm=false">
+										<input type="submit" class="btn btn-default btn-sm" name="save_return" value="{tr}Save Returning to Item List{/tr}" onclick="needToConfirm=false">
 										{if $canRemove}
 											<a class="btn btn-default btn-sm" href="tiki-view_tracker.php?trackerId={$trackerId}&amp;remove={$itemId}" title="{tr}Delete{/tr}">{icon name='delete' alt="{tr}Delete{/tr}"}</a>
 										{/if}
@@ -253,7 +263,7 @@
 							{foreach from=$ins_fields key=ix item=cur_field}
 								<div class="form-group">
 									<label class="control-label col-sm-3">
-										{$cur_field.name|tra}
+										{$cur_field.name|tra|escape}
 										{if $cur_field.isMandatory eq 'y'}
 											<strong class='mandatory_star text-danger tips' title=":{tr}This field is mandatory{/tr}">*</strong>
 										{/if}
@@ -305,7 +315,7 @@
 								<input type="submit" class="btn btn-default btn-sm" name="save" value="{tr}Save{/tr}" onclick="needToConfirm=false">
 								{* --------------------------- to return to tracker list after saving --------- *}
 								{if $canView}
-									<input type="submit" class="btn btn-default btn-sm" name="save_return" value="{tr}Save{/tr} &amp; {tr}Back to Items List{/tr}" onclick="needToConfirm=false">
+									<input type="submit" class="btn btn-default btn-sm" name="save_return" value="{tr}Save Returning to Item List{/tr}" onclick="needToConfirm=false">
 								{/if}
 								{if $canRemove}
 									<a class="link tips" href="tiki-view_tracker.php?trackerId={$trackerId}&amp;remove={$itemId}" title=":{tr}Delete{/tr}">

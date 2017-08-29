@@ -89,15 +89,10 @@ class ArtLib extends TikiLib
 
 	function add_article_hit($articleId)
 	{
-		global $prefs, $user;
-
 		if (StatsLib::is_stats_hit()) {
 			$query = "update `tiki_articles` set `nbreads`=`nbreads`+1 where `articleId`=?";
-
-			$result = $this->query($query, array($articleId));
+			$this->query($query, array($articleId));
 		}
-
-		return true;
 	}
 
 	function remove_article($articleId, $article_data ='')
@@ -258,7 +253,6 @@ class ArtLib extends TikiLib
 			$imgdata = '';
 
 		$notificationlib = TikiLib::lib('notification');
-		$hash = md5($title . $heading . $body);
 		$query = 'select `name` from `tiki_topics` where `topicId` = ?';
 		$topicName = $this->getOne($query, array((int) $topicId));
 		$size = strlen($body);
@@ -281,7 +275,6 @@ class ArtLib extends TikiLib
 			'body' => $body,
 			'publishDate' => (int) $publishDate,
 			'expireDate' => (int) $expireDate,
-			'created' => (int) $this->now,
 			'author' => $user,
 			'type' => $type,
 			'rating' => (float) $rating,
@@ -290,7 +283,6 @@ class ArtLib extends TikiLib
 			'linkto' => $linkto,
 			'image_caption' => $image_caption,
 			'lang' => $lang,
-			//'ispublished' => $ispublished, // Does not exist
 		);
 
 		$article_table = $this->table('tiki_submissions');
@@ -299,6 +291,10 @@ class ArtLib extends TikiLib
 				'subId' => (int) $subId,
 			));
 		} else {
+			$info['created'] = (int) $this->now;
+			$info['nbreads'] = 0;
+			$info['votes'] = 0;
+			$info['points'] = 0;
 			$id = $article_table->insert($info);
 		}
 
@@ -390,7 +386,6 @@ class ArtLib extends TikiLib
 		if ($expireDate < $publishDate) {
 			$expireDate = $publishDate;
 		}
-		$hash = md5($title . $heading . $body);
 		if (empty($imgdata) || $useImage === 'n') {	// remove image data if not using it
 			$imgdata = '';
 		}
@@ -450,6 +445,9 @@ class ArtLib extends TikiLib
 
 		} else {
 			$info['created'] = (int) $this->now;
+			$info['nbreads'] = 0;
+			$info['votes'] = 0;
+			$info['points'] = 0;
 
 			$articleId = $article_table->insert($info);
 

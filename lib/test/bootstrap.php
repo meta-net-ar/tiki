@@ -79,8 +79,8 @@ if (!$installer->tableExists('tiki_preferences')) {
 } else if ($installer->requiresUpdate()) {
 	echo "Updating Tiki database...\n";
 	$installer->update();
-	if ( count($installer->failures) ) {
-		foreach ( $installer->failures as $key => $error ) {
+	if ( count($installer->queries['failed']) ) {
+		foreach ( $installer->queries['failed'] as $key => $error ) {
 			list( $query, $message, $patch ) = $error;
 
 			echo "Error $key in $patch\n\t$query\n\t$message\n\n";

@@ -14,6 +14,7 @@ class Schema
 	private $primaryKey;
 	private $schemas = [];
 	private $filters;
+	private $config;
 
 	function __construct(\Tracker_Definition $definition)
 	{
@@ -54,6 +55,7 @@ class Schema
 		$out = new self($this->definition);
 		$out->filters = $this->filters;
 		$out->schemas = $this->schemas;
+		$out->config = $this->config;
 		$out->primaryKey = $this->primaryKey;
 
 		foreach ($this->columns as $column) {
@@ -83,6 +85,22 @@ class Schema
 		return $out;
 	}
 
+	function loadConfig($config) {
+		$this->config = $config;
+	}
+
+	function canImportUpdate() {
+		return $this->config['import_update'];
+	}
+
+	function ignoreImportBlanks() {
+		return $this->config['ignore_blanks'];
+	}
+
+	function isImportTransaction() {
+		return $this->config['import_transaction'];
+	}
+
 	function loadFormatDescriptor($descriptor)
 	{
 		foreach ($descriptor as $column) {
@@ -90,6 +108,9 @@ class Schema
 				$col = $this->addColumn($column['field'], $column['mode']);
 			} catch (Exception\FieldNotFound $e) {
 				\Feedback::error($e->getMessage(), 'session'); // TODO make error message appear when exporting
+				continue;
+			} catch (Exception\ModeNotSupported $e) {
+				\Feedback::error($e->getMessage(), 'session');
 				continue;
 			}
 			$col->setExportOnly(! empty($column['isExportOnly']));
@@ -228,6 +249,10 @@ class Schema
 
 			if (! $header) {
 				throw new \Exception(tr('Not enough columns, expecting "%0".', $column->getEncodedHeader()));
+			}
+
+			if ($this->config['simple_headers'] && $column->getLabel() == $header) {
+				continue;
 			}
 
 			if (preg_match(Schema\Column::HEADER_PATTERN, $header, $parts)) {

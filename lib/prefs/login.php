@@ -13,13 +13,14 @@ function prefs_login_list()
 	return array(
 		'login_is_email' => array(
 			'name' => tra('Use email as username'),
-			'description' => tra('Instead of creating new usernames, use the user\'s email address for authentication.'),
+			'description' => tra('Instead of creating new usernames, use the user\'s email address for authentication. On the registration form, there will be no Username field.'),
 			'type' => 'flag',
 			'default' => 'n',
 		),
 		'login_is_email_obscure' => array(
-			'name' => tra('Obscure the email address when using the email address as username if possible (coverage will not be complete)'),
+			'name' => tra('Obscure email when using email as username'),
 			'description' => tra('This will attempt as much as possible to hide the email address, showing the real name or the truncated email address instead.'),
+			'warning' => tra('Coverage will not be complete'),
 			'type' => 'flag',
 			'dependencies' => array(
 				'login_is_email',
@@ -27,7 +28,7 @@ function prefs_login_list()
 			'default' => 'n',
 		),
 		'login_allow_email' => array(
-			'name' => tra('User can login via username or e-mail.'),
+			'name' => tra('User can login via username or email.'),
 			'description' => tra('This will allow users to login using their email (as well as their username).'),
 			'type' => 'flag',
 			'dependencies' => array(
@@ -102,10 +103,10 @@ function prefs_login_list()
 			'tags' => array('advanced'),
 		),
 		'login_autologin_createnew' => array(
-			'name' => tr('Create user account if autologin user does not exist'),
 			'description' => tr('Create a new user account if the user that is trying to autologin does not exist on this Tiki.'),
 			'type' => 'flag',
 			'default' => 'y',
+			'name' => tr('Create user if not registered in Tiki'),
 			'tags' => array('advanced'),
 		),
 		'login_autologin_allowedgroups' => array(

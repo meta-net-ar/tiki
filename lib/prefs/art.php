@@ -45,6 +45,7 @@ function prefs_art_list()
 		),
 		'art_list_title_len' => array(
 			'name' => tra('Title length'),
+			'units' => tra('characters'),
 			'type' => 'text',
 			'size' => '5',
 			'filter' => 'digits',
@@ -104,6 +105,9 @@ function prefs_art_list()
 			'name' => tra('Reads'),
 			'type' => 'flag',
 			'default' => 'y',
+			'dependencies' => array(
+				'feature_stats',
+			),
 		),
 		'art_list_size' => array(
 			'name' => tra('Size'),

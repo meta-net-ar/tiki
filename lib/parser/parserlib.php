@@ -2861,11 +2861,11 @@ if ( \$('#$id') ) {
 					// closing a list, there really shouldn't be a
 					// paragraph open anyway.
 					$this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 0, 1, 0);
+
 					// Get count of (possible) header signs at start
 					$hdrlevel = $tikilib->how_many_at_start($line, '!');
-					// If 1st char on line is '!' and its count less than 6 (max in HTML)
-					if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6) {
 
+					if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6 /* HTML has h1 to h6, but no h7 or above */) { // If the line starts with 1 to 6 exclamation marks ("!")
 						/*
 						 * Handle headings autonumbering syntax (i.e. !#Text, !!#Text, ...)
 						 * Note :
@@ -3143,9 +3143,14 @@ if ( \$('#$id') ) {
 		}
 
 		if ($this->option['is_html']) {
+			// A paragraph cannot contain paragraphs.
+			// The following avoids invalid HTML, but could result in formatting different from that intended. Should a replacement here not at least generate a notice? Chealer 2017-08-14
 			$count = 1;
 			while ($count == 1) {
 				$data = preg_replace("#<p>([^(</p>)]*)<p>([^(</p>)]*)</p>#uims", "<p>$1$2", $data, 1, $count);
+			}
+			if (is_null($data)) {
+				trigger_error('Parsing failed (' . array_flip(get_defined_constants(true)['pcre'])[preg_last_error()] . ')', E_USER_WARNING);
 			}
 		}
 

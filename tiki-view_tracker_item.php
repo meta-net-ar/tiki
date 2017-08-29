@@ -580,6 +580,11 @@ if ($authorfield) {
 $info["createdByReal"] = $tikilib->get_user_preference($info["createdBy"], 'realName', '');
 $info["lastModifByReal"] = $tikilib->get_user_preference($info["lastModifBy"], 'realName', '');
 
+if ($tracker_info['doNotShowEmptyField'] == 'y') {
+	$trackerlib = TikiLib::lib('trk');
+	$fields['data'] = $trackerlib->mark_fields_as_empty($fields['data']);
+}
+
 $smarty->assign('trackerId', $trackerId);
 $smarty->assign('tracker_info', $tracker_info);
 $smarty->assign_by_ref('info', $info);
@@ -734,7 +739,7 @@ if ($itemObject->canRemove()) {
 } else {
 	$smarty->assign('editTitle', tr('Edit'));
 }
-
+$smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
 $smarty->assign('canView', $itemObject->canView());
 $smarty->assign('canModify', $itemObject->canModify());
 $smarty->assign('canRemove', $itemObject->canRemove());
@@ -799,12 +804,37 @@ try {
 	if (isset($_REQUEST['print'])) {
 		$smarty->assign('print_page', 'y');
 		$smarty->display('tiki-print.tpl');
+	}
+	else if (isset($_REQUEST['pdf'])) {
+		$smarty->assign('print_page', 'y');
+		$trackerData=$smarty->fetch('tiki-print.tpl');
+		//getting comments associated with tracker item
+		$broker = TikiLib::lib('service')->getBroker($addonpackage);
+		$comments=$broker->internalRender("comment", "list", $jitRequest = new JitFilter(array("controller"=>"comment","action"=>"list","type"=>"trackeritem","objectId"=>$itemId)));
+		require_once 'lib/pdflib.php';
+		$generator = new PdfGenerator();
+		if (!empty($generator->error)) {
+		Feedback::error($generator->error, 'session');
+		$access->redirect($page);
+	} else {
+		$pdf = $generator->getPdf('tiki-print.php', array('page' => $tracker_info['name']),str_ireplace("<h3>Attachments</h3>","<h3>Comments</h3>".$comments."<br /><h3>Attachments</h3>",$trackerData));
+		$length = strlen($pdf);
+		header('Cache-Control: private, must-revalidate');
+		header('Pragma: private');
+		header("Content-Description: File Transfer");
+		header('Content-disposition: attachment; filename="'. TikiLib::lib('tiki')->remove_non_word_characters_and_accents($trklib->get_isMain_value($trackerId, $itemId)) . '.pdf"');
+		header("Content-Type: application/pdf");
+		header("Content-Transfer-Encoding: binary");
+		header('Content-Length: '. $length);
+		echo $pdf; 
+	}	
+		 //end of pdf
 	} else {
 		$smarty->display('tiki.tpl');
 	}
 } catch (SmartyException $e) {
-	//$message = tr('This element cannot be displayed correctly. One of the view/edit templates is missing or has errors (%0)/(%1). Contact the administrator.', $viewItemPretty['value'], $editItemPretty['value']);
-	$message = tr('This element cannot be displayed correctly. One of the view/edit templates is missing or has errors. Contact the administrator. (%0)', $e->getMessage());
+	$message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
+	trigger_error($e->getMessage(), E_USER_ERROR);
 	$smarty->loadPlugin('smarty_modifier_sefurl');
-	$access->redirect(smarty_modifier_sefurl($info['trackerId'], 'tracker'), $message);
+	$access->redirect(smarty_modifier_sefurl($info['trackerId'], 'tracker'), $message, 302, 'error');
 }

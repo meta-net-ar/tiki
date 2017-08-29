@@ -14,8 +14,10 @@ class Search_Action_EmailAction implements Search_Action_Action
 			'to+' => true,
 			'cc+' => false,
 			'bcc+' => false,
+			'from' => false,
 			'subject' => true,
 			'content' => true,
+			'is_html' => false,
 			'pdf_page_attachment' => false,
 		);
 	}
@@ -35,28 +37,43 @@ class Search_Action_EmailAction implements Search_Action_Action
 			$mail = tiki_get_admin_mail();
 
 			if ($replyto = $this->dereference($data->replyto->text())) {
-				$mail->setReplyTo($replyto);
+				$mail->setReplyTo($replyto[0]);
 			}
 
 			foreach ($data->to->text() as $to) {
-				if( $to = $this->dereference($to) ) {
-					$mail->addTo($to);
+				if ($to = $this->dereference($to)) {
+					foreach ($to as $email) {
+						$mail->addTo($email);
+					}
 				}
 			}
 
 			foreach ($data->cc->text() as $cc) {
-				if( $cc = $this->dereference($cc) ) {
-					$mail->addCc($cc);
+				if ($cc = $this->dereference($cc)) {
+					foreach ($cc as $email) {
+						$mail->addCc($email);
+					}
 				}
 			}
 
 			foreach ($data->bcc->text() as $bcc) {
-				if( $bcc = $this->dereference($bcc) ) {
-					$mail->addBcc($bcc);
+				if ($bcc = $this->dereference($bcc)) {
+					foreach ($bcc as $email) {
+						$mail->addBcc($email);
+					}
 				}
 			}
 
-			$content = $this->parse($data->content->none());
+			if ($from = $data->from->text()) {
+				$fromEmail = $this->dereference($from);
+				$fromName = $this->dereferenceName($from);
+				if (!empty($fromEmail[0])) {
+					$mail->setFrom($fromEmail[0], $fromName);
+					$mail->setSender($fromEmail[0], $fromName);
+				}
+			}
+
+			$content = $this->parse($data->content->none(), $data->is_html->boolean());
 			$subject = $this->parse($data->subject->text());
 
 			$mail->setSubject(strip_tags($subject));
@@ -97,8 +114,23 @@ class Search_Action_EmailAction implements Search_Action_Action
 
 			tiki_send_email($mail);
 
+			if($prefs['log_mail'] == 'y') {
+				$logslib = TikiLib::lib('logs');
+				foreach($data->to->text() as $email) {
+					$logslib->add_log('mail', tr('EmailAction - send to %0, subject - %1', $email, $subject));
+				}
+			}
+
 			return true;
 		} catch (Exception $e) {
+
+			if($prefs['log_mail'] == 'y') {
+				$logslib = TikiLib::lib('logs');
+				foreach($data->to->text() as $email) {
+				$logslib->add_log('mail error', tr("EmailAction - can't send new message"));
+				}
+			}
+
 			throw new Search_Action_Exception(tr('Error sending email: %0', $e->getMessage()));
 		}
 	}
@@ -107,7 +139,7 @@ class Search_Action_EmailAction implements Search_Action_Action
 		return false;
 	}
 
-	private function parse($content)
+	private function parse($content, $is_html = null)
 	{
 		$content = "~np~$content~/np~";
 
@@ -116,6 +148,10 @@ class Search_Action_EmailAction implements Search_Action_Action
 		$options = array(
 			'protect_email' => false,
 		);
+
+		if ($is_html) {
+			$options['is_html'] = true;
+		}
 
 		return trim($parserlib->parse_data($content, $options));
 	}
@@ -131,9 +167,29 @@ class Search_Action_EmailAction implements Search_Action_Action
 		}
 		$email_or_username = $this->stripNp($email_or_username);
 		if( strstr($email_or_username, '@') ) {
-			return $email_or_username;
+			return array($email_or_username);
 		} else {
-			return TikiLib::lib('user')->get_user_email($email_or_username);
+			$users = TikiLib::lib('trk')->parse_user_field($email_or_username);
+			return array_map(function($username) {
+				return TikiLib::lib('user')->get_user_email($username);
+			}, $users);
+		}
+	}
+
+	private function dereferenceName($email_or_username) {
+		if (empty($email_or_username)) {
+			return null;
+		}
+		$email_or_username = $this->stripNp($email_or_username);
+		if( strstr($email_or_username, '@') ) {
+			return null;
+		} else {
+			$users = TikiLib::lib('trk')->parse_user_field($email_or_username);
+			if ($users) {
+				return TikiLib::lib('user')->clean_user($users[0]);
+			} else {
+				return null;
+			}
 		}
 	}
 

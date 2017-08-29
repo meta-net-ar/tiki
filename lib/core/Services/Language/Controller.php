@@ -5,6 +5,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
+include(dirname(__FILE__) . '/TranslationReader.php');
+
 class Services_Language_Controller
 {
 	private $utilities;
@@ -144,11 +146,7 @@ class Services_Language_Controller
 		//get language
 		if($input->language->text()){
 			$language = $input->language->text();
-		}
-		elseif (isset($user) && isset($user_preferences[$user]['language'])) {
-			$language = $user_preferences[$user]['language'];
-		} 
-		else {
+		} else {
 			global $prefs;
 			$language = $prefs['language'];
 		}
@@ -290,11 +288,7 @@ class Services_Language_Controller
 		//get language
 		if($input->language->text()){
 			$language = $input->language->text();
-		}
-		elseif (isset($user) && isset($user_preferences[$user]['language'])) {
-			$language = $user_preferences[$user]['language'];
-		} 
-		else {
+		} else {
 			global $prefs;
 			$language = $prefs['language'];
 		}
@@ -318,18 +312,18 @@ class Services_Language_Controller
 				unlink('temp/custom.json');
 			}
 			//move the uploaded file to /temp directory
-			move_uploaded_file($_FILES['language_file']['tmp_name'], 'temp/' . $_FILES['language_file']['name']);
+			$tempFilePath = 'temp/' . $_FILES['language_file']['name'];
+			move_uploaded_file($_FILES['language_file']['tmp_name'], $tempFilePath);
 
 			//read the uploaded file
-			$uploadContent = file_get_contents('temp/' . $_FILES['language_file']['name']);
+			$translationReader = new TranslationReader($tempFilePath);
+
+			//decode it into an associative array
+			$uploadCustomTranslations = $translationReader->getArray();
 
 			//delete the uploaded file
-			unlink('temp/' . $_FILES['language_file']['name']);
-
-			//TODO: validate if uploaded file contains json
-
-			//decode json into an associative array
-			$uploadCustomTranslations = json_decode($uploadContent, true);
+			unlink($tempFilePath);
+			unset($tempFilePath, $translationReader);
 
 			//get process_type
 			$process_type = $input->process_type->text();

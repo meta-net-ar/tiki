@@ -27,7 +27,7 @@ function wikiplugin_prefdoc_info()
 			'img' => array(
 				'required' => false,
 				'name' => tra('Images'),
-				'description' => tra('Show images at the top of each version of tiki. Format: TikiVersion:FileGalleryID'),
+				'description' => tra('Show images at the top of each version of Tiki. Format: TikiVersion:FileGalleryID. Multiple images my be separated like so: TikiVersion1:FileGalleryID1|TikiVersion2:FileGalleryID2.'),
 				'since' => '17',
 				'filter' => 'text',
 			),
@@ -71,8 +71,6 @@ function wikiplugin_prefdoc( $data, $params )
  * and generates files in wiki-syntax
  *
  * Running this will overwrite any previously generated pref doc files
- *
- * TODO: Handle help links that dont point at doc.tiki.org
  *
  *
  * Class PrefsDoc
@@ -131,7 +129,7 @@ class PrefsDoc extends TWVersion{
 		// carry over images from past versions of Tiki, if available.
 		foreach ($versions as $version) {
 			$count =$version;
-			while ($version - $count < 4) {         // If the image is older than 4 tiki versions, dont display it.
+			while ($version - $count < 5) {         // If the image is older than 5 tiki versions, dont display it.
 				if ($imageArray[$count][0]) {
 					$this->docTable .= '{img fileId="'.$imageArray[$count][0].'" thumb="y" rel="box[g]" width="300" desc="Tiki '.  $imageArray[$count][1].' Preferences Image" alt="' . $tabName . '" align="center"}';
 					break;
@@ -150,6 +148,8 @@ class PrefsDoc extends TWVersion{
 	}
 
 	/**
+	 *
+	 * Generates a list of valid pref codes when no preference page was specified
 	 *
 	 * @return string file-tab codes available for use.
 	 */
@@ -193,6 +193,10 @@ class PrefsDoc extends TWVersion{
 				$pref->help = $this->prevFilePrefs->$prefName->help;
 			if (!$pref->hint)
 				$pref->hint = $this->prevFilePrefs->$prefName->hint;
+			if (!$pref->shorthint)
+				$pref->shorthint = $this->prevFilePrefs->$prefName->shorthint;
+			if (!$pref->warning)
+				$pref->warning = $this->prevFilePrefs->$prefName->warning;
 			$this->setParams($pref);
 			$this->docTable .= $this->prefName . '~|~' . $this->prefDescription . '~|~' . $this->prefDefault . "\n";
 		}
@@ -210,10 +214,12 @@ class PrefsDoc extends TWVersion{
 	private function setParams($param)
 	{
 		// set default
-		if ($param->default == 'n') {
+		if (!empty($param->options) && isset($param->default) && $param->default !== '') {
+			$this->prefDefault = $param->options->{$param->default};
+		}else if ($param->default === 'n') {
 			$this->prefDefault = 'Disabled';
-		} else if ($param->default == 'y') {
-			$this->prefDefault = 'Enabled';            // Change default codes to human readable format
+		} else if ($param->default === 'y') {
+			$this->prefDefault = 'Enabled';						// Change default codes to human readable format
 		} else if (is_array($param->default)) {
 			$this->prefDefault = implode(', ', $param->default);
 		} else {
@@ -221,10 +227,12 @@ class PrefsDoc extends TWVersion{
 		}
 		// end first processing the below should be applied to the above.... not a continuation (eg. empty array)
 		$this->prefDefault = trim($this->prefDefault);
-		if (!$this->prefDefault) {
+		if ($this->prefDefault == '') {
 			$this->prefDefault = '~~gray:None~~';
-		} else if (!preg_match('\W', $this->prefDefault)) {                // if Pref is a singe word
-			$this->prefDefault = ucfirst($this->prefDefault);            // then caps the first letter.
+		} else if (!empty($param->units)) {
+			$this->prefDefault .= ' '. $param->units;
+		} else if (!preg_match('/\W/', $this->prefDefault)) {				// if Pref is a singe word
+			$this->prefDefault = ucfirst($this->prefDefault);					// then caps the first letter.
 		} else{
 			if (strlen($this->prefDefault) > 30) {
 				$this->prefDefault = substr($this->prefDefault, 0, 27) . '...';
@@ -234,19 +242,55 @@ class PrefsDoc extends TWVersion{
 
 		// set name
 		if ($param->help) {
-			$this->prefName = '((' . $param->help . '|' . $param->name . '))';
+			$this->prefName = '<a href="' . $param->help . '">~np~' . $param->name . '~/np~</a>';
 		}else {
-			$this->prefName = $param->name;
+			$this->prefName = '~np~'.$param->name.'~/np~';
 		}
 		$this->prefName = $this->wikiConvert($this->prefName);
 
 		// set description
 		$this->prefDescription = $param->description;
-		if ($param->hint)
-			$this->prefDescription .= " ''Hint: ".$param->hint."''";
-		foreach ($param->tags as $tag)
-			if ($tag === 'experimental')
-				$this->prefDescription .= ' (experimental)';
+		if ($param->hint) {
+			if ($this->prefDescription)					// new line if existing content
+				$this->prefDescription .= '<br>';
+			$this->prefDescription .= '<span class="fa fa-hand-pointer-o text-info" title="Hint"></span><i> ' . $param->hint . '</i>';
+		}
+		if ($param->shorthint) {
+			if ($this->prefDescription)					// new line if existing content
+				$this->prefDescription .= '<br>';
+			$this->prefDescription .= '<span class="fa fa-hand-pointer-o text-info" title="Short Hint"></span><i> ' . $param->shorthint . '</i>';
+		}
+		if ($param->warning) {
+			if ($this->prefDescription)					// new line if existing content
+				$this->prefDescription .= '<br>';
+				$this->prefDescription .= '<span class="fa fa-exclamation-triangle text-warning" title="Warning"></span><i> ' . $param->warning . '</i>';
+		}
+		// display list of options
+		if (!empty($param->options)) {
+			$count = 0;
+			$options = '';
+			foreach ($param->options as $option) {
+					if ($count)
+						$options .= ' | ';
+					$options .= $option;
+					$count++;
+			}
+			if ($count) {											// If options exist, then add them
+				if ($this->prefDescription) {						// new line if existing content
+					$this->prefDescription .= '<br>';
+					if (strlen($options) > 400) {					// truncate options if they get too long
+						$options = substr($options, 0, 397) . '...';
+					}
+				}
+				$options = $this->wikiConvert($options,true);											// sanitize special characters
+				$options = preg_replace('/\s+/',' ',$options);			// replace all excess whitespace characters with a single space.
+				$this->prefDescription .= '<span class="small text-muted"><span class="fa fa-list-ul" title="Options"></span> ' . $options.'</span>';
+			}
+		}
+		if (!empty($param->tags))
+			foreach ($param->tags as $tag)
+				if ($tag === 'experimental')
+					$this->prefDescription .= ' <span class="fa fa-flask text-danger" title="Experimental: may not work as intended"></span>';
 		$this->prefDescription = $this->wikiConvert($this->prefDescription);
 	}
 
@@ -284,7 +328,7 @@ class PrefsDoc extends TWVersion{
 	 * If its not up to date, then update it.
 	 *
 	 * Documentation is updated for every minor version change.
-	 * A seprate set of documentatin is creaed for every major version.
+	 * A separate set of documentation is created for every major version.
 	 * Only consecutive versions are supported (you cant skip a version)
 	 *
 	 * @return bool false on error, true on success.
@@ -307,7 +351,7 @@ class PrefsDoc extends TWVersion{
 				return true;
 		}
 
-		// prepate to generate prefs doc
+		// prepare to generate prefs doc
 		$this->fileCount = 0;
 		$this->prefCount = 0;
 		$this->getPrefs();
@@ -350,6 +394,9 @@ class PrefsDoc extends TWVersion{
 
 			}
 		}
+		// Sanitise specific output
+		$prefs['webcron_token']['default'] = 'Random Token';
+
 		$this->PrefVars = $prefs;
 	}
 
@@ -365,20 +412,21 @@ class PrefsDoc extends TWVersion{
 	private function getAdminUIPrefs($fileName){
 		$file = file_get_contents('templates/admin/' . $fileName);
 		$fileName = substr(substr($fileName, 8), 0, -4);						// prepare the file name for further use
-		$count = preg_match_all('/{tab name="?\'?(?:{tr})?([\w\s]*)(?:{\/tr})?"?\'?}([\w\W]*?){\/tab}/i', $file, $tabs);
+		$count = preg_match_all('/{tab name="?\'?(?:{tr})?([\w\s]*)(?:{\/tr})?"?\'?.*?}([\w\W]*?){\/tab}/i', $file, $tabs);
 		if ($count) {
 			while ($count >= 1) {
 				$count--;
 				$prefs = array();
-				preg_match_all('/{preference.*name="?\'?(\w*)"?\'?.*}/i', $tabs[2][$count], $prefs);	// Generate aray of all the prefs
+				preg_match_all('/{preference.*name="?\'?(\w*)"?\'?.*}/i', $tabs[2][$count], $prefs);					// Generate array of all the prefs
 				$tabs[1][$count] = mb_ereg_replace('\W','',strtolower($tabs[1][$count]));				// sanitize the tab name for disk
 				foreach ($prefs[1] as $pref) {
-					$tabPrefs[$fileName . '-' . $tabs[1][$count]][$pref] = $this->PrefVars[$pref];      // Add full pref info in right order
+					if ($this->PrefVars[$pref]['name'])																		// dont save prefs that have no name
+						$tabPrefs[$fileName . '-' . $tabs[1][$count]][$pref] = $this->PrefVars[$pref];						// Add full pref info in right order
 				}
 			}
 		}else if (preg_match_all('/{preference.*name="?\'?(\w*)"?\'?.*}/i', $file, $prefs)){
 			foreach ($prefs[1] as $pref) {
-				$tabPrefs[$fileName][$pref] = $this->PrefVars[$pref];      // Add full pref info in right order
+				$tabPrefs[$fileName][$pref] = $this->PrefVars[$pref];			// Add full pref info in right order
 			}
 		}
 

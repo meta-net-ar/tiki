@@ -719,10 +719,11 @@ ul.all_languages > li {
 	outline: @gray dotted 1px;
 }
 
-// /* Background for CkEditor */
-.cke_wysiwyg_frame, .cke_wysiwyg_div {
-	background: @body-bg !important;
-	color: @text-color !important;
+// /* Background for CKEditor */
+.tiki .cke_wysiwyg_frame,
+.tiki .cke_wysiwyg_div {
+	background: @editor-bg; // @body-bg;
+	color: @editor-text-color; // @text-color;
 }
 
 .tiki_plugin {
@@ -985,6 +986,13 @@ h6 a.tiki_anchor:hover {
 /* Structures drill-down menu */
 div.drillshow {
 	border: 1px solid @gray-light;
+}
+
+.tiki .chosen-container-single .chosen-single {
+	height: @chosen-single-height; // "Make inputs at least the height of their button counterpart (base line-height + padding + border)"
+	padding: @chosen-padding-base-vertical @chosen-padding-base-vertical;
+	font-size: @chosen-font-size-base;
+	line-height: @chosen-line-height;
 }
 
 .chosen-container-multi .chosen-choices {

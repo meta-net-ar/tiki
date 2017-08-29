@@ -190,7 +190,7 @@ class HeaderLib
 	 * These are usually dynamic created js scripts for configuration, module settings etc.
 	 * Urls added here will not be further processed (like minified or put into a single file)
 	 * @param string $url - relative url to this tiki instance
-	 * @return object $HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_dynamic($url)
 	{
@@ -208,7 +208,7 @@ class HeaderLib
 	 * and cdn files are added after page setup by plugins etc
 	 *
 	 * @param string $url - absolute url including http/https
-	 * @return object $HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_cdn($url)
 	{
@@ -222,8 +222,8 @@ class HeaderLib
 	 * Theses are usally libraries like jquery or codemirror, so files where other js file depend on.
 	 * Depending on prefs, it could be minified and put into a single js file.
 	 * @param string $file with path relative to tiki dir
-	 * @param boolean $skip_minify default = false - true if the file must not be minified
-	 * @return object $HeaderLib
+	 * @param bool $skip_minify true if the file must not be minified, false if it can
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_dependancy($file, $skip_minify = false)
 	{
@@ -237,8 +237,8 @@ class HeaderLib
 	 * Theses are usally custom libraries like raphael, gaffle etc.
 	 * Depending on prefs, it could be minified and put into a single js file.
 	 * @param string $filename with path relative to tiki dir
-	 * @param booloean $skip_minify default = false - true if the file must not be minified
-	 * @return object $HeaderLib
+	 * @param bool $skip_minify true if the file must not be minified, false if it can
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_external($file, $skip_minify = false)
 	{
@@ -251,8 +251,8 @@ class HeaderLib
 	 * Adds a js file to load after external. That file must not be loaded from an external source.
 	 * Depending on prefs, it could be minified and also put into a single js file
 	 * @param string $file -  path relative to tiki dir
-	 * @param boolean $skip_minify optional, default = false - true if the file must not be minified
-	 * @return object $HeaderLib
+	 * @param bool $skip_minify true if the file must not be minified, false if it can
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile($file, $skip_minify=false) {
 		$this->add_jsfile_by_rank($file, '50standard', $skip_minify);
@@ -266,8 +266,8 @@ class HeaderLib
 	 * @see $this->forceJsRankLate() 
 	 * Depending on prefs, it could be minified and put into a single js file.
 	 * @param string $filename with path relative to tiki dir
-	 * @param boolean $skip_minify default = false - true if the file must not be minified
-	 * @return object $HeaderLib
+	 * @param bool $skip_minify true if the file must not be minified, false if it can
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_late($file, $skip_minify = false)
 	{
@@ -281,8 +281,8 @@ class HeaderLib
 	 * Only reason that it is public, is for access from lib/core/tiki/PageCache.php
 	 * @param string $file
 	 * @param string $rank
-	 * @param boolean $skip_minify
-	 * @return object $HeaderLib
+	 * @param bool $skip_minify true if the file must not be minified, false if it can
+	 * @return HeaderLib Current object
 	 */
 	function add_jsfile_by_rank($file, $rank, $skip_minify = false) {
 		// if js is added after tiki-setup.php is run, add those js files to 'late'
@@ -305,7 +305,7 @@ class HeaderLib
 	 * Add js that works as config. Usally created dynamically.
 	 * @param string $script
 	 * @param integer $rank - loadorder optional, default 0
-	 * @return object $HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	function add_js_config($script, $rank=0)
 	{
@@ -320,7 +320,7 @@ class HeaderLib
 	 * JS scripts to add as string 
 	 * @param string $script
 	 * @param integer $rank loadorder optional, default = 0
-	 * @return object $HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	function add_js($script, $rank = 0)
 	{
@@ -334,7 +334,7 @@ class HeaderLib
 	 * Adds lines or blocks of JQuery JavaScript to $(document).ready handler
 	 * @param string $script - Script to execute
 	 * @param number $rank - load order (default=0)
-	 * @return $object HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	function add_jq_onready($script,$rank=0)
 	{
@@ -497,7 +497,7 @@ class HeaderLib
 	/**
 	 * Force JS Files being added after tiki-setup.php is done to the rank/loadorder 'late' if rank is not 'external'. 
 	 * Used to seperate page specific JS Files from the rest.
-	 * @return object $HeaderLib
+	 * @return HeaderLib Current object
 	 */
 	public function forceJsRankLate()
 	{
@@ -660,6 +660,12 @@ class HeaderLib
 						if (file_exists($minifyFile)) {
 							$temp = file_get_contents($minifyFile);
 						} else {
+							// if the file does not exist MatthiasMullie\Minify takes the input to be the file content
+							// which causes js errors and can break the whole site
+							if (! file_exists($f)) {
+								Feedback::error(tr('JavaScript file "%0" cannot be found so will not be minified.', $f), 'session');
+								throw new Exception('File not found');
+							}
 							$minifier = new MatthiasMullie\Minify\JS($f);
 							$temp = $minifier->minify($minifyFile);
 							chmod($minifyFile, 0644);
@@ -896,11 +902,13 @@ class HeaderLib
 	public function get_all_css_content()
 	{
 		$files = $this->collect_css_files();
-		$minified = '';
+		$minifier = new MatthiasMullie\Minify\CSS();
+
 		foreach ( array_merge($files['screen'], $files['default']) as $file) {
-			$minified .= $this->minify_css($file);
+			$minifier->add($file);
 		}
-		$minified = $this->handle_css_imports($minified);
+
+		$minified = $minifier->minify();
 
 		return $minified;
 	}
@@ -953,8 +961,10 @@ class HeaderLib
 			$hash = md5($file);
 			$min = $target . "minified_$hash.css";
 
+			$minifier = new MatthiasMullie\Minify\CSS($file);
+
 			if ( ! file_exists($min) ) {
-				file_put_contents($min, $this->minify_css($file));
+				$minifier->minify($min);
 				chmod($min, 0644);
 			}
 
@@ -972,59 +982,17 @@ class HeaderLib
 		$file = $target . "minified_$hash.css";
 
 		if ( ! file_exists($file)) {
-			$minified = '';
+			$minifier = new MatthiasMullie\Minify\CSS();
 
 			foreach ( $files as $f ) {
-				$minified .= $this->minify_css($f);
+				$minifier->add($f);
 			}
 
-			$minified = $this->handle_css_imports($minified);
-
-			file_put_contents($file, $minified);
+			$minifier->minify($file);
 			chmod($file, 0644);
 		}
 
 		return array( $file );
-	}
-
-	private function handle_css_imports( $minified )
-	{
-
-		preg_match_all('/@import\s+url\("([^;]*)"\);/', $minified, $parts);
-		$top = [];
-
-		$pre = '';
-		foreach ( $parts[1] as $k => $f ) {
-			if (substr($f, 0, 2) == '//' || substr($f, 0, 7) == 'http://' || substr($f, 0, 8) == 'https://') {
-				$top[] = $parts[0][$k];
-				unset($parts[0][$k]); // Exclude import removal, external file
-			} else {
-				$pre .= $this->minify_css($f);
-			}
-		}
-
-		$imports = array_unique($parts[0]);
-		$minified = $pre . $minified;
-		$minified = str_replace($imports, '', $minified);
-
-		return implode("\n", $top) . "\n" . $minified;
-	}
-
-	public function minify_css( $file )
-	{
-		global $tikipath, $tikiroot;
-		if (strpos($file, $tikiroot) === 0) {
-			$file = substr($file, strlen($tikiroot));
-		}
-
-		$currentdir = str_replace($tikipath, $tikiroot, str_replace('\\', '/', dirname(realpath($file))));
-		if ( $file[0] == '/' ) {
-			$file = $tikipath . $file;
-		}
-
-		$content = file_get_contents($file);
-
-		return Minify_CSSmin::minify($content, array('prependRelativePath' => $currentdir.'/', 'bubbleCssImports' => true));
 	}
 
 

@@ -5,7 +5,7 @@
  * $Id$
  */
 
-lang = {
+var lang = {
 	"Default" : "Défaut",
 	"Very Secure" : "Très sécurisé",
 	"Secure" : "Sécurisé",
@@ -29,6 +29,7 @@ lang = {
 	"Add Field" : "Ajouter un champ",
 	"Edit Field" : "Modifier le champ",
 	"Removing the field will result in data loss. Are you sure?" : "La suppression du champ entraînera la perte des données. Êtes-vous sûr(e) ?",
+	"Edit" : "Modifier",
 	"Save" : "Enregistrer",
 	"Cancel" : "Annuler",
 	"Delete" : "Supprimer",	

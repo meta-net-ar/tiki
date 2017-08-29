@@ -38,7 +38,7 @@ class Language_WriteFile
 	 * @var array
 	 */
 	protected $translations;
-	
+
 	public function __construct(Language_File $parseFile)
 	{
 		$this->parseFile = $parseFile;
@@ -68,7 +68,6 @@ class Language_WriteFile
 		
 		$this->translations = $this->parseFile->getTranslations();
 
-		$punctuations = array(':', '!', ';', '.', ',', '?'); // Should stay synchronized with tra_impl() (in lib/init/tra.php)
 		$entries = array();
 		foreach ($strings as $string) {
 			if (isset($this->translations[$string['name']])) {
@@ -80,7 +79,7 @@ class Language_WriteFile
 				$stringLength = strlen($string['name']);
 				$stringLastChar = $string['name'][$stringLength - 1];
 
-				if (in_array($stringLastChar, $punctuations) ) {
+				if (in_array($stringLastChar, Language::punctuations) ) {
 					$trimmedString = substr($string['name'], 0, $stringLength - 1);
 					$string['name'] = $trimmedString;
 					if (isset($this->translations[$trimmedString])) {

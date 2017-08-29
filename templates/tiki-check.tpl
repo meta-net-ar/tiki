@@ -233,6 +233,23 @@
 	</table>
 </div>
 
+{remarksbox type="note" id="php_conf_info" title="{tr}Change PHP configuration values{/tr}"}
+	{if $php_sapi_info}
+		<p>
+		{if $php_sapi_info.message}
+			{tr}{$php_sapi_info.message}{/tr}
+		{/if}
+		{if $php_sapi_info.link}
+			{tr}<a href="{$php_sapi_info.link}">{$php_sapi_info.link}</a>{/tr}
+		{/if}
+		</p>
+	{/if}
+
+	<p>
+		{tr}You can check the full documentation on how to change the configurations values in <a href="http://www.php.net/manual/en/configuration.php">http://www.php.net/manual/en/configuration.php</a>{/tr}
+	</p>
+{/remarksbox}
+
 <h2>{tr}PHP Security properties{/tr}</h2>
 {tr}To check the file integrity of your Tiki installation, go to <a href="tiki-admin_security.php">Admin->Security</a>{/tr}.
 <div class="table-responsive">
@@ -281,6 +298,13 @@
 {remarksbox type='info' title="{$sensitive_data_box_title}" close='n'}
 	<p>{tr}Tiki did not detect temporary files in the db folder which may expose credentials or other sensitive information.{/tr}</p>
 {/remarksbox}
+{/if}
+
+{if $prefs.print_pdf_from_url === "mpdf" && $mPDFClassMissing}
+	<h2>{tr}Print configurations{/tr}</h2>
+	{remarksbox type='error' title="{tr}mPDF Information{/tr}" close='n'}
+		<p>{tr}mPDF is selected as Print option, however the class can't be loaded, please check "Print Settings" in /tiki-admin.php?page=print{/tr}</p>
+	{/remarksbox}
 {/if}
 
 <h2>{tr}File Gallery Search Indexing{/tr}</h2>

@@ -1,6 +1,10 @@
 {* $Id$ *}
+{if empty($iListExecute)}{assign var=iListExecute value=$id}{/if}
 {if $actions}
 <form method="post" action="#{$id}" class="form-inline" id="listexecute-{$iListExecute}">
+{/if}
+{if not empty($column.field)}
+	{$column = [$column]}{* if there is only one column then it will not be in an array *}
 {/if}
 <div {if $id}id="{$id}-div" {/if}class="table-responsive ts-wrapperdiv" {if $tsOn}style="visibility:hidden;"{/if}>
 	<table {if $id}id="{$id}" {/if}class="table normal table-hover table-striped" data-count="{$count}">
@@ -17,7 +21,10 @@
 			<tr>
 				{if $actions}
 					{$fieldcount = 1}
-					<th><input type="checkbox" name="objects[]" value="ALL" class="listexecute-select-all"></th>
+					<th>
+						<input type="checkbox" name="selectall" value="" class="listexecute-select-all">
+						<input type="hidden" name="objects[]" value="" class="listexecute-all">
+					</th>
 				{/if}
 				{foreach from=$column item=col}
 					{$fieldcount = $fieldcount + 1}
@@ -54,7 +61,7 @@
 			<tr>
 				{if $actions}
 					<td>
-						<input type="checkbox" name="objects[]" value="{$row.object_type|escape}:{$row.object_id|escape}">
+						<input type="checkbox" name="objects[]" class="checkbox_objects" value="{$row.object_type|escape}:{$row.object_id|escape}">
 						{if $row.report_status eq 'success'}
 							{icon name='ok'}
 						{elseif $row.report_status eq 'error'}
@@ -78,28 +85,79 @@
 	</table>
 </div>
 {if $actions}
-	<select name="list_action" class="form-control">
+	<select name="list_action" class="form-control" id="check_submit_select_{$id}">
 		<option></option>
 		{foreach from=$actions item=action}
 			<option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}">{$action->getName()|escape}</option>
 		{/foreach}
 	</select>
 	<input type="text" name="list_input" value="" class="form-control" style="display:none">
-	<input type="submit" class="btn btn-default btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}">
+	<input type="submit" class="btn btn-default btn-sm" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{tr}Apply{/tr}">
 </form>
 {jq}
-$('.listexecute-select-all').removeClass('listexecute-select-all')
-	.on('click', function (e) {
-		$(this).closest('form').find('tbody :checkbox:not(:disabled)').each(function () {
-			$(this).prop("checked", ! $(this).prop("checked"));
+(function(){
+	var countChecked = function() {
+		if ($('#{{$id}}-div .checkbox_objects').is(':checked')) {
+			if($('select#check_submit_select_{{$id}}').val()){
+				$('input#submit_form_{{$id}}').prop('disabled', false);
+			}
+		} else {
+			$('input#submit_form_{{$id}}').prop('disabled', true);
+		}
+		var header_checked = $('#{{$id}}-div .checkbox_objects').not(':checked').length == 0;
+		$('#listexecute-{{$iListExecute}} .listexecute-all').val(header_checked ? 'ALL' : '');
+	};
+	$('#listexecute-{{$iListExecute}} .listexecute-select-all').removeClass('listexecute-select-all')
+		.on('click', function (e) {
+			$(this).closest('form').find('tbody :checkbox:not(:disabled)').each(function () {
+				$(this).prop("checked", ! $(this).prop("checked"));
+			}).promise().done(function(){ countChecked(); });
+		});
+	$('#listexecute-{{$iListExecute}}').find('select[name=list_action]')
+		.on('change', function() {
+			var valueSel = $('select#check_submit_select_{{$id}}').val();
+			if(valueSel == ''){
+				$('input#submit_form_{{$id}}').prop('disabled', true);
+			} else {
+				if($('#{{$id}}-div .checkbox_objects').is(':checked')){
+					$('input#submit_form_{{$id}}').prop('disabled', false);
+				}
+			}
+			if( $(this).find('option:selected').data('input') ) {
+				$(this).siblings('input[name=list_input]').show();
+			} else {
+				$(this).siblings('input[name=list_input]').hide();
+			}
+		});
+	$( "#{{$id}}-div .checkbox_objects" ).on( "click", countChecked );
+	countChecked();
+})();
+{/jq}
+{/if}
+{if $downloadable}
+	{if $actions}
+	<br>
+	{/if}
+	<form method="post" id="listexecute-download-{$iListExecute}">
+		<input type="hidden" name="download" value="1">
+		<input type="hidden" name="tsAjax" value="y">
+		<input type="submit" name="submit" value="{tr}Download{/tr}" class="btn btn-default">
+	</form>
+{jq}
+(function(){
+	$('#listexecute-download-{{$iListExecute}}').submit(function(){
+		var $form = $(this);
+		$form.find('input[name^=filter]').remove();
+		$('.tablesorter-filter').each(function(i,el){
+			var column = $(el).data('column'),
+					value = $(el).val();
+			if( value ) {
+				$('<input type="hidden" name="filter['+column+']">')
+					.val(value)
+					.appendTo($form);
+			}
 		});
 	});
-$('#listexecute-{{$iListExecute}}').find('select[name=list_action]').on('change', function() {
-	if( $(this).find('option:selected').data('input') ) {
-		$(this).siblings('input[name=list_input]').show();
-	} else {
-		$(this).siblings('input[name=list_input]').hide();
-	}
-});
+})();
 {/jq}
 {/if}

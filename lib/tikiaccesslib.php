@@ -770,6 +770,8 @@ class TikiAccessLib extends TikiLib
 		if (trim($msg)) {
 			$session = session_id();
 			if ( empty($session) ) {
+				// Can happen if session_silent is enabled. But does any instance enable session_silent?
+				// Removing this case would allow removing the $msg parameters and just have callers using Feedback::add() before calling redirect(). Chealer 2017-08-16
 				$start = strpos($url, '?') ? '&' : '?';
 				$url = $start . 'msg=' . urlencode($msg) . '&msgtype=' . urlencode($msgtype);
 			} else {
@@ -898,7 +900,7 @@ class TikiAccessLib extends TikiLib
 	 * @param bool $acceptFeed
 	 * @return array
 	 */
-	function get_accept_types($acceptFeed = false)
+	static function get_accept_types($acceptFeed = false)
 	{
 		$accept = explode(',', $_SERVER['HTTP_ACCEPT']);
 
@@ -935,9 +937,9 @@ class TikiAccessLib extends TikiLib
 	/**
 	 * @return bool
 	 */
-	function is_machine_request()
+	static function is_machine_request()
 	{
-		foreach ( $this->get_accept_types() as $name => $full ) {
+		foreach ( self::get_accept_types() as $name => $full ) {
 			switch ( $name ) {
 				case 'html':
 					return false;
@@ -954,9 +956,9 @@ class TikiAccessLib extends TikiLib
 	 * @param bool $acceptFeed
 	 * @return bool
 	 */
-	function is_serializable_request($acceptFeed = false)
+	static function is_serializable_request($acceptFeed = false)
 	{
-		foreach ( $this->get_accept_types($acceptFeed) as $name => $full ) {
+		foreach ( self::get_accept_types($acceptFeed) as $name => $full ) {
 			switch ( $name ) {
 				case 'json':
 				case 'yaml':
@@ -991,9 +993,9 @@ class TikiAccessLib extends TikiLib
 	 * [entryModificationKey] Key to lookup to find the modification date
 	 * [entryObjectDescriptors] Optional. Array containing two key names, object key and object type to lookup missing information (url and title)
 	 */
-	function output_serialized( $data, $feed_descriptor = null )
+	static function output_serialized( $data, $feed_descriptor = null )
 	{
-		foreach ( $this->get_accept_types(! is_null($feed_descriptor)) as $name => $full ) {
+		foreach ( self::get_accept_types(! is_null($feed_descriptor)) as $name => $full ) {
 			switch ( $name ) {
 				case 'json':
 					header("Content-Type: $full");
@@ -1039,7 +1041,7 @@ class TikiAccessLib extends TikiLib
 				case 'rss':
 					$rsslib = TikiLib::lib('rss');
 					$writer = $rsslib->generate_feed_from_data($data, $feed_descriptor);
-					$writer->setFeedLink($this->tikiUrl($_SERVER['REQUEST_URI']), 'rss');
+					$writer->setFeedLink(self::tikiUrl($_SERVER['REQUEST_URI']), 'rss');
 
 					header('Content-Type: application/rss+xml');
 					echo $writer->export('rss');
@@ -1048,7 +1050,7 @@ class TikiAccessLib extends TikiLib
 				case 'atom':
 					$rsslib = TikiLib::lib('rss');
 					$writer = $rsslib->generate_feed_from_data($data, $feed_descriptor);
-					$writer->setFeedLink($this->tikiUrl($_SERVER['REQUEST_URI']), 'atom');
+					$writer->setFeedLink(self::tikiUrl($_SERVER['REQUEST_URI']), 'atom');
 
 					header('Content-Type: application/atom+xml');
 					echo $writer->export('atom');

@@ -10,7 +10,6 @@ function prefs_calendar_list()
 	return array(
 		'calendar_view_days' => array(
 			'name' => tra('Days to display in the calendar'),
-			'description' => '',
 			'type' => 'multicheckbox',
 			'options' => array(
 				0 => tra('Sunday'),
@@ -75,6 +74,7 @@ function prefs_calendar_list()
 		),
 		'calendar_start_year' => array(
 			'name' => tra('First year in the dropdown'),
+			'units' => tra('years'),
 			'description' => '',
 			'type' => 'text',
 			'size' => '5',
@@ -84,6 +84,7 @@ function prefs_calendar_list()
 		'calendar_end_year' => array(
 			'name' => tra('Last year in the dropdown'),
 			'description' => '',
+			'units' => tra('years'),
 			'type' => 'text',
 			'size' => '5',
 			'hint' => tra('Enter a year or use +/- N to specify a year relative to the current year'),

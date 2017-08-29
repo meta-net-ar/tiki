@@ -307,6 +307,38 @@ class UnifiedSearchLib
 	}
 
 	/**
+	 * Return the current engine for unified search and version
+	 * @return array
+	 */
+	public function getEngineAndVersion()
+	{
+		global $prefs;
+		global $tikilib;
+
+		switch ($prefs['unified_engine']) {
+			case 'lucene':
+				$engine = 'Lucene';
+				$version = '';
+				break;
+			case 'elastic':
+				$elasticsearch = new \Search_Elastic_Connection($prefs['unified_elastic_url']);
+				$engine = 'Elastic';
+				$version = $elasticsearch->getVersion();
+				break;
+			case 'mysql':
+				$engine = 'MySQL';
+				$version = $tikilib->getMySQLVersion();
+				break;
+			default:
+				$engine = '';
+				$version = '';
+				break;
+		}
+
+		return [$engine, $version];
+	}
+
+	/**
 	 * Get the index location depending on $tikidomain for multi-tiki
 	 *
 	 * @return string	path to index directory
@@ -672,6 +704,7 @@ class UnifiedSearchLib
 			$connection = $this->getElasticConnection($writeMode);
 			$index = new Search_Elastic_Index($connection, $index);
 			$index->setCamelCaseEnabled($prefs['unified_elastic_camel_case'] == 'y');
+			$index->setPossessiveStemmerEnabled($prefs['unified_elastic_possessive_stemmer'] == 'y');
 			$index->setFacetCount($prefs['search_facet_default_amount']);
 			return $index;
 		case 'mysql':
@@ -1019,6 +1052,38 @@ class UnifiedSearchLib
 			$facets[] = Search_Query_Facet_Term::fromField('language')
 				->setLabel(tr('Language'))
 				->setRenderMap(TikiLib::lib('language')->get_language_map());
+		}
+
+		if ($prefs['federated_enabled'] === 'y') {
+			$tiki_extwiki = TikiDb::get()->table('tiki_extwiki');
+
+			$indexMap = [
+				$this->getIndexLocation() => tr('Local Search'),
+			];
+
+			foreach (TikiLib::lib('federatedsearch')->getIndices() as $indexname => $index) {
+				$indexMap[$indexname] = $tiki_extwiki->fetchOne('name', [
+					'indexname' => $indexname,
+				]);
+			}
+
+			$facets[] = Search_Query_Facet_Term::fromField('_index')
+				->setLabel(tr('Federated Search'))
+				->setRenderCallback(function ($index) use (& $indexMap) {
+					$out = tr('Index not found');
+					if (isset($indexMap[$index])) {
+						$out = $indexMap[$index];
+					} else {
+						foreach ($indexMap as $candidate => $name) {
+							if (0 === strpos($index, $candidate . '_')) {
+								$indicesMap[$index] = $name;
+								$out = $name;
+								break;
+							}
+						}
+					}
+					return $out;
+				});
 		}
 
 		$provider = new Search_FacetProvider;

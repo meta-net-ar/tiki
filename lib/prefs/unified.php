@@ -44,10 +44,11 @@ function prefs_unified_list()
 		),
 		'unified_lucene_max_resultset_limit' => array(
 			'name' => tra('Lucene maximum result-set limit'),
-			'hint' => tra('Maximum size of result set to consider. Default 1000, 0 = unlimited.'),
+			'hint' => tra('Maximum size of result set to consider.'),
 			'description' => tra('This is used when calculating result scores and sort order which can lead to out of memory errors on large data sets. The default of 1000 is safe with the PHP memory_limit set to 128M'),
 			'type' => 'text',
 			'filter' => 'int',
+			'shorthint' => tr('0 for unlimited'),
 			'units' => tra('result sets'),
 			'default' => 1000,
 			'size' => 6,
@@ -143,7 +144,7 @@ function prefs_unified_list()
 		),
 		'unified_forum_deepindexing' => array(
 			'name' => tra('Index forum replies together with initial post'),
-			'description' => tra('If enabled, forum replies will be indexed together with the initial post as a single document instead of being indexed separately'),
+			'description' => tra('Forum replies will be indexed together with the initial post as a single document instead of being indexed separately'),
 			'type' => 'flag',
 			'default' => 'y',
 		),
@@ -204,7 +205,7 @@ function prefs_unified_list()
 		),
 		'unified_exclude_all_plugins' => array(
 			'name' => tra('Exclude all plugins'),
-			'description' => tra('If enabled, indexing will exclude all plugins.'),
+			'description' => tra('Indexing will exclude all plugins.'),
 			'type' => 'flag',
 			'default' => 'y',
 		),
@@ -248,12 +249,12 @@ function prefs_unified_list()
 			'name' => tr('Tokenize CamelCase words'),
 			'description' => tr('Consider the components of camel-case words as separate tokens, allowing them to be searched individually.'),
 			'warning' => tr('Conflicts with Tokenize Version Numbers.'),
-			'hint' => tr('Elasticsearch only'),
 			'type' => 'flag',
 			'default' => 'n',
 		),
 		'unified_elastic_field_limit' => array(
 			'name' => tra('Elasticsearch field limit per index'),
+			'units' => tra('fields'),
 			'type' => 'text',
 			'size' => '5',
 			'filter' => 'digits',
@@ -321,6 +322,12 @@ function prefs_unified_list()
 			),
 			'tags' => array('experimental'), // See warning
 			'warning' => tra('Some plugins may not appear. When using the MySQL engine, can have problems with short plugin names (for MyISAM, those under "ft_min_word_len").'), // See ticket #6313
+		),
+		'unified_elastic_possessive_stemmer' => array(
+			'name' => tr('Possesive Stemmer'),
+			'description' => tr("The possessive stemmer removes 's from any words before indexing"),
+			'type' => 'flag',
+			'default' => 'y',
 		),
 	);
 }

@@ -133,8 +133,8 @@ if ($prefs['mobile_feature'] === 'y') {
 
 require_once ('lib/setup/user_prefs.php');
 require_once ('lib/setup/language.php');
-require_once ('lib/setup/javascript.php');
 require_once ('lib/setup/wiki.php');
+require_once ('lib/setup/javascript.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 
@@ -317,22 +317,13 @@ $smarty->assign('tiki_uses_svn', $TWV->svn);
 
 $smarty->assign('symbols', TikiLib::symbols());
 
+// Used by TikiAccessLib::redirect()
 if ( isset( $_GET['msg'] ) ) {
-	$smarty->assign('display_msg', $_GET['msg']);
+	Feedback::add(['mes' => $_GET['msg'], 'type' => $_GET['msgtype']], 'tpl');
 } elseif ( isset( $_SESSION['msg'] ) ) {
-	$smarty->assign('display_msg', $_SESSION['msg']);
+	Feedback::add(['mes' => $_SESSION['msg'], 'type' => $_SESSION['msgtype']], 'tpl');
 	unset($_SESSION['msg']);
-} else {
-	$smarty->assign('display_msg', '');
-}
-
-if ( isset( $_GET['msgtype'] ) ) {
-	$smarty->assign('display_msgtype', $_GET['msgtype']);
-} elseif ( isset( $_SESSION['msgtype'] ) ) {
-	$smarty->assign('display_msgtype', $_SESSION['msgtype']);
 	unset($_SESSION['msgtype']);
-} else {
-	$smarty->assign('display_msgtype', '');
 }
 
 require_once 'lib/setup/events.php';
@@ -391,6 +382,7 @@ if ($prefs['geo_openlayers_version'] === 'ol3') {
 	$headerlib->add_jsfile('lib/jquery_tiki/tiki-maps-ol3.js');
 } else {
 	$headerlib->add_jsfile('lib/jquery_tiki/tiki-maps.js');
+	$headerlib->add_cssfile('lib/openlayers/theme/default/style.css');
 }
 $headerlib->add_jsfile('vendor_bundled/vendor/jquery/plugins/jquery-json/src/jquery.json.js');
 
@@ -547,7 +539,9 @@ if ( $prefs['feature_jquery_validation'] == 'y' ) {
 }
 
 // note: jquery.async.js load a copy of jquery
+// Used by treetable and a few more places
 $headerlib->add_jsfile('vendor_bundled/vendor/jquery/plugins/async/jquery.async.js');
+
 $headerlib->add_jsfile('vendor_bundled/vendor/jquery/plugins/treetable/jquery.treetable.js');
 $headerlib->add_cssfile('vendor_bundled/vendor/jquery/plugins/treetable/css/jquery.treetable.css');
 
@@ -647,7 +641,8 @@ if ($prefs['feature_inline_comments'] === 'y') {
 	}
 	$commentController = new Services_Comment_Controller();
 
-	if ($commentController->isEnabled($object['type'], $object['object'])) {
+	if ($commentController->isEnabled($object['type'], $object['object']) &&
+		$commentController->canView($object['type'], $object['object'])) {
 
 		$canPost = $commentController->canPost($object['type'], $object['object']);
 		$objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);    // spoof a URI from type and id

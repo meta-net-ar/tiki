@@ -374,6 +374,7 @@ class Search_Query_WikiBuilder
 		$parser = new WikiParser_PluginArgumentParser;
 		$args = [];
 		$tsc = [];
+		$tsf = [];
 		$tsenabled = Table_Check::isEnabled();
 
 		foreach ($matches as $match) {
@@ -394,6 +395,9 @@ class Search_Query_WikiBuilder
 					if (isset($tsp[0]['max']) && $ajax) {
 						$ret['max'] = (int) $tsp[0]['max'];
 					}
+				}
+				if (isset($tsargs['tsfilters'])) {
+					$tsf = Table_Check::parseParam($tsargs['tsfilters']);
 				}
 			} elseif ($name == 'column') {
 				$args[] = $parser->parse($match->getArguments());
@@ -431,7 +435,7 @@ class Search_Query_WikiBuilder
 		}
 
 		if (Table_Check::isSort()) {
-			foreach ($_GET['sort'] as $key => $dir) {
+			foreach ($_REQUEST['sort'] as $key => $dir) {
 				if( $hasactions ) {
 					$type = $tsc[$key]['type'];
 					$field = @$args[$key-1]['field'];
@@ -456,7 +460,7 @@ class Search_Query_WikiBuilder
 		}
 
 		if (Table_Check::isFilter()) {
-			foreach ($_GET['filter'] as $key => $filter) {
+			foreach ($_REQUEST['filter'] as $key => $filter) {
 				if( $hasactions ) {
 					$type = $tsc[$key]['type'];
 					$field = @$args[$key-1]['field'];
@@ -486,7 +490,11 @@ class Search_Query_WikiBuilder
 							break;
 						}	// else fall through to default
 					default:
-						$this->query->filterContent($filter, $field);
+						if (!empty($tsf[$key]['initial'])) {
+							$this->query->filterInitial($filter, $field);
+						} else {
+							$this->query->filterContent($filter, $field);
+						}
 						break;
 				}
 			}

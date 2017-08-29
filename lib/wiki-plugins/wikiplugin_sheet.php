@@ -151,6 +151,9 @@ function wikiplugin_sheet($data, $params)
 				$page = htmlentities($page);
 				$content = htmlentities($data);
 				$formId = "form$index";
+                $accesslib = TikiLib::lib('access');
+                $accesslib->checkAuthenticity();
+                $ticket = $accesslib->getTicket();
 				return <<<EOF
 				~np~
 				<form id="$formId" method="post" action="tiki-wikiplugin_edit.php">
@@ -160,6 +163,8 @@ function wikiplugin_sheet($data, $params)
 					<input type="hidden" name="index" value="$index"/>
 					<input type="hidden" name="type" value="sheet"/>
 					<input type="hidden" name="params[id]" value="$sheetId"/>
+                    <input type="hidden" name="ticket" value="$ticket"/>
+                    <input type="hidden" name="daconfirm" value="y"/>
 				</div>
 				</form>
 				<script type="text/javascript">
@@ -245,7 +250,7 @@ EOF;
 		$headerlib = TikiLib::lib('header');
 		$sheetlib->setup_jquery_sheet();
 		$headerlib->add_jq_onready(
-			'$("div.tiki_sheet").each(function() {
+			'$("div#tiki_sheet'.$index.'").each(function() {
 				$(this).sheet($.extend($.sheet.tikiOptions,{
 				editable:false'
 			. $calcOff .
@@ -255,7 +260,7 @@ EOF;
 
 	}
 
-	$ret = '<div id="tiki_sheet' . $sheet->instance . '" class="tiki_sheet' . $class . '" style="overflow:hidden;' . $style . '">' . $ret . '</div>';
+	$ret = '<div id="tiki_sheet' . $index . '" class="tiki_sheet' . $class . '" style="overflow:hidden;' . $style . '">' . $ret . '</div>';
 
 	if ( $editable && ($objectperms->edit_sheet  || $objectperms->admin_sheet || $tiki_p_admin == 'y')) {
 		$smarty->loadPlugin('smarty_function_button');

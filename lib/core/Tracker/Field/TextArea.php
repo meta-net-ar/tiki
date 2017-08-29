@@ -293,6 +293,14 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
 					$info['fields'][$permName] = $value;
 				})
 				;
+			// convert incoming html to wiki syntax and the opposite on export
+			$schema->addNew($permName, 'wiki-html')
+				->setLabel($name)
+				->addQuerySource('text', "{$baseKey}_raw")
+				->setRenderTransform($render(null))
+				->setParseIntoTransform(function (& $info, $value) use ($permName) {
+					$info['fields'][$permName] = TikiLib::lib('edit')->parseToWiki($value);
+				});
 		} else {
 			$lang = $prefs['language'];
 			$schema->addNew($permName, "current")
@@ -338,9 +346,11 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
 
 	protected function attemptParse($text)
 	{
+		global $prefs;
+
 		$parseOptions = array();
 		if ($this->getOption('wysiwyg') === 'y') {
-			$parseOptions['is_html'] = true;
+			$parseOptions['is_html'] = ($prefs['wysiwyg_htmltowiki'] !== 'y');
 		}
 		return TikiLib::lib('parser')->parse_data($text, $parseOptions);
 	}

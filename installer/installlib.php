@@ -13,31 +13,41 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 
 
 require_once 'lib/setup/twversion.class.php';
+require_once 'Patch.php';
 
 /**
- *
+ * @see Patch
  */
 class Installer extends TikiDb_Bridge
 {
-	public $patches = array();
-	public $scripts = array();
+	static $instance = null; // Singleton instance
 
-	public $installed = array();
+	public $scripts = array();
 	public $executed = array();
 
-	public $success = array();
-	public $failures = array();
-	
+	public $queries = array('successful' => [], 'failed' => []);
+
 	public $useInnoDB = false;
 
     /**
-     *
+     * TODO: make private to enforce Singleton
      */
     function __construct() // {{{
 	{
 		$this->buildPatchList();
 		$this->buildScriptList();
 	} // }}}
+
+	/**
+	 * Get the instance (creating one if necessary)
+	 * @return Installer
+	 */
+	static function getInstance() {
+		if (is_null(self::$instance)) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	function cleanInstall() // {{{
 	{
@@ -60,10 +70,9 @@ class Installer extends TikiDb_Bridge
 			$this->buildScriptList();
 
 			// Base SQL file contains the distribution tiki patches up to this point
-			$patches = $this->patches;
-			foreach ( $patches as $patch ) {
-				if ( preg_match('/_tiki$/', $patch) ) {
-					$this->recordPatch($patch);
+			foreach ( Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch ) {
+				if ( preg_match('/_tiki$/', $patchName) ) {
+					$patch->record();
 				}
 			}
 		}
@@ -115,10 +124,14 @@ class Installer extends TikiDb_Bridge
 			// Run single inserts
 			$this->runFile($secdb);
 		}
-		
-		$patches = $this->patches;
-		foreach ($patches as $patch) {
-			$this->installPatch($patch);
+		foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
+			try {
+				$this->installPatch($patchName);
+			} catch (Exception $e) {
+				if ($e->getCode() != 2) {
+					throw $e;
+				}
+			}
 		}
 
 		foreach ( $this->scripts as $script ) {
@@ -128,11 +141,13 @@ class Installer extends TikiDb_Bridge
 
     /**
      * @param $patch
+	 * @param $force true if the patch should be applied even if already marked as applied
+	 * @throws Exception Code 1 if unknown patch, 2 if application attempt fails, 3 if patch was already installed and $force is false
      */
-    function installPatch( $patch ) // {{{
+    function installPatch( $patch, $force = false ) // {{{
 	{
-		if ( ! in_array($patch, $this->patches) ) {
-			return;
+		if ( ! $force && isset(Patch::$list[$patch]) && Patch::$list[$patch]->isApplied() ) {
+			throw new Exception('Patch already applied', 3);
 		}
 
 		$schema = dirname(__FILE__) . "/schema/$patch.sql";
@@ -145,6 +160,7 @@ class Installer extends TikiDb_Bridge
 
 		if ( file_exists($script) ) {
 			require $script;
+			$status = true;
 		}
 
 		global $dbs_tiki;
@@ -155,26 +171,37 @@ class Installer extends TikiDb_Bridge
 		}
 
 		if ( function_exists($standalone) ) {
-			$standalone($this);
+			$status = $standalone($this);
+			if (is_null($status)) {
+				$status = true;
+			}
 		} else {
 			if ( function_exists($pre) ) {
 				$pre( $this );
 			}
-	
+
 			if (file_exists($profile)) {
 				$status = $this->applyProfile($profile);
 			} else {
-				$status = $this->runFile($schema);
+				try {
+					$status = $this->runFile($schema);
+				} catch (Exception $e) {}
 			}
-	
+
 			if ( function_exists($post) ) {
 				$post( $this );
 			}
 		}
-
-		if (!isset($status) || $status ) {
-			$this->installed[] = $patch;
-			$this->recordPatch($patch);
+		if ( ! isset($status) ) {
+			if ( array_key_exists($patch, Patch::$list) ) {
+				throw new LogicException('Patch not found');
+			} else {
+				throw new Exception('No such patch', 1);
+			}
+		} elseif (! $status ) {
+			throw new Exception('Patch application failed', 2);
+		} else {
+			Patch::$list[$patch]->record();
 		}
 	} // }}}
 
@@ -195,14 +222,6 @@ class Installer extends TikiDb_Bridge
 		$this->executed[] = $script;
 	} // }}}
 
-    /**
-     * @param $patch
-     */
-    function recordPatch( $patch ) // {{{
-	{
-		$this->query("INSERT INTO tiki_schema (patch_name, install_date) VALUES(?, NOW())", array($patch));
-		$this->patches = array_diff($this->patches, array($patch));
-	} // }}}
 
 	private function applyProfile($profileFile)
 	{
@@ -251,15 +270,15 @@ class Installer extends TikiDb_Bridge
 		}
 		return $status;
 	}
-		/**
+
+	/**
      * @param $file
      * @return bool
      */
     function runFile( $file ) // {{{
 	{
 		if ( !is_file($file) || !$command = file_get_contents($file) ) {
-			print('Fatal: Cannot open '.$file);
-			exit(1);
+			throw new Exception('Fatal: Cannot open ' . $file);
 		}
 
 		// split the file into several queries?
@@ -299,57 +318,61 @@ class Installer extends TikiDb_Bridge
 		$result = $this->queryError($query, $error, $values);
 
 		if ( $result && empty($error) ) {
-			$this->success[] = $query;
+			$this->queries['successful'][] = $query;
 			return $result;
 		} else {
-			$this->failures[] = array($query, $error, substr(basename($patch), 0, -4));
+			$this->queries['failed'][] = array($query, $error, substr(basename($patch), 0, -4));
 			return false;
 		}
 	} // }}}
 
-	function buildPatchList() // {{{
+	/**
+	 * @throws Exception In case of filesystem access issue
+	 */
+	function buildPatchList()
 	{
-		$this->patches = array();
-
-		$files = glob(dirname(__FILE__) . '/schema/*_*.sql');
-		foreach ( $files as $file ) {
-			$filename = basename($file);
-			$this->patches[] = substr($filename, 0, -4);
+		// Optimization
+		if (! is_null(Patch::$list)) {
+			return;
 		}
 
-		$files = glob(dirname(__FILE__) . '/schema/*_*.yml');
-		if($files != false){
-			foreach ( $files as $file ) {
+		$patches = [];
+		foreach (['sql', 'yml', 'php' /* "php" for standalone PHP scripts */] as $extension) {
+			$files = glob(dirname(__FILE__) . '/schema/*_*.' . $extension); // glob() does not portably support brace expansion, hence the loop
+			if ($files === false) {
+				throw new Exception('Failed to scan patches');
+			}
+			foreach ($files as $file) {
 				$filename = basename($file);
-				$this->patches[] = substr($filename, 0, -4);
+				$patches[] = substr($filename, 0, -4);
 			}
 		}
-		// Add standalone PHP scripts
-		$files = glob(dirname(__FILE__) . '/schema/*_*.php');
-		foreach ( $files as $file ) {
-			$filename = basename($file);
-			$patch = substr($filename, 0, -4);
-			if (!in_array($patch, $this->patches)) {
-				$this->patches[] = $patch;
-			}
-		}
+		$patches = array_unique($patches);
 
 		$installed = array();
-		$results = false;
-		
 		if ($this->tableExists('tiki_schema')) {
 			$installed = $this->table('tiki_schema')->fetchColumn('patch_name', array());
 		}
-		
+
 		if ( empty($installed) ) {
 			// Erase initial error
-			$this->failures = array();
+			$this->queries['failed'] = array();
 		}
 
-		$this->patches = array_diff($this->patches, $installed);
+		Patch::$list = array();
+		sort($patches);
+		foreach ($patches as $patchName) {
+			if (in_array($patchName, $installed)) {
+				$status = Patch::ALREADY_APPLIED;
+			} else {
+				$status = Patch::NOT_APPLIED;
+			}
+			$patch = new Patch($patchName, $status);
+			$patch->optional = substr($patchName, 0, 8) == 'optional'; // Ignore patches starting with "optional". These patches have drawbacks and should be manually run by informed administrators.
+			Patch::$list[$patchName] = $patch;
+		}
+	}
 
-		sort($this->patches);
-	} // }}}
 
 	function buildScriptList() // {{{
 	{
@@ -384,7 +407,7 @@ class Installer extends TikiDb_Bridge
      */
     function requiresUpdate() // {{{
 	{
-		return count($this->patches) > 0 ;
+		return count(Patch::getPatches([Patch::NOT_APPLIED])) > 0;
 	} // }}}
  function checkInstallerLocked() // {{{
 	{
@@ -454,5 +477,22 @@ class Installer extends TikiDb_Bridge
 			}
 		}
 	} // }}}
-	
+
+	/**
+	 * @param string $prefName
+	 * @param string $oldDefault
+	 */
+	function preservePreferenceDefault($prefName, $oldDefault) {
+
+		if ($this->tableExists('tiki_preferences')) {
+
+			$tiki_preferences = $this->table('tiki_preferences');
+			$hasValue = $tiki_preferences->fetchCount(['name' => $prefName]);
+
+			if (empty($hasValue)) {	// old value not in database so was on default value
+				$tiki_preferences->insert(['name' => $prefName, 'value' => $oldDefault]);
+			}
+		}
+
+	}
 }

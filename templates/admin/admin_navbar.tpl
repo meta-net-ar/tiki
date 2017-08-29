@@ -16,11 +16,12 @@
 					</a>
 					<ul class="dropdown-menu" role="menu">
 						<li><span class="dropdown-title">{tr}Preference Filters{/tr}</span></li>
+							<input type="hidden" name="pref_filters[]" value="basic">
 							{foreach from=$pref_filters key=name item=info}
 								<li>
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" class="preffilter {$info.type|escape}" name="pref_filters[]" value="{$name|escape}" {if $info.selected}checked="checked"{/if}>{$info.label|escape}
+											<input type="checkbox" class="preffilter {$info.type|escape}" name="pref_filters[]" value="{$name|escape}"{if $info.selected} checked="checked"{/if}{if $name eq {tr}basic{/tr}} disabled="disabled"{/if}>{$info.label|escape}
 										</label>
 									</div>
 								</li>

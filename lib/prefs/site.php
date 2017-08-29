@@ -15,7 +15,8 @@ function prefs_site_list()
 	return array (
 		'site_closed' => array(
 			'name' => tra('Close site'),
-			'description' => tra('Close the site (except for those with access permission)'),
+			'description' => tra('Use this setting to “close” your Tiki (such as for maintenance). Users attempting to access your site will see only a login box. Only users with specific permission will be allowed to log in.
+Use the Message to display to specify the message that visitors will see when attempting to access your site.'),
 			'type' => 'flag',
 			'perspective' => false,
 			'tags' => array('basic'),
@@ -42,14 +43,15 @@ function prefs_site_list()
 		),
 		'site_crumb_seper' => array(
 			'name' => tra('Locations (breadcrumbs)'),
-			'description' => tra('Locations (breadcrumbs)'),
 			'type' => 'text',
+			'hint' => tr('Examples:  » / >  : -> →'),
 			'size' => '5',
 			'default' => '»',
 		),
 		'site_nav_seper' => array(
 			'name' => tra('Choices'),
 			'type' => 'text',
+			'hint' => tr('Examples: | / ¦  :'),
 			'size' => '5',
 			'default' => '|',
 		),
@@ -106,11 +108,11 @@ function prefs_site_list()
 		),
 		'site_google_analytics_account' => array(
 			'name' => tr('Google Analytics account number'),
-			'description' => tra('The account number for the site. The account number from Google is something like UA-XXXXXXX-YY. Enter only XXXXXXX-YY'),
+			'description' => tra('The account number for the site. The account number from Google is something like UA-XXXXXXX-YY.'),
 			'type' => 'text',
 			'size' => 15,
 			'default' => '',
-			'hint' => 'XXXXXXX-YY',
+			'hint' => ' Enter only XXXXXXX-YY (without the UA)',
 			'dependencies' => array(
 				'wikiplugin_googleanalytics',
 			),

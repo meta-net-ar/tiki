@@ -65,6 +65,8 @@ class ConsoleApplicationBuilder
 					new BackupDBCommand,
 					new BackupFilesCommand,
 					new ProfileBaselineCommand,
+					new InstallerLockCommand,
+					new PatchCommand
 				],
 			],
 			'checkIsInstalledAndDoNotRequireUpdate' => [
@@ -74,6 +76,7 @@ class ConsoleApplicationBuilder
 					new AddonRemoveCommand,
 					new AddonUpgradeCommand,
 					new DailyReportSendCommand,
+					new FakerTrackerCommand,
 					new GoalCheckCommand,
 					new FilesBatchuploadCommand,
 					new FilesDeleteoldCommand,
@@ -127,6 +130,7 @@ class ConsoleApplicationBuilder
 					new ProfileExport\Rss,
 					new ProfileExport\Tracker,
 					new ProfileExport\TrackerField,
+					new ProfileExport\TrackerItem,
 					new ProfileExport\WikiPage,
 					new ProfileExport\Finalize,
 				],
@@ -258,4 +262,3 @@ class ConsoleApplicationBuilder
 	}
 
 }
-

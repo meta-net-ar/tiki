@@ -117,7 +117,6 @@ function prefs_payment_list()
 		'payment_default_delay' => array(
 			'name' => tra('Default acceptable payment delay'),
 			'description' => tra('Number of days before the payment requests becomes overdue. This can be changed per payment request.'),
-			'shorthint' => tra('days'),
 			'type' => 'text',
 			'filter' => 'digits',
 			'units' => tra('days'),
@@ -162,7 +161,7 @@ function prefs_payment_list()
 		),
 		'payment_cclite_merchant_user' => array(
 			'name' => tra('Cclite merchant user'),
-			'description' => tra('Username in Cclite representing "the management". Defaults to "manager"'),
+			'description' => tra('Username in Cclite representing "the management".'),
 			'type' => 'text',
 			'dependencies' => array( 'payment_cclite_registries' ),
 			'default' => 'manager',
