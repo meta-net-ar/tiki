@@ -38,6 +38,50 @@
 			req.send('');
 		} // }}}
 
+		function previewProfile( domain, profile ) { // {{{
+			$('#preview-changes-' + profile).css('display', 'inline');
+
+			var data = {
+				pd: escape(domain), 
+				pp: escape(profile), 
+				install: true, 
+				dryrun: true, 
+				ajax:true 
+			};
+
+			$.post(baseURI, data, function(result) {
+				var header = $('<div class="modal-header"></div>');
+				var footer = $('<div class="modal-footer"></div>');
+				var content = $('<div class="modal-body"></div>');
+				header.html('<button type="button" class="close" data-dismiss="modal">&times;</button><h4 class="modal-title">' + tr('Profile Changes') + '</h4>');
+				footer.html('<button type="button" class="btn btn-default" data-dismiss="modal">' + tr('Close') + '</button>');
+
+				if (result.trim() != '') {
+					content.html(result);
+				} else {
+					var info = $('<div class="alert alert-info alert-dismissable "></div>');
+					var infoTitle = $('<h4><span class="icon icon-information fa fa-info-circle fa-fw "></span>&nbsp;<span class="rboxtitle">' + tr('Information') + '</span></h4>');
+					var infoContent = $('<div class="rboxcontent" style="display: inline"><p>' + tr('Profile without changes') + '</p></div>');
+					info.append(infoTitle);
+					info.append(infoContent);
+					content.html(info);
+				}
+
+				$('#bootstrap-modal-2 .modal-content').empty();
+				$('#bootstrap-modal-2 .modal-content').append(header);
+				$('#bootstrap-modal-2 .modal-content').append(content);
+				$('#bootstrap-modal-2 .modal-content').append(footer);
+				$('#bootstrap-modal-2').modal();
+			})
+			.fail(function() {
+				feedback(tr('Error loading profile'), 'error');
+			})
+			.done(function() {
+				$('#preview-changes-' + profile).css('display', 'none');
+			});
+
+		} // }}}
+
 		function showDetails( id, domain, profile ) { // {{{
 
 			var nid = id + "-sub";
@@ -93,7 +137,9 @@
 
 							var form = document.createElement( 'form' );
 							var p = document.createElement('p');
+							var span = document.createElement('span');
 							var submit = document.createElement('input');
+							var submitPreview = document.createElement('input');
 							var pd = document.createElement('input');
 							var pp = document.createElement('input');
 							form.method = 'post';
@@ -133,6 +179,22 @@
 								submit.value = 'Apply Now';
 								form.setAttribute ( "onsubmit", 'return confirm(\"{/literal}{tr}Are you sure you want to apply the profile{/tr}{literal} ' + profile + '?\");' );
 								submit.setAttribute ( "class", "btn btn-primary");
+
+								submitPreview.type = 'button'; 
+								submitPreview.name = 'profile_preview';
+								submitPreview.value = tr('Preview Changes');
+								submitPreview.setAttribute ( 'onclick', 'previewProfile(\"' + domain + '\", \"' + profile + '\");' );
+								submitPreview.setAttribute ( 'class', 'btn btn-primary' );
+								submitPreview.style.marginLeft = '20px';
+
+								span.innerHTML = tr('Loading profile changes...');
+								span.setAttribute ( 'id', 'preview-changes-' + profile );
+								span.style.fontStyle = 'italic';
+								span.style.marginLeft = '10px';
+								span.style.position = 'relative';
+								span.style.top = '10px';
+								span.style.display = 'none';
+
 							} else if ( data.already ) {
 								submit.name = 'forget';
 								submit.value = 'Forget and Re-apply';
@@ -141,6 +203,8 @@
 							}
 
 							p.appendChild(submit);
+							p.appendChild(submitPreview);
+							p.appendChild(span);
 							pd.type = 'hidden';
 							pd.name = 'pd';
 							pd.value = domain;

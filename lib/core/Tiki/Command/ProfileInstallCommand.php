@@ -59,6 +59,11 @@ class ProfileInstallCommand extends Command
 			return;
 		}
 
+		if (!$profile->validateNamedObjectsReferences()){ // sanity check on the Named Objects references
+			$output->writeln('<error>Some of the named object references in the profile are invalid</error>');
+			return;
+		}
+
 		$tikilib = \TikiLib::lib('tiki');
 
 		$installer = new \Tiki_Profile_Installer;
@@ -76,10 +81,66 @@ class ProfileInstallCommand extends Command
 				$output->writeln('Profile applied.');
 			} else {
 				if (!$dryRun) {
-				$output->writeln("<error>Installation failed:</error>");
+					$output->writeln("<error>Installation failed:</error>");
 
-				foreach ($installer->getFeedback() as $error) {
-					$output->writeln("<error>$error</error>");
+					foreach ($installer->getFeedback() as $error) {
+						$output->writeln("<error>$error</error>");
+					}
+				} else {
+					$output->writeln('Dry-run for profile: ' . $profile->profile);
+
+					foreach ($installer->getTrackProfileChanges() as $profileChanges) {
+
+						if (is_array($profileChanges)) {
+
+							$type = $profileChanges['type'];
+							$newValue = !empty($profileChanges['new']) ? $profileChanges['new'] : 'n';
+							$oldValue = !empty($profileChanges['old']) ? $profileChanges['old'] : 'n';
+							$description = !empty($profileChanges['description']) ? $profileChanges['description'] : '';
+
+							switch ($type) {
+								case 'permission' :
+									$msg = 'Permission removed: ' . $description[0];
+
+									if ($newValue == 'y') {
+										$msg = 'Permission added: ' . $description[0];
+									}
+
+									$output->writeln($msg);
+									break;
+
+								case 'user' :
+									$msg = 'User modified: ' . $description;
+
+									if ($oldValue == 'n') {
+										$msg = 'User added: ' . $description;
+									}
+
+									$output->writeln($msg);
+									break;
+
+								case 'group' :
+									$msg = 'Group modified: ' . $description;
+
+									if ($oldValue == 'n') {
+										$msg = 'Group added: ' . $description;
+									}
+
+									$output->writeln($msg);
+									break;
+
+								case 'preference' :
+									$output->writeln('Preference set: ' . $description . '=' . $newValue . ' old value=' . $oldValue);
+									break;
+
+								case 'installer' :
+									$output->writeln('Installer added: ' . $description);
+									break;
+							}
+						} else {
+							$output->writeln($profileChanges);
+						}
+					}
 				}
 			}
 		} else {

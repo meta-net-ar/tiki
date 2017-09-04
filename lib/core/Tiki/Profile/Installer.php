@@ -414,7 +414,7 @@ class Tiki_Profile_Installer
 			}
 	
 			foreach ( $profiles as $p ) {
-				$this->doInstall($p);
+				$this->doInstall($p, $dryRun);
 			}
 			
 			if (count($this->getFeedback()) == count($profiles)) {
@@ -483,16 +483,17 @@ class Tiki_Profile_Installer
 		$userhandlers = array();
 		foreach ( $profile->getObjects() as $object ) {
 			$installer = $this->getInstallHandler($object);
+			$description = $object->getDescription();
 			if ($installer instanceof Tiki_Profile_InstallHandler_User) {
 				// postpone installation of users till after groups/perms are set
-				$description = $object->getDescription();
 				$userhandlers[$description] = $installer;
 				$this->setTrackProfileChanges('user', $object, false, $description);
 				continue;
+			} else {
+				$this->setTrackProfileChanges('installer', false, false, $description);
 			}
 
 			if (!$dryRun) {
-				$description = $object->getDescription();
 				$installer->install();
 				$installer->replaceReferences($description);
 				$this->setFeedback(tra('Added (or modified)') . ': ' . $description);
@@ -573,10 +574,14 @@ class Tiki_Profile_Installer
 
 		if ( ! $userlib->group_exists($groupName) ) {
 			$this->setTrackProfileChanges('group', $info, false, $groupName);
-			$userlib->add_group($groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['user_tracker_field'], $info['group_tracker_field'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
+			if ( !$dryRun ) {
+				$userlib->add_group($groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['user_tracker_field'], $info['group_tracker_field'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
+			}
 		} else {
 			$this->setTrackProfileChanges('group', $info, $userlib->get_group_info($groupName), $groupName);
-			$userlib->change_group($groupName, $groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], $info['user_tracker_field'], $info['group_tracker_field'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
+			if ( !$dryRun ) {
+				$userlib->change_group($groupName, $groupName, $info['description'], $info['home'], $info['user_tracker'], $info['group_tracker'], $info['user_tracker_field'], $info['group_tracker_field'], implode(':', $info['registration_fields']), $info['user_signup'], $info['default_category'], $info['theme'], $info['is_external'], $info['expire_after'], $info['email_pattern'], $info['anniversary'], $info['prorate_interval'], $info['color']);
+			}
 		}
 
 		if ( count($info['include']) ) {
