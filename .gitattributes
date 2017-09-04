@@ -2709,6 +2709,8 @@ lib/core/Services/MustRead/Controller.php -text
 lib/core/Services/MustRead/index.php -text
 lib/core/Services/Object/Controller.php -text
 lib/core/Services/Object/index.php -text
+lib/core/Services/PDF/Controller.php -text
+lib/core/Services/PDF/index.php -text
 lib/core/Services/Payment/Controller.php -text
 lib/core/Services/Payment/index.php -text
 lib/core/Services/Rating/Controller.php -text
@@ -2816,6 +2818,7 @@ lib/core/Tiki/Command/ConfigureCommand.php -text
 lib/core/Tiki/Command/ConsoleApplicationBuilder.php -text
 lib/core/Tiki/Command/DailyReportSendCommand.php -text
 lib/core/Tiki/Command/FilesBatchuploadCommand.php -text
+lib/core/Tiki/Command/FilesCopyCommand.php -text
 lib/core/Tiki/Command/FilesDeleteoldCommand.php -text
 lib/core/Tiki/Command/GoalCheckCommand.php -text
 lib/core/Tiki/Command/IndexCatchUpCommand.php -text
@@ -3278,6 +3281,7 @@ lib/faqs/index.php -text
 lib/featured_links/flinkslib.php -text
 lib/featured_links/index.php -text
 lib/filegals/filegalbatchlib.php -text
+lib/filegals/filegalcopylib.php -text
 lib/filegals/filegallib.php -text
 lib/filegals/h5plib.php -text
 lib/filegals/index.php -text
