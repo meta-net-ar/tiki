@@ -10,22 +10,22 @@
  */
 class Reports_Send_EmailBuilder_WikiFileAttached extends Reports_Send_EmailBuilder_Abstract
 {
-	public function getTitle()
-	{
-		return tr('New attachments in wiki pages:');
-	}
+    public function getTitle()
+    {
+        return tr('New attachments in wiki pages:');
+    }
 
-	public function getOutput(array $change)
-	{
-		$base_url = $change['data']['base_url'];
+    public function getOutput(array $change)
+    {
+        $base_url = $change['data']['base_url'];
 
-		$output = tr(
-			'%0 uploaded the file %1 onto %2',
-			"<u>{$change['data']['user']}</u>",
-			"<a href=\"{$base_url}tiki-download_wiki_attachment.php?attId={$change['data']['attId']}\">{$change['data']['filename']}</a>",
-			"<a href=\"{$base_url}tiki-index.php?page={$change['data']['pageName']}\">{$change['data']['pageName']}</a>."
-		);
+        $output = tr(
+            '%0 uploaded the file %1 onto %2',
+            "<u>{$change['data']['user']}</u>",
+            "<a href=\"{$base_url}tiki-download_wiki_attachment.php?attId={$change['data']['attId']}\">{$change['data']['filename']}</a>",
+            "<a href=\"{$base_url}tiki-index.php?page={$change['data']['pageName']}\">{$change['data']['pageName']}</a>."
+        );
 
-		return $output;
-	}
+        return $output;
+    }
 }

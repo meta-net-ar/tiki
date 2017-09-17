@@ -14,30 +14,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class WikiPage extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:wiki-page')
-			->setDescription('Export a wiki page')
-			->addArgument(
-				'page',
-				InputArgument::REQUIRED,
-				'Page name'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:wiki-page')
+            ->setDescription('Export a wiki page')
+            ->addArgument(
+                'page',
+                InputArgument::REQUIRED,
+                'Page name'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$page = $input->getArgument('page');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $page = $input->getArgument('page');
 
-		$writer = $this->getProfileWriter($input);
-		if (\Tiki_Profile_InstallHandler_WikiPage::export($writer, $page)) {
-			$writer->save();
-		} else {
-			$output->writeln("<error>Page not found: $page</error>");
-			return;
-		}
-	}
+        $writer = $this->getProfileWriter($input);
+        if (\Tiki_Profile_InstallHandler_WikiPage::export($writer, $page)) {
+            $writer->save();
+        } else {
+            $output->writeln("<error>Page not found: $page</error>");
+            return;
+        }
+    }
 }

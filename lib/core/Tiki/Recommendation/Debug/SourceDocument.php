@@ -11,20 +11,19 @@ use Tiki\Recommendation\EngineOutput;
 
 class SourceDocument implements EngineOutput
 {
-	private $type;
-	private $object;
-	private $title;
+    private $type;
+    private $object;
+    private $title;
 
-	function __construct($type, $object, $title = null)
-	{
-		$this->type = $type;
-		$this->object = $object;
-		$this->title = $title;
-	}
+    function __construct($type, $object, $title = null)
+    {
+        $this->type = $type;
+        $this->object = $object;
+        $this->title = $title;
+    }
 
-	function __toString()
-	{
-		return tr('Source: %0:%1 (%2)', $this->type, $this->object, $this->title ?: tr('Unknown'));
-	}
+    function __toString()
+    {
+        return tr('Source: %0:%1 (%2)', $this->type, $this->object, $this->title ?: tr('Unknown'));
+    }
 }
-

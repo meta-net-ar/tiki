@@ -9,80 +9,79 @@ namespace Tracker\Tabular\Schema;
 
 class DateHelper
 {
-	private $label;
-	private $prior = [];
+    private $label;
+    private $prior = [];
 
-	function __construct($label)
-	{
-		$this->label = $label;
-	}
+    function __construct($label)
+    {
+        $this->label = $label;
+    }
 
-	function setupUnix(Column $column)
-	{
-		$permName = $column->getField();
-		$this->setupCallbacks(
-			$column,
-			function ($value, array $extra) {
-				if (empty($value)) {
-					return '';
-				}
+    function setupUnix(Column $column)
+    {
+        $permName = $column->getField();
+        $this->setupCallbacks(
+            $column,
+            function ($value, array $extra) {
+                if (empty($value)) {
+                    return '';
+                }
 
-				return $this->convertToUnix($value);
-			},
-			function (& $info, $value) use ($permName) {
-				$info['fields'][$permName] = $value;
-			}
-		);
-	}
-	
-	function setupFormat($format, Column $column)
-	{
-		$permName = $column->getField();
-		$this->setupCallbacks(
-			$column,
-			function ($value, array $extra) use ($format) {
-				if (empty($value) || $value === '0000-00-00 00:00:00') {	// empty dates are indexed as '0000-00-00 00:00:00'
-					return '';
-				}
+                return $this->convertToUnix($value);
+            },
+            function (& $info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            }
+        );
+    }
 
-				$unix = $this->convertToUnix($value);
-				return date($format, $unix);
-			},
-			function (& $info, $value) use ($permName, $format) {
-				$date = date_create_from_format($format, $value);
-				if ($date) {
-					$info['fields'][$permName] = $date->getTimestamp();
-				}
-			}
-		);
-	}
+    function setupFormat($format, Column $column)
+    {
+        $permName = $column->getField();
+        $this->setupCallbacks(
+            $column,
+            function ($value, array $extra) use ($format) {
+                if (empty($value) || $value === '0000-00-00 00:00:00') {    // empty dates are indexed as '0000-00-00 00:00:00'
+                    return '';
+                }
 
-	private function setupCallbacks($column, callable $render, callable $parseInto)
-	{
-		$column
-			->setLabel($this->label)
-			->setRenderTransform($render)
-			->setParseIntoTransform($parseInto)
-			;
+                $unix = $this->convertToUnix($value);
+                return date($format, $unix);
+            },
+            function (& $info, $value) use ($permName, $format) {
+                $date = date_create_from_format($format, $value);
+                if ($date) {
+                    $info['fields'][$permName] = $date->getTimestamp();
+                }
+            }
+        );
+    }
 
-		// Only one date field can control the value, add all previously added modes
-		// as incompatibilities
-		foreach ($this->prior as $mode) {
-			$column->addIncompatibility($column->getField(), $mode);
-		}
+    private function setupCallbacks($column, callable $render, callable $parseInto)
+    {
+        $column
+            ->setLabel($this->label)
+            ->setRenderTransform($render)
+            ->setParseIntoTransform($parseInto)
+            ;
 
-		$this->prior[] = $column->getMode();
-	}
+        // Only one date field can control the value, add all previously added modes
+        // as incompatibilities
+        foreach ($this->prior as $mode) {
+            $column->addIncompatibility($column->getField(), $mode);
+        }
 
-	private function convertToUnix($value)
-	{
-		if (preg_match('/^\d{14}$/', $value)) {
-			return date_create_from_format('YmdHise', $value . 'UTC')->getTimestamp();
-		} elseif (is_numeric($value)) {
-			return (int) $value;
-		} else {
-			return strtotime($value);
-		}
-	}
+        $this->prior[] = $column->getMode();
+    }
+
+    private function convertToUnix($value)
+    {
+        if (preg_match('/^\d{14}$/', $value)) {
+            return date_create_from_format('YmdHise', $value . 'UTC')->getTimestamp();
+        } elseif (is_numeric($value)) {
+            return (int) $value;
+        } else {
+            return strtotime($value);
+        }
+    }
 }
-

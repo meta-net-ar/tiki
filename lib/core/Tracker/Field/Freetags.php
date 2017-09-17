@@ -13,148 +13,147 @@
  */
 class Tracker_Field_Freetags extends Tracker_Field_Abstract implements Tracker_Field_Synchronizable, Tracker_Field_Exportable, Tracker_Field_Filterable
 {
-	public static function getTypes()
-	{
-		return array(
-			'F' => array(
-				'name' => tr('Tags'),
-				'description' => tr('Allows tags to be shown or added for tracker items.'),
-				'prefs' => array('trackerfield_freetags', 'feature_freetags'),
-				'tags' => array('advanced'),
-				'default' => 'y',
-				'params' => array(
-					'size' => array(
-						'name' => tr('Size'),
-						'description' => tr('Visible size of the input field'),
-						'filter' => 'int',
-						'legacy_index' => 0,
-					),
-					'hidehelp' => array(
-						'name' => tr('Help'),
-						'description' => tr('Hide or show the input help'),
-						'default' => '',
-						'filter' => 'alpha',
-						'options' => array(
-							'' => tr('Show'),
-							'y' => tr('Hide'),
-						),
-						'legacy_index' => 1,
-					),
-					'hidesuggest' => array(
-						'name' => tr('Suggest'),
-						'description' => tr('Hide or show the tag suggestions'),
-						'default' => '',
-						'filter' => 'alpha',
-						'options' => array(
-							'' => tr('Show'),
-							'y' => tr('Hide'),
-						),
-						'legacy_index' => 2,
-					),
-				),
-			),
-		);
-	}
+    public static function getTypes()
+    {
+        return [
+            'F' => [
+                'name' => tr('Tags'),
+                'description' => tr('Allows tags to be shown or added for tracker items.'),
+                'prefs' => ['trackerfield_freetags', 'feature_freetags'],
+                'tags' => ['advanced'],
+                'default' => 'y',
+                'params' => [
+                    'size' => [
+                        'name' => tr('Size'),
+                        'description' => tr('Visible size of the input field'),
+                        'filter' => 'int',
+                        'legacy_index' => 0,
+                    ],
+                    'hidehelp' => [
+                        'name' => tr('Help'),
+                        'description' => tr('Hide or show the input help'),
+                        'default' => '',
+                        'filter' => 'alpha',
+                        'options' => [
+                            '' => tr('Show'),
+                            'y' => tr('Hide'),
+                        ],
+                        'legacy_index' => 1,
+                    ],
+                    'hidesuggest' => [
+                        'name' => tr('Suggest'),
+                        'description' => tr('Hide or show the tag suggestions'),
+                        'default' => '',
+                        'filter' => 'alpha',
+                        'options' => [
+                            '' => tr('Show'),
+                            'y' => tr('Hide'),
+                        ],
+                        'legacy_index' => 2,
+                    ],
+                ],
+            ],
+        ];
+    }
 
-	function getFieldData(array $requestData = array())
-	{
-		$data = array();
+    function getFieldData(array $requestData = [])
+    {
+        $data = [];
 
-		$ins_id = $this->getInsertId();
+        $ins_id = $this->getInsertId();
 
-		if (isset($requestData[$ins_id])) {
-			$data['value'] = $requestData[$ins_id];
-		} else {
-			global $prefs;
+        if (isset($requestData[$ins_id])) {
+            $data['value'] = $requestData[$ins_id];
+        } else {
+            global $prefs;
 
-			$data['value'] = $this->getValue();
+            $data['value'] = $this->getValue();
 
-			$langutil = new Services_Language_Utilities;
-			$itemLang = null;
-			if ($this->getItemId()) {
-				try {
-					$itemLang = $langutil->getLanguage('trackeritem', $this->getItemId());
-				} catch (Services_Exception $e) {
-					$itemLang = null;
-				}
-			}
-			$freetaglib = TikiLib::lib('freetag');
-			$data['freetags'] = $freetaglib->_parse_tag($data['value']);
-			$data['tag_suggestion'] = $freetaglib->get_tag_suggestion(
-				implode(' ', $data['freetags']),
-				$prefs['freetags_browse_amount_tags_suggestion'],
-				$itemLang
-			);
-		}
+            $langutil = new Services_Language_Utilities;
+            $itemLang = null;
+            if ($this->getItemId()) {
+                try {
+                    $itemLang = $langutil->getLanguage('trackeritem', $this->getItemId());
+                } catch (Services_Exception $e) {
+                    $itemLang = null;
+                }
+            }
+            $freetaglib = TikiLib::lib('freetag');
+            $data['freetags'] = $freetaglib->_parse_tag($data['value']);
+            $data['tag_suggestion'] = $freetaglib->get_tag_suggestion(
+                implode(' ', $data['freetags']),
+                $prefs['freetags_browse_amount_tags_suggestion'],
+                $itemLang
+            );
+        }
 
-		return $data;
-	}
+        return $data;
+    }
 
-	function renderInput($context = array())
-	{
-		return $this->renderTemplate('trackerinput/freetags.tpl', $context);
-	}
+    function renderInput($context = [])
+    {
+        return $this->renderTemplate('trackerinput/freetags.tpl', $context);
+    }
 
-	function renderOutput($context = array())
-	{
-		return $this->renderTemplate('trackeroutput/freetags.tpl', $context);
-	}
+    function renderOutput($context = [])
+    {
+        return $this->renderTemplate('trackeroutput/freetags.tpl', $context);
+    }
 
-	function importRemote($value)
-	{
-		return $value;
-	}
+    function importRemote($value)
+    {
+        return $value;
+    }
 
-	function exportRemote($value)
-	{
-		return $value;
-	}
+    function exportRemote($value)
+    {
+        return $value;
+    }
 
-	function importRemoteField(array $info, array $syncInfo)
-	{
-		return $info;
-	}
+    function importRemoteField(array $info, array $syncInfo)
+    {
+        return $info;
+    }
 
-	function getTabularSchema()
-	{
-		$schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
+    function getTabularSchema()
+    {
+        $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
 
-		$permName = $this->getConfiguration('permName');
-		$name = $this->getConfiguration('name');
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
 
-		$schema->addNew($permName, 'default')
-			->setLabel($name)
-			->setRenderTransform(function ($value) {
-				return $value;
-			})
-			->setParseIntoTransform(function (& $info, $value) use ($permName) {
-				$info['fields'][$permName] = $value;
-			});
+        $schema->addNew($permName, 'default')
+            ->setLabel($name)
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (& $info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            });
 
-		return $schema;
-	}
+        return $schema;
+    }
 
-	function getFilterCollection()
-	{
-		$filters = new Tracker\Filter\Collection($this->getTrackerDefinition());
-		$permName = $this->getConfiguration('permName');
-		$name = $this->getConfiguration('name');
-		$baseKey = $this->getBaseKey();
+    function getFilterCollection()
+    {
+        $filters = new Tracker\Filter\Collection($this->getTrackerDefinition());
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
+        $baseKey = $this->getBaseKey();
 
 
-		$filters->addNew($permName, 'lookup')
-			->setLabel($name)
-			->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_lookup"))
-			->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
-				$value = $control->getValue();
+        $filters->addNew($permName, 'lookup')
+            ->setLabel($name)
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_lookup"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
 
-				if ($value) {
-					$query->filterContent($value, $baseKey);
-				}
-			})
-			;
+                if ($value) {
+                    $query->filterContent($value, $baseKey);
+                }
+            })
+            ;
 
-		return $filters;
-	}
+        return $filters;
+    }
 }
-

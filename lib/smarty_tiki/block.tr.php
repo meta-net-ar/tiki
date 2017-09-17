@@ -22,29 +22,33 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_block_tr($params, $content, $smarty, &$repeat)
 {
 
-	if ( $repeat || empty($content)) return;
+    if ($repeat || empty($content)) {
+        return;
+    }
 
-	if (empty($params['lang'])) {
-		$lang = '';
-	} else {
-		$lang = $params['lang'];
-	}
+    if (empty($params['lang'])) {
+        $lang = '';
+    } else {
+        $lang = $params['lang'];
+    }
 
-	$args = array();
-	foreach ( $params as $key => $value ) {
-		if ( preg_match('/_([[:digit:]])+/', $key, $matches) )
-			$args[$matches[1]] = $value;
-	}
+    $args = [];
+    foreach ($params as $key => $value) {
+        if (preg_match('/_([[:digit:]])+/', $key, $matches)) {
+            $args[$matches[1]] = $value;
+        }
+    }
 
-	if (empty($params['interactive']) || $params['interactive'] == 'y')
-		return tra($content, $lang, false, $args);
-	else
-		return tra($content, $lang, true);
+    if (empty($params['interactive']) || $params['interactive'] == 'y') {
+        return tra($content, $lang, false, $args);
+    } else {
+        return tra($content, $lang, true);
+    }
 }

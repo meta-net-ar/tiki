@@ -10,29 +10,28 @@
  */
 abstract class Search_Index_TypeAnalyzerTest extends PHPUnit_Framework_TestCase
 {
-	protected abstract function getIndex();
+    abstract protected function getIndex();
 
-	function testIdentifierTypes()
-	{
-		$index = $this->getIndex();
-		$typeFactory = $index->getTypeFactory();
-		$index = new Search_Index_TypeAnalysisDecorator($index);
+    function testIdentifierTypes()
+    {
+        $index = $this->getIndex();
+        $typeFactory = $index->getTypeFactory();
+        $index = new Search_Index_TypeAnalysisDecorator($index);
 
-		$index->addDocument(
-			array(
-				'object_type' => $typeFactory->identifier('wiki page'),
-				'object_id' => $typeFactory->identifier('X'),
-				'a' => $typeFactory->plaintext('X'),
-				'b' => $typeFactory->wikitext('X'),
-				'c' => $typeFactory->timestamp('X'),
-				'd' => $typeFactory->identifier('X'),
-				'e' => $typeFactory->numeric('X'),
-				'f' => $typeFactory->multivalue('X'),
-				'g' => $typeFactory->sortable('X'),
-			)
-		);
+        $index->addDocument(
+            [
+                'object_type' => $typeFactory->identifier('wiki page'),
+                'object_id' => $typeFactory->identifier('X'),
+                'a' => $typeFactory->plaintext('X'),
+                'b' => $typeFactory->wikitext('X'),
+                'c' => $typeFactory->timestamp('X'),
+                'd' => $typeFactory->identifier('X'),
+                'e' => $typeFactory->numeric('X'),
+                'f' => $typeFactory->multivalue('X'),
+                'g' => $typeFactory->sortable('X'),
+            ]
+        );
 
-		$this->assertEquals(array('object_type', 'object_id', 'd', 'e'), $index->getIdentifierFields());
-	}
+        $this->assertEquals(['object_type', 'object_id', 'd', 'e'], $index->getIdentifierFields());
+    }
 }
-

@@ -9,24 +9,24 @@ namespace Tiki\Wiki\SlugManager;
 
 class DashGenerator implements Generator
 {
-	function getName()
-	{
-		return 'dash';
-	}
+    function getName()
+    {
+        return 'dash';
+    }
 
-	function getLabel()
-	{
-		return tr('Replace spaces with dashes');
-	}
+    function getLabel()
+    {
+        return tr('Replace spaces with dashes');
+    }
 
-	function generate($pageName, $suffix = null)
-	{
-		$slug = preg_replace('/\s+/', '-', trim($pageName));
+    function generate($pageName, $suffix = null)
+    {
+        $slug = preg_replace('/\s+/', '-', trim($pageName));
 
-		if ($suffix) {
-			$slug .= '-' . $suffix;
-		}
+        if ($suffix) {
+            $slug .= '-' . $suffix;
+        }
 
-		return $slug;
-	}
+        return $slug;
+    }
 }

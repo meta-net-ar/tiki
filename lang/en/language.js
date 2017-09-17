@@ -1,7 +1,7 @@
-/* 
+/*
  * Javascript translation definition
  * Example to help translation of some English strings in some js files
- * 
+ *
  * $Id$
  */
 
@@ -30,7 +30,7 @@ var lang = {
 //	"Removing the field will result in data loss. Are you sure?" : "Removing the field will result in data loss. Are you sure?",
 //	"Save" : "Save",
 //	"Cancel" : "Cancel",
-//	"Delete" : "Delete",	
+//  "Delete" : "Delete",
 //	"Unassign module" : "Unassign module",
 //	"Edit module" : "Edit module",
 //	"Edit module:" : "Edit module:",
@@ -41,5 +41,5 @@ var lang = {
 //	"Change Highlighter" : "Change Highlighter",
 //	"Toggle Highlighter" : "Toggle Highlighter",
 //	"Are you sure you want to unassign this module?" : "Are you sure you want to unassign this module?"
-	// remember the IE does not support ending comma on last item
+    // remember the IE does not support ending comma on last item
 };

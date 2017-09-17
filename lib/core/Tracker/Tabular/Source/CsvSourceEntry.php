@@ -9,23 +9,22 @@ namespace Tracker\Tabular\Source;
 
 class CsvSourceEntry
 {
-	private $data;
+    private $data;
 
-	function __construct($data)
-	{
-		$this->data = $data;
-	}
+    function __construct($data)
+    {
+        $this->data = $data;
+    }
 
-	function render(\Tracker\Tabular\Schema\Column $column)
-	{
-		$entry = $this->data[spl_object_hash($column)];
-		return $column->render($entry);
-	}
+    function render(\Tracker\Tabular\Schema\Column $column)
+    {
+        $entry = $this->data[spl_object_hash($column)];
+        return $column->render($entry);
+    }
 
-	function parseInto(& $info, $column)
-	{
-		$entry = $this->data[spl_object_hash($column)];
-		$column->parseInto($info, $entry);
-	}
+    function parseInto(& $info, $column)
+    {
+        $entry = $this->data[spl_object_hash($column)];
+        $column->parseInto($info, $entry);
+    }
 }
-

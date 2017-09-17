@@ -7,32 +7,31 @@
 
 class Search_Elastic_TypeAnalyzerTest extends Search_Index_TypeAnalyzerTest
 {
-	protected $index;
+    protected $index;
 
-	function setUp()
-	{
-		$connection = new Search_Elastic_Connection('http://localhost:9200');
-		$connection->startBulk(100);
+    function setUp()
+    {
+        $connection = new Search_Elastic_Connection('http://localhost:9200');
+        $connection->startBulk(100);
 
-		$status = $connection->getStatus();
-		if (! $status->ok) {
-			$this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
-		}
+        $status = $connection->getStatus();
+        if (! $status->ok) {
+            $this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
+        }
 
-		$this->index = new Search_Elastic_Index($connection, 'test_index');
-		$this->index->destroy();
-	}
+        $this->index = new Search_Elastic_Index($connection, 'test_index');
+        $this->index->destroy();
+    }
 
-	protected function getIndex()
-	{
-		return $this->index;
-	}
+    protected function getIndex()
+    {
+        return $this->index;
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

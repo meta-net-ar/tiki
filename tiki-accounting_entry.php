@@ -9,31 +9,31 @@
 // $Id$
 
 $section = 'accounting';
-require_once ('tiki-setup.php');
-require_once ('lib/accounting/accountinglib.php');
+require_once('tiki-setup.php');
+require_once('lib/accounting/accountinglib.php');
 $access->checkAuthenticity();
 
 
 // Feature available?
-if ($prefs['feature_accounting'] !='y') {
-	$smarty->assign('msg', tra('This feature is disabled') . ': feature_accounting');
-	$smarty->display('error.tpl');
-	die;
+if ($prefs['feature_accounting'] != 'y') {
+    $smarty->assign('msg', tra('This feature is disabled') . ': feature_accounting');
+    $smarty->display('error.tpl');
+    die;
 }
 
 $globalperms = Perms::get();
-$objectperms = Perms::get(array( 'type' => 'accounting book', 'object' => $bookId ));
+$objectperms = Perms::get([ 'type' => 'accounting book', 'object' => $bookId ]);
 
-if (!($globalperms->acct_book or $objectperms->acct_book)) {
-	$smarty->assign('msg', tra('You do not have the right to book'));
-	$smarty->display('error.tpl');
-	die;
+if (! ($globalperms->acct_book or $objectperms->acct_book)) {
+    $smarty->assign('msg', tra('You do not have the right to book'));
+    $smarty->display('error.tpl');
+    die;
 }
 
-if (!isset($_REQUEST['bookId'])) {
-	$smarty->assign('msg', tra('Missing book id'));
-	$smarty->display('error.tpl');
-	die;
+if (! isset($_REQUEST['bookId'])) {
+    $smarty->assign('msg', tra('Missing book id'));
+    $smarty->display('error.tpl');
+    die;
 }
 $bookId = $_REQUEST['bookId'];
 $smarty->assign('bookId', $bookId);
@@ -45,55 +45,55 @@ $accounts = $accountinglib->getAccounts($bookId, $all = true);
 $smarty->assign('accounts', $accounts);
 
 if ($_REQUEST['journal_Year']) {
-	$journalDate = new DateTime();
-	$journalDate->setDate(
-		$_REQUEST['journal_Year'],
-		$_REQUEST['journal_Month'],
-		$_REQUEST['journal_Day']
-	);
+    $journalDate = new DateTime();
+    $journalDate->setDate(
+        $_REQUEST['journal_Year'],
+        $_REQUEST['journal_Month'],
+        $_REQUEST['journal_Day']
+    );
 }
 
 if (isset($_REQUEST['book']) && $access->ticketMatch()) {
-	$result = $accountinglib->book(
-		$bookId,
-		$journalDate,
-		$_REQUEST['journalDescription'],
-		$_REQUEST['debitAccount'],
-		$_REQUEST['creditAccount'],
-		$_REQUEST['debitAmount'],
-		$_REQUEST['creditAmount'],
-		$_REQUEST['debitText'],
-		$_REQUEST['creditText']
-	);
-	if (is_numeric($result)) {
-		if (isset($_REQUEST['statementId'])) {
-			$accountinglib->updateStatement($bookId, $_REQUEST['statementId'], $result);
-		}
-	}
+    $result = $accountinglib->book(
+        $bookId,
+        $journalDate,
+        $_REQUEST['journalDescription'],
+        $_REQUEST['debitAccount'],
+        $_REQUEST['creditAccount'],
+        $_REQUEST['debitAmount'],
+        $_REQUEST['creditAmount'],
+        $_REQUEST['debitText'],
+        $_REQUEST['creditText']
+    );
+    if (is_numeric($result)) {
+        if (isset($_REQUEST['statementId'])) {
+            $accountinglib->updateStatement($bookId, $_REQUEST['statementId'], $result);
+        }
+    }
 } else {
-	$result = 0;
+    $result = 0;
 }
 
 if (is_array($result)) {
-	$smarty->assign('errors', $result);
-	$smarty->assign('journalDate', $journalDate);
-	$smarty->assign('journalDescription', $_REQUEST['journalDescription']);
-	$smarty->assign('debitAccount', $_REQUEST['debitAccount']);
-	$smarty->assign('creditAccount', $_REQUEST['creditAccount']);
-	$smarty->assign('debitAmount', $_REQUEST['debitAmount']);
-	$smarty->assign('creditAmount', $_REQUEST['creditAmount']);
-	$smarty->assign('debitText', $_REQUEST['debitText']);
-	$smarty->assign('creditText', $_REQUEST['creditText']);
-	if (isset($_REQUEST['statementId'])) {
-		$smarty->assign('statementId', $_REQUEST['statementId']);
-	}
+    $smarty->assign('errors', $result);
+    $smarty->assign('journalDate', $journalDate);
+    $smarty->assign('journalDescription', $_REQUEST['journalDescription']);
+    $smarty->assign('debitAccount', $_REQUEST['debitAccount']);
+    $smarty->assign('creditAccount', $_REQUEST['creditAccount']);
+    $smarty->assign('debitAmount', $_REQUEST['debitAmount']);
+    $smarty->assign('creditAmount', $_REQUEST['creditAmount']);
+    $smarty->assign('debitText', $_REQUEST['debitText']);
+    $smarty->assign('creditText', $_REQUEST['creditText']);
+    if (isset($_REQUEST['statementId'])) {
+        $smarty->assign('statementId', $_REQUEST['statementId']);
+    }
 } else {
-	$smarty->assign('debitAccount', array(''));
-	$smarty->assign('creditAccount', array(''));
-	$smarty->assign('debitAmount', array(''));
-	$smarty->assign('creditAmount', array(''));
-	$smarty->assign('debitText', array(''));
-	$smarty->assign('creditText', array(''));
+    $smarty->assign('debitAccount', ['']);
+    $smarty->assign('creditAccount', ['']);
+    $smarty->assign('debitAmount', ['']);
+    $smarty->assign('creditAmount', ['']);
+    $smarty->assign('debitText', ['']);
+    $smarty->assign('creditText', ['']);
 }
 
 $journal = $accountinglib->getJournal($bookId, '%', '`journalId` DESC', 5);

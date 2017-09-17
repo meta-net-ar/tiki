@@ -8,13 +8,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
-require_once ('tiki-setup.php');
+require_once('tiki-setup.php');
 
 $access->check_feature('feature_blogs');
 
 $bloglib = TikiLib::lib('blog');
-if (!isset($_REQUEST['imgId'])) {
-	die;
+if (! isset($_REQUEST['imgId'])) {
+    die;
 }
 $info = $bloglib->get_post_image($_REQUEST['imgId']);
 $type = & $info['filetype'];

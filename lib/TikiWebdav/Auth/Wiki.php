@@ -7,34 +7,34 @@
 
 class TikiWebdav_Auth_Wiki extends TikiWebdav_Auth_Default
 {
-	public function authorize($user, $path, $access = self::ACCESS_READ)
-	{
-		global $tikilib;
-		print_debug("authorize " . $user . " " . $path . " " . $access . "\n");
+    public function authorize($user, $path, $access = self::ACCESS_READ)
+    {
+        global $tikilib;
+        print_debug("authorize " . $user . " " . $path . " " . $access . "\n");
 
-		if ($path === '/') {
-			return true;
-		}
+        if ($path === '/') {
+            return true;
+        }
 
-		$page = substr($path, 1);
+        $page = substr($path, 1);
 
-		$groups = $tikilib->get_user_groups($user);
-		$perms = Perms::getInstance();
-		$perms->setGroups($groups);
-		$perms = $tikilib->page_exists($page) ? Perms::get(array('type' => 'wiki page', 'object' => substr($path, 1))) : Perms::get();
+        $groups = $tikilib->get_user_groups($user);
+        $perms = Perms::getInstance();
+        $perms->setGroups($groups);
+        $perms = $tikilib->page_exists($page) ? Perms::get(['type' => 'wiki page', 'object' => substr($path, 1)]) : Perms::get();
 
-		return ($access === self::ACCESS_READ && $perms->view) || ($access === self::ACCESS_WRITE && $perms->edit);
-	}
+        return ($access === self::ACCESS_READ && $perms->view) || ($access === self::ACCESS_WRITE && $perms->edit);
+    }
 
-	public function assignLock($user, $lockToken)
-	{
-	}
+    public function assignLock($user, $lockToken)
+    {
+    }
 
-	public function ownsLock($user, $lockToken)
-	{
-	}
+    public function ownsLock($user, $lockToken)
+    {
+    }
 
-	public function releaseLock($user, $lockToken)
-	{
-	}
+    public function releaseLock($user, $lockToken)
+    {
+    }
 }

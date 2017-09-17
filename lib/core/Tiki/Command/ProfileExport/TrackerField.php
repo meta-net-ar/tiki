@@ -14,32 +14,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TrackerField extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:tracker-field')
-			->setDescription('Export a tracker field definition')
-			->addArgument(
-				'tracker-field',
-				InputArgument::REQUIRED,
-				'Tracker field ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:tracker-field')
+            ->setDescription('Export a tracker field definition')
+            ->addArgument(
+                'tracker-field',
+                InputArgument::REQUIRED,
+                'Tracker field ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$fieldId = $input->getArgument('tracker-field');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $fieldId = $input->getArgument('tracker-field');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$result = \Tiki_Profile_InstallHandler_TrackerField::export($writer, $fieldId);
+        $result = \Tiki_Profile_InstallHandler_TrackerField::export($writer, $fieldId);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("Tracker field not found: $fieldId");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("Tracker field not found: $fieldId");
+        }
+    }
 }

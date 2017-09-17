@@ -7,38 +7,37 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
-function smarty_function_trackerinput( $params, $smarty )
+function smarty_function_trackerinput($params, $smarty)
 {
-	$trklib = TikiLib::lib('trk');
+    $trklib = TikiLib::lib('trk');
 
-	$field = $params['field'];
-	$item = isset($params['item']) ? $params['item'] : array();
+    $field = $params['field'];
+    $item = isset($params['item']) ? $params['item'] : [];
 
-	$handler = $trklib->get_field_handler($field, $item);
+    $handler = $trklib->get_field_handler($field, $item);
 
-	if ($handler) {
-		$context = $params;
-		unset($context['item']);
-		unset($context['field']);
+    if ($handler) {
+        $context = $params;
+        unset($context['item']);
+        unset($context['field']);
 
-		$desc = '';
-		if (isset($params['showDescription']) && $params['showDescription'] == 'y' && $params['field']['type'] != 'S') {
-			$desc = $params['field']['description'];
-			if ($params['field']['descriptionIsParsed'] == 'y') {
-				$desc = TikiLib::lib('parser')->parse_data($desc);
-			} else {
-				$desc = htmlspecialchars($desc);
-			}
-			if (! empty($desc)) {
-				$desc = '<div class="description help-block">' . $desc . '</div>';
-			}
-		}
+        $desc = '';
+        if (isset($params['showDescription']) && $params['showDescription'] == 'y' && $params['field']['type'] != 'S') {
+            $desc = $params['field']['description'];
+            if ($params['field']['descriptionIsParsed'] == 'y') {
+                $desc = TikiLib::lib('parser')->parse_data($desc);
+            } else {
+                $desc = htmlspecialchars($desc);
+            }
+            if (! empty($desc)) {
+                $desc = '<div class="description help-block">' . $desc . '</div>';
+            }
+        }
 
-		return $handler->renderInput($context).$desc;
-	}
+        return $handler->renderInput($context).$desc;
+    }
 }
-

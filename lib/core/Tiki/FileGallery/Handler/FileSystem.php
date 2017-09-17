@@ -6,30 +6,30 @@
 // $Id$
 
 namespace Tiki\FileGallery\Handler;
+
 use Tiki\FileGallery\FileWrapper\PhysicalFile;
 
 class FileSystem implements HandlerInterface
 {
-	private $directory;
+    private $directory;
 
-	function __construct($directory)
-	{
-		$this->directory = $directory;
-		$this->directory = rtrim($directory, '/\\');
-	}
+    function __construct($directory)
+    {
+        $this->directory = $directory;
+        $this->directory = rtrim($directory, '/\\');
+    }
 
-	function getFileWrapper($data, $path)
-	{
-		return new PhysicalFile($this->directory, $path);
-	}
+    function getFileWrapper($data, $path)
+    {
+        return new PhysicalFile($this->directory, $path);
+    }
 
-	function delete($data, $path)
-	{
-		$full = "{$this->directory}/$path";
+    function delete($data, $path)
+    {
+        $full = "{$this->directory}/$path";
 
-		if ($path && is_writable($full)) {
-			unlink($full);
-		}
-	}
+        if ($path && is_writable($full)) {
+            unlink($full);
+        }
+    }
 }
-

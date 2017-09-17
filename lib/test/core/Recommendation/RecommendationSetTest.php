@@ -9,30 +9,30 @@ namespace Tiki\Recommendation;
 
 class RecommendationSetTest extends \PHPUnit_Framework_TestCase
 {
-	function testAddFiltersRecommendations()
-	{
-		$set = new RecommendationSet('X');
-		$set->add(new Debug\SourceDocument('forum post', 1));
-		$set->add(new Recommendation('forum post', 42));
+    function testAddFiltersRecommendations()
+    {
+        $set = new RecommendationSet('X');
+        $set->add(new Debug\SourceDocument('forum post', 1));
+        $set->add(new Recommendation('forum post', 42));
 
-		$expect = new RecommendationSet('X');
-		$expect->addDebug(new Debug\SourceDocument('forum post', 1));
-		$expect->add(new Recommendation('forum post', 42));
+        $expect = new RecommendationSet('X');
+        $expect->addDebug(new Debug\SourceDocument('forum post', 1));
+        $expect->add(new Recommendation('forum post', 42));
 
-		$this->assertEquals($expect, $set);
-	}
+        $this->assertEquals($expect, $set);
+    }
 
-	function testDebugInformationExcludedFromIteration()
-	{
-		$set = new RecommendationSet('X');
-		$set->addDebug(new Debug\SourceDocument('forum post', 1));
-		$set->add($rec = new Recommendation('forum post', 42));
+    function testDebugInformationExcludedFromIteration()
+    {
+        $set = new RecommendationSet('X');
+        $set->addDebug(new Debug\SourceDocument('forum post', 1));
+        $set->add($rec = new Recommendation('forum post', 42));
 
-		$out = [];
-		foreach ($set as $r) {
-			$out[] = $r;
-		}
+        $out = [];
+        foreach ($set as $r) {
+            $out[] = $r;
+        }
 
-		$this->assertSame($out, [$rec]);
-	}
+        $this->assertSame($out, [$rec]);
+    }
 }

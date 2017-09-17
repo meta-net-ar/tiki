@@ -14,18 +14,18 @@ require_once('lib/importer/tikiimporter_wiki.php');
 
 $access->check_permission('tiki_p_admin_importer');
 
-if (!empty($_POST['importerClassName'])) {
+if (! empty($_POST['importerClassName'])) {
     $importerClassName = filter_input(INPUT_POST, 'importerClassName', FILTER_SANITIZE_STRING);
 
     switch ($importerClassName) {
-    	case 'TikiImporter_Wiki_Mediawiki':
-    		require_once('lib/importer/tikiimporter_wiki_mediawiki.php');
-			break;
-    	case 'TikiImporter_Blog_Wordpress':
-    		require_once('lib/importer/tikiimporter_blog_wordpress.php');
-			break;
-    	case 'default':
-			break;
+        case 'TikiImporter_Wiki_Mediawiki':
+            require_once('lib/importer/tikiimporter_wiki_mediawiki.php');
+            break;
+        case 'TikiImporter_Blog_Wordpress':
+            require_once('lib/importer/tikiimporter_blog_wordpress.php');
+            break;
+        case 'default':
+            break;
     }
 
     $importer = new $importerClassName();
@@ -45,16 +45,16 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
 
     // wordpress specific
     if (isset($_SESSION['tiki_importer_wordpress_urls'])) {
-    	$smarty->assign('wordpressUrls', $_SESSION['tiki_importer_wordpress_urls']);
-    	unset($_SESSION['tiki_importer_wordpress_urls']);
+        $smarty->assign('wordpressUrls', $_SESSION['tiki_importer_wordpress_urls']);
+        unset($_SESSION['tiki_importer_wordpress_urls']);
     }
-} else if (!empty($_FILES['importFile'])) {
+} elseif (! empty($_FILES['importFile'])) {
     // third step: start the importing process
 
     if ($_FILES['importFile']['error'] === UPLOAD_ERR_OK) {
         try {
             $importer->import($_FILES['importFile']['tmp_name']);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $smarty->assign('msg', $e->getMessage());
             $smarty->display('error.tpl');
             die;
@@ -67,21 +67,21 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
     }
 
     die;
-} else if (!empty($_POST['importerClassName'])) {
+} elseif (! empty($_POST['importerClassName'])) {
     // second step: display import options for the software previously chosen
-    if (!class_exists($importerClassName)) {
+    if (! class_exists($importerClassName)) {
         $smarty->assign('msg', tra("Invalid software name"));
         $smarty->display("error.tpl");
         die;
     }
 
-	try {
-		$importer->checkRequirements();
-	} catch (Exception $e) {
-		$smarty->assign('msg', $e->getMessage());
-		$smarty->display('error.tpl');
-		die;
-	}
+    try {
+        $importer->checkRequirements();
+    } catch (Exception $e) {
+        $smarty->assign('msg', $e->getMessage());
+        $smarty->display('error.tpl');
+        die;
+    }
 
     $importerOptions = $importer->getOptions();
 
@@ -91,12 +91,12 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
 } else {
     // first step: display the list of available software importers
 
-	// $availableSoftwares is an array that control the list of available software importers.
-	// The array key is the name of the importer class and the value is the name of the software
-	$availableSoftwares = array(
-		'TikiImporter_Wiki_Mediawiki' => 'Mediawiki',
-		'TikiImporter_Blog_Wordpress' => 'Wordpress',
-	);
+    // $availableSoftwares is an array that control the list of available software importers.
+    // The array key is the name of the importer class and the value is the name of the software
+    $availableSoftwares = [
+        'TikiImporter_Wiki_Mediawiki' => 'Mediawiki',
+        'TikiImporter_Blog_Wordpress' => 'Wordpress',
+    ];
 
     $smarty->assign('availableSoftwares', $availableSoftwares);
     $smarty->assign('chooseSoftware', true);

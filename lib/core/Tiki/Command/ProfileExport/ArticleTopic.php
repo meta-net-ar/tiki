@@ -14,32 +14,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ArticleTopic extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:article-topic')
-			->setDescription('Export an article topic definition')
-			->addArgument(
-				'topic',
-				InputArgument::REQUIRED,
-				'Topic ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:article-topic')
+            ->setDescription('Export an article topic definition')
+            ->addArgument(
+                'topic',
+                InputArgument::REQUIRED,
+                'Topic ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$id = $input->getArgument('topic');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $id = $input->getArgument('topic');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$result = \Tiki_Profile_InstallHandler_ArticleTopic::export($writer, $id);
+        $result = \Tiki_Profile_InstallHandler_ArticleTopic::export($writer, $id);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("Topic not found: $id");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("Topic not found: $id");
+        }
+    }
 }

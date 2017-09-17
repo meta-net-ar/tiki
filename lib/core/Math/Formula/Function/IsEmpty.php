@@ -7,19 +7,18 @@
 
 class Math_Formula_Function_IsEmpty extends Math_Formula_Function
 {
-	function evaluate( $element )
-	{
-		// Multiple components will all need to be equal.
-		$out = array();
+    function evaluate($element)
+    {
+        // Multiple components will all need to be equal.
+        $out = [];
 
-		foreach ( $element as $child ) {
-			$component = $this->evaluateChild($child);
-			if (!empty($component)) {
-				return false;
-			}
-		}
+        foreach ($element as $child) {
+            $component = $this->evaluateChild($child);
+            if (! empty($component)) {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 }
-

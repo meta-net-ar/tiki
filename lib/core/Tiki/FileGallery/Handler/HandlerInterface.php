@@ -9,8 +9,7 @@ namespace Tiki\FileGallery\Handler;
 
 interface HandlerInterface
 {
-	function getFileWrapper($data, $path);
+    function getFileWrapper($data, $path);
 
-	function delete($data, $path);
+    function delete($data, $path);
 }
-

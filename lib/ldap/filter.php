@@ -11,7 +11,7 @@
  */
 class LDAPFilter
 {
-    var $_subfilters = array();
+    var $_subfilters = [];
     var $_match;
     var $_filter;
 
@@ -32,27 +32,33 @@ class LDAPFilter
     function &combine($log_op, $filters)
     {
         // substitude named operators to logical operators
-        if ($log_op == 'and') $log_op = '&';
-        if ($log_op == 'or')  $log_op = '|';
-        if ($log_op == 'not') $log_op = '!';
+        if ($log_op == 'and') {
+            $log_op = '&';
+        }
+        if ($log_op == 'or') {
+            $log_op = '|';
+        }
+        if ($log_op == 'not') {
+            $log_op = '!';
+        }
 
         // tests for sane operation
         if ($log_op == '!') {
             // Not-combination, here we also accept one filter object or filter string
-            if (!is_array($filters) && is_a($filters, 'LDAPFilter')) {
-                $filters = array($filters); // force array
+            if (! is_array($filters) && is_a($filters, 'LDAPFilter')) {
+                $filters = [$filters]; // force array
             } elseif (is_string($filters)) {
                 $filter_o = LDAPFilter::parse($filters);
-                if (!$filter_o) {
+                if (! $filter_o) {
                     throw new Exception('LDAPFilter combine error');
                 } else {
-                    $filters = array($filter_o);
+                    $filters = [$filter_o];
                 }
             } else {
                 throw new Exception('LDAPFilter combine error: operator is "not" but $filter is not a valid LDAPFilter nor an array nor a filter string');
             }
         } elseif ($log_op == '&' || $log_op == '|') {
-            if (!is_array($filters) || count($filters) < 2) {
+            if (! is_array($filters) || count($filters) < 2) {
                 throw new Exception('LDAPFilter combine error: parameter $filters is not an array or contains less than two LDAPFilter objects');
             }
         } else {
@@ -64,8 +70,7 @@ class LDAPFilter
             if (is_string($testfilter)) {
                 // string found, try to parse into an filter object
                 $filters[$key] = LDAPFilter::parse($testfilter);
-
-            } elseif (!is_a($testfilter, 'LDAPFilter')) {
+            } elseif (! is_a($testfilter, 'LDAPFilter')) {
                 throw new Exception('LDAPFilter combine error: invalid object passed in array $filters');
             }
         }
@@ -88,13 +93,13 @@ class LDAPFilter
     function parse($FILTER)
     {
         if (preg_match('/^\((.+?)\)$/', $FILTER, $matches)) {
-            if (in_array(substr($matches[1], 0, 1), array('!', '|', '&'))) {
+            if (in_array(substr($matches[1], 0, 1), ['!', '|', '&'])) {
                 // extract logical operator and subfilters
                 $log_op              = substr($matches[1], 0, 1);
                 $remaining_component = substr($matches[1], 1);
 
                 // bite off the next filter part and parse
-                $subfilters = array();
+                $subfilters = [];
                 while (preg_match('/^(\(.+?\))(.*)/', $remaining_component, $matches)) {
                     $remaining_component = $matches[2];
                     array_push($subfilters, LDAPFilter::parse($matches[1]));

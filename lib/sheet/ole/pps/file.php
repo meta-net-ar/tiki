@@ -45,7 +45,7 @@ class OLE_PPS_File extends OLE_PPS
     {
         $this->_tmp_dir = '';
         $this->OLE_PPS(
-            null, 
+            null,
             $name,
             OLE_PPS_TYPE_FILE,
             null,
@@ -54,7 +54,8 @@ class OLE_PPS_File extends OLE_PPS
             null,
             null,
             '',
-            array());
+            []
+        );
     }
 
     /**
@@ -91,7 +92,7 @@ class OLE_PPS_File extends OLE_PPS
             fseek($this->_PPS_FILE, 0);
         }
     }
-    
+
     /**
     * Append data to PPS
     *
@@ -102,8 +103,7 @@ class OLE_PPS_File extends OLE_PPS
     {
         if ($this->_PPS_FILE) {
             fwrite($this->_PPS_FILE, $data);
-        }
-        else {
+        } else {
             $this->_data .= $data;
         }
     }

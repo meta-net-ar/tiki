@@ -6,30 +6,31 @@
 // $Id$
 
 namespace Tiki\MailIn\Provider;
+
 use Tiki\MailIn\Action;
 
 class ReplyHandlerProvider implements ProviderInterface
 {
-	function isEnabled()
-	{
-		global $prefs;
-		return ! empty($prefs['monitor_reply_email_pattern']);
-	}
+    function isEnabled()
+    {
+        global $prefs;
+        return ! empty($prefs['monitor_reply_email_pattern']);
+    }
 
-	function getType()
-	{
-		return 'reply-handler';
-	}
+    function getType()
+    {
+        return 'reply-handler';
+    }
 
-	function getLabel()
-	{
-		return tr('Reply Handler');
-	}
+    function getLabel()
+    {
+        return tr('Reply Handler');
+    }
 
-	function getActionFactory(array $acc)
-	{
-		return new Action\RecipientPlaceholderFactory(array(
-			'comment' => 'Tiki\MailIn\Action\Comment',
-		));
-	}
+    function getActionFactory(array $acc)
+    {
+        return new Action\RecipientPlaceholderFactory([
+            'comment' => 'Tiki\MailIn\Action\Comment',
+        ]);
+    }
 }

@@ -6,8 +6,8 @@
 // $Id$
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 
@@ -16,13 +16,13 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function module_locator_info()
 {
-	return array(
-		'name' => tra('Locator'),
-		'description' => tra('Presents a map with the geolocated content within the page.'),
-		'prefs' => array(),
-		'params' => array(
-		),
-	);
+    return [
+        'name' => tra('Locator'),
+        'description' => tra('Presents a map with the geolocated content within the page.'),
+        'prefs' => [],
+        'params' => [
+        ],
+    ];
 }
 
 /**
@@ -31,11 +31,10 @@ function module_locator_info()
  */
 function module_locator($mod_reference, $module_params)
 {
-	$headerlib = TikiLib::lib('header');
+    $headerlib = TikiLib::lib('header');
 
-	$headerlib->add_map();
+    $headerlib->add_map();
 
-	// assign the default map centre from the prefs as a data attribute for the map-container div
-	TikiLib::lib('smarty')->assign('center', TikiLib::lib('geo')->get_default_center());
+    // assign the default map centre from the prefs as a data attribute for the map-container div
+    TikiLib::lib('smarty')->assign('center', TikiLib::lib('geo')->get_default_center());
 }
-

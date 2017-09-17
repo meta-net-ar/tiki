@@ -14,32 +14,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Menu extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:menu')
-			->setDescription('Export a menu definition')
-			->addArgument(
-				'menu',
-				InputArgument::REQUIRED,
-				'Menu ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:menu')
+            ->setDescription('Export a menu definition')
+            ->addArgument(
+                'menu',
+                InputArgument::REQUIRED,
+                'Menu ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$menuId = $input->getArgument('menu');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $menuId = $input->getArgument('menu');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$result = \Tiki_Profile_InstallHandler_Menu::export($writer, $menuId);
+        $result = \Tiki_Profile_InstallHandler_Menu::export($writer, $menuId);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("Menu not found: $menuId");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("Menu not found: $menuId");
+        }
+    }
 }

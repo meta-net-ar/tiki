@@ -14,7 +14,7 @@ define('TIKISVN', 'https://svn.code.sf.net/p/tikiwiki/code');
  */
 function full($relative)
 {
-	return TIKISVN . "/$relative";
+    return TIKISVN . "/$relative";
 }
 
 /**
@@ -23,30 +23,31 @@ function full($relative)
  */
 function short($full)
 {
-	return substr($full, strlen(TIKISVN) + 1);
+    return substr($full, strlen(TIKISVN) + 1);
 };
 
 /**
- * @param $string string			String to output
- * @param $color string				The colour of the string
- * @return string					The formatted string to output to the console
+ * @param $string string            String to output
+ * @param $color string             The colour of the string
+ * @return string                   The formatted string to output to the console
  */
 function color($string, $color)
 {
-	$avail = array(
-		'red' => 31,
-		'green' => 32,
-		'yellow' => 33,
-		'blue' => 34,
-		'purple' => 35,
-		'cyan' => 36,
-		'gray' => 37,
-	);
+    $avail = [
+        'red' => 31,
+        'green' => 32,
+        'yellow' => 33,
+        'blue' => 34,
+        'purple' => 35,
+        'cyan' => 36,
+        'gray' => 37,
+    ];
 
-	if (!isset($avail[$color]))
-		return $string;
+    if (! isset($avail[$color])) {
+        return $string;
+    }
 
-	return "\033[{$avail[$color]}m$string\033[0m";
+    return "\033[{$avail[$color]}m$string\033[0m";
 }
 
 /**
@@ -54,7 +55,7 @@ function color($string, $color)
  */
 function error($message)
 {
-	die(color($message, 'red') . "\n");
+    die(color($message, 'red') . "\n");
 }
 
 /**
@@ -62,7 +63,7 @@ function error($message)
  */
 function info($message)
 {
-	echo color($message, 'blue') . "\n";
+    echo color($message, 'blue') . "\n";
 }
 
 /**
@@ -70,7 +71,7 @@ function info($message)
  */
 function important($message)
 {
-	echo color($message, 'green') . "\n";
+    echo color($message, 'green') . "\n";
 }
 
 /**
@@ -78,7 +79,7 @@ function important($message)
  */
 function check_svn_version()
 {
-	return (float)trim(`svn --version --quiet 2> /dev/null`) > SVN_MIN_VERSION;
+    return (float)trim(`svn --version --quiet 2> /dev/null`) > SVN_MIN_VERSION;
 }
 
 /**
@@ -87,10 +88,10 @@ function check_svn_version()
  */
 function get_info($path)
 {
-	$esc = escapeshellarg($path);
-	$info = @simplexml_load_string(`svn info --xml $esc 2> /dev/null`);
+    $esc = escapeshellarg($path);
+    $info = @simplexml_load_string(`svn info --xml $esc 2> /dev/null`);
 
-	return $info;
+    return $info;
 }
 
 /**
@@ -99,7 +100,7 @@ function get_info($path)
  */
 function is_valid_merge_destination($url)
 {
-	return is_trunk($url) || is_experimental($url);
+    return is_trunk($url) || is_experimental($url);
 }
 
 /**
@@ -109,13 +110,15 @@ function is_valid_merge_destination($url)
  */
 function is_valid_merge_source($destination, $source)
 {
-	if (is_trunk($destination))
-		return is_stable($source);
+    if (is_trunk($destination)) {
+        return is_stable($source);
+    }
 
-	if (is_experimental($destination))
-		return is_trunk($source);
+    if (is_experimental($destination)) {
+        return is_trunk($source);
+    }
 
-	return false;
+    return false;
 }
 
 /**
@@ -124,7 +127,7 @@ function is_valid_merge_source($destination, $source)
  */
 function is_valid_branch($branch)
 {
-	return is_stable($branch) || is_experimental($branch);
+    return is_stable($branch) || is_experimental($branch);
 }
 
 /**
@@ -133,8 +136,8 @@ function is_valid_branch($branch)
  */
 function is_stable($branch)
 {
-	return dirname($branch) == full('branches')
-		&& (preg_match("/^\d+\.[\dx]+$/", basename($branch)) || preg_match("/test$/", basename($branch)));
+    return dirname($branch) == full('branches')
+        && (preg_match("/^\d+\.[\dx]+$/", basename($branch)) || preg_match("/test$/", basename($branch)));
 }
 
 /**
@@ -143,7 +146,7 @@ function is_stable($branch)
  */
 function is_experimental($branch)
 {
-	return dirname($branch) == full('branches/experimental');
+    return dirname($branch) == full('branches/experimental');
 }
 
 /**
@@ -152,7 +155,7 @@ function is_experimental($branch)
  */
 function is_trunk($branch)
 {
-	return $branch == full('trunk');
+    return $branch == full('trunk');
 }
 
 /**
@@ -161,9 +164,9 @@ function is_trunk($branch)
  */
 function update_working_copy($localPath, $ignore_externals = false)
 {
-	$localPath = escapeshellarg($localPath);
-	$ignoreStr = $ignore_externals ? ' --ignore-externals' : '';
-	`svn up $localPath$ignoreStr`;
+    $localPath = escapeshellarg($localPath);
+    $ignoreStr = $ignore_externals ? ' --ignore-externals' : '';
+    `svn up $localPath$ignoreStr`;
 }
 
 /**
@@ -171,20 +174,20 @@ function update_working_copy($localPath, $ignore_externals = false)
  *
  * @param $localPath string Path of the checkout
  * @return bool true if at least 1 versioned file has been modified, added or removed, false otherwise
- * 
+ *
  * @see Similar function svn_files_identical()
  */
 function has_uncommited_changes($localPath)
 {
-	$localPath = escapeshellarg($localPath);
+    $localPath = escapeshellarg($localPath);
 
-	$dom = new DOMDocument;
-	$dom->loadXML(`svn status --xml $localPath`);
+    $dom = new DOMDocument;
+    $dom->loadXML(`svn status --xml $localPath`);
 
-	$xp = new DOMXPath($dom);
-	$count = $xp->query("/status/target/entry/wc-status[@item = 'added' or @item = 'conflicted' or @item = 'deleted' or @item = 'modified' or @item = 'replaced']");
+    $xp = new DOMXPath($dom);
+    $count = $xp->query("/status/target/entry/wc-status[@item = 'added' or @item = 'conflicted' or @item = 'deleted' or @item = 'modified' or @item = 'replaced']");
 
-	return $count->length > 0;
+    return $count->length > 0;
 }
 
 /**
@@ -192,17 +195,17 @@ function has_uncommited_changes($localPath)
  *
  * @param $localPath string Path of the checkout
  * @return int The number of files that differ (additions, removals and modifications) from the repository
- * 
+ *
  * @see Similar function has_uncommited_changes()
  */
 function svn_files_identical($localPath)
 {
-	$localPath = escapeshellarg($localPath);
+    $localPath = escapeshellarg($localPath);
 
-	$dom = new DOMDocument;
-	$dom->loadXML(`svn status --xml $localPath`);
+    $dom = new DOMDocument;
+    $dom->loadXML(`svn status --xml $localPath`);
 
-	return $dom->getElementsByTagName('entry')->length;
+    return $dom->getElementsByTagName('entry')->length;
 }
 
 
@@ -212,15 +215,15 @@ function svn_files_identical($localPath)
  */
 function get_conflicts($localPath)
 {
-	$localPath = escapeshellarg($localPath);
+    $localPath = escapeshellarg($localPath);
 
-	$dom = new DOMDocument;
-	$dom->loadXML(`svn status --xml $localPath`);
+    $dom = new DOMDocument;
+    $dom->loadXML(`svn status --xml $localPath`);
 
-	$xp = new DOMXPath($dom);
-	$list = $xp->query("/status/target/entry/wc-status[@item = 'conflicted']");
+    $xp = new DOMXPath($dom);
+    $list = $xp->query("/status/target/entry/wc-status[@item = 'conflicted']");
 
-	return $list;
+    return $list;
 }
 
 /**
@@ -230,42 +233,42 @@ function get_conflicts($localPath)
  */
 function find_last_merge($path, $source)
 {
-	$short = preg_quote(short($source), '/');
-	$pattern = "/^\\[(MRG|BRANCH)\\].*$short'?\s+\d+\s+to\s+(\d+)/";
+    $short = preg_quote(short($source), '/');
+    $pattern = "/^\\[(MRG|BRANCH)\\].*$short'?\s+\d+\s+to\s+(\d+)/";
 
-	$descriptorspec = array(
-		0 => array('pipe', 'r'),
-		1 => array('pipe', 'w'),
-	);
+    $descriptorspec = [
+        0 => ['pipe', 'r'],
+        1 => ['pipe', 'w'],
+    ];
 
-	$ePath = escapeshellarg($path);
+    $ePath = escapeshellarg($path);
 
-	$process = proc_open("svn log --stop-on-copy " . TIKISVN, $descriptorspec, $pipes);
-	$rev = 0;
-	$c = 0;
+    $process = proc_open("svn log --stop-on-copy " . TIKISVN, $descriptorspec, $pipes);
+    $rev = 0;
+    $c = 0;
 
-	if (is_resource($process)) {
-		$fp = $pipes[1];
+    if (is_resource($process)) {
+        $fp = $pipes[1];
 
-		while (! feof($fp)) {
-			$line = fgets($fp, 1024);
+        while (! feof($fp)) {
+            $line = fgets($fp, 1024);
 
-			if (preg_match($pattern, $line, $parts)) {
-				$rev = (int) $parts[2];
-				break;
-			}
-			$c++;
-			if ($c > 100000) {
-				error("[MRG] or [BRANCH] message for '$source' not found in 1000000 lines of logs, something has gone wrong...");
-				break;
-			}
-		}
+            if (preg_match($pattern, $line, $parts)) {
+                $rev = (int) $parts[2];
+                break;
+            }
+            $c++;
+            if ($c > 100000) {
+                error("[MRG] or [BRANCH] message for '$source' not found in 1000000 lines of logs, something has gone wrong...");
+                break;
+            }
+        }
 
-		fclose($fp);
-		proc_close($process);
-	}
+        fclose($fp);
+        proc_close($process);
+    }
 
-	return $rev;
+    return $rev;
 }
 
 /**
@@ -276,14 +279,14 @@ function find_last_merge($path, $source)
  */
 function merge($localPath, $source, $from, $to)
 {
-	$short = short($source);
-	$source = escapeshellarg($source);
-	$from = (int) $from;
-	$to = (int) $to;
-	passthru("svn merge $source -r$from:$to");
+    $short = short($source);
+    $source = escapeshellarg($source);
+    $from = (int) $from;
+    $to = (int) $to;
+    passthru("svn merge $source -r$from:$to");
 
-	$message = "[MRG] Automatic merge, $short $from to $to";
-	file_put_contents('svn-commit.tmp', $message);
+    $message = "[MRG] Automatic merge, $short $from to $to";
+    file_put_contents('svn-commit.tmp', $message);
 }
 
 /**
@@ -294,13 +297,14 @@ function merge($localPath, $source, $from, $to)
  */
 function commit($msg, $displaySuccess = true, $dieOnRemainingChanges = true)
 {
-	$msg = escapeshellarg($msg);
-	`svn ci -m $msg`;
+    $msg = escapeshellarg($msg);
+    `svn ci -m $msg`;
 
-	if ($dieOnRemainingChanges && has_uncommited_changes('.'))
-		error("Commit seems to have failed. Uncommited changes exist in the working folder.\n");
+    if ($dieOnRemainingChanges && has_uncommited_changes('.')) {
+        error("Commit seems to have failed. Uncommited changes exist in the working folder.\n");
+    }
 
-	return (int) get_info('.')->entry->commit['revision'];
+    return (int) get_info('.')->entry->commit['revision'];
 }
 
 /**
@@ -309,10 +313,10 @@ function commit($msg, $displaySuccess = true, $dieOnRemainingChanges = true)
  */
 function incorporate($working, $source)
 {
-	$working = escapeshellarg($working);
-	$source = escapeshellarg($source);
+    $working = escapeshellarg($working);
+    $source = escapeshellarg($source);
 
-	passthru($command = "svn merge $working $source");
+    passthru($command = "svn merge $working $source");
 }
 
 /**
@@ -323,17 +327,17 @@ function incorporate($working, $source)
  */
 function branch($source, $branch, $revision)
 {
-	$short = short($branch);
+    $short = short($branch);
 
-	$file = escapeshellarg("$branch/tiki-index.php");
-	$source = escapeshellarg($source);
-	$branch = escapeshellarg($branch);
-	$message = escapeshellarg("[BRANCH] Creation, $short 0 to $revision");
-	`svn copy $source $branch -m $message`;
+    $file = escapeshellarg("$branch/tiki-index.php");
+    $source = escapeshellarg($source);
+    $branch = escapeshellarg($branch);
+    $message = escapeshellarg("[BRANCH] Creation, $short 0 to $revision");
+    `svn copy $source $branch -m $message`;
 
-	$f = @simplexml_load_string(`svn info --xml $file`);
+    $f = @simplexml_load_string(`svn info --xml $file`);
 
-	return isset($f->entry);
+    return isset($f->entry);
 }
 
 /**
@@ -344,7 +348,9 @@ function branch($source, $branch, $revision)
  */
 function get_logs($localPath, $minRevision, $maxRevision = 'HEAD')
 {
-	if (empty($minRevision) || empty($maxRevision)) return false;
-	$logs = `LANG=C svn log -r$maxRevision:$minRevision $localPath`;
-	return $logs;
+    if (empty($minRevision) || empty($maxRevision)) {
+        return false;
+    }
+    $logs = `LANG=C svn log -r$maxRevision:$minRevision $localPath`;
+    return $logs;
 }

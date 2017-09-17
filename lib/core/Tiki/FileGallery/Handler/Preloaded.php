@@ -6,17 +6,17 @@
 // $Id$
 
 namespace Tiki\FileGallery\Handler;
+
 use Tiki\FileGallery\FileWrapper\PreloadedContent;
 
 class Preloaded implements HandlerInterface
 {
-	function getFileWrapper($data, $path)
-	{
-		return new PreloadedContent($data);
-	}
+    function getFileWrapper($data, $path)
+    {
+        return new PreloadedContent($data);
+    }
 
-	function delete($data, $path)
-	{
-	}
+    function delete($data, $path)
+    {
+    }
 }
-

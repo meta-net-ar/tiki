@@ -7,7 +7,7 @@
 
 die("REMOVE THIS LINE TO USE THE SCRIPT.\n");
 
-if (!isset($argv[1])) {
+if (! isset($argv[1])) {
     echo "\nUsage: php export_translations_to_file.php langCode\n";
     echo "Example: php export_translations_to_file.php de\n";
     die;
@@ -20,7 +20,7 @@ require_once('lib/language/LanguageTranslations.php');
 
 $langCode = $argv[1];
 
-if (!array_key_exists($langCode, $langmapping)) {
+if (! array_key_exists($langCode, $langmapping)) {
     die("Invalid language code.\n");
 }
 

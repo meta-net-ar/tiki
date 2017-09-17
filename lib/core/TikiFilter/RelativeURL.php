@@ -12,32 +12,33 @@
  */
 class TikiFilter_RelativeURL implements Zend\Filter\FilterInterface
 {
-	/**
-	 *
-	 * @param string $input		Absolute or relative URL.
-	 * @return string			Absolute URL components stripped out.
-	 */
+    /**
+     *
+     * @param string $input     Absolute or relative URL.
+     * @return string           Absolute URL components stripped out.
+     */
 
 
-	function filter($input)
-	{
+    function filter($input)
+    {
 
-		$filter = new Zend\Filter\StripTags();
-		$url =  $filter->filter($input);
+        $filter = new Zend\Filter\StripTags();
+        $url = $filter->filter($input);
 
-		$url = Zend\Uri\UriFactory::factory($url);
-		$url->normalize();
+        $url = Zend\Uri\UriFactory::factory($url);
+        $url->normalize();
 
-		$query = $url->getQuery();
-		$fragment = $url->getFragment();
-		$url = preg_replace('/^\/\/+/', '', $url->getPath());
+        $query = $url->getQuery();
+        $fragment = $url->getFragment();
+        $url = preg_replace('/^\/\/+/', '', $url->getPath());
 
-		if ($query)
-			$url .= '?'.$query;
-		if ($fragment)
-			$url .= '#'.$fragment;
+        if ($query) {
+            $url .= '?'.$query;
+        }
+        if ($fragment) {
+            $url .= '#'.$fragment;
+        }
 
-		return $url;
-
-	}
+        return $url;
+    }
 }

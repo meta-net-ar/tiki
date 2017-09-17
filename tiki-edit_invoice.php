@@ -16,17 +16,17 @@ $access->check_permission('tiki_p_admin');
 
 //check if profile is created
 if ($trklib->get_tracker_by_name("Invoice Items") < 1) {
-	$smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
-	$smarty->display("error.tpl");
-	die;
+    $smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
+    $smarty->display("error.tpl");
+    die;
 }
 
 (int)$_REQUEST['InvoiceId'] = $_REQUEST['InvoiceId'];
 
 //handle saving data (edit or update)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-	//start invoice
-	/*
+    //start invoice
+    /*
 	$_REQUEST['InvoiceId'] = $trklib->replaceItemFromRequestValues(
 					$trklib->get_tracker_by_name("Invoices"),
 					array(
@@ -43,81 +43,81 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 					),
 					$_REQUEST, $_REQUEST['InvoiceId']
 	);*/
-	die;
-	//end invoice
+    die;
+    //end invoice
 
-	//start invoice items
-	$invoiceItems = array();
+    //start invoice items
+    $invoiceItems = [];
 
-	$_TEMP = $_REQUEST;
-	$itemsToDelete = array();
-	foreach (explode(',', $_REQUEST['InvoiceItemIds']) as $itemId) {
-		$itemsToDelete[$itemId] = $itemId;
-	}
+    $_TEMP = $_REQUEST;
+    $itemsToDelete = [];
+    foreach (explode(',', $_REQUEST['InvoiceItemIds']) as $itemId) {
+        $itemsToDelete[$itemId] = $itemId;
+    }
 
-	$_TEMP['InvoiceId'] = array();
-	for ($i = 0, $count_InvoiceItemId = count($_REQUEST['InvoiceItemId']); $i < $count_InvoiceItemId; $i++) {
-		$_TEMP['InvoiceId'][$i] = $_REQUEST['InvoiceId'];
+    $_TEMP['InvoiceId'] = [];
+    for ($i = 0, $count_InvoiceItemId = count($_REQUEST['InvoiceItemId']); $i < $count_InvoiceItemId; $i++) {
+        $_TEMP['InvoiceId'][$i] = $_REQUEST['InvoiceId'];
 
-		$invoiceItem = $trklib->replaceItemFromRequestValues(
-			$trklib->get_tracker_by_name("Invoice Items"),
-			array(
-				"Invoice Id",
-				"Amount",
-				"Quantity",
-				"Work Description",
-				"Taxable",
-			),
-			$_TEMP,
-			$_REQUEST['InvoiceItemId'][$i],
-			$i
-		);
+        $invoiceItem = $trklib->replaceItemFromRequestValues(
+            $trklib->get_tracker_by_name("Invoice Items"),
+            [
+                "Invoice Id",
+                "Amount",
+                "Quantity",
+                "Work Description",
+                "Taxable",
+            ],
+            $_TEMP,
+            $_REQUEST['InvoiceItemId'][$i],
+            $i
+        );
 
-		if (isset($itemsToDelete[$_REQUEST['InvoiceItemId'][$i]])) {
-			unset($itemsToDelete[$_REQUEST['InvoiceItemId'][$i]]);
-		}
+        if (isset($itemsToDelete[$_REQUEST['InvoiceItemId'][$i]])) {
+            unset($itemsToDelete[$_REQUEST['InvoiceItemId'][$i]]);
+        }
 
-		array_push($invoiceItems, $invoiceItem);
-	}
-	//end invoice items
+        array_push($invoiceItems, $invoiceItem);
+    }
+    //end invoice items
 
-	//here I need to delete items that were deleted on the page
-	foreach ($itemsToDelete as $itemId) {
-		$trklib->remove_tracker_item($itemId);
-	}
-	//end delete
+    //here I need to delete items that were deleted on the page
+    foreach ($itemsToDelete as $itemId) {
+        $trklib->remove_tracker_item($itemId);
+    }
+    //end delete
 
-	header('Location: tiki-view_invoice.php?InvoiceId='.$_REQUEST['InvoiceId']);
-	die;
+    header('Location: tiki-view_invoice.php?InvoiceId='.$_REQUEST['InvoiceId']);
+    die;
 }
 
-$invoiceItems = array();
-if (!empty($_REQUEST['InvoiceId'])) {
-	$invoice = Tracker_Query::tracker("Invoices")
-		->byName()
-		->equals($_REQUEST['InvoiceId'])
-		->getOne();
+$invoiceItems = [];
+if (! empty($_REQUEST['InvoiceId'])) {
+    $invoice = Tracker_Query::tracker("Invoices")
+        ->byName()
+        ->equals($_REQUEST['InvoiceId'])
+        ->getOne();
 
-	$invoice['Item Ids'] = implode(',', $invoice['Item Ids']);
-	$smarty->assign("invoice", $invoice);
+    $invoice['Item Ids'] = implode(',', $invoice['Item Ids']);
+    $smarty->assign("invoice", $invoice);
 
-	$invoiceItems = Tracker_Query::tracker("Invoice Items")
-		->byName()
-		->fields(array("Invoice Id"))
-		->search(array($_REQUEST['InvoiceId']))
-		->query();
+    $invoiceItems = Tracker_Query::tracker("Invoice Items")
+        ->byName()
+        ->fields(["Invoice Id"])
+        ->search([$_REQUEST['InvoiceId']])
+        ->query();
 } else {
-	$_REQUEST['InvoiceId'] = 0;
+    $_REQUEST['InvoiceId'] = 0;
 }
 
 //give the user the last invoice number
 $LastInvoice = Tracker_Query::tracker("Invoices")
-	->byName()
-	->limit(0)
-	->offset(1)
-	->desc(true)
-	->excludeDetails()
-	->getOne();
+    ->byName()
+    ->limit(0)
+    ->offset(1)
+    ->desc(true)
+    ->excludeDetails()
+    ->getOne();
 
 $NewInvoiceNumber = (isset($LastInvoice["Invoice Number"]) ? $LastInvoice["Invoice Number"] + 1 : 1);
 $smarty->assign("NewInvoiceNumber", $NewInvoiceNumber);
@@ -128,12 +128,12 @@ $smarty->assign("setting", Tracker_Query::tracker("Invoice Settings")->byName()-
 
 //we add an extra item to the end of invoiceItems, so we can duplicate it on the page
 if (count($invoiceItems) < 1) {
-	$invoiceItems[] = array(
-		"Quantity" => "",
-		"Work Description" => "",
-		"Taxable" => "",
-		"Amount" => "",
-	);
+    $invoiceItems[] = [
+        "Quantity" => "",
+        "Work Description" => "",
+        "Taxable" => "",
+        "Amount" => "",
+    ];
 }
 $smarty->assign("invoiceItems", $invoiceItems);
 

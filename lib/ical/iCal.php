@@ -48,7 +48,7 @@ class File_iCal
     const PRIORITY_MEDIUM = 5;
     const PRIORITY_LOWEST = 9;
 
-    
+
     const TRANSPARENCY_OPAQUE = "OPAQUE";
     const TRANSPARENCY_TRANSPARENT = "TRANSPARENT";
 
@@ -98,7 +98,7 @@ class File_iCal
      * @access  private
      * @var array   array of File_iCal_iCalendar objects
      */
-    private $_iCalendars = array();
+    private $_iCalendars = [];
 
     /**
      *  Open an existing iCal file and parse it
@@ -112,8 +112,9 @@ class File_iCal
      *                              If false, the return type will always be File_iCal_iCalendar
      *  @todo   Implement multiple iCalendars per file
      */
-    public static function ReadFile($filename, $return_all = false) {
-    
+    public static function ReadFile($filename, $return_all = false)
+    {
+
         require_once 'File.php';
         $data = File::readAll($filename);
         require_once 'File/iCal/iCalendar.php';
@@ -127,7 +128,8 @@ class File_iCal
      *  @access public
      *  @param  File_iCal_iCalendar $ical   The iCalendar object to add
      */
-    public function addCalendar(File_iCal_iCalendar $ical) {
+    public function addCalendar(File_iCal_iCalendar $ical)
+    {
         $this->_iCalendars[] = $ical;
     }
 
@@ -139,7 +141,8 @@ class File_iCal
      *
      *  @return string  iCal string
      */
-    public function __toString() {
+    public function __toString()
+    {
         $return = "";
         foreach ($this->_iCalendars as $c) {
             $return .= $c->__toString();
@@ -153,7 +156,8 @@ class File_iCal
      *
      *  @param  string  Filename to which to write
      */
-    public function WriteFile($filename) {
+    public function WriteFile($filename)
+    {
         require_once 'File.php';
         return File::write($filename, $this->__toString(), FILE_MODE_WRITE);
     }
@@ -164,7 +168,8 @@ class File_iCal
     * @access  public
     * @return  array   An array containing objects of type File_iCal_iCalendar
     */
-    public function getCalendars() {
+    public function getCalendars()
+    {
         return $this->_iCalendars;
     }
 
@@ -174,19 +179,21 @@ class File_iCal
     * @access  public
     * @static
     */
-    public static function sendHeader($name="toto") {
-		header("Content-type: text/calendar");
-		header("Content-disposition: inline; filename=".$name.".ics");
+    public static function sendHeader($name = "toto")
+    {
+        header("Content-type: text/calendar");
+        header("Content-disposition: inline; filename=".$name.".ics");
     }
 
     /**
      *  Returns a File_iCal_iCalendar object with just the basic requirements
      */
-    public static function getSkeletonCalendar() {
-        $skeleton =  "BEGIN:VCALENDAR\x0D\x0A" . 
+    public static function getSkeletonCalendar()
+    {
+        $skeleton = "BEGIN:VCALENDAR\x0D\x0A" .
                      "VERSION:".File_iCal::VERSION."\x0D\x0A" .
-                     "PRODID:PEAR-File_iCal\x0D\x0A" . 
-                     "CALSCALE:GREGORIAN\x0D\x0A" . 
+                     "PRODID:PEAR-File_iCal\x0D\x0A" .
+                     "CALSCALE:GREGORIAN\x0D\x0A" .
                      "END:VCALENDAR\x0D\x0A";
         require_once 'iCal/iCalendar.php';
         return new File_iCal_iCalendar($skeleton);
@@ -199,7 +206,7 @@ class File_iCal
     * @param  array  values to use.
     * @static
     */
-    function factory($str,$args = array()) 
+    function factory($str, $args = [])
     {
         require_once 'iCal/'.$str.'.php';
         $class = 'File_iCal_'. $str;
@@ -209,5 +216,4 @@ class File_iCal
         }
         return $ret;
     }
-
 }

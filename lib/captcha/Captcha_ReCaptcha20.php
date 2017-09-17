@@ -18,7 +18,7 @@ class Captcha_ReCaptcha20 extends Zend\Captcha\ReCaptcha
      */
     public function isValid($value, $context = null)
     {
-        if (!is_array($value) && !is_array($context)) {
+        if (! is_array($value) && ! is_array($context)) {
             $this->error(self::MISSING_VALUE);
             return false;
         }
@@ -40,11 +40,11 @@ class Captcha_ReCaptcha20 extends Zend\Captcha\ReCaptcha
 
         //set POST variables
         $url = 'https://www.google.com/recaptcha/api/siteverify';
-        $fields = array(
+        $fields = [
             'secret' => urlencode($this->getPrivkey()),
             'response' => urlencode($value[$this->_RESPONSE]),
             'remoteip' => urlencode($_SERVER['REMOTE_ADDR']),
-        );
+        ];
 
         $fields_string = '';
         foreach ($fields as $k => $v) {
@@ -58,7 +58,7 @@ class Captcha_ReCaptcha20 extends Zend\Captcha\ReCaptcha
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $result = @json_decode(curl_exec($ch), true);
 
-        if (!is_array($result)) {
+        if (! is_array($result)) {
             $this->error(self::ERR_CAPTCHA);
             return false;
         }
@@ -81,7 +81,7 @@ class Captcha_ReCaptcha20 extends Zend\Captcha\ReCaptcha
      */
     public function render()
     {
-    	TikiLib::lib('header')->add_css('.g-recaptcha-response {display:none !important;}');
+        TikiLib::lib('header')->add_css('.g-recaptcha-response {display:none !important;}');
         return '<div class="g-recaptcha" data-sitekey="' . $this->getPubkey() . '" id="antibotcode"></div>';
     }
 
@@ -100,5 +100,4 @@ class Captcha_ReCaptcha20 extends Zend\Captcha\ReCaptcha
 				", 100);
         return '<div id="g-recaptcha'.$id.'"></div>';
     }
-
 }

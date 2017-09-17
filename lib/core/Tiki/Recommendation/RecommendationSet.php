@@ -9,66 +9,66 @@ namespace Tiki\Recommendation;
 
 class RecommendationSet implements \Countable, \Iterator
 {
-	private $engine;
-	private $recommendations = [];
-	private $debug = [];
+    private $engine;
+    private $recommendations = [];
+    private $debug = [];
 
-	function __construct($engineName)
-	{
-		$this->engine = $engineName;
-	}
+    function __construct($engineName)
+    {
+        $this->engine = $engineName;
+    }
 
-	function add(EngineOutput $recommendation)
-	{
-		if ($recommendation instanceof Recommendation) {
-			$this->recommendations[] = $recommendation;
-		} else {
-			$this->addDebug($recommendation);
-		}
-	}
+    function add(EngineOutput $recommendation)
+    {
+        if ($recommendation instanceof Recommendation) {
+            $this->recommendations[] = $recommendation;
+        } else {
+            $this->addDebug($recommendation);
+        }
+    }
 
-	function addDebug($info)
-	{
-		$this->debug[] = $info;
-	}
+    function addDebug($info)
+    {
+        $this->debug[] = $info;
+    }
 
-	function getEngine()
-	{
-		return $this->engine;
-	}
+    function getEngine()
+    {
+        return $this->engine;
+    }
 
-	function getDebug()
-	{
-		return new \ArrayIterator($this->debug);
-	}
+    function getDebug()
+    {
+        return new \ArrayIterator($this->debug);
+    }
 
-	function count()
-	{
-		return count($this->recommendations);
-	}
+    function count()
+    {
+        return count($this->recommendations);
+    }
 
-	function current()
-	{
-		return current($this->recommendations);
-	}
+    function current()
+    {
+        return current($this->recommendations);
+    }
 
-	function next()
-	{
-		next($this->recommendations);
-	}
+    function next()
+    {
+        next($this->recommendations);
+    }
 
-	function key()
-	{
-		return key($this->recommendations);
-	}
+    function key()
+    {
+        return key($this->recommendations);
+    }
 
-	function valid()
-	{
-		return current($this->recommendations) !== false;
-	}
+    function valid()
+    {
+        return current($this->recommendations) !== false;
+    }
 
-	function rewind()
-	{
-		reset($this->recommendations);
-	}
+    function rewind()
+    {
+        reset($this->recommendations);
+    }
 }

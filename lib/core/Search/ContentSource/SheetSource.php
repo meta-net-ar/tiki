@@ -7,87 +7,86 @@
 
 class Search_ContentSource_SheetSource implements Search_ContentSource_Interface
 {
-	private $db;
+    private $db;
 
-	function __construct()
-	{
-		$this->db = TikiDb::get();
-	}
+    function __construct()
+    {
+        $this->db = TikiDb::get();
+    }
 
-	function getDocuments()
-	{
-		return $this->db->table('tiki_sheets')->fetchColumn('sheetId', array());
-	}
+    function getDocuments()
+    {
+        return $this->db->table('tiki_sheets')->fetchColumn('sheetId', []);
+    }
 
-	function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
-	{
-		$sheetlib = TikiLib::lib('sheet');
+    function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    {
+        $sheetlib = TikiLib::lib('sheet');
 
-		$info = $sheetlib->get_sheet_info($objectId);
+        $info = $sheetlib->get_sheet_info($objectId);
 
-		if (! $info) {
-			return false;
-		}
+        if (! $info) {
+            return false;
+        }
 
-		$values = $this->db->table('tiki_sheet_values');
-		$contributors = $values->fetchColumn(
-			$values->expr('DISTINCT `user`'),
-			array(
-				'sheetId' => $objectId,
-			)
-		);
-		$lastModif = $values->fetchOne(
-			$values->max('begin'),
-			array(
-				'sheetId' => $objectId,
-			)
-		);
+        $values = $this->db->table('tiki_sheet_values');
+        $contributors = $values->fetchColumn(
+            $values->expr('DISTINCT `user`'),
+            [
+                'sheetId' => $objectId,
+            ]
+        );
+        $lastModif = $values->fetchOne(
+            $values->max('begin'),
+            [
+                'sheetId' => $objectId,
+            ]
+        );
 
-		$loader = new TikiSheetDatabaseHandler($objectId);
-		$writer = new TikiSheetCSVHandler('php://output');
+        $loader = new TikiSheetDatabaseHandler($objectId);
+        $writer = new TikiSheetCSVHandler('php://output');
 
-		$grid = new TikiSheet;
-		$grid->import($loader);
+        $grid = new TikiSheet;
+        $grid->import($loader);
 
-		$grid->export($writer);
-		$text = $writer->output;
+        $grid->export($writer);
+        $text = $writer->output;
 
-		$data = array(
-			'title' => $typeFactory->sortable($info['title']),
-			'description' => $typeFactory->sortable($info['description']),
-			'modification_date' => $typeFactory->timestamp($lastModif),
-			'contributors' => $typeFactory->multivalue($contributors),
+        $data = [
+            'title' => $typeFactory->sortable($info['title']),
+            'description' => $typeFactory->sortable($info['description']),
+            'modification_date' => $typeFactory->timestamp($lastModif),
+            'contributors' => $typeFactory->multivalue($contributors),
 
-			'sheet_content' => $typeFactory->plaintext($text),
+            'sheet_content' => $typeFactory->plaintext($text),
 
-			'view_permission' => $typeFactory->identifier('tiki_p_view_sheet'),
-		);
+            'view_permission' => $typeFactory->identifier('tiki_p_view_sheet'),
+        ];
 
-		return $data;
-	}
+        return $data;
+    }
 
-	function getProvidedFields()
-	{
-		return array(
-			'title',
-			'description',
-			'modification_date',
-			'contributors',
+    function getProvidedFields()
+    {
+        return [
+            'title',
+            'description',
+            'modification_date',
+            'contributors',
 
-			'sheet_content',
+            'sheet_content',
 
-			'view_permission',
-		);
-	}
+            'view_permission',
+        ];
+    }
 
-	function getGlobalFields()
-	{
-		return array(
-			'title' => true,
-			'description' => true,
+    function getGlobalFields()
+    {
+        return [
+            'title' => true,
+            'description' => true,
 
-			'sheet_content' => false,
-		);
-	}
+            'sheet_content' => false,
+        ];
+    }
 }
-

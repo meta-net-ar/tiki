@@ -7,38 +7,37 @@
 
 class Services_ResultLoader_WebService
 {
-	private $client;
-	private $offsetKey;
-	private $countKey;
-	private $resultKey;
+    private $client;
+    private $offsetKey;
+    private $countKey;
+    private $resultKey;
 
-	function __construct($client, $offsetKey, $countKey, $resultKey)
-	{
-		$this->client = $client;
-		$this->offsetKey = $offsetKey;
-		$this->countKey = $countKey;
-		$this->resultKey = $resultKey;
-	}
+    function __construct($client, $offsetKey, $countKey, $resultKey)
+    {
+        $this->client = $client;
+        $this->offsetKey = $offsetKey;
+        $this->countKey = $countKey;
+        $this->resultKey = $resultKey;
+    }
 
-	function __invoke($offset, $count)
-	{
-		$this->client->setParameterPost(
-			array(
-				$this->offsetKey => $offset,
-				$this->countKey => $count,
-			)
-		);
-		$this->client->setHeaders(array('Accept' => 'application/json'));
+    function __invoke($offset, $count)
+    {
+        $this->client->setParameterPost(
+            [
+                $this->offsetKey => $offset,
+                $this->countKey => $count,
+            ]
+        );
+        $this->client->setHeaders(['Accept' => 'application/json']);
 
-		$this->client->setMethod(Zend\Http\Request::METHOD_POST);
-		$response = $this->client->send();
+        $this->client->setMethod(Zend\Http\Request::METHOD_POST);
+        $response = $this->client->send();
 
-		if (! $response->isSuccess()) {
-			throw new Services_Exception(tr('Remote service inaccessible (%0)', $response->getStatusCode()), 400);
-		}
+        if (! $response->isSuccess()) {
+            throw new Services_Exception(tr('Remote service inaccessible (%0)', $response->getStatusCode()), 400);
+        }
 
-		$out = json_decode($response->getBody(), true);
-		return $out[$this->resultKey];
-	}
+        $out = json_decode($response->getBody(), true);
+        return $out[$this->resultKey];
+    }
 }
-

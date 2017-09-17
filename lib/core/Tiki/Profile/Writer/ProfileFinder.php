@@ -7,57 +7,58 @@
 
 class Tiki_Profile_Writer_ProfileFinder
 {
-	private $profiles = array();
-	private $symbols;
+    private $profiles = [];
+    private $symbols;
 
-	function __construct()
-	{
-		$this->symbols = TikiDb::get()->table('tiki_profile_symbols');
-	}
+    function __construct()
+    {
+        $this->symbols = TikiDb::get()->table('tiki_profile_symbols');
+    }
 
-	function lookup($type, $object)
-	{
-		$result = $this->symbols->fetchAll(
-			array(
-				'repository' => 'domain',
-				'profile',
-			), array(
-				'type' => $type,
-				'value' => $object,
-			)
-		);
+    function lookup($type, $object)
+    {
+        $result = $this->symbols->fetchAll(
+            [
+                'repository' => 'domain',
+                'profile',
+            ],
+            [
+                'type' => $type,
+                'value' => $object,
+            ]
+        );
 
-		foreach ($result as $entry) {
-			$hash = $entry['repository'] . ':' . $entry['profile'];
-			$this->profiles[$hash] = $entry;
-		}
-	}
+        foreach ($result as $entry) {
+            $hash = $entry['repository'] . ':' . $entry['profile'];
+            $this->profiles[$hash] = $entry;
+        }
+    }
 
-	function getProfiles()
-	{
-		return array_values($this->profiles);
-	}
+    function getProfiles()
+    {
+        return array_values($this->profiles);
+    }
 
-	function getSymbols($repository, $profile)
-	{
-		return $this->symbols->fetchAll(
-			array(
-				'type',
-				'id' => 'value',
-				'symbol' => 'object',
-			), array(
-				'domain' => $repository,
-				'profile' => $profile,
-			)
-		);
-	}
+    function getSymbols($repository, $profile)
+    {
+        return $this->symbols->fetchAll(
+            [
+                'type',
+                'id' => 'value',
+                'symbol' => 'object',
+            ],
+            [
+                'domain' => $repository,
+                'profile' => $profile,
+            ]
+        );
+    }
 
-	function checkProfileAndFlush()
-	{
-		$count = count($this->profiles);
+    function checkProfileAndFlush()
+    {
+        $count = count($this->profiles);
 
-		$this->profiles = array();
-		return $count > 0;
-	}
+        $this->profiles = [];
+        return $count > 0;
+    }
 }
-

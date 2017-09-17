@@ -7,50 +7,49 @@
 
 class Tiki_Editable_Value
 {
-	private $inner;
-	private $layout = 'inline';
-	private $fieldFetchUrl;
-	private $objectStoreUrl;
+    private $inner;
+    private $layout = 'inline';
+    private $fieldFetchUrl;
+    private $objectStoreUrl;
 
-	function __construct($html, array $parameters)
-	{
-		$this->inner = $html;
-		
-		if (! empty($parameters['layout']) && in_array($parameters['layout'], array('inline', 'block'))) {
-			$this->layout = $parameters['layout'];
-		}
+    function __construct($html, array $parameters)
+    {
+        $this->inner = $html;
 
-		if (empty($parameters['field_fetch_url'])) {
-			throw new Exception(tr('Internal error: mandatory parameter field_fetch_url is missing'));
-		}
+        if (! empty($parameters['layout']) && in_array($parameters['layout'], ['inline', 'block'])) {
+            $this->layout = $parameters['layout'];
+        }
 
-		if (empty($parameters['object_store_url'])) {
-			throw new Exception(tr('Internal error: mandatory parameter object_store_url is missing'));
-		}
+        if (empty($parameters['field_fetch_url'])) {
+            throw new Exception(tr('Internal error: mandatory parameter field_fetch_url is missing'));
+        }
 
-		$this->fieldFetchUrl = $parameters['field_fetch_url'];
-		$this->objectStoreUrl = $parameters['object_store_url'];
-	}
+        if (empty($parameters['object_store_url'])) {
+            throw new Exception(tr('Internal error: mandatory parameter object_store_url is missing'));
+        }
 
-	function __toString()
-	{
-		global $prefs;
+        $this->fieldFetchUrl = $parameters['field_fetch_url'];
+        $this->objectStoreUrl = $parameters['object_store_url'];
+    }
 
-		if ($prefs['ajax_inline_edit'] != 'y') {
-			return $this->inner;
-		}
+    function __toString()
+    {
+        global $prefs;
 
-		$tag = ($this->layout == 'block') ? 'div' : 'span';
-		$fieldFetch = htmlspecialchars($this->fieldFetchUrl);
-		$objectStore = htmlspecialchars($this->objectStoreUrl);
+        if ($prefs['ajax_inline_edit'] != 'y') {
+            return $this->inner;
+        }
 
-		$value = $this->inner;
-		if (trim(strip_tags($value)) == '') {
-			// When the value is empty, make sure it becomes visible/clickable
-			$value .= '&nbsp;';
-		}
+        $tag = ($this->layout == 'block') ? 'div' : 'span';
+        $fieldFetch = htmlspecialchars($this->fieldFetchUrl);
+        $objectStore = htmlspecialchars($this->objectStoreUrl);
 
-		return "<$tag class=\"editable-inline\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\">$value</$tag>";
-	}
+        $value = $this->inner;
+        if (trim(strip_tags($value)) == '') {
+            // When the value is empty, make sure it becomes visible/clickable
+            $value .= '&nbsp;';
+        }
+
+        return "<$tag class=\"editable-inline\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\">$value</$tag>";
+    }
 }
-

@@ -15,5 +15,5 @@
  */
 function smarty_modifier_breakline($str_content)
 {
-	return str_replace('[breakline]', '<br />', $str_content);
+    return str_replace('[breakline]', '<br />', $str_content);
 }

@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -8,8 +8,8 @@
 // the expected output of TikiImporter_Wiki_Mediawiki::parseData(), used to test
 // the behavior of the TikiImporter_Wiki::insertPage()
 global $page;
-$page = array('revisions' => array(
-                  0 => array(
+$page = ['revisions' => [
+                  0 => [
                       'minor' => false,
                       'lastModif' => 1123887605,
                       'user' => 'Igordebraga',
@@ -23,8 +23,8 @@ $page = array('revisions' => array(
 *((Rede_Pitágoras|Rede Pitágoras))
 *((UNIVERSO)){{esboço-educação}} ((Categoria:Educação))
 
-                  '),
-                  1 => array(
+                  '],
+                  1 => [
                       'minor' => false,
                       'lastModif' => 1130805792,
                       'user' => 'Martiniano Hilário',
@@ -38,8 +38,8 @@ $page = array('revisions' => array(
 *((Rede_Pitágoras|Rede Pitágoras))
 *((UNIVERSO)){{mínimo}} ((Categoria:Educação))
 
-                  '),
-                  2 => array(
+                  '],
+                  2 => [
                       'minor' => false,
                       'lastModif' => 1137345461,
                       'ip' => '201.24.14.135',
@@ -55,8 +55,8 @@ $page = array('revisions' => array(
 *((Rede_Salesiana|Rede Salesiana)){{mínimo}} ((Categoria:Educação))
 
 
-                  '),
-                  3 => array(
+                  '],
+                  3 => [
                       'minor' => false,
                       'lastModif' => 1138451599,
                       'ip' => '201.24.54.212',
@@ -72,8 +72,8 @@ $page = array('revisions' => array(
 *((Rede_Salesiana_de_Escolas|Rede Salesiana de Escolas)){{mínimo}} ((Categoria:Educação))
 
 
-                  '),
-                  4 => array(
+                  '],
+                  4 => [
                       'minor' => false,
                       'lastModif' => 1145870372,
                       'user' => 'Martiniano Hilário',
@@ -89,8 +89,8 @@ $page = array('revisions' => array(
 *((Rede_Salesiana_de_Escolas|Rede Salesiana de Escolas)){{mínimo}} ((Categoria:escolas))
 
 
-                  '),
-                  5 => array(
+                  '],
+                  5 => [
                       'minor' => 1,
                       'lastModif' => 1150287386,
                       'user' => 'Rui Silva',
@@ -105,8 +105,8 @@ $page = array('revisions' => array(
 *((Rede_Salesiana_de_Escolas|Rede Salesiana de Escolas))((Categoria:escolas))
 
 
-                  '),
-                  6 => array(
+                  '],
+                  6 => [
                       'minor' => false,
                       'lastModif' => 1226515380,
                       'user' => 'LijeBot',
@@ -121,8 +121,8 @@ $page = array('revisions' => array(
 *((Rede_Salesiana_de_Escolas|Rede Salesiana de Escolas))((Categoria:Escolas))
 
 
-                  '),
-                  7 => array(
+                  '],
+                  7 => [
                       'minor' => false,
                       'lastModif' => 1234172034,
                       'ip' => '189.41.74.5',
@@ -138,7 +138,7 @@ $page = array('revisions' => array(
 *((MACRO_Clube_de_Ensino|MACRO Clube de Ensino))((Categoria:Escolas))
 
 
-                  '),
-              ),
+                  '],
+              ],
               'name' => 'Redes de ensino'
-);
+];

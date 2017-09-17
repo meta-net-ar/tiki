@@ -15,56 +15,56 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('database:update')
-			->setDescription('Update the database to the latest schema')
-			->addOption(
-				'auto-register',
-				null,
-				InputOption::VALUE_NONE,
-				'Record any failed patch as applied.'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('database:update')
+            ->setDescription('Update the database to the latest schema')
+            ->addOption(
+                'auto-register',
+                null,
+                InputOption::VALUE_NONE,
+                'Record any failed patch as applied.'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$autoRegister = $input->getOption('auto-register');
-		$installer = new \Installer;
-		$installed = $installer->tableExists('users_users');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $autoRegister = $input->getOption('auto-register');
+        $installer = new \Installer;
+        $installed = $installer->tableExists('users_users');
 
-		if ($installed) {
-			$installer->update();
-			$output->writeln('Update completed.');
-			foreach (array_keys(\Patch::getPatches([\Patch::NEWLY_APPLIED])) as $patch) {
-				$output->writeln("<info>Installed: $patch</info>");
-			}
+        if ($installed) {
+            $installer->update();
+            $output->writeln('Update completed.');
+            foreach (array_keys(\Patch::getPatches([\Patch::NEWLY_APPLIED])) as $patch) {
+                $output->writeln("<info>Installed: $patch</info>");
+            }
 
-			if ( count($installer->executed) ) {
-				foreach ( $installer->executed as $script ) {
-					$output->writeln("<info>Executed: $script</info>");
-				}
-			}
+            if (count($installer->executed)) {
+                foreach ($installer->executed as $script) {
+                    $output->writeln("<info>Executed: $script</info>");
+                }
+            }
 
-			$output->writeln('<info>Queries executed successfully: ' . count($installer->queries['successful']) . '</info>');
+            $output->writeln('<info>Queries executed successfully: ' . count($installer->queries['successful']) . '</info>');
 
-			if ( count($installer->queries['failed']) ) {
-				foreach ( $installer->queries['failed'] as $key => $error ) {
-					list( $query, $message, $patch ) = $error;
+            if (count($installer->queries['failed'])) {
+                foreach ($installer->queries['failed'] as $key => $error) {
+                    list( $query, $message, $patch ) = $error;
 
-					$output->writeln("<error>Error $key in $patch\n\t$query\n\t$message</error>");
+                    $output->writeln("<error>Error $key in $patch\n\t$query\n\t$message</error>");
 
-					if ($autoRegister) {
-						$installer->recordPatch($patch);
-					}
-				}
-			}
+                    if ($autoRegister) {
+                        $installer->recordPatch($patch);
+                    }
+                }
+            }
 
-			$cachelib = \TikiLib::lib('cache');
-			$cachelib->empty_cache();
-		} else {
-			$output->writeln('<error>Database not found.</error>');
-		}
-	}
+            $cachelib = \TikiLib::lib('cache');
+            $cachelib->empty_cache();
+        } else {
+            $output->writeln('<error>Database not found.</error>');
+        }
+    }
 }

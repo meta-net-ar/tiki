@@ -6,7 +6,8 @@
  * unit or acceptance test, and then restore it to its initial state after that.
  */
 
-class TestHelpers {
+class TestHelpers
+{
 
     private $orig_user;
 
@@ -49,17 +50,15 @@ class TestHelpers {
     /*
      * Like $tikilib->create_page(), except that it will delete the page if it already exists.
      */
-    public function create_page($name, $hits, $data, $lastModif=null, $comment='', $user = 'admin', $ip = '0.0.0.0', $description = '', $lang='', $is_html = false, $hash=null, $wysiwyg=NULL, $wiki_authors_style='', $minor=0, $created='')
+    public function create_page($name, $hits, $data, $lastModif = null, $comment = '', $user = 'admin', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
     {
         global $tikilib;
 
-        if ($lastModif == null)
-        {
+        if ($lastModif == null) {
             $lastModif = $tikilib->now;
         }
 
-        if ($tikilib->page_exists($name))
-        {
+        if ($tikilib->page_exists($name)) {
             $tikilib->remove_all_versions($name);
         }
         $tikilib->create_page($name, $hits, $data, $lastModif, $comment, $user, $ip, $description, $lang, $is_html, $hash, $wysiwyg, $wiki_authors_style, $minor, $created);
@@ -72,7 +71,6 @@ class TestHelpers {
 
         $tikilib->remove_all_versions($page_name);
     }
-
 }
 
 $testhelpers = new TestHelpers();

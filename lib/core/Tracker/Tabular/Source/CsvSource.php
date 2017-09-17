@@ -9,41 +9,40 @@ namespace Tracker\Tabular\Source;
 
 class CsvSource implements SourceInterface
 {
-	private $schema;
-	private $file;
+    private $schema;
+    private $file;
 
-	function __construct(\Tracker\Tabular\Schema $schema, $fileName)
-	{
-		$this->schema = $schema->getPlainOutputSchema();
-		$this->file = new \SplFileObject($fileName, 'r');
-	}
+    function __construct(\Tracker\Tabular\Schema $schema, $fileName)
+    {
+        $this->schema = $schema->getPlainOutputSchema();
+        $this->file = new \SplFileObject($fileName, 'r');
+    }
 
-	function getEntries()
-	{
-		$this->file->fseek(0);
-		
-		$headers = $this->file->fgetcsv();
-		$this->schema->validateAgainstHeaders($headers);
+    function getEntries()
+    {
+        $this->file->fseek(0);
 
-		while (! $this->file->eof()) {
-			$row = $this->file->fgetcsv();
+        $headers = $this->file->fgetcsv();
+        $this->schema->validateAgainstHeaders($headers);
 
-			if (count($row) == 1 && empty($row[0])) {
-				continue;
-			}
+        while (! $this->file->eof()) {
+            $row = $this->file->fgetcsv();
 
-			$data = [];
-			foreach ($this->schema->getColumns() as $i => $column) {
-				$data[spl_object_hash($column)] = $row[$i];
-			}
+            if (count($row) == 1 && empty($row[0])) {
+                continue;
+            }
 
-			yield new CsvSourceEntry($data);
-		}
-	}
+            $data = [];
+            foreach ($this->schema->getColumns() as $i => $column) {
+                $data[spl_object_hash($column)] = $row[$i];
+            }
 
-	function getSchema()
-	{
-		return $this->schema;
-	}
+            yield new CsvSourceEntry($data);
+        }
+    }
+
+    function getSchema()
+    {
+        return $this->schema;
+    }
 }
-

@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 /*
@@ -19,24 +19,23 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  * Purpose:  show avatar for a given user name
  * -------------------------------------------------------------
  */
-function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag='y')
+function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
 {
-	if (! $user) {
-		return '';
-	}
-	
-	$avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
+    if (! $user) {
+        return '';
+    }
 
-	if (! $avatar && $default) {
-		$smarty = TikiLib::lib('smarty');
-		$smarty->loadPlugin('smarty_function_icon');
-		$name = TikiLib::lib('user')->clean_user($user);
-		$avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty);
-	}
+    $avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
 
-	if ( $avatar != '' && $show_tag == 'y') {
-		$avatar = TikiLib::lib('user')->build_userinfo_tag($user, $avatar);
-	}
-	return $avatar;	
+    if (! $avatar && $default) {
+        $smarty = TikiLib::lib('smarty');
+        $smarty->loadPlugin('smarty_function_icon');
+        $name = TikiLib::lib('user')->clean_user($user);
+        $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty);
+    }
+
+    if ($avatar != '' && $show_tag == 'y') {
+        $avatar = TikiLib::lib('user')->build_userinfo_tag($user, $avatar);
+    }
+    return $avatar;
 }
-

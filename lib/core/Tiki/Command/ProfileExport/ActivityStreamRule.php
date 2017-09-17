@@ -14,31 +14,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ActivityStreamRule extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:activity-stream-rule')
-			->setDescription('Export an activity stream rule')
-			->addArgument(
-				'rule',
-				InputArgument::REQUIRED,
-				'Rule ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:activity-stream-rule')
+            ->setDescription('Export an activity stream rule')
+            ->addArgument(
+                'rule',
+                InputArgument::REQUIRED,
+                'Rule ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$rule = $input->getArgument('rule');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $rule = $input->getArgument('rule');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		if (\Tiki_Profile_InstallHandler_ActivityStreamRule::export($writer, $rule)) {
-			$writer->save();
-		} else {
-			$output->writeln("<error>Rule not found: $rule</error>");
-			return;
-		}
-	}
+        if (\Tiki_Profile_InstallHandler_ActivityStreamRule::export($writer, $rule)) {
+            $writer->save();
+        } else {
+            $output->writeln("<error>Rule not found: $rule</error>");
+            return;
+        }
+    }
 }

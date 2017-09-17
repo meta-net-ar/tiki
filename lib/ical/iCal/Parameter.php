@@ -38,152 +38,158 @@
  */
 abstract class File_iCal_Parameter
 {
-        protected $_name;
-        protected $_values = array();
+    protected $_name;
+    protected $_values = [];
 
-        protected $_valueDoubleQuote = false;
+    protected $_valueDoubleQuote = false;
 
-        public function __construct($name, &$values)
-        {
-            if (!is_array($values)) {
-                $values = array($values);
-            }
+    public function __construct($name, &$values)
+    {
+        if (! is_array($values)) {
+            $values = [$values];
         }
+    }
 
-        public function getName() { return $this->_name; }
+    public function getName()
+    {
+        return $this->_name;
+    }
 
         //returns an array of value data type objects
-        public function getValues() {
-            return $this->_values;
-        }
+    public function getValues()
+    {
+        return $this->_values;
+    }
 
         //returns a string formatted for content lines
-        public function getValuesString() {
-            $r = array();
+    public function getValuesString()
+    {
+        $r = [];
 
-            foreach ($this->_values as $v) {
-                switch ($this->_valueDoubleQuote) {
-                    case true:
+        foreach ($this->_values as $v) {
+            switch ($this->_valueDoubleQuote) {
+                case true:
+                    $r[] = "\"".$v->getValue()."\"";
+                    break;
+
+                case false:
+                    $r[] = $v->getValue();
+                    break;
+
+                case "unknown":
+                    if (self::stringNeedsQuoted($v->getValue())) {
                         $r[] = "\"".$v->getValue()."\"";
-                        break;
-
-                    case false:
+                    } else {
                         $r[] = $v->getValue();
-                        break;
-
-                    case "unknown":
-                        if (self::stringNeedsQuoted($v->getValue())) {
-                            $r[] = "\"".$v->getValue()."\"";
-                        }
-                        else {
-                            $r[] = $v->getValue();
-                        }
-                        break;
-
-                    default:
-                        trigger_error("Unknown internal double quote value in parameter", E_USER_ERROR);
-
-                }
-
-            }
-
-            return implode(',', $r);
-        }
-
-        static public function stringNeedsQuoted($s) {
-            if (strpbrk($s, ";:,")) return true;
-
-            return false;
-        }
-
-        //returns an array with key and value keys
-        public function getArray() {
-            $r = array();
-            $r['name'] = self::getName();
-            $r['values'] = self::getValueString();
-        }
-
-        //overload at child class level
-        public function getDefaultValue() {
-
-        }
-
-        //overload at child class level
-        public function getDefaultValueString() {
-
-        }
-
-        static public function getParameter($name, $values) {
-            if (!is_array($values)) {
-                $values = array($values);
-            }
-
-            switch (strtoupper($name)) {
-                case "ALTREP":
-                    return new File_iCal_Parameter_AlternateTextRepresentation($name, $values);
-
-                case "CN":
-                    return new File_iCal_Parameter_CommonName($name, $values);
-
-                case "CUTYPE":
-                    return new File_iCal_Parameter_CalendarUserType($name, $values);
-
-                case "DELEGATED-FROM":
-                    return new File_iCal_Parameter_Delegators($name, $values);
-
-                case "DELEGATED-TO":
-                    return new File_iCal_Parameter_Delegatees($name, $values);
-
-                case "DIR":
-                    return new File_iCal_Parameter_Delegators($name, $values);
-
-                case "ENCODING":
-                    return new File_iCal_Parameter_Encoding($name, $values);
-
-                case "FMTTYPE":
-                    return new File_iCal_Parameter_FormatType($name, $values);
-
-                case "FBTYPE":
-                    return new File_iCal_Parameter_FreeBusyTimeType($name, $values);
-
-                case "LANGUAGE":
-                    return new File_iCal_Parameter_Language($name, $values);
-
-                case "MEMBER":
-                    return new File_iCal_Parameter_Membership($name, $values);
-
-                case "PARTSTAT":
-                    return new File_iCal_Parameter_ParticipationStatus($name, $values);
-
-                case "RANGE":
-                    return new File_iCal_Parameter_RecurrenceIdentifierRange($name, $values);
-
-                case "RELATED":
-                    return new File_iCal_Parameter_AlarmTriggerRelationship($name, $values);
-
-                case "RELTYPE":
-                    return new File_iCal_Parameter_RelationshipType($name, $values);
-
-                case "ROLE":
-                    return new File_iCal_Parameter_ParticipationRole($name, $values);
-
-                case "RSVP":
-                    return new File_iCal_Parameter_RSVP($name, $values);
-
-                case "SENT-BY":
-                    return new File_iCal_Parameter_SentBy($name, $values);
-
-                case "TZID":
-                    return new File_iCal_Parameter_TimeZoneIdentifier($name, $values);
-
-                case "VALUE":
-                    return new File_iCal_Parameter_Value($name, $values);
+                    }
+                    break;
 
                 default:
-                    echo "The parameter type $name is not yet supported\n";
+                    trigger_error("Unknown internal double quote value in parameter", E_USER_ERROR);
             }
         }
 
+        return implode(',', $r);
+    }
+
+    public static function stringNeedsQuoted($s)
+    {
+        if (strpbrk($s, ";:,")) {
+            return true;
+        }
+
+        return false;
+    }
+
+        //returns an array with key and value keys
+    public function getArray()
+    {
+        $r = [];
+        $r['name'] = self::getName();
+        $r['values'] = self::getValueString();
+    }
+
+        //overload at child class level
+    public function getDefaultValue()
+    {
+    }
+
+        //overload at child class level
+    public function getDefaultValueString()
+    {
+    }
+
+    public static function getParameter($name, $values)
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        switch (strtoupper($name)) {
+            case "ALTREP":
+                return new File_iCal_Parameter_AlternateTextRepresentation($name, $values);
+
+            case "CN":
+                return new File_iCal_Parameter_CommonName($name, $values);
+
+            case "CUTYPE":
+                return new File_iCal_Parameter_CalendarUserType($name, $values);
+
+            case "DELEGATED-FROM":
+                return new File_iCal_Parameter_Delegators($name, $values);
+
+            case "DELEGATED-TO":
+                return new File_iCal_Parameter_Delegatees($name, $values);
+
+            case "DIR":
+                return new File_iCal_Parameter_Delegators($name, $values);
+
+            case "ENCODING":
+                return new File_iCal_Parameter_Encoding($name, $values);
+
+            case "FMTTYPE":
+                return new File_iCal_Parameter_FormatType($name, $values);
+
+            case "FBTYPE":
+                return new File_iCal_Parameter_FreeBusyTimeType($name, $values);
+
+            case "LANGUAGE":
+                return new File_iCal_Parameter_Language($name, $values);
+
+            case "MEMBER":
+                return new File_iCal_Parameter_Membership($name, $values);
+
+            case "PARTSTAT":
+                return new File_iCal_Parameter_ParticipationStatus($name, $values);
+
+            case "RANGE":
+                return new File_iCal_Parameter_RecurrenceIdentifierRange($name, $values);
+
+            case "RELATED":
+                return new File_iCal_Parameter_AlarmTriggerRelationship($name, $values);
+
+            case "RELTYPE":
+                return new File_iCal_Parameter_RelationshipType($name, $values);
+
+            case "ROLE":
+                return new File_iCal_Parameter_ParticipationRole($name, $values);
+
+            case "RSVP":
+                return new File_iCal_Parameter_RSVP($name, $values);
+
+            case "SENT-BY":
+                return new File_iCal_Parameter_SentBy($name, $values);
+
+            case "TZID":
+                return new File_iCal_Parameter_TimeZoneIdentifier($name, $values);
+
+            case "VALUE":
+                return new File_iCal_Parameter_Value($name, $values);
+
+            default:
+                echo "The parameter type $name is not yet supported\n";
+        }
+    }
 }
 
 /**
@@ -194,7 +200,8 @@ abstract class File_iCal_Parameter
  */
 class File_iCal_Parameter_AlternateTextRepresentation extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "ALTREP";
         $this->_valueDoubleQuote = true;
@@ -208,14 +215,11 @@ class File_iCal_Parameter_AlternateTextRepresentation extends File_iCal_Paramete
             $matches;
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_URI($matches[1]);
-            }
-            else {
+            } else {
                 trigger_error("Altrepparam must be double quoted", E_USER_WARNING);
             }
         }
-
     }
-
 }
 
 /**
@@ -226,7 +230,8 @@ class File_iCal_Parameter_AlternateTextRepresentation extends File_iCal_Paramete
  */
 class File_iCal_Parameter_CommonName extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
 
         $this->_name = "CN";
@@ -242,8 +247,7 @@ class File_iCal_Parameter_CommonName extends File_iCal_Parameter
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_Text($matches[1]);
                 $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 $this->_values[] = new File_iCal_ValueDataType_Text($v);
                 $this->_valueDoubleQuote = false;
             }
@@ -259,7 +263,8 @@ class File_iCal_Parameter_CommonName extends File_iCal_Parameter
  */
 class File_iCal_Parameter_CalendarUserType extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "CUTYPE";
 
@@ -280,17 +285,17 @@ class File_iCal_Parameter_CalendarUserType extends File_iCal_Parameter
                 default:
                 //need to handle cases for x-name and iana-token
                     trigger_error("CUTYPE parameter value $v is not recognized", E_USER_WARNING);
-
             }
         }
-
     }
 
-    public function getDefaultValue() {
+    public function getDefaultValue()
+    {
         return new File_iCal_ValueDataType_Text("INDIVIDUAL");
     }
 
-    public function getDefaultValueString() {
+    public function getDefaultValueString()
+    {
         $v = self::getDefaultValue();
         $return = $v->getValue();
 
@@ -308,7 +313,8 @@ class File_iCal_Parameter_CalendarUserType extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Delegators extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "DELEGATED-FROM";
         $this->_valueDoubleQuote = true;
@@ -320,8 +326,7 @@ class File_iCal_Parameter_Delegators extends File_iCal_Parameter
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                     $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($matches[1]);
                     $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 trigger_error("Delegator parameter must be specified in double quotes", E_USER_WARNING);
             }
         }
@@ -336,7 +341,8 @@ class File_iCal_Parameter_Delegators extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Delegatees extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "DELEGATED-TO";
         $this->_valueDoubleQuote = true;
@@ -347,11 +353,9 @@ class File_iCal_Parameter_Delegatees extends File_iCal_Parameter
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($v);
                 $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 trigger_error("Delegatee parameter must be specified in double quotes", E_USER_WARNING);
             }
-
         }
     }
 }
@@ -364,7 +368,8 @@ class File_iCal_Parameter_Delegatees extends File_iCal_Parameter
  */
 class File_iCal_Parameter_DirectoryEntryReference extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "DIR";
 
@@ -378,12 +383,10 @@ class File_iCal_Parameter_DirectoryEntryReference extends File_iCal_Parameter
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_URI($matches[1]);
                 $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 trigger_error("A DIR parameter must be enclosed in double quotes", E_USER_WARNING);
             }
         }
-
     }
 }
 
@@ -395,7 +398,8 @@ class File_iCal_Parameter_DirectoryEntryReference extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Encoding extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "ENCODING";
 
@@ -413,11 +417,8 @@ class File_iCal_Parameter_Encoding extends File_iCal_Parameter
                 default:
                 //need to handle cases for x-name and iana-token
                     trigger_error("ENCODING parameter value $v is not recognized", E_USER_WARNING);
-
             }
         }
-
-
     }
 }
 
@@ -429,7 +430,8 @@ class File_iCal_Parameter_Encoding extends File_iCal_Parameter
  */
 class File_iCal_Parameter_FormatType extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "FMTTYPE";
 
@@ -451,7 +453,8 @@ class File_iCal_Parameter_FormatType extends File_iCal_Parameter
  */
 class File_iCal_Parameter_FreeBusyTimeType extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "FBTYPE";
 
@@ -483,7 +486,8 @@ class File_iCal_Parameter_FreeBusyTimeType extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Language extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "LANUAGE";
 
@@ -505,7 +509,8 @@ class File_iCal_Parameter_Language extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Membership extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "MEMBER";
 
@@ -515,8 +520,7 @@ class File_iCal_Parameter_Membership extends File_iCal_Parameter
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($matches[1]);
                 $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 trigger_error("A MEMBER parameter must be enclosed in double quotes", E_USER_WARNING);
             }
         }
@@ -531,7 +535,8 @@ class File_iCal_Parameter_Membership extends File_iCal_Parameter
  */
 class File_iCal_Parameter_ParticipationStatus extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "PARTSTAT";
 
@@ -554,10 +559,8 @@ class File_iCal_Parameter_ParticipationStatus extends File_iCal_Parameter
                 default:
                 //need to handle cases for x-name and iana-token
                     trigger_error("PARTSTAT parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
-
     }
 }
 
@@ -569,7 +572,8 @@ class File_iCal_Parameter_ParticipationStatus extends File_iCal_Parameter
  */
 class File_iCal_Parameter_RecurrenceIdentifierRange extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "RANGE";
 
@@ -586,10 +590,8 @@ class File_iCal_Parameter_RecurrenceIdentifierRange extends File_iCal_Parameter
 
                 default:
                     trigger_error("RANGE parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
-
     }
 }
 
@@ -601,7 +603,8 @@ class File_iCal_Parameter_RecurrenceIdentifierRange extends File_iCal_Parameter
  */
 class File_iCal_Parameter_AlarmTriggerRelationship extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "RELATED";
 
@@ -618,7 +621,6 @@ class File_iCal_Parameter_AlarmTriggerRelationship extends File_iCal_Parameter
 
                 default:
                     trigger_error("RELATED parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
     }
@@ -632,7 +634,8 @@ class File_iCal_Parameter_AlarmTriggerRelationship extends File_iCal_Parameter
  */
 class File_iCal_Parameter_RelationshipType extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "RELTYPE";
 
@@ -650,10 +653,8 @@ class File_iCal_Parameter_RelationshipType extends File_iCal_Parameter
 
                 default:
                     trigger_error("RELTYPE parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
-
     }
 }
 
@@ -665,7 +666,8 @@ class File_iCal_Parameter_RelationshipType extends File_iCal_Parameter
  */
 class File_iCal_Parameter_ParticipationRole extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "ROLE";
 
@@ -685,11 +687,8 @@ class File_iCal_Parameter_ParticipationRole extends File_iCal_Parameter
                 default:
                 //need to handle cases for x-name and iana-token
                     trigger_error("ROLE parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
-
-
     }
 }
 
@@ -701,7 +700,8 @@ class File_iCal_Parameter_ParticipationRole extends File_iCal_Parameter
  */
 class File_iCal_Parameter_RSVP extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "RSVP";
         $this->_valueDoubleQuote = false;
@@ -719,7 +719,6 @@ class File_iCal_Parameter_RSVP extends File_iCal_Parameter
 
                 default:
                     trigger_error("RSVP parameter value $v is not yet recognized", E_USER_WARNING);
-
             }
         }
     }
@@ -733,7 +732,8 @@ class File_iCal_Parameter_RSVP extends File_iCal_Parameter
  */
 class File_iCal_Parameter_SentBy extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "SENT-BY";
         $this->_valueDoubleQuote = true;
@@ -743,17 +743,15 @@ class File_iCal_Parameter_SentBy extends File_iCal_Parameter
         }
 
         foreach ($values as $v) {
-           $matches;
+            $matches;
 
             if (preg_match("/^\"(.*)\"\$/", $v, $matches)) {
                 $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($matches[1]);
                 $this->_valueDoubleQuote = true;
-            }
-            else {
+            } else {
                 trigger_error("A SENT-BY parameter must be enclosed in double quotes", E_USER_WARNING);
             }
         }
-
     }
 }
 
@@ -765,7 +763,8 @@ class File_iCal_Parameter_SentBy extends File_iCal_Parameter
  */
 class File_iCal_Parameter_TimeZoneIdentifier extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "TZID";
         $this->_valueDoubleQuote = false;
@@ -788,7 +787,8 @@ class File_iCal_Parameter_TimeZoneIdentifier extends File_iCal_Parameter
  */
 class File_iCal_Parameter_Value extends File_iCal_Parameter
 {
-    public function __construct($name, $values) {
+    public function __construct($name, $values)
+    {
         parent::__construct($name, $values);
         $this->_name = "VALUE";
         $this->_valueDoubleQuote = false;
@@ -818,9 +818,7 @@ class File_iCal_Parameter_Value extends File_iCal_Parameter
 
                 default:
                     trigger_error("VALUE parameter $v is unknown type", E_USER_WARNING);
-
             }
         }
-
     }
 }

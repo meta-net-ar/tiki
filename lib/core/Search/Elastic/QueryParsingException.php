@@ -7,12 +7,11 @@
 
 class Search_Elastic_QueryParsingException extends Search_Elastic_Exception
 {
-	private $string;
+    private $string;
 
-	function __construct($string)
-	{
-		$this->string = $string;
-		parent::__construct(tr('Parsing search query failed: "%0"', $this->string));
-	}
+    function __construct($string)
+    {
+        $this->string = $string;
+        parent::__construct(tr('Parsing search query failed: "%0"', $this->string));
+    }
 }
-

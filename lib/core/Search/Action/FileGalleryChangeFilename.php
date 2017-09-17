@@ -8,7 +8,7 @@
 class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
 {
 
-    protected $replaceKeys = array(
+    protected $replaceKeys = [
       '%file_name%' => 'file.filename',
       '%file_id%' => 'file.fileId',
       '%parts_filename%' => 'parts.filename',
@@ -20,17 +20,17 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
       '%field_id%' => 'field.fieldId',
       '%field_perm_name%' => 'field.permName',
       '%field_name%' => 'field.name',
-    );
+    ];
 
     function getValues()
     {
-        return array(
+        return [
           'object_type' => true,
           'object_id' => true,
           'field' => true,
           'value' => true,
           'in_place' => false,
-        );
+        ];
     }
 
     function validate(JitFilter $data)
@@ -52,14 +52,14 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
         $trklib = TikiLib::lib('trk');
         $info = $trklib->get_item_info($object_id);
 
-        if (!$info) {
+        if (! $info) {
             throw new Search_Action_Exception(tr('Tracker item %0 not found.', $object_id));
         }
 
         $definition = Tracker_Definition::get($info['trackerId']);
 
         $fieldDefinition = $definition->getFieldFromPermName($field);
-        if (!$fieldDefinition) {
+        if (! $fieldDefinition) {
             throw new Search_Action_Exception(tr('Tracker field %0 not found for tracker %1.', $field, $info['trackerId']));
         }
 
@@ -111,7 +111,7 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
             return true;
         }
 
-        $newFileList = array();
+        $newFileList = [];
         foreach (explode(',', $fileList) as $fileId) {
             $file = $fileGal->get_file($fileId);
             $galInfo = $fileGal->get_file_gallery_info($file['galleryId']);
@@ -121,37 +121,37 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
                 $fileGal->update_file($fileId, $newName, $file['description'], $newUser, null, $newName);
             } else {
                 $newFileList[] = $fileGal->update_single_file(
-                  $galInfo,
-                  $newName,
-                  $file['filesize'],
-                  $file['filetype'],
-                  $file['data'],
-                  $fileId,
-                  $newUser
+                    $galInfo,
+                    $newName,
+                    $file['filesize'],
+                    $file['filetype'],
+                    $file['data'],
+                    $fileId,
+                    $newUser
                 );
             }
-
         }
 
-        if (!$in_place && ($prefs['fgal_keep_fileId'] != 'y')) {
+        if (! $in_place && ($prefs['fgal_keep_fileId'] != 'y')) {
             // new IDs are generated to for the last version we updated
             $utilities = new Services_Tracker_Utilities;
             $utilities->updateItem(
-              $definition,
-              array(
+                $definition,
+                [
                 'itemId' => $object_id,
                 'status' => $info['status'],
-                'fields' => array(
+                'fields' => [
                   $field => implode(',', $newFileList),
-                ),
-              )
+                ],
+                ]
             );
         }
 
         return true;
     }
 
-    function requiresInput(JitFilter $data) {
+    function requiresInput(JitFilter $data)
+    {
         return false;
     }
 
@@ -167,15 +167,15 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
      */
     protected function generateString($template, $fileData, $galleryData, $itemData, $fieldData)
     {
-        $dataValues = array(
+        $dataValues = [
           'file' => $fileData,
           'gallery' => $galleryData,
           'item' => $itemData,
           'field' => $fieldData,
           'parts' => pathinfo($fileData['filename'])
-        );
+        ];
 
-        $values = array();
+        $values = [];
         foreach ($this->replaceKeys as $search => $dataKey) {
             list($data, $key) = explode('.', $dataKey);
             $values[$search] = (isset($dataValues[$data])&&isset($dataValues[$data][$key])) ? $dataValues[$data][$key] : '';
@@ -184,4 +184,3 @@ class Search_Action_FileGalleryChangeFilename implements Search_Action_Action
         return str_replace(array_keys($values), array_values($values), $template);
     }
 }
-

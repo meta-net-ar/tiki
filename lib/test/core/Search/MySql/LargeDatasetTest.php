@@ -7,66 +7,65 @@
 
 class Search_MySql_LargeDatasetTest extends PHPUnit_Framework_TestCase
 {
-	protected $index;
+    protected $index;
 
-	function setUp()
-	{
-		$this->index = $this->getIndex();
-		$this->index->destroy();
-	}
+    function setUp()
+    {
+        $this->index = $this->getIndex();
+        $this->index->destroy();
+    }
 
-	protected function getIndex()
-	{
-		return new Search_MySql_Index(TikiDb::get(), 'test_index');
-	}
+    protected function getIndex()
+    {
+        return new Search_MySql_Index(TikiDb::get(), 'test_index');
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 
-	/**
-	 * @expectedException Search_MySql_LimitReachedException
-	 */
-	function testManyColumns()
-	{
-		$typeFactory = $this->index->getTypeFactory();
-		$document = array(
-			'object_type' => $typeFactory->identifier('test'),
-			'object_id' => $typeFactory->identifier('test'),
-		);
+    /**
+     * @expectedException Search_MySql_LimitReachedException
+     */
+    function testManyColumns()
+    {
+        $typeFactory = $this->index->getTypeFactory();
+        $document = [
+            'object_type' => $typeFactory->identifier('test'),
+            'object_id' => $typeFactory->identifier('test'),
+        ];
 
-		for ($i = 0; 1500 > $i; ++$i) {
-			$document['identifier_' . $i] = $typeFactory->identifier('test');
-			$document['sortable_' . $i] = $typeFactory->sortable('test');
-			$document['plaintext_' . $i] = $typeFactory->plaintext('test');
-		}
+        for ($i = 0; 1500 > $i; ++$i) {
+            $document['identifier_' . $i] = $typeFactory->identifier('test');
+            $document['sortable_' . $i] = $typeFactory->sortable('test');
+            $document['plaintext_' . $i] = $typeFactory->plaintext('test');
+        }
 
-		$this->index->addDocument($document);
-	}
+        $this->index->addDocument($document);
+    }
 
-	/**
-	 * @expectedException Search_MySql_LimitReachedException
-	 */
-	function testManyIndexes()
-	{
-		$typeFactory = $this->index->getTypeFactory();
-		$document = array(
-			'object_type' => $typeFactory->identifier('test'),
-			'object_id' => $typeFactory->identifier('test'),
-		);
+    /**
+     * @expectedException Search_MySql_LimitReachedException
+     */
+    function testManyIndexes()
+    {
+        $typeFactory = $this->index->getTypeFactory();
+        $document = [
+            'object_type' => $typeFactory->identifier('test'),
+            'object_id' => $typeFactory->identifier('test'),
+        ];
 
-		$query = new Search_Query;
-		for ($i = 0; 3000 > $i; ++$i) {
-			$document['field_' . $i] = $typeFactory->sortable('test');
-			$query->filterInitial('test', 'field_' . $i);
-		}
+        $query = new Search_Query;
+        for ($i = 0; 3000 > $i; ++$i) {
+            $document['field_' . $i] = $typeFactory->sortable('test');
+            $query->filterInitial('test', 'field_' . $i);
+        }
 
-		$this->index->addDocument($document);
+        $this->index->addDocument($document);
 
-		$query->search($this->index);
-	}
+        $query->search($this->index);
+    }
 }
-

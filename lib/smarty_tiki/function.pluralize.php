@@ -18,7 +18,7 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function smarty_function_pluralize($params, &$smarty)
 {
-    if (empty($params['singular_form']) || !isset($params['word_count'])) {
+    if (empty($params['singular_form']) || ! isset($params['word_count'])) {
         return;
     }
 

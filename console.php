@@ -12,19 +12,19 @@ define('TIKI_CONSOLE', 1);
 declare(ticks = 1); // how often to check for signals
 
 if (function_exists('pcntl_signal')) {
-	$exit = function () {
-		error_reporting(0); // Disable error reporting, misleading backtrace on kill
-		exit;
-	};
+    $exit = function () {
+        error_reporting(0); // Disable error reporting, misleading backtrace on kill
+        exit;
+    };
 
-	pcntl_signal(SIGTERM, $exit);
-	pcntl_signal(SIGHUP, $exit);
-	pcntl_signal(SIGINT, $exit);
+    pcntl_signal(SIGTERM, $exit);
+    pcntl_signal(SIGHUP, $exit);
+    pcntl_signal(SIGINT, $exit);
 }
 
 
 if (isset($_SERVER['REQUEST_METHOD'])) {
-	die('Only available through command-line.');
+    die('Only available through command-line.');
 }
 
 require_once 'tiki-filter-base.php';
@@ -35,18 +35,18 @@ require_once 'lib/setup/twversion.class.php';
 
 $input = new ArgvInput;
 
-if (false !== $site = $input->getParameterOption(array('--site'))) {
-	$_SERVER['TIKI_VIRTUAL'] = $site;
+if (false !== $site = $input->getParameterOption(['--site'])) {
+    $_SERVER['TIKI_VIRTUAL'] = $site;
 }
 
 $local_php = TikiInit::getCredentialsFile();
 
 if (! is_readable($local_php)) {
-	die("\033[31mCredentials file local.php not found. See http://doc.tiki.org/Installation for more information.\033[0m\n");
+    die("\033[31mCredentials file local.php not found. See http://doc.tiki.org/Installation for more information.\033[0m\n");
 }
 
 if (is_file($local_php) || TikiInit::getEnvironmentCredentials()) {
-	require_once 'db/tiki-db.php';
+    require_once 'db/tiki-db.php';
 }
 
 $installer = $installer = new Installer;
@@ -54,27 +54,27 @@ $isInstalled = $installer->isInstalled();
 
 $exceptionToRender = null;
 if ($isInstalled) {
-	$bypass_siteclose_check = true;
-	try {
-		require_once 'tiki-setup.php';
-	} catch (Exception $e) {
-		$exceptionToRender = $e;
-	}
+    $bypass_siteclose_check = true;
+    try {
+        require_once 'tiki-setup.php';
+    } catch (Exception $e) {
+        $exceptionToRender = $e;
+    }
 
-	if (! $asUser = $input->getParameterOption(array('--as-user'))) {
-		$asUser = 'admin';
-	}
+    if (! $asUser = $input->getParameterOption(['--as-user'])) {
+        $asUser = 'admin';
+    }
 
-	if (TikiLib::lib('user')->user_exists($asUser)) {
-		$permissionContext = new Perms_Context($asUser);
-	}
+    if (TikiLib::lib('user')->user_exists($asUser)) {
+        $permissionContext = new Perms_Context($asUser);
+    }
 }
 
 $consoleBuilder = new Tiki\Command\ConsoleApplicationBuilder($site);
 $console = $consoleBuilder->create();
 
-if ($exceptionToRender instanceof Exception){
-	$console->renderException($exceptionToRender, new \Symfony\Component\Console\Output\ConsoleOutput());
+if ($exceptionToRender instanceof Exception) {
+    $console->renderException($exceptionToRender, new \Symfony\Component\Console\Output\ConsoleOutput());
 }
 
 $console->run();

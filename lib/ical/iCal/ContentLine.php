@@ -75,13 +75,12 @@ class File_iCal_ContentLine
         if (is_a($line, "File_iCal_Property")) {
             $this->_property = $line;
         } else {
-
             //remove all special characters from beginning and end
             $line = trim($line);
 
             //now it is time again to rewrite the tokenizer (for the 4th time)
 
-            $tokens = array();  //array of strings which represent tokens
+            $tokens = [];  //array of strings which represent tokens
 
             $i = 0; //string position
             $l = strlen($line);
@@ -98,7 +97,9 @@ class File_iCal_ContentLine
 
                         while ($valid) {
                             $i = strpos($line, '\"', $i);
-                            if ($line{$i-1} == '\\') $valid = false;
+                            if ($line{$i - 1} == '\\') {
+                                $valid = false;
+                            }
                         }
 
                         $t = substr($line, $begin, $i - $begin);
@@ -118,28 +119,24 @@ class File_iCal_ContentLine
                         $present_semi = in_array(';', $tokens);
 
 
-                        if (!$present_colon && !$present_semi) {
+                        if (! $present_colon && ! $present_semi) {
                             $m;
                             preg_match("/^([\\w\\d-]+)[;:]?/", $line, $m);
                             //$m[1] contains the name
                             $t = $m[1];
                             $i += strlen($t);
-
-                        } else if ($present_colon && $tokens[count($tokens) -1] == ':') {
+                        } elseif ($present_colon && $tokens[count($tokens) - 1] == ':') {
                             //if the last token is a colon, read out the value
                             $t = substr($line, $i);
                             $i += strlen($t);
-
-                        } else if ($present_semi && $tokens[count($tokens) -1] == ';') {
+                        } elseif ($present_semi && $tokens[count($tokens) - 1] == ';') {
                             //if the last token is a semicolon
                             $t = substr($line, $i, strpos($line, ':', $i) - $i);
                             $i += strlen($t);
-
                         } else {
                             $t = $line{$i};
                             $i++;
                         }
-
                 }
 
                 $tokens[] = $t;
@@ -150,9 +147,9 @@ class File_iCal_ContentLine
             $colon_key = array_search(':', $tokens);
 
             $name_string = $tokens[0];
-            $value_string = $tokens[$colon_key+1];
+            $value_string = $tokens[$colon_key + 1];
 
-            $params = array();
+            $params = [];
 
             if ($tokens[1] == ';') {
                 $arr = explode(';', $tokens[2]);
@@ -161,17 +158,14 @@ class File_iCal_ContentLine
                     $val = explode('=', $v);
 
                     $name = $val[0];
-                    $values = array($val[1]);
+                    $values = [$val[1]];
 
                     $params[] = File_iCal_Parameter::getParameter($name, $values);
-
                 }
             }
 
             $this->_property = File_iCal_Property::getProperty($name_string, $params, $value_string);
-
         }
-
     }
 
 
@@ -184,9 +178,9 @@ class File_iCal_ContentLine
      */
     public function name()
     {
-            if (is_a($this->_property, "File_iCal_Property")) {
-                return $this->_property->getName();
-            }
+        if (is_a($this->_property, "File_iCal_Property")) {
+            return $this->_property->getName();
+        }
     }
 
     /**
@@ -215,7 +209,8 @@ class File_iCal_ContentLine
      * @access  public
      * @return  File_iCal_Property
      */
-    public function getProperty() {
+    public function getProperty()
+    {
         return $this->_property;
     }
 
@@ -242,7 +237,7 @@ class File_iCal_ContentLine
 
         //echo "$s\n";
 
-        $values = array();
+        $values = [];
         foreach ($this->_property->getValues() as $v) {
             //$values[] = self::encodeString($v->getValue());
             $values[] = $v->getValue();
@@ -264,8 +259,9 @@ class File_iCal_ContentLine
      * @return  string  Encoded string
      * @param   string  String to encode
      */
-    private function encodeString($s) {
-        return str_replace(array("\\", ",", "\"", "'", ";", ":"), array("\\\\", "\\,", "\\\"", "\\\'", "\\;", "\\:"), $s);
+    private function encodeString($s)
+    {
+        return str_replace(["\\", ",", "\"", "'", ";", ":"], ["\\\\", "\\,", "\\\"", "\\\'", "\\;", "\\:"], $s);
     }
 
     /**
@@ -275,7 +271,8 @@ class File_iCal_ContentLine
      * @return  string  Decoded string suitable for storage in data classes
      * @param   string  String to decode
      */
-    private function decodeString($s) {
-        return str_replace(array("\\\\", "\\,", "\\\"", "\\\'", "\\;", "\\:"), array("\\", ",", "\"", "'", ";", ":"), $s);
+    private function decodeString($s)
+    {
+        return str_replace(["\\\\", "\\,", "\\\"", "\\\'", "\\;", "\\:"], ["\\", ",", "\"", "'", ";", ":"], $s);
     }
 }

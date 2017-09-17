@@ -7,27 +7,26 @@
 
 class Tiki_Profile_Transport_Local implements Tiki_Profile_Transport_Interface
 {
-	function getPageContent($pageName)
-	{
-		$tikilib = TikiLib::lib('tiki');
-		$info = $tikilib->get_page_info($pageName);
-		if (empty($info)) {
-			return null;
-		}
-		return $info['data'];
-	}
+    function getPageContent($pageName)
+    {
+        $tikilib = TikiLib::lib('tiki');
+        $info = $tikilib->get_page_info($pageName);
+        if (empty($info)) {
+            return null;
+        }
+        return $info['data'];
+    }
 
-	function getPageParsed($pageName)
-	{
-		$content = $this->getPageContent($pageName);
+    function getPageParsed($pageName)
+    {
+        $content = $this->getPageContent($pageName);
 
-		if ($content) {
-			return TikiLib::lib('parser')->parse_data($content);
-		}
-	}
+        if ($content) {
+            return TikiLib::lib('parser')->parse_data($content);
+        }
+    }
 
-	function getProfilePath()
-	{
-	}	
+    function getProfilePath()
+    {
+    }
 }
-

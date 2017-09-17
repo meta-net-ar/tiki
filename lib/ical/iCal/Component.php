@@ -30,8 +30,8 @@
  *  @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
  */
 
- 
- 
+
+
 /**
  *  iCal components when put together form an iCalendar.
  *
@@ -58,7 +58,7 @@ abstract class File_iCal_Component
      * @access protected
      * @var array
      */
-    protected $_properties = array();
+    protected $_properties = [];
 
     /**
      * Array of possible properties for this component
@@ -66,7 +66,7 @@ abstract class File_iCal_Component
      * @access protected
      * @var array
      */
-    protected $_properties_possible = array();
+    protected $_properties_possible = [];
 
     /**
      * Array of possible properties for this component that can only occur once
@@ -74,7 +74,7 @@ abstract class File_iCal_Component
      * @access protected
      * @var array
      */
-    protected $_properties_single = array();
+    protected $_properties_single = [];
 
     /**
      * Array of possible properties for this component which can occur more than once
@@ -82,7 +82,7 @@ abstract class File_iCal_Component
      * @access protected
      * @var array
      */
-    protected $_properties_multiple = array();
+    protected $_properties_multiple = [];
 
     /**
      * Array of arrays of properties which are exclusive to each other
@@ -90,7 +90,7 @@ abstract class File_iCal_Component
      * @access protected
      * @var array
      */
-    protected $_properties_exclusive = array();
+    protected $_properties_exclusive = [];
 
     /**
      * Creates a component
@@ -105,7 +105,7 @@ abstract class File_iCal_Component
         if (is_array($s)) {
             //verify integrity of the array
             foreach ($s as $v) {
-                if (!is_a($v, "File_iCal_ContentLine")) {
+                if (! is_a($v, "File_iCal_ContentLine")) {
                     trigger_error("Component constructor passed array does not contain all ContentLines", E_USER_ERROR);
                 }
             }
@@ -113,7 +113,7 @@ abstract class File_iCal_Component
             //all elements are ConentLines
 
             //verify first and last lines are BEGIN and END, respectively
-            if (($s[0]->name() == "BEGIN") && ($s[count($s)-1]->name() == "END")) {
+            if (($s[0]->name() == "BEGIN") && ($s[count($s) - 1]->name() == "END")) {
                 $this->_name = $s[0]->value();
 
                 //go through and create the properties
@@ -127,18 +127,17 @@ abstract class File_iCal_Component
                         if (in_array($name, $this->_properties_multiple)) {
                             $prop = $s[$i]->getProperty();
                             self::addProperty($prop, true);
-
-                        }
-                        else if (in_array($name, $this->_properties_single)) {
+                        } elseif (in_array($name, $this->_properties_single)) {
                             $check_conflict = false;
                             foreach ($this->_properties_exclusive as $pe) {
-                                if (is_array($pe) && in_array($name, $pe)) $check_conflict = true;
+                                if (is_array($pe) && in_array($name, $pe)) {
+                                    $check_conflict = true;
+                                }
                             }
 
                             if ($check_conflict) {
                                 $is_conflict = false;
                                 foreach ($this->_properties_exclusive as $pe) {
-
                                     foreach ($pe as $name_conflict) {
                                         if (array_key_exists($name_conflict, $this->_properties)) {
                                             trigger_error("A property conflicts with another!  The iCal file is not valid", E_USER_WARNING);
@@ -147,31 +146,25 @@ abstract class File_iCal_Component
                                     }
                                 }
 
-                                if (!$is_conflict) {
+                                if (! $is_conflict) {
                                     self::addProperty($s[$i]->getProperty(), false);
                                 }
-
                             } else {
                                 $prop = $s[$i]->getProperty();
                                 self::addProperty($prop, false);
-
                             }
                         } else {
                             trigger_error("Not sure what to do with property", E_USER_WARNING);
                         }
-
                     }
 /*                    else {
                         //trigger_error("Unexpected property in component.  Found $name", E_USER_WARNING);
                     }
 */
                 }
-
             } else {
                 trigger_error("Component array must start and end with BEGIN and END tags", E_USER_ERROR);
             }
-
-
         }
 /*        else {
             //trigger_error("Component constructor expects an array", E_USER_ERROR);
@@ -186,26 +179,27 @@ abstract class File_iCal_Component
      *  @param  File_iCal_Property  $property   The property to add to this component
      *  @param  bool                $multiple   Whether this is a multiple property
      */
-    protected function addProperty($property, $multiple = false) { //File_iCal_Property 
+    protected function addProperty($property, $multiple = false)
+    {
+ //File_iCal_Property
         $name = $property->getName();
 
-        if (!array_key_exists($name, $this->_properties)) {
+        if (! array_key_exists($name, $this->_properties)) {
             if ($multiple) {
-                $this->_properties[$name] = array();
+                $this->_properties[$name] = [];
                 $this->_properties[$name][] = $property;
                 return;
             } else {
                 $this->_properties[$name] = $property;
                 return;
             }
-        } else if ($multiple) {
+        } elseif ($multiple) {
             $this->_properties[$name][] = $property;
             return;
         } else {
             //the logic before addProperty should have prevented this from happening...
             trigger_error("Trying to insert a property (".$name.") that already exists.  This function should never have been called", E_USER_ERROR);
         }
-
     }
 
 
@@ -215,10 +209,11 @@ abstract class File_iCal_Component
      *  @access public
      *  @return array   An array of File_iCal_Property objects
      */
-    public function getPropertyArray() {
-        $r = array();
+    public function getPropertyArray()
+    {
+        $r = [];
         require_once 'Property.php';
-        $r[] = File_iCal_Property::getProperty("BEGIN", array(), $this->_name);
+        $r[] = File_iCal_Property::getProperty("BEGIN", [], $this->_name);
 
         foreach ($this->_properties as $prop) {
             if (is_array($prop)) {
@@ -230,10 +225,9 @@ abstract class File_iCal_Component
             }
         }
 
-        $r[] = File_iCal_Property::getProperty("END", array(), $this->_name);
+        $r[] = File_iCal_Property::getProperty("END", [], $this->_name);
 
         return $r;
-
     }
 
     /**
@@ -244,25 +238,25 @@ abstract class File_iCal_Component
      */
     public function getCalendar()
     {
-            $r = array();
+            $r = [];
             require_once 'ContentLine.php';
             $r[] = new File_iCal_ContentLine("BEGIN:".$this->_name);
 
-            foreach ($this->_properties as $prop) {
-                if (is_array($prop)) {
-                    foreach ($prop as $propv) {
-                        if (is_a($propv, "File_iCal_Property")) {
-                            //$r[] = $propv->getName().':'.$propv->getValue();
-                            $r[] = new File_iCal_ContentLine($propv);
-                        }
-                    }
-                } else {
-                    if (is_a($prop, "File_iCal_Property")) {
-                        //$r[] = $prop->getName().':'.$prop->getValue();
-                        $r[] = new File_iCal_ContentLine($prop);
+        foreach ($this->_properties as $prop) {
+            if (is_array($prop)) {
+                foreach ($prop as $propv) {
+                    if (is_a($propv, "File_iCal_Property")) {
+                        //$r[] = $propv->getName().':'.$propv->getValue();
+                        $r[] = new File_iCal_ContentLine($propv);
                     }
                 }
+            } else {
+                if (is_a($prop, "File_iCal_Property")) {
+                    //$r[] = $prop->getName().':'.$prop->getValue();
+                    $r[] = new File_iCal_ContentLine($prop);
+                }
             }
+        }
 
             $r[] = new File_iCal_ContentLine("END:".$this->_name);
 
@@ -278,14 +272,15 @@ abstract class File_iCal_Component
      *  @param  int     $key    By Reference: will be set to an integer or array of intergers.
      *                          The values represent the internal array keys for properties of this type.
      */
-    protected function propertyExists($name, &$key = null) {
+    protected function propertyExists($name, &$key = null)
+    {
         require_once 'Property.php';
         $pn = File_iCal_Property::getClassName($name);
 
         $count = 0;
-        $keys = array();
+        $keys = [];
 
-        foreach ($this->_properties as $k=>$p) {
+        foreach ($this->_properties as $k => $p) {
             if (is_a($p, $pn)) {
                 $count++;
                 $keys[] = $k;
@@ -299,7 +294,6 @@ abstract class File_iCal_Component
         }
 
         return $count;
-
     }
 
     /**
@@ -311,21 +305,19 @@ abstract class File_iCal_Component
      *  @param  bool    $match_param    If multiple properties with the name are present, we don't know for sure to which to add the new value
      *                                  If set to true, the function will check for matching parameters when selecting the property to which to add
      */
-    protected function addPropertyValue($name, $value, $match_param = null) {
+    protected function addPropertyValue($name, $value, $match_param = null)
+    {
         require_once 'Property.php';
         if (in_array($name, $this->_properties_possible)) {
             $pn = File_iCal_Property::getClassName($name);
 
             if (in_array($name, $this->_properties_single)) {
-
                 foreach ($this->_properties as $p) {
                     if (is_a($p, $pn)) {
                         return $p->addValue($value);
                     }
                 }
-
-            }
-            else if (in_array($name, $this->_properties_multiple)) {
+            } elseif (in_array($name, $this->_properties_multiple)) {
                 foreach ($this->_properties as $p) {
                     if (is_a($p, $pn)) {
                         //match the $match_param here
@@ -347,9 +339,10 @@ abstract class File_iCal_Component
      *  @param  object  $e  The event for which you wish to return a component object
      *  @return File_iCal_Component_Event   The new component object
      */
-    public static function getComponent($e) {
+    public static function getComponent($e)
+    {
         //ideally we call the component constructor with an array of contentlines
-        $props = array();
+        $props = [];
         $component_name = "";
 
         //print_r($e);
@@ -381,11 +374,9 @@ abstract class File_iCal_Component
 
             default:
                 trigger_error("Passed object not valid type (is a ".get_class($e).")", E_USER_WARNING);
-
-
         }
         require_once 'Property.php';
-        $props[] = File_iCal_Property::getProperty("BEGIN", array(), $component_name);
+        $props[] = File_iCal_Property::getProperty("BEGIN", [], $component_name);
 
         //attachment is defined in the basecomponent class, so method_exists is always true
 /*        if (is_subclass_of($e, "File_iCal_BaseComponent_EJT") || is_a($e, "File_iCal_Alarm")) {
@@ -403,38 +394,34 @@ abstract class File_iCal_Component
         //this method is defined in the BaseComponent class, so it always exists
         //method should only be public for AEJT
         if (is_subclass_of($e, "File_iCal_BaseComponent_EJT") || is_a($e, "File_iCal_Alarm")) {
-                if ($description = $e->getDescription()) {
-                    $props[] = File_iCal_Property::getProperty("DESCRIPTION", array(), $description);
-                }
+            if ($description = $e->getDescription()) {
+                $props[] = File_iCal_Property::getProperty("DESCRIPTION", [], $description);
+            }
         }
 
         if (is_subclass_of($e, "File_iCal_BaseComponent_EJT") || is_a($e, "File_iCal_Alarm")) {
             if ($summary = $e->getSummary()) {
-                $props[] = File_iCal_Property::getProperty("SUMMARY", array(), $summary);
+                $props[] = File_iCal_Property::getProperty("SUMMARY", [], $summary);
             }
         }
 
         if (is_a($e, "File_iCal_Event") || is_a($e, "File_iCal_FreeBusy")) {
-           
-                        if (($de = $e->getDateEnd()) > 0) {
-                                $props[] = File_iCal_Property::getProperty("DTEND", array(), $de);
-                                
-                        }
-
+            if (($de = $e->getDateEnd()) > 0) {
+                    $props[] = File_iCal_Property::getProperty("DTEND", [], $de);
+            }
         }
-        
-        
+
+
         if (is_subclass_of($e, "File_iCal_BaseComponent_EFJT")) {
             if (($ds = $e->getDateStart()) > 0) {
-                    $props[] = File_iCal_Property::getProperty("DTSTART", array(), $ds);
-                    
+                    $props[] = File_iCal_Property::getProperty("DTSTART", [], $ds);
             }
         }
 
         if (is_subclass_of($e, "File_iCal_BaseComponent_ET") || is_a($e, "File_iCal_Alarm") || is_a($e, "File_iCal_FreeBusy")) {
-                        if (($dur = $e->getDuration()) > 0) {
-                                $props[] = File_iCal_Property::getProperty("DURATION", array(), $dur);
-                        }
+            if (($dur = $e->getDuration()) > 0) {
+                    $props[] = File_iCal_Property::getProperty("DURATION", [], $dur);
+            }
         }
 
                 //should be changed
@@ -451,27 +438,27 @@ abstract class File_iCal_Component
         }
 */
         if (method_exists($e, "getOrganizer")) {
-                        if ($o = $e->getOrganizer()) {
-                                $props[] = File_iCal_Property::getProperty("ORGANIZER", array(), $o);
-                        }
+            if ($o = $e->getOrganizer()) {
+                    $props[] = File_iCal_Property::getProperty("ORGANIZER", [], $o);
+            }
         }
 
         if (method_exists($e, "getURL")) {
-                        if ($url = $e->getURL()) {
-                                $props[] = File_iCal_Property::getProperty("URL", array(), $url);
-                        }
+            if ($url = $e->getURL()) {
+                    $props[] = File_iCal_Property::getProperty("URL", [], $url);
+            }
         }
 
         if (method_exists($e, "getUID")) {
             if ($uid = $e->getUID()) {
-                $props[] = File_iCal_Property::getProperty("UID", array(), $uid);
+                $props[] = File_iCal_Property::getProperty("UID", [], $uid);
             }
         }
 
         if (method_exists($e, "getDateStamp")) {
-                        if ($ds = $e->getDateStamp()) {
-                                $props[] = File_iCal_Property::getProperty("DTSTAMP", array(), $uid);
-                        }
+            if ($ds = $e->getDateStamp()) {
+                    $props[] = File_iCal_Property::getProperty("DTSTAMP", [], $uid);
+            }
         }
 /*
         if (method_exists($e, "getRequestStatus")) {
@@ -504,9 +491,8 @@ abstract class File_iCal_Component
 */
         if (method_exists($e, "getSequence")) {
             if ($sequence = $e->getSequence()) {
-                $props[] = File_iCal_Property::getProperty("SEQUENCE", array(), $sequence);
+                $props[] = File_iCal_Property::getProperty("SEQUENCE", [], $sequence);
             }
-
         }
 /*
         if (method_exists($e, "getLatitude")) {
@@ -519,7 +505,7 @@ abstract class File_iCal_Component
 */
         if (method_exists($e, "getLocation")) {
             if ($location = $e->getLocation()) {
-                $props[] = File_iCal_Property::getLocation("LOCATION", array(), $location);
+                $props[] = File_iCal_Property::getLocation("LOCATION", [], $location);
             }
         }
 /*
@@ -535,15 +521,15 @@ abstract class File_iCal_Component
 
         }
 */
-        $props[] = File_iCal_Property::getProperty("END", array(), $component_name);
+        $props[] = File_iCal_Property::getProperty("END", [], $component_name);
 
 
         //convert these properties to contentlines
         require_once 'ContentLine.php';
-        foreach ($props as $k=>$p) {
+        foreach ($props as $k => $p) {
             $props[$k] = new File_iCal_ContentLine($p);
         }
-        
+
         switch ($component_name) {
             case "VEVENT":
                 return new File_iCal_Component_Event($props);
@@ -572,7 +558,6 @@ abstract class File_iCal_Component
             default:
                 trigger_error("Cannot yet retrieve component");
         }
-
     }
 
     /**
@@ -584,7 +569,8 @@ abstract class File_iCal_Component
      *  @access public
      *  @return object
      */
-    public function getUserComponent() {
+    public function getUserComponent()
+    {
         $component_name = "";
         $c = null;
 
@@ -625,98 +611,94 @@ abstract class File_iCal_Component
         }
 
         foreach ($this->_properties as $p) {
-                        if (is_array($p)) {
-                                foreach ($p as $p2) {
-                                        self::addPropertyToUserComponent($c, $p2);
-                                }
-                        } else {
-                                self::addPropertyToUserComponent($c, $p);
-                        }
+            if (is_array($p)) {
+                foreach ($p as $p2) {
+                        self::addPropertyToUserComponent($c, $p2);
+                }
+            } else {
+                    self::addPropertyToUserComponent($c, $p);
+            }
         }
 
 
         return $c;
-
     }
 
-        protected static function addPropertyToUserComponent(&$component, $property) {
-                switch (get_class($property)) {
-                        case "File_iCal_Property_Attachment":
-                        case "File_iCal_Property_Category":
-                        case "File_iCal_Property_Classification":
-                        case "File_iCal_Property_Comment":
-                                break;
+    protected static function addPropertyToUserComponent(&$component, $property)
+    {
+        switch (get_class($property)) {
+            case "File_iCal_Property_Attachment":
+            case "File_iCal_Property_Category":
+            case "File_iCal_Property_Classification":
+            case "File_iCal_Property_Comment":
+                break;
 
-                        case "File_iCal_Property_Description":
-                                $component->setDescription($property->getValue()->getValue());
-                                break;
+            case "File_iCal_Property_Description":
+                    $component->setDescription($property->getValue()->getValue());
+                break;
 
-                        case "File_iCal_Property_GeographicPosition":
-                                break;
+            case "File_iCal_Property_GeographicPosition":
+                break;
 
-                        case "File_iCal_Property_Location":
-                                $component->setLocation($property->getValue()->getValue());
-                                break;
-                        case "File_iCal_Property_PercentComplete":
-                        case "File_iCal_Property_Priority":
-                        case "File_iCal_Property_Resources":
-                        case "File_iCal_Property_Status":
-                                break;
+            case "File_iCal_Property_Location":
+                    $component->setLocation($property->getValue()->getValue());
+                break;
+            case "File_iCal_Property_PercentComplete":
+            case "File_iCal_Property_Priority":
+            case "File_iCal_Property_Resources":
+            case "File_iCal_Property_Status":
+                break;
 
-                        case "File_iCal_Property_Summary":
-                                $component->setSummary($property->getValue()->getValue());
-                                break;
+            case "File_iCal_Property_Summary":
+                    $component->setSummary($property->getValue()->getValue());
+                break;
 
-                        case "File_iCal_Property_DateTimeCompleted":
-                        case "File_iCal_Property_DateTimeEnd":
-                        case "File_iCal_Property_DateTimeDue":
-                                break;
+            case "File_iCal_Property_DateTimeCompleted":
+            case "File_iCal_Property_DateTimeEnd":
+            case "File_iCal_Property_DateTimeDue":
+                break;
 
-                        case "File_iCal_Property_DateTimeStart":
-                                $component->setDateStart($property->getValue()->getIntegerValue());
-                                break;
+            case "File_iCal_Property_DateTimeStart":
+                    $component->setDateStart($property->getValue()->getIntegerValue());
+                break;
 
-                        case "File_iCal_Property_Duration":
-                        case "File_iCal_Property_FreeBusyTime":
-                        case "File_iCal_Property_TimeTransparency":
-                        case "File_iCal_Property_TimeZoneIdentifier":
-                        case "File_iCal_Property_TimeZoneName":
-                        case "File_iCal_Property_TimeZoneOffsetFrom":
-                        case "File_iCal_Property_TimeZoneOffsetTo":
-                        case "File_iCal_Property_TimeZoneURL":
-                        case "File_iCal_Property_Attendee":
-                        case "File_iCal_Property_Contact":
-                        case "File_iCal_Property_Organizer":
-                        case "File_iCal_Property_RecurrenceID":
-                        case "File_iCal_Property_RelatedTo":
-                        case "File_iCal_Property_URL":
+            case "File_iCal_Property_Duration":
+            case "File_iCal_Property_FreeBusyTime":
+            case "File_iCal_Property_TimeTransparency":
+            case "File_iCal_Property_TimeZoneIdentifier":
+            case "File_iCal_Property_TimeZoneName":
+            case "File_iCal_Property_TimeZoneOffsetFrom":
+            case "File_iCal_Property_TimeZoneOffsetTo":
+            case "File_iCal_Property_TimeZoneURL":
+            case "File_iCal_Property_Attendee":
+            case "File_iCal_Property_Contact":
+            case "File_iCal_Property_Organizer":
+            case "File_iCal_Property_RecurrenceID":
+            case "File_iCal_Property_RelatedTo":
+            case "File_iCal_Property_URL":
+                break;
+            case "File_iCal_Property_UID":
+                    $component->setUID($property->getValue()->getValue());
+                break;
 
-                                break;
-                        case "File_iCal_Property_UID":
-                                $component->setUID($property->getValue()->getValue());
-                                break;
+            case "File_iCal_Property_ExceptionDateTimes":
+            case "File_iCal_Property_ExceptionRule":
+            case "File_iCal_Property_RecurrenceDateTimes":
+            case "File_iCal_Property_RecurrenceRule":
+            case "File_iCal_Property_Action":
+            case "File_iCal_Property_RepeatCount":
+            case "File_iCal_Property_Trigger":
+            case "File_iCal_Property_DateTimeCreated":
+            case "File_iCal_Property_DateTimeStamp":
+            case "File_iCal_Property_LastModified":
+            case "File_iCal_Property_SequenceNumber":
+            case "File_iCal_Property_RequestStatus":
+                break;
 
-                        case "File_iCal_Property_ExceptionDateTimes":
-                        case "File_iCal_Property_ExceptionRule":
-                        case "File_iCal_Property_RecurrenceDateTimes":
-                        case "File_iCal_Property_RecurrenceRule":
-                        case "File_iCal_Property_Action":
-                        case "File_iCal_Property_RepeatCount":
-                        case "File_iCal_Property_Trigger":
-                        case "File_iCal_Property_DateTimeCreated":
-                        case "File_iCal_Property_DateTimeStamp":
-                        case "File_iCal_Property_LastModified":
-                        case "File_iCal_Property_SequenceNumber":
-                        case "File_iCal_Property_RequestStatus":
-                                break;
-
-                        default:
-                                trigger_error("Uknown property ".get_class($property), E_USER_WARNING);
-                }
+            default:
+                    trigger_error("Uknown property ".get_class($property), E_USER_WARNING);
         }
-
-
-
+    }
 }
 
 /**
@@ -732,13 +714,13 @@ class File_iCal_Component_Alarm extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "ACTION",
         "TRIGGER",
         "DURATION",
         "REPEAT",
         "ATTACH"
-        );
+        ];
 
     /**
      *  Defines the properties that may occur more than once
@@ -746,9 +728,9 @@ class File_iCal_Component_Alarm extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "X-*"
-    );
+    ];
 
 
     /**
@@ -757,13 +739,12 @@ class File_iCal_Component_Alarm extends File_iCal_Component
      *  @access public
      *  @param  array   $a  An array of File_iCal_Property objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
 
         parent::__construct($s);
         $this->_name = "VALARM";
-
     }
-
 }
 
 /**
@@ -779,7 +760,7 @@ class File_iCal_Component_Event extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "CLASS",
         "CREATED",
         "DESCRIPTION",
@@ -799,7 +780,7 @@ class File_iCal_Component_Event extends File_iCal_Component
         "RECURRENCE-ID",
         "DTEND",
         "DURATION"
-        );
+        ];
 
     /**
      *  Defines the properties that are exclusive
@@ -807,9 +788,9 @@ class File_iCal_Component_Event extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_exclusive = array(
-        array("DTEND","DURATION")
-    );
+    protected $_properties_exclusive = [
+        ["DTEND","DURATION"]
+    ];
 
     /**
      *  Defines the properties that may more than once
@@ -817,7 +798,7 @@ class File_iCal_Component_Event extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "ATTACH",
         "ATTENDEE",
         "CATEGORIES",
@@ -831,7 +812,7 @@ class File_iCal_Component_Event extends File_iCal_Component
         "RDATE",
         "RRULE",
         "X-*"
-    );
+    ];
 
     /**
      *  Create a new VEVENT component
@@ -839,12 +820,11 @@ class File_iCal_Component_Event extends File_iCal_Component
      *  @access public
      *  @param  array   $s  An array of File_iCal_Property objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
         parent::__construct($s);
         $this->_name = "VEVENT";
-
     }
-
 }
 
 /**
@@ -860,7 +840,7 @@ class File_iCal_Component_FreeBusy extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "CONTACT",
         "DTSTART",
         "DTEND",
@@ -869,7 +849,7 @@ class File_iCal_Component_FreeBusy extends File_iCal_Component
         "ORGANIZER",
         "UID",
         "URL"
-        );
+        ];
 
     /**
      *  Defines the properties that may occur more than once
@@ -877,13 +857,13 @@ class File_iCal_Component_FreeBusy extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "ATTENDEE",
         "COMMENT",
         "FREEBUSY",
         "RSTATUS",
         "X-*"
-    );
+    ];
 
 
     /**
@@ -892,12 +872,11 @@ class File_iCal_Component_FreeBusy extends File_iCal_Component
      *  @access public
      *  @param    array   $s    Array of File_iCal_Property objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
         parent::__construct($s);
         $this->_name = "VFREEBUSY";
-
     }
-
 }
 
 /**
@@ -913,7 +892,7 @@ class File_iCal_Component_Journal extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "CLASS",
         "CREATED",
         "DESCRIPTION",
@@ -927,7 +906,7 @@ class File_iCal_Component_Journal extends File_iCal_Component
         "SUMMARY",
         "UID",
         "URL"
-        );
+        ];
 
     /**
      *  Defines the properties that may occur more than once
@@ -935,7 +914,7 @@ class File_iCal_Component_Journal extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "ATTACH",
         "ATTENDEE",
         "CATEGORIES",
@@ -949,7 +928,7 @@ class File_iCal_Component_Journal extends File_iCal_Component
         "RRULE",
         "RSTATUS",
         "X-*"
-    );
+    ];
 
 
     /**
@@ -958,12 +937,11 @@ class File_iCal_Component_Journal extends File_iCal_Component
      *  @access public
      *  @param  array   $s  Array of File_iCal_Property objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
          parent::__construct($s);
          $this->_name = "VJOURNAL";
-
     }
-
 }
 
 /**
@@ -979,11 +957,11 @@ class File_iCal_Component_Timezone extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "TZID",
         "LAST-MODIFIED",
         "TZURL"
-        );
+        ];
 
     /**
      *  Defines the properties that may more than once
@@ -991,11 +969,11 @@ class File_iCal_Component_Timezone extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "STANDARDC",
         "DAYLIGHTC",
         "X-*"
-    );
+    ];
 
 
     /**
@@ -1004,12 +982,11 @@ class File_iCal_Component_Timezone extends File_iCal_Component
      *  @access public
      *  @param  array   $s  array of File_iCal_Proeperty objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
         parent::__construct($s);
         $this->_name = "VTIMEZONE";
-
     }
-
 }
 
 /**
@@ -1025,7 +1002,7 @@ class File_iCal_Component_ToDo extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_single = array(
+    protected $_properties_single = [
         "CLASS",
         "COMPLETED",
         "CREATED",
@@ -1046,7 +1023,7 @@ class File_iCal_Component_ToDo extends File_iCal_Component
         "URL",
         "DUE",
         "DURATION"
-    );
+    ];
 
     /**
      *  Defines the properties that are exclusive to one another
@@ -1054,9 +1031,9 @@ class File_iCal_Component_ToDo extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_exclusive = array(
-        array("DUE","DURATION")
-    );
+    protected $_properties_exclusive = [
+        ["DUE","DURATION"]
+    ];
 
     /**
      *  Defines the properties that may occur more than once
@@ -1064,7 +1041,7 @@ class File_iCal_Component_ToDo extends File_iCal_Component
      *  @access protected
      *  @var    array   Array of property names
      */
-    protected $_properties_multiple = array(
+    protected $_properties_multiple = [
         "ATTACH",
         "ATTENDEE",
         "CATEGORIES",
@@ -1078,7 +1055,7 @@ class File_iCal_Component_ToDo extends File_iCal_Component
         "RDATE",
         "RRULE",
         "X-*"
-    );
+    ];
 
     /**
      *  Create a new VTODO component
@@ -1086,9 +1063,9 @@ class File_iCal_Component_ToDo extends File_iCal_Component
      *  @access public
      *  @param    array   $s    Array of File_iCal_Property objects
      */
-    public function __construct($s) {
+    public function __construct($s)
+    {
         parent::__construct($s);
         $this->_name = "VTODO";
-
     }
 }

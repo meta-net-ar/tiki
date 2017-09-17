@@ -7,76 +7,76 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 class CopyrightsLib extends TikiLib
 {
-	function list_copyrights($page)
-	{
-		$query = 'select * from `tiki_copyrights` WHERE `page`=? order by ' . $this->convertSortMode('copyright_order_asc');
-		$query_cant = 'select count(*) from `tiki_copyrights` WHERE `page`=?';
-		$result = $this->query($query, array($page));
-		$cant = $this->getOne($query_cant, array($page));
-		$ret = array();
+    function list_copyrights($page)
+    {
+        $query = 'select * from `tiki_copyrights` WHERE `page`=? order by ' . $this->convertSortMode('copyright_order_asc');
+        $query_cant = 'select count(*) from `tiki_copyrights` WHERE `page`=?';
+        $result = $this->query($query, [$page]);
+        $cant = $this->getOne($query_cant, [$page]);
+        $ret = [];
 
-		while ($res = $result->fetchRow()) {
-			$ret[] = $res;
-		}
+        while ($res = $result->fetchRow()) {
+            $ret[] = $res;
+        }
 
-		$retval = array();
-		$retval['data'] = $ret;
-		$retval['cant'] = $cant;
-		return $retval;
-	}
+        $retval = [];
+        $retval['data'] = $ret;
+        $retval['cant'] = $cant;
+        return $retval;
+    }
 
-	function top_copyright_order($page)
-	{
-		$query = 'select MAX(`copyright_order`) from `tiki_copyrights` where `page` like ?';
-		return $this->getOne($query, array($page));
-	}
+    function top_copyright_order($page)
+    {
+        $query = 'select MAX(`copyright_order`) from `tiki_copyrights` where `page` like ?';
+        return $this->getOne($query, [$page]);
+    }
 
-	function unique_copyright($page, $title)
-	{
-		$query = 'select `copyrightID` from `tiki_copyrights` where `page`=? and `title`=?';
-		return $this->getOne($query, array($page, $title));
-	}
+    function unique_copyright($page, $title)
+    {
+        $query = 'select `copyrightID` from `tiki_copyrights` where `page`=? and `title`=?';
+        return $this->getOne($query, [$page, $title]);
+    }
 
-	function add_copyright($page, $title, $year, $authors, $copyrightHolder, $user) 
-	{
-		$top = $this->top_copyright_order($page);
-		$order = $top + 1;
-		$query = 'insert `tiki_copyrights` (`page`, `title`, `year`, `authors`, `holder`, `copyright_order`, `userName`) values (?,?,?,?,?,?,?)';
-		$this->query($query, array($page, $title, $year, $authors, $copyrightHolder, $order, $user));
-		return true;
-	}
+    function add_copyright($page, $title, $year, $authors, $copyrightHolder, $user)
+    {
+        $top = $this->top_copyright_order($page);
+        $order = $top + 1;
+        $query = 'insert `tiki_copyrights` (`page`, `title`, `year`, `authors`, `holder`, `copyright_order`, `userName`) values (?,?,?,?,?,?,?)';
+        $this->query($query, [$page, $title, $year, $authors, $copyrightHolder, $order, $user]);
+        return true;
+    }
 
-	function edit_copyright($id, $title, $year, $authors, $copyrightHolder, $user) 
-	{
-		$query = 'update `tiki_copyrights` SET `year`=?, `title`=?, `authors`=?, `holder`=?, `userName`=? where `copyrightId`=?';
-		$this->query($query, array($year, $title, $authors, $copyrightHolder, $user, (int)$id));
-		return true;
-	}
+    function edit_copyright($id, $title, $year, $authors, $copyrightHolder, $user)
+    {
+        $query = 'update `tiki_copyrights` SET `year`=?, `title`=?, `authors`=?, `holder`=?, `userName`=? where `copyrightId`=?';
+        $this->query($query, [$year, $title, $authors, $copyrightHolder, $user, (int)$id]);
+        return true;
+    }
 
-	function remove_copyright($id)
-	{
-		$query = 'delete from `tiki_copyrights` where `copyrightId`=?';
-		$this->query($query, array((int)$id));
-		return true;
-	}
+    function remove_copyright($id)
+    {
+        $query = 'delete from `tiki_copyrights` where `copyrightId`=?';
+        $this->query($query, [(int)$id]);
+        return true;
+    }
 
-	function up_copyright($id)
-	{
-		$query = 'update `tiki_copyrights` set `copyright_order`=`copyright_order`-1 where `copyrightId`=?';
-		$result = $this->query($query, array((int)$id));
-		return true;
-	}
+    function up_copyright($id)
+    {
+        $query = 'update `tiki_copyrights` set `copyright_order`=`copyright_order`-1 where `copyrightId`=?';
+        $result = $this->query($query, [(int)$id]);
+        return true;
+    }
 
-	function down_copyright($id)
-	{
-		$query = 'update `tiki_copyrights` set `copyright_order`=`copyright_order`+1 where `copyrightId`=?';
-		$result = $this->query($query, array((int)$id));
-		return true;
-	}
+    function down_copyright($id)
+    {
+        $query = 'update `tiki_copyrights` set `copyright_order`=`copyright_order`+1 where `copyrightId`=?';
+        $result = $this->query($query, [(int)$id]);
+        return true;
+    }
 }

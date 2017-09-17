@@ -10,97 +10,97 @@ use Psr\Log\LoggerInterface;
 class Scheduler_Item
 {
 
-	public $id;
-	public $name;
-	public $description;
-	public $task;
-	public $params;
-	public $run_time;
-	public $status;
-	public $re_run;
-	private $logger;
+    public $id;
+    public $name;
+    public $description;
+    public $task;
+    public $params;
+    public $run_time;
+    public $status;
+    public $re_run;
+    private $logger;
 
-	const STATUS_ACTIVE = 'active';
-	const STATUS_INACTIVE = 'inactive';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
 
-	static $availableTasks = array(
-		'ConsoleCommandTask' => 'ConsoleCommand',
-		'ShellCommandTask' => 'ShellCommand',
-		'HTTPGetCommandTask' => 'HTTPGetCommand',
-	);
+    static $availableTasks = [
+        'ConsoleCommandTask' => 'ConsoleCommand',
+        'ShellCommandTask' => 'ShellCommand',
+        'HTTPGetCommandTask' => 'HTTPGetCommand',
+    ];
 
-	public function __construct($id, $name, $description, $task, $params, $run_time, $status, $re_run, LoggerInterface $logger)
-	{
-		$this->id = $id;
-		$this->name = $name;
-		$this->description = $description;
-		$this->task = $task;
-		$this->params = $params;
-		$this->run_time = $run_time;
-		$this->status = $status;
-		$this->re_run = $re_run;
-		$this->logger = $logger;
-	}
+    public function __construct($id, $name, $description, $task, $params, $run_time, $status, $re_run, LoggerInterface $logger)
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->description = $description;
+        $this->task = $task;
+        $this->params = $params;
+        $this->run_time = $run_time;
+        $this->status = $status;
+        $this->re_run = $re_run;
+        $this->logger = $logger;
+    }
 
-	public static function getAvailableTasks()
-	{
-		return self::$availableTasks;
-	}
+    public static function getAvailableTasks()
+    {
+        return self::$availableTasks;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function execute()
-	{
+    /**
+     * @return array
+     */
+    public function execute()
+    {
 
-		$schedlib = TikiLib::lib('scheduler');
+        $schedlib = TikiLib::lib('scheduler');
 
-		$status = $schedlib->get_run_status($this->id);
+        $status = $schedlib->get_run_status($this->id);
 
-		$this->logger->info('Scheduler last run status: ' . $status);
+        $this->logger->info('Scheduler last run status: ' . $status);
 
-		if ($status == 'running') {
-			return array(
-				'status' => 'failed',
-				'message' => tra('Scheduler task already running.')
-			);
-		}
+        if ($status == 'running') {
+            return [
+                'status' => 'failed',
+                'message' => tra('Scheduler task already running.')
+            ];
+        }
 
-		$this->logger->info('Task: ' . $this->task);
+        $this->logger->info('Task: ' . $this->task);
 
-		$class = 'Scheduler_Task_' . $this->task;
-		if (!class_exists($class)) {
-			return array(
-				'status' => 'failed',
-				'message' => $class . ' not found.',
-			);
-		}
+        $class = 'Scheduler_Task_' . $this->task;
+        if (! class_exists($class)) {
+            return [
+                'status' => 'failed',
+                'message' => $class . ' not found.',
+            ];
+        }
 
-		$startTime = $schedlib->start_scheduler_run($this->id);
-		$this->logger->debug("Start time: " . $startTime);
+        $startTime = $schedlib->start_scheduler_run($this->id);
+        $this->logger->debug("Start time: " . $startTime);
 
-		$params = json_decode($this->params, true);
-		$this->logger->debug("Task params: " . $this->params);
+        $params = json_decode($this->params, true);
+        $this->logger->debug("Task params: " . $this->params);
 
-		if ($params === null && !empty($this->params)) {
-			return array(
-				'status' => 'failed',
-				'message' => tra('Unable to decode task params.')
-			);
-		}
+        if ($params === null && ! empty($this->params)) {
+            return [
+                'status' => 'failed',
+                'message' => tra('Unable to decode task params.')
+            ];
+        }
 
-		$task = new $class($this->logger);
-		$result = $task->execute($params);
+        $task = new $class($this->logger);
+        $result = $task->execute($params);
 
-		$executionStatus = $result ? 'done' : 'failed';
-		$outputMessage = $task->getOutput();
+        $executionStatus = $result ? 'done' : 'failed';
+        $outputMessage = $task->getOutput();
 
-		$endTime = $schedlib->end_scheduler_run($this->id, $executionStatus, $outputMessage, $startTime);
-		$this->logger->debug("End time: " . $endTime);
+        $endTime = $schedlib->end_scheduler_run($this->id, $executionStatus, $outputMessage, $startTime);
+        $this->logger->debug("End time: " . $endTime);
 
-		return array(
-			'status' => $executionStatus,
-			'message' => $outputMessage,
-		);
-	}
+        return [
+            'status' => $executionStatus,
+            'message' => $outputMessage,
+        ];
+    }
 }

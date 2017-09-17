@@ -14,26 +14,28 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_block_popup_link($params, $content, $smarty, &$repeat)
 {
-	global $prefs;
-	$headerlib = TikiLib::lib('header');
+    global $prefs;
+    $headerlib = TikiLib::lib('header');
 
-	if ( $repeat ) return;
+    if ($repeat) {
+        return;
+    }
 
-	static $counter = 0;
+    static $counter = 0;
 
-	$linkId = 'block-popup-link' . ++$counter;
-	$block = $params['block'];
+    $linkId = 'block-popup-link' . ++$counter;
+    $block = $params['block'];
 
-	if ( $repeat === false ) {
-		if ($prefs['feature_jquery'] == 'y') {
-			$headerlib->add_js(
-<<<JS
+    if ($repeat === false) {
+        if ($prefs['feature_jquery'] == 'y') {
+            $headerlib->add_js(
+                <<<JS
 \$(document).ready( function() {
 
 	\$('#$block').hide();
@@ -52,19 +54,19 @@ function smarty_block_popup_link($params, $content, $smarty, &$repeat)
 	});
 } );
 JS
-			);
-		}
+            );
+        }
 
-		$href = ' href="javascript:void(0)"';
+        $href = ' href="javascript:void(0)"';
 
-		if (isset($params['class'])) {
-			if ($params['class'] == 'button') {
-				$html = '<a id="' . $linkId . '"' . $href . '>' . $content . '</a>';
-				$html = '<span class="button">'.$html.'</span>';
-			} else {
-				$html = '<a id="' . $linkId . '"' . $href . '" class="' . $class . '">' . $content . '</a>';
-			}
-		}
-		return $html;
-	}
+        if (isset($params['class'])) {
+            if ($params['class'] == 'button') {
+                $html = '<a id="' . $linkId . '"' . $href . '>' . $content . '</a>';
+                $html = '<span class="button">'.$html.'</span>';
+            } else {
+                $html = '<a id="' . $linkId . '"' . $href . '" class="' . $class . '">' . $content . '</a>';
+            }
+        }
+        return $html;
+    }
 }

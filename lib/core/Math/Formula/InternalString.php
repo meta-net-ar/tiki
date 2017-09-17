@@ -7,18 +7,17 @@
 
 class Math_Formula_InternalString
 {
-	private $content;
-	private $type;
-	private $children;
+    private $content;
+    private $type;
+    private $children;
 
-	function __construct( $content )
-	{
-		$this->content = trim($content, '"');
-	}
+    function __construct($content)
+    {
+        $this->content = trim($content, '"');
+    }
 
-	function getContent()
-	{
-		return $this->content;
-	}
+    function getContent()
+    {
+        return $this->content;
+    }
 }
-

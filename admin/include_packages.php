@@ -9,8 +9,8 @@ use Tiki\Package\ComposerManager;
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 global $tikipath;
@@ -19,39 +19,39 @@ $composerManager = new ComposerManager($tikipath);
 $composerManagerBundled = new ComposerManager($tikipath, $tikipath . DIRECTORY_SEPARATOR . 'vendor_bundled');
 
 if ($access->ticketMatch()) {
-	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		if ($_POST['auto-fix-missing-packages']){
-			$smarty->assign('composer_output', $composerManager->fixMissing());
-		}
-		if ($_POST['auto-install-package']){
-			$smarty->assign('composer_output', $composerManager->installPackage($_POST['auto-install-package']));
-		}
-		if ($_POST['auto-remove-package']){
-			$smarty->assign('composer_output', $composerManager->removePackage($_POST['auto-remove-package']));
-		}
-		if ($_POST['auto-run-diagnostics']){
-			if (!$composerManager->composerIsAvailable()){
-				$smarty->assign('diagnostic_composer_location', '');
-				$smarty->assign('diagnostic_composer_output', '');
-			} else {
-				$smarty->assign('diagnostic_composer_location', $composerManager->composerPath());
-				$smarty->assign('diagnostic_composer_output', $composerManager->getComposer()->execDiagnose());
-			}
-		}
-	}
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_POST['auto-fix-missing-packages']) {
+            $smarty->assign('composer_output', $composerManager->fixMissing());
+        }
+        if ($_POST['auto-install-package']) {
+            $smarty->assign('composer_output', $composerManager->installPackage($_POST['auto-install-package']));
+        }
+        if ($_POST['auto-remove-package']) {
+            $smarty->assign('composer_output', $composerManager->removePackage($_POST['auto-remove-package']));
+        }
+        if ($_POST['auto-run-diagnostics']) {
+            if (! $composerManager->composerIsAvailable()) {
+                $smarty->assign('diagnostic_composer_location', '');
+                $smarty->assign('diagnostic_composer_output', '');
+            } else {
+                $smarty->assign('diagnostic_composer_location', $composerManager->composerPath());
+                $smarty->assign('diagnostic_composer_output', $composerManager->getComposer()->execDiagnose());
+            }
+        }
+    }
 }
 
 $installableList = $composerManager->getInstalled();
-if ($installableList === false){
-	$packagesMissing = false;
+if ($installableList === false) {
+    $packagesMissing = false;
 } else {
-	$packagesMissing = array_reduce(
-		$installableList,
-		function ($carry, $item) {
-			return $carry || $item['status'] === ComposerManager::STATUS_MISSING;
-		},
-		false
-	);
+    $packagesMissing = array_reduce(
+        $installableList,
+        function ($carry, $item) {
+            return $carry || $item['status'] === ComposerManager::STATUS_MISSING;
+        },
+        false
+    );
 }
 
 $smarty->assign('composer_available', $composerManager->composerIsAvailable());

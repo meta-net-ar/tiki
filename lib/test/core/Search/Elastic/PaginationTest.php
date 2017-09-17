@@ -7,27 +7,26 @@
 
 class Search_Elastic_PaginationTest extends Search_Index_PaginationTest
 {
-	function setUp()
-	{
-		static $count = 0;
+    function setUp()
+    {
+        static $count = 0;
 
-		$connection = new Search_Elastic_Connection('http://localhost:9200');
-		$connection->startBulk(100);
+        $connection = new Search_Elastic_Connection('http://localhost:9200');
+        $connection->startBulk(100);
 
-		$status = $connection->getStatus();
-		if (! $status->ok) {
-			$this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
-		}
+        $status = $connection->getStatus();
+        if (! $status->ok) {
+            $this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
+        }
 
-		$this->index = new Search_Elastic_Index($connection, 'test_index');
-		$this->index->destroy();
-	}
+        $this->index = new Search_Elastic_Index($connection, 'test_index');
+        $this->index->destroy();
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

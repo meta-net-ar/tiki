@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -16,13 +16,13 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function module_top_file_galleries_info()
 {
-	return array(
-		'name' => tra('Top File Galleries'),
-		'description' => tra('Displays the specified number of file galleries with links to them, starting with the one with most hits.'),
-		'prefs' => array('feature_file_galleries'),
-		'params' => array(),
-		'common_params' => array('nonums', 'rows')
-	);
+    return [
+        'name' => tra('Top File Galleries'),
+        'description' => tra('Displays the specified number of file galleries with links to them, starting with the one with most hits.'),
+        'prefs' => ['feature_file_galleries'],
+        'params' => [],
+        'common_params' => ['nonums', 'rows']
+    ];
 }
 
 /**
@@ -31,9 +31,9 @@ function module_top_file_galleries_info()
  */
 function module_top_file_galleries($mod_reference, $module_params)
 {
-	global $prefs;
-	$filegallib = TikiLib::lib('filegal');
-	$ranking = $filegallib->get_files(0, $mod_reference["rows"], 'hits_desc', null, $prefs['fgal_root_id'], false, true, false, false, false, false, false);
-	$smarty = TikiLib::lib('smarty');
-	$smarty->assign('modTopFileGalleries', $ranking["data"]);
+    global $prefs;
+    $filegallib = TikiLib::lib('filegal');
+    $ranking = $filegallib->get_files(0, $mod_reference["rows"], 'hits_desc', null, $prefs['fgal_root_id'], false, true, false, false, false, false, false);
+    $smarty = TikiLib::lib('smarty');
+    $smarty->assign('modTopFileGalleries', $ranking["data"]);
 }

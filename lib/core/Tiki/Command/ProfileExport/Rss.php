@@ -14,32 +14,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Rss extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:rss')
-			->setDescription('Export an RSS Feed definition')
-			->addArgument(
-				'rss',
-				InputArgument::REQUIRED,
-				'RSS Feed ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:rss')
+            ->setDescription('Export an RSS Feed definition')
+            ->addArgument(
+                'rss',
+                InputArgument::REQUIRED,
+                'RSS Feed ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$id = $input->getArgument('rss');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $id = $input->getArgument('rss');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$result = \Tiki_Profile_InstallHandler_Rss::export($writer, $id);
+        $result = \Tiki_Profile_InstallHandler_Rss::export($writer, $id);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("RSS Feed not found: $id");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("RSS Feed not found: $id");
+        }
+    }
 }

@@ -1,75 +1,74 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 class Search_Action_Factory
 {
-	private $actions = array();
+    private $actions = [];
 
-	function register(array $actions)
-	{
-		$this->actions = array_merge($this->actions, $actions);
-	}
+    function register(array $actions)
+    {
+        $this->actions = array_merge($this->actions, $actions);
+    }
 
-	function fromMatch($match)
-	{
-		$parser = new WikiParser_PluginArgumentParser;
-		$arrayBuilder = new Search_Formatter_ArrayBuilder;
-		$arguments = $parser->parse($match->getArguments());
+    function fromMatch($match)
+    {
+        $parser = new WikiParser_PluginArgumentParser;
+        $arrayBuilder = new Search_Formatter_ArrayBuilder;
+        $arguments = $parser->parse($match->getArguments());
 
-		if (! empty($arguments['name'])) {
-			$sequence = $this->build($arguments['name'], $arrayBuilder->getData($match->getBody()));
+        if (! empty($arguments['name'])) {
+            $sequence = $this->build($arguments['name'], $arrayBuilder->getData($match->getBody()));
 
-			if (isset($arguments['group'])) {
-				$sequence->setRequiredGroup($arguments['group']);
-			}
+            if (isset($arguments['group'])) {
+                $sequence->setRequiredGroup($arguments['group']);
+            }
 
-			return $sequence;
-		}
-	}
+            return $sequence;
+        }
+    }
 
-	function build($name, array $data)
-	{
-		$sequence = new Search_Action_Sequence($name);
-		
-		if (! isset($data['step'])) {
-			$data['step'] = array();
-		}
+    function build($name, array $data)
+    {
+        $sequence = new Search_Action_Sequence($name);
 
-		if (isset($data['step']['action'])) {
-			$data['step'] = array($data['step']);
-		}
+        if (! isset($data['step'])) {
+            $data['step'] = [];
+        }
 
-		foreach ($data['step'] as $definition) {
-			$sequence->addStep($this->buildStep($definition));
-		}
+        if (isset($data['step']['action'])) {
+            $data['step'] = [$data['step']];
+        }
 
-		return $sequence;
-	}
+        foreach ($data['step'] as $definition) {
+            $sequence->addStep($this->buildStep($definition));
+        }
 
-	private function buildStep($definition)
-	{
-		if (empty($definition['action'])) {
-			return new Search_Action_UnknownStep;
-		}
+        return $sequence;
+    }
 
-		$action = trim($definition['action']);
+    private function buildStep($definition)
+    {
+        if (empty($definition['action'])) {
+            return new Search_Action_UnknownStep;
+        }
 
-		if (! isset($this->actions[$action])) {
-			return new Search_Action_UnknownStep($action);
-		}
+        $action = trim($definition['action']);
 
-		$actionClass = $this->actions[$action];
-		unset($definition['action']);
+        if (! isset($this->actions[$action])) {
+            return new Search_Action_UnknownStep($action);
+        }
 
-		if (! class_exists($actionClass)) {
-			return new Search_Action_UnknownStep($action);
-		}
+        $actionClass = $this->actions[$action];
+        unset($definition['action']);
 
-		return new Search_Action_ActionStep(new $actionClass, $definition);
-	}
+        if (! class_exists($actionClass)) {
+            return new Search_Action_UnknownStep($action);
+        }
+
+        return new Search_Action_ActionStep(new $actionClass, $definition);
+    }
 }
-

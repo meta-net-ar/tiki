@@ -9,51 +9,51 @@ use Symfony\Component\Yaml\Yaml;
 
 class Yaml_DirectivesTest extends PHPUnit_Framework_TestCase
 {
-	/**
-	 * @var Yaml_Directives
-	 */
-	protected $directives;
-	protected $fixtures;
+    /**
+     * @var Yaml_Directives
+     */
+    protected $directives;
+    protected $fixtures;
 
-	public function setUp()
-	{
-		$this->fixtures = __DIR__ . '/Fixtures/';
-		$this->directives = new Yaml_Directives(null, $this->fixtures);
-	}
+    public function setUp()
+    {
+        $this->fixtures = __DIR__ . '/Fixtures/';
+        $this->directives = new Yaml_Directives(null, $this->fixtures);
+    }
 
-	public function testNoChangeIfNoDirective()
-	{
-		$yamlString = file_get_contents($this->fixtures . 'no_directives.yml');
-		$yaml = Yaml::parse($yamlString);
+    public function testNoChangeIfNoDirective()
+    {
+        $yamlString = file_get_contents($this->fixtures . 'no_directives.yml');
+        $yaml = Yaml::parse($yamlString);
 
-		$yamlJson = json_encode($yaml);
-		$this->directives->process($yaml);
-		$this->assertEquals($yamlJson, json_encode($yaml));
-	}
+        $yamlJson = json_encode($yaml);
+        $this->directives->process($yaml);
+        $this->assertEquals($yamlJson, json_encode($yaml));
+    }
 
-	/**
-	 * @dataProvider includeDataProvider
-	 */
-	public function testInclude($yamlFile, $yamlResultFile)
-	{
-		$yamlString = file_get_contents($this->fixtures . $yamlFile);
-		$yaml = Yaml::parse($yamlString);
+    /**
+     * @dataProvider includeDataProvider
+     */
+    public function testInclude($yamlFile, $yamlResultFile)
+    {
+        $yamlString = file_get_contents($this->fixtures . $yamlFile);
+        $yaml = Yaml::parse($yamlString);
 
-		$yamlResultString = file_get_contents($this->fixtures . $yamlResultFile);
-		$yamlResult = Yaml::parse($yamlResultString);
+        $yamlResultString = file_get_contents($this->fixtures . $yamlResultFile);
+        $yamlResult = Yaml::parse($yamlResultString);
 
 
-		$this->directives->process($yaml);
-		$this->assertEquals(json_encode($yamlResult), json_encode($yaml));
-	}
+        $this->directives->process($yaml);
+        $this->assertEquals(json_encode($yamlResult), json_encode($yaml));
+    }
 
-	public function includeDataProvider()
-	{
-		return array(
-			array('include_replace_key.yml', 'include_replace_key_result.yml'),
-			array('include_replace_key_2.yml', 'include_replace_key_result.yml'),
-			array('include_replace_deep_key.yml', 'include_replace_deep_key_result.yml'),
-			array('include_appending.yml', 'include_appending_result.yml'),
-		);
-	}
+    public function includeDataProvider()
+    {
+        return [
+            ['include_replace_key.yml', 'include_replace_key_result.yml'],
+            ['include_replace_key_2.yml', 'include_replace_key_result.yml'],
+            ['include_replace_deep_key.yml', 'include_replace_deep_key_result.yml'],
+            ['include_appending.yml', 'include_appending_result.yml'],
+        ];
+    }
 }

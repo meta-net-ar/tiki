@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -12,25 +12,25 @@
  */
 class Perms_Resolver_Default implements Perms_Resolver
 {
-	private $value;
+    private $value;
 
-	function __construct( $value )
-	{
-		$this->value = (bool) $value;
-	}
+    function __construct($value)
+    {
+        $this->value = (bool) $value;
+    }
 
-	function check( $name, array $groups )
-	{
-		return $this->value;
-	}
+    function check($name, array $groups)
+    {
+        return $this->value;
+    }
 
-	function from()
-	{
-		return 'system';
-	}
+    function from()
+    {
+        return 'system';
+    }
 
-	function applicableGroups()
-	{
-		return array('Anonymous', 'Registered');
-	}
+    function applicableGroups()
+    {
+        return ['Anonymous', 'Registered'];
+    }
 }

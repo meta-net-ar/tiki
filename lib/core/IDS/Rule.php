@@ -8,211 +8,215 @@
 class IDS_Rule
 {
 
-	protected $id;
-	protected $regex;
-	protected $description;
-	protected $tags;
-	protected $impact;
+    protected $id;
+    protected $regex;
+    protected $description;
+    protected $tags;
+    protected $impact;
 
-	public function __construct($id)
-	{
-		$this->id = $id;
-	}
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
 
-	public static function getCustomFilePath() {
+    public static function getCustomFilePath()
+    {
 
-		global $prefs;
+        global $prefs;
 
-		$path = $prefs['ids_custom_rules_file'];
+        $path = $prefs['ids_custom_rules_file'];
 
-		if (empty($path)) {
-			$path = 'temp/ids_custom_rules.json';
-		}
+        if (empty($path)) {
+            $path = 'temp/ids_custom_rules.json';
+        }
 
-		return $path;
-	}
+        return $path;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getId()
-	{
-		return $this->id;
-	}
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getRegex()
-	{
-		return $this->regex;
-	}
+    /**
+     * @return mixed
+     */
+    public function getRegex()
+    {
+        return $this->regex;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getDescription()
-	{
-		return $this->description;
-	}
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getTags()
-	{
-		return $this->tags;
-	}
+    /**
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getImpact()
-	{
-		return $this->impact;
-	}
+    /**
+     * @return mixed
+     */
+    public function getImpact()
+    {
+        return $this->impact;
+    }
 
-	/**
-	 * @param mixed $regex
-	 */
-	public function setRegex($regex)
-	{
-		$this->regex = $regex;
-	}
+    /**
+     * @param mixed $regex
+     */
+    public function setRegex($regex)
+    {
+        $this->regex = $regex;
+    }
 
-	/**
-	 * @param mixed $description
-	 */
-	public function setDescription($description)
-	{
-		$this->description = $description;
-	}
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
 
-	/**
-	 * @param mixed $tags
-	 */
-	public function setTags($tags)
-	{
-		if (!is_array($tags)) {
-			$tags = explode(',', $tags);
-		}
+    /**
+     * @param mixed $tags
+     */
+    public function setTags($tags)
+    {
+        if (! is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
 
-		foreach ($tags as $key => $tag) {
-			$tags[$key] = trim($tag);
-		}
+        foreach ($tags as $key => $tag) {
+            $tags[$key] = trim($tag);
+        }
 
-		$this->tags = $tags;
-	}
+        $this->tags = $tags;
+    }
 
-	/**
-	 * @param mixed $impact
-	 */
-	public function setImpact($impact)
-	{
-		$this->impact = $impact;
-	}
+    /**
+     * @param mixed $impact
+     */
+    public function setImpact($impact)
+    {
+        $this->impact = $impact;
+    }
 
-	public function save() {
+    public function save()
+    {
 
-		$customRules = self::getAllRules();
+        $customRules = self::getAllRules();
 
-		$updated = false;
-		foreach($customRules as $key => $rule) {
-			if ($rule->id == $this->id) {
-				$customRules[$key] = $this;
-				$updated = true;
-				break;
-			}
-		}
+        $updated = false;
+        foreach ($customRules as $key => $rule) {
+            if ($rule->id == $this->id) {
+                $customRules[$key] = $this;
+                $updated = true;
+                break;
+            }
+        }
 
-		if (!$updated) {
-			$customRules[] = $this;
-		}
+        if (! $updated) {
+            $customRules[] = $this;
+        }
 
-		return $this->writeRules($customRules);
-	}
+        return $this->writeRules($customRules);
+    }
 
-	public function delete() {
+    public function delete()
+    {
 
-		$customRules = self::getAllRules();
+        $customRules = self::getAllRules();
 
-		foreach($customRules as $key => $rule) {
-			if ($rule->id == $this->id) {
-				unset($customRules[$key]);
-				break;
-			}
-		}
+        foreach ($customRules as $key => $rule) {
+            if ($rule->id == $this->id) {
+                unset($customRules[$key]);
+                break;
+            }
+        }
 
-		return $this->writeRules($customRules);
-	}
+        return $this->writeRules($customRules);
+    }
 
-	private function writeRules($customRules) {
-		$rules = [];
-		foreach ($customRules as $customRule) {
-			$rules[] = [
-				'id' => $customRule->id,
-				'rule' => $customRule->regex,
-				'description' => $customRule->description,
-				'tags' => [
-					'tag' => $customRule->tags,
-				],
-				'impact' => $customRule->impact,
-			];
-		}
+    private function writeRules($customRules)
+    {
+        $rules = [];
+        foreach ($customRules as $customRule) {
+            $rules[] = [
+                'id' => $customRule->id,
+                'rule' => $customRule->regex,
+                'description' => $customRule->description,
+                'tags' => [
+                    'tag' => $customRule->tags,
+                ],
+                'impact' => $customRule->impact,
+            ];
+        }
 
-		$filter = [
-			'filters' => $rules
-		];
+        $filter = [
+            'filters' => $rules
+        ];
 
-		$filename = self::getCustomFilePath();
+        $filename = self::getCustomFilePath();
 
-		return file_put_contents($filename, json_encode($filter));
-	}
+        return file_put_contents($filename, json_encode($filter));
+    }
 
-	/**
-	 * @return array
-	 */
-	public static function getAllRules() {
+    /**
+     * @return array
+     */
+    public static function getAllRules()
+    {
 
-		$filename = self::getCustomFilePath();
+        $filename = self::getCustomFilePath();
 
-		if (!file_exists($filename)) {
-			return [];
-		}
+        if (! file_exists($filename)) {
+            return [];
+        }
 
-		$data = file_get_contents($filename);
-		$customRules = json_decode($data, true);
+        $data = file_get_contents($filename);
+        $customRules = json_decode($data, true);
 
-		$rules = [];
-		foreach ($customRules['filters'] as $customRule) {
+        $rules = [];
+        foreach ($customRules['filters'] as $customRule) {
+            $rule = new self($customRule['id']);
+            $rule->setRegex($customRule['rule']);
+            $rule->setDescription($customRule['description']);
+            $rule->setTags($customRule['tags']['tag']);
+            $rule->setImpact($customRule['impact']);
 
-			$rule = new self($customRule['id']);
-			$rule->setRegex($customRule['rule']);
-			$rule->setDescription($customRule['description']);
-			$rule->setTags($customRule['tags']['tag']);
-			$rule->setImpact($customRule['impact']);
+            $rules[] = $rule;
+        }
 
-			$rules[] = $rule;
-		}
+        return $rules;
+    }
 
-		return $rules;
-	}
+    /**
+     * @param $ruleID
+     * @return IDS_Rule | false
+     */
+    public static function getRule($ruleID)
+    {
 
-	/**
-	 * @param $ruleID
-	 * @return IDS_Rule | false
-	 */
-	public static function getRule($ruleID) {
+        $customRules = self::getAllRules();
 
-		$customRules = self::getAllRules();
+        foreach ($customRules as $rule) {
+            if ($rule->id == $ruleID) {
+                return $rule;
+            }
+        }
 
-		foreach($customRules as $rule) {
-			if ($rule->id == $ruleID) {
-				return $rule;
-			}
-		}
-
-		return false;
-	}
-
+        return false;
+    }
 }

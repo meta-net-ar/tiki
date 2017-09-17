@@ -7,38 +7,37 @@
 
 class Search_Query_RelationReplacer
 {
-	private $invertable;
+    private $invertable;
 
-	function __construct(array $invertable)
-	{
-		$this->invertable = $invertable;
-	}
+    function __construct(array $invertable)
+    {
+        $this->invertable = $invertable;
+    }
 
-	function visit(Search_Expr_Interface $expr, $results)
-	{
-		if ($expr instanceof Search_Expr_Token) {
-			$relation = Search_Query_Relation::fromToken($expr);
+    function visit(Search_Expr_Interface $expr, $results)
+    {
+        if ($expr instanceof Search_Expr_Token) {
+            $relation = Search_Query_Relation::fromToken($expr);
 
-			if (in_array($relation->getQualifier(), $this->invertable)) {
-				$invert = $relation->getInvert();
+            if (in_array($relation->getQualifier(), $this->invertable)) {
+                $invert = $relation->getInvert();
 
-				return new Search_Expr_Or(
-					array(
-						$expr,
-						new Search_Expr_Token($invert->getToken()),
-					)
-				);
-			}
-		}
+                return new Search_Expr_Or(
+                    [
+                        $expr,
+                        new Search_Expr_Token($invert->getToken()),
+                    ]
+                );
+            }
+        }
 
-		if ($expr instanceof Search_Expr_Or || $expr instanceof Search_Expr_And) {
-			$class = get_class($expr);
-			return new $class($results);
-		} elseif ($expr instanceof Search_Expr_Not) {
-			return new Search_Expr_Not($results[0]);
-		}
+        if ($expr instanceof Search_Expr_Or || $expr instanceof Search_Expr_And) {
+            $class = get_class($expr);
+            return new $class($results);
+        } elseif ($expr instanceof Search_Expr_Not) {
+            return new Search_Expr_Not($results[0]);
+        }
 
-		return $expr;
-	}
+        return $expr;
+    }
 }
-

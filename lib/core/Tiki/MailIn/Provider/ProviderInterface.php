@@ -9,8 +9,8 @@ namespace Tiki\MailIn\Provider;
 
 interface ProviderInterface
 {
-	function isEnabled();
-	function getType();
-	function getLabel();
-	function getActionFactory(array $acc);
+    function isEnabled();
+    function getType();
+    function getLabel();
+    function getActionFactory(array $acc);
 }

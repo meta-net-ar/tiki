@@ -7,253 +7,258 @@
 
 function wikiplugin_convene_info()
 {
-	return array(
-		'name' => tra('Convene'),
-		'documentation' => 'PluginConvene',
-		'description' => tra('Agree a date from a list of alternatives'),
-		'introduced' => 9,
-		'prefs' => array('wikiplugin_convene','feature_calendar'),
-		'body' => tra('Convene data generated from user input'),
-		'iconname' => 'group',
-		'filter' => 'rawhtml_unsafe',
-		'tags' => array( 'basic' ),
-		'params' => array(
-			'title' => array(
-				'required' => false,
-				'name' => tra('Title'),
-				'description' => tra('Title for the event'),
-				'since' => '9.0',
-				'default' => tra('Convene'),
-			),
-			'calendarid' => array(
-				'required' => false,
-				'name' => tra('Calendar ID'),
-				'description' => tra('ID number of the site calendar in which to store the date for the events with the most votes'),
-				'since' => '9.0',
-				'filter' => 'digits',
-				'default' => '',
-				'profile_reference' => 'calendar',
-			),
-			'minvotes' => array(
-				'required' => false,
-				'name' => tra('Minimum Votes'),
-				'description' => tra('Minimum number of votes needed to show Add-to-Calendar icon, so that new users do
+    return [
+        'name' => tra('Convene'),
+        'documentation' => 'PluginConvene',
+        'description' => tra('Agree a date from a list of alternatives'),
+        'introduced' => 9,
+        'prefs' => ['wikiplugin_convene','feature_calendar'],
+        'body' => tra('Convene data generated from user input'),
+        'iconname' => 'group',
+        'filter' => 'rawhtml_unsafe',
+        'tags' => [ 'basic' ],
+        'params' => [
+            'title' => [
+                'required' => false,
+                'name' => tra('Title'),
+                'description' => tra('Title for the event'),
+                'since' => '9.0',
+                'default' => tra('Convene'),
+            ],
+            'calendarid' => [
+                'required' => false,
+                'name' => tra('Calendar ID'),
+                'description' => tra('ID number of the site calendar in which to store the date for the events with the most votes'),
+                'since' => '9.0',
+                'filter' => 'digits',
+                'default' => '',
+                'profile_reference' => 'calendar',
+            ],
+            'minvotes' => [
+                'required' => false,
+                'name' => tra('Minimum Votes'),
+                'description' => tra('Minimum number of votes needed to show Add-to-Calendar icon, so that new users do
 					not see a potentially confusing icon before the convene has enough information on it'),
-				'since' => '10.3',
-				'filter' => 'digits',
-				'default' => '3',
-			),
-			'dateformat' => array(
-				'required' => false,
-				'name' => tra('Date-Time Format'),
-				'description' => tra('Display date and time in short or long format, according to the site wide setting'),
-				'since' => '9.0',
-				'filter' => 'alpha',
-				'default' => '',
-				'options' => array(
-					array('text' => '', 'value' => ''),
-					array('text' => tra('Short'), 'value' => 'short'),
-					array('text' => tra('Long'), 'value' => 'long')
-				)
-			),
-		)
-	);
+                'since' => '10.3',
+                'filter' => 'digits',
+                'default' => '3',
+            ],
+            'dateformat' => [
+                'required' => false,
+                'name' => tra('Date-Time Format'),
+                'description' => tra('Display date and time in short or long format, according to the site wide setting'),
+                'since' => '9.0',
+                'filter' => 'alpha',
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Short'), 'value' => 'short'],
+                    ['text' => tra('Long'), 'value' => 'long']
+                ]
+            ],
+        ]
+    ];
 }
 
 function wikiplugin_convene($data, $params)
 {
-	global $page;
-	$headerlib = TikiLib::lib('header');
-	$tikilib = TikiLib::lib('tiki');
-	$smarty = TikiLib::lib('smarty');
-	$smarty->loadPlugin('smarty_function_icon');
-	$perms = Perms::get();
+    global $page;
+    $headerlib = TikiLib::lib('header');
+    $tikilib = TikiLib::lib('tiki');
+    $smarty = TikiLib::lib('smarty');
+    $smarty->loadPlugin('smarty_function_icon');
+    $perms = Perms::get();
 
-	static $conveneI = 0;
-	++$conveneI;
-	$i = $conveneI;
+    static $conveneI = 0;
+    ++$conveneI;
+    $i = $conveneI;
 
-	$params = array_merge(
-		array(
-			"title" => "Convene",
-			"calendarid" => "1",
-			"minvotes" => "3",
-			"dateformat" => "short"
-		),
-		$params
-	);
+    $params = array_merge(
+        [
+            "title" => "Convene",
+            "calendarid" => "1",
+            "minvotes" => "3",
+            "dateformat" => "short"
+        ],
+        $params
+    );
 
-	extract($params, EXTR_SKIP);
+    extract($params, EXTR_SKIP);
 
-	$dataString = $data . '';
-	$dataArray = array();
+    $dataString = $data . '';
+    $dataArray = [];
 
-	//start flat static text to prepared array
-	$lines = explode("\n", trim($data));
-	sort($lines);
-	foreach ($lines as $line) {
-		$line = trim($line);
+    //start flat static text to prepared array
+    $lines = explode("\n", trim($data));
+    sort($lines);
+    foreach ($lines as $line) {
+        $line = trim($line);
 
-		if (!empty($line)) {
-			$parts = explode(':', $line);
-			$dataArray[trim($parts[0])] = trim($parts[1]);
-		}
-	}
+        if (! empty($line)) {
+            $parts = explode(':', $line);
+            $dataArray[trim($parts[0])] = trim($parts[1]);
+        }
+    }
 
-	$data = TikiFilter_PrepareInput::delimiter('_')->prepare($dataArray);
-	//end flat static text to prepared array
+    $data = TikiFilter_PrepareInput::delimiter('_')->prepare($dataArray);
+    //end flat static text to prepared array
 
-	//start get users from array
-	$users = array();
-	foreach (end($data['dates']) as $user => $vote) {
-		$users[] = $user;
-	}
-	//end get users from array
-
-
-	//start votes summed together
-	$votes = array();
-	foreach ($data['dates'] as $stamp => $date) {
-		foreach ($date as $vote) {
-			if (empty($votes[$stamp])) $votes[$stamp] = 0;
-			$votes[$stamp] += (int)$vote;
-		}
-	}
-	//end votes summed together
+    //start get users from array
+    $users = [];
+    foreach (end($data['dates']) as $user => $vote) {
+        $users[] = $user;
+    }
+    //end get users from array
 
 
-	//start find top vote stamp
-	$topVoteStamp = 0;
-	foreach ($votes as $stamp => $vote) {
-		if (
-			!isset($votes[$topVoteStamp]) || (
-				isset($votes[$topVoteStamp]) &&
-				$vote > $votes[$topVoteStamp]
-			)
-		) {
-			$topVoteStamp = $stamp;
-		}
-	}
-	//end find top vote stamp
+    //start votes summed together
+    $votes = [];
+    foreach ($data['dates'] as $stamp => $date) {
+        foreach ($date as $vote) {
+            if (empty($votes[$stamp])) {
+                $votes[$stamp] = 0;
+            }
+            $votes[$stamp] += (int)$vote;
+        }
+    }
+    //end votes summed together
 
 
-	//start reverse array for easy listing as table
-	$rows = array();
-	foreach ($data['dates'] as $stamp => $date) {
-		foreach ($date as $user => $vote) {
-			if (isset($rows[$user][$stamp])) $rows[$user][$stamp] = array();
+    //start find top vote stamp
+    $topVoteStamp = 0;
+    foreach ($votes as $stamp => $vote) {
+        if (! isset($votes[$topVoteStamp]) || (
+                isset($votes[$topVoteStamp]) &&
+                $vote > $votes[$topVoteStamp]
+            )
+        ) {
+            $topVoteStamp = $stamp;
+        }
+    }
+    //end find top vote stamp
 
-			$rows[$user][$stamp] = $vote;
-		}
-	}
-	//end reverse array for easy listing as table
 
-	$result = "";
+    //start reverse array for easy listing as table
+    $rows = [];
+    foreach ($data['dates'] as $stamp => $date) {
+        foreach ($date as $user => $vote) {
+            if (isset($rows[$user][$stamp])) {
+                $rows[$user][$stamp] = [];
+            }
 
-	//start date header
-	$dateHeader = "";
-	$deleteicon = smarty_function_icon(['name' => 'delete', 'iclass' => 'tips', 'ititle' => ':' . tr('Delete Date')],
-		$smarty);
-	foreach ($votes as $stamp => $totals) {
-		$dateHeader .= '<td class="conveneHeader">';
-		if (!empty($dateformat) && $dateformat == "long") {
-			$dateHeader .= $tikilib->get_long_datetime($stamp);
-		} else {
-			$dateHeader .= $tikilib->get_short_datetime($stamp);
-		}
-		$dateHeader .= ($perms->edit ? " <button class='conveneDeleteDate$i icon btn btn-default btn-xs' data-date='$stamp'>$deleteicon</button>" : ""). "</td>";
-	}
-	$result .= "<tr class='conveneHeaderRow'>";
+            $rows[$user][$stamp] = $vote;
+        }
+    }
+    //end reverse array for easy listing as table
 
-	$result .= "<td style='vertical-align: middle'>" . (
-		$perms->edit
-			?
-				"<input type='button' class='conveneAddDate$i btn btn-default btn-sm' value='" . tr('Add Date') . "'/>"
-			: ""
-	)."</td>";
+    $result = "";
 
-	$result .=	"$dateHeader
+    //start date header
+    $dateHeader = "";
+    $deleteicon = smarty_function_icon(
+        ['name' => 'delete', 'iclass' => 'tips', 'ititle' => ':' . tr('Delete Date')],
+        $smarty
+    );
+    foreach ($votes as $stamp => $totals) {
+        $dateHeader .= '<td class="conveneHeader">';
+        if (! empty($dateformat) && $dateformat == "long") {
+            $dateHeader .= $tikilib->get_long_datetime($stamp);
+        } else {
+            $dateHeader .= $tikilib->get_short_datetime($stamp);
+        }
+        $dateHeader .= ($perms->edit ? " <button class='conveneDeleteDate$i icon btn btn-default btn-xs' data-date='$stamp'>$deleteicon</button>" : ""). "</td>";
+    }
+    $result .= "<tr class='conveneHeaderRow'>";
+
+    $result .= "<td style='vertical-align: middle'>" . (
+        $perms->edit
+            ?
+                "<input type='button' class='conveneAddDate$i btn btn-default btn-sm' value='" . tr('Add Date') . "'/>"
+            : ""
+    )."</td>";
+
+    $result .= "$dateHeader
 		</tr>";
-	//end date header
+    //end date header
 
 
-	//start user list and votes
-	$userList = "";
-	foreach ($rows as $user => $row) {
-		$userList .= "<tr class='conveneVotes conveneUserVotes$i'>";
-		$userList .= "<td style='white-space: nowrap'>". ($perms->edit ? "<button class='conveneUpdateUser$i icon btn btn-default btn-sm'>"
-				.  smarty_function_icon(['name' => 'pencil', 'iclass' => 'tips', 'ititle' => ':'
-					. tr("Edit User/Save changes")], $smarty)
-				. "</button><button data-user='$user' title='" . tr("Delete User")
-				. "' class='conveneDeleteUser$i icon btn btn-danger btn-sm'>"
-				. smarty_function_icon(['name' => 'delete'], $smarty) . "</button> " : "") . TikiLib::lib('user')->clean_user($user) . "</td>";
-		foreach ($row as $stamp => $vote) {
-			if ($vote == 1) {
-				$class = 	"convene-ok text-center label-success";
-				$text = 	smarty_function_icon(['name' => 'ok', 'iclass' => 'tips', 'ititle' => ':' . tr('OK')], $smarty);
-			} elseif ($vote == -1) {
-				$class = 	"convene-no text-center label-danger";
-				$text = 	smarty_function_icon(['name' => 'remove', 'iclass' => 'tips', 'ititle' => ':'
-					. tr('Not OK')], $smarty);
-			} else {
-				$class = 	"convene-unconfirmed text-center label-default";
-				$text = 	smarty_function_icon(['name' => 'help', 'iclass' => 'tips', 'ititle' => ':'
-					. tr('Unconfirmed')], $smarty);
-			}
+    //start user list and votes
+    $userList = "";
+    foreach ($rows as $user => $row) {
+        $userList .= "<tr class='conveneVotes conveneUserVotes$i'>";
+        $userList .= "<td style='white-space: nowrap'>". ($perms->edit ? "<button class='conveneUpdateUser$i icon btn btn-default btn-sm'>"
+                .  smarty_function_icon(['name' => 'pencil', 'iclass' => 'tips', 'ititle' => ':'
+                    . tr("Edit User/Save changes")], $smarty)
+                . "</button><button data-user='$user' title='" . tr("Delete User")
+                . "' class='conveneDeleteUser$i icon btn btn-danger btn-sm'>"
+                . smarty_function_icon(['name' => 'delete'], $smarty) . "</button> " : "") . TikiLib::lib('user')->clean_user($user) . "</td>";
+        foreach ($row as $stamp => $vote) {
+            if ($vote == 1) {
+                $class = "convene-ok text-center label-success";
+                $text = smarty_function_icon(['name' => 'ok', 'iclass' => 'tips', 'ititle' => ':' . tr('OK')], $smarty);
+            } elseif ($vote == -1) {
+                $class = "convene-no text-center label-danger";
+                $text = smarty_function_icon(['name' => 'remove', 'iclass' => 'tips', 'ititle' => ':'
+                    . tr('Not OK')], $smarty);
+            } else {
+                $class = "convene-unconfirmed text-center label-default";
+                $text = smarty_function_icon(['name' => 'help', 'iclass' => 'tips', 'ititle' => ':'
+                    . tr('Unconfirmed')], $smarty);
+            }
 
-			$userList .= "<td class='$class'>". $text
-				."<input type='hidden' name='dates_" . $stamp . "_" . $user . "' value='$vote' class='conveneUserVote$i form-control' />"
-				."</td>";
-		}
-		$userList .= "</tr>";
-	}
-	$result .= $userList;
-	//end user list and votes
-
-
-	//start add new user and votes
-	$result .= "<tr class='conveneFooterRow'>";
+            $userList .= "<td class='$class'>". $text
+                ."<input type='hidden' name='dates_" . $stamp . "_" . $user . "' value='$vote' class='conveneUserVote$i form-control' />"
+                ."</td>";
+        }
+        $userList .= "</tr>";
+    }
+    $result .= $userList;
+    //end user list and votes
 
 
-	if (! empty($data['dates'])) {	// need a date before adding users
-		$result .= "<td>" . (
-			$perms->edit
-				?
-				"<div class='btn-group'>
+    //start add new user and votes
+    $result .= "<tr class='conveneFooterRow'>";
+
+
+    if (! empty($data['dates'])) {  // need a date before adding users
+        $result .= "<td>" . (
+            $perms->edit
+                ?
+                "<div class='btn-group'>
 						<input class='conveneAddUser$i form-control' value='' placeholder='" . tr("Username...") . "' style='float:left;width:72%;border-bottom-right-radius:0;border-top-right-radius:0;'>
 						<input type='button' value='+' title='" . tr('Add User') . "' class='conveneAddUserButton$i btn btn-default' />
 					</div>"
-				: ""
-			) .
-			"</td>";
-	}
-	//end add new user and votes
+                : ""
+            ) .
+            "</td>";
+    }
+    //end add new user and votes
 
 
-	//start last row with auto selected date(s)
-	$lastRow = "";
-	foreach ($votes as $stamp => $total) {
-		$pic = "";
-		if ($total == $votes[$topVoteStamp]) {
-			$pic .= ($perms->edit ? smarty_function_icon(['name' => 'ok', 'iclass' => 'tips', 'ititle' => ':'
-					. tr("Selected Date")], $smarty) : "");
-			if ($perms->edit && $votes[$topVoteStamp] >= $minvotes) {
-				$pic .= "<a class='btn btn-default btn-xs' href='tiki-calendar_edit_item.php?todate=$stamp&calendarId=$calendarid' title='"
-					. tr("Add as Calendar Event") . "'>"
-					. smarty_function_icon(['name' => 'calendar'], $smarty)
-					. "</a>";
-			}
-		}
+    //start last row with auto selected date(s)
+    $lastRow = "";
+    foreach ($votes as $stamp => $total) {
+        $pic = "";
+        if ($total == $votes[$topVoteStamp]) {
+            $pic .= ($perms->edit ? smarty_function_icon(['name' => 'ok', 'iclass' => 'tips', 'ititle' => ':'
+                    . tr("Selected Date")], $smarty) : "");
+            if ($perms->edit && $votes[$topVoteStamp] >= $minvotes) {
+                $pic .= "<a class='btn btn-default btn-xs' href='tiki-calendar_edit_item.php?todate=$stamp&calendarId=$calendarid' title='"
+                    . tr("Add as Calendar Event") . "'>"
+                    . smarty_function_icon(['name' => 'calendar'], $smarty)
+                    . "</a>";
+            }
+        }
 
-		$lastRow .= "<td class='conveneFooter'>". $total ."&nbsp;$pic</td>";
-	}
-	$result .= $lastRow;
+        $lastRow .= "<td class='conveneFooter'>". $total ."&nbsp;$pic</td>";
+    }
+    $result .= $lastRow;
 
-	$result .= "</tr>";
-	//end last row with auto selected date(s)
+    $result .= "</tr>";
+    //end last row with auto selected date(s)
 
 
-	$result = <<<FORM
+    $result = <<<FORM
 			<form id='pluginConvene$i'>
 			    <div class="table-responsive">
     				<table class="table table-bordered">$result</table>
@@ -261,27 +266,27 @@ function wikiplugin_convene($data, $params)
 			</form>
 FORM;
 
-	$conveneData = json_encode(
-		array(
-			"dates" => $data['dates'],
-			"users" => $users,
-			"votes" => $votes,
-			"topVote" => $votes[$topVoteStamp],
-			"rows" =>	$rows,
-			"data" => $dataString,
-		)
-	);
+    $conveneData = json_encode(
+        [
+            "dates" => $data['dates'],
+            "users" => $users,
+            "votes" => $votes,
+            "topVote" => $votes[$topVoteStamp],
+            "rows" => $rows,
+            "data" => $dataString,
+        ]
+    );
 
-	$n = '\n';
-	$regexN = '/[\r\n]+/g';
+    $n = '\n';
+    $regexN = '/[\r\n]+/g';
 
-	$access = TikiLib::lib('access');
-	$access->checkAuthenticity();
-	$ticket = $access->getTicket();
+    $access = TikiLib::lib('access');
+    $access->checkAuthenticity();
+    $ticket = $access->getTicket();
 
-	$headerlib->add_jq_onready(
-/** @lang JavaScript */
-		<<<JQ
+    $headerlib->add_jq_onready(
+        /** @lang JavaScript */
+        <<<JQ
 
 		var convene$i = $.extend({
 			fromBlank: function(user, date) {
@@ -605,10 +610,10 @@ FORM;
 		};
 		initConvene$i();
 JQ
-);
+    );
 
-	return
-<<<RETURN
+    return
+    <<<RETURN
 ~np~
 	<div class="panel panel-default">
 		<div class="panel-heading">

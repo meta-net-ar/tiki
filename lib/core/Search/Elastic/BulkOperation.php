@@ -7,67 +7,66 @@
 
 class Search_Elastic_BulkOperation
 {
-	private $count = 0;
-	private $limit;
-	private $callback;
-	private $buffer = '';
+    private $count = 0;
+    private $limit;
+    private $callback;
+    private $buffer = '';
 
-	function __construct($limit, $callback)
-	{
-		$this->limit = max(10, (int) $limit);
-		$this->callback = $callback;
-	}
+    function __construct($limit, $callback)
+    {
+        $this->limit = max(10, (int) $limit);
+        $this->callback = $callback;
+    }
 
-	function flush()
-	{
-		if ($this->count > 0) {
-			$callback = $this->callback;
-			$callback($this->buffer);
+    function flush()
+    {
+        if ($this->count > 0) {
+            $callback = $this->callback;
+            $callback($this->buffer);
 
-			$this->buffer = '';
-			$this->count = 0;
-		}
-	}
+            $this->buffer = '';
+            $this->count = 0;
+        }
+    }
 
-	function index($index, $type, $id, array $data)
-	{
-		$this->append(
-			array(
-				array('index' => array(
-						'_index' => $index,
-						'_type' => $type,
-						'_id' => $id,
-					)
-				),
-				$data,
-			)
-		);
-	}
+    function index($index, $type, $id, array $data)
+    {
+        $this->append(
+            [
+                ['index' => [
+                        '_index' => $index,
+                        '_type' => $type,
+                        '_id' => $id,
+                    ]
+                ],
+                $data,
+            ]
+        );
+    }
 
-	function unindex($index, $type, $id)
-	{
-		$this->append(
-			array(
-				array('delete' => array(
-						'_index' => $index,
-						'_type' => $type,
-						'_id' => $id,
-					)
-				),
-			)
-		);
-	}
+    function unindex($index, $type, $id)
+    {
+        $this->append(
+            [
+                ['delete' => [
+                        '_index' => $index,
+                        '_type' => $type,
+                        '_id' => $id,
+                    ]
+                ],
+            ]
+        );
+    }
 
-	private function append($lines)
-	{
-		$this->count += 1;
-		foreach ($lines as $line) {
-			$this->buffer .= json_encode($line) . "\n";
-		}
+    private function append($lines)
+    {
+        $this->count += 1;
+        foreach ($lines as $line) {
+            $this->buffer .= json_encode($line) . "\n";
+        }
 
-		if ($this->count >= $this->limit) {
-			$this->flush();
-		}
-	}
+        if ($this->count >= $this->limit) {
+            $this->flush();
+        }
+    }
 }
-

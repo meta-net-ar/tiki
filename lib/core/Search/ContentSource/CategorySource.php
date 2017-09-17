@@ -1,64 +1,63 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 class Search_ContentSource_CategorySource implements Search_ContentSource_Interface
 {
-	private $db;
+    private $db;
 
-	function __construct()
-	{
-		$this->db = TikiDb::get();
-	}
+    function __construct()
+    {
+        $this->db = TikiDb::get();
+    }
 
-	function getDocuments()
-	{
-		return $this->db->table('tiki_categories')->fetchColumn('categId', array());
-	}
+    function getDocuments()
+    {
+        return $this->db->table('tiki_categories')->fetchColumn('categId', []);
+    }
 
-	function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
-	{
-		$lib = TikiLib::lib('categ');
-		
-		$item = $lib->get_category($objectId);
+    function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    {
+        $lib = TikiLib::lib('categ');
 
-		if (! $item) {
-			return false;
-		}
+        $item = $lib->get_category($objectId);
 
-		$data = array(
-			'title' => $typeFactory->sortable($item['name']),
-			'description' => $typeFactory->plaintext($item['description']),
+        if (! $item) {
+            return false;
+        }
 
-			'searchable' => $typeFactory->identifier('n'),
+        $data = [
+            'title' => $typeFactory->sortable($item['name']),
+            'description' => $typeFactory->plaintext($item['description']),
 
-			'view_permission' => $typeFactory->identifier('tiki_p_view_category'),
-		);
+            'searchable' => $typeFactory->identifier('n'),
 
-		return $data;
-	}
+            'view_permission' => $typeFactory->identifier('tiki_p_view_category'),
+        ];
 
-	function getProvidedFields()
-	{
-		return array(
-			'title',
-			'description',
+        return $data;
+    }
 
-			'searchable',
+    function getProvidedFields()
+    {
+        return [
+            'title',
+            'description',
 
-			'view_permission',
-		);
-	}
+            'searchable',
 
-	function getGlobalFields()
-	{
-		return array(
-			'title' => true,
-			'description' => true,
-		);
-	}
+            'view_permission',
+        ];
+    }
+
+    function getGlobalFields()
+    {
+        return [
+            'title' => true,
+            'description' => true,
+        ];
+    }
 }
-

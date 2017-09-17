@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -10,39 +10,39 @@
  */
 class Perms_ResolverFactory_TestFactory implements Perms_ResolverFactory
 {
-	private $known;
-	private $resolvers;
+    private $known;
+    private $resolvers;
 
-	function __construct( array $known, array $resolvers )
-	{
-		$this->known = $known;
-		$this->resolvers = $resolvers;
-	}
+    function __construct(array $known, array $resolvers)
+    {
+        $this->known = $known;
+        $this->resolvers = $resolvers;
+    }
 
-	function bulk( array $baseContext, $bulkKey, array $values )
-	{
-		return array();
-	}
+    function bulk(array $baseContext, $bulkKey, array $values)
+    {
+        return [];
+    }
 
-	function getHash( array $context )
-	{
-		$parts = array();
-		
-		foreach ( $this->known as $key ) {
-			if ( isset($context[$key]) ) {
-				$parts[] = $context[$key];
-			}
-		}
+    function getHash(array $context)
+    {
+        $parts = [];
 
-		return 'test:'.implode(':', $parts);
-	}
+        foreach ($this->known as $key) {
+            if (isset($context[$key])) {
+                $parts[] = $context[$key];
+            }
+        }
 
-	function getResolver( array $context )
-	{
-		$hash = $this->getHash($context);
+        return 'test:'.implode(':', $parts);
+    }
 
-		if ( isset( $this->resolvers[$hash] ) ) {
-			return $this->resolvers[$hash];
-		}
-	}
+    function getResolver(array $context)
+    {
+        $hash = $this->getHash($context);
+
+        if (isset($this->resolvers[$hash])) {
+            return $this->resolvers[$hash];
+        }
+    }
 }

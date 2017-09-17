@@ -7,34 +7,33 @@
 
 class Search_Elastic_BulkIncrementalUpdateTest extends Search_Index_IncrementalUpdateTest
 {
-	protected $index;
+    protected $index;
 
-	function setUp()
-	{
-		$this->index = $this->getIndex();
-		$this->index->destroy();
+    function setUp()
+    {
+        $this->index = $this->getIndex();
+        $this->index->destroy();
 
-		$this->populate($this->index);
-	}
+        $this->populate($this->index);
+    }
 
-	protected function getIndex()
-	{
-		$connection = new Search_Elastic_Connection('http://localhost:9200');
-		$connection->startBulk(100);
+    protected function getIndex()
+    {
+        $connection = new Search_Elastic_Connection('http://localhost:9200');
+        $connection->startBulk(100);
 
-		$status = $connection->getStatus();
-		if (! $status->ok) {
-			$this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
-		}
+        $status = $connection->getStatus();
+        if (! $status->ok) {
+            $this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
+        }
 
-		return new Search_Elastic_Index($connection, 'test_index');
-	}
+        return new Search_Elastic_Index($connection, 'test_index');
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

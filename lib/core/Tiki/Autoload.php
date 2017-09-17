@@ -12,42 +12,41 @@
  */
 class Tiki_Autoload
 {
-	/**
-	 * Entry point to the autoload
-	 *
-	 * @param string $class the name of the class to be autoloaded
-	 */
-	static public function autoload($class)
-	{
-		switch ($class){
-			case 'mPDF':
-				self::loadMpdf($class);
-			break;
-		}
-	}
+    /**
+     * Entry point to the autoload
+     *
+     * @param string $class the name of the class to be autoloaded
+     */
+    public static function autoload($class)
+    {
+        switch ($class) {
+            case 'mPDF':
+                self::loadMpdf($class);
+                break;
+        }
+    }
 
-	/**
-	 * Handle mPDF autoload process based on tiki preferences
-	 *
-	 * @param string $class the name of the class to be autoloaded
-	 */
-	static protected function loadMpdf($class)
-	{
-		global $prefs;
+    /**
+     * Handle mPDF autoload process based on tiki preferences
+     *
+     * @param string $class the name of the class to be autoloaded
+     */
+    protected static function loadMpdf($class)
+    {
+        global $prefs;
 
-		if ($class == 'mPDF'
-			&& ! empty($prefs['print_pdf_from_url']) && $prefs['print_pdf_from_url'] === 'mpdf'
-			&& ! empty($prefs['print_pdf_mpdf_path'])) {
+        if ($class == 'mPDF'
+            && ! empty($prefs['print_pdf_from_url']) && $prefs['print_pdf_from_url'] === 'mpdf'
+            && ! empty($prefs['print_pdf_mpdf_path'])) {
+            $path = $prefs['print_pdf_mpdf_path'];
+            if (substr($prefs['print_pdf_mpdf_path'], -1) != '/') {
+                $path .= '/';
+            }
+            $path .= 'mpdf.php';
 
-			$path = $prefs['print_pdf_mpdf_path'];
-			if (substr($prefs['print_pdf_mpdf_path'], -1) != '/'){
-				$path .= '/';
-			}
-			$path .= 'mpdf.php';
-
-			if (file_exists($path)) {
-				include_once($path);
-			}
-		}
-	}
+            if (file_exists($path)) {
+                include_once($path);
+            }
+        }
+    }
 }

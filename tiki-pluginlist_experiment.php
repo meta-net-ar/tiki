@@ -11,26 +11,26 @@
 global $prefs;
 
 $section = "wiki page";
-$section_class = "tiki_wiki_page manage";	// This will be body class instead of $section
-require_once ('tiki-setup.php');
+$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
+require_once('tiki-setup.php');
 
-if ($tiki_p_edit !== 'y' ) {
-	$smarty->assign('errortype', 401);
-	$smarty->assign('msg', tra("You need permission to edit pages in order to experiment on plugin LIST."));
-	$smarty->display("error.tpl");
-	die;
+if ($tiki_p_edit !== 'y') {
+    $smarty->assign('errortype', 401);
+    $smarty->assign('msg', tra("You need permission to edit pages in order to experiment on plugin LIST."));
+    $smarty->display("error.tpl");
+    die;
 }
 
 $editwiki = $_REQUEST['editwiki'];
 $listunparsed = '{LIST()}' . $editwiki . '{LIST}';
 $listparsed = TikiLib::lib('parser')->parse_data(
-				$listunparsed,
-				array(
-					'absolute_links'=>true,
-					'noheaderinc'=>true,
-					'suppress_icons' => true,
-					'process_wiki_paragraphs' => false
-				)
+    $listunparsed,
+    [
+                    'absolute_links' => true,
+                    'noheaderinc' => true,
+                    'suppress_icons' => true,
+                    'process_wiki_paragraphs' => false
+                ]
 );
 $smarty->assign_by_ref('listparsed', $listparsed);
 $smarty->assign_by_ref('listtext', $editwiki);
@@ -43,4 +43,3 @@ $smarty->assign('page', $page);
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 $smarty->display('tiki-pluginlist_experiment.tpl');
-

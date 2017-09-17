@@ -11,41 +11,40 @@ use Tracker\Tabular\Schema;
 
 class AutoDetectCsvSource implements SourceInterface
 {
-	private $source;
+    private $source;
 
-	function __construct(\Tracker_Definition $definition, $fileName)
-	{
-		$file = new \SplFileObject($fileName, 'r');
-		$headers = $file->fgetcsv();
+    function __construct(\Tracker_Definition $definition, $fileName)
+    {
+        $file = new \SplFileObject($fileName, 'r');
+        $headers = $file->fgetcsv();
 
-		$schema = new Schema($definition);
-		
-		foreach ($headers as $header) {
-			if (preg_match(Schema\Column::HEADER_PATTERN, $header, $parts)) {
-				list($full, $pk, $field, $mode) = $parts;
-				$schema->addColumn($field, $mode);
+        $schema = new Schema($definition);
 
-				if ($pk === '*') {
-					$schema->setPrimaryKey($field);
-				}
-			} else {
-				// Column without definition, add fake entry to skip column
-				$schema->addNew('ignore', 'ignore')
-					->setReadOnly(true);
-			}
-		}
+        foreach ($headers as $header) {
+            if (preg_match(Schema\Column::HEADER_PATTERN, $header, $parts)) {
+                list($full, $pk, $field, $mode) = $parts;
+                $schema->addColumn($field, $mode);
 
-		$this->source = new CsvSource($schema, $fileName);
-	}
+                if ($pk === '*') {
+                    $schema->setPrimaryKey($field);
+                }
+            } else {
+                // Column without definition, add fake entry to skip column
+                $schema->addNew('ignore', 'ignore')
+                    ->setReadOnly(true);
+            }
+        }
 
-	function getEntries()
-	{
-		return $this->source->getEntries();
-	}
+        $this->source = new CsvSource($schema, $fileName);
+    }
 
-	function getSchema()
-	{
-		return $this->source->getSchema();
-	}
+    function getEntries()
+    {
+        return $this->source->getEntries();
+    }
+
+    function getSchema()
+    {
+        return $this->source->getSchema();
+    }
 }
-

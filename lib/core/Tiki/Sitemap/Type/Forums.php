@@ -16,20 +16,20 @@ use Perms;
  */
 class Forums extends AbstractType
 {
-	/**
-	 * Generate Sitemap
-	 */
-	public function generate()
-	{
-		if (! $this->checkFeatureAndPermissions('feature_forums', 'tiki_p_forum_read')) {
-			return;
-		}
+    /**
+     * Generate Sitemap
+     */
+    public function generate()
+    {
+        if (! $this->checkFeatureAndPermissions('feature_forums', 'tiki_p_forum_read')) {
+            return;
+        }
 
-		$commentsLib = TikiLib::lib('comments');
-		$channels = $commentsLib->list_forums();
+        $commentsLib = TikiLib::lib('comments');
+        $channels = $commentsLib->list_forums();
 
-		$channels['data'] = Perms::filter(array('type' => 'forum'), 'object', $channels['data'], array('object' => 'forumId'), 'forum_read');
+        $channels['data'] = Perms::filter(['type' => 'forum'], 'object', $channels['data'], ['object' => 'forumId'], 'forum_read');
 
-		$this->addEntriesToSitemap($channels, '/tiki-view_forum.php?forumId=%s', 'forumId', null, '', 'lastPost', '0.6', 'daily');
-	}
+        $this->addEntriesToSitemap($channels, '/tiki-view_forum.php?forumId=%s', 'forumId', null, '', 'lastPost', '0.6', 'daily');
+    }
 }

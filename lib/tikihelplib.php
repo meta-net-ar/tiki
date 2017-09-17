@@ -7,19 +7,19 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 class TikiHelpLib
 {
-	/*
+    /*
 	function TikiHelpLib()
 	{
 
 	}
 	*/
-	/* end of class */
+    /* end of class */
 }
 
 
@@ -31,34 +31,37 @@ class TikiHelpLib
 /* static */
 function help_doclink($params)
 {
-	global $prefs;
+    global $prefs;
 
-	extract($params);
-	// Param = zone
-	$ret = '';
-	if (!isset($url)) $url = '';
-	if (empty($url) && empty($desc) && empty($crumb)) {
-		return;
-	}
+    extract($params);
+    // Param = zone
+    $ret = '';
+    if (! isset($url)) {
+        $url = '';
+    }
+    if (empty($url) && empty($desc) && empty($crumb)) {
+        return;
+    }
 
-	if (!empty($crumb)) {
-		$url = $crumb->helpUrl;
-		$desc = $crumb->helpDescription;
-	}
+    if (! empty($crumb)) {
+        $url = $crumb->helpUrl;
+        $desc = $crumb->helpDescription;
+    }
 
-	// always display help buttons with descriptions, but only display help links when option is enabled.
-	if (($prefs['feature_help'] == 'y' and $url) or ($desc && empty($crumb))) {
-		if (!isset($desc))
-			$desc = tra('Help link');
+    // always display help buttons with descriptions, but only display help links when option is enabled.
+    if (($prefs['feature_help'] == 'y' and $url) or ($desc && empty($crumb))) {
+        if (! isset($desc)) {
+            $desc = tra('Help link');
+        }
 
-		$smarty = TikiLib::lib('smarty');
-		$smarty->loadPlugin('smarty_function_icon');
+        $smarty = TikiLib::lib('smarty');
+        $smarty->loadPlugin('smarty_function_icon');
 
-		$ret = '<a title="' . $url . '|' . htmlentities($desc, ENT_COMPAT, 'UTF-8') . '" href="'
-			. $prefs['helpurl'] . $url . '" target="tikihelp" class="tikihelp btn btn-link">'
-			. smarty_function_icon(array('name' => 'help'), $smarty)
-			. '</a>';
-	}
+        $ret = '<a title="' . $url . '|' . htmlentities($desc, ENT_COMPAT, 'UTF-8') . '" href="'
+            . $prefs['helpurl'] . $url . '" target="tikihelp" class="tikihelp btn btn-link">'
+            . smarty_function_icon(['name' => 'help'], $smarty)
+            . '</a>';
+    }
 
-	return $ret;
+    return $ret;
 }

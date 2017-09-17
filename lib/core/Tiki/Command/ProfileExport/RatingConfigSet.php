@@ -14,22 +14,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RatingConfigSet extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:rating-config-set')
-			->setDescription('Export all advanced rating configurations into a set')
-			;
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:rating-config-set')
+            ->setDescription('Export all advanced rating configurations into a set')
+            ;
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$writer = $this->getProfileWriter($input);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $writer = $this->getProfileWriter($input);
 
-		if (\Tiki_Profile_InstallHandler_RatingConfigSet::export($writer)) {
-			$writer->save();
-		}
-	}
+        if (\Tiki_Profile_InstallHandler_RatingConfigSet::export($writer)) {
+            $writer->save();
+        }
+    }
 }

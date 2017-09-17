@@ -7,30 +7,30 @@
 
 class Search_MySql_HighlightHelper implements Zend\Filter\FilterInterface
 {
-	private $words = array();
-	private $replacements = array();
-	private $snippetHelper;
+    private $words = [];
+    private $replacements = [];
+    private $snippetHelper;
 
-	function __construct(array $words)
-	{
-		$this->words = $words;
+    function __construct(array $words)
+    {
+        $this->words = $words;
 
-		$counter = -1;
+        $counter = -1;
 
-		$this->replacements = array_map(
-			function ($word) use (& $counter) {
-				$counter++;
-				return "<b class=\"highlight_word highlight_word_$counter\">$word</b>";
-			}, $this->words
-		);
-		$this->snippetHelper = new Search_ResultSet_SnippetHelper;
-	}
+        $this->replacements = array_map(
+            function ($word) use (& $counter) {
+                $counter++;
+                return "<b class=\"highlight_word highlight_word_$counter\">$word</b>";
+            },
+            $this->words
+        );
+        $this->snippetHelper = new Search_ResultSet_SnippetHelper;
+    }
 
-	function filter($content)
-	{
-		$content = $this->snippetHelper->filter($content);
-		$content = str_ireplace($this->words, $this->replacements, $content);
-		return trim(strip_tags($content, '<b><i><em><strong><pre><code><span>'));
-	}
+    function filter($content)
+    {
+        $content = $this->snippetHelper->filter($content);
+        $content = str_ireplace($this->words, $this->replacements, $content);
+        return trim(strip_tags($content, '<b><i><em><strong><pre><code><span>'));
+    }
 }
-

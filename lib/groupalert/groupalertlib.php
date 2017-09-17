@@ -10,8 +10,8 @@
 */
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -27,30 +27,34 @@ class groupAlertLib extends TikiLib
      * @param $displayEachUser
      * @return bool
      */
-    function AddGroup ($ObjectType, $ObjectNumber,$GroupName,$displayEachUser)
-	{
-		if ( $displayEachUser == "on" ) $displayEachUser='y';
-		if ( $displayEachUser == "" ) $displayEachUser='n';
+    function AddGroup($ObjectType, $ObjectNumber, $GroupName, $displayEachUser)
+    {
+        if ($displayEachUser == "on") {
+            $displayEachUser = 'y';
+        }
+        if ($displayEachUser == "") {
+            $displayEachUser = 'n';
+        }
 
-		$query ="delete from `tiki_groupalert` where ( `objectType`= ? and `objectId` = ?) ";
-		$this->query($query, array($ObjectType,$ObjectNumber));
-		if ( $GroupName != '' ) {
-			$query = "insert into `tiki_groupalert` ( `groupName`,`objectType`,`objectId`,`displayEachuser` )  values (?,?,?,?)";
-			$this->query($query, array($GroupName,$ObjectType,$ObjectNumber,$displayEachUser));
-		}
-	 return true;
-	}
+        $query = "delete from `tiki_groupalert` where ( `objectType`= ? and `objectId` = ?) ";
+        $this->query($query, [$ObjectType,$ObjectNumber]);
+        if ($GroupName != '') {
+            $query = "insert into `tiki_groupalert` ( `groupName`,`objectType`,`objectId`,`displayEachuser` )  values (?,?,?,?)";
+            $this->query($query, [$GroupName,$ObjectType,$ObjectNumber,$displayEachUser]);
+        }
+        return true;
+    }
 
     /**
      * @param $ObjectType
      * @param $ObjectNumber
      * @return mixed
      */
-    function GetGroup ($ObjectType,$ObjectNumber)
-	{
-		$res= $this->getOne("select `groupName` from `tiki_groupalert` where ( `objectType` = ? and `objectId` = ? )", array($ObjectType,$ObjectNumber));
-		return $res ;
-	}
+    function GetGroup($ObjectType, $ObjectNumber)
+    {
+        $res = $this->getOne("select `groupName` from `tiki_groupalert` where ( `objectType` = ? and `objectId` = ? )", [$ObjectType,$ObjectNumber]);
+        return $res ;
+    }
 
     /**
      * @param $ObjectType
@@ -58,35 +62,35 @@ class groupAlertLib extends TikiLib
      * @param $GroupName
      * @return mixed
      */
-    function GetShowEachUser($ObjectType,$ObjectNumber,$GroupName )
-	{
-		return $this->getOne("select `displayEachuser` from `tiki_groupalert` where ( `objectType` = ? and `objectId` = ? and `groupName` =? )", array($ObjectType,$ObjectNumber,$GroupName));
-	}
+    function GetShowEachUser($ObjectType, $ObjectNumber, $GroupName)
+    {
+        return $this->getOne("select `displayEachuser` from `tiki_groupalert` where ( `objectType` = ? and `objectId` = ? and `groupName` =? )", [$ObjectType,$ObjectNumber,$GroupName]);
+    }
 
     /**
      * @param $ListUserToAlert
      * @param $URI
      */
-    function Notify ( $ListUserToAlert,$URI )
-	{
-		$userlib = TikiLib::lib('user');
-		$tikilib = TikiLib::lib('tiki');
-		if (!is_array($ListUserToAlert)) {
-			return;
-		}
-		$project=$tikilib->get_preference("browsertitle");
-		$foo = parse_url($_SERVER["REQUEST_URI"]);
-		$machine = $tikilib->httpPrefix(true) . dirname($foo["path"]);
-		$URL=$machine."/".$URI;
-		foreach ( $ListUserToAlert as $user ) {
-			$email=$userlib->get_user_email($user);
-			if ( ! empty($email) ) {
-				include_once ('lib/webmail/tikimaillib.php');
-				$mail = new TikiMail();
-				$mail->setText(tra("You are alerted by the server "). $project . "\n" . tra("You can check the modifications at: ") .$URL);
-				$mail->setSubject(tra("You are alerted of a change on ").$project);
-				$mail->send(array($email));
-			}
-		}
-	}
+    function Notify($ListUserToAlert, $URI)
+    {
+        $userlib = TikiLib::lib('user');
+        $tikilib = TikiLib::lib('tiki');
+        if (! is_array($ListUserToAlert)) {
+            return;
+        }
+        $project = $tikilib->get_preference("browsertitle");
+        $foo = parse_url($_SERVER["REQUEST_URI"]);
+        $machine = $tikilib->httpPrefix(true) . dirname($foo["path"]);
+        $URL = $machine."/".$URI;
+        foreach ($ListUserToAlert as $user) {
+            $email = $userlib->get_user_email($user);
+            if (! empty($email)) {
+                include_once('lib/webmail/tikimaillib.php');
+                $mail = new TikiMail();
+                $mail->setText(tra("You are alerted by the server "). $project . "\n" . tra("You can check the modifications at: ") .$URL);
+                $mail->setSubject(tra("You are alerted of a change on ").$project);
+                $mail->send([$email]);
+            }
+        }
+    }
 }

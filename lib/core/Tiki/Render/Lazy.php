@@ -7,26 +7,25 @@
 
 class Tiki_Render_Lazy
 {
-	private $callback;
-	private $data;
+    private $callback;
+    private $data;
 
-	function __construct($callback)
-	{
-		$this->callback = $callback;
-	}
+    function __construct($callback)
+    {
+        $this->callback = $callback;
+    }
 
-	function __toString()
-	{
-		if ($this->callback) {
-			try {
-				$this->data = call_user_func($this->callback);
-			} catch (Exception $e) {
-				$this->data = $e->getMessage();
-			}
-			$this->callback = null;
-		}
+    function __toString()
+    {
+        if ($this->callback) {
+            try {
+                $this->data = call_user_func($this->callback);
+            } catch (Exception $e) {
+                $this->data = $e->getMessage();
+            }
+            $this->callback = null;
+        }
 
-		return (string) $this->data;
-	}
+        return (string) $this->data;
+    }
 }
-

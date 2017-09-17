@@ -13,23 +13,22 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CompilerPass implements CompilerPassInterface
 {
-	public function process(ContainerBuilder $container)
-	{
-		if (!$container->hasDefinition('tiki.lib.federatedsearch')) {
-			return;
-		}
+    public function process(ContainerBuilder $container)
+    {
+        if (! $container->hasDefinition('tiki.lib.federatedsearch')) {
+            return;
+        }
 
-		$definition = $container->getDefinition('tiki.lib.federatedsearch');
+        $definition = $container->getDefinition('tiki.lib.federatedsearch');
 
-		$taggedServices = $container->findTaggedServiceIds('tiki.federatedsearch.index');
-		foreach ($taggedServices as $id => $tagAttributes) {
-			foreach ($tagAttributes as $attributes) {
-				$definition->addMethodCall('addIndex', [
-					$attributes['index'],
-					new Reference($id),
-				]);
-			}
-		}
-	}
+        $taggedServices = $container->findTaggedServiceIds('tiki.federatedsearch.index');
+        foreach ($taggedServices as $id => $tagAttributes) {
+            foreach ($tagAttributes as $attributes) {
+                $definition->addMethodCall('addIndex', [
+                    $attributes['index'],
+                    new Reference($id),
+                ]);
+            }
+        }
+    }
 }
-

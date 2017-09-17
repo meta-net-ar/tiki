@@ -3,7 +3,7 @@
  * @package tikiwiki
  */
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -11,45 +11,45 @@
 // Admin to the filtering of bad shoutbox words
 // First commit on cvs by damosoft aka damian
 // Initialization
-require_once ('tiki-setup.php');
-include_once ('lib/shoutbox/shoutboxlib.php');
+require_once('tiki-setup.php');
+include_once('lib/shoutbox/shoutboxlib.php');
 $access->check_feature('feature_shoutbox');
 $access->check_permission('tiki_p_admin_shoutbox');
 //get_strings tra('Shoutbox Words')
 
 // Do the add bad word form here
 if (isset($_REQUEST["add"])) {
-	check_ticket('admin-shoutboxwords');
-	if (empty($_REQUEST["word"])) {
-		$smarty->assign('msg', tra("You have to provide a word"));
-		$smarty->display("error.tpl");
-		die;
-	}
-	$shoutboxlib->add_bad_word($_REQUEST["word"]);
+    check_ticket('admin-shoutboxwords');
+    if (empty($_REQUEST["word"])) {
+        $smarty->assign('msg', tra("You have to provide a word"));
+        $smarty->display("error.tpl");
+        die;
+    }
+    $shoutboxlib->add_bad_word($_REQUEST["word"]);
 }
-if (isset($_REQUEST["remove"]) && !empty($_REQUEST["remove"])) {
-	check_ticket('admin-shoutboxwords');
-	$shoutboxlib->remove_bad_word($_REQUEST["remove"]);
+if (isset($_REQUEST["remove"]) && ! empty($_REQUEST["remove"])) {
+    check_ticket('admin-shoutboxwords');
+    $shoutboxlib->remove_bad_word($_REQUEST["remove"]);
 }
-if (!isset($_REQUEST["sort_mode"])) {
-	$sort_mode = 'word_asc';
+if (! isset($_REQUEST["sort_mode"])) {
+    $sort_mode = 'word_asc';
 } else {
-	$sort_mode = $_REQUEST["sort_mode"];
+    $sort_mode = $_REQUEST["sort_mode"];
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (!isset($_REQUEST["offset"])) {
-	$offset = 0;
+if (! isset($_REQUEST["offset"])) {
+    $offset = 0;
 } else {
-	$offset = $_REQUEST["offset"];
+    $offset = $_REQUEST["offset"];
 }
 $smarty->assign_by_ref('offset', $offset);
 if (isset($_REQUEST["find"])) {
-	$find = $_REQUEST["find"];
+    $find = $_REQUEST["find"];
 } else {
-	$find = '';
+    $find = '';
 }
 $smarty->assign('find', $find);
 $words = $shoutboxlib->get_bad_words($offset, $maxRecords, $sort_mode, $find);

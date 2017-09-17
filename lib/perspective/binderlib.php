@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -9,235 +9,235 @@
 
 //this script may only be included - so its better to die if called  directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 $categlib = TikiLib::lib('categ');
 
 class AreasLib extends CategLib
 {
-	private $areas;
-	private $areasArray;
+    private $areas;
+    private $areasArray;
 
-	function __construct()
-	{
-		$this->areas = $this->table('tiki_areas');
-		$this->cacheAreas();
+    function __construct()
+    {
+        $this->areas = $this->table('tiki_areas');
+        $this->cacheAreas();
 
-		parent::__construct();
-	}
+        parent::__construct();
+    }
 
-	function HandleObjectCategories($objectCategoryIds)
-	{
-		global $prefs;
-		$perspectivelib = TikiLib::lib('perspective');
-		$accesslib = TikiLib::lib('access');
+    function HandleObjectCategories($objectCategoryIds)
+    {
+        global $prefs;
+        $perspectivelib = TikiLib::lib('perspective');
+        $accesslib = TikiLib::lib('access');
 
-		$current_object = current_object();
+        $current_object = current_object();
 
-		if (!$current_object) {	// only used on tiki objects
-			return;
-		}
+        if (! $current_object) { // only used on tiki objects
+            return;
+        }
 
-		$descendants = $this->get_category_descendants($prefs['areas_root']);
+        $descendants = $this->get_category_descendants($prefs['areas_root']);
 
-		$objectPerspective = 0;
-		if (!empty($objectCategoryIds)) {
-			if (!isset($_SESSION['current_perspective'])) unset($_SESSION['current_perspective']);
-			foreach ($objectCategoryIds as $categId) {
-				// If category is inside $prefs['areas_root']
-				if (in_array($categId, $descendants)) {
-					$area = $this->getAreaByCategId($categId);
+        $objectPerspective = 0;
+        if (! empty($objectCategoryIds)) {
+            if (! isset($_SESSION['current_perspective'])) {
+                unset($_SESSION['current_perspective']);
+            }
+            foreach ($objectCategoryIds as $categId) {
+                // If category is inside $prefs['areas_root']
+                if (in_array($categId, $descendants)) {
+                    $area = $this->getAreaByCategId($categId);
 
-					if ($area) {
-						$objectPerspective = $area['perspectives'][0]; // use 1st persp
-						break;
-					}
-				}
-			}
-			if ($objectPerspective && $objectPerspective != $_SESSION['current_perspective']) {
+                    if ($area) {
+                        $objectPerspective = $area['perspectives'][0]; // use 1st persp
+                        break;
+                    }
+                }
+            }
+            if ($objectPerspective && $objectPerspective != $_SESSION['current_perspective']) {
+                $area = $this->getAreaByPerspId($_SESSION['current_perspective']);
+                $objectArea = $this->getAreaByPerspId($objectPerspective);
 
-				$area = $this->getAreaByPerspId($_SESSION['current_perspective']);
-				$objectArea = $this->getAreaByPerspId($objectPerspective);
+                if (($area && ! $area['share_common']) || ($objectArea && $objectArea['exclusive'])) {
+                    $perspectivelib->set_perspective($objectPerspective, true);
+                    $accesslib->redirect(self::selfUrl(), '', 301);
+                }
+            }
+        }
+        if ($objectPerspective < 1 && ! empty($_SESSION['current_perspective'])) { // uncategorised objects
 
-				if (($area && !$area['share_common']) || ($objectArea && $objectArea['exclusive'])) {
-					$perspectivelib->set_perspective($objectPerspective, true);
-					$accesslib->redirect(self::selfUrl(), '', 301);
-				}
-			}
-		}
-		if ($objectPerspective < 1 && !empty($_SESSION['current_perspective'])) { // uncategorised objects
+            $area = $this->getAreaByPerspId($_SESSION['current_perspective']);
+            if ($area) {
+                if (! $area['share_common']) {
+                    $perspectivelib->set_perspective($objectPerspective, true);
+                    $accesslib->redirect(self::selfUrl(), '', 301);
+                }
+            }
+        }
+    }
 
-			$area = $this->getAreaByPerspId($_SESSION['current_perspective']);
-			if ($area) {
-				if ( !$area['share_common']) {
-					$perspectivelib->set_perspective($objectPerspective, true);
-					$accesslib->redirect(self::selfUrl(), '', 301);
-				}
-			}
-		}
-	}
+    /**
+     * Returns a full URL that was requested on current HTTP request.
+     *
+     * Inspired on \ZendOpenId\OpenId::selfUrl
+     *
+     * @return string
+     */
+    public static function selfUrl()
+    {
+        $url = '';
+        $port = '';
 
-	/**
-	 * Returns a full URL that was requested on current HTTP request.
-	 *
-	 * Inspired on \ZendOpenId\OpenId::selfUrl
-	 *
-	 * @return string
-	 */
-	public static function selfUrl()
-	{
-		$url = '';
-		$port = '';
+        if (isset($_SERVER['HTTP_HOST'])) {
+            if (($pos = strpos($_SERVER['HTTP_HOST'], ':')) === false) {
+                if (isset($_SERVER['SERVER_PORT'])) {
+                    $port = ':' . $_SERVER['SERVER_PORT'];
+                }
+                $url = $_SERVER['HTTP_HOST'];
+            } else {
+                $url = substr($_SERVER['HTTP_HOST'], 0, $pos);
+                $port = substr($_SERVER['HTTP_HOST'], $pos);
+            }
+        } elseif (isset($_SERVER['SERVER_NAME'])) {
+            $url = $_SERVER['SERVER_NAME'];
+            if (isset($_SERVER['SERVER_PORT'])) {
+                $port = ':' . $_SERVER['SERVER_PORT'];
+            }
+        }
 
-		if (isset($_SERVER['HTTP_HOST'])) {
-			if (($pos = strpos($_SERVER['HTTP_HOST'], ':')) === false) {
-				if (isset($_SERVER['SERVER_PORT'])) {
-					$port = ':' . $_SERVER['SERVER_PORT'];
-				}
-				$url = $_SERVER['HTTP_HOST'];
-			} else {
-				$url = substr($_SERVER['HTTP_HOST'], 0, $pos);
-				$port = substr($_SERVER['HTTP_HOST'], $pos);
-			}
-		} elseif (isset($_SERVER['SERVER_NAME'])) {
-			$url = $_SERVER['SERVER_NAME'];
-			if (isset($_SERVER['SERVER_PORT'])) {
-				$port = ':' . $_SERVER['SERVER_PORT'];
-			}
-		}
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+            $url = 'https://' . $url;
+            if ($port == ':443') {
+                $port = '';
+            }
+        } else {
+            $url = 'http://' . $url;
+            if ($port == ':80') {
+                $port = '';
+            }
+        }
 
-		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-			$url = 'https://' . $url;
-			if ($port == ':443') {
-				$port = '';
-			}
-		} else {
-			$url = 'http://' . $url;
-			if ($port == ':80') {
-				$port = '';
-			}
-		}
+        $url .= $port;
+        if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
+            $url .= $_SERVER['HTTP_X_REWRITE_URL'];
+        } elseif (isset($_SERVER['REQUEST_URI'])) {
+            $url .= $_SERVER['REQUEST_URI'];
+        } elseif (isset($_SERVER['SCRIPT_URL'])) {
+            $url .= $_SERVER['SCRIPT_URL'];
+        } elseif (isset($_SERVER['REDIRECT_URL'])) {
+            $url .= $_SERVER['REDIRECT_URL'];
+        } elseif (isset($_SERVER['PHP_SELF'])) {
+            $url .= $_SERVER['PHP_SELF'];
+        } elseif (isset($_SERVER['SCRIPT_NAME'])) {
+            $url .= $_SERVER['SCRIPT_NAME'];
+            if (isset($_SERVER['PATH_INFO'])) {
+                $url .= $_SERVER['PATH_INFO'];
+            }
+        }
+        return $url;
+    }
 
-		$url .= $port;
-		if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
-			$url .= $_SERVER['HTTP_X_REWRITE_URL'];
-		} elseif (isset($_SERVER['REQUEST_URI'])) {
-			$url .= $_SERVER['REQUEST_URI'];
-		} elseif (isset($_SERVER['SCRIPT_URL'])) {
-			$url .= $_SERVER['SCRIPT_URL'];
-		} elseif (isset($_SERVER['REDIRECT_URL'])) {
-			$url .= $_SERVER['REDIRECT_URL'];
-		} elseif (isset($_SERVER['PHP_SELF'])) {
-			$url .= $_SERVER['PHP_SELF'];
-		} elseif (isset($_SERVER['SCRIPT_NAME'])) {
-			$url .= $_SERVER['SCRIPT_NAME'];
-			if (isset($_SERVER['PATH_INFO'])) {
-				$url .= $_SERVER['PATH_INFO'];
-			}
-		}
-		return $url;
-	}
+    public function getAreaByCategId($categId, $enabled = true)
+    {
+        foreach ($this->areasArray as $area) {
+            if ($area['enabled'] == $enabled && $categId == $area['categId']) {
+                return $area;
+            }
+        }
+        return [];
+    }
 
-	public function getAreaByCategId($categId, $enabled = true)
-	{
-		foreach ($this->areasArray as $area) {
-			if ($area['enabled'] == $enabled && $categId == $area['categId']) {
-				return $area;
-			}
-		}
-		return array();
-	}
+    public function getAreaByPerspId($perspid, $enabled = true)
+    {
+        foreach ($this->areasArray as $area) {
+            if ($area['enabled'] == $enabled && in_array($perspid, $area['perspectives'])) {
+                return $area;
+            }
+        }
+        return [];
+    }
 
-	public function getAreaByPerspId($perspid, $enabled = true)
-	{
-		foreach ($this->areasArray as $area) {
-			if ($area['enabled'] == $enabled && in_array($perspid, $area['perspectives'])) {
-				return $area;
-			}
-		}
-		return array();
-	}
+    /**
+     * @param bool $reload  force reload from database
+     *
+     * Sets up a cached version of the table with proper arrays and bools
+     */
 
-	/**
-	 * @param bool $reload	force reload from database
-	 *
-	 * Sets up a cached version of the table with proper arrays and bools
-	 */
+    private function cacheAreas($reload = false)
+    {
+        if ($reload || empty($this->areasArray)) {
+            $this->areasArray = [];
+            $res = $this->areas->fetchAll($this->areas->all());
+            foreach ($res as & $row) {
+                $row['perspectives'] = unserialize($row['perspectives']);
+                $row['enabled'] = ($row['enabled'] === 'y');
+                $row['exclusive'] = ($row['exclusive'] === 'y');
+                $row['share_common'] = ($row['share_common'] === 'y');
+            }
+            $this->areasArray = $res;
+        }
+    }
 
-	private function cacheAreas($reload = false)
-	{
-		if ($reload || empty($this->areasArray)) {
-			$this->areasArray = array();
-			$res = $this->areas->fetchAll($this->areas->all());
-			foreach ($res as & $row) {
-				$row['perspectives'] = unserialize($row['perspectives']);
-				$row['enabled'] = ($row['enabled'] === 'y');
-				$row['exclusive'] = ($row['exclusive'] === 'y');
-				$row['share_common'] = ($row['share_common'] === 'y');
-			}
-			$this->areasArray = $res;
-		}
-	}
+    function update_areas()
+    {
+        global $prefs;
+        $this->areas->deleteMultiple([]);   // empty areas table before rebuilding
+        $areas = [];
+        $descendants = $this->get_category_descendants($prefs['areas_root']);
+        if (is_array($descendants)) {
+            foreach ($descendants as $item) { // it only should be just one perspective assigned
+                $areas[$item] = [];
+            }
+            $result = $this->fetchAll("SELECT `perspectiveId`, `pref`, `value` FROM tiki_perspective_preferences WHERE pref = 'category_jail'", []);
+            if (count($result) != 0) {
+                foreach ($result as $row) {
+                    $categs = unserialize($row['value']);
+                    foreach ($categs as $item) {
+                        if (array_key_exists($item, $areas)) {
+                            $areas[$item][] = $row['perspectiveId'];
+                        }
+                    }
+                }
 
-	function update_areas()
-	{
-		global $prefs;
-		$this->areas->deleteMultiple([]);	// empty areas table before rebuilding
-		$areas = array();
-		$descendants = $this->get_category_descendants($prefs['areas_root']);
-		if (is_array($descendants)) {
-			foreach ($descendants as $item) { // it only should be just one perspective assigned
-				$areas[$item] = array();
-			}
-			$result = $this->fetchAll("SELECT `perspectiveId`, `pref`, `value` FROM tiki_perspective_preferences WHERE pref = 'category_jail'", array());
-			if (count($result) != 0) {
-				foreach ($result as $row) {
-					$categs = unserialize($row['value']);
-					foreach ($categs as $item) {
-						if (array_key_exists($item, $areas)) {
-							$areas[$item][] = $row['perspectiveId'];
-						}
-					}
-				}
+                foreach (array_filter($areas) as $key => $item) { // don't bother with categs with no perspectives
+                    $data = [];
+                    // update checkboxes from form
+                    $data['enabled'] = ! empty($_REQUEST['enabled'][$key]) ? 'y' : 'n';
+                    $data['exclusive'] = ! empty($_REQUEST['exclusive'][$key]) ? 'y' : 'n';
+                    $data['share_common'] = ! empty($_REQUEST['share_common'][$key]) ? 'y' : 'n';
 
-				foreach (array_filter($areas) as $key => $item) { // don't bother with categs with no perspectives
-					$data = array();
-					// update checkboxes from form
-					$data['enabled'] = !empty($_REQUEST['enabled'][$key]) ? 'y' : 'n';
-					$data['exclusive'] = !empty($_REQUEST['exclusive'][$key]) ? 'y' : 'n';
-					$data['share_common'] = !empty($_REQUEST['share_common'][$key]) ? 'y' : 'n';
+                    $this->bind_area($key, $item, $data);
+                }
+            } else {
+                return tra("No category jail set in any perspective.");
+            }
+            $this->cacheAreas(true); // recache the whole table
+            return true;
+        } else {
+            return tra("Areas root category ID") . " " . tra("is invalid.");
+        }
+    }
 
-					$this->bind_area($key, $item, $data);
-				}
-			} else {
-				return tra("No category jail set in any perspective.");
-			}
-			$this->cacheAreas(true); // recache the whole table
-			return true;
-		} else {
-			return tra("Areas root category ID") . " " . tra("is invalid.");
-		}
-	}
+    function bind_area($categId, $perspectiveIds, $data = [])
+    {
+        $perspectiveIds = (array)$perspectiveIds;
+        $conditions = ['categId' => $categId];
+        $data['perspectives'] = serialize($perspectiveIds);
 
-	function bind_area($categId, $perspectiveIds, $data = array())
-	{
-		$perspectiveIds = (array)$perspectiveIds;
-		$conditions = array('categId' => $categId);
-		$data['perspectives'] = serialize($perspectiveIds);
-
-		if ($this->areas->fetchCount($conditions)) {
-
-			$this->areas->update($data, $conditions);
-		} else {
-			$this->areas->insert(array_merge($data, $conditions));
-		}
-	}
+        if ($this->areas->fetchCount($conditions)) {
+            $this->areas->update($data, $conditions);
+        } else {
+            $this->areas->insert(array_merge($data, $conditions));
+        }
+    }
 } // class end
 
 /*-----------------------------------------------
-+++ Description of Perspective Binder / Areas +++ 
++++ Description of Perspective Binder / Areas +++
 -------------------------------------------------
 
 Much of this will become out of date for tiki 10 (jb)
@@ -266,7 +266,7 @@ The id of the parent category you can type in the text field areas root id in th
 Step 3 of 5
 -----------
 
-Please activate "categories used in templates" in your Tiki installation: 
+Please activate "categories used in templates" in your Tiki installation:
 Admin->Categories check tick box "categories used in templates.
 
 To satisfy this step feature_areas is set to depend on categories_used_in_tpl.
@@ -299,7 +299,7 @@ Now you can combine very specific content, that mainly makes sense in a specific
 Examples of usage would be:
 
 * Project related content, that only should be visible in the perspective and context of the specific project.
-* Subwebsites of local groups 
+* Subwebsites of local groups
 a) that should not appear on the national website
 b) whith content that automatically should be adressed to the right local website without cryptical urls, even if the same Tiki installation is shared for several groups
 * News Websites with specific regional or local related content and common content in the same Tiki installation

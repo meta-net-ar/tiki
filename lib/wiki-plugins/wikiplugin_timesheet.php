@@ -7,33 +7,35 @@
 
 function wikiplugin_timesheet_info()
 {
-	return array(
-		'name' => tra('TimeSheet'),
-		'documentation' => 'Timesheet',
-		'description' => tra('Embed a timesheet into a page'),
-		'prefs' => array('wikiplugin_timesheet', 'feature_time_sheet'),
-		'body' => tra('text'),
-		'iconname' => 'table',
-		'introduced' => 9,
-		'tags' => array( 'basic' ),
-		'params' => array(
-		),
-	);
+    return [
+        'name' => tra('TimeSheet'),
+        'documentation' => 'Timesheet',
+        'description' => tra('Embed a timesheet into a page'),
+        'prefs' => ['wikiplugin_timesheet', 'feature_time_sheet'],
+        'body' => tra('text'),
+        'iconname' => 'table',
+        'introduced' => 9,
+        'tags' => [ 'basic' ],
+        'params' => [
+        ],
+    ];
 }
 
 function wikiplugin_timesheet($data, $params)
 {
-	global $tikilib, $tiki_p_view_trackers, $tiki_p_create_tracker_items;
-	extract($params, EXTR_SKIP);
+    global $tikilib, $tiki_p_view_trackers, $tiki_p_create_tracker_items;
+    extract($params, EXTR_SKIP);
 
-	if ( $tiki_p_view_trackers != "y" || $tiki_p_create_tracker_items != "y") return "";
+    if ($tiki_p_view_trackers != "y" || $tiki_p_create_tracker_items != "y") {
+        return "";
+    }
 
-	TikiLib::lib("header")
-		->add_cssfile("vendor_bundled/vendor/jquery/jtrack/css/jtrack.css")
-		->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/domcached-0.1-jquery.js")
-		->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/jtrack.js")
-		->add_jq_onready(
-			"jTask.init();"
-		);
-	return "~np~" . TikiLib::lib("smarty")->fetch('wiki-plugins/wikiplugin_timesheet.tpl') . '~/np~';
+    TikiLib::lib("header")
+        ->add_cssfile("vendor_bundled/vendor/jquery/jtrack/css/jtrack.css")
+        ->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/domcached-0.1-jquery.js")
+        ->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/jtrack.js")
+        ->add_jq_onready(
+            "jTask.init();"
+        );
+    return "~np~" . TikiLib::lib("smarty")->fetch('wiki-plugins/wikiplugin_timesheet.tpl') . '~/np~';
 }

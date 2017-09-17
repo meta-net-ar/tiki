@@ -16,13 +16,13 @@ $access->check_permission('tiki_p_admin');
 
 //check if profile is created
 if ($trklib->get_tracker_by_name("Invoice Items") < 1) {
-	$smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
-	$smarty->display("error.tpl");
-	die;
+    $smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
+    $smarty->display("error.tpl");
+    die;
 }
 
 $headerlib->add_jq_onready(
-	"$('.ClientName').each(function(i) {
+    "$('.ClientName').each(function(i) {
 					$(this)
 						.click(function() {
 							$('.ClientDetails').eq(i).toggle('fast');

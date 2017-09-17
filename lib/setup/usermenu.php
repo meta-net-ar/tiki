@@ -6,18 +6,18 @@
 // $Id$
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
-	die('This script may only be included.');
+    die('This script may only be included.');
 }
 
 // User menus
-if ( $user ) {
-	if ( ! isset($_SESSION['usermenu']) ) {
-		include_once('lib/usermenu/usermenulib.php');
-		$user_menus = $usermenulib->list_usermenus($user, 0, -1, 'position_asc', '');
-		$smarty->assign('usr_user_menus', $user_menus['data']);
-		$_SESSION['usermenu'] = $user_menus['data'];
-	} else {
-		$user_menus = $_SESSION['usermenu'];
-		$smarty->assign('usr_user_menus', $user_menus);
-	}
+if ($user) {
+    if (! isset($_SESSION['usermenu'])) {
+        include_once('lib/usermenu/usermenulib.php');
+        $user_menus = $usermenulib->list_usermenus($user, 0, -1, 'position_asc', '');
+        $smarty->assign('usr_user_menus', $user_menus['data']);
+        $_SESSION['usermenu'] = $user_menus['data'];
+    } else {
+        $user_menus = $_SESSION['usermenu'];
+        $smarty->assign('usr_user_menus', $user_menus);
+    }
 }

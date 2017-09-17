@@ -7,27 +7,26 @@
 
 class Search_GlobalSource_SearchableSource implements Search_GlobalSource_Interface
 {
-	function getProvidedFields()
-	{
-		return array('searchable');
-	}
+    function getProvidedFields()
+    {
+        return ['searchable'];
+    }
 
-	function getGlobalFields()
-	{
-		return array();
-	}
+    function getGlobalFields()
+    {
+        return [];
+    }
 
-	function getData($objectType, $objectId, Search_Type_Factory_Interface $typeFactory, array $data = array())
-	{
-		// Unless specified by content source explicitly, everything is searchable
+    function getData($objectType, $objectId, Search_Type_Factory_Interface $typeFactory, array $data = [])
+    {
+        // Unless specified by content source explicitly, everything is searchable
 
-		if (isset($data['searchable'])) {
-			return [];
-		}
+        if (isset($data['searchable'])) {
+            return [];
+        }
 
-		return array(
-			'searchable' => $typeFactory->identifier('y'),
-		);
-	}
+        return [
+            'searchable' => $typeFactory->identifier('y'),
+        ];
+    }
 }
-

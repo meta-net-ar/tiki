@@ -9,43 +9,42 @@ namespace Tiki\FileGallery\FileWrapper;
 
 class PreloadedContent implements WrapperInterface
 {
-	private $data;
+    private $data;
 
-	private $temporaryFile = false;
+    private $temporaryFile = false;
 
-	function __construct($data)
-	{
-		$this->data = $data;
-	}
+    function __construct($data)
+    {
+        $this->data = $data;
+    }
 
-	function __destruct()
-	{
-		if (false !== $this->temporaryFile) {
-			\unlink($this->temporaryFile);
-		}
-	}
+    function __destruct()
+    {
+        if (false !== $this->temporaryFile) {
+            \unlink($this->temporaryFile);
+        }
+    }
 
-	function getReadableFile()
-	{
-		if (false !== $this->temporaryFile) {
-			return $this->temporaryFile;
-		}
+    function getReadableFile()
+    {
+        if (false !== $this->temporaryFile) {
+            return $this->temporaryFile;
+        }
 
-		$sIniUploadTmpDir = \ini_get('upload_tmp_dir');
-		if (!empty($sIniUploadTmpDir)) {
-			$sTmpDir = \ini_get('upload_tmp_dir');
-		} else {
-			$sTmpDir = '/tmp';
-		}
+        $sIniUploadTmpDir = \ini_get('upload_tmp_dir');
+        if (! empty($sIniUploadTmpDir)) {
+            $sTmpDir = \ini_get('upload_tmp_dir');
+        } else {
+            $sTmpDir = '/tmp';
+        }
 
-		$this->temporaryFile = $tmpfname = \tempnam($sTmpDir, 'wiki_');
-		@\file_put_contents($tmpfname, $this->data);
-		return $tmpfname;
-	}
+        $this->temporaryFile = $tmpfname = \tempnam($sTmpDir, 'wiki_');
+        @\file_put_contents($tmpfname, $this->data);
+        return $tmpfname;
+    }
 
-	function getContents()
-	{
-		return $this->data;
-	}
+    function getContents()
+    {
+        return $this->data;
+    }
 }
-

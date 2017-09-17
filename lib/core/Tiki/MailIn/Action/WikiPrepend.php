@@ -6,24 +6,24 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 use TikiLib;
 
 class WikiPrepend extends WikiPut
 {
-	function getName()
-	{
-		return tr('Wiki Prepend');
-	}
+    function getName()
+    {
+        return tr('Wiki Prepend');
+    }
 
-	protected function handleContent($data, $info)
-	{
-		if ($info) {
-			return $data['body'] . "\n" . $info['data'];
-		} else {
-			return $data['body'];
-		}
-	}
+    protected function handleContent($data, $info)
+    {
+        if ($info) {
+            return $data['body'] . "\n" . $info['data'];
+        } else {
+            return $data['body'];
+        }
+    }
 }
-

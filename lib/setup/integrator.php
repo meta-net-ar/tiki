@@ -6,15 +6,15 @@
 // $Id$
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
-	die('This script may only be included.');
+    die('This script may only be included.');
 }
 
 /*
  * Check location for Tiki Integrator script and setup aux CSS file if needed by repository
  */
 include_once('lib/integrator/integrator.php');
-if ( (strpos($_SERVER['REQUEST_URI'], 'tiki-integrator.php') != 0) && isset($_REQUEST['repID']) ) {
-	// Create instance of integrator
-	$integrator = new TikiIntegrator($dbTiki);
-	$headerlib->add_cssfile($integrator->get_rep_css($_REQUEST['repID']), 20);
+if ((strpos($_SERVER['REQUEST_URI'], 'tiki-integrator.php') != 0) && isset($_REQUEST['repID'])) {
+    // Create instance of integrator
+    $integrator = new TikiIntegrator($dbTiki);
+    $headerlib->add_cssfile($integrator->get_rep_css($_REQUEST['repID']), 20);
 }

@@ -9,15 +9,15 @@ namespace Tiki\Recommendation\Input;
 
 class UserInput
 {
-	private $user;
+    private $user;
 
-	function __construct($username)
-	{
-		$this->user = $username;
-	}
+    function __construct($username)
+    {
+        $this->user = $username;
+    }
 
-	function getUser()
-	{
-		return $this->user;
-	}
+    function getUser()
+    {
+        return $this->user;
+    }
 }

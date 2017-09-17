@@ -7,11 +7,10 @@
 
 function smarty_function_feedback($params, $smarty)
 {
-	$result = Feedback::get();
-	if (is_array($result)) {
-		$smarty->assign('tikifeedback', $result);
-	}
-	$ret = $smarty->fetch('feedback/default.tpl');
-	return $ret;
+    $result = Feedback::get();
+    if (is_array($result)) {
+        $smarty->assign('tikifeedback', $result);
+    }
+    $ret = $smarty->fetch('feedback/default.tpl');
+    return $ret;
 }
-

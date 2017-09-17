@@ -18,199 +18,207 @@ use Search_Expr_ExplicitPhrase as ExplicitPhrase;
 
 class Search_Elastic_RescoreQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
-	function testSimpleQuery()
-	{
-		$builder = new QueryBuilder;
+    function testSimpleQuery()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(new ExplicitPhrase('Hello', 'plaintext', 'contents', 1.5));
+        $query = $builder->build(new ExplicitPhrase('Hello', 'plaintext', 'contents', 1.5));
 
-		$this->assertEquals(
-			['rescore' => [
-				'window_size' => 50,
-				'query' => [
-					'rescore_query' => ['bool' => ['should' => [
-						["match_phrase" => [
-							"contents" => ["query" => "hello", "boost" => 1.5, 'slop' => 50],
-						]],
-					]]],
-				]
-			]], $query
-		);
-	}
+        $this->assertEquals(
+            ['rescore' => [
+                'window_size' => 50,
+                'query' => [
+                    'rescore_query' => ['bool' => ['should' => [
+                        ["match_phrase" => [
+                            "contents" => ["query" => "hello", "boost" => 1.5, 'slop' => 50],
+                        ]],
+                    ]]],
+                ]
+            ]],
+            $query
+        );
+    }
 
-	function testQueryWithSinglePart()
-	{
-		$builder = new QueryBuilder;
+    function testQueryWithSinglePart()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(
-			new AndX(
-				[
-					new Token('Hello', 'plaintext', 'contents', 1.5),
-				]
-			)
-		);
+        $query = $builder->build(
+            new AndX(
+                [
+                    new Token('Hello', 'plaintext', 'contents', 1.5),
+                ]
+            )
+        );
 
-		$this->assertEquals(
-			[
-				["match_phrase" => [
-						"contents" => ["query" => "hello", "boost" => 1.5, 'slop' => 50],
-				]],
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+                ["match_phrase" => [
+                        "contents" => ["query" => "hello", "boost" => 1.5, 'slop' => 50],
+                ]],
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testBuildImplicitQuery()
-	{
-		$builder = new QueryBuilder;
+    function testBuildImplicitQuery()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(
-			new ImplicitPhrase(
-				[
-					new Token('Hello', 'plaintext', 'contents', 1.0),
-					new Token('World', 'plaintext', 'contents', 1.0),
-				]
-			)
-		);
+        $query = $builder->build(
+            new ImplicitPhrase(
+                [
+                    new Token('Hello', 'plaintext', 'contents', 1.0),
+                    new Token('World', 'plaintext', 'contents', 1.0),
+                ]
+            )
+        );
 
-		$this->assertEquals(
-			[
-				["match_phrase" => [
-						"contents" => ["query" => "hello world", "boost" => 1.0, 'slop' => 50],
-				]],
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+                ["match_phrase" => [
+                        "contents" => ["query" => "hello world", "boost" => 1.0, 'slop' => 50],
+                ]],
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testBuildOrQuery()
-	{
-		$builder = new QueryBuilder;
+    function testBuildOrQuery()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(
-			new OrX(
-				[
-					new Token('Hello', 'plaintext', 'contents', 1.0),
-					new Token('World', 'plaintext', 'contents', 1.5),
-				]
-			)
-		);
+        $query = $builder->build(
+            new OrX(
+                [
+                    new Token('Hello', 'plaintext', 'contents', 1.0),
+                    new Token('World', 'plaintext', 'contents', 1.5),
+                ]
+            )
+        );
 
-		$this->assertEquals(
-			[
-				["match_phrase" => [
-						"contents" => ["query" => "hello", "boost" => 1.0, 'slop' => 50],
-				]],
-				["match_phrase" => [
-						"contents" => ["query" => "world", "boost" => 1.5, 'slop' => 50],
-				]],
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+                ["match_phrase" => [
+                        "contents" => ["query" => "hello", "boost" => 1.0, 'slop' => 50],
+                ]],
+                ["match_phrase" => [
+                        "contents" => ["query" => "world", "boost" => 1.5, 'slop' => 50],
+                ]],
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testBuildAndQuery()
-	{
-		$builder = new QueryBuilder;
+    function testBuildAndQuery()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(
-			new AndX(
-				[
-					new Token('Hello', 'plaintext', 'contents', 1.0),
-					new Token('World', 'plaintext', 'contents', 1.5),
-				]
-			)
-		);
+        $query = $builder->build(
+            new AndX(
+                [
+                    new Token('Hello', 'plaintext', 'contents', 1.0),
+                    new Token('World', 'plaintext', 'contents', 1.5),
+                ]
+            )
+        );
 
-		// Notice how AND does not matter when ranking
-		$this->assertEquals(
-			[
-				["match_phrase" => [
-						"contents" => ["query" => "hello", "boost" => 1.0, 'slop' => 50],
-				]],
-				["match_phrase" => [
-						"contents" => ["query" => "world", "boost" => 1.5, 'slop' => 50],
-				]],
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        // Notice how AND does not matter when ranking
+        $this->assertEquals(
+            [
+                ["match_phrase" => [
+                        "contents" => ["query" => "hello", "boost" => 1.0, 'slop' => 50],
+                ]],
+                ["match_phrase" => [
+                        "contents" => ["query" => "world", "boost" => 1.5, 'slop' => 50],
+                ]],
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
 
-	function testBuildNotQuery()
-	{
-		$builder = new QueryBuilder;
+    function testBuildNotQuery()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(
-			new NotX(
-				new Token('Hello', 'plaintext', 'contents', 1.5)
-			)
-		);
+        $query = $builder->build(
+            new NotX(
+                new Token('Hello', 'plaintext', 'contents', 1.5)
+            )
+        );
 
-		$this->assertEquals(
-			[
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testFilterWithIdentifier()
-	{
-		$builder = new QueryBuilder;
+    function testFilterWithIdentifier()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(new Token('Some entry', 'identifier', 'username', 1.5));
+        $query = $builder->build(new Token('Some entry', 'identifier', 'username', 1.5));
 
-		$this->assertEquals(
-			[
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testRangeFilter()
-	{
-		$builder = new QueryBuilder;
+    function testRangeFilter()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(new Range('Hello', 'World', 'plaintext', 'title', 1.5));
+        $query = $builder->build(new Range('Hello', 'World', 'plaintext', 'title', 1.5));
 
-		$this->assertEquals(
-			[
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testInitialMatchFilter()
-	{
-		$builder = new QueryBuilder;
+    function testInitialMatchFilter()
+    {
+        $builder = new QueryBuilder;
 
-		$query = $builder->build(new Initial('Hello', 'plaintext', 'title', 1.5));
+        $query = $builder->build(new Initial('Hello', 'plaintext', 'title', 1.5));
 
-		$this->assertEquals(
-			[
-			], $query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 
-	function testMoreLikeThisQuery()
-	{
-		$builder = new QueryBuilder;
-		$builder->setDocumentReader(
-			function ($type, $object) {
-				return [
-					'object_type' => $type,
-					'object_id' => $object,
-					'contents' => 'hello world',
-				];
-			}
-		);
+    function testMoreLikeThisQuery()
+    {
+        $builder = new QueryBuilder;
+        $builder->setDocumentReader(
+            function ($type, $object) {
+                return [
+                    'object_type' => $type,
+                    'object_id' => $object,
+                    'contents' => 'hello world',
+                ];
+            }
+        );
 
-		$query = $builder->build(
-			new AndX(
-				[
-					new MoreLikeThis('wiki page', 'A'),
-				]
-			)
-		);
+        $query = $builder->build(
+            new AndX(
+                [
+                    new MoreLikeThis('wiki page', 'A'),
+                ]
+            )
+        );
 
-		$this->assertEquals(
-			[
-			],
-			$query['rescore']['query']['rescore_query']['bool']['should']
-		);
-	}
+        $this->assertEquals(
+            [
+            ],
+            $query['rescore']['query']['rescore_query']['bool']['should']
+        );
+    }
 }
-

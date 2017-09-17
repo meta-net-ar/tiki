@@ -7,21 +7,21 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 // Get list of available languages
-$languages = array();
+$languages = [];
 $langLib = TikiLib::lib('language');
 $languages = $langLib->list_languages(false, null, true);
 $smarty->assign_by_ref('languages', $languages);
 
 if (isset($_SESSION['tikifeedback'])) {
-	foreach ($_SESSION['tikifeedback'] as $item) {
-		if ($item['name'] === 'available_languages' || $item['name'] === 'restrict_language') {
-			TikiLib::lib('cache')->empty_cache('temp_cache');
-			break;
-		}
-	}
+    foreach ($_SESSION['tikifeedback'] as $item) {
+        if ($item['name'] === 'available_languages' || $item['name'] === 'restrict_language') {
+            TikiLib::lib('cache')->empty_cache('temp_cache');
+            break;
+        }
+    }
 }

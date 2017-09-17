@@ -17,31 +17,31 @@
  *
  * usage:
  * \code
- *	{accordion}
- * 		{accordion_group title="{tr}Title 1{/tr}"}tab content{/accordion_group}
- * 		{accordion_group title="{tr}Title 2{/tr}"}tab content{/accordion_group}
- *	{/accordion}
+ *  {accordion}
+ *      {accordion_group title="{tr}Title 1{/tr}"}tab content{/accordion_group}
+ *      {accordion_group title="{tr}Title 2{/tr}"}tab content{/accordion_group}
+ *  {/accordion}
  * \endcode
  */
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_block_accordion($params, $content, $smarty, &$repeat)
 {
-	global $accordion_current_group;
+    global $accordion_current_group;
 
-	if ( $repeat ) {
-		$accordion_current_group = null;
-		return;
-	} else {
-		return <<<CONTENT
+    if ($repeat) {
+        $accordion_current_group = null;
+        return;
+    } else {
+        return <<<CONTENT
 <div class="panel-group" id="$accordion_current_group">
 $content
 </div>
 CONTENT;
-	}
+    }
 }

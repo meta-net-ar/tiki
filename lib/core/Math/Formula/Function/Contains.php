@@ -7,7 +7,7 @@
 
 class Math_Formula_Function_Contains extends Math_Formula_Function
 {
-    function evaluate( $element )
+    function evaluate($element)
     {
         $reference = $this->evaluateChild($element[0]);
         $pattern = $element[1];
@@ -19,4 +19,3 @@ class Math_Formula_Function_Contains extends Math_Formula_Function
         return false;
     }
 }
-

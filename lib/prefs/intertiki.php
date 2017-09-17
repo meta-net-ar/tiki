@@ -7,26 +7,26 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 function prefs_intertiki_list()
 {
-	return [
-		'intertiki_errfile' => [
-			'name' => tra('Errors log file'),
-			'size' => 42,
-			'type' => 'text',
-			'filter' => 'text',
-			'default' => '',
-		],
-		'intertiki_logfile' => [
-			'name' => tra('Access log file'),
-			'size' => 42,
-			'type' => 'text',
-			'filter' => 'text',
-			'default' => '',
-		],
-	];
+    return [
+        'intertiki_errfile' => [
+            'name' => tra('Errors log file'),
+            'size' => 42,
+            'type' => 'text',
+            'filter' => 'text',
+            'default' => '',
+        ],
+        'intertiki_logfile' => [
+            'name' => tra('Access log file'),
+            'size' => 42,
+            'type' => 'text',
+            'filter' => 'text',
+            'default' => '',
+        ],
+    ];
 }

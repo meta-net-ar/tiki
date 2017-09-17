@@ -50,15 +50,15 @@ require_once('ValueDataType.php');
 abstract class File_iCal_Property
 {
     protected $_name;
-    protected $_params = array();
-    protected $_values = array();
+    protected $_params = [];
+    protected $_values = [];
 
-    protected $_parameters_allowed = array(); //list of allowed parameters
-    protected $_parameters_single = array();  //parameters only allowed once
-    protected $_parameters_multiple = array();//parameters allowed multiple times
-    protected $_parameters_exclusive = array(); //array of arrays containing parameters that can't coexist
-    protected $_parameters_joint = array(); //array of arrays containing parameters that must coexist
-    protected $_parameters_required = array();
+    protected $_parameters_allowed = []; //list of allowed parameters
+    protected $_parameters_single = [];  //parameters only allowed once
+    protected $_parameters_multiple = [];//parameters allowed multiple times
+    protected $_parameters_exclusive = []; //array of arrays containing parameters that can't coexist
+    protected $_parameters_joint = []; //array of arrays containing parameters that must coexist
+    protected $_parameters_required = [];
 
     protected $_value_separator;
 
@@ -71,21 +71,16 @@ abstract class File_iCal_Property
                 if (is_a($p, "File_iCal_Parameter")) {
                     if (in_array($p->getName(), $this->_parameters_allowed)) {
                         $this->_params[] = $p;
-                    }
-                    else {
+                    } else {
                         trigger_error("The parameter ".$p->getName()." is not allowed in this property type\n", E_USER_WARNING);
                     }
-
-                }
-                else {
+                } else {
                     trigger_error("Parameter passed to property is not a parameter object", E_USER_ERROR);
                 }
             }
-        }
-        else {
+        } else {
             trigger_error("2nd parameter of property constructor must be an array", E_USER_ERROR);
         }
-
     }
 
     /*
@@ -93,7 +88,8 @@ abstract class File_iCal_Property
      *
      * Can be used as a shortcut when you don't want to deal with multiple values or parameters
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->_values[0];
     }
 
@@ -102,15 +98,18 @@ abstract class File_iCal_Property
         return $this->_values;
     }
 
-    public function getParams() {
+    public function getParams()
+    {
         return $this->_params;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->_name;
     }
 
-    public function getLine() {
+    public function getLine()
+    {
         $cl = new File_iCal_ContentLine($this);
 
         $r = $cl->getLine();
@@ -119,32 +118,32 @@ abstract class File_iCal_Property
         return $r;
     }
 
-    public function getValueSeparator() {
+    public function getValueSeparator()
+    {
         return $this->_value_separator;
     }
 
 
     //this should be overwrote in child classes, if necessary
-    public function addValue($v) {
+    public function addValue($v)
+    {
         $return = false;
 
         switch (gettype($v)) {
             case "string":
-
                 $this->_values[] = new File_iCal_ValueDataType_Text($v);
                 $return = true;
                 break;
 
             default:
-
         }
 
         return $return;
-
     }
 
 
-    static public function getClassName($name) {
+    public static function getClassName($name)
+    {
         $name = strtoupper($name);
 
         switch ($name) {
@@ -291,172 +290,169 @@ abstract class File_iCal_Property
 
             default:
                 trigger_error("Unknown propert name specified", E_USER_WARNING);
-
         }
-
     }
 
 
-    static public function getProperty($name, $params, $value) {
+    public static function getProperty($name, $params, $value)
+    {
             //internally, we have already checked validity of the contentline
             $name = strtoupper($name);
 
-            switch ($name) {
-                case "BEGIN":
-                case "END":
-                    return new File_iCal_Property_NonStandard($value, $params, $name);
-                case "PRODID":
-                    return new File_iCal_Property_ProductIdentifier($value, $params);
-		case "X-WR-CALNAME":
-		    return new File_iCal_Property_NonStandard($value, $params,$name);
-                case "VERSION":
-                    return new File_iCal_Property_Version($value, $params);
+        switch ($name) {
+            case "BEGIN":
+            case "END":
+                return new File_iCal_Property_NonStandard($value, $params, $name);
+            case "PRODID":
+                return new File_iCal_Property_ProductIdentifier($value, $params);
+            case "X-WR-CALNAME":
+                return new File_iCal_Property_NonStandard($value, $params, $name);
+            case "VERSION":
+                return new File_iCal_Property_Version($value, $params);
 
-                case "CALSCALE":
-                    return new File_iCal_Property_CalendarScale($value, $params);
+            case "CALSCALE":
+                return new File_iCal_Property_CalendarScale($value, $params);
 
-                case "METHOD":
-                    return new File_iCal_Property_Method($value, $params);
+            case "METHOD":
+                return new File_iCal_Property_Method($value, $params);
 
-                case "SUMMARY":
-                    return new File_iCal_Property_Summary($value, $params);
+            case "SUMMARY":
+                return new File_iCal_Property_Summary($value, $params);
 
-                case "LOCATION":
-                    return new File_iCal_Property_Location($value, $params);
+            case "LOCATION":
+                return new File_iCal_Property_Location($value, $params);
 
-                case "DTSTART":
-                    return new File_iCal_Property_DateTimeStart($value, $params);
-		
-		case "X-WR-RELCALID":
-		    return new File_iCal_Property_NonStandard($value, $params,$name);
-                
-		case "UID":
-                    return new File_iCal_Property_UID($value, $params);
+            case "DTSTART":
+                return new File_iCal_Property_DateTimeStart($value, $params);
 
-                case "DTSTAMP":
-                    return new File_iCal_Property_DateTimeStamp($value, $params);
+            case "X-WR-RELCALID":
+                return new File_iCal_Property_NonStandard($value, $params, $name);
 
-                case "COMPLETED":
-                    return new File_iCal_Property_DateTimeCompleted($value, $params);
+            case "UID":
+                return new File_iCal_Property_UID($value, $params);
 
-                case "SEQUENCE":
-                    return new File_iCal_Property_SequenceNumber($value, $params);
+            case "DTSTAMP":
+                return new File_iCal_Property_DateTimeStamp($value, $params);
 
-                case "STATUS":
-                    return new File_iCal_Property_Status($value, $params);
+            case "COMPLETED":
+                return new File_iCal_Property_DateTimeCompleted($value, $params);
 
-                case "DESCRIPTION":
-                    return new File_iCal_Property_Description($value, $params);
+            case "SEQUENCE":
+                return new File_iCal_Property_SequenceNumber($value, $params);
 
-                case "EXDATE":
-                    return new File_iCal_Property_ExceptionDateTimes($value, $params);
+            case "STATUS":
+                return new File_iCal_Property_Status($value, $params);
 
-                case "RRULE":
-                    return new File_iCal_Property_RecurrenceRule($value, $params);
-		case "X-WR-TIMEZONE":
-		    return new File_iCal_Property_NonStandard($value, $params,$name);
-                case "TZID":
-                    return new File_iCal_Property_TimeZoneIdentifier($value, $params);
+            case "DESCRIPTION":
+                return new File_iCal_Property_Description($value, $params);
 
-                case "LAST-MODIFIED":
-                    return new File_iCal_Property_LastModified($value, $params);
+            case "EXDATE":
+                return new File_iCal_Property_ExceptionDateTimes($value, $params);
 
-                case "RECURRENCE-ID":
-                    return new File_iCal_Property_RecurrenceID($value, $params);
+            case "RRULE":
+                return new File_iCal_Property_RecurrenceRule($value, $params);
+            case "X-WR-TIMEZONE":
+                return new File_iCal_Property_NonStandard($value, $params, $name);
+            case "TZID":
+                return new File_iCal_Property_TimeZoneIdentifier($value, $params);
 
-                case "ATTACH":
-                    return new File_iCal_Property_Attachment($value, $params);
+            case "LAST-MODIFIED":
+                return new File_iCal_Property_LastModified($value, $params);
 
-                case "CATEGORIES":
-                    return new File_iCal_Property_Categories($value, $params);
+            case "RECURRENCE-ID":
+                return new File_iCal_Property_RecurrenceID($value, $params);
 
-                case "CLASS":
-                    return new File_iCal_Property_Classification($value, $params);
+            case "ATTACH":
+                return new File_iCal_Property_Attachment($value, $params);
 
-                case "COMMENT":
-                    return new File_iCal_Property_Comment($value, $params);
+            case "CATEGORIES":
+                return new File_iCal_Property_Categories($value, $params);
 
-                case "GEO":
-                    return new File_iCal_Property_GeographicPosition($value, $params);
+            case "CLASS":
+                return new File_iCal_Property_Classification($value, $params);
 
-                case "PERCENT-COMPLETE":
-                    return new File_iCal_Property_PercentComplete($value, $params);
+            case "COMMENT":
+                return new File_iCal_Property_Comment($value, $params);
 
-                case "PRIORITY":
-                    return new File_iCal_Property_Priority($value, $params);
+            case "GEO":
+                return new File_iCal_Property_GeographicPosition($value, $params);
 
-                case "RESOURCES":
-                    return new File_iCal_Property_Resources($value, $params);
+            case "PERCENT-COMPLETE":
+                return new File_iCal_Property_PercentComplete($value, $params);
 
-                case "DTEND":
-                    return new File_iCal_Property_DateTimeEnd($value, $params);
+            case "PRIORITY":
+                return new File_iCal_Property_Priority($value, $params);
 
-                case "DUE":
-                    return new File_iCal_Property_DateTimeDue($value, $params);
+            case "RESOURCES":
+                return new File_iCal_Property_Resources($value, $params);
 
-                case "DURATION":
-                    return new File_iCal_Property_Duration($value, $params);
+            case "DTEND":
+                return new File_iCal_Property_DateTimeEnd($value, $params);
 
-                case "FREEBUSY":
-                    return new File_iCal_Property_FreeBusyTime($value, $params);
+            case "DUE":
+                return new File_iCal_Property_DateTimeDue($value, $params);
 
-                case "TRANSP":
-                    return new File_iCal_Property_TimeTransparency($value, $params);
+            case "DURATION":
+                return new File_iCal_Property_Duration($value, $params);
 
-                case "TZNAME":
-                    return new File_iCal_Property_TimeZoneName($value, $params);
+            case "FREEBUSY":
+                return new File_iCal_Property_FreeBusyTime($value, $params);
 
-                case "TZOFFSETFROM":
-                    return new File_iCal_Property_TimeZoneOffsetFrom($value, $params);
+            case "TRANSP":
+                return new File_iCal_Property_TimeTransparency($value, $params);
 
-                case "TZOFFSETTO":
-                    return new File_iCal_Property_TimeZoneOffsetTo($value, $params);
+            case "TZNAME":
+                return new File_iCal_Property_TimeZoneName($value, $params);
 
-                case "TZURL":
-                    return new File_iCal_Property_TimeZoneURL($value, $params);
+            case "TZOFFSETFROM":
+                return new File_iCal_Property_TimeZoneOffsetFrom($value, $params);
 
-                case "ATTENDEE":
-                    return new File_iCal_Property_Attendee($value, $params);
+            case "TZOFFSETTO":
+                return new File_iCal_Property_TimeZoneOffsetTo($value, $params);
 
-                case "CONTACT":
-                    return new File_iCal_Property_Contact($value, $params);
+            case "TZURL":
+                return new File_iCal_Property_TimeZoneURL($value, $params);
 
-                case "ORGANIZER":
-                    return new File_iCal_Property_Organizer($value, $params);
+            case "ATTENDEE":
+                return new File_iCal_Property_Attendee($value, $params);
 
-                case "RELATED-TO":
-                    return new File_iCal_Property_RelatedTo($value, $params);
+            case "CONTACT":
+                return new File_iCal_Property_Contact($value, $params);
 
-                case "URL":
-                    return new File_iCal_Property_URL($value, $params);
+            case "ORGANIZER":
+                return new File_iCal_Property_Organizer($value, $params);
 
-                case "EXRULE":
-                    return new File_iCal_Property_ExceptionRule($value, $params);
+            case "RELATED-TO":
+                return new File_iCal_Property_RelatedTo($value, $params);
 
-                case "RDATE":
-                    return new File_iCal_Property_RecurrenceDateTimes($value, $params);
+            case "URL":
+                return new File_iCal_Property_URL($value, $params);
 
-                case "ACTION":
-                    return new File_iCal_Property_Action($value, $params);
+            case "EXRULE":
+                return new File_iCal_Property_ExceptionRule($value, $params);
 
-                case "REPEAT":
-                    return new File_iCal_Property_RepeatCount($value, $params);
+            case "RDATE":
+                return new File_iCal_Property_RecurrenceDateTimes($value, $params);
 
-                case "TRIGGER":
-                    return new File_iCal_Property_Trigger($value, $params);
+            case "ACTION":
+                return new File_iCal_Property_Action($value, $params);
 
-                case "CREATED":
-                    return new File_iCal_Property_DateTimeCreated($value, $params);
+            case "REPEAT":
+                return new File_iCal_Property_RepeatCount($value, $params);
 
-                case "REQUEST-STATUS":
-                    return new File_iCal_Property_RequestStatus($value, $params);
+            case "TRIGGER":
+                return new File_iCal_Property_Trigger($value, $params);
 
-                default:
+            case "CREATED":
+                return new File_iCal_Property_DateTimeCreated($value, $params);
 
-                    echo "Cannot get $name property yet\n";
+            case "REQUEST-STATUS":
+                return new File_iCal_Property_RequestStatus($value, $params);
 
-            };
-        }
+            default:
+                echo "Cannot get $name property yet\n";
+        };
+    }
 }
 
 /**
@@ -467,7 +463,8 @@ abstract class File_iCal_Property
  */
 class File_iCal_Property_CalendarScale extends File_iCal_Property
 {
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
 
         $this->_name = "CALSCALE";
@@ -485,13 +482,13 @@ class File_iCal_Property_CalendarScale extends File_iCal_Property
  */
 class File_iCal_Property_Method extends File_iCal_Property
 {
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
         $this->_name = "METHOD";
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -502,14 +499,13 @@ class File_iCal_Property_Method extends File_iCal_Property
  */
 class File_iCal_Property_ProductIdentifier extends File_iCal_Property
 {
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
         $this->_name = "PRODID";
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
-
 }
 
 /**
@@ -520,13 +516,13 @@ class File_iCal_Property_ProductIdentifier extends File_iCal_Property
  */
 class File_iCal_Property_Version extends File_iCal_Property
 {
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
         $this->_name = "VERSION";
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -537,17 +533,17 @@ class File_iCal_Property_Version extends File_iCal_Property
  */
 class File_iCal_Property_NonStandard extends File_iCal_Property
 {
-    public function __construct($value, $params, $name) {
+    public function __construct($value, $params, $name)
+    {
         parent::__construct($value, $params);
         $this->_name = $name;
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
-
     }
 
-    public function getValue() {
+    public function getValue()
+    {
         return $this->_values[0]->getValue();
     }
-
 }
 
 
@@ -559,8 +555,8 @@ class File_iCal_Property_NonStandard extends File_iCal_Property
  */
 class File_iCal_Property_Attachment extends File_iCal_Property
 {
-    protected $_parameters_single = array("ENCODING", "VALUE", "FMTTYPE");
-    protected $_parameters_multiple = array("X-");
+    protected $_parameters_single = ["ENCODING", "VALUE", "FMTTYPE"];
+    protected $_parameters_multiple = ["X-"];
 
     public function __construct($value, $params)
     {
@@ -579,13 +575,10 @@ class File_iCal_Property_Attachment extends File_iCal_Property
 
         if ($binary) {
             $this->_values[] = new File_iCal_ValueDataType_Binary($value);
-        }
-        else {
+        } else {
             $this->_values[] = new File_iCal_ValueDataType_URI($value);
         }
-
     }
-
 }
 
 /**
@@ -596,8 +589,8 @@ class File_iCal_Property_Attachment extends File_iCal_Property
  */
 class File_iCal_Property_Categories extends File_iCal_Property
 {
-    protected $_parameters_single = array("LANGUAGE");
-    protected $_parameters_multiple = array("X-");
+    protected $_parameters_single = ["LANGUAGE"];
+    protected $_parameters_multiple = ["X-"];
 
     public function __construct($value, $params)
     {
@@ -606,7 +599,6 @@ class File_iCal_Property_Categories extends File_iCal_Property
 
         //there can be multiple categories specified!!!
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
-
     }
 }
 
@@ -618,15 +610,14 @@ class File_iCal_Property_Categories extends File_iCal_Property
  */
 class File_iCal_Property_Classification extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
         parent::__construct($value, $params);
         $this->_name = "CLASS";
 
-        switch (strtoupper($value))
-        {
+        switch (strtoupper($value)) {
             case "PUBLIC":
             case "PRIVATE":
             case "CONFIDENTIAL":
@@ -634,13 +625,9 @@ class File_iCal_Property_Classification extends File_iCal_Property
                 break;
 
             default:
-               trigger_error("Classification property encountered an unknown value", E_USER_WARNING);
+                trigger_error("Classification property encountered an unknown value", E_USER_WARNING);
         }
-
-
     }
-
-
 }
 
 
@@ -652,18 +639,15 @@ class File_iCal_Property_Classification extends File_iCal_Property
  */
 class File_iCal_Property_Comment extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
         parent::__construct($value, $params);
         $this->_name = "COMMENT";
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
-
     }
-
-
 }
 
 /**
@@ -674,7 +658,7 @@ class File_iCal_Property_Comment extends File_iCal_Property
  */
 class File_iCal_Property_Description extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
 
     public function __construct($value, $params)
     {
@@ -683,7 +667,6 @@ class File_iCal_Property_Description extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -694,7 +677,7 @@ class File_iCal_Property_Description extends File_iCal_Property
  */
 class File_iCal_Property_GeographicPosition extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -703,7 +686,6 @@ class File_iCal_Property_GeographicPosition extends File_iCal_Property
 
         trigger_error("GEO property is not yet supported", E_USER_WARNING);
     }
-
 }
 
 /**
@@ -714,8 +696,8 @@ class File_iCal_Property_GeographicPosition extends File_iCal_Property
  */
 class File_iCal_Property_Location extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -724,7 +706,6 @@ class File_iCal_Property_Location extends File_iCal_Property
 
         $v = $value;
         $this->_values[] = new File_iCal_ValueDataType_Text($v);
-
     }
 }
 
@@ -736,7 +717,7 @@ class File_iCal_Property_Location extends File_iCal_Property
  */
 class File_iCal_Property_PercentComplete extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -745,7 +726,6 @@ class File_iCal_Property_PercentComplete extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Integer($v);
     }
-
 }
 
 /**
@@ -756,7 +736,7 @@ class File_iCal_Property_PercentComplete extends File_iCal_Property
  */
 class File_iCal_Property_Priority extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -765,7 +745,6 @@ class File_iCal_Property_Priority extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Integer($value);
     }
-
 }
 
 /**
@@ -776,8 +755,8 @@ class File_iCal_Property_Priority extends File_iCal_Property
  */
 class File_iCal_Property_Resources extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -787,7 +766,6 @@ class File_iCal_Property_Resources extends File_iCal_Property
         //multiple resources can be specified!
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -798,7 +776,7 @@ class File_iCal_Property_Resources extends File_iCal_Property
  */
 class File_iCal_Property_Status extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -806,7 +784,6 @@ class File_iCal_Property_Status extends File_iCal_Property
         $this->_name = "STATUS";
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -817,8 +794,8 @@ class File_iCal_Property_Status extends File_iCal_Property
  */
 class File_iCal_Property_Summary extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -836,16 +813,15 @@ class File_iCal_Property_Summary extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeCompleted extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
         $this->_name = "COMPLETED";
 
         $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
-
     }
-
 }
 
 /**
@@ -856,8 +832,8 @@ class File_iCal_Property_DateTimeCompleted extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeEnd extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -876,14 +852,10 @@ class File_iCal_Property_DateTimeEnd extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -894,8 +866,8 @@ class File_iCal_Property_DateTimeEnd extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeDue extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -915,14 +887,10 @@ class File_iCal_Property_DateTimeDue extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -933,8 +901,8 @@ class File_iCal_Property_DateTimeDue extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeStart extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -953,11 +921,9 @@ class File_iCal_Property_DateTimeStart extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
     }
 }
 
@@ -969,7 +935,7 @@ class File_iCal_Property_DateTimeStart extends File_iCal_Property
  */
 class File_iCal_Property_Duration extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -978,7 +944,6 @@ class File_iCal_Property_Duration extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Duration($value);
     }
-
 }
 
 /**
@@ -989,8 +954,8 @@ class File_iCal_Property_Duration extends File_iCal_Property
  */
 class File_iCal_Property_FreeBusyTime extends File_iCal_Property
 {
-    protected $_parameters_single = array("FBTYPE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["FBTYPE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -998,9 +963,7 @@ class File_iCal_Property_FreeBusyTime extends File_iCal_Property
         $this->_name = "FREEBUSY";
 
         $this->_values[] = new File_iCal_ValueDataType_PeriodOfTime($value);
-
     }
-
 }
 
 /**
@@ -1011,7 +974,7 @@ class File_iCal_Property_FreeBusyTime extends File_iCal_Property
  */
 class File_iCal_Property_TimeTransparency extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1020,7 +983,6 @@ class File_iCal_Property_TimeTransparency extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1031,7 +993,7 @@ class File_iCal_Property_TimeTransparency extends File_iCal_Property
  */
 class File_iCal_Property_TimeZoneIdentifier extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1040,7 +1002,6 @@ class File_iCal_Property_TimeZoneIdentifier extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1051,8 +1012,8 @@ class File_iCal_Property_TimeZoneIdentifier extends File_iCal_Property
  */
 class File_iCal_Property_TimeZoneName extends File_iCal_Property
 {
-    protected $_parameters_single = array("LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1061,7 +1022,6 @@ class File_iCal_Property_TimeZoneName extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1072,7 +1032,7 @@ class File_iCal_Property_TimeZoneName extends File_iCal_Property
  */
 class File_iCal_Property_TimeZoneOffsetFrom extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1081,7 +1041,6 @@ class File_iCal_Property_TimeZoneOffsetFrom extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_UTCOffset($value);
     }
-
 }
 
 /**
@@ -1092,7 +1051,7 @@ class File_iCal_Property_TimeZoneOffsetFrom extends File_iCal_Property
  */
 class File_iCal_Property_TimeZoneOffsetTo extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1101,7 +1060,6 @@ class File_iCal_Property_TimeZoneOffsetTo extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_UTCOffset($value);
     }
-
 }
 
 /**
@@ -1112,7 +1070,7 @@ class File_iCal_Property_TimeZoneOffsetTo extends File_iCal_Property
  */
 class File_iCal_Property_TimeZoneURL extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1121,7 +1079,6 @@ class File_iCal_Property_TimeZoneURL extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_URI($value);
     }
-
 }
 
 /**
@@ -1132,9 +1089,9 @@ class File_iCal_Property_TimeZoneURL extends File_iCal_Property
  */
 class File_iCal_Property_Attendee extends File_iCal_Property
 {
-    protected $_parameters_single = array("CUTYPE", "MEMBER", "ROLE", "PARTSTAT", "RSVP", "DELEGATED-TO", "DELEGATED-FROM", "SENT-BY", "CN", "DIR", "LANGUAGE");
+    protected $_parameters_single = ["CUTYPE", "MEMBER", "ROLE", "PARTSTAT", "RSVP", "DELEGATED-TO", "DELEGATED-FROM", "SENT-BY", "CN", "DIR", "LANGUAGE"];
 
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1142,9 +1099,7 @@ class File_iCal_Property_Attendee extends File_iCal_Property
         $this->_name = "ATTENDEE";
 
         $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($value);
-
     }
-
 }
 
 /**
@@ -1155,8 +1110,8 @@ class File_iCal_Property_Attendee extends File_iCal_Property
  */
 class File_iCal_Property_Contact extends File_iCal_Property
 {
-    protected $_parameters_single = array("ALTREP", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["ALTREP", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1165,7 +1120,6 @@ class File_iCal_Property_Contact extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1176,8 +1130,8 @@ class File_iCal_Property_Contact extends File_iCal_Property
  */
 class File_iCal_Property_Organizer extends File_iCal_Property
 {
-    protected $_parameters_single = array("CN", "DIR", "SENT-BY", "LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["CN", "DIR", "SENT-BY", "LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1185,9 +1139,7 @@ class File_iCal_Property_Organizer extends File_iCal_Property
         $this->_name = "ORGANIZER";
 
         $this->_values[] = new File_iCal_ValueDataType_CalendarUserAddress($value);
-
     }
-
 }
 
 /**
@@ -1198,8 +1150,8 @@ class File_iCal_Property_Organizer extends File_iCal_Property
  */
 class File_iCal_Property_RecurrenceID extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID", "RANGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID", "RANGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1218,14 +1170,10 @@ class File_iCal_Property_RecurrenceID extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -1236,8 +1184,8 @@ class File_iCal_Property_RecurrenceID extends File_iCal_Property
  */
 class File_iCal_Property_RelatedTo extends File_iCal_Property
 {
-    protected $_parameters_single = array("RELTYPE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["RELTYPE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1246,7 +1194,6 @@ class File_iCal_Property_RelatedTo extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1257,7 +1204,7 @@ class File_iCal_Property_RelatedTo extends File_iCal_Property
  */
 class File_iCal_Property_URL extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1266,7 +1213,6 @@ class File_iCal_Property_URL extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_URI($value);
     }
-
 }
 
 /**
@@ -1277,16 +1223,15 @@ class File_iCal_Property_URL extends File_iCal_Property
  */
 class File_iCal_Property_UID extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
-    public function __construct($value, $params) {
+    public function __construct($value, $params)
+    {
         parent::__construct($value, $params);
         $this->_name = "UID";
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
-
     }
-
 }
 
 /**
@@ -1297,8 +1242,8 @@ class File_iCal_Property_UID extends File_iCal_Property
  */
 class File_iCal_Property_ExceptionDateTimes extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1317,14 +1262,10 @@ class File_iCal_Property_ExceptionDateTimes extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -1335,7 +1276,7 @@ class File_iCal_Property_ExceptionDateTimes extends File_iCal_Property
  */
 class File_iCal_Property_ExceptionRule extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1343,9 +1284,7 @@ class File_iCal_Property_ExceptionRule extends File_iCal_Property
         $this->_name = "EXRULE";
 
         $this->_values[] = new File_iCal_ValueDataType_RecurrenceRule($value);
-
     }
-
 }
 
 /**
@@ -1356,8 +1295,8 @@ class File_iCal_Property_ExceptionRule extends File_iCal_Property
  */
 class File_iCal_Property_RecurrenceDateTimes extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "TZID");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "TZID"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1370,8 +1309,7 @@ class File_iCal_Property_RecurrenceDateTimes extends File_iCal_Property
             if (is_a($p, "File_iCal_Paramter_Value")) {
                 if ($p->getValueString() == "DATE") {
                     $type = "DATE";
-                }
-                else if ($p->getValueString() == "PERIOD") {
+                } elseif ($p->getValueString() == "PERIOD") {
                     $type = "PERIOD";
                 }
             }
@@ -1379,17 +1317,12 @@ class File_iCal_Property_RecurrenceDateTimes extends File_iCal_Property
 
         if ($type == "DATE") {
             $this->_values[] = new File_iCal_ValueDataType_Date($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
-        }
-        else if ($type == "PERIOD") {
+        } elseif ($type == "PERIOD") {
             $this->_values[] = new File_iCal_ValueDataType_PeriodOfTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -1400,7 +1333,7 @@ class File_iCal_Property_RecurrenceDateTimes extends File_iCal_Property
  */
 class File_iCal_Property_RecurrenceRule extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1408,9 +1341,7 @@ class File_iCal_Property_RecurrenceRule extends File_iCal_Property
         $this->_name = "RRULE";
 
         $this->_values[] = new File_iCal_ValueDataType_RecurrenceRule($value);
-
     }
-
 }
 
 /**
@@ -1421,7 +1352,7 @@ class File_iCal_Property_RecurrenceRule extends File_iCal_Property
  */
 class File_iCal_Property_Action extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1430,7 +1361,6 @@ class File_iCal_Property_Action extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }
 
 /**
@@ -1441,7 +1371,7 @@ class File_iCal_Property_Action extends File_iCal_Property
  */
 class File_iCal_Property_RepeatCount extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1450,7 +1380,6 @@ class File_iCal_Property_RepeatCount extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Integer($value);
     }
-
 }
 
 /**
@@ -1461,8 +1390,8 @@ class File_iCal_Property_RepeatCount extends File_iCal_Property
  */
 class File_iCal_Property_Trigger extends File_iCal_Property
 {
-    protected $_parameters_single = array("VALUE", "RELATED");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["VALUE", "RELATED"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1481,14 +1410,10 @@ class File_iCal_Property_Trigger extends File_iCal_Property
 
         if ($type == "DURATION") {
             $this->_values[] = new File_iCal_ValueDataType_Duration($value);
-        }
-        else if ($type == "DATE-TIME") {
+        } elseif ($type == "DATE-TIME") {
             $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
         }
-
-
     }
-
 }
 
 /**
@@ -1499,7 +1424,7 @@ class File_iCal_Property_Trigger extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeCreated extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1508,7 +1433,6 @@ class File_iCal_Property_DateTimeCreated extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
     }
-
 }
 
 /**
@@ -1519,7 +1443,7 @@ class File_iCal_Property_DateTimeCreated extends File_iCal_Property
  */
 class File_iCal_Property_DateTimeStamp extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1527,9 +1451,7 @@ class File_iCal_Property_DateTimeStamp extends File_iCal_Property
         $this->_name = "DTSTAMP";
 
         $this->_values[] = new File_iCal_ValueDataType_DateTime($value);
-
     }
-
 }
 
 /**
@@ -1540,16 +1462,14 @@ class File_iCal_Property_DateTimeStamp extends File_iCal_Property
  */
 class File_iCal_Property_LastModified extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
         parent::__construct($value, $params);
         $this->_name = "LAST-MODIFIED";
         $this->_value[] = new File_iCal_ValueDataType_DateTime($value);
-
     }
-
 }
 
 /**
@@ -1560,7 +1480,7 @@ class File_iCal_Property_LastModified extends File_iCal_Property
  */
 class File_iCal_Property_SequenceNumber extends File_iCal_Property
 {
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1579,8 +1499,8 @@ class File_iCal_Property_SequenceNumber extends File_iCal_Property
  */
 class File_iCal_Property_RequestStatus extends File_iCal_Property
 {
-    protected $_parameters_single = array("LANGUAGE");
-    protected $_parameters_multiple = array("X-*");
+    protected $_parameters_single = ["LANGUAGE"];
+    protected $_parameters_multiple = ["X-*"];
 
     public function __construct($value, $params)
     {
@@ -1589,5 +1509,4 @@ class File_iCal_Property_RequestStatus extends File_iCal_Property
 
         $this->_values[] = new File_iCal_ValueDataType_Text($value);
     }
-
 }

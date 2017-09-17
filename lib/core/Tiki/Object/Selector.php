@@ -9,59 +9,58 @@ namespace Tiki\Object;
 
 class Selector
 {
-	private $lib;
+    private $lib;
 
-	function __construct($lib)
-	{
-		$this->lib = $lib;
-	}
+    function __construct($lib)
+    {
+        $this->lib = $lib;
+    }
 
-	function read($input, $format = null)
-	{
-		$parts = explode(':', trim($input), 2);
+    function read($input, $format = null)
+    {
+        $parts = explode(':', trim($input), 2);
 
-		if (count($parts) === 2) {
-			list($type, $object) = $parts;
-			return new SelectorItem($this, $type, $object, $format);
-		}
+        if (count($parts) === 2) {
+            list($type, $object) = $parts;
+            return new SelectorItem($this, $type, $object, $format);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	function readMultiple($input, $format = null)
-	{
-		if (! is_array($input)) {
-			$input = explode("\n", $input);
-		}
+    function readMultiple($input, $format = null)
+    {
+        if (! is_array($input)) {
+            $input = explode("\n", $input);
+        }
 
-		$raw = array_map('trim', $input);
-		$raw = array_unique($raw);
-		$raw = array_map(function($input) use ($format) {
-			return $this->read($input, $format);
-		}, $raw);
-		return array_values(array_filter($raw));
-	}
+        $raw = array_map('trim', $input);
+        $raw = array_unique($raw);
+        $raw = array_map(function ($input) use ($format) {
+            return $this->read($input, $format);
+        }, $raw);
+        return array_values(array_filter($raw));
+    }
 
-	function readMultipleSimple($type, $input, $separator, $format = null)
-	{
-		if (is_string($input)) {
-			$parts = explode($separator, $input);
-		} else {
-			$parts = (array) $input;
-		}
+    function readMultipleSimple($type, $input, $separator, $format = null)
+    {
+        if (is_string($input)) {
+            $parts = explode($separator, $input);
+        } else {
+            $parts = (array) $input;
+        }
 
-		$parts = array_map('trim', $parts);
-		$parts = array_filter($parts);
-		$parts = array_unique($parts);
+        $parts = array_map('trim', $parts);
+        $parts = array_filter($parts);
+        $parts = array_unique($parts);
 
-		return array_map(function ($object) use ($type, $format) {
-			return new SelectorItem($this, $type, $object, $format);
-		}, array_values($parts));
-	}
+        return array_map(function ($object) use ($type, $format) {
+            return new SelectorItem($this, $type, $object, $format);
+        }, array_values($parts));
+    }
 
-	function getTitle($type, $object, $format = null)
-	{
-		return $this->lib->get_title($type, $object, $format);
-	}
+    function getTitle($type, $object, $format = null)
+    {
+        return $this->lib->get_title($type, $object, $format);
+    }
 }
-

@@ -9,24 +9,24 @@ namespace Tiki\Wiki\SlugManager;
 
 class UnderscoreGenerator implements Generator
 {
-	function getName()
-	{
-		return 'underscore';
-	}
+    function getName()
+    {
+        return 'underscore';
+    }
 
-	function getLabel()
-	{
-		return tr('Replace spaces with underscores');
-	}
+    function getLabel()
+    {
+        return tr('Replace spaces with underscores');
+    }
 
-	function generate($pageName, $suffix = null)
-	{
-		$slug = preg_replace('/\s+/', '_', trim($pageName));
+    function generate($pageName, $suffix = null)
+    {
+        $slug = preg_replace('/\s+/', '_', trim($pageName));
 
-		if ($suffix) {
-			$slug .= '_' . $suffix;
-		}
+        if ($suffix) {
+            $slug .= '_' . $suffix;
+        }
 
-		return $slug;
-	}
+        return $slug;
+    }
 }

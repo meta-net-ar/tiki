@@ -16,96 +16,96 @@ use Symfony\Component\Console\Command\HelpCommand;
 
 class FilesMoveCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('files:move')
-			->setDescription(tra('Move files from file galleries to a regular directory on the file system'))
-			->addArgument(
-				'galleryId',
-				InputArgument::REQUIRED,
-				'Gallery to move files from'
-			)
-			->addArgument(
-				'destinationPath',
-				InputArgument::REQUIRED,
-				'Path to move files to'
-			)
-			->addOption(
-				'confirm',
-				null,
-				InputOption::VALUE_NONE,
-				'Confirm the move operation (required)'
-			)
-		;
-	}	
+    protected function configure()
+    {
+        $this
+            ->setName('files:move')
+            ->setDescription(tra('Move files from file galleries to a regular directory on the file system'))
+            ->addArgument(
+                'galleryId',
+                InputArgument::REQUIRED,
+                'Gallery to move files from'
+            )
+            ->addArgument(
+                'destinationPath',
+                InputArgument::REQUIRED,
+                'Path to move files to'
+            )
+            ->addOption(
+                'confirm',
+                null,
+                InputOption::VALUE_NONE,
+                'Confirm the move operation (required)'
+            )
+        ;
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		global $prefs;
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        global $prefs;
 
-		if ($prefs['feature_file_galleries'] != 'y' ) {
-			throw new \Exception(tra('Feature Galleries not set up'));
-		}
+        if ($prefs['feature_file_galleries'] != 'y') {
+            throw new \Exception(tra('Feature Galleries not set up'));
+        }
 
-		$filegallib = \TikiLib::lib('filegal');
-		$filegalcopylib = \TikiLib::lib('filegalcopy');
+        $filegallib = \TikiLib::lib('filegal');
+        $filegalcopylib = \TikiLib::lib('filegalcopy');
 
-		$galleryId = (int) $input->getArgument('galleryId');
+        $galleryId = (int) $input->getArgument('galleryId');
 
-		$gal_info = $filegallib->get_file_gallery($galleryId);
-		if (! $gal_info || empty($gal_info['name'])) {
-			throw new \Exception(tr('File Move: Gallery #%0 not found', $galleryId));
-		}
+        $gal_info = $filegallib->get_file_gallery($galleryId);
+        if (! $gal_info || empty($gal_info['name'])) {
+            throw new \Exception(tr('File Move: Gallery #%0 not found', $galleryId));
+        }
 
-		$destinationPath = $input->getArgument('destinationPath');
-		if (empty($destinationPath)) {
-			throw new \Exception(tra('File Move: Destination path required'));
-		}
+        $destinationPath = $input->getArgument('destinationPath');
+        if (empty($destinationPath)) {
+            throw new \Exception(tra('File Move: Destination path required'));
+        }
 
-		$sourcePath = $filegallib->get_gallery_save_dir($galleryId);
-		// in the unlikely case where fgal_use_db was once !== 'y' and then became == 'y'
-		if (empty($sourcePath)) {
-			$sourcePath = $prefs['fgal_use_dir'];
-		}
+        $sourcePath = $filegallib->get_gallery_save_dir($galleryId);
+        // in the unlikely case where fgal_use_db was once !== 'y' and then became == 'y'
+        if (empty($sourcePath)) {
+            $sourcePath = $prefs['fgal_use_dir'];
+        }
 
-		$files = $filegallib->get_files_info_from_gallery_id($galleryId);
-		if (! $files) {
-			if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-				$output->writeln('<comment>'.tra('No files to move').'</comment>');
-			}
-			return;
-		}
+        $files = $filegallib->get_files_info_from_gallery_id($galleryId);
+        if (! $files) {
+            if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                $output->writeln('<comment>'.tra('No files to move').'</comment>');
+            }
+            return;
+        }
 
-		$confirm = $input->getOption('confirm');
+        $confirm = $input->getOption('confirm');
 
-		if (!$confirm) {
-			$help = new HelpCommand();
-			$help->setCommand($this);
-			$help->run($input, $output);
-			throw new \Exception(tra('Use the --confirm option to proceed with the move operation'));
-		}
+        if (! $confirm) {
+            $help = new HelpCommand();
+            $help->setCommand($this);
+            $help->run($input, $output);
+            throw new \Exception(tra('Use the --confirm option to proceed with the move operation'));
+        }
 
-		if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-			$output->writeln('<comment>'.tra('File Move starting...').'</comment>');
-		}
+        if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+            $output->writeln('<comment>'.tra('File Move starting...').'</comment>');
+        }
 
-		$feedback = $filegalcopylib->processCopy($files, $destinationPath, $sourcePath, true);
+        $feedback = $filegalcopylib->processCopy($files, $destinationPath, $sourcePath, true);
 
-		foreach ($feedback as $message) {
-			$error = strpos($message, '<span class="text-danger">') !== false;
-			$message = strip_tags(str_replace('<br>', ' : ', $message));
-			if ($error) {
-				$message = "<error>$message</error>";
-				$output->writeln($message);
-			} else if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-				$message = "<info>$message</info>";
-				$output->writeln($message);
-			}
-		}
+        foreach ($feedback as $message) {
+            $error = strpos($message, '<span class="text-danger">') !== false;
+            $message = strip_tags(str_replace('<br>', ' : ', $message));
+            if ($error) {
+                $message = "<error>$message</error>";
+                $output->writeln($message);
+            } elseif ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                $message = "<info>$message</info>";
+                $output->writeln($message);
+            }
+        }
 
-		if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-			$output->writeln('<comment>'.tra('File Move complete').'</comment>');
-		}
-	}
+        if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+            $output->writeln('<comment>'.tra('File Move complete').'</comment>');
+        }
+    }
 }

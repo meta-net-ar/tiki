@@ -7,48 +7,48 @@
 
 class Tiki_Profile_Writer_ExternalWriter
 {
-	private $dataPath;
-	private $files;
-	private $hashes = array();
+    private $dataPath;
+    private $files;
+    private $hashes = [];
 
-	function __construct($dataPath)
-	{
-		$this->dataPath = $dataPath;
-		$files = array_filter(
-			scandir($dataPath),
-			function ($file) {
-				return $file{0} != '.';
-			}
-		);
+    function __construct($dataPath)
+    {
+        $this->dataPath = $dataPath;
+        $files = array_filter(
+            scandir($dataPath),
+            function ($file) {
+                return $file{0} != '.';
+            }
+        );
 
-		$this->files = array_fill_keys($files, null);
-	}
+        $this->files = array_fill_keys($files, null);
+    }
 
-	function write($file, $content)
-	{
-		$this->files[$file] = $content;
-		$this->hashes[$file] = null;
-	}
+    function write($file, $content)
+    {
+        $this->files[$file] = $content;
+        $this->hashes[$file] = null;
+    }
 
-	function apply()
-	{
-		foreach (array_filter($this->files) as $file => $content) {
-			$hash = sha1($content);
-			if ($hash != $this->hashes[$file]) {
-				file_put_contents("{$this->dataPath}/$file", $content);
-			}
-		}
-	}
+    function apply()
+    {
+        foreach (array_filter($this->files) as $file => $content) {
+            $hash = sha1($content);
+            if ($hash != $this->hashes[$file]) {
+                file_put_contents("{$this->dataPath}/$file", $content);
+            }
+        }
+    }
 
-	function getFiles()
-	{
-		foreach ($this->files as $file => $content) {
-			if (is_null($content)) {
-				$this->files[$file] = file_get_contents("{$this->dataPath}/$file");
-				$this->hashes[$file] = sha1($this->files[$file]);
-			}
-		}
+    function getFiles()
+    {
+        foreach ($this->files as $file => $content) {
+            if (is_null($content)) {
+                $this->files[$file] = file_get_contents("{$this->dataPath}/$file");
+                $this->hashes[$file] = sha1($this->files[$file]);
+            }
+        }
 
-		return $this->files;
-	}
+        return $this->files;
+    }
 }

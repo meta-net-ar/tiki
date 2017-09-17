@@ -47,7 +47,6 @@ class File_iCal_ValueDataType
         //might want to overwrite in child classes
         return $this->_value;
     }
-
 }
 
 /**
@@ -71,20 +70,18 @@ class File_iCal_ValueDataType_Boolean extends File_iCal_ValueDataType
 {
     public function __construct($s)
     {
-       if (strcasecmp($s, "true"))
-       {
-        $this->_value = "TRUE";
-        return;
-       }
+        if (strcasecmp($s, "true")) {
+            $this->_value = "TRUE";
+            return;
+        }
 
-       if (strcasecmp($s, "false"))
-       {
-        $this->_value = "FALSE";
-        return;
-       }
+        if (strcasecmp($s, "false")) {
+            $this->_value = "FALSE";
+            return;
+        }
 
        //else
-       trigger_error("Boolean value data type is not \"true\" or \"false\".  Value is $s", E_WARNING);
+        trigger_error("Boolean value data type is not \"true\" or \"false\".  Value is $s", E_WARNING);
     }
 
     public function getValue()
@@ -101,14 +98,15 @@ class File_iCal_ValueDataType_Boolean extends File_iCal_ValueDataType
  */
 class File_iCal_ValueDataType_CalendarUserAddress extends File_iCal_ValueDataType
 {
-    public function __construct($s) {
+    public function __construct($s)
+    {
         $this->_value = new File_iCal_ValueDataType_URI($s);
     }
 
-    public function getValue() {
+    public function getValue()
+    {
         return $this->_value->getValue();
     }
-
 }
 
 /**
@@ -135,11 +133,12 @@ class File_iCal_ValueDataType_Date extends File_iCal_ValueDataType
     //returns YYYYmmdd
     public function getValue()
     {
-      return date("Ymd", mktime(0,0,0, $this->_month, $this->_day, $this->_year));
+        return date("Ymd", mktime(0, 0, 0, $this->_month, $this->_day, $this->_year));
     }
 
-    public function getIntegerValue() {
-        return mktime(0,0,0, $this->_month, $this->_day, $this->_year);
+    public function getIntegerValue()
+    {
+        return mktime(0, 0, 0, $this->_month, $this->_day, $this->_year);
     }
 
     public function setYear($y)
@@ -167,9 +166,7 @@ class File_iCal_ValueDataType_Date extends File_iCal_ValueDataType
         } else {
             trigger_error("Day must be greater than 0", E_USER_WARNING);
         }
-
     }
-
 }
 
 /**
@@ -198,7 +195,8 @@ class File_iCal_ValueDataType_DateTime extends File_iCal_ValueDataType
         return $this->_date->getValue() . 'T' . $this->_time->getValue();
     }
 
-    public function getIntegerValue() {
+    public function getIntegerValue()
+    {
         return $this->_date->getIntegerValue() + $this->_time->getIntegerValue();
     }
 }
@@ -218,10 +216,9 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
     {
         if ($d{0} == '+') {
             $this->_plusminus = '+';
-        } else if ($d{0} == '-') {
+        } elseif ($d{0} == '-') {
             $this->_plusminus = '-';
-        }
-        else//if we have a week identifier
+        } else //if we have a week identifier
         {
             //$this->_plusminus = '+';
             $d = '+'.$d;
@@ -237,10 +234,9 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
         $match = null;
 
         //if we have a week identifier
-        if ($w = strpos($dur, 'W'))
-        {
+        if ($w = strpos($dur, 'W')) {
             if ($i = preg_match('/^.*?(\d+)D/', $dur, $match)) {
-                $this->_length += 7*24*60*60*$match[1];
+                $this->_length += 7 * 24 * 60 * 60 * $match[1];
             } else {
                 trigger_error("At least one character before 'W' must be a digit", E_USER_ERROR);
             }
@@ -249,7 +245,7 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
         //if we have a day identifier
         if ($dee = strpos($dur, 'D')) {
             if ($i = preg_match('/^.*?(\d+)D/', $dur, $match)) {
-                $this->_length += 24*60*60*$match[1];
+                $this->_length += 24 * 60 * 60 * $match[1];
             } else {
                 trigger_error("At least one character before 'D' must be a digit", E_USER_ERROR);
             }
@@ -258,7 +254,7 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
         //if we have a hour identifier
         if (strpos($dur, 'H')) {
             if ($i = preg_match('/^.*?(\d+)H/', $dur, $match)) {
-                $this->_length += 60*60*$match[1];
+                $this->_length += 60 * 60 * $match[1];
             } else {
                 trigger_error("At least one character before 'H' must be a digit", E_USER_ERROR);
             }
@@ -267,7 +263,7 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
         //if we have a minute identifier
         if (strpos($dur, 'M')) {
             if ($i = preg_match('/^.*?(\d+)M/', $dur, $match)) {
-                $this->_length += 60*$match[1];
+                $this->_length += 60 * $match[1];
             } else {
                 trigger_error("At least one character before 'M' must be a digit", E_USER_ERROR);
             }
@@ -281,8 +277,6 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
                 trigger_error("At least one character before 'S' must be a digit", E_USER_ERROR);
             }
         }
-
-
     }
 
     public function getValue()
@@ -292,35 +286,46 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
         $sec = $this->_length % 60;
 
         $left = $this->_length;
-        $week = intval($left / (60*60*24*7));
+        $week = intval($left / (60 * 60 * 24 * 7));
 
-        $left -= $week * 60 * 60 *24 * 7;
+        $left -= $week * 60 * 60 * 24 * 7;
 
-        $day = intval($left / (60*60*24));
+        $day = intval($left / (60 * 60 * 24));
         $left -= $day * 60 * 60 * 24;
 
-        $hour = intval($left / (60*60));
-        $left -= $hour * 60*60;
+        $hour = intval($left / (60 * 60));
+        $left -= $hour * 60 * 60;
 
         $minute = $left / 60;
-        $left -= $minute*60;
+        $left -= $minute * 60;
 
 
 
         $r .= 'P';
 
-        if ($week) $r .= $week.'W';
-        if ($day) $r .= $day.'D';
+        if ($week) {
+            $r .= $week.'W';
+        }
+        if ($day) {
+            $r .= $day.'D';
+        }
 
-        if ($hour || $minute || $sec) $r .= 'T';
+        if ($hour || $minute || $sec) {
+            $r .= 'T';
+        }
 
-        if ($hour) $r .= $hour.'H';
-        if ($minute) $r .= $minute.'M';
-        if ($sec) $r .= $sec.'S';
+        if ($hour) {
+            $r .= $hour.'H';
+        }
+        if ($minute) {
+            $r .= $minute.'M';
+        }
+        if ($sec) {
+            $r .= $sec.'S';
+        }
 
         return $r;
     }
-
 }
 
 /**
@@ -331,10 +336,10 @@ class File_iCal_ValueDataType_Duration extends File_iCal_ValueDataType
  */
 class File_iCal_ValueDataType_Float extends File_iCal_ValueDataType
 {
-    public function __construct($s) {
+    public function __construct($s)
+    {
         $this->_value = $s;
     }
-
 }
 
 /**
@@ -352,7 +357,7 @@ class File_iCal_ValueDataType_Integer extends File_iCal_ValueDataType
     {
         if ($s{0} == '-') {
             $this->_plusminus = '-';
-        } else if ($s{0} == '+') {
+        } elseif ($s{0} == '+') {
             $this->_plusminus = '+';
         } else {
 //            $this->_plusminus = '+';
@@ -366,7 +371,6 @@ class File_iCal_ValueDataType_Integer extends File_iCal_ValueDataType
         } else {
             trigger_error("Integer value must consist of all digits", E_USER_ERROR);
         }
-
     }
 
     public function getValue()
@@ -383,10 +387,10 @@ class File_iCal_ValueDataType_Integer extends File_iCal_ValueDataType
  */
 class File_iCal_ValueDataType_PeriodOfTime extends File_iCal_ValueDataType
 {
-    public function __construct($s) {
+    public function __construct($s)
+    {
         $this->_value = $s;
     }
-
 }
 
 /**
@@ -414,25 +418,26 @@ class File_iCal_ValueDataType_RecurrenceRule extends File_iCal_ValueDataType
 
 
     //takes string $s
-    public function __construct($s) {
+    public function __construct($s)
+    {
         if (substr($s, 0, 5) != "FREQ=") {
             trigger_error("Recurrence rule must begin with \"FREQ\"", E_USER_WARNING);
         } else {
-           $sc = strpos($s, ';', 5);
+            $sc = strpos($s, ';', 5);
 
             if (self::isValidFrequency(substr($s, 5, $sc - 5))) {
                 $this->_frequency = substr($s, 5, $sc - 5);
 
-                $arr = explode(';', substr($s, $sc+1));
+                $arr = explode(';', substr($s, $sc + 1));
 
-                $kv = array();
+                $kv = [];
                 foreach ($arr as $v) {
                     $kv[] = explode('=', $v);
                 }
 
                 //$kv is an array of two-element arrays (hopefully)
                 foreach ($kv as $v) {
-                    if (!is_array($v)) {
+                    if (! is_array($v)) {
                         trigger_error("RRULE value not formatted properly");
                     } else {
                         switch ($v[0]) {
@@ -489,7 +494,7 @@ class File_iCal_ValueDataType_RecurrenceRule extends File_iCal_ValueDataType
                                 break;
 
                             case "BYMONTH":
-                                $this->_bymonth = explode(',' , $v[1]);
+                                $this->_bymonth = explode(',', $v[1]);
                                 break;
 
                             case "BYSETPOS":
@@ -504,26 +509,21 @@ class File_iCal_ValueDataType_RecurrenceRule extends File_iCal_ValueDataType
 
                             default:
                                 trigger_error("Unknown RRULE value ".$v[0], E_USER_WARNING);
-
-
                         }
                     }
                 }
-
-
             } else {
                 trigger_error("Bad frequency descriptor provided for RRULE", E_USER_ERROR);
             }
-
-
         }
     }
 
-    public function getValue() {
+    public function getValue()
+    {
         $r = "FREQ=".$this->_frequency;
 
         if ($this->_until) {
-            $r.= ";UNTIL=".$this->_until;
+            $r .= ";UNTIL=".$this->_until;
         }
 
         if ($this->_count) {
@@ -535,7 +535,7 @@ class File_iCal_ValueDataType_RecurrenceRule extends File_iCal_ValueDataType
         }
 
         if ($this->_bysecond) {
-            $r .= ";BYSECOND=".implode(',',$this->_bysecond);
+            $r .= ";BYSECOND=".implode(',', $this->_bysecond);
         }
 
         if ($this->_byminute) {
@@ -575,12 +575,12 @@ class File_iCal_ValueDataType_RecurrenceRule extends File_iCal_ValueDataType
     }
 
     //given a frequency string $s, return whether it is valid
-    public static function isValidFrequency($s) {
-        $good = array("SECONDLY", "MINUTELY", "HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY");
+    public static function isValidFrequency($s)
+    {
+        $good = ["SECONDLY", "MINUTELY", "HOURLY", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
 
         return in_array($s, $good);
     }
-
 }
 
 /**
@@ -596,7 +596,6 @@ class File_iCal_ValueDataType_Text extends File_iCal_ValueDataType
         //need some type verification here
         $this->_value = $text;
     }
-
 }
 
 /**
@@ -618,18 +617,23 @@ class File_iCal_ValueDataType_Time extends File_iCal_ValueDataType
         $this->_minute = substr($time, 2, 2);
         $this->_second = substr($time, 4, 2);
 
-        if ($l == 7) $this->_Z = true;
+        if ($l == 7) {
+            $this->_Z = true;
+        }
     }
 
     public function getValue()
     {
         $return = str_pad($this->_hour, 2, '0', STR_PAD_LEFT) . str_pad($this->_minute, 2, '0', STR_PAD_LEFT) . str_pad($this->_second, 2, '0', STR_PAD_LEFT);
-        if ($this->_Z) return $return.'Z';
+        if ($this->_Z) {
+            return $return.'Z';
+        }
         return $return;
     }
 
-    public function getIntegerValue() {
-        return 60*60*$this->_hour + 60*$this->_minute + $this->_second;
+    public function getIntegerValue()
+    {
+        return 60 * 60 * $this->_hour + 60 * $this->_minute + $this->_second;
     }
 
     public function setHour($h)
@@ -663,7 +667,8 @@ class File_iCal_ValueDataType_URI extends File_iCal_ValueDataType
     //from http://www.gbiv.com/protocols/uri/rfc/rfc2396.html
     public static $regexp = "^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?";
 
-    public function __construct($v) {
+    public function __construct($v)
+    {
         if (preg_match(self::$regexp, $v)) {
             $this->_value = $v;
         } else {
@@ -680,8 +685,8 @@ class File_iCal_ValueDataType_URI extends File_iCal_ValueDataType
  */
 class File_iCal_ValueDataType_UTCOffset extends File_iCal_ValueDataType
 {
-    public function __construct($s) {
+    public function __construct($s)
+    {
         $this->_value = $s;
     }
-
 }

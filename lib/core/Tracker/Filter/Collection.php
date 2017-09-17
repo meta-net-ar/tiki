@@ -1,321 +1,323 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 namespace Tracker\Filter;
+
 use Search_Query;
 use TikiLib;
 
 class Collection
 {
-	private $definition;
-	private $filters = [];
-	private $collections = [];
-	private $resultset;
+    private $definition;
+    private $filters = [];
+    private $collections = [];
+    private $resultset;
 
-	function __construct(\Tracker_Definition $definition)
-	{
-		$this->definition = $definition;
-	}
+    function __construct(\Tracker_Definition $definition)
+    {
+        $this->definition = $definition;
+    }
 
-	public static function getFilter($fieldName, $mode) {
-		$field = TikiLib::lib('trk')->get_field_by_perm_name($fieldName);
-		if ($field) {
-			if( !isset($collection) ) {
-				$definition = \Tracker_Definition::get($field['trackerId']);
-				$collection = new self($definition);
-			}
-			try {
-				return $collection->addFilter($field['permName'], $mode);
-			} catch( Exception\ModeNotSupported $e) {
-				return $collection->addFilter($field['permName']);
-			}
-		} else {
-			// non-tracker field in the index
-			$filter = new Filter($fieldName, 'default');
-			$filter->setLabel($fieldName)
-				->setControl(new Control\TextField("tf_".$fieldName))
-				->setApplyCondition(function ($control, Search_Query $query) use ($fieldName) {
-					$value = $control->getValue();
-					if ($value) {
-						$query->filterContent($value, $fieldName);
-					}
-				});
-			return $filter;
-		}
-	}
+    public static function getFilter($fieldName, $mode)
+    {
+        $field = TikiLib::lib('trk')->get_field_by_perm_name($fieldName);
+        if ($field) {
+            if (! isset($collection)) {
+                $definition = \Tracker_Definition::get($field['trackerId']);
+                $collection = new self($definition);
+            }
+            try {
+                return $collection->addFilter($field['permName'], $mode);
+            } catch (Exception\ModeNotSupported $e) {
+                return $collection->addFilter($field['permName']);
+            }
+        } else {
+            // non-tracker field in the index
+            $filter = new Filter($fieldName, 'default');
+            $filter->setLabel($fieldName)
+                ->setControl(new Control\TextField("tf_".$fieldName))
+                ->setApplyCondition(function ($control, Search_Query $query) use ($fieldName) {
+                    $value = $control->getValue();
+                    if ($value) {
+                        $query->filterContent($value, $fieldName);
+                    }
+                });
+            return $filter;
+        }
+    }
 
-	function addNew($permName, $mode)
-	{
-		$column = new Filter($permName, $mode);
-		$this->filters[] = $column;
-		return $column;
-	}
+    function addNew($permName, $mode)
+    {
+        $column = new Filter($permName, $mode);
+        $this->filters[] = $column;
+        return $column;
+    }
 
-	function addCloned($permName, self $collection)
-	{
-		foreach ($collection->filters as $filter) {
-			$this->addNew($permName, $filter->getField() . '-' . $filter->getMode())
-				->copyProperties($filter);
-		}
-	}
+    function addCloned($permName, self $collection)
+    {
+        foreach ($collection->filters as $filter) {
+            $this->addNew($permName, $filter->getField() . '-' . $filter->getMode())
+                ->copyProperties($filter);
+        }
+    }
 
-	function getFilters()
-	{
-		return $this->filters;
-	}
-	
-	function applyConditions(\Search_Query $query)
-	{
-		foreach ($this->filters as $filter) {
-			$filter->applyCondition($query);
-		}
-	}
+    function getFilters()
+    {
+        return $this->filters;
+    }
 
-	function applyInput(\JitFilter $input)
-	{
-		foreach ($this->filters as $filter) {
-			$filter->applyInput($input);
-		}
-	}
+    function applyConditions(\Search_Query $query)
+    {
+        foreach ($this->filters as $filter) {
+            $filter->applyCondition($query);
+        }
+    }
 
-	function loadFilterDescriptor($descriptor)
-	{
-		foreach ($descriptor as $filter) {
-			$fil = $this->addFilter($filter['field'], $filter['mode']);
+    function applyInput(\JitFilter $input)
+    {
+        foreach ($this->filters as $filter) {
+            $filter->applyInput($input);
+        }
+    }
 
-			if (! empty($filter['position'])) {
-				$fil->setPosition($filter['position']);
-			}
+    function loadFilterDescriptor($descriptor)
+    {
+        foreach ($descriptor as $filter) {
+            $fil = $this->addFilter($filter['field'], $filter['mode']);
 
-			if (! empty($filter['label'])) {
-				$fil->setLabel($filter['label']);
-			}
-		}
-	}
+            if (! empty($filter['position'])) {
+                $fil->setPosition($filter['position']);
+            }
 
-	function addFilter($permName, $mode = null)
-	{
-		if (isset($this->collections[$permName])) {
-			$partial = $this->collections[$permName];
-		} else {
-			$partial = $this->getFieldCollection($permName);
-			$this->collections[$permName] = $partial;
-		}
+            if (! empty($filter['label'])) {
+                $fil->setLabel($filter['label']);
+            }
+        }
+    }
 
-		$filter = $partial->lookupMode($permName, $mode);
-		$this->filters[] = $filter;
+    function addFilter($permName, $mode = null)
+    {
+        if (isset($this->collections[$permName])) {
+            $partial = $this->collections[$permName];
+        } else {
+            $partial = $this->getFieldCollection($permName);
+            $this->collections[$permName] = $partial;
+        }
 
-		return $filter;
-	}
+        $filter = $partial->lookupMode($permName, $mode);
+        $this->filters[] = $filter;
 
-	private function lookupMode($permName, $mode)
-	{
-		foreach ($this->filters as $filter) {
-			if ($filter->getField() == $permName && (!$mode || $filter->getMode() == $mode)) {
-				return $filter;
-			}
-		}
+        return $filter;
+    }
 
-		throw new Exception\ModeNotSupported($permName, $mode);
-	}
+    private function lookupMode($permName, $mode)
+    {
+        foreach ($this->filters as $filter) {
+            if ($filter->getField() == $permName && (! $mode || $filter->getMode() == $mode)) {
+                return $filter;
+            }
+        }
 
-	function getFieldCollection($permName)
-	{
-		if ($partial = $this->getSystemCollection($permName)) {
-			return $partial;
-		}
+        throw new Exception\ModeNotSupported($permName, $mode);
+    }
 
-		$field = $this->definition->getFieldFromPermName($permName);
-		$factory = $this->definition->getFieldFactory();
+    function getFieldCollection($permName)
+    {
+        if ($partial = $this->getSystemCollection($permName)) {
+            return $partial;
+        }
 
-		if (! $field) {
-			throw new Exception\FieldNotFound($permName);
-		}
+        $field = $this->definition->getFieldFromPermName($permName);
+        $factory = $this->definition->getFieldFactory();
 
-		$handler = $factory->getHandler($field);
+        if (! $field) {
+            throw new Exception\FieldNotFound($permName);
+        }
 
-		if (! $handler instanceof \Tracker_Field_Filterable) {
-			throw new Exception\ModeNotSupported($permName, 'any mode');
-		}
+        $handler = $factory->getHandler($field);
 
-		return $handler->getFilterCollection();
-	}
+        if (! $handler instanceof \Tracker_Field_Filterable) {
+            throw new Exception\ModeNotSupported($permName, 'any mode');
+        }
 
-	private function getSystemCollection($name)
-	{
-		switch ($name) {
-		case 'itemId':
-			$collection = new self($this->definition);
-			$collection->addNew($name, 'lookup')
-				->setLabel(tr('Item ID'))
-				->setHelp(tr('Look up a single item by ID.'))
-				->setControl(new Control\TextField("tf_itemId"))
-				->setApplyCondition(function ($control, Search_Query $query) {
-					$value = $control->getValue();
+        return $handler->getFilterCollection();
+    }
 
-					if ($value) {
-						$query->filterIdentifier($value, 'object_id');
-					}
-				})
-				;
-			return $collection;
-		case 'search':
-			$collection = new self($this->definition);
-			$collection->addNew($name, 'search')
-				->setLabel(tr('Search'))
-				->setHelp(tr('Full-text search across all of the content.'))
-				->setControl(new Control\TextField("tf_search"))
-				->setApplyCondition(function ($control, Search_Query $query) {
-					$value = $control->getValue();
+    private function getSystemCollection($name)
+    {
+        switch ($name) {
+            case 'itemId':
+                $collection = new self($this->definition);
+                $collection->addNew($name, 'lookup')
+                ->setLabel(tr('Item ID'))
+                ->setHelp(tr('Look up a single item by ID.'))
+                ->setControl(new Control\TextField("tf_itemId"))
+                ->setApplyCondition(function ($control, Search_Query $query) {
+                    $value = $control->getValue();
 
-					if ($value) {
-						$o = TikiLib::lib('tiki')->get_preference('unified_default_content', array('contents'), true);
-						if (count($o) == 1 && empty($o[0])) {
-							// Use "contents" field by default, if no default is specified
-							$query->filterContent($value, array('contents'));
-						} else {
-							$query->filterContent($value, $o);
-						}
-					}
-				})
-				;
-			return $collection;
-		case 'status':
-			$types = TikiLib::lib('trk')->status_types();
-			$possibilities = array_map(function ($item) {
-				return $item['label'];
-			}, $types);
+                    if ($value) {
+                        $query->filterIdentifier($value, 'object_id');
+                    }
+                })
+                    ;
+                return $collection;
+            case 'search':
+                $collection = new self($this->definition);
+                $collection->addNew($name, 'search')
+                ->setLabel(tr('Search'))
+                ->setHelp(tr('Full-text search across all of the content.'))
+                ->setControl(new Control\TextField("tf_search"))
+                ->setApplyCondition(function ($control, Search_Query $query) {
+                    $value = $control->getValue();
 
-			$collection = new self($this->definition);
-			$collection->addNew($name, 'dropdown')
-				->setLabel(tr('Status'))
-				->setControl(new Control\DropDown("tfdd_status", $possibilities))
-				->setApplyCondition(function ($control, Search_Query $query) {
-					$value = $control->getValue();
+                    if ($value) {
+                        $o = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
+                        if (count($o) == 1 && empty($o[0])) {
+                            // Use "contents" field by default, if no default is specified
+                            $query->filterContent($value, ['contents']);
+                        } else {
+                            $query->filterContent($value, $o);
+                        }
+                    }
+                })
+                    ;
+                return $collection;
+            case 'status':
+                $types = TikiLib::lib('trk')->status_types();
+                $possibilities = array_map(function ($item) {
+                    return $item['label'];
+                }, $types);
 
-					if ($value) {
-						$query->filterIdentifier($value, 'tracker_status');
-					}
-				});
+                $collection = new self($this->definition);
+                $collection->addNew($name, 'dropdown')
+                    ->setLabel(tr('Status'))
+                    ->setControl(new Control\DropDown("tfdd_status", $possibilities))
+                    ->setApplyCondition(function ($control, Search_Query $query) {
+                        $value = $control->getValue();
 
-			$controls = [
-				'multiselect' => new Control\MultiSelect("tfms_status", $possibilities),
-				'checkboxes' => new Control\InlineCheckboxes("tfc_status", $possibilities),
-			];
-			foreach ($controls as $key => $control) {
-				$collection->addNew($name, $key)
-					->setLabel(tr('Status'))
-					->setControl($control)
-					->setApplyCondition(function ($control, Search_Query $query) {
-						$values = $control->getValues();
+                        if ($value) {
+                            $query->filterIdentifier($value, 'tracker_status');
+                        }
+                    });
 
-						if (! empty($values)) {
-							$sub = $query->getSubQuery("tfms_status");
+                $controls = [
+                    'multiselect' => new Control\MultiSelect("tfms_status", $possibilities),
+                    'checkboxes' => new Control\InlineCheckboxes("tfc_status", $possibilities),
+                ];
+                foreach ($controls as $key => $control) {
+                    $collection->addNew($name, $key)
+                    ->setLabel(tr('Status'))
+                    ->setControl($control)
+                    ->setApplyCondition(function ($control, Search_Query $query) {
+                        $values = $control->getValues();
 
-							foreach ($values as $v) {
-								$sub->filterIdentifier((string) $v, 'tracker_status');
-							}
-						}
-					});
-			}
+                        if (! empty($values)) {
+                            $sub = $query->getSubQuery("tfms_status");
 
-			return $collection;
-		case 'facet':
-			$collection = new self($this->definition);
+                            foreach ($values as $v) {
+                                $sub->filterIdentifier((string) $v, 'tracker_status');
+                            }
+                        }
+                    });
+                }
 
-			$lib = \TikiLib::lib('unifiedsearch');
-			$provider = $lib->getFacetProvider();
+                return $collection;
+            case 'facet':
+                $collection = new self($this->definition);
 
-			foreach ($provider->getFacets() as $facet) {
-				$getoptions = function () use ($facet) {
-					if ($this->resultset) {
-						if ($filter = $this->resultset->getFacet($facet)) {
-							return $filter->getOptions();
-						}
-					}
+                $lib = \TikiLib::lib('unifiedsearch');
+                $provider = $lib->getFacetProvider();
 
-					return [];
-				};
+                foreach ($provider->getFacets() as $facet) {
+                    $getoptions = function () use ($facet) {
+                        if ($this->resultset) {
+                            if ($filter = $this->resultset->getFacet($facet)) {
+                                return $filter->getOptions();
+                            }
+                        }
 
-				$renderextra = function ($id) use ($facet) {
-					$label = $facet->render($id) ?: tr('Unknown value');
-					return "$label (0)";
-				};
+                        return [];
+                    };
 
-				$collection->addNew($name, 'facet-any-' . $facet->getName())
-					->setLabel(tr('%0 (any of)', $facet->getLabel()))
-					->setControl(new Control\MultiSelect("facet_any_{$facet->getName()}", $getoptions, $renderextra))
-					->setApplyCondition(function ($control, Search_Query $query) use ($facet) {
-						$query->requestFacet($facet);
+                    $renderextra = function ($id) use ($facet) {
+                        $label = $facet->render($id) ?: tr('Unknown value');
+                        return "$label (0)";
+                    };
 
-						$values = $control->getValues();
-						if (! empty($values)) {
-							$query->getPostFilter()->filterContent(implode(" OR ", $values), $facet->getName());
-						}
-					});
+                    $collection->addNew($name, 'facet-any-' . $facet->getName())
+                    ->setLabel(tr('%0 (any of)', $facet->getLabel()))
+                    ->setControl(new Control\MultiSelect("facet_any_{$facet->getName()}", $getoptions, $renderextra))
+                    ->setApplyCondition(function ($control, Search_Query $query) use ($facet) {
+                        $query->requestFacet($facet);
 
-				$collection->addNew($name, 'facet-all-' . $facet->getName())
-					->setLabel(tr('%0 (all of)', $facet->getLabel()))
-					->setControl(new Control\MultiSelect("facet_all_{$facet->getName()}", $getoptions, $renderextra))
-					->setApplyCondition(function ($control, Search_Query $query) use ($facet) {
-						$query->requestFacet($facet);
+                        $values = $control->getValues();
+                        if (! empty($values)) {
+                            $query->getPostFilter()->filterContent(implode(" OR ", $values), $facet->getName());
+                        }
+                    });
 
-						$values = $control->getValues();
-						if (! empty($values)) {
-							$query->getPostFilter()->filterContent(implode(" AND ", $values), $facet->getName());
-						}
-					});
-			}
-			
-			return $collection;
-		}
-	}
+                    $collection->addNew($name, 'facet-all-' . $facet->getName())
+                        ->setLabel(tr('%0 (all of)', $facet->getLabel()))
+                        ->setControl(new Control\MultiSelect("facet_all_{$facet->getName()}", $getoptions, $renderextra))
+                        ->setApplyCondition(function ($control, Search_Query $query) use ($facet) {
+                            $query->requestFacet($facet);
 
-	function getFilterDescriptor()
-	{
-		return array_map(function ($filter) {
-			return [
-				'label' => $filter->getLabel(),
-				'field' => $filter->getField(),
-				'mode' => $filter->getMode(),
-				'position' => $filter->getPosition(),
-			];
-		}, $this->filters);
-	}
+                            $values = $control->getValues();
+                            if (! empty($values)) {
+                                $query->getPostFilter()->filterContent(implode(" AND ", $values), $facet->getName());
+                            }
+                        });
+                }
 
-	function getQueryArguments()
-	{
-		$parts = [];
-		foreach ($this->filters as $filter) {
-			$parts += $filter->getControl()->getQueryArguments();
-		}
-		
-		return $parts;
-	}
+                return $collection;
+        }
+    }
 
-	function getAvailableFields()
-	{
-		$fields = [
-			'itemId' => tr('Item ID'),
-			'status' => tr('Status'),
-			'search' => tr('Search'),
-			'actions' => tr('Actions'),
-			'facet' => tr('Dynamic Filters'),
-		];
+    function getFilterDescriptor()
+    {
+        return array_map(function ($filter) {
+            return [
+                'label' => $filter->getLabel(),
+                'field' => $filter->getField(),
+                'mode' => $filter->getMode(),
+                'position' => $filter->getPosition(),
+            ];
+        }, $this->filters);
+    }
 
-		foreach ($this->definition->getFields() as $f) {
-			$fields[$f['permName']] = $f['name'];
-		}
+    function getQueryArguments()
+    {
+        $parts = [];
+        foreach ($this->filters as $filter) {
+            $parts += $filter->getControl()->getQueryArguments();
+        }
 
-		return $fields;
-	}
+        return $parts;
+    }
 
-	function setResultSet(\Search_ResultSet $resultset)
-	{
-		$this->resultset = $resultset;
-	}
+    function getAvailableFields()
+    {
+        $fields = [
+            'itemId' => tr('Item ID'),
+            'status' => tr('Status'),
+            'search' => tr('Search'),
+            'actions' => tr('Actions'),
+            'facet' => tr('Dynamic Filters'),
+        ];
+
+        foreach ($this->definition->getFields() as $f) {
+            $fields[$f['permName']] = $f['name'];
+        }
+
+        return $fields;
+    }
+
+    function setResultSet(\Search_ResultSet $resultset)
+    {
+        $this->resultset = $resultset;
+    }
 }

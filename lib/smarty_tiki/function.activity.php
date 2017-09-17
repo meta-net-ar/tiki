@@ -7,30 +7,29 @@
 
 function smarty_function_activity($params)
 {
-	$smarty = TikiLib::lib('smarty');
-	
-	if (isset($params['info'])) {
-		$activity = $params['info'];
-	} else {
-		$lib = TikiLib::lib('unifiedsearch');
-		$docs = $lib->getDocuments('activity', $params['id']);
+    $smarty = TikiLib::lib('smarty');
 
-		$activity = reset($docs);
+    if (isset($params['info'])) {
+        $activity = $params['info'];
+    } else {
+        $lib = TikiLib::lib('unifiedsearch');
+        $docs = $lib->getDocuments('activity', $params['id']);
 
-		if (! $activity) {
-			return tr('Not found.');
-		}
+        $activity = reset($docs);
 
-		$activity = TikiLib::lib('unifiedsearch')->getRawArray($activity);
-	}
+        if (! $activity) {
+            return tr('Not found.');
+        }
 
-	$smarty->assign('activity', $activity);
-	$smarty->assign('activity_format', !empty($params['format']) ? $params['format'] : 'default');
-	$templateName = 'activity/' . $activity['event_type'] . '.tpl';
+        $activity = TikiLib::lib('unifiedsearch')->getRawArray($activity);
+    }
 
-	if (empty($smarty->get_filename($templateName))) {
-		$templateName = 'activity/default_event.tpl';
-	}
-	return $smarty->fetch($templateName);
+    $smarty->assign('activity', $activity);
+    $smarty->assign('activity_format', ! empty($params['format']) ? $params['format'] : 'default');
+    $templateName = 'activity/' . $activity['event_type'] . '.tpl';
+
+    if (empty($smarty->get_filename($templateName))) {
+        $templateName = 'activity/default_event.tpl';
+    }
+    return $smarty->fetch($templateName);
 }
-

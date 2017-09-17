@@ -15,32 +15,32 @@ use Psr\Log\LogLevel;
 
 class SchedulerRunCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('scheduler:run')
-			->setDescription('Run scheduled tasks');
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('scheduler:run')
+            ->setDescription('Run scheduled tasks');
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		global $prefs;
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        global $prefs;
 
-		if ($prefs['feature_scheduler'] != 'y') {
-			$output->writeln("<error>Scheduler feature is not enabled.</error>");
-			exit(1);
-		}
+        if ($prefs['feature_scheduler'] != 'y') {
+            $output->writeln("<error>Scheduler feature is not enabled.</error>");
+            exit(1);
+        }
 
-		$verbosityLevelMap = array(
-			LogLevel::ERROR => OutputInterface::OUTPUT_NORMAL,
-			LogLevel::NOTICE => OutputInterface::OUTPUT_NORMAL,
-			LogLevel::INFO   => OutputInterface::VERBOSITY_VERY_VERBOSE,
-			LogLevel::DEBUG   => OutputInterface::VERBOSITY_DEBUG,
-		);
+        $verbosityLevelMap = [
+            LogLevel::ERROR => OutputInterface::OUTPUT_NORMAL,
+            LogLevel::NOTICE => OutputInterface::OUTPUT_NORMAL,
+            LogLevel::INFO   => OutputInterface::VERBOSITY_VERY_VERBOSE,
+            LogLevel::DEBUG   => OutputInterface::VERBOSITY_DEBUG,
+        ];
 
-		$logger = new ConsoleLogger($output, $verbosityLevelMap);
+        $logger = new ConsoleLogger($output, $verbosityLevelMap);
 
-		$manager = new \Scheduler_Manager($logger);
-		$manager->run();
-	}
+        $manager = new \Scheduler_Manager($logger);
+        $manager->run();
+    }
 }

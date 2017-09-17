@@ -7,210 +7,212 @@
 
 class Services_User_MonitorController
 {
-	function setUp()
-	{
-		Services_Exception_Disabled::check('monitor_enabled');
-		Services_Exception_Denied::checkAuth();
-	}
+    function setUp()
+    {
+        Services_Exception_Disabled::check('monitor_enabled');
+        Services_Exception_Denied::checkAuth();
+    }
 
-	function action_object($input)
-	{
-		global $user;
+    function action_object($input)
+    {
+        global $user;
 
-		$type = $input->type->text();
-		$object = $input->object->text();
+        $type = $input->type->text();
+        $object = $input->object->text();
 
-		$objectlib = TikiLib::lib('object');
-		$title = $objectlib->get_title($type, $object);
+        $objectlib = TikiLib::lib('object');
+        $title = $objectlib->get_title($type, $object);
 
-		$monitorlib = TikiLib::lib('monitor');
+        $monitorlib = TikiLib::lib('monitor');
 
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-			$options = $monitorlib->getOptions($user, $type, $object);
-			foreach ($options as $option) {
-				$key = $option['hash'];
-				$selected = $input->notification->{$key}->word();
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $options = $monitorlib->getOptions($user, $type, $object);
+            foreach ($options as $option) {
+                $key = $option['hash'];
+                $selected = $input->notification->{$key}->word();
 
-				if ($option['priority'] != $selected) {
-					$monitorlib->replacePriority($user, $option['event'], $option['target'], $selected);
-				}
-			}
-		}
+                if ($option['priority'] != $selected) {
+                    $monitorlib->replacePriority($user, $option['event'], $option['target'], $selected);
+                }
+            }
+        }
 
-		return array(
-			'type' => $type,
-			'object' => $object,
-			'title' => tr('Notifications for %0', $title),
-			'options' => $monitorlib->getOptions($user, $type, $object),
-			'priorities' => $monitorlib->getPriorities(),
-		);
-	}
+        return [
+            'type' => $type,
+            'object' => $object,
+            'title' => tr('Notifications for %0', $title),
+            'options' => $monitorlib->getOptions($user, $type, $object),
+            'priorities' => $monitorlib->getPriorities(),
+        ];
+    }
 
-	function action_set_component_last_view($input) {
-		global $user;
+    function action_set_component_last_view($input)
+    {
+        global $user;
 
-		if(!$user) return;
+        if (! $user) {
+            return;
+        }
 
-		$tikiLib = TikiLib::lib('tiki');
-		
-		$component = $input->component->text();
-		$id = $input->id->int();
+        $tikiLib = TikiLib::lib('tiki');
 
-		$prefName = "last_viewed_";
+        $component = $input->component->text();
+        $id = $input->id->int();
 
-		if(!empty($id)) {
-			$prefName .= $component."_".$id;
-		} else {
-			$prefName .= $component;
-		}
+        $prefName = "last_viewed_";
 
-		$tikiLib->set_user_preference($user, $prefName, time());
-	}
-	
-	function action_stream($input)
-	{
-		$loginlib = TikiLib::lib('login');
+        if (! empty($id)) {
+            $prefName .= $component."_".$id;
+        } else {
+            $prefName .= $component;
+        }
 
-		$userId = $loginlib->getUserId();
+        $tikiLib->set_user_preference($user, $prefName, time());
+    }
 
-		$critical = $input->critical->int();
-		$high = $input->high->int();
-		$low = $input->low->int();
+    function action_stream($input)
+    {
+        $loginlib = TikiLib::lib('login');
 
-		$from = $input->from->text();
-		$to = $input->to->text();
+        $userId = $loginlib->getUserId();
 
-		if (! $critical && ! $high && ! $low) {
-			throw new Services_Exception_NotFound;
-		}
+        $critical = $input->critical->int();
+        $high = $input->high->int();
+        $low = $input->low->int();
 
-		$searchlib = TikiLib::lib('unifiedsearch');
-		$query = $searchlib->buildQuery([
-			'type' => 'activity',
-		]);
-		$query->setOrder('modification_date_desc');
+        $from = $input->from->text();
+        $to = $input->to->text();
 
-		$sub = $query->getSubQuery('optional');
-		if ($critical) {
-			$sub->filterMultivalue("critical$userId", "stream");
-		}
-		if ($high) {
-			$sub->filterMultivalue("high$userId", "stream");
-		}
-		if ($low) {
-			$sub->filterMultivalue("low$userId", "stream");
-		}
+        if (! $critical && ! $high && ! $low) {
+            throw new Services_Exception_NotFound;
+        }
 
-		if ($from && $to) {
-			$query->filterRange($from, $to);
-		}
+        $searchlib = TikiLib::lib('unifiedsearch');
+        $query = $searchlib->buildQuery([
+            'type' => 'activity',
+        ]);
+        $query->setOrder('modification_date_desc');
 
-		$query->setRange($input->offset->int(), $input->limit->int());
+        $sub = $query->getSubQuery('optional');
+        if ($critical) {
+            $sub->filterMultivalue("critical$userId", "stream");
+        }
+        if ($high) {
+            $sub->filterMultivalue("high$userId", "stream");
+        }
+        if ($low) {
+            $sub->filterMultivalue("low$userId", "stream");
+        }
 
-		$result = $query->search($searchlib->getIndex());
+        if ($from && $to) {
+            $query->filterRange($from, $to);
+        }
 
-		if (! $result->count()) {
-			throw new Services_Exception(tr('No notifications.'), 404);
-		}
+        $query->setRange($input->offset->int(), $input->limit->int());
 
-		// Hacking around the horrible code generating urls in pagination
-		$_GET = [
-			'critical' => $critical, 'high' => $high, 'low' => $low,
-			'from' => $from, 'to' => $to,
-		];
-		$service = ['controller' => 'monitor', 'action' => 'stream'];
+        $result = $query->search($searchlib->getIndex());
 
-		global $prefs;
-		$servicelib = TikiLib::lib('service');
-		if ($prefs['feature_sefurl'] == 'y') {
-			$_SERVER['PHP_SELF'] = $servicelib->getUrl($service);
-		} else {
-			$_GET += $service;
-			$_SERVER['PHP_SELF'] = 'tiki-ajax_services.php';
-		}
+        if (! $result->count()) {
+            throw new Services_Exception(tr('No notifications.'), 404);
+        }
 
-		return [
-			'title' => tr('Notifications'),
-			'result' => $result,
-		];
-	}
+        // Hacking around the horrible code generating urls in pagination
+        $_GET = [
+            'critical' => $critical, 'high' => $high, 'low' => $low,
+            'from' => $from, 'to' => $to,
+        ];
+        $service = ['controller' => 'monitor', 'action' => 'stream'];
 
-	function action_unread($input)
-	{
-		global $user;
-		$loginlib = TikiLib::lib('login');
-		$servicelib = TikiLib::lib('service');
-		$tikilib = TikiLib::lib('tiki');
+        global $prefs;
+        $servicelib = TikiLib::lib('service');
+        if ($prefs['feature_sefurl'] == 'y') {
+            $_SERVER['PHP_SELF'] = $servicelib->getUrl($service);
+        } else {
+            $_GET += $service;
+            $_SERVER['PHP_SELF'] = 'tiki-ajax_services.php';
+        }
 
-		$lastread = $tikilib->get_user_preference($user, 'notification_read', 1388534400); // Jan 2014, as the feature did not exist prior to this date anyway
+        return [
+            'title' => tr('Notifications'),
+            'result' => $result,
+        ];
+    }
 
-		$userId = $loginlib->getUserId();
+    function action_unread($input)
+    {
+        global $user;
+        $loginlib = TikiLib::lib('login');
+        $servicelib = TikiLib::lib('service');
+        $tikilib = TikiLib::lib('tiki');
 
-		$searchlib = TikiLib::lib('unifiedsearch');
-		$query = $searchlib->buildQuery([
-			'type' => 'activity',
-		]);
-		$query->filterMultivalue("critical$userId OR high$userId OR low$userId", 'stream');
-		$query->filterRange($lastread, 'now');
-		$query->filterMultivalue("NOT \"$user\"", 'clear_list');
-		$query->setOrder('modification_date_desc');
+        $lastread = $tikilib->get_user_preference($user, 'notification_read', 1388534400); // Jan 2014, as the feature did not exist prior to this date anyway
 
-		if ($input->nodata->int()) {
-			$query->setRange(0, 1);
-		} else {
-			$query->setRange(0, 7);
-		}
-		$result = $query->search($searchlib->getIndex());
+        $userId = $loginlib->getUserId();
 
-		return [
-			'title' => tr('Unread Notifications'),
-			'count' => count($result),
-			'result' => $result,
-			'timestamp' => TikiLib::lib('tiki')->now,
-			'more_link' => $servicelib->getUrl([
-				'controller' => 'monitor',
-				'action' => 'stream',
-				'from' => '-30 days',
-				'to' => 'now',
-				'critical' => 1,
-				'high' => 1,
-				'low' => 1,
-			]),
-		];
-	}
+        $searchlib = TikiLib::lib('unifiedsearch');
+        $query = $searchlib->buildQuery([
+            'type' => 'activity',
+        ]);
+        $query->filterMultivalue("critical$userId OR high$userId OR low$userId", 'stream');
+        $query->filterRange($lastread, 'now');
+        $query->filterMultivalue("NOT \"$user\"", 'clear_list');
+        $query->setOrder('modification_date_desc');
 
-	function action_clearall($input)
-	{
-		global $user;
+        if ($input->nodata->int()) {
+            $query->setRange(0, 1);
+        } else {
+            $query->setRange(0, 7);
+        }
+        $result = $query->search($searchlib->getIndex());
 
-		$tikilib = TikiLib::lib('tiki');
-		$timestamp = $input->timestamp->int();
+        return [
+            'title' => tr('Unread Notifications'),
+            'count' => count($result),
+            'result' => $result,
+            'timestamp' => TikiLib::lib('tiki')->now,
+            'more_link' => $servicelib->getUrl([
+                'controller' => 'monitor',
+                'action' => 'stream',
+                'from' => '-30 days',
+                'to' => 'now',
+                'critical' => 1,
+                'high' => 1,
+                'low' => 1,
+            ]),
+        ];
+    }
 
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && $timestamp) {
-			$tikilib->set_user_preference($user, 'notification_read', $timestamp);
-		}
+    function action_clearall($input)
+    {
+        global $user;
 
-		return [
-			'title' => tr('Mark all notifications as read'),
-			'timestamp' => $timestamp ?: $tikilib->now,
-		];
-	}
+        $tikilib = TikiLib::lib('tiki');
+        $timestamp = $input->timestamp->int();
 
-	function action_clearone($input)
-	{
-		Services_Exception_Disabled::check('monitor_individual_clear');
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && $timestamp) {
+            $tikilib->set_user_preference($user, 'notification_read', $timestamp);
+        }
 
-		global $user;
-		$relationlib = TikiLib::lib('relation');
-		$searchlib = TikiLib::lib('unifiedsearch');
+        return [
+            'title' => tr('Mark all notifications as read'),
+            'timestamp' => $timestamp ?: $tikilib->now,
+        ];
+    }
 
-		$activity = $input->activity->int();
+    function action_clearone($input)
+    {
+        Services_Exception_Disabled::check('monitor_individual_clear');
 
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && $activity) {
-			$relationlib->add_relation('tiki.monitor.cleared', 'user', $user, 'activity', $activity);
-			$searchlib->invalidateObject('activity', $activity);
-			$searchlib->processUpdateQueue();
-		}
-	}
+        global $user;
+        $relationlib = TikiLib::lib('relation');
+        $searchlib = TikiLib::lib('unifiedsearch');
+
+        $activity = $input->activity->int();
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && $activity) {
+            $relationlib->add_relation('tiki.monitor.cleared', 'user', $user, 'activity', $activity);
+            $searchlib->invalidateObject('activity', $activity);
+            $searchlib->processUpdateQueue();
+        }
+    }
 }
-

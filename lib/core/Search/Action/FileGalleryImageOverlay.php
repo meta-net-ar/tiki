@@ -10,7 +10,7 @@ require_once('lib/images/images.php');
 class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
 {
 
-    protected $replaceKeys = array(
+    protected $replaceKeys = [
       '%file_name%' => 'file.filename',
       '%file_id%' => 'file.fileId',
       '%parts_filename%' => 'parts.filename',
@@ -29,17 +29,17 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
       '%exif_gps_dms%' => 'exif.gps_dms',
       '%exif_gps_dms_lat%' => 'exif.gps_dms_lat',
       '%exif_gps_dms_lon%' => 'exif.gps_dms_lon',
-    );
+    ];
 
     function getValues()
     {
-        return array(
+        return [
           'object_type' => true,
           'object_id' => true,
           'field' => true,
           'value' => true,
           'error_if_missing' => false,
-        );
+        ];
     }
 
     function validate(JitFilter $data)
@@ -61,14 +61,14 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         $trklib = TikiLib::lib('trk');
         $info = $trklib->get_item_info($object_id);
 
-        if (!$info) {
+        if (! $info) {
             throw new Search_Action_Exception(tr('Tracker item %0 not found.', $object_id));
         }
 
         $definition = Tracker_Definition::get($info['trackerId']);
 
         $fieldDefinition = $definition->getFieldFromPermName($field);
-        if (!$fieldDefinition) {
+        if (! $fieldDefinition) {
             throw new Search_Action_Exception(tr('Tracker field %0 not found for tracker %1.', $field, $info['trackerId']));
         }
 
@@ -120,7 +120,7 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
             $error_if_missing = false;
         }
 
-        $newFileList = array();
+        $newFileList = [];
         foreach (explode(',', $fileList) as $fileId) {
             $file = $fileGal->get_file($fileId);
             if (substr($file['filetype'], 0, 6) != 'image/') {
@@ -130,29 +130,31 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
             $galInfo = $fileGal->get_file_gallery_info($file['galleryId']);
             $newUser = $user ?: $file['user'];
             $overlayString = $this->generateString(
-              $value,
-              $file,
-              $galInfo,
-              $info,
-              $fieldDefinition,
-              $error_if_missing,
-              $missingKeys
+                $value,
+                $file,
+                $galInfo,
+                $info,
+                $fieldDefinition,
+                $error_if_missing,
+                $missingKeys
             );
             if ($overlayString === false) {
-                throw new Search_Action_Exception(tr('filegal_image_overlay: Problem processing image "%0", the following values form the template are empty: %1',
+                throw new Search_Action_Exception(tr(
+                    'filegal_image_overlay: Problem processing image "%0", the following values form the template are empty: %1',
                     $file['filename'],
-                    implode(', ', $missingKeys)));
+                    implode(', ', $missingKeys)
+                ));
             }
             $newImage = $this->addTextToImage($file['data'], $overlayString);
             if ($newImage) {
                 $newFileList[] = $fileGal->update_single_file(
-                  $galInfo,
-                  $file['filename'],
-                  $file['filesize'],
-                  $file['filetype'],
-                  $newImage,
-                  $fileId,
-                  $newUser
+                    $galInfo,
+                    $file['filename'],
+                    $file['filesize'],
+                    $file['filetype'],
+                    $newImage,
+                    $fileId,
+                    $newUser
                 );
             } else {
                 $newFileList[] = $fileId;
@@ -163,21 +165,22 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
             // new IDs are generated to for the last version we updated
             $utilities = new Services_Tracker_Utilities;
             $utilities->updateItem(
-              $definition,
-              array(
+                $definition,
+                [
                 'itemId' => $object_id,
                 'status' => $info['status'],
-                'fields' => array(
+                'fields' => [
                   $field => implode(',', $newFileList),
-                ),
-              )
+                ],
+                ]
             );
         }
 
         return true;
     }
 
-    function requiresInput(JitFilter $data) {
+    function requiresInput(JitFilter $data)
+    {
         return false;
     }
 
@@ -195,24 +198,24 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
      * @return string|false
      */
     protected function generateString(
-      $template,
-      $fileData,
-      $galleryData,
-      $itemData,
-      $fieldData,
-      $checkMissing = false,
-      &$missingTemplateKeys = array()
+        $template,
+        $fileData,
+        $galleryData,
+        $itemData,
+        $fieldData,
+        $checkMissing = false,
+        &$missingTemplateKeys = []
     ) {
-        $dataValues = array(
+        $dataValues = [
           'file' => $fileData,
           'gallery' => $galleryData,
           'item' => $itemData,
           'field' => $fieldData,
           'parts' => pathinfo($fileData['filename']),
           'exif' => $this->getExifArray($fileData),
-        );
+        ];
 
-        $values = array();
+        $values = [];
         foreach ($this->replaceKeys as $search => $dataKey) {
             list($data, $key) = explode('.', $dataKey);
             $values[$search] = (isset($dataValues[$data]) && isset($dataValues[$data][$key])) ? $dataValues[$data][$key] : '';
@@ -256,8 +259,8 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
      */
     function getExifArray($fileData)
     {
-        $exif = array();
-        if ($fileData['filetype'] != 'image/jpeg' || !function_exists('exif_read_data')) {
+        $exif = [];
+        if ($fileData['filetype'] != 'image/jpeg' || ! function_exists('exif_read_data')) {
             return $exif;
         }
         $exifData = exif_read_data('data://image/jpeg;base64,'.base64_encode($fileData['data']));
@@ -328,9 +331,9 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
 
         $coordinateDMS = sprintf("%d° %d' %.3f'' %s", $degrees, $minutes, $seconds, $hemisphere);
 
-        return array(
+        return [
           'dd' => $coordinateDD,
           'dms' => $coordinateDMS,
-        );
+        ];
     }
 }

@@ -6,25 +6,26 @@
 // $Id$
 
 namespace Tiki\Recommendation\Engine;
+
 use Tiki\Recommendation\Recommendation;
 
 class FakeEngine implements EngineInterface
 {
-	private $list;
+    private $list;
 
-	function __construct($list)
-	{
-		$this->list = $list;
-	}
+    function __construct($list)
+    {
+        $this->list = $list;
+    }
 
-	function generate($input)
-	{
-		foreach ($this->list as $entry) {
-			if (is_array($entry)) {
-				yield new Recommendation($entry['type'], $entry['object']);
-			} else {
-				yield $entry;
-			}
-		}
-	}
+    function generate($input)
+    {
+        foreach ($this->list as $entry) {
+            if (is_array($entry)) {
+                yield new Recommendation($entry['type'], $entry['object']);
+            } else {
+                yield $entry;
+            }
+        }
+    }
 }

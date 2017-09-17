@@ -7,6 +7,5 @@
 
 interface Tracker_Field_Exportable
 {
-	function getTabularSchema();
+    function getTabularSchema();
 }
-

@@ -9,22 +9,21 @@ namespace Tracker\Tabular\Writer;
 
 class HtmlWriter
 {
-	function __construct()
-	{
-	}
+    function __construct()
+    {
+    }
 
-	function getData(\Tracker\Tabular\Source\SourceInterface $source)
-	{
-		$schema = $source->getSchema();
-		$schema = $schema->getHtmlOutputSchema();
+    function getData(\Tracker\Tabular\Source\SourceInterface $source)
+    {
+        $schema = $source->getSchema();
+        $schema = $schema->getHtmlOutputSchema();
 
-		$columns = $schema->getColumns();
+        $columns = $schema->getColumns();
 
-		foreach ($source->getEntries() as $entry) {
-			yield array_map(function ($column) use ($entry) {
-				return $entry->render($column);
-			}, $columns);
-		}
-	}
+        foreach ($source->getEntries() as $entry) {
+            yield array_map(function ($column) use ($entry) {
+                return $entry->render($column);
+            }, $columns);
+        }
+    }
 }
-

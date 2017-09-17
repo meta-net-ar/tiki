@@ -17,30 +17,29 @@ use TikiLib;
 
 class GoalCheckCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('goal:check')
-			->setDescription('Reviews all active goals and assigns rewards.')
-			;
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('goal:check')
+            ->setDescription('Reviews all active goals and assigns rewards.')
+            ;
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		global $prefs;
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        global $prefs;
 
-		if ($prefs['goal_enabled'] != 'y') {
-			$output->writeln('<error>Goals not enabled.</error>');
-			return;
-		}
+        if ($prefs['goal_enabled'] != 'y') {
+            $output->writeln('<error>Goals not enabled.</error>');
+            return;
+        }
 
-		// Set-up reporting for achieved goals
-		TikiLib::events()->bind('tiki.goal.reached', function ($args) use ($output) {
-			$output->writeln(tr('%0 reached for %1 (%2)', $args['name'], $args['user'] ?: $args['group'], $args['goalType']));
-		});
+        // Set-up reporting for achieved goals
+        TikiLib::events()->bind('tiki.goal.reached', function ($args) use ($output) {
+            $output->writeln(tr('%0 reached for %1 (%2)', $args['name'], $args['user'] ?: $args['group'], $args['goalType']));
+        });
 
-		$goallib = TikiLib::lib('goal');
-		$goallib->evaluateAllGoals();
-	}
+        $goallib = TikiLib::lib('goal');
+        $goallib->evaluateAllGoals();
+    }
 }
-

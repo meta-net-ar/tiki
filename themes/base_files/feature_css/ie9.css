@@ -2,5 +2,5 @@
 
 .CodeMirror-fullscreen,
 .TextArea-fullscreen {
-	top: expression(eval(document.body.scrollTop + 15) + "px");
+    top: expression(eval(document.body.scrollTop + 15) + "px");
 }

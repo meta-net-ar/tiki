@@ -9,26 +9,25 @@ namespace Tiki\FileGallery\FileWrapper;
 
 class PhysicalFile implements WrapperInterface
 {
-	private $path;
-	private $basePath;
+    private $path;
+    private $basePath;
 
-	function __construct($basePath, $path)
-	{
-		$this->basePath = rtrim($basePath, '/\\');
-		$this->path = $path;
-	}
+    function __construct($basePath, $path)
+    {
+        $this->basePath = rtrim($basePath, '/\\');
+        $this->path = $path;
+    }
 
-	function getReadableFile()
-	{
-		$savedir = $this->basePath;
-		return $savedir . '/' . $this->path;
-	}
+    function getReadableFile()
+    {
+        $savedir = $this->basePath;
+        return $savedir . '/' . $this->path;
+    }
 
-	function getContents()
-	{
-		$tmpfname = $this->basePath . '/' . $this->path;
+    function getContents()
+    {
+        $tmpfname = $this->basePath . '/' . $this->path;
 
-		return \file_get_contents($tmpfname);
-	}
+        return \file_get_contents($tmpfname);
+    }
 }
-

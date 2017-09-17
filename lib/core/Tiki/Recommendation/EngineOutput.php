@@ -9,6 +9,5 @@ namespace Tiki\Recommendation;
 
 interface EngineOutput
 {
-	function __toString();
+    function __toString();
 }
-

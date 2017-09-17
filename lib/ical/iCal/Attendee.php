@@ -78,17 +78,17 @@ class File_iCal_Attendee
     /**
      * @access protected
      */
-    protected $_member = array();
+    protected $_member = [];
 
     /**
      * @access protected
      */
-    protected $_delegatedto = array();
+    protected $_delegatedto = [];
 
     /**
      * @access protected
      */
-    protected $_delegatedfrom = array();
+    protected $_delegatedfrom = [];
 
     /**
      * @access protected
@@ -110,7 +110,8 @@ class File_iCal_Attendee
      * @access  public
      * @param   string  The contact address for the attendee
      */
-    public function __construct($address) {
+    public function __construct($address)
+    {
         $this->_address = $address;
         self::setStatusNeedsAction();
         self::makeIndividual();
@@ -122,7 +123,8 @@ class File_iCal_Attendee
      * @access  public
      * @return  string  The address for the attendee
      */
-    public function getAddress() {
+    public function getAddress()
+    {
         return $this->_address;
     }
 
@@ -134,7 +136,8 @@ class File_iCal_Attendee
      * @access  public
      * @param   string  A string to which the common name will be set
      */
-    public function setCommonName($cn) {
+    public function setCommonName($cn)
+    {
         $this->_cn = $cn;
     }
 
@@ -144,126 +147,154 @@ class File_iCal_Attendee
      * @access  public
      * @return  string  The common name for this attendee
      */
-    public function getCommonName() {
+    public function getCommonName()
+    {
         return $this->_cn;
     }
 
-    public function makeChair() {
+    public function makeChair()
+    {
         $this->_role = File_iCal::ICAL_ROLE_CHAIR;
     }
 
-    public function makeRequiredParticipant() {
+    public function makeRequiredParticipant()
+    {
         $this->_role = File_iCal::IICAL_ROLE_REQUIRED;
     }
 
-    public function makeOptionalParticipant() {
+    public function makeOptionalParticipant()
+    {
         $this->_role = File_iCal::IICAL_ROLE_OPTIONAL;
     }
 
-    public function makeNonParticipant() {
+    public function makeNonParticipant()
+    {
         $this->_role = File_iCal::IICAL_ROLE_NONPARTICIPATING;
     }
 
-    public function getRole() {
+    public function getRole()
+    {
         return $this->_role;
     }
 
-    public function setStatusNeedsAction() {
+    public function setStatusNeedsAction()
+    {
         $this->_status = File_iCal::IICAL_STATUS_NEEDSACTION;
     }
 
-    public function setStatusAccepted() {
+    public function setStatusAccepted()
+    {
         $this->_status = File_iCal::IICAL_STATUS_ACCEPTED;
     }
 
-    public function setStatusDeclined() {
+    public function setStatusDeclined()
+    {
         $this->_status = File_iCal::IICAL_STATUS_DECLINED;
     }
 
-    public function setStatusTentative() {
+    public function setStatusTentative()
+    {
         $this->_status = File_iCal::IICAL_STATUS_TENTATIVE;
     }
 
-    public function setStatusDelegated() {
+    public function setStatusDelegated()
+    {
         $this->_status = File_iCal::IICAL_STATUS_DELEGATED;
     }
 
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->_status;
     }
 
-    public function setRSVP($bool) {
+    public function setRSVP($bool)
+    {
         $bool ? $this->_rsvp = true : $this->_rsvp = false;
     }
 
-    public function getRSVP() {
+    public function getRSVP()
+    {
         return $this->_rsvp;
     }
 
-    public function makeIndividual() {
+    public function makeIndividual()
+    {
         $this->_cutype = File_iCal::IICAL_USERTYPE_INDIVIDUAL;
     }
 
-    public function makeGroup() {
+    public function makeGroup()
+    {
         $this->_cutype = File_iCal::IICAL_USERTYPE_GROUP;
     }
 
-    public function makeResource() {
+    public function makeResource()
+    {
         $this->_cutype = File_iCal::IICAL_USERTYPE_RESOURCE;
     }
 
-    public function makeRoom() {
+    public function makeRoom()
+    {
         $this->_cutype = File_iCal::IICAL_USERTYPE_ROOM;
     }
 
-    public function getUserType() {
+    public function getUserType()
+    {
         return $this->_cutype;
     }
 
-    public function addMember($m) {
-        if (!in_array($m, $this->_member)) {
+    public function addMember($m)
+    {
+        if (! in_array($m, $this->_member)) {
             $this->_member[] = $m;
         }
     }
 
-    public function getMembers() {
+    public function getMembers()
+    {
         return $this->_member;
     }
 
-    public function addDelegatee($d) {
-        if (!in_array($d, $this->_delegatedto)) {
+    public function addDelegatee($d)
+    {
+        if (! in_array($d, $this->_delegatedto)) {
             $this->_delegatedto = $d;
         }
     }
 
-    public function getDelegatees() {
+    public function getDelegatees()
+    {
         return $this->_delagatedto;
     }
 
-    public function addDelegator($d) {
-        if (!in_array($d, $this->_delegatedfrom)) {
+    public function addDelegator($d)
+    {
+        if (! in_array($d, $this->_delegatedfrom)) {
             $this->_delegatedfrom = $d;
         }
     }
 
-    public function getDelegators() {
+    public function getDelegators()
+    {
         return $this->_delegatedfrom;
     }
 
-    public function setSentBy($s) {
+    public function setSentBy($s)
+    {
         $this->_sentby = $s;
     }
 
-    public function getSentBy() {
+    public function getSentBy()
+    {
         return $this->_sentby;
     }
 
-    public function setDirectory($d) {
+    public function setDirectory($d)
+    {
         $this->_dir = $d;
     }
 
-    public function getDirectory() {
+    public function getDirectory()
+    {
         return $this->_dir;
     }
-
 }

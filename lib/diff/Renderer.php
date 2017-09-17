@@ -30,7 +30,7 @@ class Text_Diff_Renderer
     /**
      * Constructor.
      */
-    function __construct($params = array())
+    function __construct($params = [])
     {
         foreach ($params as $param => $value) {
             $v = '_' . $param;
@@ -51,7 +51,7 @@ class Text_Diff_Renderer
     {
         $xi = $yi = 1;
         $block = false;
-        $context = array();
+        $context = [];
 
         $nlead = $this->_leading_context_lines;
         $ntrail = $this->_trailing_context_lines;
@@ -68,19 +68,23 @@ class Text_Diff_Renderer
                             $context = array_slice($edit->orig, 0, $ntrail);
                             $block[] = new Text_Diff_Op_copy($context);
                         }
-                        $this->_block($x0, $ntrail + $xi - $x0,
-                                      $y0, $ntrail + $yi - $y0,
-                                      $block);
+                        $this->_block(
+                            $x0,
+                            $ntrail + $xi - $x0,
+                            $y0,
+                            $ntrail + $yi - $y0,
+                            $block
+                        );
                         $block = false;
                     }
                 }
                 $context = $edit->orig;
             } else {
-                if (!is_array($block)) {
+                if (! is_array($block)) {
                     $context = array_slice($context, count($context) - $nlead);
                     $x0 = $xi - count($context);
                     $y0 = $yi - count($context);
-                    $block = array();
+                    $block = [];
                     if ($context) {
                         $block[] = new Text_Diff_Op_copy($context);
                     }
@@ -97,9 +101,13 @@ class Text_Diff_Renderer
         }
 
         if (is_array($block)) {
-            $this->_block($x0, $xi - $x0,
-                          $y0, $yi - $y0,
-                          $block);
+            $this->_block(
+                $x0,
+                $xi - $x0,
+                $y0,
+                $yi - $y0,
+                $block
+            );
         }
 
         return $this->_endDiff();
@@ -110,24 +118,24 @@ class Text_Diff_Renderer
         $this->_startBlock($this->_blockHeader($xbeg, $xlen, $ybeg, $ylen));
         foreach ($edits as $edit) {
             switch (strtolower(get_class($edit))) {
-            case 'text_diff_op_copy':
-                $this->_context($edit->orig);
-                break;
+                case 'text_diff_op_copy':
+                    $this->_context($edit->orig);
+                    break;
 
-            case 'text_diff_op_add':
-                $this->_added($edit->final);
-                break;
+                case 'text_diff_op_add':
+                    $this->_added($edit->final);
+                    break;
 
-            case 'text_diff_op_delete':
-                $this->_deleted($edit->orig);
-                break;
+                case 'text_diff_op_delete':
+                    $this->_deleted($edit->orig);
+                    break;
 
-            case 'text_diff_op_change':
-                $this->_changed($edit->orig, $edit->final);
-                break;
+                case 'text_diff_op_change':
+                    $this->_changed($edit->orig, $edit->final);
+                    break;
 
-            default:
-                trigger_error("Unknown edit type", E_USER_ERROR);
+                default:
+                    trigger_error("Unknown edit type", E_USER_ERROR);
             }
 
             $this->_endBlock();
@@ -160,7 +168,7 @@ class Text_Diff_Renderer
 
     function _startBlock($header)
     {
-    	// TODO: What's this output for? It breaks XML pages
+        // TODO: What's this output for? It breaks XML pages
         // echo $header . "\n";
     }
 
@@ -196,5 +204,4 @@ class Text_Diff_Renderer
         echo "---\n";
         $this->_added($final);
     }
-
 }

@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -16,18 +16,18 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function module_mustread_info()
 {
-	return array(
-		'name' => tr('Must Read'),
-		'description' => tr('Request the creation of a mustread item based on the current object.'),
-		'prefs' => ['mustread_enabled'],
-		'params' => array(
-			'objectField' => array(
-				'required' => true,
-				'name' => tr('Object Field'),
-				'description' => tr('Permanent name of the field containing the object reference'),
-			),
-		),
-	);
+    return [
+        'name' => tr('Must Read'),
+        'description' => tr('Request the creation of a mustread item based on the current object.'),
+        'prefs' => ['mustread_enabled'],
+        'params' => [
+            'objectField' => [
+                'required' => true,
+                'name' => tr('Object Field'),
+                'description' => tr('Permanent name of the field containing the object reference'),
+            ],
+        ],
+    ];
 }
 
 /**
@@ -36,14 +36,14 @@ function module_mustread_info()
  */
 function module_mustread($mod_reference, $module_params)
 {
-	global $prefs;
+    global $prefs;
 
-	$smarty = TikiLib::lib('smarty');
+    $smarty = TikiLib::lib('smarty');
 
-	$object = current_object();
+    $object = current_object();
 
-	$smarty->assign('mustread_module', [
-		'object' => $object,
-		'field' => $module_params['objectField'],
-	]);
+    $smarty->assign('mustread_module', [
+        'object' => $object,
+        'field' => $module_params['objectField'],
+    ]);
 }

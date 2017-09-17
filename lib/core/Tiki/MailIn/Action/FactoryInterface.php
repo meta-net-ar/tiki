@@ -6,11 +6,11 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 
 interface FactoryInterface
 {
-	function createAction(Account $account, Message $message);
+    function createAction(Account $account, Message $message);
 }
-

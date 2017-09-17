@@ -14,56 +14,56 @@ $access->check_permission('tiki_p_plugin_approve');
 $parserlib = TikiLib::lib('parser');
 
 if (isset($_POST['submit_mult']) && ($_POST['submit_mult'] == 'clear') && is_array($_POST['clear'])) {
-	foreach ($_POST['clear'] as $fp) {
-		$parserlib->plugin_clear_fingerprint($fp);
-	}
+    foreach ($_POST['clear'] as $fp) {
+        $parserlib->plugin_clear_fingerprint($fp);
+    }
 }
 
 if (isset($_POST['submit_mult']) && ($_POST['submit_mult'] == 'approve') && is_array($_POST['clear'])) {
-	foreach ($_POST['clear'] as $fp) {
-		$parserlib->approve_selected_pending_plugings($fp);
-	}
+    foreach ($_POST['clear'] as $fp) {
+        $parserlib->approve_selected_pending_plugings($fp);
+    }
 }
 
 if (isset($_REQUEST['approveone'])) {
-	$parserlib->approve_selected_pending_plugings($_REQUEST['approveone']);
+    $parserlib->approve_selected_pending_plugings($_REQUEST['approveone']);
 }
 
 if (isset($_REQUEST['clearone'])) {
-	$parserlib->plugin_clear_fingerprint($_REQUEST['clearone']);
+    $parserlib->plugin_clear_fingerprint($_REQUEST['clearone']);
 }
 
 if (isset($_REQUEST['refresh'])) {
-	$pages = $tikilib->list_pages();
+    $pages = $tikilib->list_pages();
 
-	$temp = serialize($headerlib);	// cache headerlib so we can remove all js etc added by plugins
+    $temp = serialize($headerlib);  // cache headerlib so we can remove all js etc added by plugins
 
-	// disable redirect plugin etc
-	$access->preventRedirect(true);
-	// try to avoid timeouts
-	$old_max_execution_time = ini_get('max_execution_time');
-	$time_limit = new Tiki_TimeLimit(0);
+    // disable redirect plugin etc
+    $access->preventRedirect(true);
+    // try to avoid timeouts
+    $old_max_execution_time = ini_get('max_execution_time');
+    $time_limit = new Tiki_TimeLimit(0);
 
-	foreach ($pages['data'] as $apage) {
-		$page = $apage['pageName'];
-		$parserlib->setOptions(
-			array(
-				'page' => $page,
-				'is_html' => $apage['is_html'],
-			)
-		);
-		$parserlib->parse_first($apage['data'], $pre, $no);
-	}
+    foreach ($pages['data'] as $apage) {
+        $page = $apage['pageName'];
+        $parserlib->setOptions(
+            [
+                'page' => $page,
+                'is_html' => $apage['is_html'],
+            ]
+        );
+        $parserlib->parse_first($apage['data'], $pre, $no);
+    }
 
-	ini_set('max_execution_time', $old_max_execution_time);
-	$access->preventRedirect(false);
+    ini_set('max_execution_time', $old_max_execution_time);
+    $access->preventRedirect(false);
 
-	$headerlib = unserialize($temp);
-	unset($temp);
+    $headerlib = unserialize($temp);
+    unset($temp);
 }
 
 if (isset($_POST['approveall'])) {
-	$parserlib->approve_all_pending_plugins();
+    $parserlib->approve_all_pending_plugins();
 }
 
 $smarty->assign('plugin_list', $parserlib->list_plugins_pending_approval());

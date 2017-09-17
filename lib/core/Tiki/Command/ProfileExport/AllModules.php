@@ -14,25 +14,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AllModules extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:all-modules')
-			->setDescription('Export all module definitions');
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:all-modules')
+            ->setDescription('Export all module definitions');
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$writer = $this->getProfileWriter($input);
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $writer = $this->getProfileWriter($input);
 
-		$list = \TikiDb::get()->table('tiki_modules')->fetchColumn('moduleId', array());
+        $list = \TikiDb::get()->table('tiki_modules')->fetchColumn('moduleId', []);
 
-		foreach ($list as $moduleId) {
-			\Tiki_Profile_InstallHandler_Module::export($writer, $moduleId);
-		}
+        foreach ($list as $moduleId) {
+            \Tiki_Profile_InstallHandler_Module::export($writer, $moduleId);
+        }
 
-		$writer->save();
-	}
+        $writer->save();
+    }
 }

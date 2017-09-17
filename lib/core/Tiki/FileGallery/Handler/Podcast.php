@@ -9,12 +9,11 @@ namespace Tiki\FileGallery\Handler;
 
 class Podcast extends FileSystem
 {
-	private $directory;
+    private $directory;
 
-	function __construct()
-	{
-		global $prefs;
-		parent::__construct($prefs['fgal_podcast_dir']);
-	}
+    function __construct()
+    {
+        global $prefs;
+        parent::__construct($prefs['fgal_podcast_dir']);
+    }
 }
-

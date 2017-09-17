@@ -8,57 +8,57 @@
 class Services_Scheduler_Controller
 {
 
-	/**
-	 * @var SchedulersLib
-	 */
-	private $lib;
+    /**
+     * @var SchedulersLib
+     */
+    private $lib;
 
-	/**
-	 * @var TikiAccessLib
-	 */
-	private $access;
+    /**
+     * @var TikiAccessLib
+     */
+    private $access;
 
-	function setUp()
-	{
-		$this->lib = TikiLib::lib('scheduler');
-		$this->access = TikiLib::lib('access');
-	}
+    function setUp()
+    {
+        $this->lib = TikiLib::lib('scheduler');
+        $this->access = TikiLib::lib('access');
+    }
 
 
-	/**
-	 * Admin user "perform with checked" action to remove selected users
-	 *
-	 * @param $input JitFilter
-	 * @return array
-	 * @throws Services_Exception
-	 * @throws Services_Exception_BadRequest
-	 * @throws Services_Exception_Denied
-	 * @throws Services_Exception_NotFound
-	 */
-	function action_remove($input)
-	{
-		Services_Exception_Denied::checkGlobal('admin_users');
+    /**
+     * Admin user "perform with checked" action to remove selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Services_Exception
+     * @throws Services_Exception_BadRequest
+     * @throws Services_Exception_Denied
+     * @throws Services_Exception_NotFound
+     */
+    function action_remove($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
 
-		$schedulerId = $input->schedulerId->int();
-		$confirm = $input->confirm->int();
+        $schedulerId = $input->schedulerId->int();
+        $confirm = $input->confirm->int();
 
-		$scheduler = $this->lib->get_scheduler($schedulerId);
+        $scheduler = $this->lib->get_scheduler($schedulerId);
 
-		if (!$scheduler) {
-			throw new Services_Exception_NotFound;
-		}
+        if (! $scheduler) {
+            throw new Services_Exception_NotFound;
+        }
 
-		if ($confirm) {
-			$this->lib->remove_scheduler($schedulerId);
+        if ($confirm) {
+            $this->lib->remove_scheduler($schedulerId);
 
-			return array(
-				'schedulerId' => 0,
-			);
-		}
+            return [
+                'schedulerId' => 0,
+            ];
+        }
 
-		return array(
-			'schedulerId' => $schedulerId,
-			'name' => $scheduler['name'],
-		);
-	}
+        return [
+            'schedulerId' => $schedulerId,
+            'name' => $scheduler['name'],
+        ];
+    }
 }

@@ -5,11 +5,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 function smarty_function_custom_template($params, $smarty)
 {
-	return TikiLib::custom_template($params['basetpl'],$params['modifiers']);
+    return TikiLib::custom_template($params['basetpl'], $params['modifiers']);
 }

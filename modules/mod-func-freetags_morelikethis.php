@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -16,20 +16,20 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function module_freetags_morelikethis_info()
 {
-	return array(
-		'name' => tra('Similar-Tag Items'),
-		'description' => tra('Shows content with multiple tags in common.'),
-		'prefs' => array('feature_freetags'),
-		'params' => array(
-			'type' => array(
-				'required' => false,
-				'name' => tra('Type'),
-				'description' => tra('Type of objects to extract.'),
-				'filter' => 'text',
-			),
-		),
-		'common_params' => array('nonums', 'rows')
-	);
+    return [
+        'name' => tra('Similar-Tag Items'),
+        'description' => tra('Shows content with multiple tags in common.'),
+        'prefs' => ['feature_freetags'],
+        'params' => [
+            'type' => [
+                'required' => false,
+                'name' => tra('Type'),
+                'description' => tra('Type of objects to extract.'),
+                'filter' => 'text',
+            ],
+        ],
+        'common_params' => ['nonums', 'rows']
+    ];
 }
 
 /**
@@ -38,19 +38,19 @@ function module_freetags_morelikethis_info()
  */
 function module_freetags_morelikethis($mod_reference, $module_params)
 {
-	$smarty = TikiLib::lib('smarty');
-	$freetaglib = TikiLib::lib('freetag');
+    $smarty = TikiLib::lib('smarty');
+    $freetaglib = TikiLib::lib('freetag');
 
-	$out = null;
-	if (isset($module_params['type'])) {
-		$out = $module_params['type'];
-	}
-	
-	if ($object = current_object()) {
-		$morelikethis = $freetaglib->get_similar($object['type'], $object['object'], $mod_reference["rows"], $out);
-		$smarty->assign('modMoreLikeThis', $morelikethis);
-		$smarty->assign('module_rows', $mod_reference["rows"]);
-	}
+    $out = null;
+    if (isset($module_params['type'])) {
+        $out = $module_params['type'];
+    }
 
-	$smarty->assign('tpl_module_title', tra("Similar pages"));
+    if ($object = current_object()) {
+        $morelikethis = $freetaglib->get_similar($object['type'], $object['object'], $mod_reference["rows"], $out);
+        $smarty->assign('modMoreLikeThis', $morelikethis);
+        $smarty->assign('module_rows', $mod_reference["rows"]);
+    }
+
+    $smarty->assign('tpl_module_title', tra("Similar pages"));
 }

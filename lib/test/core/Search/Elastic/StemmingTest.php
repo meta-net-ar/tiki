@@ -10,28 +10,27 @@
  */
 class Search_Elastic_StemmingTest extends Search_Index_StemmingTest
 {
-	function setUp()
-	{
-		static $count = 0;
+    function setUp()
+    {
+        static $count = 0;
 
-		$connection = new Search_Elastic_Connection('http://localhost:9200');
+        $connection = new Search_Elastic_Connection('http://localhost:9200');
 
-		$status = $connection->getStatus();
-		if (! $status->ok) {
-			$this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
-		}
+        $status = $connection->getStatus();
+        if (! $status->ok) {
+            $this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
+        }
 
-		$this->index = new Search_Elastic_Index($connection, 'test_index');
-		$this->index->destroy();
+        $this->index = new Search_Elastic_Index($connection, 'test_index');
+        $this->index->destroy();
 
-		$this->populate($this->index);
-	}
+        $this->populate($this->index);
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

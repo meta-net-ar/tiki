@@ -7,58 +7,57 @@
 
 class Search_Formatter_ValueFormatter_Wikiplugin extends Search_Formatter_ValueFormatter_Abstract
 {
-	private $arguments;
+    private $arguments;
 
-	function __construct( $arguments )
-	{
-		$this->arguments = $arguments;
-	}
+    function __construct($arguments)
+    {
+        $this->arguments = $arguments;
+    }
 
-	function render($name, $value, array $entry)
-	{
-		if (substr($name, 0, 11) !== 'wikiplugin_') {
-			return $value;
-		} else {
-			$name = substr($name, 11);
-		}
+    function render($name, $value, array $entry)
+    {
+        if (substr($name, 0, 11) !== 'wikiplugin_') {
+            return $value;
+        } else {
+            $name = substr($name, 11);
+        }
 
-		if (isset($this->arguments['content'])) {
-			$content = $this->arguments['content'];
-			unset( $this->arguments['content'] );
-		} else {
-			$content = '';
-		}
-		$defaults = array();
-		if (isset($this->arguments['default'])) {
-			parse_str($this->arguments['default'], $defaults);
-		}
+        if (isset($this->arguments['content'])) {
+            $content = $this->arguments['content'];
+            unset($this->arguments['content']);
+        } else {
+            $content = '';
+        }
+        $defaults = [];
+        if (isset($this->arguments['default'])) {
+            parse_str($this->arguments['default'], $defaults);
+        }
 
-		$params = array();
-		foreach ($this->arguments as $key => $val) {
-			if (isset($entry[$val])) {
-				$params[$key] = $entry[$val];
-			} else if (isset($defaults[$key])) {
-				$params[$key] = $defaults[$key];
-			} else if ($key !== 'default') {
-				$params[$key] = $val;
-			}
-		}
+        $params = [];
+        foreach ($this->arguments as $key => $val) {
+            if (isset($entry[$val])) {
+                $params[$key] = $entry[$val];
+            } elseif (isset($defaults[$key])) {
+                $params[$key] = $defaults[$key];
+            } elseif ($key !== 'default') {
+                $params[$key] = $val;
+            }
+        }
 
-		$parserlib = TikiLib::lib('parser');
-		$out = $parserlib->plugin_execute(
-			$name,
-			$content,
-			$params,
-			0,
-			false,
-			array(
-				'context_format' => 'html',
-				'ck_editor' => false,
-				'is_html' => 'y'
-			)
-		);
+        $parserlib = TikiLib::lib('parser');
+        $out = $parserlib->plugin_execute(
+            $name,
+            $content,
+            $params,
+            0,
+            false,
+            [
+                'context_format' => 'html',
+                'ck_editor' => false,
+                'is_html' => 'y'
+            ]
+        );
 
-		return '~np~' . $out . '~/np~';
-	}
+        return '~np~' . $out . '~/np~';
+    }
 }
-

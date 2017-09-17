@@ -20,19 +20,23 @@
  */
 function smarty_function_autocomplete($params, $smarty)
 {
-	global $prefs;
-	$headerlib = TikiLib::lib('header');
+    global $prefs;
+    $headerlib = TikiLib::lib('header');
 
-	if ($prefs['javascript_enabled'] !== 'y' or $prefs['feature_jquery_autocomplete'] !== 'y') return '';
+    if ($prefs['javascript_enabled'] !== 'y' or $prefs['feature_jquery_autocomplete'] !== 'y') {
+        return '';
+    }
 
-	if ( empty($params) || empty($params['element']) || empty($params['type']) ) return '';
-	
-	if (!empty($params['options'])) {
-		$options = ',{' . $params['options'] . '}';
-	} else {
-		$options = '';
-	}
+    if (empty($params) || empty($params['element']) || empty($params['type'])) {
+        return '';
+    }
 
-	$content = '$("' . $params['element'] . '").tiki("autocomplete", "'. $params['type'] .'"' . $options . ');';
-	$headerlib->add_jq_onready($content);
+    if (! empty($params['options'])) {
+        $options = ',{' . $params['options'] . '}';
+    } else {
+        $options = '';
+    }
+
+    $content = '$("' . $params['element'] . '").tiki("autocomplete", "'. $params['type'] .'"' . $options . ');';
+    $headerlib->add_jq_onready($content);
 }

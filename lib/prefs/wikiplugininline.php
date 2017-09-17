@@ -1,74 +1,74 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
-function prefs_wikiplugininline_list($partial = false) 
+function prefs_wikiplugininline_list($partial = false)
 {
-	global $tikilib;
-	$parserlib = TikiLib::lib('parser');
-	
-	$defaultInline = array(
-		'file' => 'y',
-		'getaccesstoken' => 'y',
-		'googleanalytics' => 'y',
-		'group' => 'y',
-		'grouplist' => 'y',
-		'mail' => 'y',
-		'perm' => 'y',
-		'smarty' => 'y',
-		'trackeritemfield' => 'y',
-		'transclude' => 'y',
-		'zotero' => 'y',
-	);
+    global $tikilib;
+    $parserlib = TikiLib::lib('parser');
 
-	if ($partial) {
-		$out = array();
-		$list = array();
-		$alias = array();
-		foreach ( glob('lib/wiki-plugins/wikiplugin_*.php') as $file ) {
-			$base = basename($file);
-			$plugin = substr($base, 11, -4);
+    $defaultInline = [
+        'file' => 'y',
+        'getaccesstoken' => 'y',
+        'googleanalytics' => 'y',
+        'group' => 'y',
+        'grouplist' => 'y',
+        'mail' => 'y',
+        'perm' => 'y',
+        'smarty' => 'y',
+        'trackeritemfield' => 'y',
+        'transclude' => 'y',
+        'zotero' => 'y',
+    ];
 
-			$list[] = $plugin;
-		}
+    if ($partial) {
+        $out = [];
+        $list = [];
+        $alias = [];
+        foreach (glob('lib/wiki-plugins/wikiplugin_*.php') as $file) {
+            $base = basename($file);
+            $plugin = substr($base, 11, -4);
 
-		global $prefs;
-		if ( isset($prefs['pluginaliaslist']) ) {
-			$alias = @unserialize($prefs['pluginaliaslist']);
-			$alias = array_filter($alias);
-		}
-		$list = array_filter(array_merge($list, $alias));
-		sort($list);
+            $list[] = $plugin;
+        }
 
-		foreach ( $list as $plugin ) {
-			$preference = 'wikiplugininline_' . $plugin;
-			$out[$preference] = array(
-				'default' => isset($defaultInline[$plugin]) ? 'y' : 'n',
-			);
-		}
+        global $prefs;
+        if (isset($prefs['pluginaliaslist'])) {
+            $alias = @unserialize($prefs['pluginaliaslist']);
+            $alias = array_filter($alias);
+        }
+        $list = array_filter(array_merge($list, $alias));
+        sort($list);
 
-		return $out;
-	}
+        foreach ($list as $plugin) {
+            $preference = 'wikiplugininline_' . $plugin;
+            $out[$preference] = [
+                'default' => isset($defaultInline[$plugin]) ? 'y' : 'n',
+            ];
+        }
 
-	$prefs = array();
+        return $out;
+    }
 
-	foreach ( $parserlib->plugin_get_list() as $plugin ) {
-		$info = $parserlib->plugin_info($plugin);
+    $prefs = [];
 
-		$prefs['wikiplugininline_' . $plugin] = array(
-			'name' => tr('Inline plugin %0', $info['name']),
-			'description' => '',
-			'type' => 'flag',
-			'default' => isset($defaultInline[$plugin]) ? 'y' : 'n',
-		);
+    foreach ($parserlib->plugin_get_list() as $plugin) {
+        $info = $parserlib->plugin_info($plugin);
 
-		if (isset($info['tags'])) {
-			$prefs['wikiplugininline_' . $plugin]['tags'] = (array) $info['tags'];
-		}
-	}
+        $prefs['wikiplugininline_' . $plugin] = [
+            'name' => tr('Inline plugin %0', $info['name']),
+            'description' => '',
+            'type' => 'flag',
+            'default' => isset($defaultInline[$plugin]) ? 'y' : 'n',
+        ];
 
-	return $prefs;
+        if (isset($info['tags'])) {
+            $prefs['wikiplugininline_' . $plugin]['tags'] = (array) $info['tags'];
+        }
+    }
+
+    return $prefs;
 }

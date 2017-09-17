@@ -9,28 +9,28 @@ namespace Tiki\Recommendation;
 
 class Comparator
 {
-	private $engines;
+    private $engines;
 
-	function __construct(EngineSet $engines)
-	{
-		$this->engines = $engines;
-	}
+    function __construct(EngineSet $engines)
+    {
+        $this->engines = $engines;
+    }
 
-	function generate($input)
-	{
-		$out = [];
+    function generate($input)
+    {
+        $out = [];
 
-		$list = $this->engines->getBasicList();
-		foreach ($list as $entry) {
-			list($set, $engine) = $entry;
-			$generated = $engine->generate($input);
-			foreach ($generated as $recommendation) {
-				$set->add($recommendation);
-			}
+        $list = $this->engines->getBasicList();
+        foreach ($list as $entry) {
+            list($set, $engine) = $entry;
+            $generated = $engine->generate($input);
+            foreach ($generated as $recommendation) {
+                $set->add($recommendation);
+            }
 
-			$out[] = $set;
-		}
+            $out[] = $set;
+        }
 
-		return $out;
-	}
+        return $out;
+    }
 }

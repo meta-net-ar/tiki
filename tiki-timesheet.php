@@ -9,16 +9,16 @@
 // $Id$
 
 require_once('tiki-setup.php');
-$access->check_feature(array('feature_time_sheet','feature_trackers'));
-$access->check_permission_either(array('tiki_p_view_trackers', 'tiki_p_create_tracker_items'));
+$access->check_feature(['feature_time_sheet','feature_trackers']);
+$access->check_permission_either(['tiki_p_view_trackers', 'tiki_p_create_tracker_items']);
 
 global $user, $prefs, $tiki_p_admin;
-$auto_query_args = array(
-	'all',
-	'profile',
-	'page',
-	'list'
-);
+$auto_query_args = [
+    'all',
+    'profile',
+    'page',
+    'list'
+];
 
 $trackerId = (int)TikiLib::lib('trk')->get_tracker_by_name('Time sheet');
 $smarty->assign("tiki_p_admin", $tiki_p_admin);
@@ -27,42 +27,42 @@ $smarty->assign("timeSheetProfileLoaded", $trackerId > 0 ? true : false);
 $projectList = Tracker_Query::tracker("Project list")->byName()->query();
 
 if (isset($_REQUEST['all'])) { //all views all sheet items
-	$smarty->assign("all", true);
+    $smarty->assign("all", true);
 
-	$timeSheet = Tracker_Query::tracker("Time sheet")
-		->byName()
-		->query();
+    $timeSheet = Tracker_Query::tracker("Time sheet")
+        ->byName()
+        ->query();
 } else {//views only your items
-	$smarty->assign("all", false);
+    $smarty->assign("all", false);
 
-	$timeSheet = Tracker_Query::tracker("Time sheet")
-		->byName()
-		->filter(array("field" => "Done by", "value" => $user))
-		->query();
+    $timeSheet = Tracker_Query::tracker("Time sheet")
+        ->byName()
+        ->filter(["field" => "Done by", "value" => $user])
+        ->query();
 }
 
 if (isset($projectList)) {
-	if (isset($_REQUEST['save'])) {
-		echo json_encode(
-			$timeSheetNewInputs = Tracker_Query::tracker("Time sheet")
-				->byName()
-				->queryInput()
-		);
-		die;
-	}
+    if (isset($_REQUEST['save'])) {
+        echo json_encode(
+            $timeSheetNewInputs = Tracker_Query::tracker("Time sheet")
+                ->byName()
+                ->queryInput()
+        );
+        die;
+    }
 
-	$smarty->assign("projectList", $projectList);
-	$smarty->assign("timeSheet", $timeSheet);
+    $smarty->assign("projectList", $projectList);
+    $smarty->assign("timeSheet", $timeSheet);
 }
 
 TikiLib::lib("sheet")->setup_jquery_sheet();
 
 $headerlib = TikiLib::lib("header")
-	->add_cssfile("vendor_bundled/vendor/jquery/jtrack/css/jtrack.css")
-	->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/domcached-0.1-jquery.js")
-	->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/jtrack.js")
-	->add_jq_onready(
-		"jTask.init();
+    ->add_cssfile("vendor_bundled/vendor/jquery/jtrack/css/jtrack.css")
+    ->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/domcached-0.1-jquery.js")
+    ->add_jsfile("vendor_bundled/vendor/jquery/jtrack/js/jtrack.js")
+    ->add_jq_onready(
+        "jTask.init();
 
 	$.timesheetSpreadsheet = function() {
 		var table = $('<table title=/>').attr('title', tr('Local Cache (Not Committed)'));
@@ -173,7 +173,7 @@ $headerlib = TikiLib::lib("header")
 	$('#timeSheetTabs')
 		.width($('#timeSheetTabs').parent().width())
 		.tabs();"
-	);
+    );
 
 $smarty->assign('mid', 'tiki-timesheet.tpl');
 // use tiki_full to include include CSS and JavaScript

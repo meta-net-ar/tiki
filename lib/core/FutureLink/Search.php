@@ -15,36 +15,38 @@
 
 class FutureLink_Search
 {
-	var $type = "futurelink";
-	var $version = 0.1;
-	var $page = '';
+    var $type = "futurelink";
+    var $version = 0.1;
+    var $page = '';
 
-	function __construct($page)
-	{
-		$this->page = $page;
-	}
+    function __construct($page)
+    {
+        $this->page = $page;
+    }
 
-	static function goToNewestWikiRevision($version, &$phrase)
-	{
-		if (!isset($_SESSION)) {
-			session_start();
-		}
+    static function goToNewestWikiRevision($version, &$phrase)
+    {
+        if (! isset($_SESSION)) {
+            session_start();
+        }
 
-		if (!empty($_SESSION['phrase'])) { //recover from redirect if it happened
-			$phrase = $_SESSION['phrase'];
-			unset($_SESSION['phrase']);
-			return;
-		}
+        if (! empty($_SESSION['phrase'])) { //recover from redirect if it happened
+            $phrase = $_SESSION['phrase'];
+            unset($_SESSION['phrase']);
+            return;
+        }
 
-		if (empty($phrase)) return;
+        if (empty($phrase)) {
+            return;
+        }
 
         // if successful, will return an array with page, version, data, date, and phrase
         $newestRevision = self::findWikiRevision($phrase);
 
-		if ($newestRevision == false) {
+        if ($newestRevision == false) {
             //TODO: abstract
-			TikiLib::lib("header")->add_jq_onready(
-<<<JQ
+            TikiLib::lib("header")->add_jq_onready(
+                <<<JQ
 				$('<div />')
 					.html(
 						tr('This can happen if the page you are linking to has changed since you obtained the futurelink or if the rights to see it are different from what you have set at the moment.') +
@@ -56,94 +58,98 @@ class FutureLink_Search
 						modal: true
 					});
 JQ
-			);
-			return;
-		}
+            );
+            return;
+        }
 
-		if ($version != $newestRevision['version']) {
-			$_SESSION['phrase'] = $phrase; //prep for redirect if it happens;
+        if ($version != $newestRevision['version']) {
+            $_SESSION['phrase'] = $phrase; //prep for redirect if it happens;
 
-			header('Location: ' . TikiLib::tikiUrl() . 'tiki-pagehistory.php?page=' . $newestRevision['page'] . '&preview=' . $newestRevision['version'] . '&nohistory');
-			exit();
-		}
-	}
+            header('Location: ' . TikiLib::tikiUrl() . 'tiki-pagehistory.php?page=' . $newestRevision['page'] . '&preview=' . $newestRevision['version'] . '&nohistory');
+            exit();
+        }
+    }
 
-	static function findWikiRevision($phrase)
-	{
-		global $tikilib;
+    static function findWikiRevision($phrase)
+    {
+        global $tikilib;
         //TODO: abstract
-		$phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
+        $phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
 
         // This query will *ALWAYS* fail if the destination page had been created/edited *PRIOR* to applying the 'Simple Wiki Attributes' profile!
         // Just recreate the destination page after having applied the profile in order to load it with the proper attributes.
-		$query = (new Tracker_Query('Wiki Attributes'))
-			->byName()
-			->filterFieldByValueLike('Value', $phrase)
-			->render(false)
-			->getLast();
+        $query = (new Tracker_Query('Wiki Attributes'))
+            ->byName()
+            ->filterFieldByValueLike('Value', $phrase)
+            ->render(false)
+            ->getLast();
 
         // TODO: consider adding a test on query failure in order to determine whether:
         //       1) the phrase isn't found, or
         //       2) the Simple Wiki Attributes profile wasn't in place at page-creation
         // ...then display a more meaningful error message
-		if (empty($query)) return false; //couldn't find it
+        if (empty($query)) {
+            return false; //couldn't find it
+        }
 
-		$query = end($query); //query has a key of itemId, we just need it's details
-		$version = $query['Attribute'];
-		$page = $query['Page'];
-		$data = $query['Value'];
+        $query = end($query); //query has a key of itemId, we just need it's details
+        $version = $query['Attribute'];
+        $page = $query['Page'];
+        $data = $query['Value'];
 
-		$date = $tikilib->getOne('SELECT lastModif FROM tiki_pages WHERE pageName = ? AND version = ?', array($page, $version));
+        $date = $tikilib->getOne('SELECT lastModif FROM tiki_pages WHERE pageName = ? AND version = ?', [$page, $version]);
 
-		if (empty($date) == true) $date = $tikilib->getOne('SELECT lastModif FROM tiki_history WHERE pageName = ? AND version = ?', array($page, $version));
+        if (empty($date) == true) {
+            $date = $tikilib->getOne('SELECT lastModif FROM tiki_history WHERE pageName = ? AND version = ?', [$page, $version]);
+        }
 
-		return array(
-			'page' => $page,
-			'version' => $version,
-			'data' => $data,
-			'date' => $date,
-			'phrase' => $phrase
-		);
-	}
+        return [
+            'page' => $page,
+            'version' => $version,
+            'data' => $data,
+            'date' => $date,
+            'phrase' => $phrase
+        ];
+    }
 
 
-	static function restoreFutureLinkPhrasesInWikiPage($items, $phrase = "")
-	{
+    static function restoreFutureLinkPhrasesInWikiPage($items, $phrase = "")
+    {
         //TODO: abstract
-		$headerlib = TikiLib::lib('header');
-		$tikilib = TikiLib::lib('tiki');
-		$smarty = TikiLib::lib('smarty');
+        $headerlib = TikiLib::lib('header');
+        $tikilib = TikiLib::lib('tiki');
+        $smarty = TikiLib::lib('smarty');
 
-		$phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
-		$phrases = array();
-		$phraseMatchIndex = -1;
+        $phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
+        $phrases = [];
+        $phraseMatchIndex = -1;
 
-		$parsed = $smarty->getTemplateVars('parsed');
-		if (empty($parsed)) {
-			$parsed = $smarty->getTemplateVars('previewd');
-		}
+        $parsed = $smarty->getTemplateVars('parsed');
+        if (empty($parsed)) {
+            $parsed = $smarty->getTemplateVars('previewd');
+        }
 
-		foreach ($items as $i => $item) {
-			if (!empty($item->pastlink->href)) {
-				if (JisonParser_Phraser_Handler::hasPhrase($parsed, $item->futurelink->text) != true) {
-					continue;
-				}
+        foreach ($items as $i => $item) {
+            if (! empty($item->pastlink->href)) {
+                if (JisonParser_Phraser_Handler::hasPhrase($parsed, $item->futurelink->text) != true) {
+                    continue;
+                }
 
-				$phrases[] = $item->futurelink->text;
+                $phrases[] = $item->futurelink->text;
 
-				$i = count($phrases) - 1;
+                $i = count($phrases) - 1;
 
-				if (JisonParser_Phraser_Handler::superSanitize($phrase) == JisonParser_Phraser_Handler::superSanitize($item->futurelink->text)) {
-					$phraseMatchIndex = $i;
-				}
+                if (JisonParser_Phraser_Handler::superSanitize($phrase) == JisonParser_Phraser_Handler::superSanitize($item->futurelink->text)) {
+                    $phraseMatchIndex = $i;
+                }
 
-				$item->futurelink->dateLastUpdated = $tikilib->get_short_datetime($item->futurelink->dateLastUpdated);
-				$item->futurelink->dateOriginated = $tikilib->get_short_datetime($item->futurelink->dateOriginated);
-				$item->pastlink->dateLastUpdated = $tikilib->get_short_datetime($item->pastlink->dateLastUpdated);
-				$item->pastlink->dateOriginated = $tikilib->get_short_datetime($item->pastlink->dateOriginated);
+                $item->futurelink->dateLastUpdated = $tikilib->get_short_datetime($item->futurelink->dateLastUpdated);
+                $item->futurelink->dateOriginated = $tikilib->get_short_datetime($item->futurelink->dateOriginated);
+                $item->pastlink->dateLastUpdated = $tikilib->get_short_datetime($item->pastlink->dateLastUpdated);
+                $item->pastlink->dateOriginated = $tikilib->get_short_datetime($item->pastlink->dateOriginated);
 
-				$headerlib->add_jq_onready(
-					"var phrase = $('span.futurelinkMiddle".$i."')
+                $headerlib->add_jq_onready(
+                    "var phrase = $('span.futurelinkMiddle".$i."')
 						.addClass('ui-state-highlight');
 
 					var phraseLink = $('<a><sup>&</sup></a>')
@@ -151,68 +157,68 @@ JQ
 						.data('metadataThere', " . json_encode($item->pastlink) . ")
 						.addClass('futurelinkA')
 						.insertBefore(phrase.first());"
-				);
-			}
-		}
+                );
+            }
+        }
 
-		$phraser = new JisonParser_Phraser_Handler();
-		$phraser->setCssWordClasses(
-			array(
-				'start'=>'futurelinkStart',
-				'middle'=>'futurelinkMiddle',
-				'end'=>'futurelinkEnd'
-			)
-		);
+        $phraser = new JisonParser_Phraser_Handler();
+        $phraser->setCssWordClasses(
+            [
+                'start' => 'futurelinkStart',
+                'middle' => 'futurelinkMiddle',
+                'end' => 'futurelinkEnd'
+            ]
+        );
 
-		if ($phraseMatchIndex > -1) {
-			$headerlib->add_jq_onready(
-				"var selection = $('span.futurelinkStart". $phraseMatchIndex.",span.futurelinkEnd".$phraseMatchIndex."').realHighlight();
+        if ($phraseMatchIndex > -1) {
+            $headerlib->add_jq_onready(
+                "var selection = $('span.futurelinkStart". $phraseMatchIndex.",span.futurelinkEnd".$phraseMatchIndex."').realHighlight();
 
 				$('body,html').animate({
 					scrollTop: selection.first().offset().top - 10
 				});"
-			);
-		}
+            );
+        }
 
-		self::restorePhrasesInWikiPage($phraser, $phrases);
-	}
+        self::restorePhrasesInWikiPage($phraser, $phrases);
+    }
 
-	static function restorePastLinkPhrasesInWikiPage($items, $phrase = "")
-	{
-		$headerlib = TikiLib::lib('header');
-		$tikilib = TikiLib::lib('tiki');
-		$smarty = TikiLib::lib('smarty');
+    static function restorePastLinkPhrasesInWikiPage($items, $phrase = "")
+    {
+        $headerlib = TikiLib::lib('header');
+        $tikilib = TikiLib::lib('tiki');
+        $smarty = TikiLib::lib('smarty');
 
-		$phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
-		$phrases = array();
-		$phraseMatchIndex = -1;
+        $phrase = JisonParser_Phraser_Handler::superSanitize($phrase);
+        $phrases = [];
+        $phraseMatchIndex = -1;
 
-		$parsed = $smarty->getTemplateVars('parsed');
-		if (empty($parsed)) {
-			$parsed = $smarty->getTemplateVars('previewd');
-		}
+        $parsed = $smarty->getTemplateVars('parsed');
+        if (empty($parsed)) {
+            $parsed = $smarty->getTemplateVars('previewd');
+        }
 
-		foreach ($items as &$item) {
-			if (!empty($item->futurelink->href)) {
-				if (JisonParser_Phraser_Handler::hasPhrase($parsed, $item->pastlink->text) != true) {
-					continue;
-				}
+        foreach ($items as &$item) {
+            if (! empty($item->futurelink->href)) {
+                if (JisonParser_Phraser_Handler::hasPhrase($parsed, $item->pastlink->text) != true) {
+                    continue;
+                }
 
-				$phrases[] = $item->pastlink->text;
+                $phrases[] = $item->pastlink->text;
 
-				$i = count($phrases) - 1;
+                $i = count($phrases) - 1;
 
-				if (JisonParser_Phraser_Handler::superSanitize($phrase) == JisonParser_Phraser_Handler::superSanitize($item->pastlink->text)) {
-					$phraseMatchIndex = $i;
-				}
+                if (JisonParser_Phraser_Handler::superSanitize($phrase) == JisonParser_Phraser_Handler::superSanitize($item->pastlink->text)) {
+                    $phraseMatchIndex = $i;
+                }
 
-				$item->futurelink->dateLastUpdated = $tikilib->get_short_datetime($item->futurelink->dateLastUpdated);
-				$item->futurelink->dateOriginated = $tikilib->get_short_datetime($item->futurelink->dateOriginated);
-				$item->pastlink->dateLastUpdated = $tikilib->get_short_datetime($item->pastlink->dateLastUpdated);
-				$item->pastlink->dateOriginated = $tikilib->get_short_datetime($item->pastlink->dateOriginated);
+                $item->futurelink->dateLastUpdated = $tikilib->get_short_datetime($item->futurelink->dateLastUpdated);
+                $item->futurelink->dateOriginated = $tikilib->get_short_datetime($item->futurelink->dateOriginated);
+                $item->pastlink->dateLastUpdated = $tikilib->get_short_datetime($item->pastlink->dateLastUpdated);
+                $item->pastlink->dateOriginated = $tikilib->get_short_datetime($item->pastlink->dateOriginated);
 
-				$headerlib->add_jq_onready(
-					"var phrase = $('span.pastlinkMiddle".$i."')
+                $headerlib->add_jq_onready(
+                    "var phrase = $('span.pastlinkMiddle".$i."')
 						.addClass('ui-state-highlight');
 
 					var phraseLink = $('<a><sup>&</sup></a>')
@@ -220,42 +226,42 @@ JQ
 						.data('metadataThere', " . json_encode($item->futurelink) . ")
 						.addClass('pastlinkA')
 						.insertAfter(phrase.last());"
-				);
-			}
-		}
+                );
+            }
+        }
 
-		$phraser = new JisonParser_Phraser_Handler();
+        $phraser = new JisonParser_Phraser_Handler();
 
-		$phraser->setCssWordClasses(
-			array(
-				'start'=>'pastlinkStart',
-				'middle'=>'pastlinkMiddle',
-				'end'=>'pastlinkEnd'
-			)
-		);
+        $phraser->setCssWordClasses(
+            [
+                'start' => 'pastlinkStart',
+                'middle' => 'pastlinkMiddle',
+                'end' => 'pastlinkEnd'
+            ]
+        );
 
-		if ($phraseMatchIndex > -1) {
-			$headerlib->add_jq_onready(
-				"var selection = $('span.pastlinkStart".$phraseMatchIndex.",span.pastlinkEnd".$phraseMatchIndex."').realHighlight();
+        if ($phraseMatchIndex > -1) {
+            $headerlib->add_jq_onready(
+                "var selection = $('span.pastlinkStart".$phraseMatchIndex.",span.pastlinkEnd".$phraseMatchIndex."').realHighlight();
 
 				$('body,html').animate({
 					scrollTop: selection.first().offset().top - 10
 				});"
-			);
-		}
+            );
+        }
 
-		self::restorePhrasesInWikiPage($phraser, $phrases);
-	}
+        self::restorePhrasesInWikiPage($phraser, $phrases);
+    }
 
-	static function restorePhrasesInWikiPage(JisonParser_Phraser_Handler $phraser, $phrases)
-	{
-		$headerlib = TikiLib::lib('header');
-		$smarty = TikiLib::lib('smarty');
-		//TODO - not sure the tablesorter js and css files need to be loaded since they are loaded in tiki-setup
-		$headerlib
-			->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/jquery.tablesorter.js')
-			->add_jq_onready(
-<<<JQ
+    static function restorePhrasesInWikiPage(JisonParser_Phraser_Handler $phraser, $phrases)
+    {
+        $headerlib = TikiLib::lib('header');
+        $smarty = TikiLib::lib('smarty');
+        //TODO - not sure the tablesorter js and css files need to be loaded since they are loaded in tiki-setup
+        $headerlib
+            ->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/jquery.tablesorter.js')
+            ->add_jq_onready(
+                <<<JQ
 				$('a.futurelinkA,a.pastlinkA')
 					.css('cursor', 'pointer')
 					.click(function() {
@@ -293,19 +299,19 @@ JQ
 						return false;
 					});
 JQ
-				,
-				100
-			);
+                ,
+                100
+            );
 
-		$parsed = $smarty->getTemplateVars('parsed');
-		if (!empty($parsed)) {
-			$smarty->assign('parsed', $phraser->findPhrases($parsed, $phrases));
-		} else {
-			$previewd = $smarty->getTemplateVars('previewd');
-			if (!empty($previewd)) {
-				$previewd = $phraser->findPhrases($previewd, $phrases);
-				$smarty->assign('previewd', $previewd);
-			}
-		}
-	}
+        $parsed = $smarty->getTemplateVars('parsed');
+        if (! empty($parsed)) {
+            $smarty->assign('parsed', $phraser->findPhrases($parsed, $phrases));
+        } else {
+            $previewd = $smarty->getTemplateVars('previewd');
+            if (! empty($previewd)) {
+                $previewd = $phraser->findPhrases($previewd, $phrases);
+                $smarty->assign('previewd', $previewd);
+            }
+        }
+    }
 }

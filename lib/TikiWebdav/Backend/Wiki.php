@@ -7,573 +7,574 @@
 
 class TikiWebdav_Backends_Wiki extends ezcWebdavSimpleBackend
 {
-	protected $options;
-	protected $root;
-	protected $lockLevel = 0;
-
-	protected $handledLiveProperties = array(
-			'getcontentlength',
-			'getlastmodified',
-			'creationdate',
-			'displayname',
-			'getetag',
-			'getcontenttype',
-			'resourcetype',
-	);
-
-	protected $propertyStorage = null;
-
-	public function getRoot()
-	{
-		return $this->root;
-	}
-
-	public function __construct()
-	{
-		global $prefs;
-
-		// avoid not having a deadlock when trying to acquire WebDav lock
-		print_debug('Lock Directory: ' . $prefs['fgal_use_dir'] . "\n" . "\n");
-		if (!empty($prefs['fgal_use_dir']) && file_exists($prefs['fgal_use_dir'])) {
-			$this->root = realpath($prefs['fgal_use_dir']);
-		} else {
-			$this->root = realpath('temp/');
-		}
-
-		$this->options = new ezcWebdavFileBackendOptions(
-			array(
-				'lockFileName' => $this->root . '/.webdav_lock',
-				'waitForLock' => 200000,
-				'propertyStoragePath' => $this->root,
-				'noLock' => false )
-		);
-
-		$this->propertyStorage = new ezcWebdavBasicPropertyStorage();
-	}
-
-	public function __get($name)
-	{
-		print_debug('get ' . $name . "\n");
-
-		switch ($name) {
-			case 'options':
-				return $this->$name;
-
-			default:
-				throw new ezcBasePropertyNotFoundException($name);
-		}
-	}
-
-	public function __set($name, $value)
-	{
-		print_debug("set " . $name . " " . $value . "\n");
-
-		switch ($name) {
-			case 'options':
-				if (! $value instanceof ezcWebdavMemoryBackendOptions) { ///FIXME
-					throw new ezcBaseValueException($name, $value, 'ezcWebdavMemoryBackendOptions'); ///FIXME
-				}
-
-				$this->$name = $value;
-				break;
-
-			default:
-				throw new ezcBasePropertyNotFoundException($name);
-		}
-	}
-
-	protected function acquireLock($readOnly = false)
-	{
-		return true;
-	}
-
-	protected function freeLock()
-	{
-		return true;
-	}
-
-	protected function getMimeType($path, $filename = '')
-	{
-		print_debug("getMimeType " . $path . " " . $filename . "\n");
-		return 'application/octet-stream';
-	}
-
-	protected function createCollection($path)
-	{
-		global $user, $tikilib;
-
-		print_debug("createCollection " . $path . "\n");
-
-		return false;
-	}
-
-	protected function createResource($path, $content = null)
-	{
-		global $user, $tikilib, $prefs;
+    protected $options;
+    protected $root;
+    protected $lockLevel = 0;
+
+    protected $handledLiveProperties = [
+            'getcontentlength',
+            'getlastmodified',
+            'creationdate',
+            'displayname',
+            'getetag',
+            'getcontenttype',
+            'resourcetype',
+    ];
+
+    protected $propertyStorage = null;
+
+    public function getRoot()
+    {
+        return $this->root;
+    }
+
+    public function __construct()
+    {
+        global $prefs;
+
+        // avoid not having a deadlock when trying to acquire WebDav lock
+        print_debug('Lock Directory: ' . $prefs['fgal_use_dir'] . "\n" . "\n");
+        if (! empty($prefs['fgal_use_dir']) && file_exists($prefs['fgal_use_dir'])) {
+            $this->root = realpath($prefs['fgal_use_dir']);
+        } else {
+            $this->root = realpath('temp/');
+        }
+
+        $this->options = new ezcWebdavFileBackendOptions(
+            [
+                'lockFileName' => $this->root . '/.webdav_lock',
+                'waitForLock' => 200000,
+                'propertyStoragePath' => $this->root,
+                'noLock' => false ]
+        );
+
+        $this->propertyStorage = new ezcWebdavBasicPropertyStorage();
+    }
+
+    public function __get($name)
+    {
+        print_debug('get ' . $name . "\n");
+
+        switch ($name) {
+            case 'options':
+                return $this->$name;
+
+            default:
+                throw new ezcBasePropertyNotFoundException($name);
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        print_debug("set " . $name . " " . $value . "\n");
+
+        switch ($name) {
+            case 'options':
+                if (! $value instanceof ezcWebdavMemoryBackendOptions) { ///FIXME
+                    throw new ezcBaseValueException($name, $value, 'ezcWebdavMemoryBackendOptions'); ///FIXME
+                }
+
+                $this->$name = $value;
+                break;
+
+            default:
+                throw new ezcBasePropertyNotFoundException($name);
+        }
+    }
+
+    protected function acquireLock($readOnly = false)
+    {
+        return true;
+    }
+
+    protected function freeLock()
+    {
+        return true;
+    }
+
+    protected function getMimeType($path, $filename = '')
+    {
+        print_debug("getMimeType " . $path . " " . $filename . "\n");
+        return 'application/octet-stream';
+    }
+
+    protected function createCollection($path)
+    {
+        global $user, $tikilib;
+
+        print_debug("createCollection " . $path . "\n");
+
+        return false;
+    }
+
+    protected function createResource($path, $content = null)
+    {
+        global $user, $tikilib, $prefs;
 
-		print_debug("createResource " . $path . "\n");
+        print_debug("createResource " . $path . "\n");
 
-		if ($this->isCollection($path)) {
-			return null;
-		}
+        if ($this->isCollection($path)) {
+            return null;
+        }
 
-		return $tikilib->create_page($this->get_page_name_from_virtual_path($path), 0, $content, $tikilib->now, "Created from WebDAV", $user, $tikilib->get_ip_address());
-	}
+        return $tikilib->create_page($this->get_page_name_from_virtual_path($path), 0, $content, $tikilib->now, "Created from WebDAV", $user, $tikilib->get_ip_address());
+    }
 
-	protected function setResourceContents( $path, $content )
-	{
-		global $user, $tikilib, $prefs;
+    protected function setResourceContents($path, $content)
+    {
+        global $user, $tikilib, $prefs;
 
-		print_debug('setResourceContents ' . $path . "\n");
+        print_debug('setResourceContents ' . $path . "\n");
 
-		if ($this->isCollection($path)) {
-			return null;
-		}
+        if ($this->isCollection($path)) {
+            return null;
+        }
 
-		return $tikilib->update_page(
-			$this->get_page_name_from_virtual_path($path),
-			$content,
-			'Edited from WebDAV',
-			$user, $tikilib->get_ip_address()
-		);
-	}
+        return $tikilib->update_page(
+            $this->get_page_name_from_virtual_path($path),
+            $content,
+            'Edited from WebDAV',
+            $user,
+            $tikilib->get_ip_address()
+        );
+    }
 
-	protected function getResourceContents($path)
-	{
-		global $tikilib, $prefs;
+    protected function getResourceContents($path)
+    {
+        global $tikilib, $prefs;
 
-		print_debug('getResourceContents ' . $path . "\n");
+        print_debug('getResourceContents ' . $path . "\n");
 
-		if ($this->isCollection($path)) {
-			return null;
-		}
+        if ($this->isCollection($path)) {
+            return null;
+        }
 
-		$info = $tikilib->get_page_info($this->get_page_name_from_virtual_path($path));
+        $info = $tikilib->get_page_info($this->get_page_name_from_virtual_path($path));
 
-		return $info['data'];
-	}
+        return $info['data'];
+    }
 
-	protected function getPropertyStorage($path)
-	{
-		print_debug('getPropertyStorage ' . $path . "\n");
+    protected function getPropertyStorage($path)
+    {
+        print_debug('getPropertyStorage ' . $path . "\n");
 
-		if ( @file_exists($storagePath = $this->options->propertyStoragePath . '/properties-' . md5($path)) ) {
-			$xml = ezcWebdavServer::getInstance()->xmlTool->createDom(@file_get_contents($storagePath));
-		} else {
-			$xml = ezcWebdavServer::getInstance()->xmlTool->createDom();
-		}
-		$handler = new ezcWebdavPropertyHandler(new ezcWebdavXmlTool());
+        if (@file_exists($storagePath = $this->options->propertyStoragePath . '/properties-' . md5($path))) {
+            $xml = ezcWebdavServer::getInstance()->xmlTool->createDom(@file_get_contents($storagePath));
+        } else {
+            $xml = ezcWebdavServer::getInstance()->xmlTool->createDom();
+        }
+        $handler = new ezcWebdavPropertyHandler(new ezcWebdavXmlTool());
 
-		try {
-			$handler->extractProperties($xml->getElementsByTagNameNS('DAV:', '*'), $this->propertyStorage);
-		} catch ( Exception $e ) {
-		}
+        try {
+            $handler->extractProperties($xml->getElementsByTagNameNS('DAV:', '*'), $this->propertyStorage);
+        } catch (Exception $e) {
+        }
 
-		return $this->propertyStorage;
-	}
+        return $this->propertyStorage;
+    }
 
-	protected function storeProperties($path, ezcWebdavBasicPropertyStorage $storage)
-	{
-		print_debug('storeProperties ' . $path . "\n");
+    protected function storeProperties($path, ezcWebdavBasicPropertyStorage $storage)
+    {
+        print_debug('storeProperties ' . $path . "\n");
 
-		$storagePath = $this->options->propertyStoragePath . '/properties-' . md5($path);
+        $storagePath = $this->options->propertyStoragePath . '/properties-' . md5($path);
 
-		// Create handler structure to read properties
-		$handler = new ezcWebdavPropertyHandler($xml = new ezcWebdavXmlTool());
+        // Create handler structure to read properties
+        $handler = new ezcWebdavPropertyHandler($xml = new ezcWebdavXmlTool());
 
-		// Create new dom document with property storage for one namespace
-		$doc = new DOMDocument('1.0');
+        // Create new dom document with property storage for one namespace
+        $doc = new DOMDocument('1.0');
 
-		$properties = $doc->createElement('properties');
-		$doc->appendChild($properties);
+        $properties = $doc->createElement('properties');
+        $doc->appendChild($properties);
 
-		// Store and store properties
-		foreach ($this->handledLiveProperties as $propName) {
-			$storage->detach($propName);
-		}
-		$handler->serializeProperties($storage, $properties);
+        // Store and store properties
+        foreach ($this->handledLiveProperties as $propName) {
+            $storage->detach($propName);
+        }
+        $handler->serializeProperties($storage, $properties);
 
-		print_debug("storeProperties method end\n");
+        print_debug("storeProperties method end\n");
 
-		return $doc->save($storagePath);
-	}
+        return $doc->save($storagePath);
+    }
 
-	public function setProperty( $path, ezcWebdavProperty $property )
-	{
-		print_debug('setProperty ' . $path . "\n");
+    public function setProperty($path, ezcWebdavProperty $property)
+    {
+        print_debug('setProperty ' . $path . "\n");
 
-		if (($property->namespace === 'DAV:')
-					&& in_array($property->name, $this->handledLiveProperties, true)
-					&& ($property->name !== 'getcontenttype') && ($property->name !== 'lockdiscovery')
-		) {
-			return false;
-		}
+        if (($property->namespace === 'DAV:')
+                    && in_array($property->name, $this->handledLiveProperties, true)
+                    && ($property->name !== 'getcontenttype') && ($property->name !== 'lockdiscovery')
+        ) {
+            return false;
+        }
 
-		// Get namespace property storage
-		$storage = $this->getPropertyStorage($path);
+        // Get namespace property storage
+        $storage = $this->getPropertyStorage($path);
+
+        // Attach property to store
+        $storage->attach($property);
 
-		// Attach property to store
-		$storage->attach($property);
+        // Store document back
+        $this->storeProperties($path, $storage);
+
+        return true;
+    }
+
+    public function removeProperty($path, ezcWebdavProperty $property)
+    {
+        print_debug('removeProperty ' . $path . "\n");
+
+        if ($property instanceof ezcWebdavLiveProperty) {
+            return false;
+        }
+
+        // Get namespace property storage
+        $storage = $this->getPropertyStorage($path);
+
+        // Attach property to store
+        $storage->detach($property->name, $property->namespace);
+
+        // Store document back
+        $this->storeProperties($path, $storage);
+
+        return true;
+    }
+
+    public function resetProperties($path, ezcWebdavPropertyStorage $storage)
+    {
+        print_debug('resetProperties ' . $path . "\n");
+
+        $this->storeProperties($path, $storage);
+        return true;
+    }
+
+    public function getProperty($path, $propertyName, $namespace = 'DAV:')
+    {
+        global $tikilib, $prefs;
+
+        print_debug('getProperty ' . $path . ' ' . $propertyName . ' ' . $namespace . "\n");
+
+        if (! $this->nodeExists($path)) {
+            return false;
+        }
+
+        $isCollection = $this->isCollection($path);
+        $tikiInfo = null;
+
+        if (! $isCollection) {
+            $tikiInfo = $tikilib->get_page_info($this->get_page_name_from_virtual_path($path));
+        }
+
+        $storage = $this->getPropertyStorage($path);
+
+        $properties = $storage->getAllProperties();
+        // Handle dead propreties
+        if ($namespace !== 'DAV:') {
+            return $properties[$namespace][$propertyName];
+        }
+
+        // Handle live properties
+        switch ($propertyName) {
+            case 'getcontentlength':
+                $property = new ezcWebdavGetContentLengthProperty(
+                    $isCollection ?
+                    ezcWebdavGetContentLengthProperty::COLLECTION :
+                    $tikiInfo['page_size']
+                );
+                return $property;
+
+            case 'getlastmodified':
+                $property = new ezcWebdavGetLastModifiedProperty(
+                    new ezcWebdavDateTime('@' . (int)$tikiInfo['lastModif'])
+                );
+                return $property;
+
+            case 'creationdate':
+                $property = new ezcWebdavCreationDateProperty(
+                    new ezcWebdavDateTime('@' . (int)$tikiInfo['created'])
+                );
+                return $property;
+
+            case 'displayname':
+                $property = new ezcWebdavDisplayNameProperty($tikiInfo['pageName']);
+                return $property;
+
+            case 'getcontenttype':
+                $property = new ezcWebdavGetContentTypeProperty(
+                    $isCollection ?
+                    'httpd/unix-directory' :
+                    'application/octet-stream'
+                );
+                return $property;
+
+            case 'getetag':
+                $md5 = md5($path);
+                $property = new ezcWebdavGetEtagProperty('"' . $md5 . '-' . crc32($md5) . '"');
+                return $property;
+
+            case 'resourcetype':
+                $property = new ezcWebdavResourceTypeProperty(
+                    $isCollection ?
+                    ezcWebdavResourceTypeProperty::TYPE_COLLECTION :
+                    ezcWebdavResourceTypeProperty::TYPE_RESOURCE
+                );
+
+                return $property;
 
-		// Store document back
-		$this->storeProperties($path, $storage);
-
-		return true;
-	}
-
-	public function removeProperty($path, ezcWebdavProperty $property)
-	{
-		print_debug('removeProperty ' . $path . "\n");
-
-		if ($property instanceof ezcWebdavLiveProperty) {
-			return false;
-		}
-
-		// Get namespace property storage
-		$storage = $this->getPropertyStorage($path);
+            case 'supportedlock':
+                if (! isset($properties[$namespace][$propertyName])) {
+                    $property = new ezcWebdavLockDiscoveryProperty();
+                } else {
+                    $property = $properties[$namespace][$propertyName];
+                }
+
+                return $property;
+
+            case 'lockdiscovery':
+                if (! isset($properties[$namespace][$propertyName])) {
+                    $property = new ezcWebdavLockDiscoveryProperty();
+                } else {
+                    $property = $properties[$namespace][$propertyName];
+                }
+
+                return $property;
+
+            default:
+                // Handle all other live properties like dead properties
+                $properties = $storage->getAllProperties();
+                return $properties[$namespace][$propertyName];
+        }
+    }
 
-		// Attach property to store
-		$storage->detach($property->name, $property->namespace);
-
-		// Store document back
-		$this->storeProperties($path, $storage);
-
-		return true;
-	}
-
-	public function resetProperties($path, ezcWebdavPropertyStorage $storage)
-	{
-		print_debug('resetProperties ' . $path . "\n");
-
-		$this->storeProperties($path, $storage);
-		return true;
-	}
-
-	public function getProperty($path, $propertyName, $namespace = 'DAV:')
-	{
-		global $tikilib, $prefs;
-
-		print_debug('getProperty ' . $path . ' ' . $propertyName . ' ' . $namespace . "\n");
-
-		if (!$this->nodeExists($path)) {
-			return false;
-		}
-
-		$isCollection = $this->isCollection($path);
-		$tikiInfo = null;
-
-		if (!$isCollection) {
-			$tikiInfo = $tikilib->get_page_info($this->get_page_name_from_virtual_path($path));
-		}
-
-		$storage = $this->getPropertyStorage($path);
-
-		$properties = $storage->getAllProperties();
-		// Handle dead propreties
-		if ($namespace !== 'DAV:') {
-			return $properties[$namespace][$propertyName];
-		}
-
-		// Handle live properties
-		switch ($propertyName) {
-			case 'getcontentlength':
-				$property = new ezcWebdavGetContentLengthProperty(
-					$isCollection ?
-					ezcWebdavGetContentLengthProperty::COLLECTION :
-					$tikiInfo['page_size']
-				);
-				return $property;
-
-			case 'getlastmodified':
-				$property = new ezcWebdavGetLastModifiedProperty(
-					new ezcWebdavDateTime('@' . (int)$tikiInfo['lastModif'])
-				);
-				return $property;
-
-			case 'creationdate':
-				$property = new ezcWebdavCreationDateProperty(
-					new ezcWebdavDateTime('@' . (int)$tikiInfo['created'])
-				);
-				return $property;
+    private function getContentLength($path)
+    {
+        print_debug('getContentLength ' . $path . "\n");
 
-			case 'displayname':
-				$property = new ezcWebdavDisplayNameProperty($tikiInfo['pageName']);
-				return $property;
-
-			case 'getcontenttype':
-				$property = new ezcWebdavGetContentTypeProperty(
-					$isCollection ?
-					'httpd/unix-directory' :
-					'application/octet-stream'
-				);
-				return $property;
-
-			case 'getetag':
-				$md5 = md5($path);
-				$property = new ezcWebdavGetEtagProperty('"' . $md5 . '-' . crc32($md5) . '"');
-				return $property;
-
-			case 'resourcetype':
-				$property = new ezcWebdavResourceTypeProperty(
-					$isCollection ?
-					ezcWebdavResourceTypeProperty::TYPE_COLLECTION :
-					ezcWebdavResourceTypeProperty::TYPE_RESOURCE
-				);
+        return null;
+    }
 
-				return $property;
+    protected function getETag($path)
+    {
+        print_debug('getETag ' . $path . "\n");
 
-			case 'supportedlock':
-				if (!isset($properties[$namespace][$propertyName])) {
-					$property = new ezcWebdavLockDiscoveryProperty();
-				} else {
-					$property = $properties[$namespace][$propertyName];
-				}
-
-				return $property;
-
-			case 'lockdiscovery':
-				if (!isset($properties[$namespace][$propertyName])) {
-					$property = new ezcWebdavLockDiscoveryProperty();
-				} else {
-					$property = $properties[$namespace][$propertyName];
-				}
-
-				return $property;
+        if ($etag = $this->getProperty($path, 'getetag')) {
+            return $this->getProperty($path, 'getetag')->etag;
+        } else {
+            return md5($path);
+        }
+    }
 
-			default:
-				// Handle all other live properties like dead properties
-				$properties = $storage->getAllProperties();
-				return $properties[$namespace][$propertyName];
-		}
-	}
+    public function getAllProperties($path)
+    {
+        print_debug('getAllProperties ' . $path . "\n");
 
-	private function getContentLength($path)
-	{
-		print_debug('getContentLength ' . $path . "\n");
+        $storage = $this->getPropertyStorage($path);
 
-		return null;
-	}
+        // Add all live properties to stored properties
+        foreach ($this->handledLiveProperties as $property) {
+            $storage->attach($this->getProperty($path, $property));
+        }
 
-	protected function getETag($path)
-	{
-		print_debug('getETag ' . $path . "\n");
+        return $storage;
+    }
 
-		if ( $etag = $this->getProperty($path, 'getetag')) {
-			return $this->getProperty($path, 'getetag')->etag;
-		} else {
-			return md5($path);
-		}
-	}
+    protected function performCopy($fromPath, $toPath, $depth = ezcWebdavRequest::DEPTH_INFINITY)
+    {
+        $wikilib = TikiLib::lib('wiki');
+        $tikilib = TikiLib::lib('tiki');
 
-	public function getAllProperties($path)
-	{
-		print_debug('getAllProperties ' . $path . "\n");
+        print_debug('performCopy ' . $fromPath . " -> " . $toPath . "\n");
 
-		$storage = $this->getPropertyStorage($path);
+        $page = $this->get_page_name_from_virtual_path($fromPath);
+        $info = $tikilib->get_page_info($page);
 
-		// Add all live properties to stored properties
-		foreach ($this->handledLiveProperties as $property) {
-			$storage->attach($this->getProperty($path, $property));
-		}
+        if (! $info) {
+            return [ezcWebdavResponse::STATUS_404];
+        }
 
-		return $storage;
-	}
+        $perms = $tikilib->get_perm_object($page, 'wiki page', $info);
 
-	protected function performCopy($fromPath, $toPath, $depth = ezcWebdavRequest::DEPTH_INFINITY)
-	{
-		$wikilib = TikiLib::lib('wiki');
-		$tikilib = TikiLib::lib('tiki');
+        if ($perms['tiki_p_edit'] == 'y' && ! $this->isCollection($fromPath) && ! $this->nodeExists($toPath)) {
+            if ($wikilib->wiki_duplicate_page($page, $this->get_page_name_from_virtual_path($toPath))) {
+                return [];
+            } else {
+                return [ezcWebdavResponse::STATUS_500];
+            }
+        }
 
-		print_debug('performCopy ' . $fromPath . " -> " . $toPath . "\n");
+        return [ezcWebdavResponse::STATUS_409];
+    }
 
-		$page = $this->get_page_name_from_virtual_path($fromPath);
-		$info = $tikilib->get_page_info($page);
+    protected function performDelete($path)
+    {
+        global $tikilib;
 
-		if (!$info) {
-			return array(ezcWebdavResponse::STATUS_404);
-		}
+        print_debug('performDelete ' . $path . "\n");
 
-		$perms = $tikilib->get_perm_object($page, 'wiki page', $info);
+        $page = $this->get_page_name_from_virtual_path($path);
+        $info = $tikilib->get_page_info($page);
 
-		if ($perms['tiki_p_edit'] == 'y' && !$this->isCollection($fromPath) && !$this->nodeExists($toPath)) {
-			if ($wikilib->wiki_duplicate_page($page, $this->get_page_name_from_virtual_path($toPath))) {
-				return array();
-			} else {
-				return array(ezcWebdavResponse::STATUS_500);
-			}
-		}
+        if (! $info) {
+            return [ezcWebdavResponse::STATUS_404];
+        }
 
-		return array(ezcWebdavResponse::STATUS_409);
-	}
+        $perms = $tikilib->get_perm_object($page, 'wiki page', $info);
 
-	protected function performDelete($path)
-	{
-		global $tikilib;
+        if ($perms['tiki_p_remove'] == 'y' && $perms['tiki_p_edit'] == 'y' && ! $this->isCollection($path)) {
+            if ($tikilib->remove_all_versions($this->get_page_name_from_virtual_path($path), "Remove from WebDav")) {
+                return [];
+            } else {
+                return [ezcWebdavResponse::STATUS_500];
+            }
+        }
 
-		print_debug('performDelete ' . $path . "\n");
+        return [ezcWebdavResponse::STATUS_409];
+    }
 
-		$page = $this->get_page_name_from_virtual_path($path);
-		$info = $tikilib->get_page_info($page);
+    protected function nodeExists($path)
+    {
+        global $tikilib;
 
-		if (!$info) {
-			return array(ezcWebdavResponse::STATUS_404);
-		}
+        print_debug('nodeExists ' . $path . "\n");
 
-		$perms = $tikilib->get_perm_object($page, 'wiki page', $info);
+        if (empty($path) || $path[0] != '/') {
+            return false;
+        }
 
-		if ( $perms['tiki_p_remove'] == 'y' && $perms['tiki_p_edit'] == 'y' && !$this->isCollection($path) ) {
-			if ($tikilib->remove_all_versions($this->get_page_name_from_virtual_path($path), "Remove from WebDav")) {
-				return array();
-			} else {
-				return array(ezcWebdavResponse::STATUS_500);
-			}
-		}
+        if ($path == '/') {
+            return true;
+        }
 
-		return array(ezcWebdavResponse::STATUS_409);
-	}
+        return $tikilib->page_exists($this->get_page_name_from_virtual_path($path));
+    }
 
-	protected function nodeExists($path)
-	{
-		global $tikilib;
+    protected function isCollection($path)
+    {
+        print_debug('isCollection ' . $path . ' -> ' . ( $path === '/' ) . "\n");
 
-		print_debug('nodeExists ' . $path . "\n");
+        if ($path === '/') {
+            return true;
+        }
 
-		if (empty($path) || $path[0] != '/') {
-			return false;
-		}
+        return false;
+    }
 
-		if ($path == '/') {
-			return true;
-		}
+    protected function getCollectionMembers($path)
+    {
+        global $tikilib, $user;
 
-		return $tikilib->page_exists($this->get_page_name_from_virtual_path($path));
-	}
+        print_debug('getCollectionMembers ' . $path . "\n");
 
-	protected function isCollection($path)
-	{
-		print_debug('isCollection ' . $path . ' -> ' . ( $path === '/' ) . "\n");
+        $contents = [];
 
-		if ($path === '/') {
-			return true;
-		}
+        if ($path !== '/') {
+            return $contents;
+        }
 
-		return false;
-	}
+        $groups = $tikilib->get_user_groups($user);
+        $perms = Perms::getInstance();
+        $perms->setGroups($groups);
+        $pages = $tikilib->list_pages();
 
-	protected function getCollectionMembers($path)
-	{
-		global $tikilib, $user;
+        foreach ($pages['data'] as $page) {
+            $contents[] = new ezcWebdavResource($path . $page['pageName']);
+        }
 
-		print_debug('getCollectionMembers ' . $path . "\n");
+        return $contents;
+    }
 
-		$contents = array();
+    public function get(ezcWebdavGetRequest $request)
+    {
+        print_debug("-- HTTP method: GET --\n");
+        $return = parent::get($request);
 
-		if ($path !== '/') {
-			return $contents;
-		}
+        print_debug('get -> ' . $return . "\n");
 
-		$groups = $tikilib->get_user_groups($user);
-		$perms = Perms::getInstance();
-		$perms->setGroups($groups);
-		$pages = $tikilib->list_pages();
+        return $return;
+    }
 
-		foreach ($pages['data'] as $page) {
-			$contents[] = new ezcWebdavResource($path . $page['pageName']);
-		}
+    public function head(ezcWebdavHeadRequest $request)
+    {
+        print_debug("-- HTTP method: HEAD --\n");
+        $return = parent::head($request);
 
-		return $contents;
-	}
+        print_debug("head \n");
 
-	public function get(ezcWebdavGetRequest $request)
-	{
-		print_debug("-- HTTP method: GET --\n");
-		$return = parent::get($request);
+        return $return;
+    }
 
-		print_debug('get -> ' . $return . "\n");
+    public function propFind(ezcWebdavPropFindRequest $request)
+    {
+        print_debug("-- HTTP method: PROPFIND --\n");
+        $return = parent::propFind($request);
 
-		return $return;
-	}
+        print_debug("propFind \n");
 
-	public function head(ezcWebdavHeadRequest $request)
-	{
-		print_debug("-- HTTP method: HEAD --\n");
-		$return = parent::head($request);
+        return $return;
+    }
 
-		print_debug("head \n");
+    public function propPatch(ezcWebdavPropPatchRequest $request)
+    {
+        print_debug("-- HTTP method: PROPPATCH --\n");
+        $this->acquireLock();
+        $return = parent::propPatch($request);
+        $this->freeLock();
 
-		return $return;
-	}
+        print_debug("propPatch \n");
 
-	public function propFind(ezcWebdavPropFindRequest $request)
-	{
-		print_debug("-- HTTP method: PROPFIND --\n");
-		$return = parent::propFind($request);
+        return $return;
+    }
 
-		print_debug("propFind \n");
+    public function put(ezcWebdavPutRequest $request)
+    {
+        print_debug("-- HTTP method: PUT --\n");
+        $this->acquireLock();
+        $return = parent::put($request);
+        $this->freeLock();
 
-		return $return;
-	}
+        print_debug("put \n");
 
-	public function propPatch(ezcWebdavPropPatchRequest $request)
-	{
-		print_debug("-- HTTP method: PROPPATCH --\n");
-		$this->acquireLock();
-		$return = parent::propPatch($request);
-		$this->freeLock();
+        return $return;
+    }
 
-		print_debug("propPatch \n");
+    public function delete(ezcWebdavDeleteRequest $request)
+    {
+        print_debug('-- HTTP method: DELETE --' . print_r($request, true) . "\n");
+        $this->acquireLock();
+        $return = parent::delete($request);
+        $this->freeLock();
 
-		return $return;
-	}
+        print_debug("delete \n");
 
-	public function put(ezcWebdavPutRequest $request)
-	{
-		print_debug("-- HTTP method: PUT --\n");
-		$this->acquireLock();
-		$return = parent::put($request);
-		$this->freeLock();
+        return $return;
+    }
 
-		print_debug("put \n");
+    public function copy(ezcWebdavCopyRequest $request)
+    {
+        print_debug("-- HTTP method: COPY --\n");
+        $this->acquireLock();
+        $return = parent::copy($request);
+        $this->freeLock();
 
-		return $return;
-	}
+        print_debug("copy \n");
 
-	public function delete(ezcWebdavDeleteRequest $request)
-	{
-		print_debug('-- HTTP method: DELETE --' . print_r($request, true) . "\n");
-		$this->acquireLock();
-		$return = parent::delete($request);
-		$this->freeLock();
+        return $return;
+    }
 
-		print_debug("delete \n");
+    public function makeCollection(ezcWebdavMakeCollectionRequest $request)
+    {
+        print_debug("-- HTTP method: MAKECOL --\n");
+        $this->acquireLock();
+        $return = parent::makeCollection($request);
+        $this->freeLock();
 
-		return $return;
-	}
+        return $return;
+    }
 
-	public function copy(ezcWebdavCopyRequest $request)
-	{
-		print_debug("-- HTTP method: COPY --\n");
-		$this->acquireLock();
-		$return = parent::copy($request);
-		$this->freeLock();
-
-		print_debug("copy \n");
-
-		return $return;
-	}
-
-	public function makeCollection(ezcWebdavMakeCollectionRequest $request)
-	{
-		print_debug("-- HTTP method: MAKECOL --\n");
-		$this->acquireLock();
-		$return = parent::makeCollection($request);
-		$this->freeLock();
-
-		return $return;
-	}
-
-	private function get_page_name_from_virtual_path($path)
-	{
-		return substr($path, 1);
-	}
+    private function get_page_name_from_virtual_path($path)
+    {
+        return substr($path, 1);
+    }
 }

@@ -15,17 +15,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallerLockCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('installer:lock')
-			->setDescription('Disable the installer')
-			->setHelp('Lock the installer so that users can\'t destroy the database through the browser');
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('installer:lock')
+            ->setDescription('Disable the installer')
+            ->setHelp('Lock the installer so that users can\'t destroy the database through the browser');
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$out = <<<LOCK
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $out = <<<LOCK
 This lock file was created with:
 
 php console.php installer:lock
@@ -35,11 +35,11 @@ installer allows a user to change or destroy the site’s database through the
 browser so it is very important to keep it locked.
 
 LOCK;
-		$file='db/lock';
-		if (!file_put_contents($file, $out)) {
-			$output->writeln("<error>Could not lock installer</error>");
-		} else {
-			$output->writeln("<info>Installer locked</info>");
-		}
-	}
+        $file = 'db/lock';
+        if (! file_put_contents($file, $out)) {
+            $output->writeln("<error>Could not lock installer</error>");
+        } else {
+            $output->writeln("<info>Installer locked</info>");
+        }
+    }
 }

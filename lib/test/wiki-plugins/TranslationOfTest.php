@@ -18,8 +18,8 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
     protected function setUp()
     {
         global $user, $prefs;
-		$multilinguallib = TikiLib::lib('multilingual');
-		$tikilib = TikiLib::lib('tiki');
+        $multilinguallib = TikiLib::lib('multilingual');
+        $tikilib = TikiLib::lib('tiki');
         $this->orig_user = $user;
 
         $prefs['site_language'] = 'en';
@@ -32,7 +32,6 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
 
         /* Remove all translationof relations */
         //
-
     }
 
     protected function tearDown()
@@ -46,32 +45,32 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
         $user = $this->orig_user;
     }
 
-	/**
-	 * @dataProvider provider
-	 */
-	public function testWikiPlugin_TranslationOf($data, $expectedOutput, $params = array(), $message = "")
-	{
-		$this->assertEquals($expectedOutput, wikiplugin_translationof($data, $params), $message);
-	}
+    /**
+     * @dataProvider provider
+     */
+    public function testWikiPlugin_TranslationOf($data, $expectedOutput, $params = [], $message = "")
+    {
+        $this->assertEquals($expectedOutput, wikiplugin_translationof($data, $params), $message);
+    }
 
-	public function provider()
-	{
-		return array(
-			array('', '<a href="tiki-index.php?page=SomePage"  data-toggle="popover" data-container="body" data-trigger="click" data-content="<a href=\"tiki-edit_translation.php?page=SomePage&target_lang=fr#new_translation\">Translate this link</a>"  data-delay=\'{"show":"0","hide":"10"}\'>SomePage</a>',
-                  array('orig_page' => 'SomePage', 'translation_lang' => 'fr'),
-                  "Happy Path Case"),
-            array('', '<a href="tiki-index.php?page=SomePage"  data-toggle="popover" data-container="body" data-trigger="click" data-content="<a href=\"tiki-edit_translation.php?page=SomePage&target_lang=fr&translation_name=UnePage#new_translation\">Translate this link</a>"  data-delay=\'{"show":"0","hide":"10"}\'>UnePage</a>',
-                  array('orig_page' => 'SomePage', 'translation_lang' => 'fr', 'translation_page' => 'UnePage'),
-                  "Case with name of translated page provided"),
-		);
-	}
+    public function provider()
+    {
+        return [
+            ['', '<a href="tiki-index.php?page=SomePage"  data-toggle="popover" data-container="body" data-trigger="click" data-content="<a href=\"tiki-edit_translation.php?page=SomePage&target_lang=fr#new_translation\">Translate this link</a>"  data-delay=\'{"show":"0","hide":"10"}\'>SomePage</a>',
+                  ['orig_page' => 'SomePage', 'translation_lang' => 'fr'],
+                  "Happy Path Case"],
+            ['', '<a href="tiki-index.php?page=SomePage"  data-toggle="popover" data-container="body" data-trigger="click" data-content="<a href=\"tiki-edit_translation.php?page=SomePage&target_lang=fr&translation_name=UnePage#new_translation\">Translate this link</a>"  data-delay=\'{"show":"0","hide":"10"}\'>UnePage</a>',
+                  ['orig_page' => 'SomePage', 'translation_lang' => 'fr', 'translation_page' => 'UnePage'],
+                  "Case with name of translated page provided"],
+        ];
+    }
 
     public function test_create_page_that_contains_a_TranslationOf_plugin_generates_an_object_relation()
     {
         global $prefs;
-		$tikilib = TikiLib::lib('tiki');
-		$relationlib = TikiLib::lib('relation');
-		$testhelpers = new TestHelpers();
+        $tikilib = TikiLib::lib('tiki');
+        $relationlib = TikiLib::lib('relation');
+        $testhelpers = new TestHelpers();
 
         // Make sure the page doesn't exist to start with.
         $tikilib->remove_all_versions($this->page_containing_plugin);
@@ -80,8 +79,10 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
         $link_target_page = "TargetPage";
 
         $relation_id = $relationlib->get_relation_id('tiki.wiki.translationof', 'wiki page', $this->page_containing_plugin, 'wiki page', $link_target_page);
-        $this->assertTrue($relation_id == null,
-            "Before creating a page that contains a TranslationOf plugin, there should NOT have been a 'translationof' relation from $this->page_containing_plugin to $link_target_page.");
+        $this->assertTrue(
+            $relation_id == null,
+            "Before creating a page that contains a TranslationOf plugin, there should NOT have been a 'translationof' relation from $this->page_containing_plugin to $link_target_page."
+        );
 
         $page_containing_plugin_content = "{TranslationOf(orig_page=\"$link_source_page\" translation_page=\"$link_target_page\") /}";
         $prefs['wikiplugin_translationof'] = 'y';
@@ -90,8 +91,9 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
         $tikilib->create_page($this->page_containing_plugin, 0, $page_containing_plugin_content, time(), "");
 
         $relation_id = $relationlib->get_relation_id('tiki.wiki.translationof', 'wiki page', $this->page_containing_plugin, 'wiki page', $link_target_page);
-        $this->assertTrue($relation_id != null,
-            "After we created a page that contains a TranslationOf plugin, there SHOULD have been a 'translationof' relation from $this->page_containing_plugin to $link_target_page.");
-
+        $this->assertTrue(
+            $relation_id != null,
+            "After we created a page that contains a TranslationOf plugin, there SHOULD have been a 'translationof' relation from $this->page_containing_plugin to $link_target_page."
+        );
     }
 }

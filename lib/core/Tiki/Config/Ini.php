@@ -8,78 +8,78 @@
 class Tiki_Config_Ini extends Zend\Config\Reader\Ini
 {
 
-	const SECTION_SEPARATOR = ':';
-	const SECTION_EXTENDS_KEY = ';extends';
+    const SECTION_SEPARATOR = ':';
+    const SECTION_EXTENDS_KEY = ';extends';
 
-	protected $filterSection = null;
+    protected $filterSection = null;
 
-	public function setFilterSection($filter)
-	{
-		$this->filterSection = $filter;
-	}
+    public function setFilterSection($filter)
+    {
+        $this->filterSection = $filter;
+    }
 
-	/**
-	 * Process data from the parsed ini file.
-	 *
-	 * @param  array $data
-	 * @return array
-	 */
-	protected function process(array $data)
-	{
-		$data = $this->preProcessSectionInheritance($data);
-		$config = parent::process($data);
-		$config = $this->posProcessSectionInheritance($config);
+    /**
+     * Process data from the parsed ini file.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function process(array $data)
+    {
+        $data = $this->preProcessSectionInheritance($data);
+        $config = parent::process($data);
+        $config = $this->posProcessSectionInheritance($config);
 
-		if ( !is_null($this->filterSection) ){
-			if (array_key_exists($this->filterSection, $config)){
-				return $config[$this->filterSection];
-			} else {
-				return array();
-			}
-		}
+        if (! is_null($this->filterSection)) {
+            if (array_key_exists($this->filterSection, $config)) {
+                return $config[$this->filterSection];
+            } else {
+                return [];
+            }
+        }
 
-		return $config;
-	}
+        return $config;
+    }
 
-	protected function preProcessSectionInheritance(array $data)
-	{
-		$result = array();
+    protected function preProcessSectionInheritance(array $data)
+    {
+        $result = [];
 
-		foreach($data as $key => $value){
-			$tokens = explode(self::SECTION_SEPARATOR, $key);
-			$section = trim($tokens[0]);
-			if ( count($tokens) == 2 && is_array($value)){
-				$value[self::SECTION_EXTENDS_KEY] = trim($tokens[1]);
-			}
-			$result[$section] = $value;
-		}
-		return $result;
-	}
+        foreach ($data as $key => $value) {
+            $tokens = explode(self::SECTION_SEPARATOR, $key);
+            $section = trim($tokens[0]);
+            if (count($tokens) == 2 && is_array($value)) {
+                $value[self::SECTION_EXTENDS_KEY] = trim($tokens[1]);
+            }
+            $result[$section] = $value;
+        }
+        return $result;
+    }
 
-	protected function posProcessSectionInheritance(array $config)
-	{
-		$result = array();
+    protected function posProcessSectionInheritance(array $config)
+    {
+        $result = [];
 
-		foreach($config as $key => $value){
-			if (is_array($value) && array_key_exists(self::SECTION_EXTENDS_KEY, $value)){
-				$value = $this->resolveSectionInheritance($config, $key);
-			}
-			$result[$key] = $value;
-		}
-		return $result;
-	}
+        foreach ($config as $key => $value) {
+            if (is_array($value) && array_key_exists(self::SECTION_EXTENDS_KEY, $value)) {
+                $value = $this->resolveSectionInheritance($config, $key);
+            }
+            $result[$key] = $value;
+        }
+        return $result;
+    }
 
-	protected function resolveSectionInheritance($config, $section)
-	{
-		$result = array();
+    protected function resolveSectionInheritance($config, $section)
+    {
+        $result = [];
 
-		if (array_key_exists(self::SECTION_EXTENDS_KEY, $config[$section])){
-			$parentSection = $config[$section][self::SECTION_EXTENDS_KEY];
-			unset($config[$section][self::SECTION_EXTENDS_KEY]);
-			$result = $this->resolveSectionInheritance($config, $parentSection);
-		}
-		$result = array_replace_recursive($result, $config[$section]);
+        if (array_key_exists(self::SECTION_EXTENDS_KEY, $config[$section])) {
+            $parentSection = $config[$section][self::SECTION_EXTENDS_KEY];
+            unset($config[$section][self::SECTION_EXTENDS_KEY]);
+            $result = $this->resolveSectionInheritance($config, $parentSection);
+        }
+        $result = array_replace_recursive($result, $config[$section]);
 
-		return $result;
-	}
+        return $result;
+    }
 }

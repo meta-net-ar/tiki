@@ -19,9 +19,9 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 function upgrade_20161109_remove_old_password_tiki($installer)
 {
     $query = "SHOW COLUMNS FROM `users_users` LIKE 'password'";
-    $result = $installer->query($query, array());
+    $result = $installer->query($query, []);
     if ($result->numRows()) {
         $query = 'ALTER TABLE `users_users` DROP `password`';
-        $installer->query($query, array());
+        $installer->query($query, []);
     }
 }

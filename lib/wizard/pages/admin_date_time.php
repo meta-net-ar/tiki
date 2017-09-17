@@ -12,35 +12,35 @@ require_once('lib/wizard/wizard.php');
  */
 class AdminWizardDateTime extends Wizard
 {
-    function pageTitle ()
+    function pageTitle()
     {
         return tra('Set up Date and Time');
     }
 
-	function isEditable ()
-	{
-		return true;
-	}
+    function isEditable()
+    {
+        return true;
+    }
 
-	function onSetupPage ($homepageUrl)
-	{
-		global $prefs;
-		$smarty = TikiLib::lib('smarty');
-		// Run the parent first
-		parent::onSetupPage($homepageUrl);
+    function onSetupPage($homepageUrl)
+    {
+        global $prefs;
+        $smarty = TikiLib::lib('smarty');
+        // Run the parent first
+        parent::onSetupPage($homepageUrl);
 
-		return true;
-	}
+        return true;
+    }
 
-	function getTemplate()
-	{
-		$wizardTemplate = 'wizard/admin_date_time.tpl';
-		return $wizardTemplate;
-	}
+    function getTemplate()
+    {
+        $wizardTemplate = 'wizard/admin_date_time.tpl';
+        return $wizardTemplate;
+    }
 
-	function onContinue ($homepageUrl)
-	{
-		// Run the parent first
-		parent::onContinue($homepageUrl);
-	}
+    function onContinue($homepageUrl)
+    {
+        // Run the parent first
+        parent::onContinue($homepageUrl);
+    }
 }

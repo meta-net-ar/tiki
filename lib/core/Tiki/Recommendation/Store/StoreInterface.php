@@ -12,11 +12,11 @@ use Tiki\Recommendation\RecommendationSet;
 
 interface StoreInterface
 {
-	function isReceived($input, Recommendation $recommendation);
+    function isReceived($input, Recommendation $recommendation);
 
-	function store($input, RecommendationSet $recommendation);
+    function store($input, RecommendationSet $recommendation);
 
-	function getInputs();
+    function getInputs();
 
-	function terminate();
+    function terminate();
 }

@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -9,97 +9,97 @@ namespace Tracker\Filter;
 
 class Filter
 {
-	private $permName;
-	private $mode;
-	private $position = 'default';
-	private $label;
-	private $help;
-	private $control;
-	private $applyCondition;
+    private $permName;
+    private $mode;
+    private $position = 'default';
+    private $label;
+    private $help;
+    private $control;
+    private $applyCondition;
 
-	function __construct($permName, $mode)
-	{
-		$this->permName = $permName;
-		$this->mode = $mode;
-	}
+    function __construct($permName, $mode)
+    {
+        $this->permName = $permName;
+        $this->mode = $mode;
+    }
 
-	function getField()
-	{
-		return $this->permName;
-	}
-	
-	function getMode()
-	{
-		return $this->mode;
-	}
+    function getField()
+    {
+        return $this->permName;
+    }
 
-	function setLabel($label)
-	{
-		$this->label = $label;
-		return $this;
-	}
+    function getMode()
+    {
+        return $this->mode;
+    }
 
-	function getLabel()
-	{
-		return $this->label;
-	}
+    function setLabel($label)
+    {
+        $this->label = $label;
+        return $this;
+    }
 
-	function getPosition()
-	{
-		return $this->position;
-	}
+    function getLabel()
+    {
+        return $this->label;
+    }
 
-	function setPosition($position)
-	{
-		$this->position = $position;
-		return $this;
-	}
+    function getPosition()
+    {
+        return $this->position;
+    }
 
-	function setHelp($help)
-	{
-		$this->help = $help;
-		return $this;
-	}
+    function setPosition($position)
+    {
+        $this->position = $position;
+        return $this;
+    }
 
-	function getHelp()
-	{
-		return $this->help;
-	}
+    function setHelp($help)
+    {
+        $this->help = $help;
+        return $this;
+    }
 
-	function setControl(Control\Control $control)
-	{
-		$this->control = $control;
-		return $this;
-	}
+    function getHelp()
+    {
+        return $this->help;
+    }
 
-	function getControl()
-	{
-		return $this->control;
-	}
+    function setControl(Control\Control $control)
+    {
+        $this->control = $control;
+        return $this;
+    }
 
-	function setApplyCondition(callable $apply)
-	{
-		$this->applyCondition = $apply;
-		return $this;
-	}
+    function getControl()
+    {
+        return $this->control;
+    }
 
-	function applyCondition(\Search_Query $query)
-	{
-		$cb = $this->applyCondition;
-		$cb($this->control, $query);
-	}
+    function setApplyCondition(callable $apply)
+    {
+        $this->applyCondition = $apply;
+        return $this;
+    }
 
-	function applyInput(\JitFilter $input)
-	{
-		$this->control->applyInput($input);
-	}
+    function applyCondition(\Search_Query $query)
+    {
+        $cb = $this->applyCondition;
+        $cb($this->control, $query);
+    }
 
-	function copyProperties(self $other)
-	{
-		$this->help = $other->help;
-		$this->label = $other->label;
-		$this->position = $other->position;
-		$this->control = clone $other->control;
-		$this->applyCondition = $other->applyCondition;
-	}
+    function applyInput(\JitFilter $input)
+    {
+        $this->control->applyInput($input);
+    }
+
+    function copyProperties(self $other)
+    {
+        $this->help = $other->help;
+        $this->label = $other->label;
+        $this->position = $other->position;
+        $this->control = clone $other->control;
+        $this->applyCondition = $other->applyCondition;
+    }
 }

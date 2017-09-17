@@ -9,11 +9,10 @@ namespace Tracker\Tabular\Source;
 
 interface SourceInterface
 {
-	/**
-	 * Provides an iterable result
-	 */
-	function getEntries();
+    /**
+     * Provides an iterable result
+     */
+    function getEntries();
 
-	function getSchema();
+    function getSchema();
 }
-

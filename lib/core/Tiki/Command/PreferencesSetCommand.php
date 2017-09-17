@@ -47,12 +47,12 @@ class PreferencesSetCommand extends Command
             return;
         }
 
-        if ($preferenceInfo['type'] == 'flag' && !in_array($value, array('y', 'n'))) {
+        if ($preferenceInfo['type'] == 'flag' && ! in_array($value, ['y', 'n'])) {
             $output->writeln(sprintf('Preference %s is of type flag, allowed values are "y" or "n", you used %s.', $preference, $value));
             return;
         }
 
-        if (!empty($preferenceInfo['separator']) && !is_array($value)) {
+        if (! empty($preferenceInfo['separator']) && ! is_array($value)) {
             $value = explode($preferenceInfo['separator'], $value);
         }
 

@@ -18,11 +18,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class UnavailableCommand extends Command
 {
-	public function __construct($commandName)
-	{
-		$this->setName($commandName);
-		parent::__construct();
-	}
+    public function __construct($commandName)
+    {
+        $this->setName($commandName);
+        parent::__construct();
+    }
 
     protected function configure()
     {
@@ -32,6 +32,6 @@ class UnavailableCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		$output->writeln('<error>Command not available at this stage. Complete required installation steps.</error>');
+        $output->writeln('<error>Command not available at this stage. Complete required installation steps.</error>');
     }
 }

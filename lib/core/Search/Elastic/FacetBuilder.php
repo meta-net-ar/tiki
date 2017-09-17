@@ -7,37 +7,36 @@
 
 class Search_Elastic_FacetBuilder
 {
-	private $count;
-	private $mainKey;
+    private $count;
+    private $mainKey;
 
-	function __construct($count = 10, $useAggregations = false)
-	{
-		$this->count = $count;
-		$this->mainKey = $useAggregations ? 'aggregations' : 'facets';
-	}
+    function __construct($count = 10, $useAggregations = false)
+    {
+        $this->count = $count;
+        $this->mainKey = $useAggregations ? 'aggregations' : 'facets';
+    }
 
-	function build(array $facets)
-	{
-		if (empty($facets)) {
-			return array();
-		}
+    function build(array $facets)
+    {
+        if (empty($facets)) {
+            return [];
+        }
 
-		$out = array();
-		foreach ($facets as $facet) {
-			$out[$facet->getName()] = $this->buildFacet($facet);
-		}
+        $out = [];
+        foreach ($facets as $facet) {
+            $out[$facet->getName()] = $this->buildFacet($facet);
+        }
 
-		return array(
-			$this->mainKey => $out,
-		);
-	}
+        return [
+            $this->mainKey => $out,
+        ];
+    }
 
-	private function buildFacet(Search_Query_Facet_Interface $facet)
-	{
-		return array('terms' => array(
-			'field' => $facet->getField(),
-			'size' => $facet->getCount() ?: $this->count,
-		));
-	}
+    private function buildFacet(Search_Query_Facet_Interface $facet)
+    {
+        return ['terms' => [
+            'field' => $facet->getField(),
+            'size' => $facet->getCount() ?: $this->count,
+        ]];
+    }
 }
-

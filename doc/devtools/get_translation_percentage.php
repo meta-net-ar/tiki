@@ -1,43 +1,43 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 /*
  * This script was created to get the translation percentage for each language.php file.
- * 
+ *
  * Before calculating the percentage, it will run get_strings.php to make sure all language.php
  * files are up to date.
- * 
+ *
  * The output is in wiki syntax and if a page name is provided as the second parameter,
  * it will be updated.
  */
 
 die("REMOVE THIS LINE TO USE THE SCRIPT.\n");
 
-if (!isset($argv[1])) {
-	echo "\nUsage: php get_translation_percentage.php pathToTikiRootDir wikiPageName\n";
-	echo "Example: php get_translation_percentage.php /home/user/public_html/tiki i18nStats\n";
-	echo "The second parameter is optional\n\n";
-	die;
+if (! isset($argv[1])) {
+    echo "\nUsage: php get_translation_percentage.php pathToTikiRootDir wikiPageName\n";
+    echo "Example: php get_translation_percentage.php /home/user/public_html/tiki i18nStats\n";
+    echo "The second parameter is optional\n\n";
+    die;
 }
 
 $tikiPath = $argv[1];
 
 if (substr($tikiPath, -1) != '/') {
-	$tikiPath .= '/';
+    $tikiPath .= '/';
 }
 
 if (isset($argv[2])) {
-	$wikiPage = $argv[2];
+    $wikiPage = $argv[2];
 }
 
-if (!file_exists($tikiPath)) {
-	die("\nERROR: $tikiPath doesn't exist\n\n");
-} else if (!file_exists($tikiPath . 'db/local.php')) {
-	die("\nERROR: $tikiPath doesn't seem to be a valid Tiki installation\n\n");
+if (! file_exists($tikiPath)) {
+    die("\nERROR: $tikiPath doesn't exist\n\n");
+} elseif (! file_exists($tikiPath . 'db/local.php')) {
+    die("\nERROR: $tikiPath doesn't seem to be a valid Tiki installation\n\n");
 }
 
 chdir($tikiPath);
@@ -45,46 +45,46 @@ require_once('tiki-setup.php');
 require_once('lang/langmapping.php');
 require_once('lib/language/File.php');
 
-if (isset($wikiPage) && !$tikilib->page_exists($wikiPage)) {
-	die("\nERROR: $wikiPage doesn't exist\n\n");
+if (isset($wikiPage) && ! $tikilib->page_exists($wikiPage)) {
+    die("\nERROR: $wikiPage doesn't exist\n\n");
 }
 
 // update all language.php files by calling get_strings.php
-$output = array();
+$output = [];
 $return_var = null;
 
 exec('php get_strings.php', $output, $return_var);
 
 if ($return_var == 1) {
-	die("\nCouln't execute get_strings.php\n\n");
+    die("\nCouln't execute get_strings.php\n\n");
 }
 
 // calculate the percentage for each language.php
-$outputData = array();
-$globalStats = array();
+$outputData = [];
+$globalStats = [];
 
 // $langmapping is set on lang/langmapping.php
 foreach ($langmapping as $lang => $null) {
-	$filePath = "lang/$lang/language.php";
-	if (file_exists($filePath) && $lang != 'en') {
-		$parseFile = new Language_File($filePath);
-		$stats = $parseFile->getStats();
-		
-		$outputData[$lang] = array(
-			'total' => $stats['total'],
-			'untranslated' => $stats['untranslated'],
-			'translated' => $stats['translated'],
-			'percentage' => $stats['percentage'],
-		);
-		
-		if ($stats['percentage'] >= 70) {
-			$globalStats['70+']++; 
-		} else if ($stats['percentage'] >= 30) {
-			$globalStats['30+']++;
-		} else if ($stats['percentage'] < 30) {
-			$globalStats['0+']++;
-		}
-	}
+    $filePath = "lang/$lang/language.php";
+    if (file_exists($filePath) && $lang != 'en') {
+        $parseFile = new Language_File($filePath);
+        $stats = $parseFile->getStats();
+
+        $outputData[$lang] = [
+            'total' => $stats['total'],
+            'untranslated' => $stats['untranslated'],
+            'translated' => $stats['translated'],
+            'percentage' => $stats['percentage'],
+        ];
+
+        if ($stats['percentage'] >= 70) {
+            $globalStats['70+']++;
+        } elseif ($stats['percentage'] >= 30) {
+            $globalStats['30+']++;
+        } elseif ($stats['percentage'] < 30) {
+            $globalStats['0+']++;
+        }
+    }
 }
 
 
@@ -97,14 +97,14 @@ $output .= "__Global stats:__\n* {$globalStats['70+']} languages with more than 
 $output .= "{FANCYTABLE(head=\"Language code (ISO)|English name|Native Name|Completion|Percentage|Number of strings\" sortable=\"y\")}\n";
 
 foreach ($outputData as $lang => $data) {
-	$output .= "$lang | {$langmapping[$lang][1]} | {$langmapping[$lang][0]} | {gauge value=\"{$data['percentage']}\" size=\"100\" showvalue=\"false\"} | ";
-	$output .= "{$data['percentage']}% | Total: {$data['total']} %%% Translated: {$data['translated']} %%% Untranslated: {$data['untranslated']} \n";
+    $output .= "$lang | {$langmapping[$lang][1]} | {$langmapping[$lang][0]} | {gauge value=\"{$data['percentage']}\" size=\"100\" showvalue=\"false\"} | ";
+    $output .= "{$data['percentage']}% | Total: {$data['total']} %%% Translated: {$data['translated']} %%% Untranslated: {$data['untranslated']} \n";
 }
 
 $output .= '{FANCYTABLE}';
 
 if (isset($wikiPage)) {
-	$tikilib->update_page($wikiPage, $output, 'Updating translation stats', 'i18nbot', '127.0.0.1');
+    $tikilib->update_page($wikiPage, $output, 'Updating translation stats', 'i18nbot', '127.0.0.1');
 } else {
-	echo $output;
+    echo $output;
 }

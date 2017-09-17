@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -13,21 +13,21 @@ require_once 'lib/language/Language.php';
  */
 class LanguageTest extends TikiTestCase
 {
-	public function testAddPhpSlashes()
-	{
-		$string = "\n \t \r " . '\\ $ "';
-		$expectedResult = '\n \t \r \\\\ \$ \"';
-		$this->assertEquals($expectedResult, Language::addPhpSlashes($string));
-	}
+    public function testAddPhpSlashes()
+    {
+        $string = "\n \t \r " . '\\ $ "';
+        $expectedResult = '\n \t \r \\\\ \$ \"';
+        $this->assertEquals($expectedResult, Language::addPhpSlashes($string));
+    }
 
-	public function testRemovePhpSlashes()
-	{
-		$string = '\n \t \r \\\\ \$ \"';
-		$expectedResult = "\n \t \r " . '\\ $ "';
-		$this->assertEquals($expectedResult, Language::removePhpSlashes($string));
-	}
-	
-	// TODO: We need a way to create a Tiki database just for the tests
-	/*public function testGetDbTranslatedLanguages() {
+    public function testRemovePhpSlashes()
+    {
+        $string = '\n \t \r \\\\ \$ \"';
+        $expectedResult = "\n \t \r " . '\\ $ "';
+        $this->assertEquals($expectedResult, Language::removePhpSlashes($string));
+    }
+
+    // TODO: We need a way to create a Tiki database just for the tests
+    /*public function testGetDbTranslatedLanguages() {
 	}*/
 }

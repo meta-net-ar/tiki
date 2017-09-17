@@ -6,228 +6,226 @@
 // $Id$
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 class ScormLib
 {
-	private $unlinkList = array();
+    private $unlinkList = [];
 
-	function __destruct()
-	{
-		foreach ($this->unlinkList as $file) {
-			unlink($file);
-		}
-	}
+    function __destruct()
+    {
+        foreach ($this->unlinkList as $file) {
+            unlink($file);
+        }
+    }
 
-	function handle_file_creation($args)
-	{
-		if ($metadata = $this->getRequestMetadata($args)) {
-			$this->createItem(
-				$metadata,
-				array(
-					'scormPackage' => $args['object'],
-				)
-			);
-		}
-	}
+    function handle_file_creation($args)
+    {
+        if ($metadata = $this->getRequestMetadata($args)) {
+            $this->createItem(
+                $metadata,
+                [
+                    'scormPackage' => $args['object'],
+                ]
+            );
+        }
+    }
 
-	function handle_file_update($args)
-	{
-		if (isset($args['initialFileId']) && $metadata = $this->getRequestMetadata($args)) {
-			$relationlib = TikiLib::lib('relation');
-			$items = $relationlib->get_relations_to('file', $args['initialFileId'], 'tiki.file.attach');
+    function handle_file_update($args)
+    {
+        if (isset($args['initialFileId']) && $metadata = $this->getRequestMetadata($args)) {
+            $relationlib = TikiLib::lib('relation');
+            $items = $relationlib->get_relations_to('file', $args['initialFileId'], 'tiki.file.attach');
 
-			$transaction = TikiDb::get()->begin();
+            $transaction = TikiDb::get()->begin();
 
-			foreach ($items as $item ) {
-				if ($item['type'] == 'trackeritem') {
-					$this->updateItem(
-						$item['itemId'],
-						$metadata,
-						array(
-							'scormPackage' => $args['object'],
-						)
-					);
-				}
-			}
+            foreach ($items as $item) {
+                if ($item['type'] == 'trackeritem') {
+                    $this->updateItem(
+                        $item['itemId'],
+                        $metadata,
+                        [
+                            'scormPackage' => $args['object'],
+                        ]
+                    );
+                }
+            }
 
-			$transaction->commit();
-		}
-	}
+            $transaction->commit();
+        }
+    }
 
-	private function getRequestMetadata($args)
-	{
-		$metadata = null;
+    private function getRequestMetadata($args)
+    {
+        $metadata = null;
 
-		if ($this->isZipFile($args)
-			&& $zip = $this->getZipFile($args['object'])) {
+        if ($this->isZipFile($args)
+            && $zip = $this->getZipFile($args['object'])) {
+            if ($manifest = $this->getScormManifest($zip)) {
+                $metadata = $this->getMetadata($manifest);
+            }
 
-			if ($manifest = $this->getScormManifest($zip)) {
-				$metadata = $this->getMetadata($manifest);
-			}
+            $zip->close();
+        }
 
-			$zip->close();
-		}
+        return $metadata;
+    }
 
-		return $metadata;
-	}
+    private function isZipFile($args)
+    {
+        if (! isset($args['filetype'])) {
+            return false;
+        }
 
-	private function isZipFile($args)
-	{
-		if (! isset($args['filetype'])) {
-			return false;
-		}
+        return in_array($args['filetype'], ['application/zip', 'application/x-zip', 'application/x-zip-compressed']);
+    }
 
-		return in_array($args['filetype'], array('application/zip', 'application/x-zip', 'application/x-zip-compressed'));
-	}
+    private function getZipFile($fileId)
+    {
+        global $prefs;
 
-	private function getZipFile($fileId)
-	{
-		global $prefs;
+        if (! class_exists('ZipArchive')) {
+            return null;
+        }
 
-		if (! class_exists('ZipArchive')) {
-			return null;
-		}
+        $filegallib = TikiLib::lib('filegal');
 
-		$filegallib = TikiLib::lib('filegal');
+        if (! $info = $filegallib->get_file_info($fileId, false, true, false)) {
+            return null;
+        }
 
-		if (! $info = $filegallib->get_file_info($fileId, false, true, false)) {
-			return null;
-		}
+        $zip = new ZipArchive;
 
-		$zip = new ZipArchive;
+        if ($info['path'] && $prefs['fgal_use_db'] == 'n') {
+            $filepath = $prefs['fgal_use_dir'] . $info['path'];
+        } else {
+            $filepath = tempnam('temp/', 'scorm');
+            file_put_contents($filepath, $info['data']);
+            $this->unlinkList[] = $filepath;
+        }
 
-		if ($info['path'] && $prefs['fgal_use_db'] == 'n') {
-			$filepath = $prefs['fgal_use_dir'] . $info['path'];
-		} else {
-			$filepath = tempnam('temp/', 'scorm');
-			file_put_contents($filepath, $info['data']);
-			$this->unlinkList[] = $filepath;
-		}
+        if ($zip->open($filepath) === true) {
+            return $zip;
+        }
+    }
 
-		if ($zip->open($filepath) === TRUE) {
-			return $zip;
-		}
-	}
+    private function getScormManifest($zip)
+    {
+        return $zip->getFromName('imsmanifest.xml');
+    }
 
-	private function getScormManifest($zip)
-	{
-		return $zip->getFromName('imsmanifest.xml');
-	}
+    private function getMetadata($manifest)
+    {
+        $dom = new DOMDocument;
+        $dom->loadXML($manifest);
 
-	private function getMetadata($manifest)
-	{
-		$dom = new DOMDocument;
-		$dom->loadXML($manifest);
+        $metadata = [];
+        foreach ($dom->getElementsByTagName('general')->item(0)->childNodes as $node) {
+            if ($node instanceof DOMElement) {
+                $metadata[$this->getKey($node)][] = $this->getData($node);
+            }
+        }
 
-		$metadata = array();
-		foreach ($dom->getElementsByTagName('general')->item(0)->childNodes as $node) {
-			if ($node instanceof DOMElement) {
-				$metadata[$this->getKey($node)][] = $this->getData($node);
-			}
-		}
+        return $metadata;
+    }
 
-		return $metadata;
-	}
+    private function getKey($node)
+    {
+        $raw = $node->tagName;
+        return substr($raw, strpos($raw, ':') + 1);
+    }
 
-	private function getKey($node)
-	{
-		$raw = $node->tagName;
-		return substr($raw, strpos($raw, ':') + 1);
-	}
+    private function getData($node)
+    {
+        $data = [];
+        foreach ($node->getElementsByTagName('langstring') as $text) {
+            $data[$text->getAttribute('xml:lang')] = trim($text->textContent);
+        }
 
-	private function getData($node)
-	{
-		$data = array();
-		foreach ($node->getElementsByTagName('langstring') as $text) {
-			$data[$text->getAttribute('xml:lang')] = trim($text->textContent);
-		}
+        return $data;
+    }
 
-		return $data;
-	}
+    private function createItem($metadata, $additional)
+    {
+        $definition = $this->getScormTracker();
+        $fields = $this->buildFields($definition, $metadata, $additional);
 
-	private function createItem($metadata, $additional)
-	{
-		$definition = $this->getScormTracker();
-		$fields = $this->buildFields($definition, $metadata, $additional);
+        $utilities = new Services_Tracker_Utilities;
+        $utilities->insertItem(
+            $definition,
+            [
+                'status' => 'o',
+                'fields' => $fields,
+            ]
+        );
+    }
 
-		$utilities = new Services_Tracker_Utilities;
-		$utilities->insertItem(
-			$definition,
-			array(
-				'status' => 'o',
-				'fields' => $fields,
-			)
-		);
-	}
+    private function updateItem($itemId, $metadata, $additional)
+    {
+        $definition = $this->getScormTracker();
+        $fields = $this->buildFields($definition, $metadata, $additional);
 
-	private function updateItem($itemId, $metadata, $additional)
-	{
-		$definition = $this->getScormTracker();
-		$fields = $this->buildFields($definition, $metadata, $additional);
+        $utilities = new Services_Tracker_Utilities;
+        $utilities->updateItem(
+            $definition,
+            [
+                'itemId' => (int) $itemId,
+                'status' => 'o',
+                'fields' => $fields,
+            ]
+        );
+    }
 
-		$utilities = new Services_Tracker_Utilities;
-		$utilities->updateItem(
-			$definition,
-			array(
-				'itemId' => (int) $itemId,
-				'status' => 'o',
-				'fields' => $fields,
-			)
-		);
-	}
+    private function getScormTracker()
+    {
+        global $prefs;
 
-	private function getScormTracker()
-	{
-		global $prefs;
+        return Tracker_Definition::get($prefs['scorm_tracker']);
+    }
 
-		return Tracker_Definition::get($prefs['scorm_tracker']);
-	}
+    private function buildFields($definition, $metadata, $additional)
+    {
+        $fields = [];
 
-	private function buildFields($definition, $metadata, $additional)
-	{
-		$fields = array();
+        foreach ($metadata as $key => $values) {
+            if ($field = $definition->getFieldFromPermName($key)) {
+                if ($field['type'] === 'F') {
+                    $fields[$key] = $this->getTagString($values);
+                } elseif ($field['isMultilingual'] == 'y') {
+                    $fields[$key] = reset($values);
+                } else {
+                    $fields[$key] = $this->getForDefaultLanguage($values);
+                }
+            }
+        }
 
-		foreach ($metadata as $key => $values) {
-			if ($field = $definition->getFieldFromPermName($key)) {
-				if ($field['type'] === 'F') {
-					$fields[$key] = $this->getTagString($values);
-				} elseif ($field['isMultilingual'] == 'y') {
-					$fields[$key] = reset($values);
-				} else {
-					$fields[$key] = $this->getForDefaultLanguage($values);
-				}
-			}
-		}
+        return array_merge($fields, $additional);
+    }
 
-		return array_merge($fields, $additional);
-	}
+    private function getTagString($values)
+    {
+        $completeSet = [];
+        foreach ($values as $val) {
+            $completeSet = array_merge($completeSet, array_values($val));
+        }
 
-	private function getTagString($values)
-	{
-		$completeSet = array();
-		foreach ($values as $val) {
-			$completeSet = array_merge($completeSet, array_values($val));
-		}
+        return implode(' ', array_unique($completeSet));
+    }
 
-		return implode(' ', array_unique($completeSet));
-	}
+    private function getForDefaultLanguage($values)
+    {
+        global $prefs;
 
-	private function getForDefaultLanguage($values)
-	{
-		global $prefs;
+        $defaultLanguage = $prefs['language'];
+        foreach ($values as $valueSet) {
+            if (isset($valueSet[$defaultLanguage])) {
+                return $valueSet[$defaultLanguage];
+            }
+        }
 
-		$defaultLanguage = $prefs['language'];
-		foreach ($values as $valueSet) {
-			if (isset($valueSet[$defaultLanguage])) {
-				return $valueSet[$defaultLanguage];
-			}
-		}
-
-		// If nothing matching the language found, return the first value
-		return reset(reset($values));
-	}
+        // If nothing matching the language found, return the first value
+        return reset(reset($values));
+    }
 }
-

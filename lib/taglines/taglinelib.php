@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -25,27 +25,27 @@ class TagLineLib extends TikiLib
      * @return array
      */
     public function list_cookies($offset, $maxRecords, $sort_mode, $find)
-	{
-		if ($find) {
-			$mid = " where (`cookie` like ?)";
-			$bindvars = array('%' . $find . '%');
-		} else {
-			$mid = "";
-			$bindvars = array();
-		}
-		$query = "select * from `tiki_cookies` $mid order by ".$this->convertSortMode($sort_mode);
-		$query_cant = "select count(*) from `tiki_cookies` $mid";
-		$result = $this->query($query, $bindvars, $maxRecords, $offset);
-		$cant = $this->getOne($query_cant, $bindvars);
-		$ret = array();
-		while ($res = $result->fetchRow()) {
-			$ret[] = $res;
-		}
-		$retval = array();
-		$retval["data"] = $ret;
-		$retval["cant"] = $cant;
-		return $retval;
-	}
+    {
+        if ($find) {
+            $mid = " where (`cookie` like ?)";
+            $bindvars = ['%' . $find . '%'];
+        } else {
+            $mid = "";
+            $bindvars = [];
+        }
+        $query = "select * from `tiki_cookies` $mid order by ".$this->convertSortMode($sort_mode);
+        $query_cant = "select count(*) from `tiki_cookies` $mid";
+        $result = $this->query($query, $bindvars, $maxRecords, $offset);
+        $cant = $this->getOne($query_cant, $bindvars);
+        $ret = [];
+        while ($res = $result->fetchRow()) {
+            $ret[] = $res;
+        }
+        $retval = [];
+        $retval["data"] = $ret;
+        $retval["cant"] = $cant;
+        return $retval;
+    }
 
     /**
      * @param $cookieId
@@ -53,53 +53,53 @@ class TagLineLib extends TikiLib
      * @return bool
      */
     public function replace_cookie($cookieId, $cookie)
-	{
-		//$cookie = addslashes($cookie);
-		// Check the name
-		if ($cookieId) {
-			$query = "update `tiki_cookies` set `cookie`=? where `cookieId`=?";
-			$bindvars = array($cookie,(int) $cookieId);
-		} else {
-			$bindvars = array($cookie);
-			$query = "delete from `tiki_cookies` where `cookie`=?";
-			$result = $this->query($query, $bindvars);
-			$query = "insert into `tiki_cookies`(`cookie`) values(?)";
-		}
-		$result = $this->query($query, $bindvars);
-		return true;
-	}
+    {
+        //$cookie = addslashes($cookie);
+        // Check the name
+        if ($cookieId) {
+            $query = "update `tiki_cookies` set `cookie`=? where `cookieId`=?";
+            $bindvars = [$cookie,(int) $cookieId];
+        } else {
+            $bindvars = [$cookie];
+            $query = "delete from `tiki_cookies` where `cookie`=?";
+            $result = $this->query($query, $bindvars);
+            $query = "insert into `tiki_cookies`(`cookie`) values(?)";
+        }
+        $result = $this->query($query, $bindvars);
+        return true;
+    }
 
     /**
      * @param $cookieId
      * @return bool
      */
     public function remove_cookie($cookieId)
-	{
-		$query = "delete from `tiki_cookies` where `cookieId`=?";
-		$result = $this->query($query, array((int) $cookieId));
-		return true;
-	}
+    {
+        $query = "delete from `tiki_cookies` where `cookieId`=?";
+        $result = $this->query($query, [(int) $cookieId]);
+        return true;
+    }
 
     /**
      * @param $cookieId
      * @return bool
      */
     public function get_cookie($cookieId)
-	{
-		$query = "select * from `tiki_cookies` where `cookieId`=?";
-		$result = $this->query($query, array((int) $cookieId));
-		if (!$result->numRows()) {
-			return false;
-		}
+    {
+        $query = "select * from `tiki_cookies` where `cookieId`=?";
+        $result = $this->query($query, [(int) $cookieId]);
+        if (! $result->numRows()) {
+            return false;
+        }
 
-		$res = $result->fetchRow();
-		return $res;
-	}
+        $res = $result->fetchRow();
+        return $res;
+    }
 
-	public function remove_all_cookies()
-	{
-		$query = "delete from `tiki_cookies`";
-		$result = $this->query($query, array());
-	}
+    public function remove_all_cookies()
+    {
+        $query = "delete from `tiki_cookies`";
+        $result = $this->query($query, []);
+    }
 }
 $taglinelib = new TagLineLib;

@@ -1,181 +1,180 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 /**
  * Handler class for Auto increment
- * 
+ *
  * Letter key: ~q~
  *
  */
 class Tracker_Field_AutoIncrement extends Tracker_Field_Abstract implements Tracker_Field_Exportable, Tracker_Field_Filterable
 {
-	public static function getTypes()
-	{
-		return array(
-			'q' => array(
-				'name' => tr('Unique identifier'),
-				'description' => tr('The value of this field is set automatically. The value contains an integer (number) which increases automatically, so that any 2 tracker items will be assigned different values.'),
-				'readonly' => true,
-				'help' => 'Auto-Increment Field',				
-				'prefs' => array('trackerfield_autoincrement'),
-				'tags' => array('advanced'),
-				'default' => 'n',
-				'supported_changes' => array('d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b'),
-				'params' => array(
-					'start' => array(
-						'name' => tr('Start'),
-						'description' => tr('The starting value for the field'),
-						'default' => 1,
-						'filter' => 'int',
-						'legacy_index' => 0,
-					),
-					'prepend' => array(
-						'name' => tr('Prepend'),
-						'description' => tr('Text that will be displayed before the field'),
-						'filter' => 'text',
-						'legacy_index' => 1,
-					),
-					'append' => array(
-						'name' => tr('Append'),
-						'description' => tr('Text that will be displayed after the field'),
-						'filter' => 'text',
-						'legacy_index' => 2,
-					),
-					'itemId' => array(
-						'name' => tr('Item ID'),
-						'description' => tr('If set to "itemId", will set this field to match the value of the actual database itemId field value'),
-						'filter' => 'alpha',
-						'options' => array(
-							'' => '',
-							'itemId' => 'itemId',
-						),
-						'legacy_index' => 3,
-					),
-				),
-			),
-		);
-	}
+    public static function getTypes()
+    {
+        return [
+            'q' => [
+                'name' => tr('Unique identifier'),
+                'description' => tr('The value of this field is set automatically. The value contains an integer (number) which increases automatically, so that any 2 tracker items will be assigned different values.'),
+                'readonly' => true,
+                'help' => 'Auto-Increment Field',
+                'prefs' => ['trackerfield_autoincrement'],
+                'tags' => ['advanced'],
+                'default' => 'n',
+                'supported_changes' => ['d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b'],
+                'params' => [
+                    'start' => [
+                        'name' => tr('Start'),
+                        'description' => tr('The starting value for the field'),
+                        'default' => 1,
+                        'filter' => 'int',
+                        'legacy_index' => 0,
+                    ],
+                    'prepend' => [
+                        'name' => tr('Prepend'),
+                        'description' => tr('Text that will be displayed before the field'),
+                        'filter' => 'text',
+                        'legacy_index' => 1,
+                    ],
+                    'append' => [
+                        'name' => tr('Append'),
+                        'description' => tr('Text that will be displayed after the field'),
+                        'filter' => 'text',
+                        'legacy_index' => 2,
+                    ],
+                    'itemId' => [
+                        'name' => tr('Item ID'),
+                        'description' => tr('If set to "itemId", will set this field to match the value of the actual database itemId field value'),
+                        'filter' => 'alpha',
+                        'options' => [
+                            '' => '',
+                            'itemId' => 'itemId',
+                        ],
+                        'legacy_index' => 3,
+                    ],
+                ],
+            ],
+        ];
+    }
 
-	function getFieldData(array $requestData = array())
-	{
-		$ins_id = $this->getInsertId();
-		$value = isset($requestData[$ins_id]) ? $requestData[$ins_id] : $this->getValue();
+    function getFieldData(array $requestData = [])
+    {
+        $ins_id = $this->getInsertId();
+        $value = isset($requestData[$ins_id]) ? $requestData[$ins_id] : $this->getValue();
 
-		return array('value' => $value);
-	}
-	
-	function renderInput($context = array())
-	{
-		return $this->renderTemplate('trackerinput/autoincrement.tpl', $context);
-	}
+        return ['value' => $value];
+    }
 
-	protected function renderInnerOutput($context = array())
-	{
-		$value = $this->getValue();
-		$prepend = $this->getOption('prepend');
-		if (!empty($prepend)) {
-			if( $context['list_mode'] !== 'csv' ) {
-				$value = "<span class='formunit'>$prepend</span>" . $value;
-			} else {
-				$value = $prepend . $value;
-			}
-		}
-	
-		$append = $this->getOption('append');
-		if (!empty($append)) {
-			if( $context['list_mode'] !== 'csv' ) {
-				$value .= "<span class='formunit'>$append</span>";
-			} else {
-				$value .= $append;
-			}
-		}
+    function renderInput($context = [])
+    {
+        return $this->renderTemplate('trackerinput/autoincrement.tpl', $context);
+    }
 
-		return $value;
-	}
+    protected function renderInnerOutput($context = [])
+    {
+        $value = $this->getValue();
+        $prepend = $this->getOption('prepend');
+        if (! empty($prepend)) {
+            if ($context['list_mode'] !== 'csv') {
+                $value = "<span class='formunit'>$prepend</span>" . $value;
+            } else {
+                $value = $prepend . $value;
+            }
+        }
 
-	function handleSave($value, $oldValue)
-	{
-		$value = false;
-		if ($this->getOption('itemId') == 'itemId') {
-			$value = $this->getItemId();
-		} elseif (is_null($oldValue)) {
-			$value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
-			if (! $value) {
-				$value = $this->getOption('start', 1);
-			} else {
-				$value += 1;
-			}
-		}
+        $append = $this->getOption('append');
+        if (! empty($append)) {
+            if ($context['list_mode'] !== 'csv') {
+                $value .= "<span class='formunit'>$append</span>";
+            } else {
+                $value .= $append;
+            }
+        }
 
-		return array(
-			'value' => $value,
-		);
-	}
+        return $value;
+    }
 
-	function getTabularSchema()
-	{
-		$schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
+    function handleSave($value, $oldValue)
+    {
+        $value = false;
+        if ($this->getOption('itemId') == 'itemId') {
+            $value = $this->getItemId();
+        } elseif (is_null($oldValue)) {
+            $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            if (! $value) {
+                $value = $this->getOption('start', 1);
+            } else {
+                $value += 1;
+            }
+        }
 
-		$permName = $this->getConfiguration('permName');
-		$prepend = $this->getOption('prepend');
-		$append = $this->getOption('append');
+        return [
+            'value' => $value,
+        ];
+    }
 
-		$schema->addNew($permName, 'default')
-			->setLabel($this->getConfiguration('name'))
-			->setRenderTransform(function ($value) {
-				return $value;
-			})
-			;
-		$schema->addNew($permName, 'formatted')
-			->setLabel($this->getConfiguration('name'))
-			->addIncompatibility($permName, 'default')
-			->setRenderTransform(function ($value) use ($prepend, $append) {
-				return $prepend . $value . $append;
-			})
-			;
+    function getTabularSchema()
+    {
+        $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
 
-		return $schema;
-	}
+        $permName = $this->getConfiguration('permName');
+        $prepend = $this->getOption('prepend');
+        $append = $this->getOption('append');
 
-	function getFilterCollection()
-	{
-		$filters = new Tracker\Filter\Collection($this->getTrackerDefinition());
-		$permName = $this->getConfiguration('permName');
-		$name = $this->getConfiguration('name');
-		$baseKey = $this->getBaseKey();
+        $schema->addNew($permName, 'default')
+            ->setLabel($this->getConfiguration('name'))
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ;
+        $schema->addNew($permName, 'formatted')
+            ->setLabel($this->getConfiguration('name'))
+            ->addIncompatibility($permName, 'default')
+            ->setRenderTransform(function ($value) use ($prepend, $append) {
+                return $prepend . $value . $append;
+            })
+            ;
+
+        return $schema;
+    }
+
+    function getFilterCollection()
+    {
+        $filters = new Tracker\Filter\Collection($this->getTrackerDefinition());
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
+        $baseKey = $this->getBaseKey();
 
 
-		$filters->addNew($permName, 'lookup')
-			->setLabel($name)
-			->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_lookup"))
-			->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
-				$value = $control->getValue();
+        $filters->addNew($permName, 'lookup')
+            ->setLabel($name)
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_lookup"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
 
-				if ($value) {
-					$query->filterIdentifier($value, $baseKey);
-				}
-			})
-			;
+                if ($value) {
+                    $query->filterIdentifier($value, $baseKey);
+                }
+            })
+            ;
 
-		return $filters;
-	}
+        return $filters;
+    }
 
-	function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
-	{
-		$item = $this->getValue();
-		$baseKey = $this->getBaseKey();
-		$prepend = $this->getOption('prepend');
-		$append = $this->getOption('append');
+    function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
+    {
+        $item = $this->getValue();
+        $baseKey = $this->getBaseKey();
+        $prepend = $this->getOption('prepend');
+        $append = $this->getOption('append');
 
-		$out = array(
-			$baseKey => $typeFactory->numeric($item),
-			"{$baseKey}_text" => $typeFactory->sortable($prepend.$item.$append),
-		);
-		return $out;
-	}
+        $out = [
+            $baseKey => $typeFactory->numeric($item),
+            "{$baseKey}_text" => $typeFactory->sortable($prepend.$item.$append),
+        ];
+        return $out;
+    }
 }
-

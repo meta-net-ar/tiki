@@ -1,21 +1,21 @@
 .cm-tw-syntaxerror {
-	color: #FFFFFF;
-	background-color: #990000;
+    color: #FFFFFF;
+    background-color: #990000;
 }
 
 .cm-tw-deleted {
-	text-decoration: line-through;
+    text-decoration: line-through;
 }
 
 .cm-tw-header5 {
-	font-weight: bold;
+    font-weight: bold;
 }
 .cm-tw-listitem:first-child { /*Added first child to fix duplicate padding when highlighting*/
-	padding-left: 10px;
+    padding-left: 10px;
 }
 
-.cm-s-default span.cm-bracket {	/* list items too light by default - not sure why this selector is needed */
-	color: #9d8859;
+.cm-s-default span.cm-bracket { /* list items too light by default - not sure why this selector is needed */
+    color: #9d8859;
 }
 
 /*Removed border attributes from .cm-tw-box since it produced a missplacement with the selections of text inside it. Added grey color instead*/
@@ -26,9 +26,9 @@
 	border-color: inherit;
 } */
 .cm-tw-box {
-	color: #808080;
-	border: none;
+    color: #808080;
+    border: none;
 }
 .cm-tw-underline {
-	text-decoration: underline;
+    text-decoration: underline;
 }

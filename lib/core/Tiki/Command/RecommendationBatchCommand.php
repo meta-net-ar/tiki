@@ -27,7 +27,7 @@ class RecommendationBatchCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		$batch = TikiLib::lib('recommendationcontentbatch');
-		$batch->process();
+        $batch = TikiLib::lib('recommendationcontentbatch');
+        $batch->process();
     }
 }

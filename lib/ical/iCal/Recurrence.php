@@ -48,16 +48,16 @@ class File_iCal_Recurrence
     protected $_frequency;
     protected $_count, $_until;
     protected $_interval;
-    protected $_bysecond = array();
-    protected $_byminute = array();
-    protected $_byhour = array();
-    protected $_byday = array();
-    protected $_bymonthday = array();
-    protected $_byyearday = array();
-    protected $_byweekno = array();
-    protected $_bymonth = array();
+    protected $_bysecond = [];
+    protected $_byminute = [];
+    protected $_byhour = [];
+    protected $_byday = [];
+    protected $_bymonthday = [];
+    protected $_byyearday = [];
+    protected $_byweekno = [];
+    protected $_bymonth = [];
     protected $_wkst;
-    protected $_setpos = array();
+    protected $_setpos = [];
 
 
     /**
@@ -66,7 +66,8 @@ class File_iCal_Recurrence
      * This will create an empty recurrence object.  It will set some default values.
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->_interval = 1;
     }
 
@@ -75,7 +76,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeSecondly() {
+    public function makeSecondly()
+    {
         $this->_freqeuncy = ICAL_FREQUENCY_SECONDLY;
     }
 
@@ -84,7 +86,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeMinutely() {
+    public function makeMinutely()
+    {
         $this->_frequency = ICAL_FREQUENCY_MINUTELY;
     }
 
@@ -93,7 +96,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeHourly() {
+    public function makeHourly()
+    {
         $this->_frequency = ICAL_FREQUENCY_HOURLY;
     }
 
@@ -102,7 +106,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeDaily() {
+    public function makeDaily()
+    {
         $this->_frequency = ICAL_FREQUENCY_DAILY;
     }
 
@@ -111,7 +116,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeWeekly() {
+    public function makeWeekly()
+    {
         $this->_frequency = ICAL_FREQUENCY_WEEKLY;
     }
 
@@ -120,7 +126,8 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeMonthly() {
+    public function makeMonthly()
+    {
         $this->_frequency = ICAL_FREQUENCY_MONTHLY;
     }
 
@@ -129,11 +136,13 @@ class File_iCal_Recurrence
      *
      *
      */
-    public function makeYearly() {
+    public function makeYearly()
+    {
         $this->_frequency = ICAL_FREQUENCY_YEARLY;
     }
 
-    public function getFrequency() {
+    public function getFrequency()
+    {
         return $this->_frequency;
     }
 
@@ -141,16 +150,17 @@ class File_iCal_Recurrence
      * Set the number of times to recur
      *
      */
-    public function setCount($c) {
+    public function setCount($c)
+    {
         if (ctype_digit($c)) {
             $this->_count = $c;
-        }
-        else {
+        } else {
             trigger_error("Count must be an integer", E_USER_WARNING);
         }
     }
 
-    public function getCount() {
+    public function getCount()
+    {
         return $this->_count;
     }
 
@@ -159,11 +169,13 @@ class File_iCal_Recurrence
      * Set the date or time until which to recur
      *
      */
-    public function setUntil($u) {
+    public function setUntil($u)
+    {
         $this->_until = $u;
     }
 
-    public function getUntil() {
+    public function getUntil()
+    {
         return $this->_until;
     }
 
@@ -171,7 +183,8 @@ class File_iCal_Recurrence
      * Set the frequency interval for which items recur
      *
      */
-    public function setInterval($i) {
+    public function setInterval($i)
+    {
         if (ctype_digit($i)) {
             if ($i > 0) {
                 $this->_interval = $i;
@@ -184,60 +197,71 @@ class File_iCal_Recurrence
         }
     }
 
-    public function getInterval() {
+    public function getInterval()
+    {
         return $this->_interval;
     }
 
-    public function addSecond($s) {
+    public function addSecond($s)
+    {
         if ($s >= 0 && $s <= 59) {
             $this->_bysecond[] = $s;
         }
     }
 
-    public function deleteSecond($s) {
+    public function deleteSecond($s)
+    {
         if ($key = array_search($s, $this->_bysecond)) {
             unset($this->_bysecond[$key]);
         }
     }
 
-    public function getSeconds() {
+    public function getSeconds()
+    {
         return $this->_bysecond;
     }
 
-    public function addMinute($m) {
+    public function addMinute($m)
+    {
         if ($m >= 0 && $m <= 59) {
             $this->_byminute[] = $m;
         }
     }
 
-    public function deleteMinute($m) {
+    public function deleteMinute($m)
+    {
         if ($key = array_search($m, $_byminute)) {
             unset($this->_byminute[$key]);
         }
     }
 
-    public function getMinutes() {
+    public function getMinutes()
+    {
         return $this->_byminute;
     }
 
-    public function addHour($h) {
+    public function addHour($h)
+    {
         if ($h >= 0 && $h <= 23) {
             $this->_byhour[] = $h;
         }
     }
 
-    public function deleteHour($h) {
+    public function deleteHour($h)
+    {
         if ($key = array_search($h, $_byhour)) {
             unset($this->_byhour[$key]);
         }
     }
 
-    public function getHours() {
+    public function getHours()
+    {
         return $this->_byhour;
     }
 
     //need to implement the +n prefix
-    public function addDay($d, $i = null) {
+    public function addDay($d, $i = null)
+    {
         switch ($d) {
             case ICAL_DAY_SUNDAY:
             case ICAL_DAY_MONDAY:
@@ -246,7 +270,7 @@ class File_iCal_Recurrence
             case ICAL_DAY_THURSDAY:
             case ICAL_DAY_FRIDAY:
             case ICAL_DAY_SATURDAY:
-                if (!in_array($d, $this->_byday)) {
+                if (! in_array($d, $this->_byday)) {
                     $this->_byday[] = $d;
                 }
                 break;
@@ -256,7 +280,8 @@ class File_iCal_Recurrence
         }
     }
 
-    public function deleteDay($d) {
+    public function deleteDay($d)
+    {
         switch ($d) {
             case ICAL_DAY_SUNDAY:
             case ICAL_DAY_MONDAY:
@@ -271,79 +296,92 @@ class File_iCal_Recurrence
                 break;
 
             default:
-
         }
     }
 
-    public function getDays() {
+    public function getDays()
+    {
         return $this->_byday;
     }
 
-    public function addMonthDay($m) {
+    public function addMonthDay($m)
+    {
         if (($m >= -31 && $m <= -1) || ($m >= 1 && $m <= 31)) {
             $this->_bymonthdayp[] = $m;
         }
     }
 
-    public function deleteMonthDay($m) {
+    public function deleteMonthDay($m)
+    {
         if ($key = array_search($m, $this->_bymonthday)) {
             unset($this->_bymonthday[$key]);
         }
     }
 
-    public function getMonthDays() {
+    public function getMonthDays()
+    {
         return $this->_bymonthday;
     }
 
-    public function addYearDay($y) {
+    public function addYearDay($y)
+    {
         if (($y >= -366 && $y <= -1) || ($y >= 1 && $y <= 366)) {
             $this->_byyearday[] = $y;
         }
     }
 
-    public function deleteYearDay($y) {
+    public function deleteYearDay($y)
+    {
         if ($key = array_search($y, $this->_byyearday)) {
             unset($this->_byyearday[$key]);
         }
     }
 
-    public function getYearDays() {
+    public function getYearDays()
+    {
         return $this->_byyearday;
     }
 
-    public function addWeekNumber($w) {
-        if (($w >= -53 && $w <= -1) || ($w >=1 && $w<=53)) {
+    public function addWeekNumber($w)
+    {
+        if (($w >= -53 && $w <= -1) || ($w >= 1 && $w <= 53)) {
             $this->_byweekno[] = $w;
         }
     }
 
-    public function deleteWeekNumber($w) {
+    public function deleteWeekNumber($w)
+    {
         if ($key = array_search($w, $this->_byweekno)) {
             unset($this->_byweekno[$key]);
         }
     }
 
-    public function getWeekNumbers() {
+    public function getWeekNumbers()
+    {
         return $this->_byweekno;
     }
 
-    public function addMonth($m) {
-        if ($m >=1 && $m <= 12) {
+    public function addMonth($m)
+    {
+        if ($m >= 1 && $m <= 12) {
             $this->_bymonth[] = $m;
         }
     }
 
-    public function deleteMonth($m) {
+    public function deleteMonth($m)
+    {
         if ($key = array_search($m, $this->_bymonth)) {
             unset($this->_bymonth[$key]);
         }
     }
 
-    public function getMonths() {
+    public function getMonths()
+    {
         return $this->_bymonth;
     }
 
-    public function setWeekStart($s) {
+    public function setWeekStart($s)
+    {
         switch ($s) {
             case ICAL_DAY_SUNDAY:
             case ICAL_DAY_MONDAY:
@@ -356,31 +394,32 @@ class File_iCal_Recurrence
 
             default:
                 $this->_wkst = ICAL_DAY_MONDAY;
-
         }
     }
 
-    public function getWeekStart() {
+    public function getWeekStart()
+    {
         return $this->_wkst;
     }
 
-    public function addSetPos($p) {
+    public function addSetPos($p)
+    {
         if (($p >= -366 && $p <= -1) || ($p >= 1 && $p <= 366)) {
-            if (!in_array($p, $this->_setpos)) {
+            if (! in_array($p, $this->_setpos)) {
                 $this->_setpos[] = $p;
             }
         }
     }
 
-    public function deleteSetPos($p) {
+    public function deleteSetPos($p)
+    {
         if ($key = array_search($p, $this->_setpos)) {
             unset($this->_setpos[$key]);
         }
     }
 
-    public function getSetPos() {
+    public function getSetPos()
+    {
         return $this->_setpos;
     }
-
-
 }

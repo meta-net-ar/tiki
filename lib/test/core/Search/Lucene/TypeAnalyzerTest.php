@@ -10,22 +10,21 @@
  */
 class Search_Lucene_TypeAnalyzerTest extends Search_Index_TypeAnalyzerTest
 {
-	private $dir;
+    private $dir;
 
-	function setUp()
-	{
-		$this->dir = dirname(__FILE__) . '/test_index';
-		$this->tearDown();
-	}
+    function setUp()
+    {
+        $this->dir = dirname(__FILE__) . '/test_index';
+        $this->tearDown();
+    }
 
-	function tearDown()
-	{
-		$this->getIndex()->destroy();
-	}
+    function tearDown()
+    {
+        $this->getIndex()->destroy();
+    }
 
-	protected function getIndex()
-	{
-		return new Search_Lucene_Index($this->dir);
-	}
+    protected function getIndex()
+    {
+        return new Search_Lucene_Index($this->dir);
+    }
 }
-

@@ -7,187 +7,187 @@
 
 class Search_MySql_Index implements Search_Index_Interface
 {
-	private $db;
-	private $table;
-	private $builder;
+    private $db;
+    private $table;
+    private $builder;
 
-	private $providedMappings = array();
+    private $providedMappings = [];
 
-	function __construct(TikiDb $db, $index)
-	{
-		$this->db = $db;
-		$this->table = new Search_MySql_Table($db, $index);
-		$this->builder = new Search_MySql_QueryBuilder($db);
-	}
+    function __construct(TikiDb $db, $index)
+    {
+        $this->db = $db;
+        $this->table = new Search_MySql_Table($db, $index);
+        $this->builder = new Search_MySql_QueryBuilder($db);
+    }
 
-	function destroy()
-	{
-		$this->table->drop();
-		return true;
-	}
+    function destroy()
+    {
+        $this->table->drop();
+        return true;
+    }
 
-	function exists()
-	{
-		return $this->table->exists();
-	}
+    function exists()
+    {
+        return $this->table->exists();
+    }
 
-	function addDocument(array $data)
-	{
-		foreach ($data as $key => $value) {
-			$this->handleField($key, $value);
-		}
+    function addDocument(array $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->handleField($key, $value);
+        }
 
-		$data = array_map(
-			function ($entry) {
-				return $entry->getValue();
-			}, $data
-		);
+        $data = array_map(
+            function ($entry) {
+                return $entry->getValue();
+            },
+            $data
+        );
 
-		$this->table->insert($data);
-	}
+        $this->table->insert($data);
+    }
 
-	private function handleField($name, $value)
-	{
-		if ($value instanceof Search_Type_Whole) {
-			$this->table->ensureHasField($name, 'TEXT');
-		} elseif ($value instanceof Search_Type_Numeric) {
-			$this->table->ensureHasField($name, 'FLOAT');
-		} elseif ($value instanceof Search_Type_PlainShortText) {
-			$this->table->ensureHasField($name, 'TEXT');
-		} elseif ($value instanceof Search_Type_PlainText) {
-			$this->table->ensureHasField($name, 'TEXT');
-		} elseif ($value instanceof Search_Type_WikiText) {
-			$this->table->ensureHasField($name, 'TEXT');
-		} elseif ($value instanceof Search_Type_MultivalueText) {
-			$this->table->ensureHasField($name, 'TEXT');
-		} elseif ($value instanceof Search_Type_Timestamp) {
-			$this->table->ensureHasField($name, $value->isDateOnly() ? 'DATE' : 'DATETIME');
-		} else {
-			throw new Exception('Unsupported type: ' . get_class($value));
-		}
-	}
+    private function handleField($name, $value)
+    {
+        if ($value instanceof Search_Type_Whole) {
+            $this->table->ensureHasField($name, 'TEXT');
+        } elseif ($value instanceof Search_Type_Numeric) {
+            $this->table->ensureHasField($name, 'FLOAT');
+        } elseif ($value instanceof Search_Type_PlainShortText) {
+            $this->table->ensureHasField($name, 'TEXT');
+        } elseif ($value instanceof Search_Type_PlainText) {
+            $this->table->ensureHasField($name, 'TEXT');
+        } elseif ($value instanceof Search_Type_WikiText) {
+            $this->table->ensureHasField($name, 'TEXT');
+        } elseif ($value instanceof Search_Type_MultivalueText) {
+            $this->table->ensureHasField($name, 'TEXT');
+        } elseif ($value instanceof Search_Type_Timestamp) {
+            $this->table->ensureHasField($name, $value->isDateOnly() ? 'DATE' : 'DATETIME');
+        } else {
+            throw new Exception('Unsupported type: ' . get_class($value));
+        }
+    }
 
-	function endUpdate()
-	{
-		$this->table->flush();
-	}
+    function endUpdate()
+    {
+        $this->table->flush();
+    }
 
-	function optimize()
-	{
-		$this->table->flush();
-	}
+    function optimize()
+    {
+        $this->table->flush();
+    }
 
-	function invalidateMultiple(array $objectList)
-	{
-		foreach ($objectList as $object) {
-			$this->table->deleteMultiple($object);
-		}
-	}
+    function invalidateMultiple(array $objectList)
+    {
+        foreach ($objectList as $object) {
+            $this->table->deleteMultiple($object);
+        }
+    }
 
-	function find(Search_Query_Interface $query, $resultStart, $resultCount)
-	{
-		try {
-			$words = $this->getWords($query->getExpr());
+    function find(Search_Query_Interface $query, $resultStart, $resultCount)
+    {
+        try {
+            $words = $this->getWords($query->getExpr());
 
-			$condition = $this->builder->build($query->getExpr());
-			$conditions = empty($condition) ? array() : array(
-				$this->table->expr($condition),
-			);
+            $condition = $this->builder->build($query->getExpr());
+            $conditions = empty($condition) ? [] : [
+                $this->table->expr($condition),
+            ];
 
-			$scoreFields = [];
-			$indexes = $this->builder->getRequiredIndexes();
-			foreach ($indexes as $index) {
-				$this->table->ensureHasIndex($index['field'], $index['type']);
+            $scoreFields = [];
+            $indexes = $this->builder->getRequiredIndexes();
+            foreach ($indexes as $index) {
+                $this->table->ensureHasIndex($index['field'], $index['type']);
 
-				if (! in_array($index, $scoreFields) && $index['type'] == 'fulltext') {
-					$scoreFields[] = $index;
-				}
-			}
+                if (! in_array($index, $scoreFields) && $index['type'] == 'fulltext') {
+                    $scoreFields[] = $index;
+                }
+            }
 
-			$this->table->flush();
+            $this->table->flush();
 
-			$order = $this->getOrderClause($query, (bool) $scoreFields);
+            $order = $this->getOrderClause($query, (bool) $scoreFields);
 
-			$selectFields = $this->table->all();
+            $selectFields = $this->table->all();
 
-			if ($scoreFields) {
-				$str = $this->db->qstr(implode(' ', $words));
-				$scoreCalc = '';
-				foreach($scoreFields as $field) {
-					$scoreCalc .= $scoreCalc ? ' + ' : '';
-					$scoreCalc .= "ROUND(MATCH(`{$field['field']}`) AGAINST ($str),2) * {$field['weight']}";
-				}
-				$selectFields['score'] = $this->table->expr($scoreCalc);
-			}
-			$count = $this->table->fetchCount($conditions);
-			$entries = $this->table->fetchAll($selectFields, $conditions, $resultCount, $resultStart, $order);
+            if ($scoreFields) {
+                $str = $this->db->qstr(implode(' ', $words));
+                $scoreCalc = '';
+                foreach ($scoreFields as $field) {
+                    $scoreCalc .= $scoreCalc ? ' + ' : '';
+                    $scoreCalc .= "ROUND(MATCH(`{$field['field']}`) AGAINST ($str),2) * {$field['weight']}";
+                }
+                $selectFields['score'] = $this->table->expr($scoreCalc);
+            }
+            $count = $this->table->fetchCount($conditions);
+            $entries = $this->table->fetchAll($selectFields, $conditions, $resultCount, $resultStart, $order);
 
-			$resultSet = new Search_ResultSet($entries, $count, $resultStart, $resultCount);
-			$resultSet->setHighlightHelper(new Search_MySql_HighlightHelper($words));
+            $resultSet = new Search_ResultSet($entries, $count, $resultStart, $resultCount);
+            $resultSet->setHighlightHelper(new Search_MySql_HighlightHelper($words));
 
-			return $resultSet;
-		} catch (Search_MySql_QueryException $e) {
-			Feedback::error($e->getMessage());
-			$resultSet = new Search_ResultSet(array(), 0, $resultStart, $resultCount);
-			return $resultSet;
-		}
-	}
+            return $resultSet;
+        } catch (Search_MySql_QueryException $e) {
+            Feedback::error($e->getMessage());
+            $resultSet = new Search_ResultSet([], 0, $resultStart, $resultCount);
+            return $resultSet;
+        }
+    }
 
-	function scroll(Search_Query_Interface $query)
-	{
-		$perPage = 100;
-		$hasMore = true;
+    function scroll(Search_Query_Interface $query)
+    {
+        $perPage = 100;
+        $hasMore = true;
 
-		for ($from = 0; $hasMore; $from += $perPage) {
-			$result = $this->find($query, $from, $perPage);
-			foreach ($result as $row) {
-				yield $row;
-			}
-			
-			$hasMore = $result->hasMore();
-		}
-	}
+        for ($from = 0; $hasMore; $from += $perPage) {
+            $result = $this->find($query, $from, $perPage);
+            foreach ($result as $row) {
+                yield $row;
+            }
 
-	private function getOrderClause($query, $useScore)
-	{
-		$order = $query->getSortOrder();
+            $hasMore = $result->hasMore();
+        }
+    }
 
-		if ($order->getField() == Search_Query_Order::FIELD_SCORE) {
-			if ($useScore) {
-				return array('score' => 'DESC');
-			} else {
-				return; // No specific order
-			}
-		}
+    private function getOrderClause($query, $useScore)
+    {
+        $order = $query->getSortOrder();
 
-		if ($order->getMode() == Search_Query_Order::MODE_NUMERIC) {
-			return $this->table->expr("CAST(`{$order->getField()}` as SIGNED) {$order->getOrder()}");
-		} else {
-			return $this->table->expr("`{$order->getField()}` {$order->getOrder()}");
-		}
-	}
+        if ($order->getField() == Search_Query_Order::FIELD_SCORE) {
+            if ($useScore) {
+                return ['score' => 'DESC'];
+            } else {
+                return; // No specific order
+            }
+        }
 
-	private function getWords($expr)
-	{
-		$words = array();
-		$factory = new Search_Type_Factory_Direct;
-		$expr->walk(
-			function ($node) use (& $words, $factory) {
-				if ($node instanceof Search_Expr_Token && $node->getField() !== 'searchable') {
-					$word = $node->getValue($factory)->getValue();
-					if (is_string($word) && !in_array($word, $words)) {
-						$words[] = $word;
-					}
-				}
-			}
-		);
+        if ($order->getMode() == Search_Query_Order::MODE_NUMERIC) {
+            return $this->table->expr("CAST(`{$order->getField()}` as SIGNED) {$order->getOrder()}");
+        } else {
+            return $this->table->expr("`{$order->getField()}` {$order->getOrder()}");
+        }
+    }
 
-		return $words;
-	}
+    private function getWords($expr)
+    {
+        $words = [];
+        $factory = new Search_Type_Factory_Direct;
+        $expr->walk(
+            function ($node) use (& $words, $factory) {
+                if ($node instanceof Search_Expr_Token && $node->getField() !== 'searchable') {
+                    $word = $node->getValue($factory)->getValue();
+                    if (is_string($word) && ! in_array($word, $words)) {
+                        $words[] = $word;
+                    }
+                }
+            }
+        );
 
-	function getTypeFactory()
-	{
-		return new Search_MySql_TypeFactory;
-	}
+        return $words;
+    }
+
+    function getTypeFactory()
+    {
+        return new Search_MySql_TypeFactory;
+    }
 }
-

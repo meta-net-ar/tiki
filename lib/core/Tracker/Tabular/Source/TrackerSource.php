@@ -9,31 +9,30 @@ namespace Tracker\Tabular\Source;
 
 class TrackerSource implements SourceInterface
 {
-	private $schema;
-	private $trackerId;
+    private $schema;
+    private $trackerId;
 
-	function __construct(\Tracker\Tabular\Schema $schema)
-	{
-		$def = $schema->getDefinition();
-		$this->trackerId = $def->getConfiguration('trackerId');
-		$this->schema = $schema;
-	}
+    function __construct(\Tracker\Tabular\Schema $schema)
+    {
+        $def = $schema->getDefinition();
+        $this->trackerId = $def->getConfiguration('trackerId');
+        $this->schema = $schema;
+    }
 
-	function getEntries()
-	{
-		$table = \TikiDb::get()->table('tiki_tracker_items');
-		$ids = $table->fetchColumn('itemId', [
-			'trackerId' => $this->trackerId,
-		]);
+    function getEntries()
+    {
+        $table = \TikiDb::get()->table('tiki_tracker_items');
+        $ids = $table->fetchColumn('itemId', [
+            'trackerId' => $this->trackerId,
+        ]);
 
-		foreach ($ids as $id) {
-			yield new TrackerSourceEntry($id);
-		}
-	}
+        foreach ($ids as $id) {
+            yield new TrackerSourceEntry($id);
+        }
+    }
 
-	function getSchema()
-	{
-		return $this->schema;
-	}
+    function getSchema()
+    {
+        return $this->schema;
+    }
 }
-

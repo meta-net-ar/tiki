@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -16,26 +16,27 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 class SearchStatsLib extends TikiLib
 {
-	function clear_search_stats()
-	{
-		$query = "delete from tiki_search_stats";
-		$result = $this->query($query, array());
-	}
+    function clear_search_stats()
+    {
+        $query = "delete from tiki_search_stats";
+        $result = $this->query($query, []);
+    }
 
-	function register_term_hit($term)
-	{
-		$term = trim($term);
+    function register_term_hit($term)
+    {
+        $term = trim($term);
 
-		$table = $this->table('tiki_search_stats');
-		$table->insertOrUpdate(
-			array(
-				'hits' => $table->increment(1),
-			), array(
-				'term' => $term,
-				'hits' => 1,
-			)
-		);
-	}
+        $table = $this->table('tiki_search_stats');
+        $table->insertOrUpdate(
+            [
+                'hits' => $table->increment(1),
+            ],
+            [
+                'term' => $term,
+                'hits' => 1,
+            ]
+        );
+    }
 
     /**
      * @param $offset
@@ -45,28 +46,28 @@ class SearchStatsLib extends TikiLib
      * @return array
      */
     function list_search_stats($offset, $maxRecords, $sort_mode, $find)
-	{
-		if ($find) {
-			$mid = " where (`term` like ?)";
-			$bindvars = array("%$find%");
-		} else {
-			$mid = "";
-			$bindvars = array();
-		}
+    {
+        if ($find) {
+            $mid = " where (`term` like ?)";
+            $bindvars = ["%$find%"];
+        } else {
+            $mid = "";
+            $bindvars = [];
+        }
 
-		$query = "select * from `tiki_search_stats` $mid order by " . $this->convertSortMode($sort_mode);
-		$query_cant = "select count(*) from `tiki_search_stats` $mid";
-		$result = $this->query($query, $bindvars, $maxRecords, $offset);
-		$cant = $this->getOne($query_cant, $bindvars);
-		$ret = array();
+        $query = "select * from `tiki_search_stats` $mid order by " . $this->convertSortMode($sort_mode);
+        $query_cant = "select count(*) from `tiki_search_stats` $mid";
+        $result = $this->query($query, $bindvars, $maxRecords, $offset);
+        $cant = $this->getOne($query_cant, $bindvars);
+        $ret = [];
 
-		while ($res = $result->fetchRow(DB_FETCHMODE_ASSOC)) {
-			$ret[] = $res;
-		}
+        while ($res = $result->fetchRow(DB_FETCHMODE_ASSOC)) {
+            $ret[] = $res;
+        }
 
-		$retval = array();
-		$retval["data"] = $ret;
-		$retval["cant"] = $cant;
-		return $retval;
-	}
+        $retval = [];
+        $retval["data"] = $ret;
+        $retval["cant"] = $cant;
+        return $retval;
+    }
 }

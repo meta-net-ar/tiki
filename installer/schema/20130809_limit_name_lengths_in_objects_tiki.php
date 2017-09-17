@@ -6,8 +6,8 @@
 // $Id$
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /*
@@ -34,32 +34,32 @@ This script fixes existing records by
 */
 function upgrade_20130809_limit_name_lengths_in_objects_tiki($installer)
 {
-	$max_pagename_length = 160;
+    $max_pagename_length = 160;
 
-	// Fix tiki_objects
-	///////////////////////////
+    // Fix tiki_objects
+    ///////////////////////////
 
-	// Find all records with long pagenames
-	$query = 'SELECT objectId, itemId, name, href FROM tiki_objects where type = "wiki page" and  length(itemId) > ?';
-	$results = $installer->query($query, array($max_pagename_length));
-	if ($results) {
-		$newValues = array();
-		while ($row = $results->fetchRow()) {
-			// Update the page name
-			$itemId = substr($row['itemId'], 0, $max_pagename_length);
-			$name = substr($row['name'], 0, $max_pagename_length);
-			// Update the URL
-			$href = "tiki-index.php?page=".urlencode($itemId);
-			$objectId = intval($row['objectId']);
+    // Find all records with long pagenames
+    $query = 'SELECT objectId, itemId, name, href FROM tiki_objects where type = "wiki page" and  length(itemId) > ?';
+    $results = $installer->query($query, [$max_pagename_length]);
+    if ($results) {
+        $newValues = [];
+        while ($row = $results->fetchRow()) {
+            // Update the page name
+            $itemId = substr($row['itemId'], 0, $max_pagename_length);
+            $name = substr($row['name'], 0, $max_pagename_length);
+            // Update the URL
+            $href = "tiki-index.php?page=".urlencode($itemId);
+            $objectId = intval($row['objectId']);
 
-			// Build the query parameters
-			$newValues[] = array($itemId, $name, $href, $objectId);
-		}
+            // Build the query parameters
+            $newValues[] = [$itemId, $name, $href, $objectId];
+        }
 
-		// Update the database record
-		$query = "update tiki_objects set itemId = ?, name=?, href=? where objectId = ?";
-		foreach ($newValues as $newVal) {
-			$installer->query($query, $newVal);
-		}
-	}
+        // Update the database record
+        $query = "update tiki_objects set itemId = ?, name=?, href=? where objectId = ?";
+        foreach ($newValues as $newVal) {
+            $installer->query($query, $newVal);
+        }
+    }
 }

@@ -1,27 +1,27 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 require_once(dirname(__FILE__) . '/tikiimporter_testcase.php');
 require_once(dirname(__FILE__) . '/../../importer/tikiimporter.php');
-/** 
+/**
  * @group importer
  */
 class TikiImporter_Test extends TikiImporter_TestCase
 {
     public function testGetOptions()
     {
-        $expectedResult = array(array('name' => 'name'),
-                                array('name' => 'otherName'),
-                                array('secondName' => 'something'));
+        $expectedResult = [['name' => 'name'],
+                                ['name' => 'otherName'],
+                                ['secondName' => 'something']];
         $object = new TikiImporterGranSon();
         $this->assertEquals($expectedResult, $object->getOptions());
 
-        $expectedResult = array(array('name' => 'someName', 'property1' => 'someProperty'),
-                                array('name' => 'differentName', 'property' => 'anotherProperty'));
+        $expectedResult = [['name' => 'someName', 'property1' => 'someProperty'],
+                                ['name' => 'differentName', 'property' => 'anotherProperty']];
         $object = new TikiImporterFirstChild();
         $this->assertEquals($expectedResult, $object->getOptions());
     }
@@ -46,32 +46,32 @@ class TikiImporter_Test extends TikiImporter_TestCase
 
 class TikiImporterFirstChild extends TikiImporter
 {
-    static public function importOptions()
+    public static function importOptions()
     {
-    	return array(
-    		array('name' => 'someName', 'property1' => 'someProperty'),
-            array('name' => 'differentName', 'property' => 'anotherProperty')
-        );
+        return [
+            ['name' => 'someName', 'property1' => 'someProperty'],
+            ['name' => 'differentName', 'property' => 'anotherProperty']
+        ];
     }
 }
 
 class TikiImporterSecondChild extends TikiImporter
 {
-    static public function importOptions()
+    public static function importOptions()
     {
-		return array(
-			array('name' => 'otherName'),
-            array('secondName' => 'something')
-        );
+        return [
+            ['name' => 'otherName'],
+            ['secondName' => 'something']
+        ];
     }
 }
 
 class TikiImporterGranSon extends TikiImporterSecondChild
 {
-    static public function importOptions()
+    public static function importOptions()
     {
-    	 return array(
-    	 	array('name' => 'name')
-    	 );
+         return [
+            ['name' => 'name']
+         ];
     }
 }

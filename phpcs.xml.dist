@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<ruleset name="Tiki Coding Standards">
+    <description>Tiki Coding Standards</description>
+
+    <arg name="basepath" value="."/>
+    <!-- display progress -->
+    <arg value="p"/>
+    <!-- <arg name="colors"/> -->
+    <arg name="parallel" value="75" />
+
+    <exclude-pattern>bin/*</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>vendor_extra/*</exclude-pattern>
+    <exclude-pattern>vendor_custom/*</exclude-pattern>
+    <exclude-pattern>vendor_bundled/*</exclude-pattern>
+    <exclude-pattern>lib/tikihelp/menu/*</exclude-pattern>
+
+    <exclude-pattern>*.min.js</exclude-pattern>
+    <exclude-pattern>*.min.css</exclude-pattern>
+
+    <!-- Zend Framework Rules: -->
+    <rule ref="PSR2">
+        <!-- Tiki: Mute check for side effects since we use inclusion guards everywhere -->
+        <exclude name="PSR1.Files.SideEffects"/>
+    </rule>
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+    <rule ref="Generic.Formatting.SpaceAfterNot"/>
+    <rule ref="Squiz.WhiteSpace.OperatorSpacing">
+        <properties>
+            <property name="ignoreNewlines" value="true"/>
+        </properties>
+    </rule>
+    <rule ref="Squiz.WhiteSpace.SuperfluousWhitespace">
+        <properties>
+            <property name="ignoreBlankLines" value="false"/>
+        </properties>
+    </rule>
+
+    <!-- Tiki Specific: -->
+
+    <!-- Change the tolerance for long lines -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="300"/>
+            <property name="absoluteLineLimit" value="500"/>
+        </properties>
+        <exclude-pattern>lang/*.php</exclude-pattern>
+    </rule>
+</ruleset>

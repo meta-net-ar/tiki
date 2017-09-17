@@ -7,63 +7,62 @@
 
 class Tiki_Event_Customizer_Executor implements Tiki_Event_EdgeProvider
 {
-	private $ruleSet;
-	private $runner;
+    private $ruleSet;
+    private $runner;
 
-	function __construct(Tiki_Event_Customizer_RuleSet $ruleSet, Math_Formula_Runner $runner)
-	{
-		$this->ruleSet = $ruleSet;
-		$this->runner = $runner;
-	}
+    function __construct(Tiki_Event_Customizer_RuleSet $ruleSet, Math_Formula_Runner $runner)
+    {
+        $this->ruleSet = $ruleSet;
+        $this->runner = $runner;
+    }
 
-	function __invoke($arguments, $eventName, $priority)
-	{
-		$rules = $this->ruleSet->getRules();
-		$runner = $this->runner;
+    function __invoke($arguments, $eventName, $priority)
+    {
+        $rules = $this->ruleSet->getRules();
+        $runner = $this->runner;
 
-		$runner->setVariables(
-			array(
-				'args' => $arguments,
-				'event' => $eventName,
-				'priority' => $priority,
-			)
-		);
+        $runner->setVariables(
+            [
+                'args' => $arguments,
+                'event' => $eventName,
+                'priority' => $priority,
+            ]
+        );
 
-		foreach ($rules as $rule) {
-			try {
-				$runner->setFormula($rule);
-				$runner->evaluate();
-			} catch (Math_Formula_Exception $e) {
-				// Skip errors
-			}
-		}
-	}
+        foreach ($rules as $rule) {
+            try {
+                $runner->setFormula($rule);
+                $runner->evaluate();
+            } catch (Math_Formula_Exception $e) {
+                // Skip errors
+            }
+        }
+    }
 
-	function getTargetEvents()
-	{
-		$out = array();
+    function getTargetEvents()
+    {
+        $out = [];
 
-		foreach ($this->ruleSet->getRules() as $rule) {
-			$out = array_merge($out, $this->findTrigger($rule));
-		}
+        foreach ($this->ruleSet->getRules() as $rule) {
+            $out = array_merge($out, $this->findTrigger($rule));
+        }
 
-		return $out;
-	}
+        return $out;
+    }
 
-	private function findTrigger($element)
-	{
-		if ($element->getType() == 'event-trigger') {
-			return array($element[0]);
-		} else {
-			$out = array();
-			foreach ($element as $child) {
-				if ($child instanceof Math_Formula_Element) {
-					$out = array_merge($out, $this->findTrigger($child));
-				}
-			}
+    private function findTrigger($element)
+    {
+        if ($element->getType() == 'event-trigger') {
+            return [$element[0]];
+        } else {
+            $out = [];
+            foreach ($element as $child) {
+                if ($child instanceof Math_Formula_Element) {
+                    $out = array_merge($out, $this->findTrigger($child));
+                }
+            }
 
-			return $out;
-		}
-	}
+            return $out;
+        }
+    }
 }
-

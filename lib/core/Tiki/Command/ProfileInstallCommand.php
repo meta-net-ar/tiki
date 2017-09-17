@@ -15,72 +15,72 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProfileInstallCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:apply')
-			->setDescription('Apply a profile')
-			->addArgument(
-				'profile',
-				InputArgument::REQUIRED,
-				'Profile name'
-			)
-			->addArgument(
-				'repository',
-				InputArgument::OPTIONAL,
-				'Repository',
-				'profiles.tiki.org'
-			)
-			->addOption(
-				'force',
-				null,
-				InputOption::VALUE_NONE,
-				'Re-apply profiles when already applied.'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('profile:apply')
+            ->setDescription('Apply a profile')
+            ->addArgument(
+                'profile',
+                InputArgument::REQUIRED,
+                'Profile name'
+            )
+            ->addArgument(
+                'repository',
+                InputArgument::OPTIONAL,
+                'Repository',
+                'profiles.tiki.org'
+            )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Re-apply profiles when already applied.'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$profileName = $input->getArgument('profile');
-		$repository = $input->getArgument('repository');
-		$force = $input->getOption('force');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $profileName = $input->getArgument('profile');
+        $repository = $input->getArgument('repository');
+        $force = $input->getOption('force');
 
-		$profile = \Tiki_Profile::fromNames($repository, $profileName);
+        $profile = \Tiki_Profile::fromNames($repository, $profileName);
 
-		if (! $profile) {
-			$output->writeln('<error>Profile not found.</error>');
-			return;
-		}
+        if (! $profile) {
+            $output->writeln('<error>Profile not found.</error>');
+            return;
+        }
 
-		if (!$profile->validateNamedObjectsReferences()){ // sanity check on the Named Objects references
-			$output->writeln('<error>Some of the named object references in the profile are invalid</error>');
-			return;
-		}
+        if (! $profile->validateNamedObjectsReferences()) { // sanity check on the Named Objects references
+            $output->writeln('<error>Some of the named object references in the profile are invalid</error>');
+            return;
+        }
 
-		$tikilib = \TikiLib::lib('tiki');
+        $tikilib = \TikiLib::lib('tiki');
 
-		$installer = new \Tiki_Profile_Installer;
-		$isInstalled = $installer->isInstalled($profile);
+        $installer = new \Tiki_Profile_Installer;
+        $isInstalled = $installer->isInstalled($profile);
 
-		if ($isInstalled && $force) {
-			$installer->forget($profile);
-			$isInstalled = false;
-		}
+        if ($isInstalled && $force) {
+            $installer->forget($profile);
+            $isInstalled = false;
+        }
 
-		if (! $isInstalled) {
-			$transaction = $tikilib->begin();
-			if ($installer->install($profile)) {
-				$transaction->commit();
-				$output->writeln('Profile applied.');
-			} else {
-				$output->writeln("<error>Installation failed:</error>");
+        if (! $isInstalled) {
+            $transaction = $tikilib->begin();
+            if ($installer->install($profile)) {
+                $transaction->commit();
+                $output->writeln('Profile applied.');
+            } else {
+                $output->writeln("<error>Installation failed:</error>");
 
-				foreach ($installer->getFeedback() as $error) {
-					$output->writeln("<error>$error</error>");
-				}
-			}
-		} else {
-			$output->writeln('<info>Profile was already applied. Nothing happened.</info>');
-		}
-	}
+                foreach ($installer->getFeedback() as $error) {
+                    $output->writeln("<error>$error</error>");
+                }
+            }
+        } else {
+            $output->writeln('<info>Profile was already applied. Nothing happened.</info>');
+        }
+    }
 }

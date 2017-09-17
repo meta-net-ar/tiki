@@ -7,44 +7,43 @@
 
 class Search_ResultSet_FacetFilter
 {
-	private $facet;
-	private $data;
+    private $facet;
+    private $data;
 
-	function __construct(Search_Query_Facet_Interface $facet, array $data)
-	{
-		$this->facet = $facet;
-		$this->data = $data;
-	}
+    function __construct(Search_Query_Facet_Interface $facet, array $data)
+    {
+        $this->facet = $facet;
+        $this->data = $data;
+    }
 
-	function isFacet(Search_Query_Facet_Interface $facet)
-	{
-		return $this->facet->getName() === $facet->getName();
-	}
+    function isFacet(Search_Query_Facet_Interface $facet)
+    {
+        return $this->facet->getName() === $facet->getName();
+    }
 
-	function getName()
-	{
-		return $this->facet->getName();
-	}
+    function getName()
+    {
+        return $this->facet->getName();
+    }
 
-	function getLabel()
-	{
-		return $this->facet->getLabel();
-	}
+    function getLabel()
+    {
+        return $this->facet->getLabel();
+    }
 
-	function getOperator()
-	{
-		return $this->facet->getOperator();
-	}
+    function getOperator()
+    {
+        return $this->facet->getOperator();
+    }
 
-	function getOptions()
-	{
-		$out = array();
+    function getOptions()
+    {
+        $out = [];
 
-		foreach ($this->data as $entry) {
-			$out[$entry['value']] = tr('%0 (%1)', tra($this->facet->render($entry['value'])), $entry['count']);
-		}
-		
-		return $out;
-	}
+        foreach ($this->data as $entry) {
+            $out[$entry['value']] = tr('%0 (%1)', tra($this->facet->render($entry['value'])), $entry['count']);
+        }
+
+        return $out;
+    }
 }
-

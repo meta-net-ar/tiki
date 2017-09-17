@@ -8,9 +8,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
-require_once ('tiki-setup.php');
+require_once('tiki-setup.php');
 $access->check_feature('feature_references');
-$access->check_permission(array('tiki_p_edit_references'), tra('Edit Library References'));
+$access->check_permission(['tiki_p_edit_references'], tra('Edit Library References'));
 
 global $dbTiki;
 $referenceslib = TikiLib::lib('references');
@@ -34,78 +34,77 @@ $ref_style = $_REQUEST['ref_style'];
 $ref_template = $_REQUEST['ref_template'];
 
 if (isset($_REQUEST['addreference'])) {
-	$errors = array();
+    $errors = [];
 
-	if ($ref_biblio_code == '') {
-		$errors[] = 'Please enter Biblio Code.';
-	}
+    if ($ref_biblio_code == '') {
+        $errors[] = 'Please enter Biblio Code.';
+    }
 
-	$exists = $referenceslib->check_lib_existence($ref_biblio_code);
-	if ($exists > 0) {
-		$errors[] = 'This reference already exists.';
-	}
+    $exists = $referenceslib->check_lib_existence($ref_biblio_code);
+    if ($exists > 0) {
+        $errors[] = 'This reference already exists.';
+    }
 
-	if (count($errors) < 1) {
-		$id = $referenceslib->add_reference(
-			$ref_biblio_code,
-			$ref_author,
-			$ref_title,
-			$ref_part,
-			$ref_uri,
-			$ref_code,
-			$ref_year,
-			$ref_style,
-			$ref_template,
-			$ref_publisher,
-			$ref_location
-		);
-	} else {
-		foreach ($errors as $error) {
-			$msg .= tra($error);
-		}
-		$access->display_error(basename(__FILE__), $msg);
-	}
+    if (count($errors) < 1) {
+        $id = $referenceslib->add_reference(
+            $ref_biblio_code,
+            $ref_author,
+            $ref_title,
+            $ref_part,
+            $ref_uri,
+            $ref_code,
+            $ref_year,
+            $ref_style,
+            $ref_template,
+            $ref_publisher,
+            $ref_location
+        );
+    } else {
+        foreach ($errors as $error) {
+            $msg .= tra($error);
+        }
+        $access->display_error(basename(__FILE__), $msg);
+    }
 }
 
 if (isset($_REQUEST['editreference'])) {
+    $errors = [];
 
-	$errors = array();
+    if ($ref_id == '') {
+        $errors[] = 'Reference not found.';
+    }
+    if ($ref_biblio_code == '') {
+        $errors[] = 'Please enter Biblio Code.';
+    }
 
-	if ($ref_id == '') {
-		$errors[] = 'Reference not found.';
-	}
-	if ($ref_biblio_code == '') {
-		$errors[] = 'Please enter Biblio Code.';
-	}
-
-	if (count($errors) < 1) {
-		$referenceslib->edit_reference(
-			$ref_id,
-			$ref_biblio_code,
-			$ref_author,
-			$ref_title,
-			$ref_part,
-			$ref_uri,
-			$ref_code,
-			$ref_year,
-			$ref_style,
-			$ref_template,
-			$ref_publisher,
-			$ref_location
-		);
-	} else {
-		foreach ($errors as $error) {
-			$msg .= tra($error);
-		}
-		$access->display_error(basename(__FILE__), $msg);
-	}
+    if (count($errors) < 1) {
+        $referenceslib->edit_reference(
+            $ref_id,
+            $ref_biblio_code,
+            $ref_author,
+            $ref_title,
+            $ref_part,
+            $ref_uri,
+            $ref_code,
+            $ref_year,
+            $ref_style,
+            $ref_template,
+            $ref_publisher,
+            $ref_location
+        );
+    } else {
+        foreach ($errors as $error) {
+            $msg .= tra($error);
+        }
+        $access->display_error(basename(__FILE__), $msg);
+    }
 }
 
 if (isset($_REQUEST['action']) && isset($ref_id)) {
-	if ($_REQUEST['action'] == 'delete') {
-		$access->check_authenticity();
-		$referenceslib->remove_reference($ref_id);
-	}
+    if ($_REQUEST['action'] == 'delete') {
+        $access->check_authenticity();
+        $referenceslib->remove_reference($ref_id);
+    }
 }
 
 $references = $referenceslib->list_lib_references();

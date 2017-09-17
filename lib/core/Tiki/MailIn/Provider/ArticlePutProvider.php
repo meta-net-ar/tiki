@@ -6,31 +6,32 @@
 // $Id$
 
 namespace Tiki\MailIn\Provider;
+
 use Tiki\MailIn\Action;
 
 class ArticlePutProvider implements ProviderInterface
 {
-	function isEnabled()
-	{
-		global $prefs;
-		return $prefs['feature_submissions'] == 'y';
-	}
+    function isEnabled()
+    {
+        global $prefs;
+        return $prefs['feature_submissions'] == 'y';
+    }
 
-	function getType()
-	{
-		return 'article-put';
-	}
+    function getType()
+    {
+        return 'article-put';
+    }
 
-	function getLabel()
-	{
-		return tr('Create or update article');
-	}
+    function getLabel()
+    {
+        return tr('Create or update article');
+    }
 
-	function getActionFactory(array $acc)
-	{
-		return new Action\DirectFactory('Tiki\MailIn\Action\ArticlePut', array(
-			'topic' => $acc['article_topicId'],
-			'type' => $acc['article_type'],
-		));
-	}
+    function getActionFactory(array $acc)
+    {
+        return new Action\DirectFactory('Tiki\MailIn\Action\ArticlePut', [
+            'topic' => $acc['article_topicId'],
+            'type' => $acc['article_type'],
+        ]);
+    }
 }

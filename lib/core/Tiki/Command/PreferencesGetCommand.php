@@ -43,7 +43,7 @@ class PreferencesGetCommand extends Command
 
         $value = $tikilib->get_preference($preference);
 
-        if (!empty($preferenceInfo['separator']) && is_array($value)) {
+        if (! empty($preferenceInfo['separator']) && is_array($value)) {
             $value = implode($preferenceInfo['separator'], $value);
         }
 

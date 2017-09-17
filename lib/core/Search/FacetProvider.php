@@ -7,44 +7,43 @@
 
 class Search_FacetProvider implements Search_FacetProvider_Interface
 {
-	private $facets = array();
+    private $facets = [];
 
-	function addContentSource($type, Search_ContentSource_Interface $source)
-	{
-		if ($source instanceof Search_FacetProvider_Interface) {
-			$this->addProvider($source);
-		}
-	}
+    function addContentSource($type, Search_ContentSource_Interface $source)
+    {
+        if ($source instanceof Search_FacetProvider_Interface) {
+            $this->addProvider($source);
+        }
+    }
 
-	function addGlobalSource(Search_GlobalSource_Interface $source)
-	{
-		if ($source instanceof Search_FacetProvider_Interface) {
-			$this->addProvider($source);
-		}
-	}
+    function addGlobalSource(Search_GlobalSource_Interface $source)
+    {
+        if ($source instanceof Search_FacetProvider_Interface) {
+            $this->addProvider($source);
+        }
+    }
 
-	function addProvider(Search_FacetProvider_Interface $provider)
-	{
-		$this->addFacets($provider->getFacets());
-	}
+    function addProvider(Search_FacetProvider_Interface $provider)
+    {
+        $this->addFacets($provider->getFacets());
+    }
 
-	function addFacets(array $facets)
-	{
-		foreach ($facets as $facet) {
-			$this->facets[$facet->getName()] = $facet;
-		}
-	}
+    function addFacets(array $facets)
+    {
+        foreach ($facets as $facet) {
+            $this->facets[$facet->getName()] = $facet;
+        }
+    }
 
-	function getFacets()
-	{
-		return $this->facets;
-	}
+    function getFacets()
+    {
+        return $this->facets;
+    }
 
-	function getFacet($name)
-	{
-		if (isset($this->facets[$name])) {
-			return $this->facets[$name];
-		}
-	}
+    function getFacet($name)
+    {
+        if (isset($this->facets[$name])) {
+            return $this->facets[$name];
+        }
+    }
 }
-

@@ -14,32 +14,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Forum extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:forum')
-			->setDescription('Export a forum definition')
-			->addArgument(
-				'forum',
-				InputArgument::REQUIRED,
-				'Forum ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:forum')
+            ->setDescription('Export a forum definition')
+            ->addArgument(
+                'forum',
+                InputArgument::REQUIRED,
+                'Forum ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$forumId = $input->getArgument('forum');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $forumId = $input->getArgument('forum');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$result = \Tiki_Profile_InstallHandler_Forum::export($writer, $forumId);
+        $result = \Tiki_Profile_InstallHandler_Forum::export($writer, $forumId);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("Forum not found: $forumId");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("Forum not found: $forumId");
+        }
+    }
 }

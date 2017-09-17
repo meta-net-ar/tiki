@@ -7,38 +7,36 @@
 
 class Tiki_Profile_Transport_File implements Tiki_Profile_Transport_Interface
 {
-	private $path;
+    private $path;
 
-	function __construct($path, $profileName)
-	{
-		$this->path = "$path/$profileName";
-	}
+    function __construct($path, $profileName)
+    {
+        $this->path = "$path/$profileName";
+    }
 
-	function getPageContent($pageName)
-	{
-		$fullpath = $this->path . '/' . $pageName . '.wiki';
-		if (file_exists($fullpath)) {
-			return file_get_contents($fullpath);
-		} else {
-			return ''; // assume empty if file not found to prevent unexpected errors
-		}
-	}
+    function getPageContent($pageName)
+    {
+        $fullpath = $this->path . '/' . $pageName . '.wiki';
+        if (file_exists($fullpath)) {
+            return file_get_contents($fullpath);
+        } else {
+            return ''; // assume empty if file not found to prevent unexpected errors
+        }
+    }
 
-	function getPageParsed($pageName)
-	{
-		$content = $this->getPageContent($pageName);
+    function getPageParsed($pageName)
+    {
+        $content = $this->getPageContent($pageName);
 
-		if ($content) {
-			return TikiLib::lib('parser')->parse_data($content);
-		} else {
-			return ''; // assume empty if file not found to prevent unexpected errors
-		}
-	}
+        if ($content) {
+            return TikiLib::lib('parser')->parse_data($content);
+        } else {
+            return ''; // assume empty if file not found to prevent unexpected errors
+        }
+    }
 
-	function getProfilePath()
-	{
-		return $this->path;
-	}
-
+    function getProfilePath()
+    {
+        return $this->path;
+    }
 }
-

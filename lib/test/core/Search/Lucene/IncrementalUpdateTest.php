@@ -10,24 +10,24 @@
  */
 abstract class Search_Lucene_IncrementalUpdateTest extends Search_Index_IncrementalUpdateTest
 {
-	private $dir;
+    private $dir;
 
-	function setUp()
-	{
-		$this->dir = dirname(__FILE__) . '/test_index';
-		$this->tearDown();
+    function setUp()
+    {
+        $this->dir = dirname(__FILE__) . '/test_index';
+        $this->tearDown();
 
-		$index = $this->getIndex();
-		$this->populate($index);
-	}
+        $index = $this->getIndex();
+        $this->populate($index);
+    }
 
-	function tearDown()
-	{
-		$this->getIndex()->destroy();
-	}
+    function tearDown()
+    {
+        $this->getIndex()->destroy();
+    }
 
-	protected function getIndex()
-	{
-		return new Search_Lucene_Index($this->dir);
-	}
+    protected function getIndex()
+    {
+        return new Search_Lucene_Index($this->dir);
+    }
 }

@@ -7,63 +7,65 @@
 
 class Tiki_Profile_InstallHandler_Blog extends Tiki_Profile_InstallHandler
 {
-	function getData()
-	{
-		if ( $this->data )
-			return $this->data;
+    function getData()
+    {
+        if ($this->data) {
+            return $this->data;
+        }
 
-		$defaults = array(
-			'description' => '',
-			'user' => 'admin',
-			'public' => 'n',
-			'max_posts' => 10,
-			'heading' => '',
-			'post_heading' => '',
-			'use_find' => 'y',
-			'comments' => 'n',
-			'show_avatar' => 'n',
-		);
+        $defaults = [
+            'description' => '',
+            'user' => 'admin',
+            'public' => 'n',
+            'max_posts' => 10,
+            'heading' => '',
+            'post_heading' => '',
+            'use_find' => 'y',
+            'comments' => 'n',
+            'show_avatar' => 'n',
+        ];
 
-		$data = array_merge($defaults, $this->obj->getData());
+        $data = array_merge($defaults, $this->obj->getData());
 
-		$data = Tiki_Profile::convertYesNo($data);
+        $data = Tiki_Profile::convertYesNo($data);
 
-		return $this->data = $data;
-	}
+        return $this->data = $data;
+    }
 
-	function canInstall()
-	{
-		$data = $this->getData();
-		if ( ! isset( $data['title'] ) )
-			return false;
+    function canInstall()
+    {
+        $data = $this->getData();
+        if (! isset($data['title'])) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	function _install()
-	{
-		$bloglib = TikiLib::lib('blog');
+    function _install()
+    {
+        $bloglib = TikiLib::lib('blog');
 
-		$data = $this->getData();
+        $data = $this->getData();
 
-		$this->replaceReferences($data);
+        $this->replaceReferences($data);
 
-		$blogId = $bloglib->replace_blog(
-			$data['title'],
-			$data['description'],
-			$data['user'],
-			$data['public'],
-			$data['max_posts'],
-			0,
-			$data['heading'],
-			$data['use_author'],
-			$data['add_date'],
-			$data['use_find'],
-			$data['allow_comments'],
-			$data['show_avatar'],
-			$data['post_heading']
-		);
+        $blogId = $bloglib->replace_blog(
+            $data['title'],
+            $data['description'],
+            $data['user'],
+            $data['public'],
+            $data['max_posts'],
+            0,
+            $data['heading'],
+            $data['use_author'],
+            $data['add_date'],
+            $data['use_find'],
+            $data['allow_comments'],
+            $data['show_avatar'],
+            $data['post_heading']
+        );
 
-		return $blogId;
-	}
+        return $blogId;
+    }
 }

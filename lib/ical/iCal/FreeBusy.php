@@ -42,27 +42,33 @@ require_once('BaseComponent.php');
  */
 class File_iCal_FreeBusy extends File_iCal_BaseComponent_EFJT
 {
-    public function setDateEnd($dt) {
+    public function setDateEnd($dt)
+    {
         File_iCal_BaseComponent::setDateEnd($dt);
     }
 
-    public function getDateEnd() {
+    public function getDateEnd()
+    {
         return File_iCal_BaseComponent::getDateEnd();
     }
 
-    public function setDateStart($ds) {
+    public function setDateStart($ds)
+    {
         File_iCal_BaseComponent::setDateStart($ds);
     }
 
-    public function getDateStart() {
+    public function getDateStart()
+    {
         return File_iCal_BaseComponent::getDateStart();
     }
 
-    public function setDuration($d) {
+    public function setDuration($d)
+    {
         File_iCal_BaseComponent::setDuration($d);
     }
 
-    public function getDuration() {
+    public function getDuration()
+    {
         return File_iCal_BaseComponent::getDuration();
     }
 
@@ -77,15 +83,14 @@ class File_iCal_FreeBusy extends File_iCal_BaseComponent_EFJT
     /**
      *
      */
-    public function setFreeBusy($fb) {
-
+    public function setFreeBusy($fb)
+    {
     }
 
     /**
      *
      */
-    public function getFreeBusy() {
-
+    public function getFreeBusy()
+    {
     }
-
 }

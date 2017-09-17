@@ -10,23 +10,22 @@
  */
 class Search_Lucene_SortTest extends Search_Index_SortTest
 {
-	private $dir;
+    private $dir;
 
-	function setUp()
-	{
-		$this->dir = dirname(__FILE__) . '/test_index';
-		$this->tearDown();
+    function setUp()
+    {
+        $this->dir = dirname(__FILE__) . '/test_index';
+        $this->tearDown();
 
-		$this->index = new Search_Lucene_Index($this->dir);
+        $this->index = new Search_Lucene_Index($this->dir);
 
-		$this->populate($this->index);
-	}
+        $this->populate($this->index);
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

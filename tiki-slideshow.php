@@ -3,17 +3,17 @@
  * @package tikiwiki
  */
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 $section = 'wiki page';
-require_once ('tiki-setup.php');
+require_once('tiki-setup.php');
 $tikilib = TikiLib::lib('tiki');
 $structlib = TikiLib::lib('struct');
 $wikilib = TikiLib::lib('wiki');
-include_once ('lib/wiki-plugins/wikiplugin_slideshow.php');
+include_once('lib/wiki-plugins/wikiplugin_slideshow.php');
 
 $access->check_feature('feature_wiki');
 $access->check_feature('feature_slideshow');
@@ -23,100 +23,99 @@ $tikilib->is_slideshow = true;
 $smarty->assign('is_slideshow', 'y');
 
 // Create the HomePage if it doesn't exist
-if (!$tikilib->page_exists($prefs['wikiHomePage'])) {
-	$tikilib->create_page($prefs['wikiHomePage'], 0, '', date("U"), 'Tiki initialization');
+if (! $tikilib->page_exists($prefs['wikiHomePage'])) {
+    $tikilib->create_page($prefs['wikiHomePage'], 0, '', date("U"), 'Tiki initialization');
 }
 
-if (!isset($_SESSION["thedate"])) {
-	$thedate = date("U");
+if (! isset($_SESSION["thedate"])) {
+    $thedate = date("U");
 } else {
-	$thedate = $_SESSION["thedate"];
+    $thedate = $_SESSION["thedate"];
 }
 
 if (isset($_REQUEST['pdf'])) {
-	$access->check_feature("feature_slideshow_pdfexport");
-	set_time_limit(777);
+    $access->check_feature("feature_slideshow_pdfexport");
+    set_time_limit(777);
 
-	$_POST["html"] = urldecode($_POST["html"]);
+    $_POST["html"] = urldecode($_POST["html"]);
 
-	if ( isset( $_POST["html"] ) ) {
+    if (isset($_POST["html"])) {
+        require_once 'lib/pdflib.php';
+        PdfGenerator::setupMPDFPathConstants(); // reuse mPDF settings
+        if (class_exists('mPDF')) { // use mPDF if available
+            $orientation = isset($_REQUEST['landscape']) ? "L" : "P";
+            $mpdf = new mPDF(null, "letter-" . $orientation);
+            $mpdf->WriteHTML(preg_replace('/%u([a-fA-F0-9]{4})/', '&#x\\1;', $_POST["html"]));
+            $mpdf->Output();
+            exit(0);
+        }
 
-		require_once 'lib/pdflib.php';
-		PdfGenerator::setupMPDFPathConstants(); // reuse mPDF settings
-		if (class_exists('mPDF')) { // use mPDF if available
-			$orientation =  isset($_REQUEST['landscape']) ? "L" : "P";
-			$mpdf = new mPDF(null, "letter-" . $orientation);
-			$mpdf->WriteHTML(preg_replace('/%u([a-fA-F0-9]{4})/', '&#x\\1;',$_POST["html"]));
-			$mpdf->Output();
-			exit(0);
-		}
+        define("DOMPDF_ENABLE_REMOTE", true);
+        define('DOMPDF_ENABLE_AUTOLOAD', false);
 
-		define("DOMPDF_ENABLE_REMOTE", true);
-		define('DOMPDF_ENABLE_AUTOLOAD', false);
+        require_once("vendor_bundled/vendor/dompdf/dompdf/dompdf_config.inc.php");
 
-		require_once("vendor_bundled/vendor/dompdf/dompdf/dompdf_config.inc.php");
+        // fallback to DOMPDF
+        $dompdf = new DOMPDF();
 
-		// fallback to DOMPDF
-		$dompdf = new DOMPDF();
+        $dompdf->load_html($_POST["html"]);
+        $dompdf->set_paper("letter", (isset($_REQUEST['landscape']) ? "landscape" : "portrait"));
+        $dompdf->render();
 
-		$dompdf->load_html($_POST["html"]);
-		$dompdf->set_paper("letter", (isset($_REQUEST['landscape']) ? "landscape" : "portrait"));
-		$dompdf->render();
+        $dompdf->stream("dompdf_out.pdf", ["Attachment" => false]);
 
-		$dompdf->stream("dompdf_out.pdf", array("Attachment" => false));
-
-		exit(0);
-	}
-	die;
+        exit(0);
+    }
+    die;
 }
 
 // Get the page from the request var or default it to HomePage
-if (!isset($_REQUEST["page"])) {
-	$_REQUEST["page"] = $wikilib->get_default_wiki_page();
+if (! isset($_REQUEST["page"])) {
+    $_REQUEST["page"] = $wikilib->get_default_wiki_page();
 }
 $page = htmlspecialchars($_REQUEST['page']);
 $smarty->assign('page', $page);
 
 // If the page doesn't exist then display an error
-if (!($info = $tikilib->page_exists($page))) {
-	include_once ('tiki-index.php');
-	die;
+if (! ($info = $tikilib->page_exists($page))) {
+    include_once('tiki-index.php');
+    die;
 }
 
 if (isset($_REQUEST['theme'])) {
-	echo json_encode($tikilib->getSlideshowTheme($_REQUEST['theme'])); 
-	die; 
+    echo json_encode($tikilib->getSlideshowTheme($_REQUEST['theme']));
+    die;
 }
 
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);
 if ($tiki_p_view != 'y') {
-	$smarty->assign('errortype', 401);
-	$smarty->assign('msg', tra("Permission denied. You cannot view this page."));
+    $smarty->assign('errortype', 401);
+    $smarty->assign('msg', tra("Permission denied. You cannot view this page."));
 
-	$smarty->display("error_raw.tpl");
-	die;
+    $smarty->display("error_raw.tpl");
+    die;
 }
 
 // BreadCrumbNavigation here
 // Remember to reverse the array when posting the array
 
-if (!isset($_SESSION["breadCrumb"])) {
-	$_SESSION["breadCrumb"] = array();
+if (! isset($_SESSION["breadCrumb"])) {
+    $_SESSION["breadCrumb"] = [];
 }
 
-if (!in_array($page, $_SESSION["breadCrumb"])) {
-	if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
-		array_shift($_SESSION["breadCrumb"]);
-	}
+if (! in_array($page, $_SESSION["breadCrumb"])) {
+    if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
+        array_shift($_SESSION["breadCrumb"]);
+    }
 
-	array_push($_SESSION["breadCrumb"], $page);
+    array_push($_SESSION["breadCrumb"], $page);
 } else {
-	// If the page is in the array move to the last position
-	$pos = array_search($page, $_SESSION["breadCrumb"]);
+    // If the page is in the array move to the last position
+    $pos = array_search($page, $_SESSION["breadCrumb"]);
 
-	unset ($_SESSION["breadCrumb"][$pos]);
-	array_push($_SESSION["breadCrumb"], $page);
+    unset($_SESSION["breadCrumb"][$pos]);
+    array_push($_SESSION["breadCrumb"], $page);
 }
 
 // Now increment page hits since we are visiting this page
@@ -127,8 +126,9 @@ $parserlib = TikiLib::lib('parser');
 $info = $tikilib->get_page_info($page);
 $pdata = $parserlib->parse_data_raw($info["data"]);
 
-if (!isset($_REQUEST['pagenum']))
-	$_REQUEST['pagenum'] = 1;
+if (! isset($_REQUEST['pagenum'])) {
+    $_REQUEST['pagenum'] = 1;
+}
 
 $pages = $wikilib->get_number_of_pages($pdata);
 $pdata = $wikilib->get_page($pdata, $_REQUEST['pagenum']);
@@ -143,12 +143,12 @@ $smarty->assign_by_ref('parsed', $pdata);
 $smarty->assign_by_ref('lastModif', $info["lastModif"]);
 
 if (empty($info["user"])) {
-	$info["user"] = 'anonymous';
+    $info["user"] = 'anonymous';
 }
 
 $smarty->assign_by_ref('lastUser', $info["user"]);
 
-include_once ('tiki-section_options.php');
+include_once('tiki-section_options.php');
 
 $headerlib->add_cssfile('vendor_bundled/vendor/jquery/jquery-s5/jquery.s5.css');
 $headerlib->add_jsfile('vendor_bundled/vendor/jquery/jquery-s5/jquery.s5.js');

@@ -14,101 +14,100 @@
  */
 class Session
 {
-	public $db;
+    public $db;
 
-	public function __destruct()
-	{
-		session_write_close();
-	}
+    public function __destruct()
+    {
+        session_write_close();
+    }
 
     /**
      * @param $path
      * @param $name
      * @return bool
      */
-    public function open( $path, $name )
-	{
-		return true;
-	}
+    public function open($path, $name)
+    {
+        return true;
+    }
 
     /**
      * @return bool
      */
     public function close()
-	{
-		return true;
-	}
+    {
+        return true;
+    }
 
     /**
      * @param $sesskey
      * @return mixed
      */
     public function read($sesskey)
-	{
-		global $prefs;
+    {
+        global $prefs;
 
-		$bindvars = array( $sesskey );
+        $bindvars = [ $sesskey ];
 
-		if ( $prefs['session_lifetime'] > 0 ) {
-			$qry = 'select data from sessions where sesskey = ? and expiry > ?';
-			$bindvars[] = $prefs['session_lifetime'];
-		} else {
-			$qry = 'select data from sessions where sesskey = ?';
-		}
+        if ($prefs['session_lifetime'] > 0) {
+            $qry = 'select data from sessions where sesskey = ? and expiry > ?';
+            $bindvars[] = $prefs['session_lifetime'];
+        } else {
+            $qry = 'select data from sessions where sesskey = ?';
+        }
 
-		return TikiDb::get()->getOne($qry, $bindvars);
-	}
+        return TikiDb::get()->getOne($qry, $bindvars);
+    }
 
     /**
      * @param $sesskey
      * @param $data
      */
     public function write($sesskey, $data)
-	{
-		global $prefs;
+    {
+        global $prefs;
 
-		$expiry = time() + ( $prefs['session_lifetime'] * 60 );
+        $expiry = time() + ( $prefs['session_lifetime'] * 60 );
 
-		TikiDb::get()->query('delete from sessions where sesskey = ?', array( $sesskey ));
-		TikiDb::get()->query('insert into sessions (sesskey, data, expiry) values( ?, ?, ? )', array( $sesskey, $data, $expiry ));
-	}
+        TikiDb::get()->query('delete from sessions where sesskey = ?', [ $sesskey ]);
+        TikiDb::get()->query('insert into sessions (sesskey, data, expiry) values( ?, ?, ? )', [ $sesskey, $data, $expiry ]);
+    }
 
     /**
      * @param $sesskey
      * @return int
      */
     public function destroy($sesskey)
-	{
-		$qry = 'delete from sessions where sesskey = ?';
-		TikiDb::get()->query($qry, array( $sesskey ));
-		return 1;
-	}
+    {
+        $qry = 'delete from sessions where sesskey = ?';
+        TikiDb::get()->query($qry, [ $sesskey ]);
+        return 1;
+    }
 
     /**
      * @param $maxlifetime
      * @return int
      */
     public function gc($maxlifetime)
-	{
-		global $prefs;
+    {
+        global $prefs;
 
-		if ( $prefs['session_lifetime'] > 0 ) {
-			$qry = 'delete from sessions where expiry < ?';
-			TikiDb::get()->query($qry, array( time() ));
-		}
+        if ($prefs['session_lifetime'] > 0) {
+            $qry = 'delete from sessions where expiry < ?';
+            TikiDb::get()->query($qry, [ time() ]);
+        }
 
-		return 1;
-	}
+        return 1;
+    }
 }
 
 $session = new Session;
 ini_set('session.save_handler', 'user');
 session_set_save_handler(
-	array($session, 'open'),
-	array($session, 'close'),
-	array($session, 'read'),
-	array($session, 'write'),
-	array($session, 'destroy'),
-	array($session, 'gc')
+    [$session, 'open'],
+    [$session, 'close'],
+    [$session, 'read'],
+    [$session, 'write'],
+    [$session, 'destroy'],
+    [$session, 'gc']
 );
-

@@ -9,7 +9,7 @@
  * turning them into right text-alignments.
 */
 
-/* Notice : BiDi layout modifications are general and try to address to all the themes. 
+/* Notice : BiDi layout modifications are general and try to address to all the themes.
  * BiDi is set by default to work with the default theme of Tiki, FiveAlive Blueberry.
  * BiDi file is read only and used when RTL (Right To Left) language is detected.
  * It is located at "/styles/BiDi/".

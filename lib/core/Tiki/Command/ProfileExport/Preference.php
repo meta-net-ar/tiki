@@ -14,31 +14,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Preference extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:preference')
-			->setDescription('Include a preference within the profile definition')
-			->addArgument(
-				'name',
-				InputArgument::REQUIRED,
-				'Preference name'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:preference')
+            ->setDescription('Include a preference within the profile definition')
+            ->addArgument(
+                'name',
+                InputArgument::REQUIRED,
+                'Preference name'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$preference = $input->getArgument('name');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $preference = $input->getArgument('name');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		$prefslib = \TikiLib::lib('prefs');
-		$result = $prefslib->exportPreference($writer, $preference);
+        $prefslib = \TikiLib::lib('prefs');
+        $result = $prefslib->exportPreference($writer, $preference);
 
-		if ($result) {
-			$writer->save();
-		} else {
-			$output->writeln("Preference not found: $preference");
-		}
-	}
+        if ($result) {
+            $writer->save();
+        } else {
+            $output->writeln("Preference not found: $preference");
+        }
+    }
 }

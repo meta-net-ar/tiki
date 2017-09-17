@@ -28,26 +28,26 @@
  */
 function smarty_modifier_number_format($number, $decimals = 2, $dec_point = '.', $thousands = ',')
 {
-	$dec_point = separator($dec_point);
-	$thousands = separator($thousands);
-	return number_format($number, $decimals, $dec_point, $thousands);
+    $dec_point = separator($dec_point);
+    $thousands = separator($thousands);
+    return number_format($number, $decimals, $dec_point, $thousands);
 }
 
 function separator($sep)
 {
-	switch ($sep) {
-		case 'c':
-		case ',':
-			$sep = ',';
-			break;
-		case 'd':
-		case '.':
-			$sep = '.';
-			break;
-		case 's':
-		case ' ':
-			$sep = ' ';
-			break;
-	}
-	return $sep;
+    switch ($sep) {
+        case 'c':
+        case ',':
+            $sep = ',';
+            break;
+        case 'd':
+        case '.':
+            $sep = '.';
+            break;
+        case 's':
+        case ' ':
+            $sep = ' ';
+            break;
+    }
+    return $sep;
 }

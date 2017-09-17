@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -72,7 +72,7 @@ class Reports_Send_EmailBuilder
      */
     private function makeChangeArray(array $report_cache)
     {
-        $change_array = array();
+        $change_array = [];
 
         foreach ($report_cache as $change) {
             $indexIdentifier = $change['event'];
@@ -83,9 +83,9 @@ class Reports_Send_EmailBuilder
 
             if (isset($change['data']['galleryId'])) {
                 $indexIdentifier .= '_' . $change['data']['galleryId'];
-            } else if (isset($change['data']['pageName'])) {
+            } elseif (isset($change['data']['pageName'])) {
                 $indexIdentifier .= '_' . $change['data']['pageName'];
-            } else if (isset($change['data']['categoryId'])) {
+            } elseif (isset($change['data']['categoryId'])) {
                 $indexIdentifier .= '_' . $change['data']['categoryId'];
             }
 
@@ -104,22 +104,21 @@ class Reports_Send_EmailBuilder
      */
     public function makeEmailBody(array $report_cache, array $report_preferences)
     {
-		$userlib = TikiLib::lib('user');
+        $userlib = TikiLib::lib('user');
 
         $change_array = $this->makeChangeArray($report_cache);
         $body = '';
 
         $morechanges = 0;
         foreach ($change_array as $eventName => $changes) {
-
             $eventObject = $this->factory->build($changes[0]['event']);
 
             $body .= '<b>' . $eventObject->getTitle() . "</b><br />\n";
 
             foreach ($changes as $key => $change) {
-                if ($report_preferences['view']=="short" AND $key>0) {
+                if ($report_preferences['view'] == "short" and $key > 0) {
                     $morechanges++;
-                } elseif ($report_preferences['view']=="detailed" OR $key==0) {
+                } elseif ($report_preferences['view'] == "detailed" or $key == 0) {
                     if ($morechanges > 0) {
                         $body .= "   " . tr('and %0 more changes of the same type.', $morechanges) . "<br>\n";
                         $morechanges = 0;
@@ -147,7 +146,7 @@ class Reports_Send_EmailBuilder
                         include_once('lib/smarty_tiki/modifier.username.php');
                         $change['user'] = smarty_modifier_username($change['user']);
                     }
-                    
+
                     $body .= $eventObject->getOutput($change);
 
                     $body .= "<br>\n";

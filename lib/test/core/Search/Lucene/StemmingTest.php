@@ -10,24 +10,23 @@
  */
 class Search_Lucene_StemmingTest extends Search_Index_StemmingTest
 {
-	private $dir;
+    private $dir;
 
-	function setUp()
-	{
-		$this->dir = dirname(__FILE__) . '/test_index';
-		$this->tearDown();
+    function setUp()
+    {
+        $this->dir = dirname(__FILE__) . '/test_index';
+        $this->tearDown();
 
-		$index = new Search_Lucene_Index($this->dir, 'en');
-		$this->populate($index);
+        $index = new Search_Lucene_Index($this->dir, 'en');
+        $this->populate($index);
 
-		$this->index = $index;
-	}
+        $this->index = $index;
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

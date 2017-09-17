@@ -9,15 +9,15 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_modifier_virtual_path($fileId, $type = 'file')
 {
-	global $prefs;
-	global $base_url;
-	$filegallib = TikiLib::lib('filegal');
+    global $prefs;
+    global $base_url;
+    $filegallib = TikiLib::lib('filegal');
 
-	return  $base_url . 'tiki-webdav.php' . ($filegallib->get_full_virtual_path($fileId, $type));
+    return  $base_url . 'tiki-webdav.php' . ($filegallib->get_full_virtual_path($fileId, $type));
 }

@@ -7,21 +7,21 @@
 
 class Reports_Send_EmailBuilder_Factory
 {
-	/**
-	 * Build childs of Reports_Send_EmailBuilder_Abstract
-	 * based on the $eventName.
-	 * @param string $eventName
-	 * @return mixed
-	 */
-	public function build($eventName)
-	{
-		$className = 'Reports_Send_EmailBuilder_' .
-								str_replace(' ', '', ucwords(str_replace('_', ' ', $eventName)));
-		
-		if (class_exists($className)) {
-			return new $className;
-		} else {
-			throw new Exception("There is no class to handle the event $eventName.");
-		}
-	}
+    /**
+     * Build childs of Reports_Send_EmailBuilder_Abstract
+     * based on the $eventName.
+     * @param string $eventName
+     * @return mixed
+     */
+    public function build($eventName)
+    {
+        $className = 'Reports_Send_EmailBuilder_' .
+                                str_replace(' ', '', ucwords(str_replace('_', ' ', $eventName)));
+
+        if (class_exists($className)) {
+            return new $className;
+        } else {
+            throw new Exception("There is no class to handle the event $eventName.");
+        }
+    }
 }

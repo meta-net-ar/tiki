@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -18,14 +18,14 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class Table_Settings_Plugin extends Table_Settings_Abstract
 {
-	protected $ts = array(
-		'selflinks' => false,
-		'usecolselector' => false,
-		'filters' => array(
-			'external' => false,
-		),
-		'ajax' => array(
-			'type' => false,
-		),
-	);
+    protected $ts = [
+        'selflinks' => false,
+        'usecolselector' => false,
+        'filters' => [
+            'external' => false,
+        ],
+        'ajax' => [
+            'type' => false,
+        ],
+    ];
 }

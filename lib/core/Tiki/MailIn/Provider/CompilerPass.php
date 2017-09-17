@@ -13,20 +13,19 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CompilerPass implements CompilerPassInterface
 {
-	public function process(ContainerBuilder $container)
-	{
-		if (!$container->hasDefinition('tiki.mailin.providerlist')) {
-			return;
-		}
+    public function process(ContainerBuilder $container)
+    {
+        if (! $container->hasDefinition('tiki.mailin.providerlist')) {
+            return;
+        }
 
-		$definition = $container->getDefinition('tiki.mailin.providerlist');
+        $definition = $container->getDefinition('tiki.mailin.providerlist');
 
-		$taggedServices = $container->findTaggedServiceIds('tiki.mailin.provider');
-		foreach ($taggedServices as $id => $attributes) {
-			$definition->addMethodCall('addProvider', [
-				new Reference($id),
-			]);
-		}
-	}
+        $taggedServices = $container->findTaggedServiceIds('tiki.mailin.provider');
+        foreach ($taggedServices as $id => $attributes) {
+            $definition->addMethodCall('addProvider', [
+                new Reference($id),
+            ]);
+        }
+    }
 }
-

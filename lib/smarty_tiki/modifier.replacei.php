@@ -21,5 +21,5 @@
  */
 function smarty_modifier_replacei($string, $find, $replacement)
 {
-	return str_ireplace($find, $replacement, $string);
+    return str_ireplace($find, $replacement, $string);
 }

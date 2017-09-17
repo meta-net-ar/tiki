@@ -10,21 +10,21 @@
  */
 class Reports_Send_EmailBuilder_StructureAdd extends Reports_Send_EmailBuilder_Abstract
 {
-	public function getTitle()
-	{
-		return tr('Wiki pages added to a structure:');
-	}
+    public function getTitle()
+    {
+        return tr('Wiki pages added to a structure:');
+    }
 
-	public function getOutput(array $change)
-	{
-		$base_url = $change['data']['base_url'];
+    public function getOutput(array $change)
+    {
+        $base_url = $change['data']['base_url'];
 
-		$output = tr(
-			"%0 added %1 wiki page to a structure",
-			"<u>{$change['user']}</u>",
-			"<a href='{$base_url}tiki-index.php?page={$change['data']['name']}'>{$change['data']['name']}</a>"
-		);
+        $output = tr(
+            "%0 added %1 wiki page to a structure",
+            "<u>{$change['user']}</u>",
+            "<a href='{$base_url}tiki-index.php?page={$change['data']['name']}'>{$change['data']['name']}</a>"
+        );
 
-		return $output;
-	}
+        return $output;
+    }
 }

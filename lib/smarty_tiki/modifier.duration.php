@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /*
@@ -19,33 +19,33 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  * Purpose:  formats a duration from seconds
  * -------------------------------------------------------------
  */
-function smarty_modifier_duration($string, $long=true, $maxLevel=false)
+function smarty_modifier_duration($string, $long = true, $maxLevel = false)
 {
-	if (!is_numeric($string)) {
-		return $string;
-	}
-	$values = array(31536000, 2628000, 604800, 86400, 3600, 60, 1);
-	$output = array(tra('year'), tra('month'), tra('week'), tra('day'), tra('hour'), tra('minute'), tra('second'));
-	$outputs = array(tra('years'), tra('months'), tra('weeks'), tra('days'), tra('hours'), tra('minutes'), tra('seconds'));
-	$result = array();
+    if (! is_numeric($string)) {
+        return $string;
+    }
+    $values = [31536000, 2628000, 604800, 86400, 3600, 60, 1];
+    $output = [tra('year'), tra('month'), tra('week'), tra('day'), tra('hour'), tra('minute'), tra('second')];
+    $outputs = [tra('years'), tra('months'), tra('weeks'), tra('days'), tra('hours'), tra('minutes'), tra('seconds')];
+    $result = [];
 
-	// maxLevel defines the maximum unit to be consider (e.g. $maxLevel = 'hour')
-	if (is_string($maxLevel) && $level = array_search(tra($maxLevel), $output)) {
-		$values = array_slice($values, $level);
-		$output = array_slice($output, $level);
-		$outputs = array_slice($outputs, $level);
-	}
+    // maxLevel defines the maximum unit to be consider (e.g. $maxLevel = 'hour')
+    if (is_string($maxLevel) && $level = array_search(tra($maxLevel), $output)) {
+        $values = array_slice($values, $level);
+        $output = array_slice($output, $level);
+        $outputs = array_slice($outputs, $level);
+    }
 
-	foreach ($values as $i=>$value) {
-		if ($string >= $value) {
-			$nb = floor($string / $value);
-			// add a zero before seconds or minutes with just one digit if $long == false
-			$nb = (!$long && !empty($result) && ($output[$i] == 'minute' || $output[$i] == 'second') && strlen($nb) == 1) ? 0 . $nb : $nb;
-			$s = ($nb == 1) ? $output[$i] : $outputs[$i];
-			$s = $long? " $s": substr($s, 0, 1);
-			$string = $string % $value;
-			$result[] = "$nb$s";
-		}
-	}
-	return implode(' ', $result);
+    foreach ($values as $i => $value) {
+        if ($string >= $value) {
+            $nb = floor($string / $value);
+            // add a zero before seconds or minutes with just one digit if $long == false
+            $nb = (! $long && ! empty($result) && ($output[$i] == 'minute' || $output[$i] == 'second') && strlen($nb) == 1) ? 0 . $nb : $nb;
+            $s = ($nb == 1) ? $output[$i] : $outputs[$i];
+            $s = $long ? " $s" : substr($s, 0, 1);
+            $string = $string % $value;
+            $result[] = "$nb$s";
+        }
+    }
+    return implode(' ', $result);
 }

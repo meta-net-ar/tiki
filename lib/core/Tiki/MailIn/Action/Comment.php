@@ -6,64 +6,64 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 use TikiLib;
 
 class Comment implements ActionInterface
 {
-	private $type;
-	private $object;
+    private $type;
+    private $object;
 
-	function __construct($args)
-	{
-		$this->type = $args['type'];
-		$this->object = $args['object'];
-	}
+    function __construct($args)
+    {
+        $this->type = $args['type'];
+        $this->object = $args['object'];
+    }
 
-	function getName()
-	{
-		return tr('Comment');
-	}
-	
-	function isEnabled()
-	{
-		$service = new \Services_Comment_Controller;
-		return $service->isEnabled($this->type, $this->object);
-	}
+    function getName()
+    {
+        return tr('Comment');
+    }
 
-	function isAllowed(Account $account, Message $message)
-	{
-		$service = new \Services_Comment_Controller;
-		return $service->canPost($this->type, $this->object);
-	}
+    function isEnabled()
+    {
+        $service = new \Services_Comment_Controller;
+        return $service->isEnabled($this->type, $this->object);
+    }
 
-	function execute(Account $account, Message $message)
-	{
-		$body = $message->getHtmlBody();
-		$body = $account->parseBody($body, false);
+    function isAllowed(Account $account, Message $message)
+    {
+        $service = new \Services_Comment_Controller;
+        return $service->canPost($this->type, $this->object);
+    }
 
-		$commentslib = TikiLib::lib('comments');
-		$message_id = ''; // By ref
-		$threadId = $commentslib->post_new_comment(
-			"{$this->type}:{$this->object}",
-			0,
-			$message->getAssociatedUser(),
-			$message->getSubject(),
-			$body['body'],
-			$message_id,
-			'',
-			'n',
-			'',
-			'',
-			'',
-			'',
-			'',
-			'',
-			''
-		);
+    function execute(Account $account, Message $message)
+    {
+        $body = $message->getHtmlBody();
+        $body = $account->parseBody($body, false);
 
-		return true;
-	}
+        $commentslib = TikiLib::lib('comments');
+        $message_id = ''; // By ref
+        $threadId = $commentslib->post_new_comment(
+            "{$this->type}:{$this->object}",
+            0,
+            $message->getAssociatedUser(),
+            $message->getSubject(),
+            $body['body'],
+            $message_id,
+            '',
+            'n',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            ''
+        );
+
+        return true;
+    }
 }
-

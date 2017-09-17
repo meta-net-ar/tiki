@@ -44,35 +44,43 @@ require_once('BaseComponent.php');
 class File_iCal_Alarm extends File_iCal_BaseComponent
 {
     //make public from BaseComponent
-    public function addAttachment($a) {
+    public function addAttachment($a)
+    {
         File_iCal_BaseComponent::addAttachment($a);
     }
 
-    public function getAttachments() {
+    public function getAttachments()
+    {
         return File_iCal_BaseComponent::getAttachments();
     }
 
-    public function setDescription($d) {
+    public function setDescription($d)
+    {
         File_iCal_BaseComponent::setDescription($d);
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return File_iCal_BaseComponent::getDescription();
     }
 
-    public function setSummary($s) {
+    public function setSummary($s)
+    {
         File_iCal_BaseComponent::setSummary($s);
     }
 
-    public function getSummary() {
+    public function getSummary()
+    {
         return File_iCal_BaseComponent::getSummary();
     }
 
-    public function setDuration($d) {
+    public function setDuration($d)
+    {
         File_iCal_BaseComponent::setDuration($d);
     }
 
-    public function getDuration() {
+    public function getDuration()
+    {
         return File_iCal_BaseComponent::getDuration();
     }
 
@@ -87,15 +95,15 @@ class File_iCal_Alarm extends File_iCal_BaseComponent
     /**
      *  Set the action to be invoked by this alarm
      */
-    public function setAction($a) {
-
+    public function setAction($a)
+    {
     }
 
     /**
      *  Get the action to be performed by this alarm
      */
-    public function getAction() {
-
+    public function getAction()
+    {
     }
 
     /**
@@ -106,15 +114,15 @@ class File_iCal_Alarm extends File_iCal_BaseComponent
     /**
      *  Set the number of times the action should occur
      */
-    public function setRepeatCount($r) {
-
+    public function setRepeatCount($r)
+    {
     }
 
     /**
      *  Get the number of times the action should occur
      */
-    public function getRepeatCount() {
-
+    public function getRepeatCount()
+    {
     }
 
     /**
@@ -125,15 +133,14 @@ class File_iCal_Alarm extends File_iCal_BaseComponent
     /**
      *  Set when the alarm will trigger
      */
-    public function setTrigger($t) {
-
+    public function setTrigger($t)
+    {
     }
 
     /**
      *  Get when the alarm will trigger
      */
-    public function getTrigger() {
-
+    public function getTrigger()
+    {
     }
-
 }

@@ -7,23 +7,22 @@
 
 class Search_Lucene_PaginationTest extends Search_Index_PaginationTest
 {
-	private $dir;
+    private $dir;
 
-	function setUp()
-	{
-		$this->dir = dirname(__FILE__) . '/test_index';
-		$this->tearDown();
+    function setUp()
+    {
+        $this->dir = dirname(__FILE__) . '/test_index';
+        $this->tearDown();
 
-		$index = new Search_Lucene_Index($this->dir);
+        $index = new Search_Lucene_Index($this->dir);
 
-		$this->index = $index;
-	}
+        $this->index = $index;
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 }
-

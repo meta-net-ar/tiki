@@ -6,24 +6,24 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 
 class DirectFactory implements FactoryInterface
 {
-	private $class;
-	private $parameters;
+    private $class;
+    private $parameters;
 
-	function __construct($class, array $parameters = [])
-	{
-		$this->class = $class;
-		$this->parameters = $parameters;
-	}
+    function __construct($class, array $parameters = [])
+    {
+        $this->class = $class;
+        $this->parameters = $parameters;
+    }
 
-	function createAction(Account $account, Message $message)
-	{
-		$class = $this->class;
-		return new $class($this->parameters);
-	}
+    function createAction(Account $account, Message $message)
+    {
+        $class = $this->class;
+        return new $class($this->parameters);
+    }
 }
-

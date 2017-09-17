@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -22,84 +22,83 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class Table_Settings_TikiAdminGroups extends Table_Settings_Standard
 {
-	protected $ts = [
-		'ajax' => [
-			'url' => [
-				'file' => 'tiki-admingroups.php'
-			],
-		],
-		'columns' => [
-			'#checkbox' => [
-				'sort' => [
-					'type' => false
-				],
-				'filter' => [
-					'type' => false
-				],
-				'resizable' => false,
-				'priority' => 'critical'
-			],
-			'#id' => [
-				'sort' => [
-					'type' => 'digit',
-					'ajax' => 'id'
-				],
-				'filter' => [
-					'type' => false
-				],
-				'priority' => 5
-			],
-			'#group' => [
-				'sort' => [
-					'type' => true,
-					'dir' => 'asc',
-					'ajax' =>'groupName'
-				],
-				'filter' => [
-					'type' => 'text',
-					'ajax' => 'find'
-				],
-				'priority' => 'critical'
-			],
-			'#inherits' => [
-				'sort' => [
-					'type' => false,
-				],
-				'filter' => [
-					'type' => false
-				],
-				'priority' => 6
-			],
-			'#home' => [					//only if $prefs.useGroupHome == 'y'
-				'sort' => [
-					'type' => 'text',
-					'ajax' => 'groupHome'
-				],
-				'filter' => [
-					'type' => false
-				],
-				'priority' => 6
-			],
-			'#choice' => [
-				'sort' => [
-					'type' => 'text',
-					'ajax' => 'userChoice'
-				],
-				'filter' => [
-					'type' => false
-				],
-				'priority' => 6
-			],
-			'#actions' => [
-				'sort' => [
-					'type' => false
-				],
-				'filter' => [
-					'type' => false
-				],
-				'priority' => 1
-			]
-		]
-	];
+    protected $ts = [
+        'ajax' => [
+            'url' => [
+                'file' => 'tiki-admingroups.php'
+            ],
+        ],
+        'columns' => [
+            '#checkbox' => [
+                'sort' => [
+                    'type' => false
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'resizable' => false,
+                'priority' => 'critical'
+            ],
+            '#id' => [
+                'sort' => [
+                    'type' => 'digit',
+                    'ajax' => 'id'
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'priority' => 5
+            ],
+            '#group' => [
+                'sort' => [
+                    'type' => true,
+                    'dir' => 'asc',
+                    'ajax' => 'groupName'
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'find'
+                ],
+                'priority' => 'critical'
+            ],
+            '#inherits' => [
+                'sort' => [
+                    'type' => false,
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'priority' => 6
+            ],
+            '#home' => [                    //only if $prefs.useGroupHome == 'y'
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'groupHome'
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'priority' => 6
+            ],
+            '#choice' => [
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'userChoice'
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'priority' => 6
+            ],
+            '#actions' => [
+                'sort' => [
+                    'type' => false
+                ],
+                'filter' => [
+                    'type' => false
+                ],
+                'priority' => 1
+            ]
+        ]
+    ];
 }
-

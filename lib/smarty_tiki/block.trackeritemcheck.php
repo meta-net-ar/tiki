@@ -14,8 +14,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /***
@@ -34,35 +34,37 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 
 function smarty_block_trackeritemcheck($params, $content, $smarty, $repeat)
 {
-	if ( $repeat ) return;
+    if ($repeat) {
+        return;
+    }
 
-	if ( empty( $params['itemId'] ) ) {
-		return tra('itemId required');
-	}
-	if (empty($params['mode'])) {
-		$params['mode'] = '';		// default is to view
-	}
+    if (empty($params['itemId'])) {
+        return tra('itemId required');
+    }
+    if (empty($params['mode'])) {
+        $params['mode'] = '';       // default is to view
+    }
 
-	$item = Tracker_Item::fromId($params['itemId']);
+    $item = Tracker_Item::fromId($params['itemId']);
 
-	$allowed = false;
+    $allowed = false;
 
-	switch ($params['mode']) {
-		case 'edit':
-			$allowed = $item->canModify();
-			break;
-		case 'delete':
-			$allowed = $item->canRemove();
-			break;
-		case 'view':
-			$allowed = $item->canView();
-		default:
-			break;
-	}
+    switch ($params['mode']) {
+        case 'edit':
+            $allowed = $item->canModify();
+            break;
+        case 'delete':
+            $allowed = $item->canRemove();
+            break;
+        case 'view':
+            $allowed = $item->canView();
+        default:
+            break;
+    }
 
-	if ( $allowed ) {
-		return $content;
-	} else {
-		return '';
-	}
+    if ($allowed) {
+        return $content;
+    } else {
+        return '';
+    }
 }

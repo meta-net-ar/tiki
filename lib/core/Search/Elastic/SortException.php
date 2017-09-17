@@ -7,12 +7,11 @@
 
 class Search_Elastic_SortException extends Search_Elastic_Exception
 {
-	private $field;
+    private $field;
 
-	function __construct($field)
-	{
-		$this->field = $field;
-		parent::__construct(tr('Sort field %0 not found in index', $this->field));
-	}
+    function __construct($field)
+    {
+        $this->field = $field;
+        parent::__construct(tr('Sort field %0 not found in index', $this->field));
+    }
 }
-

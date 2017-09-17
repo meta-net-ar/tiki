@@ -6,31 +6,31 @@
 // $Id$
 
 namespace Tiki\FileGallery\Handler;
+
 use Tiki\FileGallery\FileWrapper\PreloadedContent;
 
 class System implements HandlerInterface
 {
-	private $real;
+    private $real;
 
-	function __construct()
-	{
-		global $prefs;
+    function __construct()
+    {
+        global $prefs;
 
-		if ($prefs['fgal_use_db'] == 'n') {
-			$this->real = new FileSystem($prefs['fgal_use_dir']);
-		} else {
-			$this->real = new Preloaded;
-		}
-	}
+        if ($prefs['fgal_use_db'] == 'n') {
+            $this->real = new FileSystem($prefs['fgal_use_dir']);
+        } else {
+            $this->real = new Preloaded;
+        }
+    }
 
-	function getFileWrapper($data, $path)
-	{
-		return $this->real->getFileWrapper($data, $path);
-	}
+    function getFileWrapper($data, $path)
+    {
+        return $this->real->getFileWrapper($data, $path);
+    }
 
-	function delete($data, $path)
-	{
-		return $this->real->delete($data, $path);
-	}
+    function delete($data, $path)
+    {
+        return $this->real->delete($data, $path);
+    }
 }
-

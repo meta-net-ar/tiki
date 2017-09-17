@@ -9,7 +9,7 @@ namespace Tiki\Wiki\SlugManager;
 
 interface Generator
 {
-	function getName();
-	function getLabel();
-	function generate($pageName, $suffix = null);
+    function getName();
+    function getLabel();
+    function generate($pageName, $suffix = null);
 }

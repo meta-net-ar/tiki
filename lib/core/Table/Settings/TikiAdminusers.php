@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -22,111 +22,110 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class Table_Settings_TikiAdminusers extends Table_Settings_Standard
 {
-	protected $ts = array(
-		'filters' => array(
-			'external' => array(
-				0 => array(
-					'type' => 'dropdown',
-					'options' => array(
-						'All users (no filter)' => '',
-						'Email not confirmed' => 'filterEmailNotConfirmed=on',
-						'User not validated' => 'filterNotValidated=on',
-						'Never logged in' => 'filterNeverLoggedIn=on',
-					),
-				),
-			),
-		),
-		'ajax' => array(
-			'url' => array(
-				'file' => 'tiki-adminusers.php',
-			),
-		),
-		'columns' => array(
-			'#checkbox' => array(
-				'sort' => array(
-					'type' => false,
-				),
-				'filter' => array(
-					'type' => false,
-				),
-				'resizable' => false,
-				'priority' => 'critical',
-			),
-			'#user' => array(
-				'sort' => array(
-					'type' => true,
-					'dir' => 'asc',
-					'ajax' => 'login',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' => 'find',
-				),
-				'priority' => 'critical',
-			),
-			'#email' => array(					//only if $prefs.login_is_email != 'y'
-				'sort' => array(
-					'type' => true,
-					'ajax' =>'email',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'placeholder' => 'Enter valid email...',
-					'ajax' => 'filterEmail',
-				),
-				'priority' => 1,
-			),
-			'#openid' => array(					//only if $prefs.auth_method == 'openid'
-				'sort' => array(
-					'type' => true,
-					'ajax' => 'openid_url',
-				),
-				'filter' => array(
-					'type' => false,	//no filter since $userlib->get_users doesn't have it
-				),
-				'priority' => 6,
-			),
-			'#lastlogin' => array(
-				'sort' => array(
-					'type' => 'text',
-					'ajax' => 'currentLogin',
-				),
-				'filter' => array(
-					'type' => false,
-				),
-				'priority' => 4,
-			),
-			'#registered' => array(
-				'sort' => array(
-					'type' => 'isoDate',
-					'ajax' => 'registrationDate',
-				),
-				'filter' => array(
-					'type' => false,	//no filter since $userlib->get_users doesn't have it
-				),
-				'priority' => 5,
-			),
-			'#groups' => array(
-				'sort' => array(
-					'type' => false,
-				),
-				'filter' => array(
-					'placeholder' => 'Select group',
-					'type' => 'dropdown',
-					'ajax' => 'filterGroup',
-				),
-				'priority' => 3,
-			),
-			'#actions' => array(
-				'sort' => array(
-					'type' => false,
-				),
-				'filter' => array(
-					'type' => false,
-				),
-				'priority' => 1,
-			),
-		),
-	);
+    protected $ts = [
+        'filters' => [
+            'external' => [
+                0 => [
+                    'type' => 'dropdown',
+                    'options' => [
+                        'All users (no filter)' => '',
+                        'Email not confirmed' => 'filterEmailNotConfirmed=on',
+                        'User not validated' => 'filterNotValidated=on',
+                        'Never logged in' => 'filterNeverLoggedIn=on',
+                    ],
+                ],
+            ],
+        ],
+        'ajax' => [
+            'url' => [
+                'file' => 'tiki-adminusers.php',
+            ],
+        ],
+        'columns' => [
+            '#checkbox' => [
+                'sort' => [
+                    'type' => false,
+                ],
+                'filter' => [
+                    'type' => false,
+                ],
+                'resizable' => false,
+                'priority' => 'critical',
+            ],
+            '#user' => [
+                'sort' => [
+                    'type' => true,
+                    'dir' => 'asc',
+                    'ajax' => 'login',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'find',
+                ],
+                'priority' => 'critical',
+            ],
+            '#email' => [                  //only if $prefs.login_is_email != 'y'
+                'sort' => [
+                    'type' => true,
+                    'ajax' => 'email',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'placeholder' => 'Enter valid email...',
+                    'ajax' => 'filterEmail',
+                ],
+                'priority' => 1,
+            ],
+            '#openid' => [                 //only if $prefs.auth_method == 'openid'
+                'sort' => [
+                    'type' => true,
+                    'ajax' => 'openid_url',
+                ],
+                'filter' => [
+                    'type' => false,    //no filter since $userlib->get_users doesn't have it
+                ],
+                'priority' => 6,
+            ],
+            '#lastlogin' => [
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'currentLogin',
+                ],
+                'filter' => [
+                    'type' => false,
+                ],
+                'priority' => 4,
+            ],
+            '#registered' => [
+                'sort' => [
+                    'type' => 'isoDate',
+                    'ajax' => 'registrationDate',
+                ],
+                'filter' => [
+                    'type' => false,    //no filter since $userlib->get_users doesn't have it
+                ],
+                'priority' => 5,
+            ],
+            '#groups' => [
+                'sort' => [
+                    'type' => false,
+                ],
+                'filter' => [
+                    'placeholder' => 'Select group',
+                    'type' => 'dropdown',
+                    'ajax' => 'filterGroup',
+                ],
+                'priority' => 3,
+            ],
+            '#actions' => [
+                'sort' => [
+                    'type' => false,
+                ],
+                'filter' => [
+                    'type' => false,
+                ],
+                'priority' => 1,
+            ],
+        ],
+    ];
 }
-

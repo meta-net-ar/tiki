@@ -9,18 +9,18 @@ namespace Tiki\Wiki\SlugManager;
 
 class UrlencodeGenerator implements Generator
 {
-	function getName()
-	{
-		return 'urlencode';
-	}
+    function getName()
+    {
+        return 'urlencode';
+    }
 
-	function getLabel()
-	{
-		return tr('URL Encode (Tiki Classic)');
-	}
+    function getLabel()
+    {
+        return tr('URL Encode (Tiki Classic)');
+    }
 
-	function generate($pageName, $suffix = null)
-	{
-		return urlencode($pageName) . $suffix;
-	}
+    function generate($pageName, $suffix = null)
+    {
+        return urlencode($pageName) . $suffix;
+    }
 }

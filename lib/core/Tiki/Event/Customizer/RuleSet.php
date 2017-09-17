@@ -7,22 +7,21 @@
 
 class Tiki_Event_Customizer_RuleSet
 {
-	private $parser;
-	private $rules = array();
+    private $parser;
+    private $rules = [];
 
-	function __construct()
-	{
-		$this->parser = new Math_Formula_Parser;
-	}
+    function __construct()
+    {
+        $this->parser = new Math_Formula_Parser;
+    }
 
-	function addRule($function)
-	{
-		$this->rules[] = $this->parser->parse($function);
-	}
+    function addRule($function)
+    {
+        $this->rules[] = $this->parser->parse($function);
+    }
 
-	function getRules()
-	{
-		return $this->rules;
-	}
+    function getRules()
+    {
+        return $this->rules;
+    }
 }
-

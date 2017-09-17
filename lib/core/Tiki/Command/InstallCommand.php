@@ -15,45 +15,45 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('database:install')
-			->setDescription('Clean Tiki install')
-			->addOption(
-				'force',
-				null,
-				InputOption::VALUE_NONE,
-				'Force installation. Overwrite any current database.'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('database:install')
+            ->setDescription('Clean Tiki install')
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Force installation. Overwrite any current database.'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$force = $input->getOption('force');
-		$installer = new \Installer;
-		$installed = $installer->tableExists('users_users');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $force = $input->getOption('force');
+        $installer = new \Installer;
+        $installed = $installer->tableExists('users_users');
 
-		if (! $installed || $force) {
-			$installer->cleanInstall();
-			$output->writeln('Installation completed.');
-			$output->writeln('<info>Queries executed successfully: ' . count($installer->queries['successful']) . '</info>');
+        if (! $installed || $force) {
+            $installer->cleanInstall();
+            $output->writeln('Installation completed.');
+            $output->writeln('<info>Queries executed successfully: ' . count($installer->queries['successful']) . '</info>');
 
-			if ( count($installer->queries['failed']) ) {
-				foreach ( $installer->queries['failed'] as $key => $error ) {
-					list( $query, $message, $patch ) = $error;
+            if (count($installer->queries['failed'])) {
+                foreach ($installer->queries['failed'] as $key => $error) {
+                    list( $query, $message, $patch ) = $error;
 
-					$output->writeln("<error>Error $key in $patch\n\t$query\n\t$message</error>");
-				}
-			}
+                    $output->writeln("<error>Error $key in $patch\n\t$query\n\t$message</error>");
+                }
+            }
 
-			include_once 'tiki-setup.php';
-			\TikiLib::lib('cache')->empty_cache();
-			initialize_prefs(true);
-			\TikiLib::lib('unifiedsearch')->rebuild();
-			\TikiLib::lib('prefs')->rebuildIndex();
-		} else {
-			$output->writeln('<error>Database already exists.</error>');
-		}
-	}
+            include_once 'tiki-setup.php';
+            \TikiLib::lib('cache')->empty_cache();
+            initialize_prefs(true);
+            \TikiLib::lib('unifiedsearch')->rebuild();
+            \TikiLib::lib('prefs')->rebuildIndex();
+        } else {
+            $output->writeln('<error>Database already exists.</error>');
+        }
+    }
 }

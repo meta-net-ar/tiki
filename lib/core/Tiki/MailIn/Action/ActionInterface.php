@@ -6,17 +6,17 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 
 interface ActionInterface
 {
-	function getName();
+    function getName();
 
-	function isEnabled();
+    function isEnabled();
 
-	function isAllowed(Account $account, Message $message);
+    function isAllowed(Account $account, Message $message);
 
-	function execute(Account $account, Message $message);
+    function execute(Account $account, Message $message);
 }
-

@@ -7,41 +7,40 @@
 
 class Search_Elastic_BaseTest extends Search_Index_BaseTest
 {
-	function setUp()
-	{
-		static $count = 0;
+    function setUp()
+    {
+        static $count = 0;
 
-		$connection = new Search_Elastic_Connection('http://localhost:9200');
+        $connection = new Search_Elastic_Connection('http://localhost:9200');
 
-		$status = $connection->getStatus();
-		if (! $status->ok) {
-			$this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
-		}
+        $status = $connection->getStatus();
+        if (! $status->ok) {
+            $this->markTestSkipped('Elasticsearch needs to be available on localhost:9200 for the test to run.');
+        }
 
-		$this->index = new Search_Elastic_Index($connection, 'test_index');
-		$this->index->destroy();
+        $this->index = new Search_Elastic_Index($connection, 'test_index');
+        $this->index->destroy();
 
-		$this->populate($this->index);
-	}
+        $this->populate($this->index);
+    }
 
-	function tearDown()
-	{
-		if ($this->index) {
-			$this->index->destroy();
-		}
-	}
+    function tearDown()
+    {
+        if ($this->index) {
+            $this->index->destroy();
+        }
+    }
 
-	function testIndexProvidesHighlightHelper()
-	{
-		$query = new Search_Query('foobar or bonjour');
-		$resultSet = $query->search($this->index);
+    function testIndexProvidesHighlightHelper()
+    {
+        $query = new Search_Query('foobar or bonjour');
+        $resultSet = $query->search($this->index);
 
-		$plugin = new Search_Formatter_Plugin_WikiTemplate('{display name=highlight}');
-		$formatter = new Search_Formatter($plugin);
-		$output = $formatter->format($resultSet);
+        $plugin = new Search_Formatter_Plugin_WikiTemplate('{display name=highlight}');
+        $formatter = new Search_Formatter($plugin);
+        $output = $formatter->format($resultSet);
 
-		$this->assertRegExp('/<em.*>Bonjour<\/em>/', $output);
-		$this->assertNotContains('<body>', $output);
-	}
+        $this->assertRegExp('/<em.*>Bonjour<\/em>/', $output);
+        $this->assertNotContains('<body>', $output);
+    }
 }
-

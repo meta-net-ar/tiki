@@ -18,5 +18,5 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function upgrade_20170702_wiki_url_scheme_pref_default_tiki($installer)
 {
-	$installer->preservePreferenceDefault('wiki_url_scheme', 'urlencode');
+    $installer->preservePreferenceDefault('wiki_url_scheme', 'urlencode');
 }

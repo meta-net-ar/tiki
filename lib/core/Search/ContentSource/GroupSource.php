@@ -1,87 +1,86 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 class Search_ContentSource_GroupSource implements Search_ContentSource_Interface
 {
-	private $db;
+    private $db;
 
-	function __construct()
-	{
-		$this->db = TikiDb::get();
-	}
+    function __construct()
+    {
+        $this->db = TikiDb::get();
+    }
 
-	function getDocuments()
-	{
-		return $this->db->table('users_groups')->fetchColumn('groupName', array());
-	}
+    function getDocuments()
+    {
+        return $this->db->table('users_groups')->fetchColumn('groupName', []);
+    }
 
-	function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
-	{
-		$row = $this->db->table('users_groups')->fetchRow(['groupDesc'], array('groupName' => $objectId));
+    function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    {
+        $row = $this->db->table('users_groups')->fetchRow(['groupDesc'], ['groupName' => $objectId]);
 
-		if (! $row) {
-			return false;
-		}
+        if (! $row) {
+            return false;
+        }
 
-		$api = new TikiAddons_Api_Group;
-		$groupName = $objectId;
-		$addongroup = false;
-		$addonpendinggroup = false;
-		$addonleadergroup = false;
-	
-		if ($ret = $api->getOrganicGroupName($objectId)) {
-			$groupName = $ret;
-			$addongroup = $api->isOrganicGroup($objectId);
-			if ($addongroup == true && $api->getOrganicGroupPendingToken($objectId) == $objectId) {
-				$addonpendinggroup = true;
-			}
-			if ($addongroup == true && $api->getOrganicGroupLeaderToken($objectId) == $objectId) {
-				$addonleadergroup = true;
-			}
-		}
+        $api = new TikiAddons_Api_Group;
+        $groupName = $objectId;
+        $addongroup = false;
+        $addonpendinggroup = false;
+        $addonleadergroup = false;
 
-		$data = array(
-			'title' => $typeFactory->sortable($groupName),
-			'description' => $typeFactory->plaintext($row['groupDesc']),
+        if ($ret = $api->getOrganicGroupName($objectId)) {
+            $groupName = $ret;
+            $addongroup = $api->isOrganicGroup($objectId);
+            if ($addongroup == true && $api->getOrganicGroupPendingToken($objectId) == $objectId) {
+                $addonpendinggroup = true;
+            }
+            if ($addongroup == true && $api->getOrganicGroupLeaderToken($objectId) == $objectId) {
+                $addonleadergroup = true;
+            }
+        }
 
-			'searchable' => $typeFactory->identifier('n'),
+        $data = [
+            'title' => $typeFactory->sortable($groupName),
+            'description' => $typeFactory->plaintext($row['groupDesc']),
 
-			'view_permission' => $typeFactory->identifier('tiki_p_group_view'),
+            'searchable' => $typeFactory->identifier('n'),
 
-			'addongroup' => $addongroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
-			'addonleadergroup' => $addonleadergroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
-			'addonpendinggroup' => $addonpendinggroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
-		);
+            'view_permission' => $typeFactory->identifier('tiki_p_group_view'),
 
-		return $data;
-	}
+            'addongroup' => $addongroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
+            'addonleadergroup' => $addonleadergroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
+            'addonpendinggroup' => $addonpendinggroup ? $typeFactory->identifier('y') : $typeFactory->identifier('n'),
+        ];
 
-	function getProvidedFields()
-	{
-		return array(
-			'title',
-			'description',
+        return $data;
+    }
 
-			'searchable',
+    function getProvidedFields()
+    {
+        return [
+            'title',
+            'description',
 
-			'view_permission',
+            'searchable',
 
-			'addongroup',
-			'addonleadergroup',
-			'addonpendinggroup',
-		);
-	}
+            'view_permission',
 
-	function getGlobalFields()
-	{
-		return array(
-			'title' => true,
-			'description' => true,
-		);
-	}
+            'addongroup',
+            'addonleadergroup',
+            'addonpendinggroup',
+        ];
+    }
+
+    function getGlobalFields()
+    {
+        return [
+            'title' => true,
+            'description' => true,
+        ];
+    }
 }
-

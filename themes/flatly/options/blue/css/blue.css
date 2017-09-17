@@ -7,7 +7,7 @@ a, .btn-link {
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus,
 a:hover, a:active, a:focus {
-	color: #50b3fb;
+    color: #50b3fb;
 }
 
 .btn-default {

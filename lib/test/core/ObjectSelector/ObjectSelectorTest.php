@@ -3,108 +3,108 @@ namespace Test\ObjectSelector;
 
 class ObjectSelectorTest extends \PHPUnit_Framework_TestCase
 {
-	private $selector;
-	private $mock;
-	
-	private $calls = [];
+    private $selector;
+    private $mock;
 
-	function setUp()
-	{
-		$this->selector = new \Tiki\Object\Selector($this);
-	}
+    private $calls = [];
 
-	function testReadEmpty()
-	{
-		$this->assertEquals(null, $this->selector->read(''));
-	}
+    function setUp()
+    {
+        $this->selector = new \Tiki\Object\Selector($this);
+    }
 
-	function testReadObjectFromString()
-	{
-		$expect = new \Tiki\Object\SelectorItem($this->selector, 'wiki page', 'HomePage');
-		$this->assertEquals($expect, $this->selector->read('wiki page:HomePage'));
-	}
+    function testReadEmpty()
+    {
+        $this->assertEquals(null, $this->selector->read(''));
+    }
 
-	function testReadMultiple()
-	{
-		$this->assertEquals([], $this->selector->readMultiple(''));
-	}
+    function testReadObjectFromString()
+    {
+        $expect = new \Tiki\Object\SelectorItem($this->selector, 'wiki page', 'HomePage');
+        $this->assertEquals($expect, $this->selector->read('wiki page:HomePage'));
+    }
 
-	function testReadMultipleFromString()
-	{
-		$this->assertEquals([
-			$this->selector->read('wiki page:HomePage'),
-			$this->selector->read('trackeritem:12'),
-		], $this->selector->readMultiple("wiki page:HomePage\r\ntrackeritem:12\r\n"));
-	}
+    function testReadMultiple()
+    {
+        $this->assertEquals([], $this->selector->readMultiple(''));
+    }
 
-	function testReadMultipleFromArray()
-	{
-		$this->assertEquals([
-			$this->selector->read('wiki page:HomePage'),
-			$this->selector->read('trackeritem:12'),
-		], $this->selector->readMultiple([
-			'wiki page:HomePage',
-			'trackeritem:12',
-		]));
-	}
+    function testReadMultipleFromString()
+    {
+        $this->assertEquals([
+            $this->selector->read('wiki page:HomePage'),
+            $this->selector->read('trackeritem:12'),
+        ], $this->selector->readMultiple("wiki page:HomePage\r\ntrackeritem:12\r\n"));
+    }
 
-	function testExcludeDuplicates()
-	{
-		$this->assertEquals([
-			$this->selector->read('trackeritem:12'),
-		], $this->selector->readMultiple([
-			'trackeritem:12',
-			'trackeritem:12',
-		]));
-	}
+    function testReadMultipleFromArray()
+    {
+        $this->assertEquals([
+            $this->selector->read('wiki page:HomePage'),
+            $this->selector->read('trackeritem:12'),
+        ], $this->selector->readMultiple([
+            'wiki page:HomePage',
+            'trackeritem:12',
+        ]));
+    }
 
-	function testObtainTitle()
-	{
-		$object = $this->selector->read('trackeritem:12');
+    function testExcludeDuplicates()
+    {
+        $this->assertEquals([
+            $this->selector->read('trackeritem:12'),
+        ], $this->selector->readMultiple([
+            'trackeritem:12',
+            'trackeritem:12',
+        ]));
+    }
 
-		$this->assertEquals('Foobar', $object->getTitle());
-	}
+    function testObtainTitle()
+    {
+        $object = $this->selector->read('trackeritem:12');
 
-	function testArrayAccess()
-	{
-		$object = $this->selector->read('trackeritem:12');
+        $this->assertEquals('Foobar', $object->getTitle());
+    }
 
-		$this->assertEquals('trackeritem', $object['type']);
-		$this->assertEquals('12', $object['id']);
-		$this->assertEquals('Foobar', $object['title']);
-		$this->assertEquals('trackeritem:12', (string) $object);
-	}
+    function testArrayAccess()
+    {
+        $object = $this->selector->read('trackeritem:12');
 
-	function testReadMultipleSimpleOnEmpty()
-	{
-		$this->assertEquals([], $this->selector->readMultipleSimple('trackeritem', '', ','));
-	}
+        $this->assertEquals('trackeritem', $object['type']);
+        $this->assertEquals('12', $object['id']);
+        $this->assertEquals('Foobar', $object['title']);
+        $this->assertEquals('trackeritem:12', (string) $object);
+    }
 
-	function testReadMultipleSimpleFromString()
-	{
-		$this->assertEquals([
-			$this->selector->read('trackeritem:14'),
-			$this->selector->read('trackeritem:12'),
-		], $this->selector->readMultipleSimple('trackeritem', '14:12', ':'));
-	}
+    function testReadMultipleSimpleOnEmpty()
+    {
+        $this->assertEquals([], $this->selector->readMultipleSimple('trackeritem', '', ','));
+    }
 
-	function testReadMultipleSimpleEliminatesDuplicates()
-	{
-		$this->assertEquals([
-			$this->selector->read('trackeritem:14'),
-		], $this->selector->readMultipleSimple('trackeritem', '14,14', ','));
-	}
+    function testReadMultipleSimpleFromString()
+    {
+        $this->assertEquals([
+            $this->selector->read('trackeritem:14'),
+            $this->selector->read('trackeritem:12'),
+        ], $this->selector->readMultipleSimple('trackeritem', '14:12', ':'));
+    }
 
-	function testReadMultipleSimpleHandlesArrays()
-	{
-		$this->assertEquals([
-			$this->selector->read('trackeritem:14'),
-			$this->selector->read('trackeritem:12'),
-		], $this->selector->readMultipleSimple('trackeritem', ['14', '12'], ':'));
-	}
+    function testReadMultipleSimpleEliminatesDuplicates()
+    {
+        $this->assertEquals([
+            $this->selector->read('trackeritem:14'),
+        ], $this->selector->readMultipleSimple('trackeritem', '14,14', ','));
+    }
 
-	function get_title($type, $id)
-	{
-		return 'Foobar';
-	}
+    function testReadMultipleSimpleHandlesArrays()
+    {
+        $this->assertEquals([
+            $this->selector->read('trackeritem:14'),
+            $this->selector->read('trackeritem:12'),
+        ], $this->selector->readMultipleSimple('trackeritem', ['14', '12'], ':'));
+    }
+
+    function get_title($type, $id)
+    {
+        return 'Foobar';
+    }
 }

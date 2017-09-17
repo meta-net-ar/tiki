@@ -42,27 +42,33 @@ require_once('BaseComponent.php');
  */
 class File_iCal_TimeZone extends File_iCal_BaseComponent
 {
-    public function addComment($c) {
+    public function addComment($c)
+    {
         File_iCal_BaseComponent::addComment($c);
     }
 
-    public function getComments() {
+    public function getComments()
+    {
         return File_iCal_BaseComponent::getComments();
     }
 
-    public function setDateStart($ds) {
+    public function setDateStart($ds)
+    {
         File_iCal_BaseComponent::setDateStart($ds);
     }
 
-    public function getDateStart() {
+    public function getDateStart()
+    {
         return File_iCal_BaseComponent::getDateStart();
     }
 
-    public function setLastModified($m) {
+    public function setLastModified($m)
+    {
         File_iCal_BaseComponent::setLastModified($m);
     }
 
-    public function getLastModified() {
+    public function getLastModified()
+    {
         return File_iCal_BaseComponent::getLastModified();
     }
 
@@ -75,15 +81,15 @@ class File_iCal_TimeZone extends File_iCal_BaseComponent
     /**
      *
      */
-    public function setTimeZoneIdentifier($tz) {
-
+    public function setTimeZoneIdentifier($tz)
+    {
     }
 
     /**
      *
      */
-    public function getTimeZoneIdentifier() {
-
+    public function getTimeZoneIdentifier()
+    {
     }
 
     /**
@@ -94,15 +100,15 @@ class File_iCal_TimeZone extends File_iCal_BaseComponent
     /**
      *
      */
-    public function setTimeZoneName($n) {
-
+    public function setTimeZoneName($n)
+    {
     }
 
     /**
      *
      */
-    public function getTimeZoneName() {
-
+    public function getTimeZoneName()
+    {
     }
 
     /**
@@ -113,15 +119,15 @@ class File_iCal_TimeZone extends File_iCal_BaseComponent
     /**
      *
      */
-    public function setTimeZoneOffsetFrom($of) {
-
+    public function setTimeZoneOffsetFrom($of)
+    {
     }
 
     /**
      *
      */
-    public function getTimeZoneOffsetFrom() {
-
+    public function getTimeZoneOffsetFrom()
+    {
     }
 
     /**
@@ -132,15 +138,15 @@ class File_iCal_TimeZone extends File_iCal_BaseComponent
     /**
      *
      */
-    public function setTimeZoneOffsetTo($ot) {
-
+    public function setTimeZoneOffsetTo($ot)
+    {
     }
 
     /**
      *
      */
-    public function getTimeZoneOffsetTo() {
-
+    public function getTimeZoneOffsetTo()
+    {
     }
 
     /**
@@ -151,14 +157,14 @@ class File_iCal_TimeZone extends File_iCal_BaseComponent
     /**
      *
      */
-    public function setTimeZoneURL($url) {
-
+    public function setTimeZoneURL($url)
+    {
     }
 
     /**
      *
      */
-    public function getTimeZoneURL() {
-
+    public function getTimeZoneURL()
+    {
     }
 }

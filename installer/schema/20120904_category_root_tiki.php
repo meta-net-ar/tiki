@@ -6,8 +6,8 @@
 // $Id$
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -15,33 +15,33 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function post_20120904_category_root_tiki($installer)
 {
-	// Finds the root category on all existing categories
-	$categs = $installer->table('tiki_categories');
+    // Finds the root category on all existing categories
+    $categs = $installer->table('tiki_categories');
 
-	$roots = array();
+    $roots = [];
 
-	$map = $categs->fetchMap('categId', 'parentId', array());
+    $map = $categs->fetchMap('categId', 'parentId', []);
 
-	$findRoot = function ($category, $cb) use($map) {
-		if (! empty($map[$category])) {
-			return $cb($map[$category], $cb);
-		} else {
-			return $category;
-		}
-	};
+    $findRoot = function ($category, $cb) use ($map) {
+        if (! empty($map[$category])) {
+            return $cb($map[$category], $cb);
+        } else {
+            return $category;
+        }
+    };
 
-	foreach (array_keys($map) as $categId) {
-		$root = $findRoot($categId, $findRoot);
+    foreach (array_keys($map) as $categId) {
+        $root = $findRoot($categId, $findRoot);
 
-		if ($root != $categId) {
-			$categs->update(
-				array(
-					'rootId' => $root,
-				), array(
-					'categId' => $categId,
-				)
-			);
-		}
-	}
+        if ($root != $categId) {
+            $categs->update(
+                [
+                    'rootId' => $root,
+                ],
+                [
+                    'categId' => $categId,
+                ]
+            );
+        }
+    }
 }
-

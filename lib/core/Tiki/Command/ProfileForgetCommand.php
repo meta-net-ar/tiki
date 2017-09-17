@@ -15,48 +15,48 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ProfileForgetCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:forget')
-			->setDescription('Forget a profile installation')
-			->addArgument(
-				'profile',
-				InputArgument::REQUIRED,
-				'Profile name'
-			)
-			->addArgument(
-				'repository',
-				InputArgument::OPTIONAL,
-				'Repository',
-				'profiles.tiki.org'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('profile:forget')
+            ->setDescription('Forget a profile installation')
+            ->addArgument(
+                'profile',
+                InputArgument::REQUIRED,
+                'Profile name'
+            )
+            ->addArgument(
+                'repository',
+                InputArgument::OPTIONAL,
+                'Repository',
+                'profiles.tiki.org'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$profileName = $input->getArgument('profile');
-		$repository = $input->getArgument('repository');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $profileName = $input->getArgument('profile');
+        $repository = $input->getArgument('repository');
 
-		$profile = \Tiki_Profile::fromNames($repository, $profileName);
+        $profile = \Tiki_Profile::fromNames($repository, $profileName);
 
-		if (! $profile) {
-			$output->writeln('<error>Profile not found.</error>');
-			return;
-		}
+        if (! $profile) {
+            $output->writeln('<error>Profile not found.</error>');
+            return;
+        }
 
-		$tikilib = \TikiLib::lib('tiki');
+        $tikilib = \TikiLib::lib('tiki');
 
-		$installer = new \Tiki_Profile_Installer;
-		$isInstalled = $installer->isInstalled($profile);
+        $installer = new \Tiki_Profile_Installer;
+        $isInstalled = $installer->isInstalled($profile);
 
-		if ($isInstalled) {
-			$transaction = $tikilib->begin();
-			$installer->forget($profile);
-			$transaction->commit();
-			$output->writeln('Profile forgotten.');
-		} else {
-			$output->writeln('<info>Profile was not installed or did not create any objects.</info>');
-		}
-	}
+        if ($isInstalled) {
+            $transaction = $tikilib->begin();
+            $installer->forget($profile);
+            $transaction->commit();
+            $output->writeln('Profile forgotten.');
+        } else {
+            $output->writeln('<info>Profile was not installed or did not create any objects.</info>');
+        }
+    }
 }

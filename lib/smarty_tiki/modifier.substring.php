@@ -28,9 +28,9 @@
 function smarty_modifier_substring($string, $position = 0, $length = null)
 {
 
-	if ($length == null) {
-		return substr($string, $position);
-	} else {
-		return substr($string, $position, $length);
-	}
+    if ($length == null) {
+        return substr($string, $position);
+    } else {
+        return substr($string, $position, $length);
+    }
 }

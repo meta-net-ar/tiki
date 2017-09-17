@@ -29,7 +29,7 @@
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
 */
 
- 
+
 /**
  *  The base component class defined variables and methods common to all, or much of the components
  *
@@ -52,7 +52,7 @@ abstract class File_iCal_BaseComponent
      *  @var    array
      *  @access private
      */
-    private $_attachments = array();
+    private $_attachments = [];
 
     /**
      *  Add an attachment to the event
@@ -62,8 +62,8 @@ abstract class File_iCal_BaseComponent
      *
      *  @access protected
      */
-    protected function addAttachment($a) {
-
+    protected function addAttachment($a)
+    {
     }
 
     /**
@@ -75,8 +75,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @return array   Array of ??
      */
-    protected function getAttachments() {
-
+    protected function getAttachments()
+    {
     }
 
     /**
@@ -85,7 +85,7 @@ abstract class File_iCal_BaseComponent
      *  @var    array
      *  @access private
      */
-    private $_comments = array();
+    private $_comments = [];
 
     /**
      * Adds a comment to the component
@@ -93,8 +93,9 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @param  string  $c  Comment text to add
      */
-    protected function addComment($c) {
-        if (!in_array($c, $this->_comments)) {
+    protected function addComment($c)
+    {
+        if (! in_array($c, $this->_comments)) {
             $this->_comments[] = $c;
         }
     }
@@ -105,7 +106,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @return array   An array of strings
      */
-    protected function getComments() {
+    protected function getComments()
+    {
         return $this->_comments;
     }
 
@@ -125,7 +127,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @param  string  $d  The string to which to set the description of the component
      */
-    protected function setDescription($d) {
+    protected function setDescription($d)
+    {
         $this->_description = $d;
     }
 
@@ -135,7 +138,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @return string  String representation the description for the component
      */
-    protected function getDescription() {
+    protected function getDescription()
+    {
         return $this->_description;
     }
 
@@ -152,7 +156,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @param  string  $s  Text to which to set the summary of the component
      */
-    protected function setSummary($s) {
+    protected function setSummary($s)
+    {
         $this->_summary = $s;
     }
 
@@ -162,7 +167,8 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @return string  Text representing a summary of the component
      */
-    protected function getSummary() {
+    protected function getSummary()
+    {
         return $this->_summary;
     }
 
@@ -181,16 +187,15 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *
      */
-    protected function setDateEnd($dt) {
+    protected function setDateEnd($dt)
+    {
         if (ctype_digit($dt)) {
             if ($dt > $this->_dtstart) {
                 $this->_dtend = $dt;
-              }
-            else {
+            } else {
                 trigger_error("The end date must be after the start date", E_USER_WARNING);
             }
-        }
-        else {
+        } else {
             trigger_error("The end date specified is not an integer", E_USER_WARNING);
         }
     }
@@ -203,7 +208,8 @@ abstract class File_iCal_BaseComponent
      *  @return int UNIX timestamp for end date
      *  @access protected
      */
-    protected function getDateEnd() {
+    protected function getDateEnd()
+    {
         return $this->_dtend;
     }
 
@@ -223,16 +229,15 @@ abstract class File_iCal_BaseComponent
      *  @param  int $ds UNIX timestamp for start date/time
      *  @access protected
      */
-    protected function setDateStart($ds) {
+    protected function setDateStart($ds)
+    {
         if (ctype_digit($ds)) {
             if ($ds > 0) {
                 $this->_dtstart = $ds;
-            }
-            else {
+            } else {
                 trigger_error("Start date specified cannot be less than 0", E_USER_WARNING);
             }
-        }
-        else {
+        } else {
             trigger_error("Start date must be an integer");
         }
     }
@@ -242,7 +247,8 @@ abstract class File_iCal_BaseComponent
      *
      *  @return int UNIX timestamp of start date
      */
-    protected function getDateStart() {
+    protected function getDateStart()
+    {
         return $this->_dtstart;
     }
 
@@ -257,16 +263,15 @@ abstract class File_iCal_BaseComponent
      *
      *  @param  int length in seconds of the component
      */
-    protected function setDuration($d) {
+    protected function setDuration($d)
+    {
         if (ctype_digit($d)) {
             if ($d > 0) {
                 $this->_duration = $d;
-            }
-            else {
+            } else {
                 trigger_error("Duration must be greater than 0", E_USER_WARNING);
             }
-        }
-        else {
+        } else {
             trigger_error("Duration specified ($d) is not an integer", E_USER_WARNING);
         }
     }
@@ -275,21 +280,24 @@ abstract class File_iCal_BaseComponent
      *  Get the duration of the component
      *
      */
-    protected function getDuration() {
+    protected function getDuration()
+    {
         return $this->_duration;
     }
 
     /**
      *  The attendees for the component
      */
-    private $_attendees = array();
+    private $_attendees = [];
 
     /**
      *  Add an attendee to the component
      *
      *  @param  File_iCal_Attendee  $a
      */
-    protected function addAttendees($a) { //File_iCal_Attendee 
+    protected function addAttendees($a)
+    {
+ //File_iCal_Attendee
         $this->_attendees[] = $a;
     }
 
@@ -298,7 +306,8 @@ abstract class File_iCal_BaseComponent
      *
      *  @return array   Array of File_iCal_Attendee
      */
-    protected function getAttendees() {
+    protected function getAttendees()
+    {
         return $this->_attendees;
     }
 
@@ -313,16 +322,15 @@ abstract class File_iCal_BaseComponent
      *  @access protected
      *  @param  int $m  UNIX timestamp representing when the component was last modified
      */
-    protected function setLastModified($m) {
+    protected function setLastModified($m)
+    {
         if (ctype_digit($m)) {
             if ($m > 0) {
                 $this->_lastmodified = $m;
-            }
-            else {
+            } else {
                 trigger_error("The last modified value is less than 0", E_USER_WARNING);
             }
-        }
-        else {
+        } else {
             trigger_error("The last modified value ($m) is not an integer", E_USER_WARNING);
         }
     }
@@ -332,10 +340,10 @@ abstract class File_iCal_BaseComponent
      *
      *  @return int UNIX timestamp of last modified date
      */
-    protected function getLastModified() {
+    protected function getLastModified()
+    {
         return $this->_lastmodified;
     }
-
 }
 
 
@@ -352,7 +360,8 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  {@inheritdoc}
      *  @access public
      */
-    public function addComment($c) {
+    public function addComment($c)
+    {
         File_iCal_BaseComponent::addComment($c);
     }
 
@@ -360,14 +369,15 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  {@inheritdoc}
      *  @access public
      */
-    public function getComments() {
+    public function getComments()
+    {
         return File_iCal_BaseComponent::getComments();
     }
 
     /**
      *  Contacts for the component
      */
-    protected $_contacts = array();
+    protected $_contacts = [];
 
     /**
      *  Add a contact to the component
@@ -375,11 +385,11 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @access public
      *  @param  string  $c  Text to which to set the contact info
      */
-    public function addContact($c) {
-        if (!in_array($c, $this->_contacts)) {
+    public function addContact($c)
+    {
+        if (! in_array($c, $this->_contacts)) {
             $this->_contacts[] = $c;
-        }
-        else {
+        } else {
             trigger_error("Attempting to add contact which already exists", E_USER_NOTICE);
         }
     }
@@ -390,7 +400,8 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @access public
      *  @return array   Array of strings containing contact info
      */
-    public function getContacts() {
+    public function getContacts()
+    {
         return $this->_contacts;
     }
 
@@ -399,7 +410,7 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *
      *  @val array
      */
-    protected $_organizer = array();
+    protected $_organizer = [];
 
     /**
      *  Set the organizer for this component
@@ -407,7 +418,8 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @access public
      *  @param  string  $o  The address for the organizer
      */
-    public function setOrganizer($o) {
+    public function setOrganizer($o)
+    {
         $this->_organizer['address'] = $o;
     }
 
@@ -417,7 +429,8 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @access public
      *  @param  string  $cn Common name of the organizer
      */
-    public function setOrganizerCommonName($cn) {
+    public function setOrganizerCommonName($cn)
+    {
         $this->_organizer['cn'] = $cn;
     }
 
@@ -427,8 +440,9 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @access public
      *  @return string  Address for the organizer
      */
-    public function getOrganizer() {
-        
+    public function getOrganizer()
+    {
+
         return isset($this->_organizer['address']) ? $this->_organizer['address'] : '';
     }
 
@@ -438,7 +452,8 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
      *  @return string  Common name for the organizer
      *  @access public
      */
-    public function getOrganizerCommonName() {
+    public function getOrganizerCommonName()
+    {
         return $this->_organizer['cn'];
     }
 
@@ -453,15 +468,15 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
     /**
      *  Set a URL for this component
      */
-    public function setURL($url) {
-
+    public function setURL($url)
+    {
     }
 
     /**
      *  Get the URL for this component
      */
-    public function getURL() {
-
+    public function getURL()
+    {
     }
 
     /**
@@ -472,14 +487,16 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
     /**
      *  Set the unique identifier for this component
      */
-    public function setUID($uid) {
+    public function setUID($uid)
+    {
         $this->_uid = $uid;
     }
 
     /**
      *  Get the unique identifier for this component
      */
-    public function getUID() {
+    public function getUID()
+    {
         return $this->_uid;
     }
 
@@ -491,15 +508,15 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
     /**
      *  Set the date/time that this component was created
      */
-    public function setDateStamp($ds) {
-
+    public function setDateStamp($ds)
+    {
     }
 
     /**
      *  Get the date/time that this component was created
      */
-    public function getDateStamp() {
-
+    public function getDateStamp()
+    {
     }
 
     /**
@@ -510,17 +527,16 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
     /**
      *  Set the requestion status of this component
      */
-    public function setRequestStatus($rs) {
-
+    public function setRequestStatus($rs)
+    {
     }
 
     /**
      *  Get the request status for this component
      */
-    public function getRequestStatus() {
-
+    public function getRequestStatus()
+    {
     }
-
 }
 
 
@@ -536,44 +552,55 @@ abstract class File_iCal_BaseComponent_EFJT extends File_iCal_BaseComponent
 abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
 {
     //make some methods public
-    public function addAttachment($a) {
+    public function addAttachment($a)
+    {
         File_iCal_BaseComponent::addAttachment($a);
     }
 
-    public function getAttachments() {
+    public function getAttachments()
+    {
         return File_iCal_BaseComponent::getAttachments();
     }
 
-    public function setDescription($d) {
+    public function setDescription($d)
+    {
         File_iCal_BaseComponent::setDescription($d);
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return File_iCal_BaseComponent::getDescription();
     }
 
-    public function setSummary($s) {
+    public function setSummary($s)
+    {
         File_iCal_BaseComponent::setSummary($s);
     }
 
-    public function getSummary() {
+    public function getSummary()
+    {
         return File_iCal_BaseComponent::getSummary();
     }
 
 
-    public function addAttendee($a) { //File_iCal_Attendee 
+    public function addAttendee($a)
+    {
+ //File_iCal_Attendee
         File_iCal_BaseComponent::addAttendees($a);
     }
 
-    public function getAttendees() {
+    public function getAttendees()
+    {
         return File_iCal_BaseComponent::getAttendees();
     }
 
-    public function setLastModified($m) {
+    public function setLastModified($m)
+    {
         File_iCal_BaseComponent::setLastModified($m);
     }
 
-    public function getLastModified() {
+    public function getLastModified()
+    {
         return File_iCal_BaseComponent::getLastModified();
     }
 
@@ -583,7 +610,7 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *  @var    array
      *  @access protected
      */
-    protected $_categories = array();
+    protected $_categories = [];
 
     /**
      * Add a category to an event
@@ -592,8 +619,9 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function addCategory($c) {
-        if (!in_array($c, $this->_categories)) {
+    public function addCategory($c)
+    {
+        if (! in_array($c, $this->_categories)) {
             $this->_categories[] = $c;
         }
     }
@@ -603,7 +631,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function getCategories() {
+    public function getCategories()
+    {
         return $this->_categories;
     }
 
@@ -622,7 +651,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      * Set this event to be viewable by anyone
      *  @access public
      */
-    public function makePublic() {
+    public function makePublic()
+    {
         $this->_classification = File_iCal::ICAL_CLASSIFICATION_PUBLIC;
     }
 
@@ -631,7 +661,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function makePrivate() {
+    public function makePrivate()
+    {
         $this->_classification = File_iCal::ICAL_CLASSIFICATION_PRIVATE;
     }
 
@@ -642,7 +673,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function makeConfidential() {
+    public function makeConfidential()
+    {
         $this->_classification = File_iCal::ICAL_CLASSIFICATION_CONFIDENTIAL;
     }
 
@@ -653,7 +685,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function setClassification($c) {
+    public function setClassification($c)
+    {
         $this->_class = $c;
     }
 
@@ -663,7 +696,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function getClassification() {
+    public function getClassification()
+    {
         return $this->_class;
     }
 
@@ -679,7 +713,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function makeTentative() {
+    public function makeTentative()
+    {
         $this->_status = ICAL_STATUS_TENTATIVE;
     }
 
@@ -688,7 +723,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function makeConfirmed() {
+    public function makeConfirmed()
+    {
         $this->_status = ICAL_STATUS_CONFIRMED;
     }
 
@@ -697,7 +733,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function makeCancelled() {
+    public function makeCancelled()
+    {
         $this->_status = ICAL_STATUS_CANCELLED;
     }
 
@@ -706,7 +743,8 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->_status;
     }
 
@@ -725,32 +763,35 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function setRecurrenceId($rid) {
+    public function setRecurrenceId($rid)
+    {
         $this->_recurid = $rid;
     }
 
     /**
      *  Get the recurrence id of the component
      */
-    public function getRecurrenceId() {
+    public function getRecurrenceId()
+    {
         return $this->_recurid;
     }
 
-    protected $_related = array();
+    protected $_related = [];
 
     /**
      *
      *
      *
      */
-    public function addRelatedTo($rt) {
-        if (!in_array($this->_related)) {
+    public function addRelatedTo($rt)
+    {
+        if (! in_array($this->_related)) {
             $this->_related[] = $rt;
         }
     }
 
-    public function getRelatedTo() {
-
+    public function getRelatedTo()
+    {
     }
 
     /**
@@ -767,15 +808,16 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *  @access public
      */
-    public function setCreated($c) {
-
+    public function setCreated($c)
+    {
     }
 
     /**
      *  Gets the created time of the component
      *  @access public
      */
-    public function getCreated() {
+    public function getCreated()
+    {
         return $this->_created;
     }
 
@@ -791,21 +833,19 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
      *
      *
      */
-    public function setSequence($s) {
+    public function setSequence($s)
+    {
         $this->_sequence = $s;
     }
 
     /**
      *  Get the sequence of this component
      */
-    public function getSequence() {
+    public function getSequence()
+    {
         return $this->_sequence;
     }
-
-
-
-
- }
+}
 
 /**
  *  This class defines methods for VEVENT and VTODO components
@@ -816,32 +856,34 @@ abstract class File_iCal_BaseComponent_EJT extends File_iCal_BaseComponent_EFJT
  */
 class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
 {
-    function assignFrom($array) 
+    function assignFrom($array)
     {
-        foreach($array as $k=>$v) {
-            if (method_exists($this,'add'.$k)) {
+        foreach ($array as $k => $v) {
+            if (method_exists($this, 'add'.$k)) {
                 $this->{'add'.$k}($v);
             } else {
                 $this->{'set'.$k}($v);
             }
         }
-    
     }
 
-    public function setDateStart($ds) 
+    public function setDateStart($ds)
     {
         parent::setDateStart($ds);
     }
 
-    public function getDateStart() {
+    public function getDateStart()
+    {
         return parent::getDateStart();
     }
 
-    public function setDuration($d) {
+    public function setDuration($d)
+    {
         File_iCal_BaseComponent::setDuration($d);
     }
 
-    public function getDuration() {
+    public function getDuration()
+    {
         return File_iCal_BaseComponent::getDuration();
     }
 
@@ -855,7 +897,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function setPosition($latitude, $longitude) {
+    public function setPosition($latitude, $longitude)
+    {
         if (is_numeric($latitude) && is_numeric($longitude)) {
             $this->_latitude = $latitude;
             $this->_longitude = $longitude;
@@ -865,14 +908,16 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
     /**
      * returns the latitude of the component
      */
-    public function getLatitude() {
+    public function getLatitude()
+    {
         return $this->_latitude;
     }
 
     /**
      * returns the longitude of the component
      */
-    public function getLongitude() {
+    public function getLongitude()
+    {
         return $this->_longitude;
     }
 
@@ -890,7 +935,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function setLocation($l) {
+    public function setLocation($l)
+    {
         $this->_location = $l;
     }
 
@@ -899,7 +945,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function getLocation() {
+    public function getLocation()
+    {
         return $this->_location;
     }
 
@@ -908,7 +955,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function setPriorityHighest() {
+    public function setPriorityHighest()
+    {
         $this->_priority = ICAL_PRIORITY_HIGHEST;
     }
 
@@ -917,7 +965,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function setPriorityMedium() {
+    public function setPriorityMedium()
+    {
         $this->_priority = ICAL_PRIORITY_MEDIUM;
     }
 
@@ -926,7 +975,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function setPriorityLowest() {
+    public function setPriorityLowest()
+    {
         $this->_priority = ICAL_PRIORITY_LOWEST;
     }
 
@@ -935,7 +985,8 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      * Priority must be between 0 and 9.  Other values are ignored
      */
-    public function setPriority($p) {
+    public function setPriority($p)
+    {
         if ($p >= 0 && $p <= 9) {
             $this->_priority = $p;
         }
@@ -946,27 +997,27 @@ class File_iCal_BaseComponent_ET extends File_iCal_BaseComponent_EJT
      *
      *
      */
-    public function getPriority() {
+    public function getPriority()
+    {
         return $this->_priority;
     }
 
     /**
      *  Holds resources associated with component
      */
-    protected $_resources = array();
+    protected $_resources = [];
 
     /**
      *  Add a resource to a component
      */
-    public function addResource($r) {
-
+    public function addResource($r)
+    {
     }
 
     /**
      *  Get the resources associated with a component
      */
-    public function getResources() {
-
+    public function getResources()
+    {
     }
-
 }

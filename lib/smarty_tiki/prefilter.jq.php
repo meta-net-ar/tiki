@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -21,23 +21,23 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 
 function smarty_prefilter_jq($source)
 {
-	if (strpos($source, '{jq') === false) {
-		return $source;			// quick escape if no jq tags
-	}
-	$return = preg_replace_callback('/(?s)(\{jq.*?\})(.+?)\{\/jq\}/', '_escape_smarty_jq', $source);
+    if (strpos($source, '{jq') === false) {
+        return $source;         // quick escape if no jq tags
+    }
+    $return = preg_replace_callback('/(?s)(\{jq.*?\})(.+?)\{\/jq\}/', '_escape_smarty_jq', $source);
 
-	return $return;
+    return $return;
 }
 
 function _escape_smarty_jq($key)
 {
-	$s = $key[2];
-	if (preg_match('/\{literal\}/Ums', $s)) {
-		return $key[1].$s.'{/jq}';	// don't parse {{s if already escaped
-	}
-	$s = preg_replace('/(?s)\{\*.*?\*\}/', '', $s);
-	$s = preg_replace('/(?s)\{\{/', '{/literal}{', $s);					// replace {{ with {/literal}{ and wrap with {literal}
-	$s = preg_replace('/(?s)\}\}/', '}{literal}', $s);					// close }}s
-	$s = preg_replace('/(?s)\{literal\}\s*\{\/literal\}/', '', $s);		// remove empties
-	return !empty($s) ? $key[1].'{literal}'.$s.'{/literal}{/jq}' : '';	// wrap
+    $s = $key[2];
+    if (preg_match('/\{literal\}/Ums', $s)) {
+        return $key[1].$s.'{/jq}';  // don't parse {{s if already escaped
+    }
+    $s = preg_replace('/(?s)\{\*.*?\*\}/', '', $s);
+    $s = preg_replace('/(?s)\{\{/', '{/literal}{', $s);                 // replace {{ with {/literal}{ and wrap with {literal}
+    $s = preg_replace('/(?s)\}\}/', '}{literal}', $s);                  // close }}s
+    $s = preg_replace('/(?s)\{literal\}\s*\{\/literal\}/', '', $s);     // remove empties
+    return ! empty($s) ? $key[1].'{literal}'.$s.'{/literal}{/jq}' : '';  // wrap
 }

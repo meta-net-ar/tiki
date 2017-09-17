@@ -1,26 +1,25 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 interface Search_Index_Interface
 {
-	function addDocument(array $document);
+    function addDocument(array $document);
 
-	function invalidateMultiple(array $query);
+    function invalidateMultiple(array $query);
 
-	function endUpdate();
+    function endUpdate();
 
-	function find(Search_Query_Interface $query, $resultStart, $resultCount);
+    function find(Search_Query_Interface $query, $resultStart, $resultCount);
 
-	function getTypeFactory();
+    function getTypeFactory();
 
-	function optimize();
+    function optimize();
 
-	function destroy();
+    function destroy();
 
-	function exists();
+    function exists();
 }
-

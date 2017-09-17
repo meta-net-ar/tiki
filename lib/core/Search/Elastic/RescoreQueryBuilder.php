@@ -21,118 +21,117 @@ use Search_Expr_ExplicitPhrase as ExplicitPhrase;
  */
 class Search_Elastic_RescoreQueryBuilder
 {
-	private $factory;
-	private $documentReader;
-	private $accumulate;
+    private $factory;
+    private $documentReader;
+    private $accumulate;
 
-	function __construct()
-	{
-		$this->factory = new Search_Elastic_TypeFactory;
-		$this->documentReader = function ($type, $object) {
-			return null;
-		};
-	}
+    function __construct()
+    {
+        $this->factory = new Search_Elastic_TypeFactory;
+        $this->documentReader = function ($type, $object) {
+            return null;
+        };
+    }
 
-	function build(Search_Expr_Interface $expr)
-	{
-		$this->accumulate = [];
+    function build(Search_Expr_Interface $expr)
+    {
+        $this->accumulate = [];
 
-		$expr->walk($this);
+        $expr->walk($this);
 
-		$query = [
-			'rescore' => [
-				'window_size' => 50,
-				'query' => [
-					'rescore_query' => [
-						'bool' => [
-							'should' => array_values($this->accumulate),
-						],
-					],
-				],
-			],
-		];
+        $query = [
+            'rescore' => [
+                'window_size' => 50,
+                'query' => [
+                    'rescore_query' => [
+                        'bool' => [
+                            'should' => array_values($this->accumulate),
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
-		return $query;
-	}
+        return $query;
+    }
 
-	function setDocumentReader($callback)
-	{
-		$this->documentReader = $callback;
-	}
+    function setDocumentReader($callback)
+    {
+        $this->documentReader = $callback;
+    }
 
-	/**
-	 * Used when a negation, or a more complete phrase makes a subtree irrelevant
-	 */
-	private function cancelNode($node)
-	{
-		$node->walk(function ($node) {
-			$hash = spl_object_hash($node);
-			unset($this->accumulate[$hash]);
-		});
-	}
+    /**
+     * Used when a negation, or a more complete phrase makes a subtree irrelevant
+     */
+    private function cancelNode($node)
+    {
+        $node->walk(function ($node) {
+            $hash = spl_object_hash($node);
+            unset($this->accumulate[$hash]);
+        });
+    }
 
-	private function addPhrase($node, $field = null, $phrase = null)
-	{
-		$field = $field ?: $node->getField();
-		$phrase = $phrase ?: $this->getTerm($node);
+    private function addPhrase($node, $field = null, $phrase = null)
+    {
+        $field = $field ?: $node->getField();
+        $phrase = $phrase ?: $this->getTerm($node);
 
-		$boost = $node->getWeight();
+        $boost = $node->getWeight();
 
-		$this->cancelNode($node);
+        $this->cancelNode($node);
 
-		$hash = spl_object_hash($node);
-		$this->accumulate[$hash] = [
-			'match_phrase' => [
-				$field => [
-					'query' => $phrase,
-					'boost' => $boost,
-					'slop' => 50,
-				],
-			],
-		];
-	}
+        $hash = spl_object_hash($node);
+        $this->accumulate[$hash] = [
+            'match_phrase' => [
+                $field => [
+                    'query' => $phrase,
+                    'boost' => $boost,
+                    'slop' => 50,
+                ],
+            ],
+        ];
+    }
 
-	function __invoke($node, $childNodes)
-	{
-		if ($node instanceof ExplicitPhrase) {
-			$type = $node->getType();
-			if ($type == 'plaintext') {
-				$this->addPhrase($node);
-			}
-			return $node;
-		} elseif ($node instanceof Token) {
-			$type = $node->getType();
-			if ($type == 'plaintext') {
-				$this->addPhrase($node);
-			}
-			return $node;
-		} elseif ($node instanceof ImplicitPhrase) {
-			$first = reset($childNodes);
-			if ($first && $first instanceof Token) {
-				$firstType = $first->getType();
-				$firstField = $first->getField();
-				$terms = [];
-				foreach ($childNodes as $child) {
-					if ($child instanceof Token && $firstType == $child->getType() && $firstField == $child->getField()) {
-						$terms[] = $this->getTerm($child);
-					}
-				}
-				
-				if (count($terms) == count($childNodes)) {
-					$this->addPhrase($node, $firstField, implode(' ', $terms));
-				}
-			}
+    function __invoke($node, $childNodes)
+    {
+        if ($node instanceof ExplicitPhrase) {
+            $type = $node->getType();
+            if ($type == 'plaintext') {
+                $this->addPhrase($node);
+            }
+            return $node;
+        } elseif ($node instanceof Token) {
+            $type = $node->getType();
+            if ($type == 'plaintext') {
+                $this->addPhrase($node);
+            }
+            return $node;
+        } elseif ($node instanceof ImplicitPhrase) {
+            $first = reset($childNodes);
+            if ($first && $first instanceof Token) {
+                $firstType = $first->getType();
+                $firstField = $first->getField();
+                $terms = [];
+                foreach ($childNodes as $child) {
+                    if ($child instanceof Token && $firstType == $child->getType() && $firstField == $child->getField()) {
+                        $terms[] = $this->getTerm($child);
+                    }
+                }
 
-			return $node;
-		} elseif ($node instanceof NotX) {
-			$this->cancelNode($node);
-		}
-	}
+                if (count($terms) == count($childNodes)) {
+                    $this->addPhrase($node, $firstField, implode(' ', $terms));
+                }
+            }
 
-	private function getTerm($node)
-	{
-		$value = $node->getValue($this->factory);
-		return strtolower($value->getValue());
-	}
+            return $node;
+        } elseif ($node instanceof NotX) {
+            $this->cancelNode($node);
+        }
+    }
+
+    private function getTerm($node)
+    {
+        $value = $node->getValue($this->factory);
+        return strtolower($value->getValue());
+    }
 }
-

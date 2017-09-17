@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -8,28 +8,28 @@
 require_once('lib/wizard/wizard.php');
 
 /**
- * The Wizard's language handler 
+ * The Wizard's language handler
  */
 class UpgradeWizardUI extends Wizard
 {
-    function pageTitle ()
+    function pageTitle()
     {
         return tra('User Interface');
     }
 
-	function isEditable ()
-	{
-		return true;
-	}
-	
-	function onSetupPage ($homepageUrl) 
-	{
-		global $prefs;
-		$smarty = TikiLib::lib('smarty');
-		// Run the parent first
-		parent::onSetupPage($homepageUrl);
-		
-		$showPage = true;
+    function isEditable()
+    {
+        return true;
+    }
+
+    function onSetupPage($homepageUrl)
+    {
+        global $prefs;
+        $smarty = TikiLib::lib('smarty');
+        // Run the parent first
+        parent::onSetupPage($homepageUrl);
+
+        $showPage = true;
         // Show if any more specification is needed
 
         // ElFinder
@@ -48,20 +48,20 @@ class UpgradeWizardUI extends Wizard
         }
 
         return $showPage;
-	}
+    }
 
-	function getTemplate()
-	{
-		$wizardTemplate = 'wizard/upgrade_ui.tpl';
-		return $wizardTemplate;
-	}
+    function getTemplate()
+    {
+        $wizardTemplate = 'wizard/upgrade_ui.tpl';
+        return $wizardTemplate;
+    }
 
-	function onContinue ($homepageUrl) 
-	{
+    function onContinue($homepageUrl)
+    {
         $tikilib = TikiLib::lib('tiki');
 
-		// Run the parent first
-		parent::onContinue($homepageUrl);
+        // Run the parent first
+        parent::onContinue($homepageUrl);
 
         if (isset($_REQUEST['useElFinderAsDefault']) && $_REQUEST['useElFinderAsDefault'] === 'on') {
             // Set ElFinder view as the default File Gallery view

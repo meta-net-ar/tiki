@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -22,96 +22,95 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class Table_Settings_TikiPayment extends Table_Settings_Standard
 {
-	protected $ts = array(
-		'ajax' => array(
-			'url' => array(
-				'file' => 'tiki-payment.php',
-			),
-		),
-		'columns' => array(
-			'#id' => array(
-				'sort' => array(
-					'type' => 'digit',
-					'dir' => 'asc',
-					'ajax' =>'paymentRequestId',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' =>'filter_paymentRequestId',
-				),
-				'priority' => 3,
-			),
-			'#description' => array(
-				'sort' => array(
-					'type' => 'text',
-					'ajax' =>'description',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' =>'filter_description',
-				),
-				'priority' => 2,
-			),
-			'#amount' => array(
-				'sort' => array(
-					'type' => 'digit',
-					'ajax' =>'amount',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' =>'filter_amount',
-				),
-				'priority' => 'critical',
-			),
-			'#req_date' => array(
-				'sort' => array(
-					'type' => 'dateFormat-yyyy-mm-dd',
-					'ajax' =>'request_date',
-				),
-				'filter' => array(
-					'type' => 'date',
-					'ajax' =>'filter_request_date',
-				),
-				'priority' => 5,
-			),
-			'#user' => array(
-				'sort' => array(
-					'type' => 'text',
-					'ajax' =>'login',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' =>'filter_login',
-				),
-				'priority' => 5,
-			),
-			'#payer' => array(
-				'sort' => array(
-					'type' => 'text',
-					'ajax' =>'login',
-				),
-				'filter' => array(
-					'type' => 'text',
-					'ajax' =>'filter_login',
-				),
-				'priority' => 6,
-			),
-			'#actions' => array(
-				'sort' => array(
-					'type' => false,
-				),
-				'filter' => array(
-					'type' => false,
-				),
-				'priority' => 'critical',
-			),
-		),
-	);
+    protected $ts = [
+        'ajax' => [
+            'url' => [
+                'file' => 'tiki-payment.php',
+            ],
+        ],
+        'columns' => [
+            '#id' => [
+                'sort' => [
+                    'type' => 'digit',
+                    'dir' => 'asc',
+                    'ajax' => 'paymentRequestId',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'filter_paymentRequestId',
+                ],
+                'priority' => 3,
+            ],
+            '#description' => [
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'description',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'filter_description',
+                ],
+                'priority' => 2,
+            ],
+            '#amount' => [
+                'sort' => [
+                    'type' => 'digit',
+                    'ajax' => 'amount',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'filter_amount',
+                ],
+                'priority' => 'critical',
+            ],
+            '#req_date' => [
+                'sort' => [
+                    'type' => 'dateFormat-yyyy-mm-dd',
+                    'ajax' => 'request_date',
+                ],
+                'filter' => [
+                    'type' => 'date',
+                    'ajax' => 'filter_request_date',
+                ],
+                'priority' => 5,
+            ],
+            '#user' => [
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'login',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'filter_login',
+                ],
+                'priority' => 5,
+            ],
+            '#payer' => [
+                'sort' => [
+                    'type' => 'text',
+                    'ajax' => 'login',
+                ],
+                'filter' => [
+                    'type' => 'text',
+                    'ajax' => 'filter_login',
+                ],
+                'priority' => 6,
+            ],
+            '#actions' => [
+                'sort' => [
+                    'type' => false,
+                ],
+                'filter' => [
+                    'type' => false,
+                ],
+                'priority' => 'critical',
+            ],
+        ],
+    ];
 
-	protected function getTableSettings()
-	{
-		$this->ts['ajax']['offset'] .= '_' . $this->ts['ajax']['requiredparams']['list_type'];
-		return $this->ts;
-	}
-
+    protected function getTableSettings()
+    {
+        $this->ts['ajax']['offset'] .= '_' . $this->ts['ajax']['requiredparams']['list_type'];
+        return $this->ts;
+    }
 }

@@ -7,15 +7,15 @@
 
 class Search_Type_GeoPoint implements Search_Type_Interface
 {
-	private $value;
+    private $value;
 
-	function __construct($value)
-	{
-		$this->value = $value;
-	}
+    function __construct($value)
+    {
+        $this->value = $value;
+    }
 
-	function getValue()
-	{
-		return $this->value;
-	}
+    function getValue()
+    {
+        return $this->value;
+    }
 }

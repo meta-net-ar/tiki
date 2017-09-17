@@ -13,49 +13,49 @@ $access->check_permission('tiki_p_admin');
 
 //check if profile is created
 if ($trklib->get_tracker_by_name("Invoice Items") < 1) {
-	$smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
-	$smarty->display("error.tpl");
-	die;
+    $smarty->assign('msg', tra('You need to apply the "Invoice" profile'));
+    $smarty->display("error.tpl");
+    die;
 }
 
 (int)$_REQUEST['InvoiceId'] = $_REQUEST['InvoiceId'];
 $smarty->assign('InvoiceId', $_REQUEST['InvoiceId']);
 $invoice = Tracker_Query::tracker("Invoices")
-	->byName()
-	->equals($_REQUEST['InvoiceId'])
-	->getOne();
+    ->byName()
+    ->equals($_REQUEST['InvoiceId'])
+    ->getOne();
 
 $amount = 0;
 
 if (is_array($invoice["Item Amounts"])) {
-	foreach ($invoice["Item Amounts"] as $key => $sum) {
-		$amount += $invoice["Item Amounts"][$key] * $invoice["Item Quantities"][$key];
-	}
+    foreach ($invoice["Item Amounts"] as $key => $sum) {
+        $amount += $invoice["Item Amounts"][$key] * $invoice["Item Quantities"][$key];
+    }
 } else {
-	$amount = $invoice["Item Amounts"] * $invoice["Item Quantities"];
+    $amount = $invoice["Item Amounts"] * $invoice["Item Quantities"];
 }
 
 $smarty->assign("invoice", $invoice);
 $smarty->assign("amount", $amount);
 $smarty->assign(
-	"client",
-	Tracker_Query::tracker("Invoice Clients")
-	->fields(array("Client Id"))->equals(array($invoice['Client Id']))
-	->byName()
-	->getOne()
+    "client",
+    Tracker_Query::tracker("Invoice Clients")
+    ->fields(["Client Id"])->equals([$invoice['Client Id']])
+    ->byName()
+    ->getOne()
 );
 $smarty->assign(
-	"setting",
-	Tracker_Query::tracker("Invoice Settings")
-	->byName()
-	->query()
+    "setting",
+    Tracker_Query::tracker("Invoice Settings")
+    ->byName()
+    ->query()
 );
 $smarty->assign(
-	"invoiceItems",
-	Tracker_Query::tracker("Invoice Items")
-	->fields(array("Invoice Id"))->equals(array($_REQUEST['InvoiceId']))
-	->byName()
-	->query()
+    "invoiceItems",
+    Tracker_Query::tracker("Invoice Items")
+    ->fields(["Invoice Id"])->equals([$_REQUEST['InvoiceId']])
+    ->byName()
+    ->query()
 );
 
 // Display the template

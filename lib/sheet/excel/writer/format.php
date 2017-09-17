@@ -5,7 +5,7 @@
 *  The majority of this is _NOT_ my code.  I simply ported it from the
 *  PERL Spreadsheet::WriteExcel module.
 *
-*  The author of the Spreadsheet::WriteExcel module is John McNamara 
+*  The author of the Spreadsheet::WriteExcel module is John McNamara
 *  <jmcnamara@cpan.org>
 *
 *  I _DO_ maintain this code, and John McNamara has nothing to do with the
@@ -247,7 +247,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     * @param integer $index the XF index for the format.
     * @param array   $properties array with properties to be set on initialization.
     */
-    function __construct($BIFF_version, $index = 0, $properties =  array())
+    function __construct($BIFF_version, $index = 0, $properties = [])
     {
         $this->_xf_index       = $index;
         $this->_BIFF_version   = $BIFF_version;
@@ -264,9 +264,9 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $this->_font_script    = 0;
         $this->_font_family    = 0;
         $this->_font_charset   = 0;
-                               
+
         $this->_num_format     = 0;
-                               
+
         $this->_hidden         = 0;
         $this->_locked         = 0;
 
@@ -280,24 +280,22 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $this->_bg_color       = 0x41;
 
         $this->_pattern        = 0;
-                               
+
         $this->_bottom         = 0;
         $this->_top            = 0;
         $this->_left           = 0;
         $this->_right          = 0;
         $this->_diag           = 0;
-                               
+
         $this->_bottom_color   = 0x40;
         $this->_top_color      = 0x40;
         $this->_left_color     = 0x40;
         $this->_right_color    = 0x40;
         $this->_diag_color     = 0x40;
-    
+
         // Set properties passed to Spreadsheet_Excel_Writer_Workbook::addFormat()
-        foreach($properties as $property => $value)
-        {
-            if(method_exists($this,'set'.ucwords($property)))
-            {
+        foreach ($properties as $property => $value) {
+            if (method_exists($this, 'set'.ucwords($property))) {
                 $method_name = 'set'.ucwords($property);
                 $this->$method_name($value);
             }
@@ -316,30 +314,29 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         // Set the type of the XF record and some of the attributes.
         if ($style == "style") {
             $style = 0xFFF5;
-        }
-        else {
+        } else {
             $style   = $this->_locked;
             $style  |= $this->_hidden << 1;
         }
-    
+
         // Flags to indicate if attributes have been set.
-        $atr_num     = ($this->_num_format != 0)?1:0;
-        $atr_fnt     = ($this->font_index != 0)?1:0;
-        $atr_alc     = ($this->_text_wrap)?1:0;
+        $atr_num     = ($this->_num_format != 0) ? 1 : 0;
+        $atr_fnt     = ($this->font_index != 0) ? 1 : 0;
+        $atr_alc     = ($this->_text_wrap) ? 1 : 0;
         $atr_bdr     = ($this->_bottom   ||
                         $this->_top      ||
                         $this->_left     ||
-                        $this->_right)?1:0;
+                        $this->_right) ? 1 : 0;
         $atr_pat     = (($this->_fg_color != 0x40) ||
                         ($this->_bg_color != 0x41) ||
-                        $this->_pattern)?1:0;
+                        $this->_pattern) ? 1 : 0;
         $atr_prot    = $this->_locked | $this->_hidden;
-    
+
         // Zero the default border colour if the border has not been set.
         if ($this->_bottom == 0) {
             $this->_bottom_color = 0;
         }
-        if ($this->_top  == 0) {
+        if ($this->_top == 0) {
             $this->_top_color = 0;
         }
         if ($this->_right == 0) {
@@ -351,7 +348,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         if ($this->_diag == 0) {
             $this->_diag_color = 0;
         }
-    
+
         $record         = 0x00E0;              // Record identifier
         if ($this->_BIFF_version == 0x0500) {
             $length         = 0x0010;              // Number of bytes to follow
@@ -359,78 +356,83 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         if ($this->_BIFF_version == 0x0600) {
             $length         = 0x0014;
         }
-                                               
+
         $ifnt           = $this->font_index;   // Index to FONT record
         $ifmt           = $this->_num_format;  // Index to FORMAT record
-        if ($this->_BIFF_version == 0x0500)
-        {
+        if ($this->_BIFF_version == 0x0500) {
             $align          = $this->_text_h_align;       // Alignment
-            $align         |= $this->_text_wrap     << 3;
-            $align         |= $this->_text_v_align  << 4;
+            $align         |= $this->_text_wrap << 3;
+            $align         |= $this->_text_v_align << 4;
             $align         |= $this->_text_justlast << 7;
-            $align         |= $this->_rotation      << 8;
-            $align         |= $atr_num                << 10;
-            $align         |= $atr_fnt                << 11;
-            $align         |= $atr_alc                << 12;
-            $align         |= $atr_bdr                << 13;
-            $align         |= $atr_pat                << 14;
-            $align         |= $atr_prot               << 15;
- 
+            $align         |= $this->_rotation << 8;
+            $align         |= $atr_num << 10;
+            $align         |= $atr_fnt << 11;
+            $align         |= $atr_alc << 12;
+            $align         |= $atr_bdr << 13;
+            $align         |= $atr_pat << 14;
+            $align         |= $atr_prot << 15;
+
             $icv            = $this->_fg_color;       // fg and bg pattern colors
-            $icv           |= $this->_bg_color      << 7;
-     
+            $icv           |= $this->_bg_color << 7;
+
             $fill           = $this->_pattern;        // Fill and border line style
-            $fill          |= $this->_bottom        << 6;
-            $fill          |= $this->_bottom_color  << 9;
-     
+            $fill          |= $this->_bottom << 6;
+            $fill          |= $this->_bottom_color << 9;
+
             $border1        = $this->_top;            // Border line style and color
-            $border1       |= $this->_left          << 3;
-            $border1       |= $this->_right         << 6;
-            $border1       |= $this->_top_color     << 9;
-     
+            $border1       |= $this->_left << 3;
+            $border1       |= $this->_right << 6;
+            $border1       |= $this->_top_color << 9;
+
             $border2        = $this->_left_color;     // Border color
-            $border2       |= $this->_right_color   << 7;
-         
-            $header      = pack("vv",       $record, $length);
-            $data        = pack("vvvvvvvv", $ifnt, $ifmt, $style, $align,
-                                            $icv, $fill,
-                                            $border1, $border2);
-        }
-        elseif ($this->_BIFF_version == 0x0600)
-        {
+            $border2       |= $this->_right_color << 7;
+
+            $header      = pack("vv", $record, $length);
+            $data        = pack(
+                "vvvvvvvv",
+                $ifnt,
+                $ifmt,
+                $style,
+                $align,
+                $icv,
+                $fill,
+                $border1,
+                $border2
+            );
+        } elseif ($this->_BIFF_version == 0x0600) {
             $align          = $this->_text_h_align;       // Alignment
-            $align         |= $this->_text_wrap     << 3;
-            $align         |= $this->_text_v_align  << 4;
+            $align         |= $this->_text_wrap << 3;
+            $align         |= $this->_text_v_align << 4;
             $align         |= $this->_text_justlast << 7;
 
-            $used_attrib    = $atr_num              << 2;
-            $used_attrib   |= $atr_fnt              << 3;
-            $used_attrib   |= $atr_alc              << 4;
-            $used_attrib   |= $atr_bdr              << 5;
-            $used_attrib   |= $atr_pat              << 6;
-            $used_attrib   |= $atr_prot             << 7;
+            $used_attrib    = $atr_num << 2;
+            $used_attrib   |= $atr_fnt << 3;
+            $used_attrib   |= $atr_alc << 4;
+            $used_attrib   |= $atr_bdr << 5;
+            $used_attrib   |= $atr_pat << 6;
+            $used_attrib   |= $atr_prot << 7;
 
             $icv            = $this->_fg_color;      // fg and bg pattern colors
-            $icv           |= $this->_bg_color      << 7;
-   
+            $icv           |= $this->_bg_color << 7;
+
             $border1        = $this->_left;          // Border line style and color
-            $border1       |= $this->_right         << 4;
-            $border1       |= $this->_top           << 8;
-            $border1       |= $this->_bottom        << 12;
-            $border1       |= $this->_left_color    << 16;
-            $border1       |= $this->_right_color   << 23;
+            $border1       |= $this->_right << 4;
+            $border1       |= $this->_top << 8;
+            $border1       |= $this->_bottom << 12;
+            $border1       |= $this->_left_color << 16;
+            $border1       |= $this->_right_color << 23;
             $diag_tl_to_rb = 0; // FIXME: add method
             $diag_tr_to_lb = 0; // FIXME: add method
-            $border1       |= $diag_tl_to_rb        << 30;
-            $border1       |= $diag_tr_to_lb        << 31;
-     
-            $border2        = $this->_top_color;    // Border color
-            $border2       |= $this->_bottom_color   << 7;
-            $border2       |= $this->_diag_color     << 14;
-            $border2       |= $this->_diag           << 21;
-            $border2       |= $this->_pattern        << 26;
+            $border1       |= $diag_tl_to_rb << 30;
+            $border1       |= $diag_tr_to_lb << 31;
 
-            $header      = pack("vv",       $record, $length);
+            $border2        = $this->_top_color;    // Border color
+            $border2       |= $this->_bottom_color << 7;
+            $border2       |= $this->_diag_color << 14;
+            $border2       |= $this->_diag << 21;
+            $border2       |= $this->_pattern << 26;
+
+            $header      = pack("vv", $record, $length);
 
             $rotation      = 0x00;
             $biff8_options = 0x00;
@@ -441,7 +443,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
 
         return($header.$data);
     }
-    
+
     /**
     * Generate an Excel BIFF FONT record.
     *
@@ -457,13 +459,12 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $bFamily    = $this->_font_family;  // Font family
         $bCharSet   = $this->_font_charset; // Character set
         $encoding   = 0;                    // TODO: Unicode support
-    
+
         $cch        = strlen($this->_font_name); // Length of font name
         $record     = 0x31;                      // Record identifier
         if ($this->_BIFF_version == 0x0500) {
             $length     = 0x0F + $cch;            // Record length
-        }
-        elseif ($this->_BIFF_version == 0x0600) {
+        } elseif ($this->_BIFF_version == 0x0600) {
             $length     = 0x10 + $cch;
         }
         $reserved   = 0x00;                // Reserved
@@ -480,23 +481,43 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         if ($this->_font_shadow) {
             $grbit     |= 0x20;
         }
-    
-        $header  = pack("vv",         $record, $length);
+
+        $header  = pack("vv", $record, $length);
         if ($this->_BIFF_version == 0x0500) {
-            $data    = pack("vvvvvCCCCC", $dyHeight, $grbit, $icv, $bls,
-                                          $sss, $uls, $bFamily,
-                                          $bCharSet, $reserved, $cch);
-        }
-        elseif ($this->_BIFF_version == 0x0600) {
-            $data    = pack("vvvvvCCCCCC", $dyHeight, $grbit, $icv, $bls,
-                                           $sss, $uls, $bFamily,
-                                           $bCharSet, $reserved, $cch, $encoding);
+            $data    = pack(
+                "vvvvvCCCCC",
+                $dyHeight,
+                $grbit,
+                $icv,
+                $bls,
+                $sss,
+                $uls,
+                $bFamily,
+                $bCharSet,
+                $reserved,
+                $cch
+            );
+        } elseif ($this->_BIFF_version == 0x0600) {
+            $data    = pack(
+                "vvvvvCCCCCC",
+                $dyHeight,
+                $grbit,
+                $icv,
+                $bls,
+                $sss,
+                $uls,
+                $bFamily,
+                $bCharSet,
+                $reserved,
+                $cch,
+                $encoding
+            );
         }
         return($header . $data. $this->_font_name);
     }
-    
+
     /**
-    * Returns a unique hash key for a font. 
+    * Returns a unique hash key for a font.
     * Used by Spreadsheet_Excel_Writer_Workbook::_storeAllFonts()
     *
     * The elements that form the key are arranged to increase the probability of
@@ -512,10 +533,10 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $key .= "$this->_font_strikeout$this->_bold$this->_font_outline";
         $key .= "$this->_font_family$this->_font_charset";
         $key .= "$this->_font_shadow$this->_color$this->_italic";
-        $key  = str_replace(" ","_",$key);
+        $key  = str_replace(" ", "_", $key);
         return ($key);
     }
-    
+
     /**
     * Returns the index used by Spreadsheet_Excel_Writer_Worksheet::_XF()
     *
@@ -525,7 +546,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         return($this->_xf_index);
     }
-    
+
     /**
     * Used in conjunction with the set_xxx_color methods to convert a color
     * string into a number. Color range is 0..63 but we will restrict it
@@ -537,7 +558,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     */
     function _getColor($name_color = '')
     {
-        $colors = array(
+        $colors = [
                         'aqua'    => 0x0F,
                         'cyan'    => 0x0F,
                         'black'   => 0x08,
@@ -556,37 +577,37 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
                         'silver'  => 0x16,
                         'white'   => 0x09,
                         'yellow'  => 0x0D
-                       );
-    
+                       ];
+
         // Return the default color, 0x7FFF, if undef,
-        if($name_color == '') {
+        if ($name_color == '') {
             return(0x7FFF);
         }
-    
+
         // or the color string converted to an integer,
-        if(isset($colors[$name_color])) {
+        if (isset($colors[$name_color])) {
             return($colors[$name_color]);
         }
-    
+
         // or the default color if string is unrecognised,
-        if(preg_match("/\D/",$name_color)) {
+        if (preg_match("/\D/", $name_color)) {
             return(0x7FFF);
         }
-    
+
         // or an index < 8 mapped into the correct range,
-        if($name_color < 8) {
+        if ($name_color < 8) {
             return($name_color + 8);
         }
-    
+
         // or the default color if arg is outside range,
-        if($name_color > 63) {
+        if ($name_color > 63) {
             return(0x7FFF);
         }
-    
+
         // or an integer in the valid range
         return($name_color);
     }
-    
+
     /**
     * Set cell alignment.
     *
@@ -595,12 +616,12 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     */
     function setAlign($location)
     {
-        if (preg_match("/\d/",$location)) {
+        if (preg_match("/\d/", $location)) {
             return;                      // Ignore numbers
         }
-    
+
         $location = strtolower($location);
-    
+
         if ($location == 'left') {
             $this->_text_h_align = 1;
         }
@@ -644,7 +665,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
             $this->_text_v_align = 4;
         }
     }
-    
+
     /**
     * This is an alias for the unintuitive setAlign('merge')
     *
@@ -654,7 +675,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->setAlign('merge');
     }
-    
+
     /**
     * Sets the boldness of the text.
     * Bold has a range 100..1000.
@@ -667,26 +688,26 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     */
     function setBold($weight = 1)
     {
-        if($weight == 1) {
+        if ($weight == 1) {
             $weight = 0x2BC;  // Bold text
         }
-        if($weight == 0) {
+        if ($weight == 0) {
             $weight = 0x190;  // Normal text
         }
-        if($weight <  0x064) {
+        if ($weight < 0x064) {
             $weight = 0x190;  // Lower bound
         }
-        if($weight >  0x3E8) {
+        if ($weight > 0x3E8) {
             $weight = 0x190;  // Upper bound
         }
         $this->_bold = $weight;
     }
-    
-    
+
+
     /************************************
     * FUNCTIONS FOR SETTING CELLS BORDERS
     */
-    
+
     /**
     * Sets the width for the bottom border of the cell
     *
@@ -697,7 +718,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_bottom = $style;
     }
-    
+
     /**
     * Sets the width for the top border of the cell
     *
@@ -708,7 +729,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_top = $style;
     }
-    
+
     /**
     * Sets the width for the left border of the cell
     *
@@ -719,7 +740,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_left = $style;
     }
-    
+
     /**
     * Sets the width for the right border of the cell
     *
@@ -730,8 +751,8 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_right = $style;
     }
-    
-    
+
+
     /**
     * Set cells borders to the same style
     *
@@ -745,17 +766,17 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $this->setLeft($style);
         $this->setRight($style);
     }
-    
-    
+
+
     /*******************************************
     * FUNCTIONS FOR SETTING CELLS BORDERS COLORS
     */
-    
+
     /**
     * Sets all the cell's borders to the same color
     *
     * @access public
-    * @param mixed $color The color we are setting. Either a string (like 'blue'), 
+    * @param mixed $color The color we are setting. Either a string (like 'blue'),
     *                     or an integer (range is [8...63]).
     */
     function setBorderColor($color)
@@ -765,7 +786,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $this->setLeftColor($color);
         $this->setRightColor($color);
     }
-    
+
     /**
     * Sets the cell's bottom border color
     *
@@ -777,7 +798,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $value = $this->_getColor($color);
         $this->_bottom_color = $value;
     }
-    
+
     /**
     * Sets the cell's top border color
     *
@@ -789,7 +810,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $value = $this->_getColor($color);
         $this->_top_color = $value;
     }
-    
+
     /**
     * Sets the cell's left border color
     *
@@ -801,7 +822,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $value = $this->_getColor($color);
         $this->_left_color = $value;
     }
-    
+
     /**
     * Sets the cell's right border color
     *
@@ -813,8 +834,8 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $value = $this->_getColor($color);
         $this->_right_color = $value;
     }
-    
-    
+
+
     /**
     * Sets the cell's foreground color
     *
@@ -829,7 +850,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
             $this->_pattern = 1;
         }
     }
-      
+
     /**
     * Sets the cell's background color
     *
@@ -844,7 +865,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
             $this->_pattern = 1;
         }
     }
-    
+
     /**
     * Sets the cell's color
     *
@@ -856,7 +877,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
         $value = $this->_getColor($color);
         $this->_color = $value;
     }
-    
+
     /**
     * Sets the fill pattern attribute of a cell
     *
@@ -868,7 +889,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_pattern = $arg;
     }
-    
+
     /**
     * Sets the underline of the text
     *
@@ -880,7 +901,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_underline = $underline;
     }
- 
+
     /**
     * Sets the font style as italic
     *
@@ -892,7 +913,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     }
 
     /**
-    * Sets the font size 
+    * Sets the font size
     *
     * @access public
     * @param integer $size The font size (in pixels I think).
@@ -901,7 +922,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     {
         $this->_size = $size;
     }
-    
+
     /**
     * Sets text wrapping
     *
@@ -921,8 +942,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     */
     function setTextRotation($angle)
     {
-        switch ($angle)
-        {
+        switch ($angle) {
             case 0:
                 $this->_rotation = 0;
                 break;
@@ -935,7 +955,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
             case -1:
                 $this->_rotation = 1;
                 break;
-            default :
+            default:
                 return $this->raiseError("Invalid value for angle.".
                                   " Possible values are: 0, 90, 270 and -1 ".
                                   "for stacking top-to-bottom.");
@@ -1003,10 +1023,10 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
      *
      * @access public
      */
-     function setLocked()
-     {
-         $this->_locked = 1;
-     }
+    function setLocked()
+    {
+        $this->_locked = 1;
+    }
 
     /**
     * Unlocks a cell. Useful for unprotecting particular cells of a protected sheet.

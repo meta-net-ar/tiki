@@ -14,19 +14,19 @@ use Tiki\Sitemap\AbstractType;
  */
 class Page extends AbstractType
 {
-	/**
-	 * Generate Sitemap
-	 */
-	public function generate()
-	{
-		global $tikilib;
+    /**
+     * Generate Sitemap
+     */
+    public function generate()
+    {
+        global $tikilib;
 
-		if (! $this->checkFeatureAndPermissions('feature_wiki', 'tiki_p_view')) {
-			return;
-		}
+        if (! $this->checkFeatureAndPermissions('feature_wiki', 'tiki_p_view')) {
+            return;
+        }
 
-		/** @var \TikiLib $tikilib */
-		$listPages = $tikilib->list_pages();
-		$this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, '', 'lastModif');
-	}
+        /** @var \TikiLib $tikilib */
+        $listPages = $tikilib->list_pages();
+        $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, '', 'lastModif');
+    }
 }

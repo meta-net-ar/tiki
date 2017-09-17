@@ -14,8 +14,8 @@ class MultilingualLibTest extends TikiTestCase
     protected function setUp()
     {
         global $user, $prefs;
-		$tikilib = TikiLib::lib('tiki');
-		$multilinguallib = TikiLib::lib('multilingual');
+        $tikilib = TikiLib::lib('tiki');
+        $multilinguallib = TikiLib::lib('multilingual');
         $this->orig_user = $user;
 
         $prefs['site_language'] = 'en';
@@ -46,9 +46,6 @@ class MultilingualLibTest extends TikiTestCase
         $content = "This page is NOT already translated.";
         $lang = 'en';
         $tikilib->create_page($page_name, 0, $content, null, '', null, $user, '', $lang);
-
-
-
     }
 
     protected function tearDown()
@@ -63,7 +60,6 @@ class MultilingualLibTest extends TikiTestCase
         unset($_SERVER['HTTP_HOST']);
         unset($_SERVER['REQUEST_URI']);
         $user = $this->orig_user;
-
     }
 
     /**
@@ -72,63 +68,69 @@ class MultilingualLibTest extends TikiTestCase
      */
     public function test_translateLinksInPageContent($src_content, $targ_lang, $exp_translated_content, $message)
     {
-		$multilinguallib = TikiLib::lib('multilingual');
+        $multilinguallib = TikiLib::lib('multilingual');
         $got_translated_content = $multilinguallib->translateLinksInPageContent($src_content, $targ_lang);
 
-        $this->assertEquals($exp_translated_content, $got_translated_content,
-            "$message\nLinks were not properly translated in source page content.");
+        $this->assertEquals(
+            $exp_translated_content,
+            $got_translated_content,
+            "$message\nLinks were not properly translated in source page content."
+        );
     }
 
 
     function dataProvider_translateLinksInPageContent()
     {
-        return array(
+        return [
 
-            array("((A Page That Is Already Translated))", "fr",
+            ["((A Page That Is Already Translated))", "fr",
                   "((Une page déjà traduite))",
                   "Case Description: Link to a page that already has a translation. The link should be ".
-                  "be replaced by the link of the translation."),
+                  "be replaced by the link of the translation."],
 
-            array("((A Page That Is NOT Already Translated))", "fr",
+            ["((A Page That Is NOT Already Translated))", "fr",
                   "{TranslationOf(orig_page=\"A Page That Is NOT Already Translated\" translation_lang=\"fr\" translation_page=\"\") /}",
                   "Case Description: Link to a page that is NOT already translated. The link should be ".
-                    "be replaced by a {TranslationOf} plugin."),
+                    "be replaced by a {TranslationOf} plugin."],
 
-            array("((A Page That Is Already Translated|click here))", "fr",
+            ["((A Page That Is Already Translated|click here))", "fr",
                   "((Une page déjà traduite|click here))",
                   "Case Description: Link to a page that already has a translation, but with an anchor text override. ".
-                  "The link should be replaced by a link to the translation, but anchor text should remain the same."),
-        );
-
+                  "The link should be replaced by a link to the translation, but anchor text should remain the same."],
+        ];
     }
 
     /**
      * @group multilingual
      * @dataProvider dataProvider_defaultTargetLanguageForNewTranslation
      */
-    function test_defaultTargetLanguageForNewTranslation($src_lang, $langs_already_translated,
-                                                    $user_langs, $exp_lang, $message)
-    {
+    function test_defaultTargetLanguageForNewTranslation(
+        $src_lang,
+        $langs_already_translated,
+        $user_langs,
+        $exp_lang,
+        $message
+    ) {
+
         $multilinguallib = TikiLib::lib('multilingual');
 
         $got_lang = $multilinguallib->defaultTargetLanguageForNewTranslation($src_lang, $langs_already_translated, $user_langs);
         $this->assertEquals($got_lang, $exp_lang, $message."\nThe default target language was not as expected.");
-
     }
 
     function dataProvider_defaultTargetLanguageForNewTranslation()
     {
-        return array(
+        return [
 
-            array('en', array('en', 'es'), array('en', 'fr'),
+            ['en', ['en', 'es'], ['en', 'fr'],
                   'fr',
-                  "Case Description: There is one language spoken by user, for which there is no translation. Choose that one."),
+                  "Case Description: There is one language spoken by user, for which there is no translation. Choose that one."],
 
-            array('en', array('en', 'fr', 'es'), array('en', 'fr'),
+            ['en', ['en', 'fr', 'es'], ['en', 'fr'],
                 '',
-                "Case Description: Page has already been translated to all the languages that the user speaks. In that case, we don't know which default to pick.")
+                "Case Description: Page has already been translated to all the languages that the user speaks. In that case, we don't know which default to pick."]
 
-        );
+        ];
     }
 
     /**
@@ -145,13 +147,11 @@ class MultilingualLibTest extends TikiTestCase
 
     function dataProvider_partiallyPretranslateContentOfPage()
     {
-        return array(
-            array("SomePage", "fr",
+        return [
+            ["SomePage", "fr",
                   "This page is in English.\n".
                   "It contains links to ((Une page déjà traduite)) and {TranslationOf(orig_page=\"A Page That Is NOT Already Translated\" translation_lang=\"fr\" translation_page=\"\") /}.",
-                  "Case description: Happy path.")
-        );
+                  "Case description: Happy path."]
+        ];
     }
-
-
 }

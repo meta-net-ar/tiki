@@ -1,7 +1,7 @@
 <?php
 /**
  * This checks that composer was installed and otherwise displays a web-friendly error page
- *  
+ *
  * @package Tiki
  * @copyright (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
  * @licence Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
@@ -11,33 +11,33 @@
 // Don't call tiki-setup.php because it does the same test on composer's
 // installation and displays a web-ugly error message // which only looks nice in
 // command line mode
-if (strpos($_SERVER["SCRIPT_NAME"],basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+    header("location: index.php");
+    exit;
 }
 
 
 if (! file_exists('vendor_bundled/vendor/autoload.php')) {
-	$title="Tiki Installer missing third party software files";
-	$content="<p>Your Tiki is not completely installed because Composer has not been run to fetch package dependencies.</p>";
-	$content.="<p>You need to run <b>sh setup.sh</b> from the command line.</p>";
-	$content.="<p>See <a href='https://dev.tiki.org/Composer' target='_blank' >https://dev.tiki.org/Composer</a> for details.</p>";
-	createPage($title, $content);
-	exit;
+    $title = "Tiki Installer missing third party software files";
+    $content = "<p>Your Tiki is not completely installed because Composer has not been run to fetch package dependencies.</p>";
+    $content .= "<p>You need to run <b>sh setup.sh</b> from the command line.</p>";
+    $content .= "<p>See <a href='https://dev.tiki.org/Composer' target='_blank' >https://dev.tiki.org/Composer</a> for details.</p>";
+    createPage($title, $content);
+    exit;
 }
 
 /**
  * creates the HTML page to be displayed.
- * 
- * Tiki may not have been installed when we reach here, so we can't use our templating system yet. 
+ *
+ * Tiki may not have been installed when we reach here, so we can't use our templating system yet.
  * This needs to be done before tiki-setup.php is called because tiki-setup.php produces a message formatted for command-line only
- * 
+ *
  * @param string $title   page Title
  * @param mixed  $content page Content
  */
 function createPage($title, $content)
 {
-	echo <<<END
+    echo <<<END
 <!DOCTYPE html 
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -85,6 +85,5 @@ function createPage($title, $content)
 	</body>
 </html>
 END;
-	die;
+    die;
 }
-

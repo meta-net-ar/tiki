@@ -24,12 +24,12 @@ class IndexOptimizeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		$unifiedsearchlib = \TikiLib::lib('unifiedsearch');
+        $unifiedsearchlib = \TikiLib::lib('unifiedsearch');
 
-		$output->writeln('Started optimizing index...');
+        $output->writeln('Started optimizing index...');
 
-		$unifiedsearchlib->getIndex('data-write')->optimize();
+        $unifiedsearchlib->getIndex('data-write')->optimize();
 
-		$output->writeln('Optimizing index done');
+        $output->writeln('Optimizing index done');
     }
 }

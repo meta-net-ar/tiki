@@ -7,14 +7,14 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_modifier_tiki_long_date($string)
 {
-	global $prefs;
-	$smarty = TikiLib::lib('smarty');
-	$smarty->loadPlugin('smarty_modifier_tiki_date_format');
-	return smarty_modifier_tiki_date_format($string, $prefs['long_date_format']);
+    global $prefs;
+    $smarty = TikiLib::lib('smarty');
+    $smarty->loadPlugin('smarty_modifier_tiki_date_format');
+    return smarty_modifier_tiki_date_format($string, $prefs['long_date_format']);
 }

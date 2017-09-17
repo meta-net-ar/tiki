@@ -7,89 +7,88 @@
 
 function wikiplugin_sign_info()
 {
-	return array(
-		'name' => tr('Signature'),
-		'documentation' => 'PluginSign',
-		'description' => tr('Sign and date your contribution to a page'),
-		'prefs' => array('wikiplugin_sign'),
-		'tags' => array('basic'),
-		'inline' => true,
-		'format' => 'html',
-		'iconname' => 'pencil',
-		'introduced' => 10,
-		'params' => array(
-			'user' => array(
-				'required' => false,
-				'name' => tr('User'),
-				'description' => tr('Auto-generated, the username.'),
-				'since' => '10.0',
-				'default' => '',
-				'filter' => 'text',
-				'advanced' => true,
-			),
-			'datetime' => array(
-				'required' => false,
-				'name' => tr('Date and time'),
-				'description' => tr('Auto-generated, the timestamp'),
-				'since' => '10.0',
-				'default' => '',
-				'filter' => 'text',
-				'advanced' => true,
-			),
-		),
-	);
+    return [
+        'name' => tr('Signature'),
+        'documentation' => 'PluginSign',
+        'description' => tr('Sign and date your contribution to a page'),
+        'prefs' => ['wikiplugin_sign'],
+        'tags' => ['basic'],
+        'inline' => true,
+        'format' => 'html',
+        'iconname' => 'pencil',
+        'introduced' => 10,
+        'params' => [
+            'user' => [
+                'required' => false,
+                'name' => tr('User'),
+                'description' => tr('Auto-generated, the username.'),
+                'since' => '10.0',
+                'default' => '',
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'datetime' => [
+                'required' => false,
+                'name' => tr('Date and time'),
+                'description' => tr('Auto-generated, the timestamp'),
+                'since' => '10.0',
+                'default' => '',
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+        ],
+    ];
 }
 
 function wikiplugin_sign_rewrite($data, $params, $context)
 {
-	if (empty($params['user']) && empty($params['datetime'])) {
-		global $user;
-		$date = gmdate(DateTime::W3C);
-		return "{sign user=\"$user\" datetime=\"$date\"}";
-	}
+    if (empty($params['user']) && empty($params['datetime'])) {
+        global $user;
+        $date = gmdate(DateTime::W3C);
+        return "{sign user=\"$user\" datetime=\"$date\"}";
+    }
 
-	return false;
+    return false;
 }
 
 function wikiplugin_sign($data, $params, $offset)
 {
-	if (empty($params['datetime'])) {
-		return false;
-	}
+    if (empty($params['datetime'])) {
+        return false;
+    }
 
-	$user = isset($params['user']) ? $params['user'] : '';
+    $user = isset($params['user']) ? $params['user'] : '';
 
-	$time = strtotime($params['datetime']);
+    $time = strtotime($params['datetime']);
 
-	if ($time === false) {
-		return false;
-	}
+    if ($time === false) {
+        return false;
+    }
 
-	$smarty = TikiLib::lib('smarty');
-	$smarty->assign(
-		'sign',
-		array(
-			'user' => $user,
-			'datetime' => $params['datetime'],
-			'time' => $time,
-		)
-	);
+    $smarty = TikiLib::lib('smarty');
+    $smarty->assign(
+        'sign',
+        [
+            'user' => $user,
+            'datetime' => $params['datetime'],
+            'time' => $time,
+        ]
+    );
 
-	$tip = $smarty->fetch('wiki-plugins/wikiplugin_sign.tpl');
+    $tip = $smarty->fetch('wiki-plugins/wikiplugin_sign.tpl');
 
-	$smarty->loadPlugin('smarty_function_icon');
-	$icon = smarty_function_icon(array('name' => 'pencil', 'title' => '', 'iclass' => 'wp-sign-icon'), $smarty);
+    $smarty->loadPlugin('smarty_function_icon');
+    $icon = smarty_function_icon(['name' => 'pencil', 'title' => '', 'iclass' => 'wp-sign-icon'], $smarty);
 
-	TikiLib::lib('header')-> add_jq_onready(
-		'
+    TikiLib::lib('header')-> add_jq_onready(
+        '
 	$(".wp-sign-icon").mouseenter(function () {
 		$(this).next(".wp-sign").fadeIn("fast");
 	}).mouseleave(function () {
 		var $this = $(this);
 		setTimeout(function () {$this.next(".wp-sign").fadeOut();}, 1000);
 	});'
-	);
+    );
 
-	return $icon . $tip;
+    return $icon . $tip;
 }
-

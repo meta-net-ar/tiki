@@ -22,23 +22,23 @@ function wikiplugin_translationof_info()
     $description =
         tra('Translate a link from one language to another');
 
-    return array(
+    return [
         'name' => tra('TranslationOf'),
         'documentation' => 'PluginTranslationOf',
         'description' => $description,
-        'prefs' => array( 'feature_multilingual', 'wikiplugin_translationof' ),
+        'prefs' => [ 'feature_multilingual', 'wikiplugin_translationof' ],
         'iconname' => 'language',
         'introduced' => 12,
-        'params' => array(
-            'orig_page' => array(
+        'params' => [
+            'orig_page' => [
                 'required' => true,
                 'name' => tra('Original Page'),
                 'description' => tra('Name of the page from which this link will be translated.'),
                 'since' => '12.0',
                 'filter' => 'pagename',
                 'default' => '',
-            ),
-            'translation_lang' => array(
+            ],
+            'translation_lang' => [
                 'required' => true,
                 'name' => tra('Translation Language'),
                 'description' => tr('Two letter language code of the language in which you want to translate this
@@ -46,46 +46,42 @@ function wikiplugin_translationof_info()
                 'since' => '12.0',
                 'filter' => 'alpha',
                 'default' => '',
-            ),
-            'translation_page' => array(
+            ],
+            'translation_page' => [
                 'required' => false,
                 'name' => tra('Translation Name'),
                 'description' => tra('Name of the page that will become the translation of the "Original Page".'),
                 'since' => '12.0',
                 'filter' => 'pagename',
                 'default' => '',
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 }
 
 function wikiplugin_translationof($data, $params)
 {
     global $tracer;
-	$smarty = TikiLib::lib('smarty');
+    $smarty = TikiLib::lib('smarty');
     extract($params, EXTR_SKIP);
 
     $anchor_text = $orig_page;
-    if (isset($translation_page) && $translation_page != '')
-    {
+    if (isset($translation_page) && $translation_page != '') {
         $anchor_text = $translation_page;
     }
 
-    if (isset($orig_page))
-    {
+    if (isset($orig_page)) {
         $orig_page = urlencode($orig_page);
     }
 
     $translation_name_arg = '';
-    if (isset($translation_page))
-    {
+    if (isset($translation_page)) {
         $translation_page = urlencode($translation_page);
         $translation_name_arg = "&translation_name=$translation_page";
     }
 
     $translation_lang_arg = '';
-    if (isset($translation_lang))
-    {
+    if (isset($translation_lang)) {
         $translation_lang_arg = "&target_lang=$translation_lang";
     }
 
@@ -94,7 +90,7 @@ function wikiplugin_translationof($data, $params)
 
     $link = 'javascript:void(0)';
     $popup_html = "<a href=\"tiki-edit_translation.php?page=$orig_page$translation_lang_arg$translation_name_arg#new_translation\">".tr("Translate this link")."</a>";
-    $popup_params = array( 'text'=> $popup_html, 'sticky' => true, 'trigger' => 'mouseover');
+    $popup_params = [ 'text' => $popup_html, 'sticky' => true, 'trigger' => 'mouseover'];
     $smarty->loadPlugin('smarty_function_popup');
     $mouseover = ' ' . smarty_function_popup($popup_params, $smarty);
     $html = "<a href=\"tiki-index.php?page=$orig_page\" $mouseover>$anchor_text</a>";

@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -9,7 +9,7 @@
  * \brief Skeleton to quick startup of making new debugger command
  * \author zaufi <zaufi@sendmail.ru>
  */
-require_once ('lib/debug/debugger-ext.php');
+require_once('lib/debug/debugger-ext.php');
 
 /**
  * \brief Just a test
@@ -29,23 +29,23 @@ require_once ('lib/debug/debugger-ext.php');
  */
 class DebuggerCommand_Test extends DebuggerCommand
 {
-	/// \b Must have function to announce command name in debugger console
-	function name()
-	{
-		return 'test';
-	}
+    /// \b Must have function to announce command name in debugger console
+    function name()
+    {
+        return 'test';
+    }
 
-	/// Execute command with given set of arguments. Must return string of result.
-	function execute($params)
-	{
-		// NOTE: Don't forget to set result type! By default it is NO_RESULT.
-		$this->set_result_type(TEXT_RESULT);
+    /// Execute command with given set of arguments. Must return string of result.
+    function execute($params)
+    {
+        // NOTE: Don't forget to set result type! By default it is NO_RESULT.
+        $this->set_result_type(TEXT_RESULT);
 
-		return 'done';
-	}
+        return 'done';
+    }
 }
 
 function dbg_command_factory_test()
 {
-	return new DebuggerCommand_Test();
+    return new DebuggerCommand_Test();
 }

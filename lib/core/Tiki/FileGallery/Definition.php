@@ -9,39 +9,38 @@ namespace Tiki\FileGallery;
 
 class Definition
 {
-	private $info;
+    private $info;
 
-	function __construct($info)
-	{
-		$this->info = $info;
-		$this->handler = $this->getHandler($info);
-	}
+    function __construct($info)
+    {
+        $this->info = $info;
+        $this->handler = $this->getHandler($info);
+    }
 
-	function getFileWrapper($data, $path)
-	{
-		return $this->handler->getFileWrapper($data, $path);
-	}
+    function getFileWrapper($data, $path)
+    {
+        return $this->handler->getFileWrapper($data, $path);
+    }
 
-	function delete($data, $path)
-	{
-		$this->handler->delete($data, $path);
-	}
+    function delete($data, $path)
+    {
+        $this->handler->delete($data, $path);
+    }
 
-	function getInfo()
-	{
-		return $this->info;
-	}
+    function getInfo()
+    {
+        return $this->info;
+    }
 
-	private function getHandler($info)
-	{
-		switch ($info['type']) {
-		case 'podcast':
-		case 'vidcast':
-			return new Handler\PodCast();
-		case 'system':
-		default:
-			return new Handler\System();
-		}
-	}
+    private function getHandler($info)
+    {
+        switch ($info['type']) {
+            case 'podcast':
+            case 'vidcast':
+                return new Handler\PodCast();
+            case 'system':
+            default:
+                return new Handler\System();
+        }
+    }
 }
-

@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -11,9 +11,9 @@
 
 class WikiParser_StressTest extends PHPUnit_Framework_TestCase
 {
-	function testMessProvidedByJonny()
-	{
-		$content = <<<WIKI
+    function testMessProvidedByJonny()
+    {
+        $content = <<<WIKI
 {HTML()}<img style="margin-bottom: 10px" src="Web-Images/headers/Directory-Header_wide.jpg" border="0" />{HTML}{DIV(class="dark_acme1")}{DIV(class="wrapper")}{DIV(class="halffloat clearfix")}{DIV(class="box")}~tc~directory item photo~/tc~{\$f_130}
 
 ! {\$f_126}
@@ -71,9 +71,8 @@ Neighborhood: __{\$f_133}__
 {DIV}{DIV}{DIV}{DIV}{DIV}
 WIKI;
 
-		$matches = WikiParser_PluginMatcher::match($content);
+        $matches = WikiParser_PluginMatcher::match($content);
 
-		$this->assertGreaterThan(0, count($matches));
-	}
+        $this->assertGreaterThan(0, count($matches));
+    }
 }
-

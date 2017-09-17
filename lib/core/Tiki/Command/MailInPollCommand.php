@@ -27,17 +27,17 @@ class MailInPollCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		$mailinlib = TikiLib::lib('mailin');
-		$accs = $mailinlib->list_active_mailin_accounts(0, -1, 'account_desc', '');
+        $mailinlib = TikiLib::lib('mailin');
+        $accs = $mailinlib->list_active_mailin_accounts(0, -1, 'account_desc', '');
 
-		// foreach account
-		foreach ($accs['data'] as $acc) {
-			if (empty($acc['account'])) {
-				continue;
-			}
+        // foreach account
+        foreach ($accs['data'] as $acc) {
+            if (empty($acc['account'])) {
+                continue;
+            }
 
-			$account = MailIn\Account::fromDb($acc);
-			$account->check();
-		}
+            $account = MailIn\Account::fromDb($acc);
+            $account->check();
+        }
     }
 }

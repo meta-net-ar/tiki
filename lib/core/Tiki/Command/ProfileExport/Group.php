@@ -14,44 +14,44 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Group extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:group')
-			->setDescription('Export a group definition')
-			->addArgument(
-				'group',
-				InputArgument::REQUIRED,
-				'Group Name'
-			)
-			->addOption(
-				'with-category',
-				null,
-				InputOption::VALUE_NONE,
-				'Include category permissions'
-			)
-			->addOption(
-				'with-object',
-				null,
-				InputOption::VALUE_NONE,
-				'Include object permissions (note: some object types may be missing)'
-			)
-			;
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:group')
+            ->setDescription('Export a group definition')
+            ->addArgument(
+                'group',
+                InputArgument::REQUIRED,
+                'Group Name'
+            )
+            ->addOption(
+                'with-category',
+                null,
+                InputOption::VALUE_NONE,
+                'Include category permissions'
+            )
+            ->addOption(
+                'with-object',
+                null,
+                InputOption::VALUE_NONE,
+                'Include object permissions (note: some object types may be missing)'
+            )
+            ;
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$writer = $this->getProfileWriter($input);
-		$group = $input->getArgument('group');
-		$category = $input->getOption('with-category');
-		$object = $input->getOption('with-object');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $writer = $this->getProfileWriter($input);
+        $group = $input->getArgument('group');
+        $category = $input->getOption('with-category');
+        $object = $input->getOption('with-object');
 
-		if (\Tiki_Profile_Installer::exportGroup($writer, $group, $category, $object)) {
-			$writer->save();
-		} else {
-			$output->writeln("<error>Group '$group' not found.</error>");
-		}
-	}
+        if (\Tiki_Profile_Installer::exportGroup($writer, $group, $category, $object)) {
+            $writer->save();
+        } else {
+            $output->writeln("<error>Group '$group' not found.</error>");
+        }
+    }
 }

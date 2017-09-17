@@ -3,101 +3,102 @@
 class BOMChecker_Scanner
 {
 
-	// Tiki source folder
-	protected $sourceDir = __DIR__ . '/../../../';
-	
-	protected $scanExtensions = array(
-		'php',
-		'tpl'
-	);
+    // Tiki source folder
+    protected $sourceDir = __DIR__ . '/../../../';
 
-	// The number of files scanned.
-	public $scannedFiles = 0;
+    protected $scanExtensions = [
+        'php',
+        'tpl'
+    ];
 
-	// The list of files detected with BOM
-	public $bomFiles = array();
+    // The number of files scanned.
+    public $scannedFiles = 0;
 
-	/**
-	 * @param string $scanDir
-	 *    The file directory to scan.
-	 * @param array $scanExtensions
-	 *    An array with the file extensions to scan for BOM.
-	 */
-	public function __construct($scanDir = null, $scanExtensions = array())
-	{
-		if (!empty($scanDir) && is_dir($scanDir)) {
-			$this->sourceDir = $scanDir;
-		}
+    // The list of files detected with BOM
+    public $bomFiles = [];
 
-		if (is_array($scanExtensions)&&count($scanExtensions)) {
-			$this->scanExtensions = $scanExtensions;
-		}
-	}
+    /**
+     * @param string $scanDir
+     *    The file directory to scan.
+     * @param array $scanExtensions
+     *    An array with the file extensions to scan for BOM.
+     */
+    public function __construct($scanDir = null, $scanExtensions = [])
+    {
+        if (! empty($scanDir) && is_dir($scanDir)) {
+            $this->sourceDir = $scanDir;
+        }
 
-	/**
-	 * Scan the folder for BOM files
-	 * @return array
-	 *  An array with the path to the BOM detected files.
-	 */
-	public function scan()
-	{
-		self::checkDir($this->sourceDir);
-		return $this->bomFiles;
-	}
+        if (is_array($scanExtensions)&&count($scanExtensions)) {
+            $this->scanExtensions = $scanExtensions;
+        }
+    }
 
-	protected function checkDir($sourceDir)
-	{
-		$sourceDir = $this->fixDirSlash($sourceDir);
+    /**
+     * Scan the folder for BOM files
+     * @return array
+     *  An array with the path to the BOM detected files.
+     */
+    public function scan()
+    {
+        self::checkDir($this->sourceDir);
+        return $this->bomFiles;
+    }
 
-		// Copy files and directories.
-		$sourceDirHandler = opendir($sourceDir);
+    protected function checkDir($sourceDir)
+    {
+        $sourceDir = $this->fixDirSlash($sourceDir);
 
-		while ($file = readdir($sourceDirHandler)) {
-			// Skip ".", ".." and hidden fields (Unix).
-			if (substr($file, 0, 1) == '.')
-				continue;
+        // Copy files and directories.
+        $sourceDirHandler = opendir($sourceDir);
 
-			$sourcefilePath = $sourceDir . $file;
+        while ($file = readdir($sourceDirHandler)) {
+            // Skip ".", ".." and hidden fields (Unix).
+            if (substr($file, 0, 1) == '.') {
+                continue;
+            }
 
-			if (is_dir($sourcefilePath)) {
-				self::checkDir($sourcefilePath);
-			}
+            $sourcefilePath = $sourceDir . $file;
 
-			if (!is_file($sourcefilePath)
-				|| !in_array(self::getFileExtension($sourcefilePath), $this->scanExtensions)
-				|| !self::checkUtf8Bom($sourcefilePath)
-			) {
-				continue;
-			}
-			$this->bomFiles[] = str_replace($this->sourceDir, '',$sourcefilePath);
-		}
-	}
+            if (is_dir($sourcefilePath)) {
+                self::checkDir($sourcefilePath);
+            }
 
-	private function fixDirSlash($dirPath)
-	{
-		$dirPath = str_replace('\\', '/', $dirPath);
+            if (! is_file($sourcefilePath)
+                || ! in_array(self::getFileExtension($sourcefilePath), $this->scanExtensions)
+                || ! self::checkUtf8Bom($sourcefilePath)
+            ) {
+                continue;
+            }
+            $this->bomFiles[] = str_replace($this->sourceDir, '', $sourcefilePath);
+        }
+    }
 
-		if (substr($dirPath, -1, 1) != '/')
-			$dirPath .= '/';
+    private function fixDirSlash($dirPath)
+    {
+        $dirPath = str_replace('\\', '/', $dirPath);
 
-		return $dirPath;
-	}
+        if (substr($dirPath, -1, 1) != '/') {
+            $dirPath .= '/';
+        }
 
-	private function getFileExtension($filePath)
-	{
-		$info = pathinfo($filePath);
-		return isset($info['extension'])?$info['extension']:'';
-	}
+        return $dirPath;
+    }
 
-	public function checkUtf8Bom($filePath)
-	{
-		$file = fopen($filePath, 'r');
-		$data = fgets($file, 10);
-		fclose($file);
+    private function getFileExtension($filePath)
+    {
+        $info = pathinfo($filePath);
+        return isset($info['extension']) ? $info['extension'] : '';
+    }
 
-		$this->scannedFiles++;
+    public function checkUtf8Bom($filePath)
+    {
+        $file = fopen($filePath, 'r');
+        $data = fgets($file, 10);
+        fclose($file);
 
-		return (substr($data, 0, 3) == "\xEF\xBB\xBF");
-	}
+        $this->scannedFiles++;
 
+        return (substr($data, 0, 3) == "\xEF\xBB\xBF");
+    }
 }

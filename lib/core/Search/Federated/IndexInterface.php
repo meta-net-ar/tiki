@@ -9,10 +9,9 @@ namespace Search\Federated;
 
 interface IndexInterface
 {
-	function getTransformations();
+    function getTransformations();
 
-	function applyContentConditions(\Search_Query $query, $content);
+    function applyContentConditions(\Search_Query $query, $content);
 
-	function applySimilarConditions(\Search_Query $query, $type, $object);
+    function applySimilarConditions(\Search_Query $query, $type, $object);
 }
-

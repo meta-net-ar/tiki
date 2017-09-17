@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -18,15 +18,14 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class Table_Settings_PluginWithAjax extends Table_Settings_Plugin
 {
-	protected $ts = array(
-		'selflinks' => true,
-		'sorts' => array(
-			'multisort' => false,	//$trklib->list_items doesn't seem to support multisorts
-			'group' => true,
-		),
-		'ajax' => array(
-			'custom' => false,		//url sort and filter params manipulated on the server side for this plugin
-		)
-	);
+    protected $ts = [
+        'selflinks' => true,
+        'sorts' => [
+            'multisort' => false,   //$trklib->list_items doesn't seem to support multisorts
+            'group' => true,
+        ],
+        'ajax' => [
+            'custom' => false,      //url sort and filter params manipulated on the server side for this plugin
+        ]
+    ];
 }
-

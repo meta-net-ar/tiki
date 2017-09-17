@@ -14,30 +14,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Calendar extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:calendar')
-			->setDescription('Export a calendar')
-			->addArgument(
-				'calendar',
-				InputArgument::REQUIRED,
-				'Calendar ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:calendar')
+            ->setDescription('Export a calendar')
+            ->addArgument(
+                'calendar',
+                InputArgument::REQUIRED,
+                'Calendar ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$calendarId = $input->getArgument('calendar');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $calendarId = $input->getArgument('calendar');
 
-		$writer = $this->getProfileWriter($input);
-		if (\Tiki_Profile_InstallHandler_Calendar::export($writer, $calendarId)) {
-			$writer->save();
-		} else {
-			$output->writeln("<error>Calendar not found: $calendarId</error>");
-			return;
-		}
-	}
+        $writer = $this->getProfileWriter($input);
+        if (\Tiki_Profile_InstallHandler_Calendar::export($writer, $calendarId)) {
+            $writer->save();
+        } else {
+            $output->writeln("<error>Calendar not found: $calendarId</error>");
+            return;
+        }
+    }
 }

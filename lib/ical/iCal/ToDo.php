@@ -50,14 +50,15 @@ class File_iCal_ToDo extends File_iCal_BaseComponent_ET
     /**
      *  Set the percentage complete of this todo
      */
-    public function setPercentComplete($p) {
-
+    public function setPercentComplete($p)
+    {
     }
 
     /**
      *  Get the percentage complete of this todo
      */
-    public function getPercentComplete() {
+    public function getPercentComplete()
+    {
         return $this->_percentcomplete;
     }
 
@@ -69,15 +70,15 @@ class File_iCal_ToDo extends File_iCal_BaseComponent_ET
     /**
      *  Set the date/time the todo was completed
      */
-    public function setCompleted() {
-
+    public function setCompleted()
+    {
     }
 
     /**
      *  Get the date/time the todo was completed
      */
-    public function getCompleted() {
-
+    public function getCompleted()
+    {
     }
 
     /**
@@ -88,15 +89,14 @@ class File_iCal_ToDo extends File_iCal_BaseComponent_ET
     /**
      *  Set the date/time the todo is due
      */
-    public function setDue($d) {
-
+    public function setDue($d)
+    {
     }
 
     /**
      *  Get the date/time the todo is due
      */
-    public function getDue() {
-
+    public function getDue()
+    {
     }
-
 }

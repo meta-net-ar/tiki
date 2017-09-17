@@ -14,12 +14,12 @@ require_once('tiki-setup.php');
 // this since I do not know too much about Tiki permission system, so
 // I would kindly ask a wizard to enlarge this. (filmil)
 if ($tiki_p_admin != 'y') {
-	$smarty->assign(
-		'msg',
-		tra("This feature is for admins only") . ": show_raw_links"
-	);
-	$smarty->display("error.tpl");
-	die;
+    $smarty->assign(
+        'msg',
+        tra("This feature is for admins only") . ": show_raw_links"
+    );
+    $smarty->display("error.tpl");
+    die;
 }
 
 // Otherwise do the following:
@@ -30,18 +30,18 @@ if ($tiki_p_admin != 'y') {
 
 header("Content-Type: text/plain; charset=utf-8");
 $query = "select `pageName` from `tiki_pages`";
-$result = $tikilib->query($query, array());
+$result = $tikilib->query($query, []);
 while ($res = $result->fetchRow()) {
-	$resnew = str_replace(" ", '+', $res); // Must do this since
-					       // TGBrowser will get confused
-	$put = "";
-	$query2 = "select `toPage`, `fromPage` from `tiki_links` where `fromPage`='" .
-		$res["pageName"]."'";
-	$result2 = $tikilib->query($query2, array());
-	$put = $put . $resnew["pageName"] . " ";
-	while ($res2 = $result2->fetchRow()) {
-		$res2 = str_replace(" ", '+', $res2);
-		$put = $put . $res2["toPage"] . " ";
-	}
-	echo $put."\n";
+    $resnew = str_replace(" ", '+', $res); // Must do this since
+                           // TGBrowser will get confused
+    $put = "";
+    $query2 = "select `toPage`, `fromPage` from `tiki_links` where `fromPage`='" .
+        $res["pageName"]."'";
+    $result2 = $tikilib->query($query2, []);
+    $put = $put . $resnew["pageName"] . " ";
+    while ($res2 = $result2->fetchRow()) {
+        $res2 = str_replace(" ", '+', $res2);
+        $put = $put . $res2["toPage"] . " ";
+    }
+    echo $put."\n";
 }

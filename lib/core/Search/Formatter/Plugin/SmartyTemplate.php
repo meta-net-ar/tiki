@@ -7,87 +7,86 @@
 
 class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_Interface
 {
-	private $templateFile;
-	private $changeDelimiters;
-	private $data = array();
-	private $fields = array();
+    private $templateFile;
+    private $changeDelimiters;
+    private $data = [];
+    private $fields = [];
 
-	function __construct($templateFile, $changeDelimiters = false)
-	{
-		$this->templateFile = $templateFile;
-		$this->changeDelimiters = (bool) $changeDelimiters;
-	}
+    function __construct($templateFile, $changeDelimiters = false)
+    {
+        $this->templateFile = $templateFile;
+        $this->changeDelimiters = (bool) $changeDelimiters;
+    }
 
-	function setData(array $data)
-	{
-		$this->data = $data;
-	}
+    function setData(array $data)
+    {
+        $this->data = $data;
+    }
 
-	function getFields()
-	{
-		return $this->fields;
-	}
+    function getFields()
+    {
+        return $this->fields;
+    }
 
-	function setFields(array $fields)
-	{
-		$this->fields = $fields;
-	}
+    function setFields(array $fields)
+    {
+        $this->fields = $fields;
+    }
 
-	function getFormat()
-	{
-		return self::FORMAT_HTML;
-	}
+    function getFormat()
+    {
+        return self::FORMAT_HTML;
+    }
 
-	function prepareEntry($entry)
-	{
-		return $entry->getPlainValues();
-	}
+    function prepareEntry($entry)
+    {
+        return $entry->getPlainValues();
+    }
 
-	function renderEntries(Search_ResultSet $entries)
-	{
-		$smarty = new Smarty_Tiki;
+    function renderEntries(Search_ResultSet $entries)
+    {
+        $smarty = new Smarty_Tiki;
 
-		if ( $this->changeDelimiters ) {
-			$smarty->left_delimiter = '{{';
-			$smarty->right_delimiter = '}}';
-		}
+        if ($this->changeDelimiters) {
+            $smarty->left_delimiter = '{{';
+            $smarty->right_delimiter = '}}';
+        }
 
-		foreach ($this->data as $key => $value) {
-			$smarty->assign($key, $value);
-		}
+        foreach ($this->data as $key => $value) {
+            $smarty->assign($key, $value);
+        }
 
-		$smarty->assign('base_url', $GLOBALS['base_url']);
-		$smarty->assign('prefs', $GLOBALS['prefs']);
-		$smarty->assign('user', $GLOBALS['user']);
-		$smarty->assign('results', $entries);
-		$smarty->assign(
-			'facets',
-			array_map(
-				function ($facet) {
-					return array(
-						'name' => $facet->getName(),
-						'label' => $facet->getLabel(),
-						'options' => $facet->getOptions(),
-						'operator' => $facet->getOperator(),
-					);
-				},
-				$entries->getFacets()
-			)
-		);
-		$smarty->assign('count', count($entries));
-		$smarty->assign('offset', $entries->getOffset());
-		$smarty->assign('offsetplusone', $entries->getOffset() + 1);
-		$smarty->assign('offsetplusmaxRecords', $entries->getOffset() + $entries->getMaxRecords());
-		$smarty->assign('maxRecords', $entries->getMaxRecords());
-		$smarty->assign('id', $entries->getId());
-		$smarty->assign('tsOn', $entries->getTsOn());
-		$tsettings = $entries->getTsSettings();
-		if (is_array($tsettings)) {
-			$smarty->assign('tstotals', $tsettings['math']['totals']);
-			$smarty->assign('tscols', $tsettings['columns']);
-		}
+        $smarty->assign('base_url', $GLOBALS['base_url']);
+        $smarty->assign('prefs', $GLOBALS['prefs']);
+        $smarty->assign('user', $GLOBALS['user']);
+        $smarty->assign('results', $entries);
+        $smarty->assign(
+            'facets',
+            array_map(
+                function ($facet) {
+                    return [
+                        'name' => $facet->getName(),
+                        'label' => $facet->getLabel(),
+                        'options' => $facet->getOptions(),
+                        'operator' => $facet->getOperator(),
+                    ];
+                },
+                $entries->getFacets()
+            )
+        );
+        $smarty->assign('count', count($entries));
+        $smarty->assign('offset', $entries->getOffset());
+        $smarty->assign('offsetplusone', $entries->getOffset() + 1);
+        $smarty->assign('offsetplusmaxRecords', $entries->getOffset() + $entries->getMaxRecords());
+        $smarty->assign('maxRecords', $entries->getMaxRecords());
+        $smarty->assign('id', $entries->getId());
+        $smarty->assign('tsOn', $entries->getTsOn());
+        $tsettings = $entries->getTsSettings();
+        if (is_array($tsettings)) {
+            $smarty->assign('tstotals', $tsettings['math']['totals']);
+            $smarty->assign('tscols', $tsettings['columns']);
+        }
 
-		return $smarty->fetch($this->templateFile);
-	}
+        return $smarty->fetch($this->templateFile);
+    }
 }
-

@@ -7,38 +7,38 @@
 
 class Search_Type_WikiText implements Search_Type_Interface
 {
-	private $value;
+    private $value;
 
-	function __construct($value)
-	{
-		$this->value = $value;
-	}
+    function __construct($value)
+    {
+        $this->value = $value;
+    }
 
-	function getValue()
-	{
-		global $prefs;
-		$out = TikiLib::lib('parser')->parse_data(
-			$this->value, array(
-				'parsetoc' => false,
-				'indexing' => true,
-				'exclude_plugins' => $prefs['unified_excluded_plugins'],
-				'exclude_all_plugins' => $prefs['unified_exclude_all_plugins'] == 'y',
-				'include_plugins' => $prefs['unified_included_plugins'],
-			)
-		);
+    function getValue()
+    {
+        global $prefs;
+        $out = TikiLib::lib('parser')->parse_data(
+            $this->value,
+            [
+                'parsetoc' => false,
+                'indexing' => true,
+                'exclude_plugins' => $prefs['unified_excluded_plugins'],
+                'exclude_all_plugins' => $prefs['unified_exclude_all_plugins'] == 'y',
+                'include_plugins' => $prefs['unified_included_plugins'],
+            ]
+        );
 
-		return strip_tags($out);
-	}
+        return strip_tags($out);
+    }
 
-	function filter(array $filters)
-	{
-		$value = $this->value;
+    function filter(array $filters)
+    {
+        $value = $this->value;
 
-		foreach ($filters as $f) {
-			$value = $f->filter($value);
-		}
+        foreach ($filters as $f) {
+            $value = $f->filter($value);
+        }
 
-		return new self($value);
-	}
+        return new self($value);
+    }
 }
-

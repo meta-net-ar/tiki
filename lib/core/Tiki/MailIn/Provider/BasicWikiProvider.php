@@ -6,50 +6,51 @@
 // $Id$
 
 namespace Tiki\MailIn\Provider;
+
 use Tiki\MailIn\Action;
 
 class BasicWikiProvider implements ProviderInterface
 {
-	private $type;
-	private $label;
-	private $class;
+    private $type;
+    private $label;
+    private $class;
 
-	function __construct($type, $label, $class)
-	{
-		$this->type = $type;
-		$this->label = $label;
-		$this->class = $class;
-	}
+    function __construct($type, $label, $class)
+    {
+        $this->type = $type;
+        $this->label = $label;
+        $this->class = $class;
+    }
 
-	function isEnabled()
-	{
-		global $prefs;
-		return $prefs['feature_wiki'] == 'y';
-	}
+    function isEnabled()
+    {
+        global $prefs;
+        return $prefs['feature_wiki'] == 'y';
+    }
 
-	function getType()
-	{
-		return $this->type;
-	}
+    function getType()
+    {
+        return $this->type;
+    }
 
-	function getLabel()
-	{
-		/* Catch strings
+    function getLabel()
+    {
+        /* Catch strings
 		tr('Create or update wiki page')
 		tr('Send page to user')
 		tr('Append to wiki page')
 		tr('Prepend to wiki page')
 		*/
-		return tr($this->label);
-	}
+        return tr($this->label);
+    }
 
-	function getActionFactory(array $acc)
-	{
-		$wikiParams = [
-			'namespace' => $acc['namespace'],
-			'structure_routing' => $acc['routing'] == 'y',
-		];
+    function getActionFactory(array $acc)
+    {
+        $wikiParams = [
+            'namespace' => $acc['namespace'],
+            'structure_routing' => $acc['routing'] == 'y',
+        ];
 
-		return new Action\DirectFactory($this->class, $wikiParams);
-	}
+        return new Action\DirectFactory($this->class, $wikiParams);
+    }
 }

@@ -6,33 +6,33 @@
 // $Id$
 
 namespace Tiki\MailIn\Action;
+
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 use Tiki\MailIn\Exception\MailInException;
 
 class SubjectPrefixFactory implements FactoryInterface
 {
-	private $config;
+    private $config;
 
-	function __construct($config)
-	{
-		$this->config = $config;
-	}
+    function __construct($config)
+    {
+        $this->config = $config;
+    }
 
-	function createAction(Account $account, Message $message)
-	{
-		$subject = $message->getSubject();
+    function createAction(Account $account, Message $message)
+    {
+        $subject = $message->getSubject();
 
-		foreach ($this->config as $prefix => $factory) {
-			if (empty($prefix) || strpos($subject, $prefix) === 0) {
-				$subject = trim(substr($subject, strlen($prefix)));
-				$message->setSubject($subject);
+        foreach ($this->config as $prefix => $factory) {
+            if (empty($prefix) || strpos($subject, $prefix) === 0) {
+                $subject = trim(substr($subject, strlen($prefix)));
+                $message->setSubject($subject);
 
-				return $factory->createAction($account, $message);
-			}
-		}
+                return $factory->createAction($account, $message);
+            }
+        }
 
-		throw new MailInException(tr("Unable to find suitable action."));
-	}
+        throw new MailInException(tr("Unable to find suitable action."));
+    }
 }
-

@@ -16,18 +16,17 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class GalleryMigrateCommand extends Command
 {
-	protected function configure()
-	{
-		$this
-			->setName('gallery:migrate')
-			->setDescription(tra('Migrate images from the Image Gallery to the File Gallery'));
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('gallery:migrate')
+            ->setDescription(tra('Migrate images from the Image Gallery to the File Gallery'));
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		\TikiLib::lib('filegal')->migrateFilesFromImageGalleries();
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        \TikiLib::lib('filegal')->migrateFilesFromImageGalleries();
 
-		$output->writeln('<info>' . tra('All files migrated!') . '</info>');
-	}
+        $output->writeln('<info>' . tra('All files migrated!') . '</info>');
+    }
 }
-

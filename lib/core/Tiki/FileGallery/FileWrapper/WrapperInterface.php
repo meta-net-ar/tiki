@@ -9,15 +9,14 @@ namespace Tiki\FileGallery\FileWrapper;
 
 interface WrapperInterface
 {
-	/**
-	 * Returns a path to a readable file path to read the content from.
-	 * Can be used by external tools who use a file path as the input.
-	 */
-	function getReadableFile();
+    /**
+     * Returns a path to a readable file path to read the content from.
+     * Can be used by external tools who use a file path as the input.
+     */
+    function getReadableFile();
 
-	/**
-	 * Returns the content of the file as a string.
-	 */
-	function getContents();
+    /**
+     * Returns the content of the file as a string.
+     */
+    function getContents();
 }
-

@@ -17,28 +17,26 @@ use Tiki\Sitemap\Generator as SiteMapGenerator;
 class SitemapGenerateCommand extends Command
 {
 
-	protected function configure()
-	{
-		$this
-			->setName('sitemap:generate')
-			->setDescription('Generate sitemap')
-			->addArgument(
-				'url',
-				InputArgument::REQUIRED,
-				'URL of the website. Example http://www.example.com'
-			);
-	}
+    protected function configure()
+    {
+        $this
+            ->setName('sitemap:generate')
+            ->setDescription('Generate sitemap')
+            ->addArgument(
+                'url',
+                InputArgument::REQUIRED,
+                'URL of the website. Example http://www.example.com'
+            );
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$url = $input->getArgument('url');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $url = $input->getArgument('url');
 
-		$sitemap = new SiteMapGenerator();
+        $sitemap = new SiteMapGenerator();
 
-		$sitemap->generate($url);
+        $sitemap->generate($url);
 
-		$output->writeln('<info>' . tra('New sitemap created.') . '</info>');
-
-	}
-
+        $output->writeln('<info>' . tra('New sitemap created.') . '</info>');
+    }
 }

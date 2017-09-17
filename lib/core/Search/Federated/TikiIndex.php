@@ -9,48 +9,47 @@ namespace Search\Federated;
 
 class TikiIndex implements IndexInterface
 {
-	private $prefix;
-	private $groups;
+    private $prefix;
+    private $groups;
 
-	function __construct($urlPrefix, array $groups = [])
-	{
-		$this->prefix = $urlPrefix;
-		$this->groups = $groups;
-	}
+    function __construct($urlPrefix, array $groups = [])
+    {
+        $this->prefix = $urlPrefix;
+        $this->groups = $groups;
+    }
 
-	function getTransformations()
-	{
-		return [
-			new UrlPrefixTransform($this->prefix),
-		];
-	}
+    function getTransformations()
+    {
+        return [
+            new UrlPrefixTransform($this->prefix),
+        ];
+    }
 
-	function applyContentConditions(\Search_Query $query, $content)
-	{
-		$query->filterContent('y', 'searchable');
-		$query->filterContent($content, ['title', 'contents']);
+    function applyContentConditions(\Search_Query $query, $content)
+    {
+        $query->filterContent('y', 'searchable');
+        $query->filterContent($content, ['title', 'contents']);
 
-		$this->applyRaw($query);
-	}
+        $this->applyRaw($query);
+    }
 
-	function applySimilarConditions(\Search_Query $query, $type, $object)
-	{
-		$query->filterSimilar($type, $object);
+    function applySimilarConditions(\Search_Query $query, $type, $object)
+    {
+        $query->filterSimilar($type, $object);
 
-		$this->applyRaw($query);
-	}
+        $this->applyRaw($query);
+    }
 
-	private function applyRaw($query)
-	{
-		$unified = \TikiLib::lib('unifiedsearch');
-		$unified->initQueryBase($query, false);
+    private function applyRaw($query)
+    {
+        $unified = \TikiLib::lib('unifiedsearch');
+        $unified->initQueryBase($query, false);
 
-		$applyAs = $this->groups;
-		if (empty($applyAs)) {
-			$unified->initQueryPermissions($query);
-		} else {
-			$query->filterPermissions($applyAs);
-		}
-	}
+        $applyAs = $this->groups;
+        if (empty($applyAs)) {
+            $unified->initQueryPermissions($query);
+        } else {
+            $query->filterPermissions($applyAs);
+        }
+    }
 }
-

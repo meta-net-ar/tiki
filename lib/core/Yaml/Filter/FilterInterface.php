@@ -7,5 +7,5 @@
 
 interface Yaml_Filter_FilterInterface
 {
-	public function filter(&$value);
-} 
+    public function filter(&$value);
+}

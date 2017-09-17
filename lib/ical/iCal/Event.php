@@ -42,11 +42,13 @@ require_once 'BaseComponent.php';
  */
 class File_iCal_Event extends File_iCal_BaseComponent_ET
 {
-    public function setDateEnd($dt) {
+    public function setDateEnd($dt)
+    {
         File_iCal_BaseComponent::setDateEnd($dt);
     }
 
-    public function getDateEnd() {
+    public function getDateEnd()
+    {
         return File_iCal_BaseComponent::getDateEnd();
     }
 
@@ -60,8 +62,9 @@ class File_iCal_Event extends File_iCal_BaseComponent_ET
      *
      *
      */
-    public function setOpaque() {
-        $this->_transparency= ICAL_TRANSPARENCY_OPAQUE;
+    public function setOpaque()
+    {
+        $this->_transparency = ICAL_TRANSPARENCY_OPAQUE;
     }
 
     /**
@@ -69,16 +72,16 @@ class File_iCal_Event extends File_iCal_BaseComponent_ET
      *
      *
      */
-    public function setTransparent() {
+    public function setTransparent()
+    {
         $this->_transparency = ICAL_TRANSPARENCY_TRANSPARENT;
     }
 
     /**
      *  returns the transparency of the component
      */
-    public function getTransparency() {
+    public function getTransparency()
+    {
         return $this->_transparency;
     }
-
-
 }

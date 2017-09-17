@@ -7,26 +7,26 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_block_ifsearchexists($params, $content, $smarty, &$repeat)
 {
-	if (empty($params['type']) || empty($params['id'])) {
-		return '';
-	}
+    if (empty($params['type']) || empty($params['id'])) {
+        return '';
+    }
 
-	TikiLib::lib('access')->check_feature('feature_search');
+    TikiLib::lib('access')->check_feature('feature_search');
 
-	$query = new Search_Query;
-	$query->addObject($params['type'], $params['id']);
-	$index = TikiLib::lib('unifiedsearch')->getIndex();
-	$result = $query->search($index);
-	
-	if ($result->count() > 0 ) {
-		return $content;
-	} else {
-		return '';
-	}
+    $query = new Search_Query;
+    $query->addObject($params['type'], $params['id']);
+    $index = TikiLib::lib('unifiedsearch')->getIndex();
+    $result = $query->search($index);
+
+    if ($result->count() > 0) {
+        return $content;
+    } else {
+        return '';
+    }
 }

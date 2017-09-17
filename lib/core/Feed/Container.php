@@ -3,10 +3,10 @@
 class Feed_Container
 {
     public $version;
-	public $encoding;
-	public $feed;
-	public $origin;
-	public $type;
+    public $encoding;
+    public $feed;
+    public $origin;
+    public $type;
 
     public function __construct($version, $encoding, $feed, $origin, $type)
     {

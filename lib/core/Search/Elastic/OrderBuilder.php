@@ -7,42 +7,41 @@
 
 class Search_Elastic_OrderBuilder
 {
-	function build(Search_Query_Order $order)
-	{
-		$component = '_score';
-		$field = $order->getField();
+    function build(Search_Query_Order $order)
+    {
+        $component = '_score';
+        $field = $order->getField();
 
-		if ($field !== Search_Query_Order::FIELD_SCORE) {
-			if ($order->getMode() == Search_Query_Order::MODE_NUMERIC) {
-				$component = array(
-					"$field.nsort" => $order->getOrder(),
-				);
-			} else if ($order->getMode() == Search_Query_Order::MODE_DISTANCE) {
-				$arguments = $order->getArguments();
+        if ($field !== Search_Query_Order::FIELD_SCORE) {
+            if ($order->getMode() == Search_Query_Order::MODE_NUMERIC) {
+                $component = [
+                    "$field.nsort" => $order->getOrder(),
+                ];
+            } elseif ($order->getMode() == Search_Query_Order::MODE_DISTANCE) {
+                $arguments = $order->getArguments();
 
-				$component = [
-					"_geo_distance" => [
-						'geo_point' => [
-							'lat' => $arguments['lat'],
-							'lon' => $arguments['lon'],
-						],
-						'order' => $order->getOrder(),
-						'unit' => $arguments['unit'],
-						'distance_type' => $arguments['distance_type'],
-					],
-				];
-			} else {
-				$component = array(
-					"$field.sort" => $order->getOrder(),
-				);
-			}
-		}
+                $component = [
+                    "_geo_distance" => [
+                        'geo_point' => [
+                            'lat' => $arguments['lat'],
+                            'lon' => $arguments['lon'],
+                        ],
+                        'order' => $order->getOrder(),
+                        'unit' => $arguments['unit'],
+                        'distance_type' => $arguments['distance_type'],
+                    ],
+                ];
+            } else {
+                $component = [
+                    "$field.sort" => $order->getOrder(),
+                ];
+            }
+        }
 
-		return array(
-			"sort" => array(
-				$component,
-			),
-		);
-	}
+        return [
+            "sort" => [
+                $component,
+            ],
+        ];
+    }
 }
-

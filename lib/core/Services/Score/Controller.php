@@ -7,31 +7,31 @@
 class Services_Score_Controller
 {
 
-	function setUp()
-	{
+    function setUp()
+    {
+    }
 
-	}
+    function action_create_score_event($input)
+    {
 
-	function action_create_score_event($input) {
+        $eventType = $input->eventType->text();
 
-		$eventType = $input->eventType->text();
+        if ($input->rowOnly->text() == 'y') {
+            $rowOnly = 1;
+        } else {
+            $rowOnly = 0;
+        }
 
-		if ($input->rowOnly->text() == 'y') {
-			$rowOnly = 1;
-		} else {
-			$rowOnly = 0;
-		}
+        if ($input->rowCount->text() > 0) {
+            $rowCount = $input->rowCount->text();
+        } else {
+            $rowCount = 0;
+        }
 
-		if ($input->rowCount->text() > 0) {
-			$rowCount = $input->rowCount->text();
-		} else {
-			$rowCount = 0;
-		}
-
-		return array (
-			'eventType' => $eventType,
-			'rowOnly' => $rowOnly,
-			'rowCount' => $rowCount,
-		);
-	}
+        return  [
+            'eventType' => $eventType,
+            'rowOnly' => $rowOnly,
+            'rowCount' => $rowCount,
+        ];
+    }
 }

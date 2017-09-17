@@ -7,11 +7,11 @@
 
 function smarty_modifier_star($score)
 {
-	global $prefs, $tikilib;
+    global $prefs, $tikilib;
 
-	if ($prefs['feature_score'] != 'y') {
-		return '';
-	}
+    if ($prefs['feature_score'] != 'y') {
+        return '';
+    }
 
-	return $tikilib->get_star($score);
+    return $tikilib->get_star($score);
 }

@@ -7,24 +7,23 @@
 
 abstract class Math_Formula_Function
 {
-	private $callback;
+    private $callback;
 
-	function evaluateTemplate( $element, $evaluateCallback )
-	{
-		$this->callback = $evaluateCallback;
-		return $this->evaluate($element);
-	}
+    function evaluateTemplate($element, $evaluateCallback)
+    {
+        $this->callback = $evaluateCallback;
+        return $this->evaluate($element);
+    }
 
-	abstract function evaluate( $element );
+    abstract function evaluate($element);
 
-	protected function evaluateChild( $child, array $extraVariables = array() )
-	{
-		return call_user_func($this->callback, $child, $extraVariables);
-	}
+    protected function evaluateChild($child, array $extraVariables = [])
+    {
+        return call_user_func($this->callback, $child, $extraVariables);
+    }
 
-	protected function error( $message )
-	{
-		throw new Math_Formula_Exception($message);
-	}
+    protected function error($message)
+    {
+        throw new Math_Formula_Exception($message);
+    }
 }
-

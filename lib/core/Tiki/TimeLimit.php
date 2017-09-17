@@ -7,9 +7,8 @@
 
 class Tiki_TimeLimit
 {
-	function __construct($targetLimit)
-	{
-		set_time_limit((int) $targetLimit);
-	}
+    function __construct($targetLimit)
+    {
+        set_time_limit((int) $targetLimit);
+    }
 }
-

@@ -7,15 +7,15 @@
 
 function prefs_sitemap_list()
 {
-	return array(
-		'sitemap_enable' => array(
-			'name' => tra('Sitemap protocol'),
-			'description' => tra('Allows generating site maps based on the Sitemap protocol, in the form of XML documents. Mostly used to facilitate indexation of a site by web search engines.'),
-			'type' => 'flag',
-			'help' => 'https://www.sitemaps.org/protocol.html',
-			'default' => 'n',
-			'since' => '18',
-			'tags' => array('advanced'),
-		),
-	);
+    return [
+        'sitemap_enable' => [
+            'name' => tra('Sitemap protocol'),
+            'description' => tra('Allows generating site maps based on the Sitemap protocol, in the form of XML documents. Mostly used to facilitate indexation of a site by web search engines.'),
+            'type' => 'flag',
+            'help' => 'https://www.sitemaps.org/protocol.html',
+            'default' => 'n',
+            'since' => '18',
+            'tags' => ['advanced'],
+        ],
+    ];
 }

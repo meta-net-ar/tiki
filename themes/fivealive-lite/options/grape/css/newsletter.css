@@ -2,13 +2,13 @@
 	FiveAlive theme grape option newsletter css (fivealive/options/grape/newsletter.css) for Tiki Wiki CMS/Groupware.
 	Visit http://themes.tiki.org for more information.
 */
- 
+
 /***** XHTML Elements (body tag here,
-			others follow Layout) *****/ 
+			others follow Layout) *****/
 body {
-	background-color: #fff;
-	font: 76%/1.5em Arial, Helvetica, sans-serif;
-	color: #000;
+    background-color: #fff;
+    font: 76%/1.5em Arial, Helvetica, sans-serif;
+    color: #000;
 }
 
 
@@ -19,7 +19,7 @@ tr.even a,
 tr.even a:visited,
 tr.odd a,
 tr.odd a:visited {
-	color: #8e286a;
+    color: #8e286a;
 }
 
 a:active,
@@ -28,16 +28,16 @@ tr.even a:active,
 tr.even a:hover,
 tr.odd a:active,
 tr.odd a:hover {
-	color: #a02871;
+    color: #a02871;
 }
 
 fieldset {
-	border: 1px solid #8e286a;
+    border: 1px solid #8e286a;
 }
 
 hr {
-	color: #a82a76;
-	background: #a82a76;
+    color: #a82a76;
+    background: #a82a76;
 }
 
 .button a,
@@ -50,10 +50,10 @@ input[type="submit"],
 #genPass .button a,
 #genPass .button a:visited,
 .daterow {
-	color: #fff;
-	background: #a82a76;
-	border-color: #a82a76 #69285c #69285c #a82a76;
-	font-weight: bold;
+    color: #fff;
+    background: #a82a76;
+    border-color: #a82a76 #69285c #69285c #a82a76;
+    font-weight: bold;
 }
 
 .button a:hover,
@@ -63,20 +63,20 @@ input[type="submit"]:hover,
 .button input:hover
 #genPass .button a:hover,
 .daterow:hover {
-	background: #9b286f;
-	border-color: #69285c #a82a76 #a82a76 #69285c;
+    background: #9b286f;
+    border-color: #69285c #a82a76 #a82a76 #69285c;
 }
 
 .highlight,
 .button.highlight a {
-	border: #e4afd3;
-	color: #8e286a;
-	background: #ddf4ef;
+    border: #e4afd3;
+    color: #8e286a;
+    background: #ddf4ef;
 }
 
 .button.highlight a {
-	background: #f4dded;
-	color: #8e286a;
+    background: #f4dded;
+    color: #8e286a;
 }
 
 select,
@@ -86,29 +86,29 @@ input[type="file"],
 input#login-pass,
 textarea,
 .adminoptionbox option {
-	background: #f4dded;
-	border-color: #e4afd3 #faf1f8 #faf1f8 #e4afd3;
+    background: #f4dded;
+    border-color: #e4afd3 #faf1f8 #faf1f8 #e4afd3;
 }
 
 .cbox {
-	background: #efcde5;
-	color: #8b1932;
+    background: #efcde5;
+    color: #8b1932;
 }
 
 .cbox-title {
-	border-bottom: 3px solid #a82a76;
+    border-bottom: 3px solid #a82a76;
 }
 
 .titlebar,
-.rbox-title, 
+.rbox-title,
 .rbox-data {
-	border: #a82a76;
-	background: #efcde5;
-	color: #8b1932;
+    border: #a82a76;
+    background: #efcde5;
+    color: #8b1932;
 }
 
 .simplebox {
-	border: 2px solid #a82a76;
+    border: 2px solid #a82a76;
 }
 
 /***** Tables, Tabs *****/
@@ -116,27 +116,27 @@ textarea,
 
 .normal,
 .wikitable {
-	border: 2px solid #a82a76;
+    border: 2px solid #a82a76;
 }
 
 .caltable .odd,
 .caltable .even,
 .caltable .calborder,
 .wikicell {
-	border: 2px solid #efcde5;
+    border: 2px solid #efcde5;
 }
 
 .caltable td.calhighlight,
 td.calheadhighlight {
-	background: #ddf4ef;
+    background: #ddf4ef;
 }
 
 .odd {
-	background: #faf1f8;
+    background: #faf1f8;
 }
 
 .even {
-	background: #f4dded;
+    background: #f4dded;
 }
 
 /* End of File */

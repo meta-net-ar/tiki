@@ -1,89 +1,88 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
 class Search_ContentSource_BlogPostSource implements Search_ContentSource_Interface, Tiki_Profile_Writer_ReferenceProvider
 {
-	private $db;
+    private $db;
 
-	function __construct()
-	{
-		$this->db = TikiDb::get();
-	}
+    function __construct()
+    {
+        $this->db = TikiDb::get();
+    }
 
-	function getReferenceMap()
-	{
-		return array(
-			'blog_id' => 'blog',
-		);
-	}
+    function getReferenceMap()
+    {
+        return [
+            'blog_id' => 'blog',
+        ];
+    }
 
-	function getDocuments()
-	{
-		return $this->db->table('tiki_blog_posts')->fetchColumn('postId', array());
-	}
+    function getDocuments()
+    {
+        return $this->db->table('tiki_blog_posts')->fetchColumn('postId', []);
+    }
 
-	function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
-	{
-		$bloglib = TikiLib::lib('blog');
-		
-		$post = $bloglib->get_post($objectId);
+    function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    {
+        $bloglib = TikiLib::lib('blog');
 
-		if (! $post) {
-			return false;
-		}
+        $post = $bloglib->get_post($objectId);
 
-		$data = array(
-			'title' => $typeFactory->sortable($post['title']),
-			'language' => $typeFactory->identifier('unknown'),
-			'creation_date' => $typeFactory->timestamp($post['created']),
-			'modification_date' => $typeFactory->timestamp($post['created']),
-			'contributors' => $typeFactory->multivalue(array($post['user'])),
+        if (! $post) {
+            return false;
+        }
 
-			'blog_id' => $typeFactory->identifier($post['blogId']),
-			'blog_excerpt' => $typeFactory->wikitext($post['excerpt']),
-			'blog_content' => $typeFactory->wikitext($post['data']),
+        $data = [
+            'title' => $typeFactory->sortable($post['title']),
+            'language' => $typeFactory->identifier('unknown'),
+            'creation_date' => $typeFactory->timestamp($post['created']),
+            'modification_date' => $typeFactory->timestamp($post['created']),
+            'contributors' => $typeFactory->multivalue([$post['user']]),
 
-			'parent_object_type' => $typeFactory->identifier('blog'),
-			'parent_object_id' => $typeFactory->identifier($post['blogId']),
-			'view_permission' => $typeFactory->identifier('tiki_p_read_blog'),
-			'parent_view_permission' => $typeFactory->identifier('tiki_p_read_blog'),
-		);
+            'blog_id' => $typeFactory->identifier($post['blogId']),
+            'blog_excerpt' => $typeFactory->wikitext($post['excerpt']),
+            'blog_content' => $typeFactory->wikitext($post['data']),
 
-		return $data;
-	}
+            'parent_object_type' => $typeFactory->identifier('blog'),
+            'parent_object_id' => $typeFactory->identifier($post['blogId']),
+            'view_permission' => $typeFactory->identifier('tiki_p_read_blog'),
+            'parent_view_permission' => $typeFactory->identifier('tiki_p_read_blog'),
+        ];
 
-	function getProvidedFields()
-	{
-		return array(
-			'title',
-			'language',
-			'creation_date',
-			'modification_date',
-			'contributors',
+        return $data;
+    }
 
-			'blog_id',
-			'blog_excerpt',
-			'blog_content',
+    function getProvidedFields()
+    {
+        return [
+            'title',
+            'language',
+            'creation_date',
+            'modification_date',
+            'contributors',
 
-			'view_permission',
-			'parent_view_permission',
-			'parent_object_id',
-			'parent_object_type',
-		);
-	}
+            'blog_id',
+            'blog_excerpt',
+            'blog_content',
 
-	function getGlobalFields()
-	{
-		return array(
-			'title' => true,
+            'view_permission',
+            'parent_view_permission',
+            'parent_object_id',
+            'parent_object_type',
+        ];
+    }
 
-			'blog_excerpt' => false,
-			'blog_content' => false,
-		);
-	}
+    function getGlobalFields()
+    {
+        return [
+            'title' => true,
+
+            'blog_excerpt' => false,
+            'blog_content' => false,
+        ];
+    }
 }
-

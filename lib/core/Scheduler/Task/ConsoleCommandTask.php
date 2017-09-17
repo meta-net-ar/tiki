@@ -12,62 +12,61 @@ use Tiki\Command\Application;
 class Scheduler_Task_ConsoleCommandTask extends Scheduler_Task_CommandTask
 {
 
-	public function execute($params = null)
-	{
-		if (empty($params['console_command'])) {
-			$this->errorMessage = tra('Missing parameters to run the command.');
-			return false;
-		}
+    public function execute($params = null)
+    {
+        if (empty($params['console_command'])) {
+            $this->errorMessage = tra('Missing parameters to run the command.');
+            return false;
+        }
 
-		$this->logger->debug(sprintf(tra('Executing console command: %s'), $params['console_command']));
+        $this->logger->debug(sprintf(tra('Executing console command: %s'), $params['console_command']));
 
-		$consoleParams = 'console.php ' . $params['console_command'];
-		$args = $this->parseConsoleParams($consoleParams);
+        $consoleParams = 'console.php ' . $params['console_command'];
+        $args = $this->parseConsoleParams($consoleParams);
 
-		$commandName = $args[1];
+        $commandName = $args[1];
 
-		try {
-			$consoleBuilder = new Tiki\Command\ConsoleApplicationBuilder(
-				isset($_SERVER['TIKI_VIRTUAL']) ? $_SERVER['TIKI_VIRTUAL'] : ''
-			);
-			$console = $consoleBuilder->create(true);
+        try {
+            $consoleBuilder = new Tiki\Command\ConsoleApplicationBuilder(
+                isset($_SERVER['TIKI_VIRTUAL']) ? $_SERVER['TIKI_VIRTUAL'] : ''
+            );
+            $console = $consoleBuilder->create(true);
 
-			$command = $console->find($commandName);
+            $command = $console->find($commandName);
 
-			$input = new ArgvInput($args);
-			$input->setInteractive(false);
+            $input = new ArgvInput($args);
+            $input->setInteractive(false);
 
-			$output = new BufferedOutput();
-			$statusCode = $command->run($input, $output);
+            $output = new BufferedOutput();
+            $statusCode = $command->run($input, $output);
 
-			$content = $output->fetch();
-			$this->errorMessage = $content;
+            $content = $output->fetch();
+            $this->errorMessage = $content;
 
-			return $statusCode === 0;
-		} catch (Exception $e) {
-			$this->errorMessage = $e->getMessage();
+            return $statusCode === 0;
+        } catch (Exception $e) {
+            $this->errorMessage = $e->getMessage();
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
-	private function parseConsoleParams($params)
-	{
+    private function parseConsoleParams($params)
+    {
 
-		preg_match_all('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', $params, $args);
+        preg_match_all('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', $params, $args);
 
-		return $args[2];
-	}
+        return $args[2];
+    }
 
-	public function getParams()
-	{
-		return array(
-			'console_command' => array(
-				'name' => tra('Console command'),
-				'type' => 'text',
-				'required' => true,
-			),
-		);
-	}
-
+    public function getParams()
+    {
+        return [
+            'console_command' => [
+                'name' => tra('Console command'),
+                'type' => 'text',
+                'required' => true,
+            ],
+        ];
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 // (c) Copyright 2002-2016 by authors of the Tiki Wiki CMS Groupware Project
-// 
+//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
@@ -24,14 +24,14 @@ class Text_Diff_Renderer_character extends Tiki_Text_Diff_Renderer
         $this->orig = "";
         $this->final = "";
     }
-    
+
     function _startDiff()
     {
     }
 
     function _endDiff()
     {
-        return array($this->orig, $this->final);
+        return [$this->orig, $this->final];
     }
 
     function _blockHeader($xbeg, $xlen, $ybeg, $ylen)
@@ -47,56 +47,58 @@ class Text_Diff_Renderer_character extends Tiki_Text_Diff_Renderer
     {
     }
 
-	function _lines($lines, $prefix = '', $suffix = '', $type = '')
-	{
-		if ($type == 'context') {
-	        foreach ($lines as $line) {
-			$this->orig .= htmlspecialchars($line);
-			$this->final .= htmlspecialchars($line);
-	        }
-		} elseif ($type == 'added' || $type == 'change-added') {
-	   	$l = "";
-			foreach ($lines as $line) {
-				$l .= htmlspecialchars($line);
-			}
-			if (!empty($l))
-				$this->final .= '<ins class="diffchar inserted"><strong>'.$l."</strong></ins>";
-		} elseif ($type == 'deleted' || $type == 'change-deleted') {
-			$l = "";
-			foreach ($lines as $line)
-				$l .= htmlspecialchars($line);
-			if (!empty($l))
-				$this->orig .= '<del class="diffchar deleted"><strong>'.$l."</strong></del>";
-		}
-	}
+    function _lines($lines, $prefix = '', $suffix = '', $type = '')
+    {
+        if ($type == 'context') {
+            foreach ($lines as $line) {
+                $this->orig .= htmlspecialchars($line);
+                $this->final .= htmlspecialchars($line);
+            }
+        } elseif ($type == 'added' || $type == 'change-added') {
+            $l = "";
+            foreach ($lines as $line) {
+                $l .= htmlspecialchars($line);
+            }
+            if (! empty($l)) {
+                $this->final .= '<ins class="diffchar inserted"><strong>'.$l."</strong></ins>";
+            }
+        } elseif ($type == 'deleted' || $type == 'change-deleted') {
+            $l = "";
+            foreach ($lines as $line) {
+                $l .= htmlspecialchars($line);
+            }
+            if (! empty($l)) {
+                $this->orig .= '<del class="diffchar deleted"><strong>'.$l."</strong></del>";
+            }
+        }
+    }
 
     function _context($lines)
     {
         $this->_lines($lines, '', '', 'context');
     }
 
-    function _added($lines, $changemode = FALSE)
+    function _added($lines, $changemode = false)
     {
         if ($changemode) {
-        	$this->_lines($lines, '+', '', 'change-added');
+            $this->_lines($lines, '+', '', 'change-added');
         } else {
-        	$this->_lines($lines, '+', '', 'added');
+            $this->_lines($lines, '+', '', 'added');
         }
     }
 
-    function _deleted($lines, $changemode = FALSE)
+    function _deleted($lines, $changemode = false)
     {
         if ($changemode) {
-        	$this->_lines($lines, '-', '', 'change-deleted');
+            $this->_lines($lines, '-', '', 'change-deleted');
         } else {
-	        $this->_lines($lines, '-', '', 'deleted');
+            $this->_lines($lines, '-', '', 'deleted');
         }
     }
 
     function _changed($orig, $final)
     {
-        $this->_deleted($orig, TRUE);
-        $this->_added($final, TRUE);
+        $this->_deleted($orig, true);
+        $this->_added($final, true);
     }
-
 }

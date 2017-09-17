@@ -10,48 +10,48 @@
 #col2 a:visited,
 #col3 a,
 #col3 a:visited {
-	color: #666;
+    color: #666;
 }
- 
+
 #col2 a:active,
 #col2 a:hover,
 #col3 a:active,
 #col3 a:hover {
-	color: #888;
+    color: #888;
 }
 
 a, a:visited {
-	color: #666;
+    color: #666;
 }
 
 a:active,
 a:hover {
-	color: #aaa;
+    color: #aaa;
 }
 
 #col1 {
-	color: #999;
-	font-size: 120%;
+    color: #999;
+    font-size: 120%;
 }
 
 #top a, #top a:visited {
-	color: #666;
+    color: #666;
 }
- 
+
 #top a:active, #top a:hover {
-	color: #aaa;
+    color: #aaa;
 }
 
 h1,h2,h3,h4,h5,h6, #top .pagetitle a {
-	color: #aaa;
+    color: #aaa;
 }
 
 #top .pagetitle a {
-	color: #888;
+    color: #888;
 }
 
 #top_modules .box-login_box {
-	bottom: -6px;
+    bottom: -6px;
 }
 
 .btn-default,
@@ -74,7 +74,7 @@ input[type="submit"]:hover,
     border: 1px solid #666;
     font-weight: bold;
     color: #212121;
-	background-color: #ea6;
+    background-color: #ea6;
 }
 
 .btn-primary {
@@ -84,8 +84,8 @@ input[type="submit"]:hover,
 }
 
 .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
-	border-color: transparent;
-	color: #212121;
+    border-color: transparent;
+    color: #212121;
 }
 
 .navbar-default .navbar-nav > li > a,
@@ -94,7 +94,7 @@ input[type="submit"]:hover,
 .topbar .nav > li > a {
   color: #666;
 }
-    
+
 /*.topbar .cssmenu_horiz {
     line-height: 0;
 }*/

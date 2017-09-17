@@ -5,7 +5,7 @@
 *  The majority of this is _NOT_ my code.  I simply ported it from the
 *  PERL Spreadsheet::WriteExcel module.
 *
-*  The author of the Spreadsheet::WriteExcel module is John McNamara 
+*  The author of the Spreadsheet::WriteExcel module is John McNamara
 *  <jmcnamara@cpan.org>
 *
 *  I _DO_ maintain this code, and John McNamara has nothing to do with the
@@ -34,14 +34,14 @@
 
 /**
 * Class for writing Excel BIFF records.
-* 
+*
 * From "MICROSOFT EXCEL BINARY FILE FORMAT" by Mark O'Brien (Microsoft Corporation):
 *
-* BIFF (BInary File Format) is the file format in which Excel documents are 
+* BIFF (BInary File Format) is the file format in which Excel documents are
 * saved on disk.  A BIFF file is a complete description of an Excel document.
-* BIFF files consist of sequences of variable-length records. There are many 
-* different types of BIFF records.  For example, one record type describes a 
-* formula entered into a cell; one describes the size and location of a 
+* BIFF files consist of sequences of variable-length records. There are many
+* different types of BIFF records.  For example, one record type describes a
+* formula entered into a cell; one describes the size and location of a
 * window into a document; another describes a picture format.
 *
 * @author   Xavier Noguer <xnoguer@php.net>
@@ -52,13 +52,13 @@
 class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
 {
     /**
-    * The BIFF/Excel version (5). 
+    * The BIFF/Excel version (5).
     * @var integer
     */
     var $_BIFF_version = 0x0500;
 
     /**
-    * The byte order of this architecture. 0 => little endian, 1 => big endian 
+    * The byte order of this architecture. 0 => little endian, 1 => big endian
     * @var integer
     */
     var $_byte_order;
@@ -81,7 +81,7 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
     * @see _addContinue()
     */
     var $_limit;
- 
+
     /**
     * Constructor
     *
@@ -92,7 +92,7 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
         $this->_byte_order = '';
         $this->_data       = '';
         $this->_datasize   = 0;
-        $this->_limit      = 2080;   
+        $this->_limit      = 2080;
         // Set the byte order
         $this->_setByteOrder();
     }
@@ -110,11 +110,9 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
         $number  = pack("C8", 0x8D, 0x97, 0x6E, 0x12, 0x83, 0xC0, 0xF3, 0x3F);
         if ($number == $teststr) {
             $byte_order = 0;    // Little Endian
-        }
-        elseif ($number == strrev($teststr)){
+        } elseif ($number == strrev($teststr)) {
             $byte_order = 1;    // Big Endian
-        }
-        else {
+        } else {
             // Give up. I'll fix this in a later version.
             return $this->raiseError("Required floating point format ".
                                      "not supported on this platform.");
@@ -171,16 +169,15 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
             $unknown = '';
             $build   = 0x096C;
             $year    = 0x07C9;
-        }
-        elseif ($this->_BIFF_version == 0x0600) {
+        } elseif ($this->_BIFF_version == 0x0600) {
             $length  = 0x0010;
             $unknown = pack("VV", 0x00000041, 0x00000006); //unknown last 8 bytes for BIFF8
             $build   = 0x0DBB;
             $year    = 0x07CC;
         }
         $version = $this->_BIFF_version;
-   
-        $header  = pack("vv",   $record, $length);
+
+        $header  = pack("vv", $record, $length);
         $data    = pack("vvvv", $version, $type, $build, $year);
         $this->_prepend($header.$data.$unknown);
     }
@@ -190,7 +187,7 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
     *
     * @access private
     */
-    function _storeEof() 
+    function _storeEof()
     {
         $record    = 0x000A;   // Record identifier
         $length    = 0x0000;   // Number of bytes to follow
@@ -214,25 +211,24 @@ class Spreadsheet_Excel_Writer_BIFFwriter extends PEAR
     {
         $limit      = $this->_limit;
         $record     = 0x003C;         // Record identifier
- 
+
         // The first 2080/8224 bytes remain intact. However, we have to change
         // the length field of the record.
-        $tmp = substr($data, 0, 2).pack("v", $limit-4).substr($data, 4, $limit - 4);
-        
+        $tmp = substr($data, 0, 2).pack("v", $limit - 4).substr($data, 4, $limit - 4);
+
         $header = pack("vv", $record, $limit);  // Headers for continue records
- 
+
         // Retrieve chunks of 2080/8224 bytes +4 for the header.
-        for($i = $limit; $i < strlen($data) - $limit; $i += $limit)
-        {
+        for ($i = $limit; $i < strlen($data) - $limit; $i += $limit) {
             $tmp .= $header;
             $tmp .= substr($data, $i, $limit);
         }
- 
+
         // Retrieve the last chunk of data
         $header  = pack("vv", $record, strlen($data) - $i);
         $tmp    .= $header;
-        $tmp    .= substr($data,$i,strlen($data) - $i);
- 
+        $tmp    .= substr($data, $i, strlen($data) - $i);
+
         return $tmp;
     }
 }

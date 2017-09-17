@@ -27,12 +27,12 @@
 
 function smarty_block_translation($params, $content, $smarty, &$repeat)
 {
-	if ( !$repeat && !empty($content) ) {
-  	$lang = $params['lang'];
-		if ($smarty->getTemplateVars('language') == $lang) {
-			return $content;
-		} else {
-			return '';
-		}
-	}
+    if (! $repeat && ! empty($content)) {
+        $lang = $params['lang'];
+        if ($smarty->getTemplateVars('language') == $lang) {
+            return $content;
+        } else {
+            return '';
+        }
+    }
 }

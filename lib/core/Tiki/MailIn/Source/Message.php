@@ -9,153 +9,152 @@ namespace Tiki\MailIn\Source;
 
 class Message
 {
-	const EXTRACT_EMAIL_REGEX = '/<?([-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+@[-!#$%&\'*+\/0-9=?A-Z^_`a-z{|}~]+\.[-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+)>?/';
+    const EXTRACT_EMAIL_REGEX = '/<?([-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+@[-!#$%&\'*+\/0-9=?A-Z^_`a-z{|}~]+\.[-!#$%&\'*+\.\/0-9=?A-Z^_`a-z{|}~]+)>?/';
 
-	private $id;
-	private $deleteCallback;
+    private $id;
+    private $deleteCallback;
 
-	private $messageId;
-	private $from;
-	private $recipient;
-	private $subject;
-	private $body;
-	private $htmlBody;
-	private $attachments = [];
+    private $messageId;
+    private $from;
+    private $recipient;
+    private $subject;
+    private $body;
+    private $htmlBody;
+    private $attachments = [];
 
-	private $associatedUser;
+    private $associatedUser;
 
-	function __construct($id, $deleteCallback)
-	{
-		$this->id = $id;
-		$this->deleteCallback = $deleteCallback;
-	}
+    function __construct($id, $deleteCallback)
+    {
+        $this->id = $id;
+        $this->deleteCallback = $deleteCallback;
+    }
 
-	function getMessageId()
-	{
-		return $this->messageId;
-	}
+    function getMessageId()
+    {
+        return $this->messageId;
+    }
 
-	function setMessageId($messageId)
-	{
-		$this->messageId = $messageId;
-	}
-	
-	function setRawFrom($from)
-	{
-		$this->from = $from;
-		
-		if ($email = $this->getFromAddress()) {
-			$userlib = \TikiLib::lib('user');
-			$this->associatedUser = $userlib->get_user_by_email($email);
-		}
-	}
+    function setMessageId($messageId)
+    {
+        $this->messageId = $messageId;
+    }
 
-	function getFromAddress()
-	{
-		preg_match(self::EXTRACT_EMAIL_REGEX, $this->from, $mail);
-		
-		return $mail[1];
-	}
+    function setRawFrom($from)
+    {
+        $this->from = $from;
 
-	function setAssociatedUser($user)
-	{
-		$this->associatedUser = $user;
-	}
+        if ($email = $this->getFromAddress()) {
+            $userlib = \TikiLib::lib('user');
+            $this->associatedUser = $userlib->get_user_by_email($email);
+        }
+    }
 
-	function getAssociatedUser()
-	{
-		return $this->associatedUser;
-	}
+    function getFromAddress()
+    {
+        preg_match(self::EXTRACT_EMAIL_REGEX, $this->from, $mail);
 
-	function delete()
-	{
-		if ($this->deleteCallback) {
-			$callback = $this->deleteCallback;
-			$callback();
-			$this->deleteCallback = null;
-		}
-	}
-	
-	function setSubject($subject)
-	{
-		$this->subject = $subject;
-	}
+        return $mail[1];
+    }
 
-	function getSubject()
-	{
-		return $this->subject;
-	}
+    function setAssociatedUser($user)
+    {
+        $this->associatedUser = $user;
+    }
 
-	function setBody($body)
-	{
-		$this->body = $body;
-	}
+    function getAssociatedUser()
+    {
+        return $this->associatedUser;
+    }
 
-	function getBody()
-	{
-		return $this->body;
-	}
+    function delete()
+    {
+        if ($this->deleteCallback) {
+            $callback = $this->deleteCallback;
+            $callback();
+            $this->deleteCallback = null;
+        }
+    }
 
-	function setHtmlBody($body)
-	{
-		$this->htmlBody = $body;
-	}
+    function setSubject($subject)
+    {
+        $this->subject = $subject;
+    }
 
-	function getHtmlBody($fallback = true)
-	{
-		if ($fallback) {
-			return $this->htmlBody ?: $this->body;
-		} else {
-			return $this->htmlBody;
-		}
-	}
+    function getSubject()
+    {
+        return $this->subject;
+    }
 
-	function addAttachment($contentId, $name, $type, $size, $data)
-	{
-		$this->attachments[$contentId] = [
-			'contentId' => $contentId,
-			'name' => $name,
-			'type' => $type,
-			'size' => $size,
-			'data' => $data,
-			'link' => null,
-		];
-	}
+    function setBody($body)
+    {
+        $this->body = $body;
+    }
 
-	function setLink($contentId, $link)
-	{
-		if (isset($this->attachments[$contentId])) {
-			$this->attachments[$contentId]['link'] = $link;
-		}
-	}
+    function getBody()
+    {
+        return $this->body;
+    }
 
-	function getAttachments()
-	{
-		return array_values($this->attachments);
-	}
+    function setHtmlBody($body)
+    {
+        $this->htmlBody = $body;
+    }
 
-	function getAttachment($contentId)
-	{
-		if (isset($this->attachments[$contentId])) {
-			return $this->attachments[$contentId];
-		}
-	}
+    function getHtmlBody($fallback = true)
+    {
+        if ($fallback) {
+            return $this->htmlBody ?: $this->body;
+        } else {
+            return $this->htmlBody;
+        }
+    }
 
-	function getRecipient()
-	{
-		return $this->recipient;
-	}
+    function addAttachment($contentId, $name, $type, $size, $data)
+    {
+        $this->attachments[$contentId] = [
+            'contentId' => $contentId,
+            'name' => $name,
+            'type' => $type,
+            'size' => $size,
+            'data' => $data,
+            'link' => null,
+        ];
+    }
 
-	function setRecipient($recipient)
-	{
-		$this->recipient = $recipient;
-	}
+    function setLink($contentId, $link)
+    {
+        if (isset($this->attachments[$contentId])) {
+            $this->attachments[$contentId]['link'] = $link;
+        }
+    }
 
-	function getRecipientAddress()
-	{
-		preg_match(self::EXTRACT_EMAIL_REGEX, $this->recipient, $mail);
-		
-		return $mail[1];
-	}
+    function getAttachments()
+    {
+        return array_values($this->attachments);
+    }
+
+    function getAttachment($contentId)
+    {
+        if (isset($this->attachments[$contentId])) {
+            return $this->attachments[$contentId];
+        }
+    }
+
+    function getRecipient()
+    {
+        return $this->recipient;
+    }
+
+    function setRecipient($recipient)
+    {
+        $this->recipient = $recipient;
+    }
+
+    function getRecipientAddress()
+    {
+        preg_match(self::EXTRACT_EMAIL_REGEX, $this->recipient, $mail);
+
+        return $mail[1];
+    }
 }
-

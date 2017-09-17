@@ -7,18 +7,18 @@
 
 class TikiFilter_WikiContent implements Zend\Filter\FilterInterface
 {
-	function filter( $value )
-	{
-		$parserlib = TikiLib::lib('parser');
-		$noparsed = array();
-		$parserlib->plugins_remove($value, $noparsed);
+    function filter($value)
+    {
+        $parserlib = TikiLib::lib('parser');
+        $noparsed = [];
+        $parserlib->plugins_remove($value, $noparsed);
 
-		$value = TikiFilter::get('xss')->filter($value);
+        $value = TikiFilter::get('xss')->filter($value);
 
-		$parserlib->isEditMode = true;
-		$parserlib->plugins_replace($value, $noparsed, true);
-		$parserlib->isEditMode = false;
+        $parserlib->isEditMode = true;
+        $parserlib->plugins_replace($value, $noparsed, true);
+        $parserlib->isEditMode = false;
 
-		return $value;
-	}
+        return $value;
+    }
 }

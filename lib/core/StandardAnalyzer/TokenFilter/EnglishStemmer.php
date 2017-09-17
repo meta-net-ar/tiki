@@ -22,9 +22,9 @@ class StandardAnalyzer_Analysis_TokenFilter_EnglishStemmer implements ZendSearch
      *
      * @param array $stopwords array (set) of words that will be filtered out
      */
-	public function __construct()
-	{
-	}
+    public function __construct()
+    {
+    }
 
     /**
      * Normalize Token or remove it (if null is returned)
@@ -32,18 +32,17 @@ class StandardAnalyzer_Analysis_TokenFilter_EnglishStemmer implements ZendSearch
      * @param ZendSearch\Lucene\Analysis\Token $srcToken
      * @return ZendSearch\Lucene\Analysis\Token
      */
-	public function normalize(ZendSearch\Lucene\Analysis\Token $srcToken)
-	{
+    public function normalize(ZendSearch\Lucene\Analysis\Token $srcToken)
+    {
 
-		$newToken = new ZendSearch\Lucene\Analysis\Token(
-			PorterStemmer::stem($srcToken->getTermText()),
-			$srcToken->getStartOffset(),
-			$srcToken->getEndOffset()
-		);
+        $newToken = new ZendSearch\Lucene\Analysis\Token(
+            PorterStemmer::stem($srcToken->getTermText()),
+            $srcToken->getStartOffset(),
+            $srcToken->getEndOffset()
+        );
 
-		$newToken->setPositionIncrement($srcToken->getPositionIncrement());
+        $newToken->setPositionIncrement($srcToken->getPositionIncrement());
 
-		return $newToken;
-	}
+        return $newToken;
+    }
 }
-

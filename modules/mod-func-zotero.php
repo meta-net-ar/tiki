@@ -6,8 +6,8 @@
 // $Id$
 
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-	header("location: index.php");
-	exit;
+    header("location: index.php");
+    exit;
 }
 
 /**
@@ -15,13 +15,13 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
  */
 function module_zotero_info()
 {
-	return array(
-		'name' => tra('Bibliography Search'),
-		'description' => tra('Search the group\'s Zotero library for entries with the specified tags'),
-		'prefs' => array('zotero_enabled'),
-		'params' => array(
-		),
-	);
+    return [
+        'name' => tra('Bibliography Search'),
+        'description' => tra('Search the group\'s Zotero library for entries with the specified tags'),
+        'prefs' => ['zotero_enabled'],
+        'params' => [
+        ],
+    ];
 }
 
 /**
@@ -30,9 +30,8 @@ function module_zotero_info()
  */
 function module_zotero($mod_reference, $module_params)
 {
-	$zoterolib = TikiLib::lib('zotero');
-	$smarty = TikiLib::lib('smarty');
+    $zoterolib = TikiLib::lib('zotero');
+    $smarty = TikiLib::lib('smarty');
 
-	$smarty->assign('zotero_authorized', $zoterolib->is_authorized());
+    $smarty->assign('zotero_authorized', $zoterolib->is_authorized());
 }
-

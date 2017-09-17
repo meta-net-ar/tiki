@@ -14,31 +14,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Goal extends ObjectWriter
 {
-	protected function configure()
-	{
-		$this
-			->setName('profile:export:goal')
-			->setDescription('Export a goal')
-			->addArgument(
-				'goal',
-				InputArgument::REQUIRED,
-				'Goal ID'
-			);
+    protected function configure()
+    {
+        $this
+            ->setName('profile:export:goal')
+            ->setDescription('Export a goal')
+            ->addArgument(
+                'goal',
+                InputArgument::REQUIRED,
+                'Goal ID'
+            );
 
-		parent::configure();
-	}
+        parent::configure();
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		$goal = $input->getArgument('goal');
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $goal = $input->getArgument('goal');
 
-		$writer = $this->getProfileWriter($input);
+        $writer = $this->getProfileWriter($input);
 
-		if (\Tiki_Profile_InstallHandler_Goal::export($writer, $goal)) {
-			$writer->save();
-		} else {
-			$output->writeln("<error>Goal not found: $goal</error>");
-			return;
-		}
-	}
+        if (\Tiki_Profile_InstallHandler_Goal::export($writer, $goal)) {
+            $writer->save();
+        } else {
+            $output->writeln("<error>Goal not found: $goal</error>");
+            return;
+        }
+    }
 }

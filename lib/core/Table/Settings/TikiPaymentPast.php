@@ -7,8 +7,8 @@
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
-	header('location: index.php');
-	exit;
+    header('location: index.php');
+    exit;
 }
 
 /**
@@ -23,55 +23,55 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 class Table_Settings_TikiPaymentPast extends Table_Settings_TikiPayment
 {
 
-	protected function getTableSettings()
-	{
-		unset ($this->ts['columns']['#req_date']);
-		$this->ts['columns']['#detail'] = [
-			'sort' => [
-				'type' => 'text',
-				'ajax' => 'detail',
-			],
-			'filter' => [
-				'type' => 'text',
-				'ajax' => 'filter_detail',
-			],
-			'priority' => 6,
-			'hidden' => true,
-		];
-		$this->ts['columns']['#pmt_date'] = [
-			'sort' => [
-				'type' => 'dateFormat-yyyy-mm-dd',
-				'ajax' =>'payment_date',
-			],
-			'filter' => [
-				'type' => 'date',
-				'ajax' =>'filter_payment_date',
-			],
-			'priority' => 5,
-		];
-		$this->ts['columns']['#pmt_type'] = [
-			'sort' => [
-				'type' => 'text',
-				'ajax' =>'type',
-			],
-			'filter' => [
-				'type' => 'text',
-				'ajax' =>'filter_type',
-			],
-			'priority' => 5,
-		];
-		$this->ts['columns']['#payer'] = [
-			'sort' => array(
-				'type' => 'text',
-				'ajax' =>'payer',
-			),
-			'filter' => array(
-				'type' => 'text',
-				'ajax' =>'filter_payer',
-			),
-			'priority' => 6,
-		];
-		$this->ts['ajax']['offset'] .= '_' . $this->ts['ajax']['requiredparams']['list_type'];
-		return $this->ts;
-	}
+    protected function getTableSettings()
+    {
+        unset($this->ts['columns']['#req_date']);
+        $this->ts['columns']['#detail'] = [
+            'sort' => [
+                'type' => 'text',
+                'ajax' => 'detail',
+            ],
+            'filter' => [
+                'type' => 'text',
+                'ajax' => 'filter_detail',
+            ],
+            'priority' => 6,
+            'hidden' => true,
+        ];
+        $this->ts['columns']['#pmt_date'] = [
+            'sort' => [
+                'type' => 'dateFormat-yyyy-mm-dd',
+                'ajax' => 'payment_date',
+            ],
+            'filter' => [
+                'type' => 'date',
+                'ajax' => 'filter_payment_date',
+            ],
+            'priority' => 5,
+        ];
+        $this->ts['columns']['#pmt_type'] = [
+            'sort' => [
+                'type' => 'text',
+                'ajax' => 'type',
+            ],
+            'filter' => [
+                'type' => 'text',
+                'ajax' => 'filter_type',
+            ],
+            'priority' => 5,
+        ];
+        $this->ts['columns']['#payer'] = [
+            'sort' => [
+                'type' => 'text',
+                'ajax' => 'payer',
+            ],
+            'filter' => [
+                'type' => 'text',
+                'ajax' => 'filter_payer',
+            ],
+            'priority' => 6,
+        ];
+        $this->ts['ajax']['offset'] .= '_' . $this->ts['ajax']['requiredparams']['list_type'];
+        return $this->ts;
+    }
 }

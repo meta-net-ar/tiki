@@ -9,50 +9,51 @@ namespace Tiki\Recommendation;
 
 class EngineSet
 {
-	private $engines = [];
+    private $engines = [];
 
-	function register($name, Engine\EngineInterface $engine)
-	{
-		$this->registerWeighted($name, 1, $engine);
-	}
+    function register($name, Engine\EngineInterface $engine)
+    {
+        $this->registerWeighted($name, 1, $engine);
+    }
 
-	function registerWeighted($name, $weight, Engine\EngineInterface $engine)
-	{
-		$this->engines[$name] = [$weight, $engine];
-	}
+    function registerWeighted($name, $weight, Engine\EngineInterface $engine)
+    {
+        $this->engines[$name] = [$weight, $engine];
+    }
 
-	function getBasicList()
-	{
-		foreach ($this->engines as $name => $entry) {
-			list($weight, $engine) = $entry;
-			yield [new RecommendationSet($name), $engine];
-		}
-	}
+    function getBasicList()
+    {
+        foreach ($this->engines as $name => $entry) {
+            list($weight, $engine) = $entry;
+            yield [new RecommendationSet($name), $engine];
+        }
+    }
 
-	function getGenerator()
-	{
-		$list = [];
-		foreach ($this->engines as $name => $entry) {
-			list($weight, $engine) = $entry;
-			for ($i = 0; $i < $weight; ++$i) {
-				$list[] = [$name, $engine];
-			}
-		}
-		if (empty($list)) {
-			return;
-		}
+    function getGenerator()
+    {
+        $list = [];
+        foreach ($this->engines as $name => $entry) {
+            list($weight, $engine) = $entry;
+            for ($i = 0; $i < $weight; ++$i) {
+                $list[] = [$name, $engine];
+            }
+        }
+        if (empty($list)) {
+            return;
+        }
 
-		shuffle($list);
+        shuffle($list);
 
-		while (true) {
-			foreach ($list as $entry) {
-				list($name, $engine) = $entry;
-				yield [new RecommendationSet($name), $engine];
-			}
-		}
-	}
+        while (true) {
+            foreach ($list as $entry) {
+                list($name, $engine) = $entry;
+                yield [new RecommendationSet($name), $engine];
+            }
+        }
+    }
 
-	function getCount() {
-		return count($this->engines);
-	}
+    function getCount()
+    {
+        return count($this->engines);
+    }
 }

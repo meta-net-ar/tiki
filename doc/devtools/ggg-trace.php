@@ -30,76 +30,76 @@
  */
 class ggg_trace
 {
-	var $fp;
+    var $fp;
 
     /**
      * @param string $nameStr
      */
     function ggg_trace($nameStr = 'ggg-trace.out')
-	{
-		register_shutdown_function(array(&$this, '_ggg_trace')); // the & is important
-		$this->fp = fopen($nameStr, 'a');
-		fwrite($this->fp, "\n");
-		// e.g. 20031231 17:00:20
-		fwrite($this->fp, '*' . date('Ymd G:i:s') . "*Starting*****************************************************\n");
+    {
+        register_shutdown_function([&$this, '_ggg_trace']); // the & is important
+        $this->fp = fopen($nameStr, 'a');
+        fwrite($this->fp, "\n");
+        // e.g. 20031231 17:00:20
+        fwrite($this->fp, '*' . date('Ymd G:i:s') . "*Starting*****************************************************\n");
 
-		// print date("Ymd G:i:s<br>",time()); // e.g. 20031231 17:00:20
-	}
+        // print date("Ymd G:i:s<br>",time()); // e.g. 20031231 17:00:20
+    }
 
     /**
      * @param string $outStr
      */
     function out($outStr = '')
-	{
-		fwrite($this->fp, "$outStr");
-	}
+    {
+        fwrite($this->fp, "$outStr");
+    }
 
     /**
      * @param string $outStr
      */
     function outln($outStr = '')
-	{
-		fwrite($this->fp, "$outStr\n");
-	}
+    {
+        fwrite($this->fp, "$outStr\n");
+    }
 
     /**
      * @param $var
      * @param int $indent
      */
     function outvar($var, $indent = 0)
-	{
-		if ($indent > 8) {
-			fwrite($this->fp, "Too many levels of recursion! \n");
-			return;
-		}
+    {
+        if ($indent > 8) {
+            fwrite($this->fp, "Too many levels of recursion! \n");
+            return;
+        }
 
-		$spaces = sprintf('%' . $indent . 's', '');
-		fwrite($this->fp, $spaces . $var . "\n");
+        $spaces = sprintf('%' . $indent . 's', '');
+        fwrite($this->fp, $spaces . $var . "\n");
 
-		if (is_array($var)) {
-			$indent++;
-			$spaces = sprintf('%' . $indent . 's', '');
-			foreach ($var as $key=>$val) {
-				if ($key === 'GLOBALS' && is_array($val)) {
-					// In case we are called with $ggg_tracer->outvar($GLOBALS);
-					// and we don't check here, we get an infinite recursion.
-					// If another array has an element called GLOBALS, oh well.
-					fwrite($this->fp, "ggg-trace.php, line 62: Found GLOBALS array, not recursing. \n");
-				} elseif (is_array($val)) {
-					$this->out($spaces . "$key = ");
-					$this->outvar($val, $indent);
-				} else {
-					fwrite($this->fp, $spaces . $key . '=>' . $val . "\n");
-				}
-			}
-		}
-	}
+        if (is_array($var)) {
+            $indent++;
+            $spaces = sprintf('%' . $indent . 's', '');
+            foreach ($var as $key => $val) {
+                if ($key === 'GLOBALS' && is_array($val)) {
+                    // In case we are called with $ggg_tracer->outvar($GLOBALS);
+                    // and we don't check here, we get an infinite recursion.
+                    // If another array has an element called GLOBALS, oh well.
+                    fwrite($this->fp, "ggg-trace.php, line 62: Found GLOBALS array, not recursing. \n");
+                } elseif (is_array($val)) {
+                    $this->out($spaces . "$key = ");
+                    $this->outvar($val, $indent);
+                } else {
+                    fwrite($this->fp, $spaces . $key . '=>' . $val . "\n");
+                }
+            }
+        }
+    }
 
-	function _ggg_trace()
-	{
-		fwrite($this->fp, '*' . date('Ymd G:i:s') . "*Finishing****************************************************\n");
-		fclose($this->fp);
-	}
+    function _ggg_trace()
+    {
+        fwrite($this->fp, '*' . date('Ymd G:i:s') . "*Finishing****************************************************\n");
+        fclose($this->fp);
+    }
 }
 
 $ggg_traceFiles = new ggg_trace('ggg-traceFiles.out');

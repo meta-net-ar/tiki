@@ -17,39 +17,39 @@
  *
  * usage:
  * \code
- *	{accordion}
- * 		{accordion_group title="{tr}Title 1{/tr}"}tab content{/accordion_group}
- * 		{accordion_group title="{tr}Title 2{/tr}"}tab content{/accordion_group}
- *	{/accordion}
+ *  {accordion}
+ *      {accordion_group title="{tr}Title 1{/tr}"}tab content{/accordion_group}
+ *      {accordion_group title="{tr}Title 2{/tr}"}tab content{/accordion_group}
+ *  {/accordion}
  * \endcode
  */
 
 //this script may only be included - so its better to die if called directly.
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
-  header("location: index.php");
-  exit;
+    header("location: index.php");
+    exit;
 }
 
 function smarty_block_accordion_group($params, $content, $smarty, $repeat)
 {
-	if ($repeat) {
-		return;
-	}
+    if ($repeat) {
+        return;
+    }
 
-	global $accordion_current_group, $accordion_position;
+    global $accordion_current_group, $accordion_position;
 
-	if (empty($accordion_current_group)) {
-		$accordion_current_group = uniqid();
-		$accordion_position = 0;
-	}
+    if (empty($accordion_current_group)) {
+        $accordion_current_group = uniqid();
+        $accordion_position = 0;
+    }
 
-	$smarty->loadPlugin('smarty_modifier_escape');
-	$title = smarty_modifier_escape($params['title']);
-	$id = $accordion_current_group . '-' . ++$accordion_position;
+    $smarty->loadPlugin('smarty_modifier_escape');
+    $title = smarty_modifier_escape($params['title']);
+    $id = $accordion_current_group . '-' . ++$accordion_position;
 
-	$first = ($accordion_position == 1) ? 'in' : '';
+    $first = ($accordion_position == 1) ? 'in' : '';
 
-	return <<<CONTENT
+    return <<<CONTENT
 <div class="panel panel-default panel-accordian">
 	<div class="panel-heading">
 		<h4 class="panel-title">

@@ -13,36 +13,35 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CompilerPass implements CompilerPassInterface
 {
-	public function process(ContainerBuilder $container)
-	{
-		$definition = $container->getDefinition("tiki.lib.trk");
+    public function process(ContainerBuilder $container)
+    {
+        $definition = $container->getDefinition("tiki.lib.trk");
 
-		$taggedServices = $container->findTaggedServiceIds('tiki.tracker.sectionformat');
-		foreach ($taggedServices as $id => $tagAttributes) {
-			foreach ($tagAttributes as $attributes) {
-				if (! empty($attributes['mode'])) {
-					$definition->addMethodCall('registerSectionFormat', [
-						$attributes['layout'],
-						$attributes['mode'],
-						$attributes['template'],
-						$attributes['label'],
-					]);
-				} else {
-					$definition->addMethodCall('registerSectionFormat', [
-						$attributes['layout'],
-						'view',
-						$attributes['template'],
-						$attributes['label'],
-					]);
-					$definition->addMethodCall('registerSectionFormat', [
-						$attributes['layout'],
-						'edit',
-						$attributes['template'],
-						$attributes['label'],
-					]);
-				}
-			}
-		}
-	}
+        $taggedServices = $container->findTaggedServiceIds('tiki.tracker.sectionformat');
+        foreach ($taggedServices as $id => $tagAttributes) {
+            foreach ($tagAttributes as $attributes) {
+                if (! empty($attributes['mode'])) {
+                    $definition->addMethodCall('registerSectionFormat', [
+                        $attributes['layout'],
+                        $attributes['mode'],
+                        $attributes['template'],
+                        $attributes['label'],
+                    ]);
+                } else {
+                    $definition->addMethodCall('registerSectionFormat', [
+                        $attributes['layout'],
+                        'view',
+                        $attributes['template'],
+                        $attributes['label'],
+                    ]);
+                    $definition->addMethodCall('registerSectionFormat', [
+                        $attributes['layout'],
+                        'edit',
+                        $attributes['template'],
+                        $attributes['label'],
+                    ]);
+                }
+            }
+        }
+    }
 }
-
