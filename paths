@@ -1,6 +1,20 @@
 M
 dir
+/trim
+
+
+
+
+M
+dir
 /trim/data
+
+
+
+
+M
+dir
+/trim/logs
 
 
 
