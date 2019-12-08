@@ -181,9 +181,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/bacon/bacon-qr-code/bacon-bacon-qr-code-eaac909da3ccc32b748a65b127acd8918f58d9b0-zip-89eef4.zip",
+                "url": "https://api.github.com/repos/Bacon/BaconQrCode/zipball/eaac909da3ccc32b748a65b127acd8918f58d9b0",
                 "reference": "eaac909da3ccc32b748a65b127acd8918f58d9b0",
-                "shasum": "4ac4c301e860247d8a28187cc8d503bebfe6ba56"
+                "shasum": ""
             },
             "require": {
                 "dasprid/enum": "^1.0",
@@ -211,9 +211,9 @@
             "authors": [
                 {
                     "name": "Ben Scholzen 'DASPRiD'",
+                    "role": "Developer",
                     "email": "mail@dasprids.de",
-                    "homepage": "http://www.dasprids.de",
-                    "role": "Developer"
+                    "homepage": "http://www.dasprids.de"
                 }
             ],
             "description": "BaconQrCode is a QR code generator for PHP.",
@@ -342,9 +342,9 @@
             "authors": [
                 {
                     "name": "Christian Riesen",
-                    "role": "Developer",
                     "email": "chris.riesen@gmail.com",
-                    "homepage": "http://christianriesen.com"
+                    "homepage": "http://christianriesen.com",
+                    "role": "Developer"
                 }
             ],
             "description": "Base32 encoder/decoder according to RFC 4648",
@@ -711,9 +711,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/components/revealjs/components-revealjs-85e95cc14987dbb30bef3cb11ab8acddf5267819-zip-d39ddc.zip",
+                "url": "https://api.github.com/repos/components/revealjs/zipball/85e95cc14987dbb30bef3cb11ab8acddf5267819",
                 "reference": "85e95cc14987dbb30bef3cb11ab8acddf5267819",
-                "shasum": "0bb4d7264ed3bf028c5e46316afbb18855ab00d9"
+                "shasum": ""
             },
             "type": "component",
             "extra": {
@@ -933,9 +933,9 @@
             "authors": [
                 {
                     "name": "Cameron Spear",
-                    "role": "Developer",
                     "email": "cam@cameronspear.com",
-                    "homepage": "http://cameronspear.com"
+                    "homepage": "http://cameronspear.com",
+                    "role": "Developer"
                 }
             ],
             "description": "An unofficial Bootstrap plugin to enable Bootstrap dropdowns to activate on hover and provide a nice user experience.",
@@ -957,9 +957,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/dasprid/enum/dasprid-enum-631ef6e638e9494b0310837fa531bedd908fc22b-zip-f6ef6d.zip",
+                "url": "https://api.github.com/repos/DASPRiD/Enum/zipball/631ef6e638e9494b0310837fa531bedd908fc22b",
                 "reference": "631ef6e638e9494b0310837fa531bedd908fc22b",
-                "shasum": "384a45962fcf1dcb23d1466ff6e372d33dcd21a8"
+                "shasum": ""
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.4",
@@ -1217,7 +1217,7 @@
             ],
             "authors": [
                 {
-                    "name": "Osman Üngür",
+                    "name": "Osman Ungur",
                     "email": "osmanungur@gmail.com"
                 },
                 {
@@ -1386,17 +1386,17 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.4.1",
+            "version": "6.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "0895c932405407fd3a7368b6910c09a24d26db11"
+                "reference": "dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/guzzlehttp/guzzle/guzzlehttp-guzzle-0895c932405407fd3a7368b6910c09a24d26db11-zip-7065ea.zip",
-                "reference": "0895c932405407fd3a7368b6910c09a24d26db11",
-                "shasum": "d4e8e0775903c147ea4d132f81a35c211efe4121"
+                "url": "https://composer.tiki.org/dist/guzzlehttp/guzzle/guzzlehttp-guzzle-dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5-zip-96b4e3.zip",
+                "reference": "dbc2bc3a293ed6b1ae08a3651e2bfd213d19b6a5",
+                "shasum": "2a57ccc3a2d5dfc32183a8d6f4f6b026a395b407"
             },
             "require": {
                 "ext-json": "*",
@@ -1410,12 +1410,13 @@
                 "psr/log": "^1.1"
             },
             "suggest": {
+                "ext-intl": "Required for Internationalized Domain Name (IDN) support",
                 "psr/log": "Required for using the Log middleware"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.3-dev"
+                    "dev-master": "6.5-dev"
                 }
             },
             "autoload": {
@@ -1448,7 +1449,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2019-10-23T15:58:00+00:00"
+            "time": "2019-12-07T18:20:45+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1696,9 +1697,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/harvesthq/chosen/harvesthq-chosen-ad86732b668627c131e61ee8f0e6e9ed52e4db8d-zip-4474a1.zip",
+                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
                 "reference": "ad86732b668627c131e61ee8f0e6e9ed52e4db8d",
-                "shasum": "fa12f07bf546d99a533bcc625421fec1ac48a3e5"
+                "shasum": ""
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -2315,9 +2316,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/kriswallsmith/assetic/kriswallsmith-assetic-e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1-zip-5b3422.zip",
+                "url": "https://api.github.com/repos/kriswallsmith/assetic/zipball/e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1",
                 "reference": "e911c437dbdf006a8f62c2f59b15b2d69a5e0aa1",
-                "shasum": "33e3acdb5b45cbe7e60ac6e9c15f832b256576ce"
+                "shasum": ""
             },
             "require": {
                 "php": ">=5.3.1",
@@ -2781,9 +2782,9 @@
             "authors": [
                 {
                     "name": "Matthias Mullie",
-                    "role": "Developer",
                     "email": "pathconverter@mullie.eu",
-                    "homepage": "http://www.mullie.eu"
+                    "homepage": "http://www.mullie.eu",
+                    "role": "Developer"
                 }
             ],
             "description": "Relative path converter",
@@ -2865,9 +2866,9 @@
             "authors": [
                 {
                     "name": "Michel Fortin",
-                    "role": "Developer",
                     "email": "michel.fortin@michelf.ca",
-                    "homepage": "https://michelf.ca/"
+                    "homepage": "https://michelf.ca/",
+                    "role": "Developer"
                 },
                 {
                     "name": "John Gruber",
@@ -3387,9 +3388,8 @@
             "name": "npm-asset/sass-svg-uri",
             "version": "1.0.0",
             "dist": {
-                "type": "zip",
-                "url": "https://composer.tiki.org/dist/npm-asset/sass-svg-uri/npm-asset-sass-svg-uri-1.0.0.zip",
-                "shasum": "7c188e107890d085834ebd8286d9b26d1204e25a"
+                "type": "tar",
+                "url": "https://registry.npmjs.org/sass-svg-uri/-/sass-svg-uri-1.0.0.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -3733,18 +3733,18 @@
             "authors": [
                 {
                     "name": "Chuck Hagenbuch",
-                    "email": "chuck@horde.org",
-                    "role": "Lead"
+                    "role": "Lead",
+                    "email": "chuck@horde.org"
                 },
                 {
                     "name": "Aleksander Machniak",
-                    "email": "alec@php.net",
-                    "role": "Lead"
+                    "role": "Lead",
+                    "email": "alec@php.net"
                 },
                 {
                     "name": "Stig Bakken",
-                    "email": "stig@php.net",
-                    "role": "Lead"
+                    "role": "Lead",
+                    "email": "stig@php.net"
                 }
             ],
             "description": "More info available on: http://pear.php.net/package/Net_Socket",
@@ -4028,24 +4028,24 @@
         },
         {
             "name": "pear/xml_util",
-            "version": "v1.4.3",
+            "version": "v1.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/XML_Util.git",
-                "reference": "c74278d925be9c2f7d39955cdce45d8275571a1d"
+                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/pear/xml_util/pear-xml_util-c74278d925be9c2f7d39955cdce45d8275571a1d-zip-b7d7ee.zip",
-                "reference": "c74278d925be9c2f7d39955cdce45d8275571a1d",
-                "shasum": "9940cdde74a916da71fa6ab7d10bc2e3f900fc1a"
+                "url": "https://composer.tiki.org/dist/pear/xml_util/pear-xml_util-49cffb77aee118484cd55b9c5c1fd5323e9ceb9a-zip-68ce1f.zip",
+                "reference": "49cffb77aee118484cd55b9c5c1fd5323e9ceb9a",
+                "shasum": "4562a4e455686591f73450546d01607f7304cccd"
             },
             "require": {
                 "pear/pear-core-minimal": "^1.10.1",
                 "php": ">=5.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "@stable"
+                "phpunit/phpunit": "<=7"
             },
             "type": "library",
             "autoload": {
@@ -4062,13 +4062,13 @@
             ],
             "authors": [
                 {
-                    "name": "Stephan Schmidt",
-                    "email": "schst@php-tools.net",
+                    "name": "Chuck Burgess",
+                    "email": "ashnazg@php.net",
                     "role": "Lead"
                 },
                 {
-                    "name": "Chuck Burgess",
-                    "email": "ashnazg@php.net",
+                    "name": "Stephan Schmidt",
+                    "email": "schst@php-tools.net",
                     "role": "Lead"
                 },
                 {
@@ -4079,7 +4079,7 @@
             ],
             "description": "Methods to work with XML documents",
             "homepage": "http://pear.php.net/package/XML_Util",
-            "time": "2017-06-28T19:21:19+00:00"
+            "time": "2019-12-05T19:08:39+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
@@ -4272,8 +4272,8 @@
             "authors": [
                 {
                     "name": "Antonio Carlos Ribeiro",
-                    "email": "acr@antoniocarlosribeiro.com",
-                    "role": "Creator & Designer"
+                    "role": "Creator & Designer",
+                    "email": "acr@antoniocarlosribeiro.com"
                 }
             ],
             "description": "A One Time Password Authentication package, compatible with Google Authenticator.",
@@ -4564,9 +4564,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/robloach/component-installer/robloach-component-installer-908a859aa7c4949ba9ad67091e67bac10b66d3d7-zip-343382.zip",
+                "url": "https://api.github.com/repos/RobLoach/component-installer/zipball/908a859aa7c4949ba9ad67091e67bac10b66d3d7",
                 "reference": "908a859aa7c4949ba9ad67091e67bac10b66d3d7",
-                "shasum": "393701b38d2d24dc33c101fec6e01c5221070ac9"
+                "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.0",
@@ -5097,17 +5097,17 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.50",
+            "version": "2.1.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "ae1a24001af2727ef7ef4e8f32c7dc1b49709062"
+                "reference": "783709d6b97cafba586b0aa61e48b271407821fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/studio-42/elfinder/studio-42-elfinder-ae1a24001af2727ef7ef4e8f32c7dc1b49709062-zip-f688fe.zip",
-                "reference": "ae1a24001af2727ef7ef4e8f32c7dc1b49709062",
-                "shasum": "bef98d9a2dfd3b7c4b03b095cd66ea9ade1e3fed"
+                "url": "https://composer.tiki.org/dist/studio-42/elfinder/studio-42-elfinder-783709d6b97cafba586b0aa61e48b271407821fb-zip-71cb73.zip",
+                "reference": "783709d6b97cafba586b0aa61e48b271407821fb",
+                "shasum": "9da842a6019a0f23e4af1ab878083d9104925bc7"
             },
             "require": {
                 "php": ">=5.2"
@@ -5151,7 +5151,7 @@
             ],
             "description": "File manager for web",
             "homepage": "http://elfinder.org",
-            "time": "2019-08-20T14:15:16+00:00"
+            "time": "2019-12-08T03:03:51+00:00"
         },
         {
             "name": "svg-edit/svg-edit",
@@ -5301,25 +5301,25 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v4.4.1",
+            "version": "v5.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "64acec7e0d67125e9f4656c68d4a38a42ab5a0b7"
+                "reference": "19d29e7098b7b2c3313cb03902ca30f100dcb837"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/symfony/css-selector/symfony-css-selector-64acec7e0d67125e9f4656c68d4a38a42ab5a0b7-zip-740ecb.zip",
-                "reference": "64acec7e0d67125e9f4656c68d4a38a42ab5a0b7",
-                "shasum": "179b3179d008e6395076fa6f642d343c26dd22d8"
+                "url": "https://composer.tiki.org/dist/symfony/css-selector/symfony-css-selector-19d29e7098b7b2c3313cb03902ca30f100dcb837-zip-f0f80b.zip",
+                "reference": "19d29e7098b7b2c3313cb03902ca30f100dcb837",
+                "shasum": "fd3c08b14d38f05a6456c6b1938cd5b7a7044a3c"
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^7.2.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.4-dev"
+                    "dev-master": "5.0-dev"
                 }
             },
             "autoload": {
@@ -5350,7 +5350,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2019-10-12T00:35:04+00:00"
+            "time": "2019-11-18T17:27:11+00:00"
         },
         {
             "name": "symfony/debug",
@@ -5970,9 +5970,9 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/true/punycode/true-punycode-a4d0c11a36dd7f4e7cd7096076cab6d3378a071e-zip-4ceb35.zip",
+                "url": "https://api.github.com/repos/true/php-punycode/zipball/a4d0c11a36dd7f4e7cd7096076cab6d3378a071e",
                 "reference": "a4d0c11a36dd7f4e7cd7096076cab6d3378a071e",
-                "shasum": "0153b28196219934ea010de766dea03de32a7d89"
+                "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0",
@@ -8044,17 +8044,17 @@
         },
         {
             "name": "overtrue/phplint",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/phplint.git",
-                "reference": "2f822d72db3be32d872d32aa001b2f1d13aeff6a"
+                "reference": "deaee8c3459087ea5d17031206b8722a96dd330b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/overtrue/phplint/overtrue-phplint-2f822d72db3be32d872d32aa001b2f1d13aeff6a-zip-10a76a.zip",
-                "reference": "2f822d72db3be32d872d32aa001b2f1d13aeff6a",
-                "shasum": "c5d4165d92dc90791dfcb77c42b1c866539ee525"
+                "url": "https://composer.tiki.org/dist/overtrue/phplint/overtrue-phplint-deaee8c3459087ea5d17031206b8722a96dd330b-zip-b0b281.zip",
+                "reference": "deaee8c3459087ea5d17031206b8722a96dd330b",
+                "shasum": "962ef7c578be59cb5fab43051dd8b8097d90f625"
             },
             "require": {
                 "ext-json": "*",
@@ -8093,7 +8093,7 @@
                 "phplint",
                 "syntax"
             ],
-            "time": "2019-11-23T15:35:00+00:00"
+            "time": "2019-12-07T13:46:15+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
