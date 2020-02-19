@@ -6373,4 +6373,26 @@ class TrackerLib extends TikiLib
 
 		return $permName;
 	}
+
+	public function tracker_item_file($name, $type, $size, $data, $comment, $user, $fhash, $date = '')
+	{
+		$comment = strip_tags($comment);
+		$now = empty($date) ? $this->now : $date;
+		$info = pathinfo($name);
+		$file_name =  basename($name,'.'.$info['extension']);
+		$attId = $this->table('tiki_files')->insert([
+			'name' => $file_name,
+			'filename' => $name,
+			'filesize' => (int) $size,
+			'filetype' => $type,
+			'data' => $data,
+			'created' => (int) $now,
+			'hits' => 0,
+			'user' => $user,
+			'comment' => $comment,
+			'path' => $fhash,
+		]);
+
+		return $attId;
+	}
 }
