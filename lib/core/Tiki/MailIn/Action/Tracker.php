@@ -64,6 +64,7 @@ class Tracker implements ActionInterface
 	function execute(Account $account, Message $message)
 	{
 		$tikilib = TikiLib::lib('tiki');
+		$filegallib = TikiLib::lib('filegal');
 		$trackerUtilities = new Services_Tracker_Utilities();
 
 		$fieldSubject = [
@@ -185,13 +186,29 @@ class Tracker implements ActionInterface
 
 			$definition = $this->getDefinition($trackerId);
 
+			$galleryId = 1; // defalut file gallery
+			$gal_info = $filegallib->get_file_gallery($galleryId);
+			if(!$gal_info) {
+				$galInfo = [
+					'galleryId' => '',
+					'parentId' => 1,
+					'name' => 'MailInTrackerGal' . time(),
+					'description' => '',
+					'user' => $message->getAssociatedUser(),
+					'public' => 'y',
+					'visible' => 'y',
+				];
+				$galleryId = $filegallib->replace_file_gallery($galInfo);
+				$gal_info = $filegallib->get_file_gallery($galleryId);
+			}
+
 			$itemFiles='';
 
 			if ($this->canAttach() && $account->hasAutoAttach()) {
 				$i=0;
 				foreach ($message->getAttachments() as $att) {
-					// store each attachment
-					$id = $this->attachFile($att,  $message->getAssociatedUser());
+					// upload each attachment
+					$id = $this->attachFile($gal_info, $att, $message->getAssociatedUser());
 					if ($i == 0) {
 						$itemFiles .= $id;
 					} else {
@@ -207,7 +224,6 @@ class Tracker implements ActionInterface
 			for ($i=0; $i < sizeof($permNames);$i++) {
 				$toItem[$permNames[$i]]= $datasItem[$i];
 			}
-
 			$itemId = $trackerUtilities->insertItem(
 				$definition,
 				[
@@ -229,11 +245,11 @@ class Tracker implements ActionInterface
 		return true;
 	}
 
-	private function attachFile($att, $user)
+	private function attachFile($gal_info, $att, $user)
 	{
-		$trklib = TikiLib::lib('trk');
-		$attId = $trklib->tracker_item_file($att['name'], $att['type'], $att['size'], $att['data'], "inserted by Mailin to Tracker $user", $user, '');
-		return $attId;
+		$filegallib = TikiLib::lib('filegal');
+		$result = $filegallib->upload_single_file($gal_info, $att['name'], $att['size'], $att['type'], $att['data'], $user, null, null, null);
+		return $result;
 	}
 
 	private function getDefinition($trackerId)
