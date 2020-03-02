@@ -8,7 +8,6 @@ use Tiki\MailIn\Source\Message;
 use TikiLib;
 use Tracker_Definition;
 
-
 class Tracker implements ActionInterface
 {
 	private $tracker;
@@ -23,7 +22,6 @@ class Tracker implements ActionInterface
 		$this->tracker = isset($params['trackerId']) ? intval($params['trackerId']) : 0;
 		$this->attachments = $params['attachments'];
 	}
-
 
 	function getName()
 	{
@@ -60,9 +58,9 @@ class Tracker implements ActionInterface
 		return $trackerId;
 	}
 
-
 	function execute(Account $account, Message $message)
 	{
+		global $prefs;
 		$tikilib = TikiLib::lib('tiki');
 		$filegallib = TikiLib::lib('filegal');
 		$trackerUtilities = new Services_Tracker_Utilities();
@@ -186,12 +184,12 @@ class Tracker implements ActionInterface
 
 			$definition = $this->getDefinition($trackerId);
 
-			$galleryId = 1; // defalut file gallery
+			$galleryId = $prefs['fgal_root_id']; // defalut file gallery
 			$gal_info = $filegallib->get_file_gallery($galleryId);
 			if(!$gal_info) {
 				$galInfo = [
 					'galleryId' => '',
-					'parentId' => 1,
+					'parentId' => $galleryId,
 					'name' => 'MailInTrackerGal' . time(),
 					'description' => '',
 					'user' => $message->getAssociatedUser(),
@@ -221,7 +219,7 @@ class Tracker implements ActionInterface
 			$datasItem[] = $itemFiles;
 			$toItem = [];
 			// construct final table
-			for ($i=0; $i < sizeof($permNames);$i++) {
+			for ($i=0; $i < sizeof($permNames); $i++) {
 				$toItem[$permNames[$i]]= $datasItem[$i];
 			}
 			$itemId = $trackerUtilities->insertItem(
