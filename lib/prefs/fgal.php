@@ -715,5 +715,13 @@ When the limit is reached, no more files can be uploaded. The user will see an e
 			'type' => 'flag',
 			'default' => 'y'
 		],
+		'fgal_use_record_rtc_screen' => [
+			'name' => tra('Use RecordRTC to screen record'),
+			'description' => tra('if this setting is enabled, will use RecordRTC to record the screen activity.'),
+			'type' => 'flag',
+			'default' => 'n',
+			'tags' => ['experimental'],
+			'packages_required' => ['npm-asset/recordrtc' => VendorHelper::getAvailableVendorPath('recordrtc', '/npm-asset/recordrtc/RecordRTC.js')]
+		],
 	];
 }

@@ -146,6 +146,11 @@
 				{preference name='fgal_use_drawio_services_to_export_images'}
 				{preference name='fgal_use_diagram_compression_by_default'}
 			</fieldset>
+
+			<fieldset>
+				<legend> {tr}Settings for RecordRTC{/tr}</legend>
+				{preference name='fgal_use_record_rtc_screen'}
+			</fieldset>
 		{/tab}
 
 		{tab name="{tr}Plugins{/tr}"}
