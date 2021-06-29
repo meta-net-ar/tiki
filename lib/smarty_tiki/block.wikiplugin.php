@@ -36,6 +36,21 @@ function smarty_block_wikiplugin($params, $content, $smarty, $repeat = false)
 		$params = $params['_compactArguments_'];
 	}
 
+	// render the block as wiki syntax (useful when using inside other wikiplugin block)
+	// IN: {wikiplugin _name="tracker" trackerId="18" url="this-page?itemId=$result.object_id" _wikiSyntax=y}{/wikiplugin}
+	// OUT: {TRACKER (trackerId="18" url="this-page?itemId=$result.object_id")}{TRACKER}
+	$wikiSyntax = isset($params['_wikiSyntax']) && $params['_wikiSyntax'] == 'y';
+	unset($params['_wikiSyntax']);
+
+	if ($wikiSyntax) {
+		$options = '';
+		foreach ($params as $key => $value) {
+			$options .= sprintf( ' %s=%s', $key, escapeshellarg($value));
+		}
+
+		return sprintf('{%1$s(%2$s)}%3$s{%1$s}', strtoupper($name), $options, $content);
+	}
+
 	$parserlib = TikiLib::lib('parser');
 	$out = $parserlib->plugin_execute(
 		$name,
