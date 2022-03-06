@@ -70,7 +70,7 @@
  * guarentees a basic set of rules.
  *
  * The context is provided as an array for extensibility. Currently,
- * type and object are the only two known keys.
+ * type, object and parentId are the only known keys.
  *
  * Resolvers are group agnostic, meaning the same resolver will be
  * provided no matter which groups have been configured. This allows
