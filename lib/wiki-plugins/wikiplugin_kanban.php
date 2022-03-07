@@ -276,6 +276,15 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 
 
     $caslAbilities = []; //Spec at https://casl.js.org/
+    $trackerPerms = Perms::get(['type' => 'tracker', 'object' => $trackerId]);
+
+    if ($trackerPerms['tiki_p_create_tracker_items']) {
+        $caslAbilities[] =
+            [
+                'action' => 'create',
+                'subject' => 'Tracker_Item'
+            ];
+    }
     foreach ($entries as $row) {
 
         //$trackerItem = Tracker_Item::fromInfo($row);
@@ -288,15 +297,25 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             }
         }
         $trackerItemData = $trackerItem->getData();
+
         //echo '<pre>DATA:';print_r($trackerItemData);echo '</pre>';
-        $caslAbilityDefinition = [
-            'action' => 'update',
-            'subject' => 'Tracker_Item',
-            'fields' => $updatableFields,
-            'conditions' => ['itemId' => $trackerItem->getId()]
-        ];
-        //echo '<pre>';print_r($caslAbilityDefinition);echo '</pre>';
-        $caslAbilities[] = $caslAbilityDefinition;
+
+        $caslAbilities[] =
+            [
+                'action' => 'update',
+                'subject' => 'Tracker_Item',
+                'fields' => $updatableFields,
+                'conditions' => ['itemId' => $trackerItem->getId()]
+            ];
+
+        $caslAbilities[] =
+            [
+                'action' => 'delete',
+                'subject' => 'Tracker_Item',
+                'conditions' => ['itemId' => $trackerItem->getId()]
+            ];
+
+        //if ($perms['tiki_p_create_tracker_items'] == 'n' && empty($itemId)) {
 
         //We don't use $row[$swimlaneFieldPermName], because it's the title, not the value
         $swimlaneValue = $trackerItemData['fields'][$swimlaneFieldPermName];
