@@ -56,24 +56,24 @@ function wikiplugin_kanban_info(): array
             ],
             'columnValues' => [
                 'name' => tr('Column acceptable values and configuration'),
-                'description' => tr('Defines the acceptable values, ordering, labels, WiP limits of each columns.  An array of semicolumn separated values, containing a coma separated arguments configuring the column.
-                someValue,4,someAlternateTextToDisplay:someOtherValue,null,someOtherAlternateTextToDisplay
+                'description' => tr('Defines the number and order of columns, as well as the value, label and WiP limit for each one.  An array of semicolumn separated values, containing a coma separated arguments configuring the column.
+                someValue,someAlternateTextToDisplay,null:someOtherValue,someOtherAlternateTextToDisplay,,4
                 
                 In order, the configuration represent the:
 
                 1) field value in the column mapped tracker field
-                2) wipLimit for the column.  Typically you will use null for the first and last column.
-                3) overrideLabel If present and not "null",  the text to be displayed as the column header instead of the normal tracker field label. (For example "Done" instead of "Closed")
+                2) overrideLabel If present and not "null",  the text to be displayed as the column header instead of the normal tracker field label. (For example "Done" instead of "Closed")
+                3) wipLimit for the column.  Typically you will use null for the first and last column.
 
-                null means the parameter is not set.  Necessary since the arguments are positional.
+                null or nothing between the comas means the parameter is not set.  Necessary since the arguments are positional.
 
                 If the whole parameter is absent (not recommended), all possible field values will be used.
                 
                 '),
-                'hint' => tr('e.g. "someValue,4,someAlternateTextToDisplay:someOtherValue,null,someOtherAlternateTextToDisplay"'),
+                'hint' => tr('e.g. "someValue,someAlternateTextToDisplay,null:someOtherValue,someOtherAlternateTextToDisplay,,4"'),
                 'since' => '24.0',
                 'required' => false,
-                'filter' => 'test',
+                'filter' => 'text',
                 'separator' => ':'
             ],
             'order' => [
@@ -91,11 +91,81 @@ function wikiplugin_kanban_info(): array
                 'since' => '24.0',
                 'required' => false,
                 'filter' => 'word',
-            ]
+            ],
+            'swimlaneValues' => [
+                'name' => tr('Swimlanes acceptable values and configuration'),
+                'description' => tr('Similar to columnValues, except there is no WiP limit.
+
+                If the whole parameter is absent, all possible field values will be used.
+                
+                '),
+                'hint' => tr('e.g. "someValue,someAlternateTextToDisplay:someOtherValue"'),
+                'since' => '24.0',
+                'required' => false,
+                'filter' => 'text',
+                'separator' => ':'
+            ],
         ],
     ];
 }
 
+function _map_field($fieldHandler, string $fieldValuesParamName, array|null $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig): array
+{
+    $fieldPossibleValues = wikiplugin_kanban_format_list($fieldHandler);
+    //echo '<pre>';print_r($fieldPossibleValues);echo '</pre>';
+    $fieldValuesMap = [];
+    foreach ($fieldPossibleValues as $info) {
+        $fieldValuesMap[$info['value']] = $info;
+    }
+    $fieldInfo = [];
+    if (!$fieldValuesParam) {
+        foreach ($fieldValuesMap as $key => $column) {
+            $fieldInfo[$key] = array_merge($fieldDefaultConfig, $column);
+        }
+    } else {
+
+        foreach ($fieldValuesParam as $key => $fieldParams) {
+            $fieldParamsArray = explode(',', $fieldParams);
+            //column value
+            if (!$fieldParamsArray[0]) {
+                return WikiParser_PluginOutput::userError(tra('Parameter "%0=%1" has an empty column value (first parameter after the :) at index %2.  Possible values are %3', '', false, [
+                    $fieldValuesParamName,
+                    implode(':', $fieldValuesParam),
+                    $key,
+                    implode(',', array_keys($fieldValuesMap))
+                ]));
+            }
+            $fieldValue = trim($fieldParamsArray[0]);
+            if (!$fieldValuesMap[$fieldValue]) {
+                return WikiParser_PluginOutput::userError(tra('Column value "%0" specified in parameter "%1=%2" is not found in tracker field "%3".  Possible values are %4', '', false, [
+                    $fieldValue,
+                    $fieldValuesParamName,
+                    implode(':', $fieldValuesParam),
+                    $fieldPermName,
+                    implode(',', array_keys($fieldValuesMap))
+                ]));
+            }
+            $fieldInfo[$fieldValue] = array_merge($fieldDefaultConfig, $fieldValuesMap[$fieldValue]);
+            //Override column label
+            if ($fieldParamsArray[1] && $fieldParamsArray[1] !== 'null') {
+                $fieldInfo[$fieldValue]['title'] = trim($fieldParamsArray[1]);
+            }
+            //wip limit
+            if ($fieldParamsArray[2] && $fieldParamsArray[2] !== 'null') {
+                if (!is_numeric($fieldParamsArray[2])) {
+                    throw new Exception(tra('Wip limit value "%0" specified in parameter "%1=%2" is not numeric', '', false, [
+                        $fieldParamsArray[2],
+                        $fieldValuesParamName,
+                        implode(':', $fieldValuesParam)
+                    ]));
+                }
+                $wipValue = intval($fieldParamsArray[2]);
+                $fieldInfo[$fieldValue]['wip'] = $wipValue;
+            }
+        }
+    }
+    return $fieldInfo;
+}
 function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 {
     global $user, $prefs;
@@ -139,79 +209,43 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             return WikiParser_PluginOutput::userError(tr('Param "%0" is missing', $key));
         }
         $fieldDef = $mappedTrackerDefinition->getFieldFromPermName($field);
-        //echo '<pre>';print_r($fieldDef);echo '</pre>';
         if (!$fieldDef) {
-            return WikiParser_PluginOutput::userError(tra('Tracker field with permName "%0" found for param "%1"', '', false, [$field, $key]));
+            return WikiParser_PluginOutput::userError(tra('Tracker field with permName "%0" not found for param "%1".  Possible fields are %2', '', false, [
+                $field,
+                $key,
+                implode(',', array_column($mappedTrackerDefinition->getFields(), 'permName'))
+            ]));
         }
         $boardFields[$key] = $fieldDef;
     }
 
     $fieldFactory = $mappedTrackerDefinition->getFieldFactory();
 
-    $columnDefaultConfig = [
-        'wip' => null
-    ];
-
     $columnsHandler = $fieldFactory->getHandler($boardFields['column']);
     $columnFieldPermName = $boardFields['column']['permName'];
-    $columnFieldPossibleValues = wikiplugin_kanban_format_list($columnsHandler);
-    $columnsMap = [];
-    foreach ($columnFieldPossibleValues as $info) {
-        $columnsMap[$info['value']] = $info;
-    }
-    //echo '<pre>';print_r($columnsMap);echo '</pre>';
+    $columnsInfo = _map_field(
+        $columnsHandler,
+        'columnValues',
+        $jit->columnValues->text(),
+        $columnFieldPermName,
+        [
+            'wip' => null
+        ]
+    );
 
-    $columnValuesParam = $jit->columnValues->text();
-    //echo '<pre>';print_r($columnValuesParam);echo '</pre>';
-
-    $columnsInfo = [];
-    if (!$columnValuesParam) {
-        foreach ($columnsMap as $key => $column) {
-            $columnsInfo[$key] = array_merge($columnDefaultConfig, $column);
-        }
-    } else {
-
-        foreach ($columnValuesParam as $key => $columnParams) {
-            $columnParamsArray = explode(',', $columnParams);
-            //column value
-            if (!$columnParamsArray[0]) {
-                return WikiParser_PluginOutput::userError(tra('Parameter "columnValues=%0" has an empty column value (first parameter after the :) at index %1.  Possible values are %2', '', false, [
-                    implode(':', $jit->columnValues->text()),
-                    $key,
-                    implode(',', array_keys($columnsMap))
-                ]));
-            }
-            $columnValue = trim($columnParamsArray[0]);
-            if (!$columnsMap[$columnValue]) {
-                return WikiParser_PluginOutput::userError(tra('Column value "%0" specified in parameter "columnValues=%1" is not found in tracker field "%2".  Possible values are %3', '', false, [
-                    $columnValue,
-                    implode(':', $jit->columnValues->text()),
-                    $columnFieldPermName,
-                    implode(',', array_keys($columnsMap))
-                ]));
-            }
-            $columnsInfo[$columnValue] = array_merge($columnDefaultConfig, $columnsMap[$columnValue]);
-            //
-            //wip limit
-            if ($columnParamsArray[1]) {
-                $wipValue = $columnParamsArray[1] == 'null' ? null : intval($columnParamsArray[1]);
-                $columnsInfo[$columnValue]['wip'] = $wipValue;
-            }
-            //Override column label
-            if ($columnParamsArray[2]) {
-                $columnsInfo[$columnValue]['title'] = trim($columnParamsArray[2]);
-            }
-        }
-    }
-    //echo '<pre>';print_r($columnsInfo);echo '</pre>';
 
     $swimlanesHandler = $fieldFactory->getHandler($boardFields['swimlane']);
     $swimlaneFieldPermName = $boardFields['swimlane']['permName'];
-    $swimlaneFieldPossibleValues = wikiplugin_kanban_format_list($swimlanesHandler);
-    $swimlanesInfo = [];
-    foreach ($swimlaneFieldPossibleValues as $info) {
-        $swimlanesInfo[$info['value']] = $info;
-    }
+    $swimlanesInfo = _map_field(
+        $swimlanesHandler,
+        'swimlaneValues',
+        $jit->swimlaneValues->text(),
+        $swimlaneFieldPermName,
+        [
+            'wip' => null
+        ]
+    );
+
     //echo '<pre>';print_r($swimlanesInfo);echo '</pre>';
     //END mapping the fields
 
@@ -220,7 +254,12 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $query->filterType('trackeritem');
     $query->filterContent((string)$jit->boardTrackerId->int(), 'tracker_id');
     //print_r(array_keys($columnsInfo));
-    $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
+    if ($jit->columnValues->text()) {
+        $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
+    }
+    if ($jit->swimlaneValues->text()) {
+        $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
+    }
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
     $unifiedsearchlib->initQuery($query);
@@ -382,6 +421,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 function wikiplugin_kanban_format_list($handler)
 {
     $fieldData = $handler->getFieldData();
+    //echo '<pre>';print_r($fieldData);echo '</pre>';
     $list = $formatted = [];
     if ($handler->getConfiguration('type') === 'd') {
         $list = $fieldData['possibilities'];
