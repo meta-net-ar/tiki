@@ -317,11 +317,23 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $caslAbilities = []; //Spec at https://casl.js.org/
     $trackerPerms = Perms::get(['type' => 'tracker', 'object' => $trackerId]);
 
+
+
     if ($trackerPerms['tiki_p_create_tracker_items']) {
+
+        //We need this to check field permissions.
+        $trackerItem = Tracker_Item::newItem($trackerId);
+        $updatableFields = [];
+        foreach ($boardFields as $field) {
+            if ($trackerItem->canModifyField($field['fieldId'])) {
+                $updatableFields[] =  $field['permName'];
+            }
+        }
         $caslAbilities[] =
             [
                 'action' => 'create',
-                'subject' => 'Tracker_Item'
+                'subject' => 'Tracker_Item',
+                'fields' => $updatableFields
             ];
     }
     foreach ($entries as $row) {
@@ -399,7 +411,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             'user' => $user,
             'CASLAbilityRules' => $caslAbilities
         ];
-    //echo ("<pre>");var_dump($kanbanData);//echo ("</pre>");
+    //echo ("<pre>");print_r($kanbanData);echo ("</pre>");
     $smarty->assign(
         'kanbanData',
         $kanbanData
