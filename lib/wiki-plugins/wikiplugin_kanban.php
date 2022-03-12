@@ -109,7 +109,7 @@ function wikiplugin_kanban_info(): array
     ];
 }
 
-function _map_field($fieldHandler, string $fieldValuesParamName, array|null $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig): array
+function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig): array
 {
     $fieldPossibleValues = wikiplugin_kanban_format_list($fieldHandler);
     //echo '<pre>';print_r($fieldPossibleValues);echo '</pre>';
