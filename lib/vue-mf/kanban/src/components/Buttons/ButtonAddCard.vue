@@ -20,7 +20,10 @@ defineProps({
 
 const showForm = ref(false)
 
-const ability = computed(() => defineAbilityFor(store.getters.getUser))
+const canCreateCard = computed(() => {
+    const ability = defineAbilityFor(store.getters.getRules)
+    return ability.can('create', 'Tracker_Item')
+})
 
 const handleOpen = () => {
     showForm.value = true
@@ -33,7 +36,7 @@ const handleClose = () => {
 </script>
 
 <template>
-    <Button v-if="!showForm && ability.can('create', 'Card')" class="w-100" variant="default" sm @click="handleOpen">
+    <Button v-if="!showForm && canCreateCard" class="w-100" variant="default" sm @click="handleOpen">
         <i class="fas fa-plus"></i>
         <span class="ml-2">Add a card</span>
     </Button>

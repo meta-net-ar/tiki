@@ -9,7 +9,7 @@ import { ref, onBeforeMount } from 'vue'
 import KanbanBoard from './components/KanbanBoard.vue'
 // import Sidemenu from './components/Sidemenu/Sidemenu.vue'
 import store from './store'
-import kanban from './api/kanban'
+// import kanban from './api/kanban'
 
 const props = defineProps({
     customProps: {

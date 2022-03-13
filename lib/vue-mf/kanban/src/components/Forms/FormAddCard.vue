@@ -59,6 +59,30 @@ const handleAddCard = () => {
                 column: props.columnValue,
                 sortOrder: sortOrder,
             })
+            store.dispatch('addRules', [
+                {
+                    action: "update",
+                    subject: "Tracker_Item",
+                    fields: [
+                        store.getters.getTitleField,
+                        store.getters.getDescriptionField,
+                        store.getters.getXaxisField,
+                        store.getters.getYaxisField,
+                        store.getters.getSwimlaneField
+                    ],
+                    conditions: {
+                        itemId: res.data.itemId
+                    }
+                },
+                {
+                    action: "delete",
+                    subject: "Tracker_Item",
+                    conditions: {
+                        itemId: res.data.itemId
+                    }
+                }
+            ])
+            console.log(res.data)
             toast.success(`${res.status} ${res.statusText}! Item created.`)
         })
         .catch(err => {

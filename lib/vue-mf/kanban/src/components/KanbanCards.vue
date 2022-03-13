@@ -13,6 +13,7 @@ import { useToast } from 'vue-toastification'
 import kanban from '../api/kanban'
 import store from '../store'
 import defineAbilityFor from '../auth/defineAbility'
+import { subject } from "@casl/ability"
 
 const props = defineProps({
     cardIds: {
@@ -37,13 +38,18 @@ const toast = useToast()
 const dragging = ref(false)
 
 const getCards = computed(() => store.getters.getCards(props.cardIds))
-const ability = computed(() => defineAbilityFor(store.getters.getUser))
 const getTrackerItemEditLink = computed(() => id => `tiki-tracker-update_item?trackerId=${store.getters.getTrackerId}&itemId=${id}`)
 const getTrackerItemLink = computed(() => id => `tiki-view_tracker_item.php?itemId=${id}`)
 
 
 const startDragging = () => dragging.value = true
 const endDragging = () => setTimeout(() => dragging.value = false, 0)
+
+const checkMove = (event) => {
+    const ability = defineAbilityFor(store.getters.getRules)
+    const canUpdate = ability.can('update', subject('Tracker_Item', {itemId: event.draggedContext.element.id}), store.getters.getColumnField)
+    return canUpdate;
+}
 
 const handleEditCard = element => {
     if (!dragging.value) emit('editCard', element)
@@ -119,10 +125,10 @@ const setItem = (itemId, newIndex) => {
         dragClass="dragging-card"
         filter="textarea"
         :preventOnFilter="false"
-        :disabled="!ability.can('update', 'Card')"
         @change="handleChange"
         @start="startDragging"
         @end="endDragging"
+        :move="checkMove"
         :fallbackTolerance="3"
         :forceFallback="true"
         :animation="150"

@@ -10,6 +10,7 @@ import { useToast } from "vue-toastification"
 import kanban from '../../api/kanban'
 import store from '../../store'
 import defineAbilityFor from '../../auth/defineAbility'
+import { subject } from "@casl/ability"
 
 const props = defineProps({
     id: [Number, String],
@@ -56,8 +57,9 @@ const handleSaveTitle = event => {
 }
 
 const handleEditClick = event => {
-    const ability = defineAbilityFor(store.getters.getUser)
-    if (ability.can('update', 'Card')) showEditField.value = true
+    const ability = defineAbilityFor(store.getters.getRules)
+    const canUpdate = ability.can('update', subject('Tracker_Item', {itemId: props.id}), store.getters.getTitleField)
+    if (canUpdate) showEditField.value = true
 }
 </script>
 

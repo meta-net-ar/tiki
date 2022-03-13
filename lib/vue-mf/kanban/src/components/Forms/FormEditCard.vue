@@ -11,6 +11,7 @@ import { Button } from '@vue-mf/styleguide'
 import kanban from '../../api/kanban'
 import store from '../../store'
 import defineAbilityFor from '../../auth/defineAbility'
+import { subject } from "@casl/ability"
 
 const props = defineProps({
     id: [Number, String],
@@ -38,6 +39,12 @@ const textarea = ref(null)
 watchEffect(() => {
     description.value = props.desc
 })
+
+const handleEditClick = event => {
+    const ability = defineAbilityFor(store.getters.getRules)
+    const canUpdate = ability.can('update', subject('Tracker_Item', {itemId: props.id}), store.getters.getTitleField)
+    if (canUpdate) showEditField.value = true
+}
 
 const handleSaveTitle = event => {
     showEditField.value = false
@@ -71,17 +78,13 @@ const handleSaveTitle = event => {
     })
 }
 
-const handleEditClick = event => {
-    const ability = defineAbilityFor(store.getters.getUser)
-    if (ability.can('update', 'Card')) showEditField.value = true
-}
-
 const handleDescriptionInput = event => {
     description.value = event.target.value
 }
 const handleEditDesc = () => {
-    const ability = defineAbilityFor(store.getters.getUser)
-    if (ability.can('update', 'Card')) editDesc.value = true
+    const ability = defineAbilityFor(store.getters.getRules)
+    const canUpdate = ability.can('update', subject('Tracker_Item', {itemId: props.id}), store.getters.getDescriptionField)
+    if (canUpdate) editDesc.value = true
 }
 const handleSaveDesc = () => {
     kanban.setItem(
