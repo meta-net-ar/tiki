@@ -585,19 +585,12 @@ class Tracker_Field_UserSelector extends Tracker_Field_Abstract implements Track
         return $schema;
     }
 
-    public function getFilterCollection()
+    public function getPossibleItemValues()
     {
-        global $prefs;
-
-        if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_modifier_username');
-            $showRealname = true;
-        } else {
-            $showRealname = false;
-        }
-
-        $userlib = TikiLib::lib('user');
+        static $localCache = [];
+        $CACHE_KEY = 'possibleUsers';
+        if (! isset($localCache[$CACHE_KEY])) {
+            $userlib = TikiLib::lib('user');
         $tikilib = TikiLib::lib('tiki');
         $users = [];
 
@@ -630,6 +623,24 @@ class Tracker_Field_UserSelector extends Tracker_Field_Abstract implements Track
             }
         }
 
+            $localCache[$CACHE_KEY] =  $users;
+        }
+        return $localCache[$CACHE_KEY];
+    }
+
+    public function getFilterCollection()
+    {
+        global $prefs;
+
+        if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
+            $smarty = TikiLib::lib('smarty');
+            $smarty->loadPlugin('smarty_modifier_username');
+            $showRealname = true;
+        } else {
+            $showRealname = false;
+        }
+
+        $users = $this->getPossibleItemValues();
         asort($users, SORT_NATURAL | SORT_FLAG_CASE);
 
         $users['-Blank (no data)-'] = tr('-Blank (no data)-');

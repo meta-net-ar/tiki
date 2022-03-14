@@ -111,16 +111,12 @@ function wikiplugin_kanban_info(): array
 
 function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig): array
 {
-    $fieldPossibleValues = wikiplugin_kanban_format_list($fieldHandler);
-    //echo '<pre>';print_r($fieldPossibleValues);echo '</pre>';
-    $fieldValuesMap = [];
-    foreach ($fieldPossibleValues as $info) {
-        $fieldValuesMap[$info['value']] = $info;
-    }
+    $fieldValuesMap = $fieldHandler->getPossibleItemValues();
+    //echo '<pre>';print_r($fieldValuesMap);echo '</pre>';
     $fieldInfo = [];
     if (!$fieldValuesParam) {
-        foreach ($fieldValuesMap as $key => $column) {
-            $fieldInfo[$key] = array_merge($fieldDefaultConfig, $column);
+        foreach ($fieldValuesMap as $value => $label) {
+            $fieldInfo[$value] = array_merge($fieldDefaultConfig, ['title' => $label, 'value' => $value]);
         }
     } else {
 
@@ -145,7 +141,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
                     implode(',', array_keys($fieldValuesMap))
                 ]));
             }
-            $fieldInfo[$fieldValue] = array_merge($fieldDefaultConfig, $fieldValuesMap[$fieldValue]);
+            $fieldInfo[$fieldValue] = array_merge($fieldDefaultConfig, ['title' => $fieldValuesMap[$fieldValue], 'value' => $fieldValue]);
             //Override column label
             if ($fieldParamsArray[1] && $fieldParamsArray[1] !== 'null') {
                 $fieldInfo[$fieldValue]['title'] = trim($fieldParamsArray[1]);
@@ -259,6 +255,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     }
     if ($jit->swimlaneValues->text()) {
         $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
+        //$query->filterIdentifier('NOT ', 'tracker_field_' . $swimlaneFieldPermName);
     }
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
@@ -371,19 +368,19 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         //We don't use $row[$swimlaneFieldPermName], because it's the title, not the value
         $swimlaneValue = $trackerItemData['fields'][$swimlaneFieldPermName];
         //We really should NOT be providing this id, since the api writes using the value
-        $swimlaneDatabasePrimaryKey = $swimlanesInfo[$swimlaneValue]['id'];
+        //$swimlaneDatabasePrimaryKey = $swimlanesInfo[$swimlaneValue]['id'];
 
         //We don't use $row[$columnFieldPermName], because it's the title, not the value
         $columnValue = $trackerItemData['fields'][$columnFieldPermName];
         //We really should NOT be providing this id, since the api writes using the value
-        $columnDatabasePrimaryKey = $columnsInfo[$columnValue]['id'];
+        //$columnDatabasePrimaryKey = $columnsInfo[$columnValue]['id'];
 
         $boardCards[] = [
             'id' => $row['object_id'],
             'title' => $row[$boardFields['title']['permName']],
             'description' => $row[$boardFields['description']['permName']],
-            'row' => $swimlaneDatabasePrimaryKey,
-            'column' => $columnDatabasePrimaryKey,
+            'row' => $swimlaneValue,
+            'column' => $columnValue,
             'sortOrder' => $row[$boardFields['order']['permName']],
         ];
     }
@@ -405,13 +402,15 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             'swimlaneField' => $jit->swimlane->word(),
             'titleField' => $jit->title->word(),
             'descriptionField' => $jit->description->word(),
-            'columns' => array_values($columnsInfo),
-            'rows' => array_values($swimlanesInfo),
+            'columns' => $columnsInfo,
+            'rows' => $swimlanesInfo,
             'cards' => $boardCards,
             'user' => $user,
             'CASLAbilityRules' => $caslAbilities
         ];
-    //echo ("<pre>");print_r($kanbanData);echo ("</pre>");
+    echo ("<pre>");
+    print_r($kanbanData);
+    echo ("</pre>");
     $smarty->assign(
         'kanbanData',
         $kanbanData

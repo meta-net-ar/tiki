@@ -12,7 +12,7 @@
  * Letter key: ~d~ ~D~ ~R~ ~M~
  *
  */
-class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_Field_Synchronizable, Search_FacetProvider_Interface, Tracker_Field_Exportable, Tracker_Field_Filterable
+class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_Field_Synchronizable, Search_FacetProvider_Interface, Tracker_Field_Exportable, Tracker_Field_Filterable, Tracker_Field_EnumerableInterface
 {
     public static function getTypes()
     {
@@ -125,7 +125,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
         return [
             'value' => $value,
             'selected' => $value === '' ? [] : explode(',', $value),
-            'possibilities' => $this->getPossibilities(),
+            'possibilities' => $this->getPossibleItemValues(),
         ];
     }
 
@@ -164,7 +164,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
 
     private function getValueLabel($value)
     {
-        $possibilities = $this->getPossibilities();
+        $possibilities = $this->getPossibleItemValues();
         if (isset($possibilities[$value])) {
             return $possibilities[$value];
         } else {
@@ -187,7 +187,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
         return $info;
     }
 
-    private function getPossibilities()
+    public function getPossibleItemValues()
     {
         static $localCache = [];
 
@@ -206,7 +206,6 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
 
             $localCache[$string] = $out;
         }
-
         return $localCache[$string];
     }
 
@@ -301,7 +300,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
         return [
             Search_Query_Facet_Term::fromField($baseKey)
                 ->setLabel($this->getConfiguration('name'))
-                ->setRenderMap($this->getPossibilities())
+                ->setRenderMap($this->getPossibleItemValues())
         ];
     }
 
@@ -312,7 +311,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
         $permName = $this->getConfiguration('permName');
         $name = $this->getConfiguration('name');
 
-        $possibilities = $this->getPossibilities();
+        $possibilities = $this->getPossibleItemValues();
         $invert = array_flip($possibilities);
         $withOther = ($this->getConfiguration('type') === 'D');
 
@@ -358,7 +357,7 @@ class Tracker_Field_Dropdown extends Tracker_Field_Abstract implements Tracker_F
         $name = $this->getConfiguration('name');
         $baseKey = $this->getBaseKey();
 
-        $possibilities = $this->getPossibilities();
+        $possibilities = $this->getPossibleItemValues();
         if ($this->getConfiguration('type') == 'D') {
             // TODO: make these and the ones in wikiplugin_trackerFilter_get_filters actually return accessible items
             // i.e. if I am not able to see an item, I should not see its value in the filter as well (WYSIWYCA problem)
