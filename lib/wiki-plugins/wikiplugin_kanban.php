@@ -86,7 +86,11 @@ function wikiplugin_kanban_info(): array
             ],
             'swimlane' => [
                 'name' => tr('Swimlane (row) field'),
-                'description' => tr('Tracker field representing the "rows" or "swimlanes" of the board. Can be any field with discrete values.  Usually represents a client, a project, or a team member.  Note:  A kanban board can have multiple rows, but these rows aren\'t independent, they share the same possible States and Wip limits.  If what you want is completely independent "rows", create two boards on the same tracker, with different filters.'),
+                'description' => tr('Tracker field representing the "rows" or "swimlanes" of the board. Can be any field with discrete values.  Usually represents a client, a project, or a team member.  
+                
+                All tracker items with valid field values on the board, but not those with empty values (this behaviour may change in the future).  To allow empty values, see swimlaneValues
+
+                Note:  A kanban board can have multiple rows, but these rows aren\'t independent, they share the same possible States and Wip limits.  If what you want is completely independent "rows", create two boards on the same tracker, with different filters.'),
                 'hint' => tr('e.g. "kanbanSwimlanes'),
                 'since' => '24.0',
                 'required' => false,
@@ -96,8 +100,7 @@ function wikiplugin_kanban_info(): array
                 'name' => tr('Swimlanes acceptable values and configuration'),
                 'description' => tr('Similar to columnValues, except there is no WiP limit.
 
-                If the whole parameter is absent, all possible field values will be used.
-                
+                To allow empty values, include field with an empty value (ex: someValue:someOtherValue:,Unsorted cards)
                 '),
                 'hint' => tr('e.g. "someValue,someAlternateTextToDisplay:someOtherValue"'),
                 'since' => '24.0',
@@ -109,7 +112,7 @@ function wikiplugin_kanban_info(): array
     ];
 }
 
-function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig): array
+function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig, bool $allowEmptyValues=false)
 {
     $fieldValuesMap = $fieldHandler->getPossibleItemValues();
     //echo '<pre>';print_r($fieldValuesMap);echo '</pre>';
@@ -123,8 +126,8 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
         foreach ($fieldValuesParam as $key => $fieldParams) {
             $fieldParamsArray = explode(',', $fieldParams);
             //column value
-            if (!$fieldParamsArray[0]) {
-                return WikiParser_PluginOutput::userError(tra('Parameter "%0=%1" has an empty column value (first parameter after the :) at index %2.  Possible values are %3', '', false, [
+            if (!$allowEmptyValues && !$fieldParamsArray[0]) {
+                throw new TypeError(tra('Parameter "%0=%1" has an empty column value (first parameter after the :) at index %2.  Possible values are %3', '', false, [
                     $fieldValuesParamName,
                     implode(':', $fieldValuesParam),
                     $key,
@@ -132,8 +135,8 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
                 ]));
             }
             $fieldValue = trim($fieldParamsArray[0]);
-            if (!$fieldValuesMap[$fieldValue]) {
-                return WikiParser_PluginOutput::userError(tra('Column value "%0" specified in parameter "%1=%2" is not found in tracker field "%3".  Possible values are %4', '', false, [
+            if (!$allowEmptyValues && !$fieldValuesMap[$fieldValue]) {
+                throw new TypeError(tra('Column value "%0" specified in parameter "%1=%2" is not found in tracker field "%3".  Possible values are %4', '', false, [
                     $fieldValue,
                     $fieldValuesParamName,
                     implode(':', $fieldValuesParam),
@@ -149,7 +152,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
             //wip limit
             if ($fieldParamsArray[2] && $fieldParamsArray[2] !== 'null') {
                 if (!is_numeric($fieldParamsArray[2])) {
-                    throw new Exception(tra('Wip limit value "%0" specified in parameter "%1=%2" is not numeric', '', false, [
+                    throw new TypeError(tra('Wip limit value "%0" specified in parameter "%1=%2" is not numeric', '', false, [
                         $fieldParamsArray[2],
                         $fieldValuesParamName,
                         implode(':', $fieldValuesParam)
@@ -216,31 +219,36 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     }
 
     $fieldFactory = $mappedTrackerDefinition->getFieldFactory();
+    try {
+        $columnsHandler = $fieldFactory->getHandler($boardFields['column']);
+        $columnFieldPermName = $boardFields['column']['permName'];
+        $columnsInfo = _map_field(
+            $columnsHandler,
+            'columnValues',
+            $jit->columnValues->text(),
+            $columnFieldPermName,
+            [
+                'wip' => null
+            ]
+        );
 
-    $columnsHandler = $fieldFactory->getHandler($boardFields['column']);
-    $columnFieldPermName = $boardFields['column']['permName'];
-    $columnsInfo = _map_field(
-        $columnsHandler,
-        'columnValues',
-        $jit->columnValues->text(),
-        $columnFieldPermName,
-        [
-            'wip' => null
-        ]
-    );
 
+        $swimlanesHandler = $fieldFactory->getHandler($boardFields['swimlane']);
+        $swimlaneFieldPermName = $boardFields['swimlane']['permName'];
+        $swimlanesInfo = _map_field(
+            $swimlanesHandler,
+            'swimlaneValues',
+            $jit->swimlaneValues->text(),
+            $swimlaneFieldPermName,
+            [
+                'wip' => null
+            ],
+            true
+        );
+    } catch (TypeError $e) {
+        return WikiParser_PluginOutput::userError($e);
+    }
 
-    $swimlanesHandler = $fieldFactory->getHandler($boardFields['swimlane']);
-    $swimlaneFieldPermName = $boardFields['swimlane']['permName'];
-    $swimlanesInfo = _map_field(
-        $swimlanesHandler,
-        'swimlaneValues',
-        $jit->swimlaneValues->text(),
-        $swimlaneFieldPermName,
-        [
-            'wip' => null
-        ]
-    );
 
     //echo '<pre>';print_r($swimlanesInfo);echo '</pre>';
     //END mapping the fields
@@ -249,13 +257,20 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $query = new Search_Query();
     $query->filterType('trackeritem');
     $query->filterContent((string)$jit->boardTrackerId->int(), 'tracker_id');
-    //print_r(array_keys($columnsInfo));
+    //print_r(array_keys($swimlanesInfo));
+
+    //Filter the cards
     if ($jit->columnValues->text()) {
-        $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
+        foreach (array_keys($columnsInfo) as $index => $fieldValue) {
+            $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
+        }
     }
-    if ($jit->swimlaneValues->text()) {
-        $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
-        //$query->filterIdentifier('NOT ', 'tracker_field_' . $swimlaneFieldPermName);
+    if ($jit->swimlaneValues->text() && 
+    !array_key_exists('', $swimlanesInfo)) {
+        //We only filter the swimlane if we don't allow empty values. Search_Query cannot include specific values plus empty ones. 
+        foreach (array_keys($swimlanesInfo) as $index => $fieldValue) {
+            $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
+        }
     }
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
@@ -284,6 +299,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $data .= '{display name="object_id"}';
     $plugin = new Search_Formatter_Plugin_ArrayTemplate($data);
     $usedFields = array_keys($plugin->getFields());
+
     foreach ($boardFields as $key => $field) {
         if (!in_array('tracker_field_' . $field['permName'], $usedFields) && !in_array($field['permName'], $usedFields)) {
             if ($field['type'] == 'e') {
@@ -305,16 +321,17 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     $builder->setFormatterPlugin($plugin);
 
     $formatter = $builder->getFormatter();
+
+
     $entries = $formatter->getPopulatedList($result, false);
     $entries = $plugin->renderEntries($entries);
-    //echo '<pre>';print_r($entries);echo '</pre>';
+
+    //echo '<pre>TrackerQueryResults:\n';print_r($entries);echo '</pre>';
     $boardCards = [];
 
 
     $caslAbilities = []; //Spec at https://casl.js.org/
     $trackerPerms = Perms::get(['type' => 'tracker', 'object' => $trackerId]);
-
-
 
     if ($trackerPerms['tiki_p_create_tracker_items']) {
 
@@ -334,6 +351,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             ];
     }
     foreach ($entries as $row) {
+        //echo '<pre>ROW:';print_r($row);echo '</pre>';
 
         //$trackerItem = Tracker_Item::fromInfo($row);
         //The following will cause SQL query inside a loop, but the above just doesn't work right.   We really need a proper query engine...
@@ -346,7 +364,31 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         }
         $trackerItemData = $trackerItem->getData();
 
-        //echo '<pre>DATA:';print_r($trackerItemData);echo '</pre>';
+        //echo '<pre>trackerItemData:';print_r($trackerItemData);echo '</pre>';
+
+        //We don't use $row[$swimlaneFieldPermName], because it's the title, not the value
+        $swimlaneValue = $trackerItemData['fields'][$swimlaneFieldPermName];
+
+        //We don't use $row[$columnFieldPermName], because it's the title, not the value
+        $columnValue = $trackerItemData['fields'][$columnFieldPermName];
+
+        //Both Search_Query and Tracker_Query do not allow proper ANDing of OR groups, so we have to do some horrible filtering here in PHP.
+        //Furthermore, we have to wait this late in the loop because Search_Query does not give us the proper field values
+
+        //Filter the cards ,AGAIN!
+        if ($jit->columnValues->text()) {
+            if (!in_array($columnValue, array_keys($columnsInfo))) {
+                print_r("SKIP bad column");
+                print_r(array_keys($columnsInfo));
+                continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
+            }
+        }
+        //if ($jit->swimlaneValues->text()) {
+            if (!in_array($swimlaneValue, array_keys($swimlanesInfo))) {
+                print_r("SKIP bad swimlane");
+                continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
+            }
+        //}
 
         $caslAbilities[] =
             [
@@ -364,16 +406,6 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             ];
 
         //if ($perms['tiki_p_create_tracker_items'] == 'n' && empty($itemId)) {
-
-        //We don't use $row[$swimlaneFieldPermName], because it's the title, not the value
-        $swimlaneValue = $trackerItemData['fields'][$swimlaneFieldPermName];
-        //We really should NOT be providing this id, since the api writes using the value
-        //$swimlaneDatabasePrimaryKey = $swimlanesInfo[$swimlaneValue]['id'];
-
-        //We don't use $row[$columnFieldPermName], because it's the title, not the value
-        $columnValue = $trackerItemData['fields'][$columnFieldPermName];
-        //We really should NOT be providing this id, since the api writes using the value
-        //$columnDatabasePrimaryKey = $columnsInfo[$columnValue]['id'];
 
         $boardCards[] = [
             'id' => $row['object_id'],
@@ -408,9 +440,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             'user' => $user,
             'CASLAbilityRules' => $caslAbilities
         ];
-    echo ("<pre>");
-    print_r($kanbanData);
-    echo ("</pre>");
+    //echo ("<pre>");print_r($kanbanData);echo ("</pre>");
     $smarty->assign(
         'kanbanData',
         $kanbanData
@@ -421,7 +451,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         ->add_jsfile('storage/public/vue-mf/root-config/vue-mf-root-config.min.js')
         ->add_jsfile('storage/public/vue-mf/kanban/vue-mf-kanban.min.js');
 
-    $out = str_replace(['~np~', '~/np~'], '', $formatter->renderFilters());
+    //$out = str_replace(['~np~', '~/np~'], '', $formatter->renderFilters());
 
     $out .= $smarty->fetch('wiki-plugins/wikiplugin_kanban.tpl');
 

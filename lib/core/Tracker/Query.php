@@ -18,7 +18,6 @@
  * Examples of usage (fake tracker called 'Event Tracker':
  * //using id
  * $results = Tracker_Query(1)
- *              ->byName()
  *              ->itemId(100)
  *              ->query();
  *
@@ -30,7 +29,7 @@
  *
  *
  *<p>
- * The Output of tracker query is built as tracker(items(fields())) with the keys being the id (or name for fields if byName is called).
+ * The Output of tracker query is built as tracker(items(fields())) with the keys being the id (or name or permName for fields if setTrackerKey() is called).
  * Standard output example ($this->byName() not called):
  * Array
  *  (
@@ -91,7 +90,12 @@ class Tracker_Query
     private $sort = null;
     private $limit = 100; //added limit so default wouldn't crash system
     private $offset = 0;
-    private $byName = false;
+    //Should be marked final, but only supported from php > 8.1
+    const ALLOWED_TRACKER_KEY_COLUMNS = ['trackerId', 'name']; 
+    private $trackerKey = 'trackerId';
+    //Should be marked final, but only supported from php > 8.1
+    const ALLOWED_FIELD_KEY_COLUMNS = ['fieldId', 'name', 'permName'];
+    private $fieldKey = 'fieldId';
     private $desc = false;
     private $render = true;
     private $excludeDetails = false;
@@ -104,12 +108,11 @@ class Tracker_Query
     public $itemsRaw = [];
     public $permissionsChecks = true;
     public $limitReached = false;
-
     /**
      * Instantiates a tracker query
      *
      * @access  public static
-     * @param   mixed  $tracker id, (or name if called $this->byName() before query)
+     * @param   mixed  $tracker id, (or name if $this->setTrackerKey('name') called before query)
      * @return  new self
      */
     public static function tracker($tracker)
@@ -205,7 +208,7 @@ class Tracker_Query
      * filter results on a mysql level using 'and' type, needs called before $this->query()
      *
      * @access  public
-     * @param   mixed  $field either id or name when $this->byName() is called
+     * @param   mixed  $field either fieldId, permName or name depending on what $this->setFieldKey() is called with
      * @param   string  $value
      * @return  $this for chainability
      */
@@ -218,7 +221,7 @@ class Tracker_Query
      * filter results on a mysql level using 'like' + 'and' type, needs called before $this->query()
      *
      * @access  public
-     * @param   mixed  $field either id or name when $this->byName() is called
+     * @param   mixed  $field either fieldId, permName or name depending on what $this->setFieldKey() is called with
      * @param   string  $value
      * @return  $this for chainability
      */
@@ -231,7 +234,7 @@ class Tracker_Query
      * filter results on a mysql level using 'or' type, needs called before $this->query()
      *
      * @access  public
-     * @param   mixed  $field either id or name when $this->byName() is called
+     * @param   mixed  $field either fieldId, permName or name depending on what $this->setFieldKey() is called with
      * @param   string  $value
      * @return  $this for chainability
      */
@@ -338,15 +341,54 @@ class Tracker_Query
     }
 
     /**
-     * Change tracker to use all, in tracker and fields, needs called before $this->query()
-     *
+     * DEPRECATED Change tracker to use all, in tracker and fields, needs called before $this->query()
+     * 
      * @access  public
      * @param   bool  $byName default to true, optional
      * @return  $this for chainability
      */
     public function byName($byName = true)
     {
-        $this->byName = $byName;
+        //$this->byName = $byName;
+        if ($byName) {
+
+            $this->setTrackerKey('name');
+            $this->setFieldKey('name');
+        }
+        return $this;
+    }
+
+    /**
+     * Set how trackers are keyed in input and output.  id or name.
+     * If not called, the query will operate on tracker ids.
+     *
+     * @access  public
+     * @param   string  $trackerKey
+     * @return  $this for chainability
+     */
+    public function setTrackerKey(string $trackerKey)
+    {
+        if (!in_array($trackerKey, self::ALLOWED_TRACKER_KEY_COLUMNS)) {
+            throw new Exception("Opps, tracker key " . $trackerKey . " isn't supported");
+        }
+        $this->trackerKey = $trackerKey;
+        return $this;
+    }
+
+    /**
+     * Set how field are keyed in input and output.  id, name or permName.
+     * If not called, the query will operate on field ids.
+     *
+     * @access  public
+     * @param   string  $fieldKey
+     * @return  $this for chainability
+     */
+    public function setFieldKey(string $fieldKey)
+    {
+        if (!in_array($fieldKey, self::ALLOWED_FIELD_KEY_COLUMNS)) {
+            throw new Exception("Opps, fieldKey " . $fieldKey . "isn't ALLOWED_FIELD_KEY_COLUMNS");
+        }
+        $this->fieldKey = $fieldKey;
         return $this;
     }
 
@@ -482,7 +524,7 @@ class Tracker_Query
             return true;
         }
 
-        return Perms::get([ 'type' => 'tracker', 'object' => $this->trackerId() ])->view;
+        return Perms::get(['type' => 'tracker', 'object' => $this->trackerId()])->view;
     }
 
     /**
@@ -497,7 +539,7 @@ class Tracker_Query
             return true;
         }
 
-        return Perms::get([ 'type' => 'tracker', 'object' => $this->trackerId() ])->edit;
+        return Perms::get(['type' => 'tracker', 'object' => $this->trackerId()])->edit;
     }
 
     /**
@@ -512,14 +554,14 @@ class Tracker_Query
             return true;
         }
 
-        return Perms::get([ 'type' => 'tracker', 'object' => $this->trackerId() ])->delete;
+        return Perms::get(['type' => 'tracker', 'object' => $this->trackerId()])->delete;
     }
 
     /**
      * Setup temporary table for joining trackers together
      *
      * @access  public
-     * @param   mixed  $tracker, id or tracker name if $this->byName() called
+     * @param   mixed  $tracker, id or tracker name depending on what $this->setTrackerKey() is called with
      */
     public function __construct($tracker = '')
     {
@@ -631,7 +673,7 @@ class Tracker_Query
             }
         }
 
-        if (! empty($nameOrder)) {
+        if (!empty($nameOrder)) {
             $sortedHeader = [];
             $unsortedHeader = [];
             foreach ($nameOrder as $name) {
@@ -687,7 +729,7 @@ class Tracker_Query
 
     public static function arfsort(&$array, $fieldList)
     {
-        if (! is_array($fieldList)) {
+        if (!is_array($fieldList)) {
             $fieldList = explode('|', $fieldList);
             $fieldList = [[$fieldList[0], self::sortDirection($fieldList[1])]];
         } else {
@@ -708,12 +750,12 @@ class Tracker_Query
                 case SORT_NUMERIC:
                     $strc = ((float)$b[$f[0]] > (float)$a[$f[0]] ? -1 : 1);
                     return $strc;
-                                break;
+                    break;
 
                 default:
                     $strc = strcasecmp($b[$f[0]], $a[$f[0]]);
                     if ($strc != 0) {
-                        return $strc * (! empty($f[1]) && $f[1] == SORT_DESC ? 1 : -1);
+                        return $strc * (!empty($f[1]) && $f[1] == SORT_DESC ? 1 : -1);
                     }
             }
         }
@@ -737,14 +779,14 @@ class Tracker_Query
      */
     public function trackerId()
     {
-        if ($this->byName == true) {
+        if ($this->trackerKey === 'name') {
             $trackerId = TikiLib::lib('trk')->get_tracker_by_name($this->tracker);
         } else {
             $trackerId = $this->tracker;
         }
 
-        if (! empty($trackerId) && ! is_numeric($trackerId)) {
-            throw new Exception("Opps, looks like you need to call ->byName();");
+        if (!empty($trackerId) && !is_numeric($trackerId)) {
+            throw new Exception("Opps, looks like you need to call ->setTrackerKey();");
         }
 
         return $trackerId;
@@ -777,7 +819,13 @@ class Tracker_Query
 
         $trackerId = $this->trackerId();
 
-        if (empty($trackerId) || $this->canView() == false) {//if we can't find a tracker, then return
+        if(!in_array($this->trackerKey,  self::ALLOWED_TRACKER_KEY_COLUMNS) ||
+           !in_array($this->fieldKey,  self::ALLOWED_FIELD_KEY_COLUMNS)
+        ) {
+            throw new Error("SECURITY ERROR, possible sql injection attempt");
+        }
+
+        if (empty($trackerId) || $this->canView() == false) { //if we can't find a tracker, then return
             return [];
         }
 
@@ -787,32 +835,34 @@ class Tracker_Query
 
         $params[] = $trackerId;
 
-        if (! empty($this->start) && empty($this->search)) {
+        if (!empty($this->start) && empty($this->search)) {
             $params[] = $this->start;
         }
 
-        if (! empty($this->end) && empty($this->search)) {
+        if (!empty($this->end) && empty($this->search)) {
             $params[] = $this->end;
         }
 
-        if (! empty($this->itemId) && empty($this->search)) {
+        if (!empty($this->itemId) && empty($this->search)) {
             $params[] = $this->itemId;
         }
 
 
-        /*Get field ids from names*/
-        if ($this->byName == true && ! empty($this->fields)) {
+        /*Get field ids from names or permNames to rewrite field filters*/
+        if ($this->trackerField !== 'id' && !empty($this->fields)) {
             $fieldIds = [];
+
             foreach ($this->fields as $field) {
                 $fieldIds[] = $tikilib->getOne(
                     "SELECT fieldId FROM tiki_tracker_fields" .
-                    " LEFT JOIN tiki_trackers ON (tiki_trackers.trackerId = tiki_tracker_fields.trackerId)" .
-                    " WHERE" .
-                    " tiki_trackers.name = ? AND tiki_tracker_fields.name = ?",
+                        " LEFT JOIN tiki_trackers ON (tiki_trackers.trackerId = tiki_tracker_fields.trackerId)" .
+                        " WHERE" .
+                        " tiki_trackers." . $this->trackerKey. " = ? AND tiki_tracker_fields." . $this->fieldKey . " = ?",
                     [$this->tracker, $field]
                 );
             }
             $this->fields = $fieldIds;
+
         }
 
         if (count($this->fields) > 0 && (count($this->equals) > 0 || count($this->search) > 0)) {
@@ -871,11 +921,11 @@ class Tracker_Query
             }
         }
 
-        if (! empty($this->limit) && is_numeric($this->limit) == false) {
+        if (!empty($this->limit) && is_numeric($this->limit) == false) {
             unset($this->limit);
         }
 
-        if (isset($this->offset) && ! empty($this->offset) && is_numeric($this->offset) == false) {
+        if (isset($this->offset) && !empty($this->offset) && is_numeric($this->offset) == false) {
             unset($this->offset);
         }
 
@@ -886,8 +936,11 @@ class Tracker_Query
             tiki_tracker_items.status,
             tiki_tracker_item_fields.itemId,
             tiki_tracker_fields.trackerId,
-            " . $this->concatStr("tiki_tracker_fields.name") . " AS fieldNames,
-            " . $this->concatStr("tiki_tracker_item_fields.fieldId") . " AS fieldIds,
+            " . ($this->fieldKey === 'name' ? $this->concatStr("tiki_tracker_fields.name") . " AS fieldNames,
+            " : "")
+            . ($this->fieldKey === 'permName' ? $this->concatStr("tiki_tracker_fields.permName") . " AS fieldPermNames,
+            " : "")
+            . $this->concatStr("tiki_tracker_item_fields.fieldId") . " AS fieldIds,
             " . $this->concatStr("IFNULL(items_right.value, tiki_tracker_item_fields.value)") . " AS item_values
 
                 FROM tiki_tracker_item_fields " . ($isSearch == true ? " AS search_item_fields " : "") . "
@@ -895,7 +948,7 @@ class Tracker_Query
                 " . ($isSearch == true ? "
                 LEFT JOIN tiki_tracker_item_fields ON
                 search_item_fields.itemId = tiki_tracker_item_fields.itemId
-                " : "" ) . "
+                " : "") . "
                 LEFT JOIN tiki_tracker_fields ON
                 tiki_tracker_fields.fieldId = tiki_tracker_item_fields.fieldId
                 LEFT JOIN tiki_trackers ON
@@ -926,19 +979,19 @@ class Tracker_Query
                 WHERE
                 tiki_trackers.trackerId = ?
 
-                " . (! empty($this->start) ? " AND tiki_tracker_items." . $dateUnit . " > ? " : "") . "
-                " . (! empty($this->end) ? " AND tiki_tracker_items." . $dateUnit . " < ? " : "") . "
-                " . (! empty($this->itemId) ? " AND tiki_tracker_item_fields.itemId = ? " : "") . "
-                " . (! empty($fields_safe) ? $fields_safe : "") . "
-                " . (! empty($status_safe) ? $status_safe : "") . "
+                " . (!empty($this->start) ? " AND tiki_tracker_items." . $dateUnit . " > ? " : "") . "
+                " . (!empty($this->end) ? " AND tiki_tracker_items." . $dateUnit . " < ? " : "") . "
+                " . (!empty($this->itemId) ? " AND tiki_tracker_item_fields.itemId = ? " : "") . "
+                " . (!empty($fields_safe) ? $fields_safe : "") . "
+                " . (!empty($status_safe) ? $status_safe : "") . "
 
                 GROUP BY
                 tiki_tracker_item_fields.itemId
-                " . ($isSearch == true ? ", search_item_fields.fieldId, search_item_fields.itemId " : "" ) . "
+                " . ($isSearch == true ? ", search_item_fields.fieldId, search_item_fields.itemId " : "") . "
                 ORDER BY
                 tiki_tracker_items." . $dateUnit . " " . ($this->desc == true ? 'DESC' : 'ASC') . "
-                " . (! empty($this->limit) ? " LIMIT " . $this->limit : "") . "
-                " . (! empty($this->offset) ? " OFFSET " . $this->offset : "");
+                " . (!empty($this->limit) ? " LIMIT " . $this->limit : "") . "
+                " . (!empty($this->offset) ? " OFFSET " . $this->offset : "");
 
         if ($this->debug == true) {
             $result = [$query, $params];
@@ -963,13 +1016,19 @@ class Tracker_Query
             }
 
             $newRow = [];
-            $fieldNames = explode($this->delimiter, $row['fieldNames']);
             $fieldIds = explode($this->delimiter, $row['fieldIds']);
+            if ($$this->fieldKey === 'permName') {
+                $fieldKeys = explode($this->delimiter, $row['fieldPermNames']);
+            } else if ($$this->fieldKey === 'name') {
+                $fieldKeys = explode($this->delimiter, $row['fieldNames']);
+            } else {
+                $fieldKeys = $fieldIds;
+            }
             $itemValues = explode($this->delimiter, $row['item_values']);
 
             $matchCount = 0;
             foreach ($fieldIds as $key => $fieldId) {
-                $field = ($this->byName == true ? $fieldNames[$key] : $fieldId);
+                $field = $fieldKeys[$key];
                 $value = '';
 
                 //This script attempts to narrow the results further by using an "AND" style checking of the returned result since it cannot be made at this time in mysql
@@ -989,7 +1048,7 @@ class Tracker_Query
                     $value = $itemValues[$key];
                 }
 
-                if (! isset($this->itemsRaw[$row['itemId']])) {
+                if (!isset($this->itemsRaw[$row['itemId']])) {
                     $this->itemsRaw[$row['itemId']] = [];
                 }
 
@@ -1038,8 +1097,8 @@ class Tracker_Query
 
         //if type is text, no need to render value
         switch ($fieldDefinition['type']) {
-            case 't'://text
-            case 'S'://static text
+            case 't': //text
+            case 'S': //static text
                 return $value;
         }
 
@@ -1134,7 +1193,7 @@ class Tracker_Query
         header("Pragma: no-cache");
         header("Expires: 0");
 
-        if (! is_array($array)) {
+        if (!is_array($array)) {
             return false;
         }
         $output = '';
@@ -1191,11 +1250,7 @@ class Tracker_Query
 
         $fields = TikiLib::lib("trk")->list_tracker_fields($this->trackerId());
         for ($i = 0, $fieldCount = count($fields['data']); $i < $fieldCount; $i++) {
-            if ($this->byName == true) {
-                $fields['data'][$i]['value'] = $data[$fields['data'][$i]['name']];
-            } else {
-                $fields['data'][$i]['value'] = $data[$fields['data'][$i]['fieldId']];
-            }
+                $fields['data'][$i]['value'] = $data[$fields['data'][$i][$this->fieldKey]];
         }
 
         $itemId = TikiLib::lib("trk")->replace_item($this->trackerId(), $this->itemId, $fields);
@@ -1232,8 +1287,6 @@ class Tracker_Query
         $itemData = TikiLib::lib("trk")->get_tracker_item($itemId);
 
         foreach ($trackerDefinition->getFields() as $field) {
-            $fieldKey = ($this->byName == true ? $field['name'] : $field['fieldId']);
-
             if ($includeJs == true) {
                 $headerlib->clear_js();
             }
@@ -1241,7 +1294,7 @@ class Tracker_Query
             $field['ins_id'] = "ins_" . $field['fieldId'];
 
             if ($itemId == 0 && isset($this->inputDefaults)) {
-                $field['value'] = $this->inputDefaults[$fieldKey];
+                $field['value'] = $this->inputDefaults[$this->fieldKey];
             }
 
             $fieldHandler = $fieldFactory->getHandler($field, $itemData);
@@ -1252,7 +1305,7 @@ class Tracker_Query
                 $fieldInput = $fieldInput . $headerlib->output_js();
             }
 
-            $fields[$fieldKey] = $fieldInput;
+            $fields[$this->fieldKey] = $fieldInput;
         }
 
         if ($includeJs == true) { //restore the header to the way it was originally
