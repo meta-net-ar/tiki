@@ -12,7 +12,7 @@
  * Letter key: ~u~
  *
  */
-class Tracker_Field_UserSelector extends Tracker_Field_Abstract implements Tracker_Field_Synchronizable, Tracker_Field_Exportable, Tracker_Field_Filterable, Search_FacetProvider_Interface
+class Tracker_Field_UserSelector extends Tracker_Field_Abstract implements Tracker_Field_Synchronizable, Tracker_Field_Exportable, Tracker_Field_Filterable, Search_FacetProvider_Interface, Tracker_Field_EnumerableInterface
 {
     public static function getTypes()
     {
