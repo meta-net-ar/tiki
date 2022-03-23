@@ -114,6 +114,7 @@ const handleAddRow = event => {
 .board-container {
     flex-grow: 1;
     // padding-top: 5px;
+    margin-bottom: 8px;
 }
 .navbar {
     // padding: 0rem 1rem;
