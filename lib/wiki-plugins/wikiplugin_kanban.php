@@ -56,21 +56,26 @@ function wikiplugin_kanban_info(): array
             ],
             'columnValues' => [
                 'name' => tr('Column acceptable values and configuration'),
-                'description' => tr('Defines the number and order of columns, as well as the value, label and WiP limit for each one.  An array of semicolumn separated values, containing a coma separated arguments configuring the column.
-                someValue,someAlternateTextToDisplay,null:someOtherValue,someOtherAlternateTextToDisplay,,4
-                
-                In order, the configuration represent the:
+                'description' => tr('For the tracker field mapped in "column", defines for each column the value a tracker item must have for that field, as well as the label displayed as the column header and the WiP limit for that column. Implicitely defines the number of columns and in which order they are shown; You can skip values so they are not part of the board (and you typically do, if only to eventually archive done cards).
 
-                1) field value in the column mapped tracker field
-                2) overrideLabel If present and not "null",  the text to be displayed as the column header instead of the normal tracker field label. (For example "Done" instead of "Closed")
-                3) wipLimit for the column.  Typically you will use null for the first and last column.
+The parameter is and array of colon separated values, each containing a coma separated arguments configuring the column.
 
-                null or nothing between the comas means the parameter is not set.  Necessary since the arguments are positional.
+In order, the configuration represent the:
 
-                If the whole parameter is absent (not recommended), all possible field values will be used.
-                
+1) Mandatory. The value the mapped field must have in the tracker item for the card to be shown in the matching column.
+2) Optional. If present and not "null", the text to be displayed as the column header instead of the normal tracker field label for the value above. (For example "Done" instead of "Closed")
+3) Optional. If present and not "null", the WiP (Work in Progress) limit for the cards in the column. In "null", there is no limit for the number of cards in the column. Typically you will use null for the first and last column.
+
+null or nothing between the comas means the parameter is not set. Necessary since the arguments are positional.
+
+So for example:
+someValue,someAlternateTextToDisplay,null:someOtherValue,,4
+
+Means the board would have two colums, the first column would be titled "someAlternateTextToDisplay" containing cards with the value "someValue" for the mapped field and no limit to the number of cards. The second column would have cards with "someOtherValue" for the mapped field, with whatever the label is for that value in the field definition, and the column would be highlighted red if there is more than 4 cards. No card with any other value would be anywhere on the board.
+
+If the whole parameter is absent (not recommended), all possible field values will be used to generate columns (except the empty value).
                 '),
-                'hint' => tr('e.g. "someValue,someAlternateTextToDisplay,null:someOtherValue,someOtherAlternateTextToDisplay,,4"'),
+                'hint' => tr('e.g. "someValue,someAlternateTextToDisplay,null:someOtherValue,,4"'),
                 'since' => '24.0',
                 'required' => false,
                 'filter' => 'text',
@@ -112,7 +117,7 @@ function wikiplugin_kanban_info(): array
     ];
 }
 
-function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig, bool $allowEmptyValues=false)
+function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesParam, string $fieldPermName, array $fieldDefaultConfig, bool $allowEmptyValues = false)
 {
     $fieldValuesMap = $fieldHandler->getPossibleItemValues();
     //echo '<pre>';print_r($fieldValuesMap);echo '</pre>';
@@ -144,13 +149,14 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
                     implode(',', array_keys($fieldValuesMap))
                 ]));
             }
+            //echo '<pre>';print_r($fieldValue);echo '</pre>';
             $fieldInfo[$fieldValue] = array_merge($fieldDefaultConfig, ['title' => $fieldValuesMap[$fieldValue], 'value' => $fieldValue]);
             //Override column label
-            if ($fieldParamsArray[1] && $fieldParamsArray[1] !== 'null') {
+            if (isset($fieldParamsArray[1]) && $fieldParamsArray[1] !== 'null') {
                 $fieldInfo[$fieldValue]['title'] = trim($fieldParamsArray[1]);
             }
             //wip limit
-            if ($fieldParamsArray[2] && $fieldParamsArray[2] !== 'null') {
+            if (isset($fieldParamsArray[2]) && $fieldParamsArray[2] !== 'null') {
                 if (!is_numeric($fieldParamsArray[2])) {
                     throw new TypeError(tra('Wip limit value "%0" specified in parameter "%1=%2" is not numeric', '', false, [
                         $fieldParamsArray[2],
@@ -265,8 +271,10 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             $query->filterContent(implode(' OR ', array_keys($columnsInfo)), 'tracker_field_' . $columnFieldPermName);
         }
     }
-    if ($jit->swimlaneValues->text() && 
-    !array_key_exists('', $swimlanesInfo)) {
+    if (
+        $jit->swimlaneValues->text() &&
+        !array_key_exists('', $swimlanesInfo)
+    ) {
         //We only filter the swimlane if we don't allow empty values. Search_Query cannot include specific values plus empty ones. 
         foreach (array_keys($swimlanesInfo) as $index => $fieldValue) {
             $query->filterContent(implode(' OR ', array_keys($swimlanesInfo)), 'tracker_field_' . $swimlaneFieldPermName);
@@ -343,6 +351,9 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
                 $updatableFields[] =  $field['permName'];
             }
         }
+        if (count($updatableFields) == 0) {
+            $updatableFields = null;
+        }
         $caslAbilities[] =
             [
                 'action' => 'create',
@@ -384,10 +395,10 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
             }
         }
         //if ($jit->swimlaneValues->text()) {
-            if (!in_array($swimlaneValue, array_keys($swimlanesInfo))) {
-                print_r("SKIP bad swimlane");
-                continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
-            }
+        if (!in_array($swimlaneValue, array_keys($swimlanesInfo))) {
+            print_r("SKIP bad swimlane");
+            continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
+        }
         //}
 
         $caslAbilities[] =
@@ -450,7 +461,7 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
     TikiLib::lib('header')
         ->add_jsfile('storage/public/vue-mf/root-config/vue-mf-root-config.min.js')
         ->add_jsfile('storage/public/vue-mf/kanban/vue-mf-kanban.min.js');
-
+    $out = "";
     //$out = str_replace(['~np~', '~/np~'], '', $formatter->renderFilters());
 
     $out .= $smarty->fetch('wiki-plugins/wikiplugin_kanban.tpl');
