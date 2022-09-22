@@ -248,6 +248,7 @@
     <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/import-map-overrides/dist/import-map-overrides.js"></script>
     <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/systemjs/dist/system.min.js"></script>
     <script type="text/javascript" src="lib/vue/lib/vue.runtime.global.prod.js"></script>
+    <link rel="stylesheet" type="text/css" href="{$tikiroot}storage/public/vue-mf/kanban/assets/vue-mf-kanban.min.css">
     {* How to load Vue 3 (race conditions issue solved): https://github.com/systemjs/systemjs/issues/2272#issuecomment-744636282 *}
     {* Note: JS code in the page might try to use these functions before they are actually loaded by systemjs, so provide stubs here *}
     <script>
