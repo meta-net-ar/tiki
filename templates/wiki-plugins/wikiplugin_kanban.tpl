@@ -3,7 +3,7 @@
 {jq}
     window.registerApplication({
         name: "@vue-mf/kanban-{{$kanbanData.id|escape}}",
-        app: () => System.import("@vue-mf/kanban"),
+        app: () => importShim("@vue-mf/kanban"),
         activeWhen: (location) => {
             let condition = true;
             return condition;

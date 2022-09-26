@@ -54,6 +54,7 @@ modules/cache/*
 /storage/tiki-manager
 /storage/public/*
 !/storage/public/vue-mf
+/storage/public/vue-mf/*/*.map
 /storage/fgal/*
 /svn-commit.tmp
 temp/*

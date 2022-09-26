@@ -233,11 +233,13 @@
     {/if}
 {/if}
 {if $prefs.vuejs_enable eq 'y'}
-    <meta name="importmap-type" content="systemjs-importmap" />
-    <script type="systemjs-importmap">
+
+    <script async src="{$tikiroot}storage/public/vue-mf/root-config/es-module-shims.js"></script>
+
+    <script type="importmap">
         {
             "imports": {
-                "vue": "{$tikiroot}lib/vue/lib/vue.runtime.global.prod.js",
+                "vue": "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.39/vue.esm-browser.min.js",
                 "@vue-mf/styleguide": "{$tikiroot}storage/public/vue-mf/styleguide/vue-mf-styleguide.min.js",
                 "@vue-mf/root-config": "{$tikiroot}storage/public/vue-mf/root-config/vue-mf-root-config.min.js",
                 "@vue-mf/kanban": "{$tikiroot}storage/public/vue-mf/kanban/vue-mf-kanban.min.js",
@@ -245,11 +247,7 @@
             }
         }
     </script>
-    <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/import-map-overrides/dist/import-map-overrides.js"></script>
-    <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/systemjs/dist/system.min.js"></script>
-    <script type="text/javascript" src="lib/vue/lib/vue.runtime.global.prod.js"></script>
     <link rel="stylesheet" type="text/css" href="{$tikiroot}storage/public/vue-mf/kanban/assets/vue-mf-kanban.min.css">
-    {* How to load Vue 3 (race conditions issue solved): https://github.com/systemjs/systemjs/issues/2272#issuecomment-744636282 *}
     {* Note: JS code in the page might try to use these functions before they are actually loaded by systemjs, so provide stubs here *}
     <script>
         window.registerApplication = function(opts) {
@@ -262,10 +260,8 @@
                 window.unregisterApplication(opts);
             }, 100);
         }
-        System.set(System.resolve('vue'), window.Vue);
-        System.import("@vue-mf/root-config");
-        window.Vue = undefined;
     </script>
+
 {/if}
 <!--[if lt IE 9]>{* according to http://remysharp.com/2009/01/07/html5-enabling-script/ *}
     <script src="vendor_bundled/vendor/afarkas/html5shiv/dist/html5shiv.min.js" type="text/javascript"></script>

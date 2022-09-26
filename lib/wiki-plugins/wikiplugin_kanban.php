@@ -457,10 +457,11 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         $kanbanData
 
     );
-
     TikiLib::lib('header')
-        ->add_jsfile('storage/public/vue-mf/root-config/vue-mf-root-config.min.js')
-        ->add_jsfile('storage/public/vue-mf/kanban/vue-mf-kanban.min.js');
+        ->add_js_module('
+        import \'@vue-mf/root-config\';
+        import \'@vue-mf/kanban\';
+    ');
     $out = "";
     //$out = str_replace(['~np~', '~/np~'], '', $formatter->renderFilters());
 
