@@ -306,6 +306,16 @@ class RegistrationLib extends TikiLib
                 $errors[] = new RegistrationError('chosenGroup', tra('You must choose a group'));
             }
 
+            $choosable_groups = array_map(function ($gr) {
+                return $gr['groupName'];
+            }, $this->merged_prefs['choosable_groups']);
+            if (empty($choosable_groups)) {
+                $choosable_groups[] = 'Registered';
+            }
+            if (! empty($registration['chosenGroup']) && ! in_array($registration['chosenGroup'], $choosable_groups)) {
+                $errors[] = new RegistrationError('chosenGroup', tra('Invalid group selected'));
+            }
+
             $email_valid = 'y';
             if (! validate_email($registration['email'], $this->merged_prefs['validateEmail'])) {
                 $errors[] = new RegistrationError('email', tra('Email not valid. Should be in the format "mailbox@example.com".'));
