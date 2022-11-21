@@ -84,10 +84,15 @@ class ToolbarInline extends ToolbarItem
      */
     public function getOnClick(): string
     {
-        return 'insertAt(\'' . $this->domElementId . '\', \'' .
-            addslashes(
-                htmlentities($this->syntax, ENT_COMPAT, 'UTF-8')
-            ) . '\');';
+        if ($this->syntax === '~np~text~/np~') {
+            // closing non-parse tags get removed by the parser so combine that in js
+            return 'insertAt(\'' . $this->domElementId . '\', \'~np~text~\'+\'/np~\', true);';
+        } else {
+            return 'insertAt(\'' . $this->domElementId . '\', \'' .
+                addslashes(
+                    htmlentities($this->syntax, ENT_COMPAT, 'UTF-8')
+                ) . '\');';
+        }
     }
 
     /**
