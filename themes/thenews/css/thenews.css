@@ -11514,6 +11514,7 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 }
 .tiki .pvtUi {
   color: #212529;
+  background: #fff;
 }
 .tiki table.pvtTable {
   font-size: 1rem;
@@ -11526,7 +11527,7 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   padding: 5px;
 }
 .tiki table.pvtTable tr td {
-  color: #212529;
+  color: var(--bs-body-color);
   cursor: pointer;
   background-color: transparent;
   border-color: var(--bs-border-color);
@@ -11556,12 +11557,12 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 }
 .tiki .pvtAxisContainer li span.pvtAttr {
   -webkit-text-size-adjust: 100%;
+  color: #212529;
+  background: #fff;
   padding: 2px 5px;
   white-space: nowrap;
-  background: #000;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  color: #000;
+  border: 1px solid #ced4da;
+  border-radius: 0rem;
 }
 .tiki .pvtTriangle {
   cursor: pointer;

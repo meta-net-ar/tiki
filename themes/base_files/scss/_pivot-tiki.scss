@@ -1,6 +1,7 @@
 .tiki {
     .pvtUi {
-        color: $tiki-pvt-color;
+        color: $tiki-pvtUi-color;
+        background: $tiki-pvtUI-bg;
     }
 
     table.pvtTable {
@@ -19,7 +20,7 @@
     //table.pvtTable .pvtTotalLabel {text-align: right;}
 
     table.pvtTable tr td {
-        color: $tiki-pvt-color;
+        color: $tiki-pvt-table-color;
         cursor: pointer; // indicate that the cell is clickable
         //    padding: 5px;
         background-color: $tiki-pvt-table-bg;
@@ -50,7 +51,7 @@
     .pvtAxisContainer,
     .pvtVals {
         border-color: $tiki-pvt-table-border-color;
-        background: $tiki-pvt-bg;
+        background: $tiki-pvt-table-bg;
         padding: 5px;
         //    min-width: 20px;
         //    min-height: 20px;
@@ -60,7 +61,7 @@
     //    list-style-type: none;
     //    cursor:move;
     //}
-    .pvtAxisContainer li.pvtPlaceholder {
+    .pvtAxisContainer li.pvtPlaceholder {  // .tiki .pvtAxisContainer li span.pvtAttr
         padding: 3px 15px;
         border-radius: 5px;
         border: 1px dashed $tiki-pvt-table-border-color;
@@ -68,17 +69,13 @@
 
     .pvtAxisContainer li span.pvtAttr {
         -webkit-text-size-adjust: 100%;
-//        background: $table-bg;
-//        border: 1px solid $tiki-pvt-table-border-color;
+        color: $tiki-pvtAttr-color;
+        background: $tiki-pvtAttr-bg;
         padding: 2px 5px;
         white-space: nowrap;
-//        -webkit-border-radius: 5px;
-//        -moz-border-radius: 5px;
-//        border-radius: 5px;
-        background: $dark; // $btn-primary-bg; Temporary comment out May 2022 Gary
-        border: 1px solid $border-color; // $btn-primary-border;
-        border-radius: $btn-border-radius;
-        color: $tiki-pvtAttr-color;
+        border: 1px solid $tiki-pvtAttr-border-color; // $btn-primary-border;
+        border-radius: $tiki-pvtAttr-border-radius;
+
     }
 
     .pvtTriangle {

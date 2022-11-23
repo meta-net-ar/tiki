@@ -57,15 +57,19 @@ $tiki-modal-link-hover-color: $link-hover-color !default;
 $tiki-secondary-legend-font-size: 1.35rem !default;
 
 // Plugin Pivot Table variables
-$tiki-pvt-color: $body-color !default;
-$tiki-pvt-bg: $table-bg !default;
+$tiki-pvtUi-color: $body-color !default;
+$tiki-pvtUI-bg: $body-bg !default;
 $tiki-pvt-font-size: $font-size-base !default;
+$tiki-pvt-table-color: $table-color;
 $tiki-pvt-table-bg: $table-bg !default;
 $tiki-pvt-table-th-bg: $table-striped-bg !default;
 $tiki-pvt-table-th-color: $table-color !default;
 $tiki-pvt-table-border-color: $table-border-color !default;
 $tiki-pvt-modal-content-bg: $modal-content-bg !default;
-$tiki-pvtAttr-color: $dark; // $btn-primary-color !default; // Temporary comment-out May 2022 - Gary
+$tiki-pvtAttr-color: $input-color; // $btn-primary-color !default; // Temporary comment-out May 2022 - Gary
+$tiki-pvtAttr-bg: $input-bg;
+$tiki-pvtAttr-border-color: $input-border-color; // $btn-primary-border;
+$tiki-pvtAttr-border-radius: $input-border-radius;
 $tiki-pvtFilterBox-button-color: $dark; // $btn-primary-color !default;
 $tiki-pvtFilterBox-button-bg: $light; // $btn-primary-bg !default;
 $tiki-pvtFilterBox-button-hover-bg: darken($light,10%); // adjust-hue($btn-primary-bg, 10%) !default;
