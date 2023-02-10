@@ -30,7 +30,7 @@
         </strong>
         <br>
     {/if}
-    <a href="tiki-calendar_edit_item.php?viewcalitemId={$cellid}" title="{tr}Details{/tr}"{if isset($cellstatus) and $cellstatus eq '2'} style="text-decoration:line-through"{/if}>
+    <a href="{service controller='calendar' action='view_item' calitemId=$cellid}" title="{tr}Details{/tr}"{if isset($cellstatus) and $cellstatus eq '2'} style="text-decoration:line-through"{/if}>
         {$cellname|escape}
     </a>
     <p><strong>{tr}Created by:{/tr}{$celluser}</strong></p>

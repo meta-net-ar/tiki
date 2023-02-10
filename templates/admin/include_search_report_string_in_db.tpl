@@ -135,7 +135,7 @@
                 {elseif $tableName=='tiki_calendars' && ($column=='name'|| $column=='description')}
                     <td><a href=tiki-calendar.php?calIds[]={$row['calendarId']} class="link tips" title="{$row['name']|escape}:{tr}View calendar{/tr}" target="_blank">{$value}</a></td>
                 {elseif $tableName=='tiki_calendar_items' && ($column=='name'|| $column=='description')}
-                    <td><a href=tiki-calendar_edit_item.php?viewcalitemId={$row['calitemId']} class="link tips" title="{$row['name']|escape}:{tr}View calendar item{/tr}" target="_blank">{$value}</a></td>
+                    <td><a href={service controller='calendar' action='view_item' calitemId=$row.calitemId} class="link tips" title="{$row.name|escape}:{tr}View calendar item{/tr}" target="_blank">{$value}</a></td>
                 {elseif $tableName=='tiki_trackers' && ($column=='name'|| $column=='description')}
                     <td><a href=tiki-view_tracker.php?trackerId={$row['trackerId']} class="link tips" title="{$row['name']|escape}:{tr}View tracker{/tr}" target="_blank">{$value}</a></td>
                 {elseif $tableName=='tiki_tracker_item_fields' && $column=='value'}

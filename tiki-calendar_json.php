@@ -151,11 +151,13 @@ foreach ($listevents as $event) {
         'object' => $event['calitemId'],
         'parentId' => $event['calendarId'],
     ]);
-    if ($eventPerms->change_events) {
-        $url = 'tiki-calendar_edit_item.php?fullcalendar=y&calitemId=' . $event['calitemId'];
-    } else {
-        $url = 'tiki-calendar_edit_item.php?fullcalendar=y&viewcalitemId=' . $event['calitemId'];
-    }
+
+    $url = TikiLib::lib('service')->getUrl([
+        'controller' => 'calendar',
+        'action'     => $eventPerms->change_events ? 'edit_item': 'view_item',
+        'calitemId'  => $event['calitemId'],
+    ]);
+
     $events[] = [
         'id'          => $event['calitemId'],
         'title'       => $event['name'],

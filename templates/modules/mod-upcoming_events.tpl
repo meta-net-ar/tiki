@@ -37,7 +37,7 @@ html indentation and smarty indentation are independant. Please keep consistent 
             <br>
 
             <a class="linkmodule summary"
-                href="{if $prefs.feature_sefurl eq 'y'}event{$modUpcomingEvents[ix].calitemId}{else}tiki-calendar_edit_item.php?viewcalitemId={$modUpcomingEvents[ix].calitemId}{/if}"
+                href="{service controller='calendar' action='view_item' calitemId=$modUpcomingEvents[ix].calitemId}"
                 title="{if $tooltip_infos neq 'n'}{$modUpcomingEvents[ix].lastModif|tiki_short_datetime:'':'n'}, {tr}by{/tr} {if $modUpcomingEvents[ix].user ne ''}{$modUpcomingEvents[ix].user|username}{else}{tr}Anonymous{/tr}{/if}{else}{tr}click to view{/tr}{/if}"
                 {if $modUpcomingEvents[ix].status eq '2'}style="text-decoration: line-through;"{/if}
             >
@@ -64,6 +64,6 @@ html indentation and smarty indentation are independant. Please keep consistent 
 {/if}
 
 {if $tiki_p_add_events eq 'y' && (empty($module_params.showaction) || $module_params.showaction ne 'n')}
-    <p><a href="tiki-calendar_edit_item.php">{icon name="add"} {tr}Add Event{/tr}</a></p>
+    <p><a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg'}">{icon name="add"} {tr}Add Event{/tr}</a></p>
 {/if}
 {/tikimodule}

@@ -1,0 +1,1 @@
+{include file='templates/calendar/edit_item.tpl'}

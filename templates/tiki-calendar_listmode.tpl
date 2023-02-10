@@ -35,7 +35,7 @@
                     </div>
                 </td>
                 <td style="word-wrap:break-word; {if $infocals.$calendarId.custombgcolor ne ''}background-color:#{$infocals.$calendarId.custombgcolor};{/if}">
-                    <a class="link" href="tiki-calendar_edit_item.php?viewcalitemId={$event.calitemId}" title="{tr}View{/tr}">
+                    <a class="link" href="{service controller='calendar' action='view_item' calitemId=$event.calitemId}" title="{tr}View{/tr}">
                     {if $infocals.$calendarId.customfgcolor ne ''}<span style="color:#{$infocals.$calendarId.customfgcolor};">{/if}
                     <span class="summary">{$event.name|escape}</span></a><br>
                     <span class="description" style="font-style:italic">{$event.parsed}</span>
@@ -49,7 +49,7 @@
                         {actions}
                             {strip}
                                 <action>
-                                    <a href="tiki-calendar_edit_item.php?calitemId={$event.calitemId}">
+                                    <a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' calitemId=$event.calitemId}">
                                         {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
                                     </a>
                                 </action>

@@ -112,7 +112,7 @@
                                     </a>
                                 </action>
                                 <action>
-                                    <a href="tiki-calendar_edit_item.php?calendarId={$id}">
+                                    <a href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' calendarId=$id}">
                                         {icon name='create' _menu_text='y' _menu_icon='y' alt="{tr}Add event{/tr}"}
                                     </a>
                                 </action>
