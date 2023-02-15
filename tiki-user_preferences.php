@@ -394,7 +394,7 @@ if (
     && isset($_POST['tfaPin'])
     && $access->checkCsrf()
 ) {
-    if ($userlib->validate_two_factor($_POST['tfaSecret'], $_POST['tfaPin'])) {
+    if ($userlib->validate_two_factor($_POST['tfaSecret'], $_POST['tfaPin'], $user)) {
         $tfaSecret = $userlib->update_2_factor_secret(
             $user,
             $_POST['tfaSecret']

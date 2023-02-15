@@ -8,6 +8,20 @@
 
 function validator_smarty($input, $parameter = '', $message = '')
 {
+    // since this is used only in Tiki modules, we skip validation if user is not allowed to admin modules
+    $perms = Perms::get();
+    if (! $perms->admin_modules) {
+        return true;
+    }
+
+    TikiLib::lib('events')->bind('tiki.process.shutdown', function() {
+        $content = ob_get_contents();
+        if (strstr($content, 'Fatal error')) {
+            ob_end_clean();
+            echo 'Fatal error occured while trying to validate your smarty code.';
+        }
+    });
+
     /** @var Smarty_Tiki $smarty */
     $smarty = \TikiLib::lib('smarty');
 

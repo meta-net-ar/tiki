@@ -158,22 +158,31 @@ class Debugger extends ResultType
     }
   /**
    * \brief Dump variable (global) into string (errors aware function)
-   * \todo Need to rename all local variables to smth realy unique
-   *       (smth that user never guess and try to print :)
    */
     public function str_var_dump($v)
     {
         $result = '';
-        $v = trim($v);
-        if (strlen(str_replace("$", "", $v)) > 0) {
-          // Need to make var global... strip [] if needed
-            $global = (($pos = strpos($v, '[')) == false) ? $v : substr($v, 0, $pos);
-          //
-            $expr = "global $global;\n\$result .= print_r($v, true);";
-            $php_errormsg = '';
-            @eval($expr);
-            if (strlen($php_errormsg)) {
-                $result .= "ERROR: " . $php_errormsg;
+        $v = preg_replace('/^\$/', '', trim($v));
+        if (strlen($v) > 0) {
+            $var = (($pos = strpos($v, '[')) == false) ? $v : substr($v, 0, $pos);
+            if (isset($GLOBALS[$var])) {
+                $var = $GLOBALS[$var];
+                if (preg_match_all('/\[([^\]]+)\]/', $v, $m)) {
+                    foreach ($m[1] as $sub) {
+                        if (isset($var[$sub])) {
+                            $var = $var[$sub];
+                        } else {
+                            return "ERROR: Undefined index $sub for variable $v";
+                        }
+                    }
+                }
+                $result .= print_r($var, true);
+            } else {
+                $result .= "ERROR: Undefined variable $var";
+            }
+            $error = error_get_last();
+            if ($error) {
+                $result .= "ERROR: " . $error['message'];
             }
         }
         return $result;

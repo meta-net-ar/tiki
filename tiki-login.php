@@ -299,7 +299,7 @@ if (
         }
     } elseif ($isvalid) {
         $twoFactorSecret = $userlib->get_2_factor_secret($requestedUser);
-        if ($prefs['twoFactorAuth'] == 'y' && ! empty($twoFactorSecret) && ! $userlib->validate_two_factor($twoFactorSecret, $_REQUEST["twoFactorAuthCode"])) {
+        if ($prefs['twoFactorAuth'] == 'y' && ! empty($twoFactorSecret) && ! $userlib->validate_two_factor($twoFactorSecret, $_REQUEST["twoFactorAuthCode"], $requestedUser)) {
             $error = TWO_FA_INCORRECT;
             $isvalid = false;
             $smarty->assign('twoFactorForm', 'y');
@@ -527,43 +527,11 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         && ($prefs['unsuccessful_logins'] >= 0 || $prefs['unsuccessful_logins_invalid'] >= 0)
     ) {
         $nb_bad_logins = $userlib->unsuccessful_logins($requestedUser);
-        $nb_bad_logins++ ;
-        $userlib->set_unsuccessful_logins($requestedUser, $nb_bad_logins);
         if ($prefs['unsuccessful_logins_invalid'] > 0 && ($nb_bad_logins >= $prefs['unsuccessful_logins_invalid'])) {
-            $info = $userlib->get_user_info($requestedUser);
-            $userlib->change_user_waiting($requestedUser, 'a');
-            $msg = sprintf(tra('%d or more unsuccessful login attempts have been made.'), $prefs['unsuccessful_logins_invalid']);
-            $msg .= ' ' . tra('Your account has been suspended.') . ' ' . tra('Contact your site administrator to reactivate it.');
-            $smarty->assign('msg', $msg);
-            if ($nb_bad_logins % $prefs['unsuccessful_logins_invalid'] == 0) {
-                //don't send an email after every failed login
-                include_once('lib/webmail/tikimaillib.php');
-                $mail = new TikiMail();
-                $smarty->assign('mail_user', $requestedUser);
-                $foo = parse_url($_SERVER['REQUEST_URI']);
-                $mail_machine = $tikilib->httpPrefix(true) . str_replace('tiki-login.php', '', $foo['path']);
-                $smarty->assign('mail_machine', $mail_machine);
-                $mail->setText($smarty->fetch('mail/unsuccessful_logins_suspend.tpl'));
-                $mail->setSubject($smarty->fetch('mail/unsuccessful_logins_suspend_subject.tpl'));
-                $emails = ! empty($prefs['validator_emails']) ? preg_split('/,/', $prefs['validator_emails']) : (! empty($prefs['sender_email']) ? [$prefs['sender_email']] : '');
-                if (! $mail->send([$info['email']]) || ! $mail->send($emails)) {
-                    $smarty->assign('msg', tra("The mail can't be sent. Contact the administrator"));
-                    $smarty->display("error.tpl");
-                    die;
-                }
-            }
             $smarty->assign('mid', 'tiki-information.tpl');
             $smarty->display('tiki.tpl');
             die;
         } elseif ($prefs['unsuccessful_logins'] > 0 && ($nb_bad_logins >= $prefs['unsuccessful_logins'])) {
-            $msg = sprintf(tra('%d or more unsuccessful login attempts have been made.'), $prefs['unsuccessful_logins']);
-            $smarty->assign('msg', $msg);
-            if ($nb_bad_logins % $prefs['unsuccessful_logins'] == 0) {
-                //don't send an email after every failed login
-                if ($userlib->send_confirm_email($requestedUser, 'unsuccessful_logins')) {
-                    $smarty->assign('msg', $msg . ' ' . tra('An email has been sent to you with the instructions to follow.'));
-                }
-            }
             $show_history_back_link = 'y';
             $smarty->assign_by_ref('show_history_back_link', $show_history_back_link);
             $smarty->assign('mid', 'tiki-information.tpl');
