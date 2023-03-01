@@ -1945,6 +1945,7 @@ class UsersLib extends TikiLib
 				}
 				return [USER_VALID, $user];
 			} else {
+				$this->handleUnsuccessfulLogin($user);
 				return [PASSWORD_INCORRECT, $user];      // if the password was incorrect, dont give the md5's a spin
 			}
 		}
@@ -1962,7 +1963,49 @@ class UsersLib extends TikiLib
 			return [USER_VALID, $user];
 		}
 
-			return [PASSWORD_INCORRECT, $user];
+		$this->handleUnsuccessfulLogin($user);
+
+		return [PASSWORD_INCORRECT, $user];
+	}
+
+	public function handleUnsuccessfulLogin($user)
+	{
+		global $prefs, $base_url;
+
+		$nb_bad_logins = $this->unsuccessful_logins($user);
+		$nb_bad_logins++ ;
+		$this->set_unsuccessful_logins($user, $nb_bad_logins);
+
+		$smarty = TikiLib::lib('smarty');
+
+		if ($prefs['unsuccessful_logins_invalid'] > 0 && ($nb_bad_logins >= $prefs['unsuccessful_logins_invalid'])) {
+			$info = $this->get_user_info($user);
+			$this->change_user_waiting($user, 'a');
+			$msg = sprintf(tra('%d or more unsuccessful login attempts have been made.'), $prefs['unsuccessful_logins_invalid']);
+			$msg .= ' ' . tra('Your account has been suspended.') . ' ' . tra('Contact your site administrator to reactivate it.');
+			$smarty->assign('msg', $msg);
+			if ($nb_bad_logins % $prefs['unsuccessful_logins_invalid'] == 0) {
+				//don't send an email after every failed login
+				include_once('lib/webmail/tikimaillib.php');
+				$mail = new TikiMail();
+				$smarty->assign('mail_user', $user);
+				$smarty->assign('mail_machine', $base_url);
+				$mail->setText($smarty->fetch('mail/unsuccessful_logins_suspend.tpl'));
+				$mail->setSubject($smarty->fetch('mail/unsuccessful_logins_suspend_subject.tpl'));
+				$emails = ! empty($prefs['validator_emails']) ? preg_split('/,/', $prefs['validator_emails']) : (! empty($prefs['sender_email']) ? [$prefs['sender_email']] : '');
+				$mail->send([$info['email']]);
+				$mail->send($emails);
+			}
+		} elseif ($prefs['unsuccessful_logins'] > 0 && ($nb_bad_logins >= $prefs['unsuccessful_logins'])) {
+			$msg = sprintf(tra('%d or more unsuccessful login attempts have been made.'), $prefs['unsuccessful_logins']);
+			$smarty->assign('msg', $msg);
+			if ($nb_bad_logins % $prefs['unsuccessful_logins'] == 0) {
+				//don't send an email after every failed login
+				if ($this->send_confirm_email($user, 'unsuccessful_logins')) {
+					$smarty->assign('msg', $msg . ' ' . tra('An email has been sent to you with the instructions to follow.'));
+				}
+			}
+		}
 	}
 
 
@@ -7358,10 +7401,14 @@ class UsersLib extends TikiLib
 		return $this->getOne($query, [$user]);
 	}
 
-	function validate_two_factor($twoFactorSecret, $pin)
+	function validate_two_factor($twoFactorSecret, $pin, $user)
 	{
 		$google2fa = new Google2FA();
-		return $google2fa->verifyKey($twoFactorSecret, $pin, 2);
+		$result = $google2fa->verifyKey($twoFactorSecret, $pin, 2);
+		if (! $result) {
+			$this->handleUnsuccessfulLogin($user);
+		}
+		return $result;
 	}
 
 	function change_user_password($user, $pass, $pass_first_login = false)
