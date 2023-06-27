@@ -910,7 +910,15 @@ if (isset($_REQUEST["description"])) {
     $smarty->assign_by_ref('description', $_REQUEST["description"]);
     $description = $_REQUEST["description"];
 }
-
+if ($prefs['wiki_customize_title_tag'] === 'y') {
+    $attributelib = TikiLib::lib('attribute');
+    $attributes = $attributelib->get_attribute('wiki page', $page, "tiki.wiki.page_title");
+    if ($attributes !== false) {
+        $smarty->assign('tagTitle', $attributes);
+    } else {
+        $smarty->assign('tagTitle', '');
+    }
+}
 $wiki_authors_style = '';
 if ($prefs['wiki_authors_style_by_page'] === 'y') {
     if (isset($_REQUEST['wiki_authors_style']) && $tiki_p_admin_wiki === 'y') {
@@ -1311,9 +1319,14 @@ if (
                 $hash,
                 null,
                 $_REQUEST['wysiwyg'],
-                $wiki_authors_style
+                $wiki_authors_style,
+                false
             );
             $info_new = $tikilib->get_page_info($page);
+            if (isset($_REQUEST['content_title'])) {
+                $attributelib = TikiLib::lib('attribute');
+                $attributelib->set_attribute('wiki page', $page, 'tiki.wiki.page_title', $_REQUEST['content_title']);
+            }
 
             // Handle translation bits
             if ($prefs['feature_multilingual'] === 'y' && ! $minor) {

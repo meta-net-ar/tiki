@@ -435,6 +435,13 @@ if (
 }
 
 $page = $info['pageName'];
+if ($prefs['wiki_customize_title_tag'] === 'y') {
+    $attributelib = TikiLib::lib('attribute');
+    $attributes = $attributelib->get_attribute('wiki page', $page, "tiki.wiki.page_title");
+    if ($attributes !== false) {
+        $smarty->assign('tagTitle', $attributes);
+    }
+}
 
 if (
     ! empty($info) && isset($info['data']) &&

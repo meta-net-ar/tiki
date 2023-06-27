@@ -647,6 +647,17 @@
                                 </div>
                             </div>
                         {/if}
+                        {if $prefs.wiki_customize_title_tag eq 'y'}
+                            <div class="mb-3 row clearfix">
+                                <label for="content_title" class="col-md-4 col-form-label">{tr}Content of the tag title{/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="content_title" name="content_title" value="{$tagTitle|escape}" placeholder="{tr}Type the content of title{/tr}">
+                                    <span class="form-text">
+                                        {tr}this field allows you to customize the content of your title tag to get a better referencing{/tr}
+                                    </span>
+                                </div>
+                            </div>
+                        {/if}
                         {if $prefs.namespace_enabled eq 'y'}
                             <div class="mb-3 row clearfix">
                                 <label for="explicit_namespace" class="col-md-4 col-form-label">{tr}Namespace{/tr}</label>

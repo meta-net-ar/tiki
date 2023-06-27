@@ -125,6 +125,8 @@
         {else}
             {if !empty($tracker_item_main_value)}
                 {$tracker_item_main_value|truncate:255|escape}
+            {elseif !empty($tagTitle)}
+                {$tagTitle|escape}
             {elseif !empty($title) and !is_array($title)}
                 {$title|escape}
             {elseif !empty($aliasname)}
@@ -143,7 +145,7 @@
                 {$tracker_info.pagetitle|escape}
             {elseif !empty($tracker_info.name)}
                 {$tracker_info.name|escape}
-             {elseif !empty($description)}
+            {elseif !empty($description)}
                 {$description|escape}{* use description if nothing else is found but this is likely to contain tiki markup *}
                 {* add $description|escape if you want to put the description + update breadcrumb_build replace return $crumbs->title; with return empty($crumbs->description)? $crumbs->title: $crumbs->description; *}
             {elseif !empty($page)}

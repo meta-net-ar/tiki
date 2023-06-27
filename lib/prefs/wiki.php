@@ -795,6 +795,17 @@ function prefs_wiki_list($partial = false)
             'default' => 'y',
             'dependencies' => [],
         ],
+        'wiki_customize_title_tag' => [
+            'name' => tr('Adding the content of the title tag'),
+            'description' => tr("allows the application to be better referenced with a personalized title tag"),
+            'type' => 'list',
+            'default' => 'y',
+            'option' => [
+                'y' => tra('Yes'),
+                'n' => tra('No')
+            ],
+            'dependencies' => []
+        ],
         'wiki_heading_links' => [
             'name' => tr('Anchor links on headings'),
             'description' => tr('Cause a link icon to appear on hover over each heading, useful for sharing the URL to an exact location on a page.'),
