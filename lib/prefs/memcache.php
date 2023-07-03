@@ -25,7 +25,7 @@ function prefs_memcache_list()
             'unserialize' => 'prefs_memcache_unserialize_servers',
             'size' => 10,
             'default' => false,
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
         'memcache_prefix' => [
             'name' => tra('Memcache key prefix'),
@@ -34,7 +34,7 @@ function prefs_memcache_list()
             'size' => 10,
             'type' => 'text',
             'default' => 'tiki_',
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
         'memcache_expiration' => [
             'name' => tra('Memcache expiration'),
@@ -44,25 +44,25 @@ function prefs_memcache_list()
             'filter' => 'digits',
             'units' => tra('seconds'),
             'default' => 3600,
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
         'memcache_wiki_data' => [
             'name' => tra('Cache wiki data in memcache'),
             'type' => 'flag',
             'default' => 'y',
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
         'memcache_wiki_output' => [
             'name' => tra('Cache wiki output in memcache'),
             'type' => 'flag',
             'default' => 'y',
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
         'memcache_forum_output' => [
             'name' => tra('Cache forum output in memcache'),
             'type' => 'flag',
             'default' => 'y',
-            'extensions' => [ 'memcached' ],
+            'dependencies' => ['memcache_enabled'],
         ],
     ];
 }

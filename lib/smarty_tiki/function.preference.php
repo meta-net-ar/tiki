@@ -38,6 +38,11 @@ function smarty_function_preference($params, $smarty)
             $info['params'] .= ' autocomplete="new-password" '; // by default preferences of type password should not be autocomplete
         }
 
+        if ($info['default'] !== $info['value']) {
+            $info['modified'] = true;
+            $params['visible'] = 'always';
+        }
+
         if (isset($params['visible']) && $params['visible'] == 'always') {
             // Modified preferences are never hidden, so pretend it's modified when forcing display
             $info['tags'][] = 'modified';
