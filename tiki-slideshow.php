@@ -180,55 +180,57 @@ if (isset($_REQUEST['pdf'])) {
                 = "<style type='text/css'>img{max-height:300px;width:auto;} body{font-size:1em} h1{font-size:1.5em;text-transform:none !important;}  section{height:300px;border:1px solid #000;margin-bottom:1%;padding:1%;}</style> ";
             $pdata = $customCSS . '<pdfsettings printFriendly="y" header="off" footer="off"></pdfsettings>' . $pdata;
         } else {
-            $doc = new DOMDocument();
-            libxml_use_internal_errors(true);
-            $doc->loadHTML($pdata, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            libxml_clear_errors();
+            if (! empty($pdata)) {
+                $doc = new DOMDocument();
+                libxml_use_internal_errors(true);
+                $doc->loadHTML($pdata, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                libxml_clear_errors();
 
-            $sections = $doc->getElementsByTagName('section');
+                $sections = $doc->getElementsByTagName('section');
 
-            foreach ($sections as $key => $section) {
-                // Remove saveHTML call
-                $color = $section->getAttribute('data-background-color');
-                $imgBackground = $section->getAttribute('data-background-image');
+                foreach ($sections as $key => $section) {
+                    // Remove saveHTML call
+                    $color = $section->getAttribute('data-background-color');
+                    $imgBackground = $section->getAttribute('data-background-image');
 
-                if (! empty($imgBackground)) {
-                    $class = $section->getAttribute('class');
-                    $section->setAttribute("class", 'section_bg_image_' . $key . ' ' . $class);
+                    if (! empty($imgBackground)) {
+                        $class = $section->getAttribute('class');
+                        $section->setAttribute("class", 'section_bg_image_' . $key . ' ' . $class);
 
-                    $imgBackgroundCSS .= ' .section_bg_image_' . $key . '{ 
-                        background-image: url("' . $imgBackground . '"); 
-                        background-position: top left;
-                        background-repeat: no-repeat;
-                        background-image-resize: 4; 
-                        background-image-resolution: from-image;
-                    }';
+                        $imgBackgroundCSS .= ' .section_bg_image_' . $key . '{ 
+                            background-image: url("' . $imgBackground . '"); 
+                            background-position: top left;
+                            background-repeat: no-repeat;
+                            background-image-resize: 4; 
+                            background-image-resolution: from-image;
+                        }';
+                    }
+
+                    if (! empty($color)) {
+                        $style = $section->getAttribute('style');
+                        $section->setAttribute("style", "background-color:" . $color . ";" . $style);
+                    }
                 }
 
-                if (! empty($color)) {
-                    $style = $section->getAttribute('style');
-                    $section->setAttribute("style", "background-color:" . $color . ";" . $style);
-                }
+                $pdata = $doc->saveHTML();
+
+                //getting css
+                $customCSS = file_get_contents(
+                    'vendor_bundled/vendor/npm-asset/reveal.js/css/reveal.css'
+                );
+                $customCSS .= file_get_contents(
+                    'vendor_bundled/vendor/npm-asset/reveal.js/css/theme/' . $theme
+                    . '.css'
+                );
+
+                $customCSS .= '.reveal section{width:100%; height:100%;text-align:center;margin:auto;} section{text-align:center;margin: auto;width:100%;} .ss-heading{line-height:2.5em,padding-bottom:20px;} ' . $imgBackgroundCSS;
+                $pdata = '<pdfsettings header="off" footer="off" margin_top="0" margin_bottom="0" margin_left="0" margin_right="0" printfriendly="n"></pdfsettings><div class="reveal">' . $pdata . '</div>';
+                $pdata = str_replace(
+                    "</section><section",
+                    "</section><pagebreak /><section",
+                    $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1 {font-size: 2.8em; text-transform:none !important;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
+                ) . $pdfStyles;
             }
-
-            $pdata = $doc->saveHTML();
-
-            //getting css
-            $customCSS = file_get_contents(
-                'vendor_bundled/vendor/npm-asset/reveal.js/css/reveal.css'
-            );
-            $customCSS .= file_get_contents(
-                'vendor_bundled/vendor/npm-asset/reveal.js/css/theme/' . $theme
-                . '.css'
-            );
-
-            $customCSS .= '.reveal section{width:100%; height:100%;text-align:center;margin:auto;} section{text-align:center;margin: auto;width:100%;} .ss-heading{line-height:2.5em,padding-bottom:20px;} ' . $imgBackgroundCSS;
-            $pdata = '<pdfsettings header="off" footer="off" margin_top="0" margin_bottom="0" margin_left="0" margin_right="0" printfriendly="n"></pdfsettings><div class="reveal">' . $pdata . '</div>';
-            $pdata = str_replace(
-                "</section><section",
-                "</section><pagebreak /><section",
-                $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1 {font-size: 2.8em; text-transform:none !important;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
-            ) . $pdfStyles;
         }
 
         $pdf = $generator->getPdf(
