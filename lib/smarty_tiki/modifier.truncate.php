@@ -32,7 +32,7 @@ function smarty_modifier_truncate(
     $middle = false
 ) {
 
-    if ($length == 0) {
+    if (! isset($string) || $length == 0) {
         return '';
     }
 
