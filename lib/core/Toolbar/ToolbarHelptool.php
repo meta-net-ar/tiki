@@ -57,7 +57,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
         $url = $servicelib->getUrl($params);
         $help = tra('Help');
 
-        return "<a title=\":$help\" class=\"toolbar btn btn-sm px-2 qt-help tips bottom\" href=\"$url\" data-bs-toggle=\"modal\" data-bs-target=\"#bootstrap-modal\">$icon</a>";
+        return "<a title=\":$help\" class=\"toolbar btn btn-sm px-2 qt-help tips bottom click-modal\" href=\"$url\" data-modal-size=\"modal-md\">$icon</a>";
     }
 
     public function getWysiwygToken(): string
