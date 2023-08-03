@@ -137,6 +137,10 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
             $fieldPermName
         ]));
     }
+
+    if ($fieldValuesParam === null) {
+        $fieldValuesParam = [];
+    }
     $fieldValuesMap = $fieldHandler->getPossibleItemValues();
 
     //echo '<pre>Possible item values';print_r($fieldValuesMap);echo '</pre>';
