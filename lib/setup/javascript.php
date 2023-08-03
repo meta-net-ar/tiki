@@ -320,7 +320,7 @@ $(document).on("tiki.modal.redraw", function (event) {
     if (! $modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    if ($modalContent.is(".ui-resizable")) {
+    if ($modalContent.is(".ui-resizable") && $modalContent.resizable("instance").started) {
         $modalContent.resizable( "destroy" );
     }
     $modalContent
