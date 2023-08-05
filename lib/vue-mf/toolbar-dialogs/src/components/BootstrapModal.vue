@@ -21,7 +21,7 @@ let modalElement = ref(null);
 let thisModalObj = null;
 
 onMounted(() => {
-    thisModalObj = new Modal(modalElement.value);
+    document.body.appendChild(modalElement.value);
 });
 
 function _shown(e) {
@@ -29,11 +29,15 @@ function _shown(e) {
 }
 
 function _show() {
+    thisModalObj = new Modal(modalElement.value, {focus: false	});
+    modalElement.value.addEventListener('shown.bs.modal', event => {
+        $("a, input,select", modalElement.value).first().focus();
+    })
     thisModalObj.show();
 }
 
 function _close() {
-    thisModalObj.hide();
+    thisModalObj.dispose();
 }
 
 defineExpose({ show: _show, shown: _shown, close: _close });
