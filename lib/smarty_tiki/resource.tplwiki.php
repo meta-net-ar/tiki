@@ -13,7 +13,7 @@
  * Purpose:  Fetches a template from a wiki page but parsing as little as with tpl's on disk
  * -------------------------------------------------------------
  */
-class Smarty_Resource_Tplwiki extends Smarty_Resource_Custom
+class Smarty_Resource_Tplwiki extends \Smarty\Resource\CustomPlugin
 {
     protected function fetch($name, &$source, &$mtime)
     {

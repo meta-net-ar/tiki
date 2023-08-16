@@ -13,7 +13,7 @@
  * Purpose:  Fetches a template from a wiki page
  * -------------------------------------------------------------
  */
-class Smarty_Resource_Wiki extends Smarty_Resource_Custom
+class Smarty_Resource_Wiki extends \Smarty\Resource\CustomPlugin
 {
     protected function fetch($name, &$source, &$mtime): void
     {

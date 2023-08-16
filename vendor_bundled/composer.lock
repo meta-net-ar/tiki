@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2988dba6857ea730f6062a8ee31c8e6",
+    "content-hash": "c3e68c1d9220a7e404128fed32839925",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -1778,17 +1778,17 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "v3.3.2",
+            "version": "v3.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "782ca5968ab8b954773518e9e49a6f892a34b2a8"
+                "reference": "adfb1f505deb6384dc8b39804c5065dd3c8c8c0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/dragonmantank/cron-expression/dragonmantank-cron-expression-782ca5968ab8b954773518e9e49a6f892a34b2a8-zip-b5ea0c.zip",
-                "reference": "782ca5968ab8b954773518e9e49a6f892a34b2a8",
-                "shasum": "4f096ce0f78c530db1e7c05e282da42f3385313b"
+                "url": "https://composer.tiki.org/dist/dragonmantank/cron-expression/dragonmantank-cron-expression-adfb1f505deb6384dc8b39804c5065dd3c8c8c0a-zip-d2abfb.zip",
+                "reference": "adfb1f505deb6384dc8b39804c5065dd3c8c8c0a",
+                "shasum": "95fb582539b2eb009f7b193599854c45c9960682"
             },
             "require": {
                 "php": "^7.2|^8.0",
@@ -1831,7 +1831,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-10T18:51:20+00:00"
+            "time": "2023-08-10T19:36:49+00:00"
         },
         {
             "name": "drmonty/smartmenus",
@@ -1881,17 +1881,17 @@
         },
         {
             "name": "elliotjreed/disposable-emails-filter",
-            "version": "3.4.12",
+            "version": "3.4.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elliotjreed/disposable-emails-filter-php.git",
-                "reference": "6bbc024d813b2274fac97e8a4234052ab66264f3"
+                "reference": "a2071bb26ccb7fea3893a0d70827e6fb6347764c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/elliotjreed/disposable-emails-filter/elliotjreed-disposable-emails-filter-6bbc024d813b2274fac97e8a4234052ab66264f3-zip-94ce10.zip",
-                "reference": "6bbc024d813b2274fac97e8a4234052ab66264f3",
-                "shasum": "d1e4263effd8b68e67113e390b83e33663b7d337"
+                "url": "https://composer.tiki.org/dist/elliotjreed/disposable-emails-filter/elliotjreed-disposable-emails-filter-a2071bb26ccb7fea3893a0d70827e6fb6347764c-zip-88b789.zip",
+                "reference": "a2071bb26ccb7fea3893a0d70827e6fb6347764c",
+                "shasum": "36451524db2eb9cd2e9aeddba82e9e45adb74802"
             },
             "require": {
                 "php": "^7.4|^8.0"
@@ -1921,7 +1921,7 @@
                 }
             ],
             "description": "A PHP package for determining whether an email address is from a disposable / temporary email address provider.",
-            "time": "2023-08-09T07:33:16+00:00"
+            "time": "2023-08-11T07:33:06+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -2775,13 +2775,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "eebf33ff55451682dee5a1bfe10f39a507bac56a"
+                "reference": "c55313b3bbd56aed2a5e85bfb8a855501523cffa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-eebf33ff55451682dee5a1bfe10f39a507bac56a-zip-126c66.zip",
-                "reference": "eebf33ff55451682dee5a1bfe10f39a507bac56a",
-                "shasum": "2cd4fd6a63d233e420331f68f78c13ad99d5fde7"
+                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-c55313b3bbd56aed2a5e85bfb8a855501523cffa-zip-81d563.zip",
+                "reference": "c55313b3bbd56aed2a5e85bfb8a855501523cffa",
+                "shasum": "b5e9ec18af3c1c8407498dedec8f455a4410666d"
             },
             "require": {
                 "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
@@ -2841,7 +2841,7 @@
                 "webmail",
                 "webmail-client"
             ],
-            "time": "2023-08-07T12:45:45+00:00"
+            "time": "2023-08-12T20:24:14+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -4859,17 +4859,17 @@
         },
         {
             "name": "laminas/laminas-validator",
-            "version": "2.37.0",
+            "version": "2.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-validator.git",
-                "reference": "e57810c007891066fdc4e9fb2523bf32e218fd92"
+                "reference": "5fafe1ec4cc23e4bb4dfe6b4cd96c28e1c7f48a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/laminas/laminas-validator/laminas-laminas-validator-e57810c007891066fdc4e9fb2523bf32e218fd92-zip-a132d5.zip",
-                "reference": "e57810c007891066fdc4e9fb2523bf32e218fd92",
-                "shasum": "5fc1cd35a76776281f55171d1834e1f83d7d710f"
+                "url": "https://composer.tiki.org/dist/laminas/laminas-validator/laminas-laminas-validator-5fafe1ec4cc23e4bb4dfe6b4cd96c28e1c7f48a3-zip-f42a9d.zip",
+                "reference": "5fafe1ec4cc23e4bb4dfe6b4cd96c28e1c7f48a3",
+                "shasum": "670670cd81e202fafc250e4bbaf3863bbb71d253"
             },
             "require": {
                 "laminas/laminas-servicemanager": "^3.21.0",
@@ -4931,7 +4931,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2023-08-07T12:36:50+00:00"
+            "time": "2023-08-14T07:19:58+00:00"
         },
         {
             "name": "laminas/laminas-zendframework-bridge",
@@ -6160,21 +6160,21 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.2.3",
+            "version": "v1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "abbdbb70e0245d5f3bf77874cea1dfb0c930d06f"
+                "reference": "c9ff517a53903b3d4e29ec547fb20feecb05b8ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/nette/schema/nette-schema-abbdbb70e0245d5f3bf77874cea1dfb0c930d06f-zip-b07229.zip",
-                "reference": "abbdbb70e0245d5f3bf77874cea1dfb0c930d06f",
-                "shasum": "c15a5c5828c0abe76beb8f6fe44a59501398b72e"
+                "url": "https://composer.tiki.org/dist/nette/schema/nette-schema-c9ff517a53903b3d4e29ec547fb20feecb05b8ab-zip-dcbc1f.zip",
+                "reference": "c9ff517a53903b3d4e29ec547fb20feecb05b8ab",
+                "shasum": "925437f91cca851a5460a851699831ae161e1373"
             },
             "require": {
                 "nette/utils": "^2.5.7 || ^3.1.5 ||  ^4.0",
-                "php": ">=7.1 <8.3"
+                "php": "7.1 - 8.3"
             },
             "require-dev": {
                 "nette/tester": "^2.3 || ^2.4",
@@ -6214,7 +6214,7 @@
                 "config",
                 "nette"
             ],
-            "time": "2022-10-13T01:24:26+00:00"
+            "time": "2023-08-05T18:56:25+00:00"
         },
         {
             "name": "nette/utils",
@@ -11222,35 +11222,39 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v4.3.2",
+            "version": "v5.0.0-rc1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "1d9cda2be34fd6edb74924684260636fd0b89288"
+                "reference": "548a67031d0cb37863c64aa3ef3e0535a4f5191d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/smarty/smarty/smarty-smarty-1d9cda2be34fd6edb74924684260636fd0b89288-zip-d77820.zip",
-                "reference": "1d9cda2be34fd6edb74924684260636fd0b89288",
-                "shasum": "f23578faedb9f6b38df644bad1d3b93ec32c5e5b"
+                "url": "https://composer.tiki.org/dist/smarty/smarty/smarty-smarty-548a67031d0cb37863c64aa3ef3e0535a4f5191d-zip-95f77d.zip",
+                "reference": "548a67031d0cb37863c64aa3ef3e0535a4f5191d",
+                "shasum": "43211b2557383af327f04429ab3c8e0a53b87445"
             },
             "require": {
-                "php": "^7.1 || ^8.0"
+                "php": "^7.2 || ^8.0",
+                "symfony/polyfill-mbstring": "^1.27"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.5 || ^7.5",
-                "smarty/smarty-lexer": "^3.1"
+                "smarty/smarty-lexer": "^4.0.2"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.0.x-dev"
+                    "dev-master": "5.0.x-dev"
                 }
             },
             "autoload": {
-                "classmap": [
-                    "libs/"
-                ]
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "Smarty\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -11279,7 +11283,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2023-07-19T10:27:36+00:00"
+            "time": "2023-08-07T22:20:35+00:00"
         },
         {
             "name": "sorich87/bootstrap-tour",
@@ -15825,17 +15829,17 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.16.0",
+            "version": "v4.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "19526a33fb561ef417e822e85f08a00db4059c17"
+                "reference": "a6303e50c90c355c7eeee2c4a8b27fe8dc8fef1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/nikic/php-parser/nikic-php-parser-19526a33fb561ef417e822e85f08a00db4059c17-zip-a7d68f.zip",
-                "reference": "19526a33fb561ef417e822e85f08a00db4059c17",
-                "shasum": "16f459e7bdfcf19c6a8b2b3703062d8b4ff69ad5"
+                "url": "https://composer.tiki.org/dist/nikic/php-parser/nikic-php-parser-a6303e50c90c355c7eeee2c4a8b27fe8dc8fef1d-zip-5f72f4.zip",
+                "reference": "a6303e50c90c355c7eeee2c4a8b27fe8dc8fef1d",
+                "shasum": "f243e3b91ac02ee9951f77376e3ed21c0d6da2f3"
             },
             "require": {
                 "ext-tokenizer": "*",
@@ -15873,7 +15877,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2023-06-25T14:52:30+00:00"
+            "time": "2023-08-13T19:53:39+00:00"
         },
         {
             "name": "overtrue/phplint",
@@ -16063,13 +16067,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
-                "reference": "62db200c9372a0f610980f2b33be5c5d77f31636"
+                "reference": "38daa2ed33b0e3da329a03a6db7faedbd562d033"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/phpcompatibility/php-compatibility/phpcompatibility-php-compatibility-62db200c9372a0f610980f2b33be5c5d77f31636-zip-391918.zip",
-                "reference": "62db200c9372a0f610980f2b33be5c5d77f31636",
-                "shasum": "1657b9825478f121fa1dbf9bfea6fe68da6794c2"
+                "url": "https://composer.tiki.org/dist/phpcompatibility/php-compatibility/phpcompatibility-php-compatibility-38daa2ed33b0e3da329a03a6db7faedbd562d033-zip-be5b84.zip",
+                "reference": "38daa2ed33b0e3da329a03a6db7faedbd562d033",
+                "shasum": "59ad97a80238419924e52ecd3fb30883ca8169fc"
             },
             "require": {
                 "php": ">=5.4",
@@ -16125,7 +16129,7 @@
                 "standards",
                 "static analysis"
             ],
-            "time": "2023-08-04T21:50:50+00:00"
+            "time": "2023-08-14T00:16:39+00:00"
         },
         {
             "name": "phpcsstandards/phpcsutils",
@@ -16197,17 +16201,17 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.28",
+            "version": "1.10.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "e4545b55904ebef470423d3ddddb74fa7325497a"
+                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/phpstan/phpstan/phpstan-phpstan-e4545b55904ebef470423d3ddddb74fa7325497a-zip-35b30b.zip",
-                "reference": "e4545b55904ebef470423d3ddddb74fa7325497a",
-                "shasum": "e0e4933a4fe8d109d00c15ac5217eed08b02c915"
+                "url": "https://composer.tiki.org/dist/phpstan/phpstan/phpstan-phpstan-ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1-zip-389e35.zip",
+                "reference": "ee5d8f2d3977fb09e55603eee6fb53bdd76ee9c1",
+                "shasum": "66eaa096b4b8ac13faf5dfcb47a7195ad05b0a6e"
             },
             "require": {
                 "php": "^7.2|^8.0"
@@ -16248,7 +16252,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-08-08T12:33:42+00:00"
+            "time": "2023-08-14T13:24:11+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -16812,17 +16816,17 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.17.10",
+            "version": "0.17.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "f4c0627d5e157272cf4783099730ef7241fddb14"
+                "reference": "e2003ba7c5bda06d7bb419cf4be8dae5f8672132"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/rector/rector/rector-rector-f4c0627d5e157272cf4783099730ef7241fddb14-zip-e300e1.zip",
-                "reference": "f4c0627d5e157272cf4783099730ef7241fddb14",
-                "shasum": "87c52736191c355a9a8c5d74d011679c85813c0f"
+                "url": "https://composer.tiki.org/dist/rector/rector/rector-rector-e2003ba7c5bda06d7bb419cf4be8dae5f8672132-zip-2cba9b.zip",
+                "reference": "e2003ba7c5bda06d7bb419cf4be8dae5f8672132",
+                "shasum": "a6f58bc76a80d68676c5b891ca2e918bf2f6f297"
             },
             "require": {
                 "php": "^7.2|^8.0",
@@ -16838,11 +16842,6 @@
                 "bin/rector"
             ],
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "0.15-dev"
-                }
-            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -16865,7 +16864,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-08-03T14:19:51+00:00"
+            "time": "2023-08-14T16:33:29+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -18457,7 +18456,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "RC",
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "erusev/parsedown": 10,

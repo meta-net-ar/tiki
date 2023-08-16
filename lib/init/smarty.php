@@ -24,7 +24,7 @@ require_once __DIR__ . '/SmartyTikiErrorHandler.php';
  * extends Smarty_Security
  * @package TikiWiki\lib\init
  */
-class Tiki_Security_Policy extends Smarty_Security
+class Tiki_Security_Policy extends \Smarty\Security
 {
     public $trusted_uri = [];
 
@@ -141,7 +141,7 @@ class Tiki_Security_Policy extends Smarty_Security
  * Centralizing overrides here will avoid problems when upgrading to newer versions of the Smarty library.
  * @package TikiWiki\lib\init
  */
-class Smarty_Tiki extends Smarty
+class Smarty_Tiki extends \Smarty\Smarty
 {
     /**
      * needs a proper description
@@ -221,7 +221,7 @@ class Smarty_Tiki extends Smarty
 
         global $prefs;
         // Assign the prefs array in smarty, by reference
-        $this->assignByRef('prefs', $prefs);
+        $this->assign('prefs', $prefs);
 
         if (! empty($prefs['log_tpl']) && $prefs['log_tpl'] === 'y') {
             $this->loadFilter('pre', 'log_tpl');
@@ -232,8 +232,8 @@ class Smarty_Tiki extends Smarty
         }
 
         // restore tiki's own escape function
-        $this->loadPlugin('smarty_modifier_escape');
-        $this->registerPlugin('modifier', 'escape', 'smarty_modifier_escape');
+        //$this->loadPlugin('smarty_modifier_escape'); // TODO5: check how plugins work
+        //$this->registerPlugin('modifier', 'escape', 'smarty_modifier_escape');
 
         // register PHP functions used as smarty modifiers in Tiki templates
         $builtin = ['addslashes', 'array_reverse', 'count', 'explode', 'implode', 'is_array', 'json_decode', 'json_encode', 'md5', 'stristr', 'strpos', 'trim', 'ucfirst', 'ucwords', 'urlencode', 'var_dump'];
@@ -260,7 +260,7 @@ class Smarty_Tiki extends Smarty
         if (is_array($override_vars)) {
             foreach ($override_vars as $k => $v) {
                 $smarty_orig_values[ $k ] = $this->getTemplateVars($k);
-                $this->assignByRef($k, $override_vars[ $k ]);
+                $this->assign($k, $override_vars[ $k ]);
             }
         }
 
@@ -269,7 +269,7 @@ class Smarty_Tiki extends Smarty
         // Restore original values of smarty variables
         if (count($smarty_orig_values) > 0) {
             foreach ($smarty_orig_values as $k => $v) {
-                $this->assignByRef($k, $smarty_orig_values[ $k ]);
+                $this->assign($k, $smarty_orig_values[ $k ]);
             }
         }
 
@@ -345,7 +345,7 @@ class Smarty_Tiki extends Smarty
      */
     public function assign_by_ref($var, &$value)
     {
-        return parent::assignByRef($var, $value);
+        return parent::assign($var, $value);
     }
 
     /**
@@ -698,7 +698,7 @@ class Smarty_Tiki extends Smarty
             $this->setPluginsDir(
                 [   // the directory order must be like this to overload a plugin
                     TIKI_PATH . '/' . TIKI_SMARTY_DIR,
-                    SMARTY_DIR . 'plugins'
+                    //SMARTY_DIR . 'plugins' // TODO5: check what replaces this
                 ]
             );
         }
@@ -781,15 +781,15 @@ class Smarty_Tiki extends Smarty
     }
 
     /**
-     * When calling directly smarty functions, from PHP, you need to provide a object of type Smarty_Internal_Template
-     * The method signature for smarty functions is: smarty_function_xxxx($params, Smarty_Internal_Template $template)
+     * When calling directly smarty functions, from PHP, you need to provide a object of type \Smarty\Template
+     * The method signature for smarty functions is: smarty_function_xxxx($params, \Smarty\Template $template)
      *
-     * @return Smarty_Internal_Template
+     * @return \Smarty\Template
      */
     public function getEmptyInternalTemplate()
     {
         global $prefs;
-        $tpl = new Smarty_Internal_Template('empty', $this);
+        $tpl = new \Smarty\Template('empty', $this);
         $tpl->assign('app_name', $this->getTemplateVars('app_name'));
 
         // DO NOT USE THIS, this has been added 2023-06-14 for backward compatibility with existing custom mail templates and will be removed in future versions
@@ -798,7 +798,7 @@ class Smarty_Tiki extends Smarty
             $tpl->assign('mail_machine_raw', $tikilib->tikiUrl());
         }
 
-        $tpl->assignByRef('prefs', $prefs);
+        $tpl->assign('prefs', $prefs);
         return $tpl;
     }
 
