@@ -283,6 +283,25 @@ class Hm_Handler_tiki_mark_as_answered extends Hm_Handler_Module
 }
 
 /**
+ * Prevents saving the message to IMAP if message was sent from tracker
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_tiki_presave_sent extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if (! $this->get('save_sent_msg')) {
+            return;
+        }
+
+        $path = $this->request->post['compose_msg_path'];
+        if (strstr($path, 'tracker_folder_')) {
+            $this->out('save_sent_server', false);
+        }
+    }
+}
+
+/**
  * Save a sent message to EmailFolder field
  * @subpackage tiki/handler
  */
