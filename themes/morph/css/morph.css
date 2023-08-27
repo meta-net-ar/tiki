@@ -11531,6 +11531,9 @@ table.treetable.objectperms td.removed {
 .tiki .wiki.external + .icon-link-external, .tiki .wiki.external .icon-link-external, .editable-inline .icon {
   color: var(--bs-link-color);
 }
+.btn.btn-link.navbar-btn {
+  text-decoration: none;
+}
 #ajaxLoadingBG {
   background: transparent url("../../../img/overlay-light.png");
 }

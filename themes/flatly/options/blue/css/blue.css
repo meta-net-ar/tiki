@@ -36,12 +36,12 @@ a:hover, a:active, a:focus,
     color: #50b3fb;
 }*/
 
-.btn-primary {
+.btn-primary, .btn.btn-link.navbar-btn {
     background-color: #3c88bc;
     border-color: #3c88bc;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn.btn-link.navbar-btn:hover {
     background-color: #2b6288;
     border-color: #2b6288;
 }

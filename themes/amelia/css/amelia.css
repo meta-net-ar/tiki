@@ -2602,7 +2602,7 @@ textarea.form-control-lg {
 }
 .btn:hover {
   color: var(--bs-btn-hover-color);
-  text-decoration: none;
+  text-decoration: none !important;
   background-color: var(--bs-btn-hover-bg);
   border-color: var(--bs-btn-hover-border-color);
 }
@@ -10950,6 +10950,10 @@ table.treetable.objectperms td.removed {
 }
 .tiki .wiki.external + .icon-link-external, .tiki .wiki.external .icon-link-external, .editable-inline .icon {
   color: var(--bs-link-color);
+}
+.btn.btn-link.navbar-btn {
+  color: #000;
+  background-color: var(--bs-primary);
 }
 #ajaxLoadingBG {
   background: transparent url("../../../img/overlay-light.png");
