@@ -29,7 +29,7 @@ $survey_info = $srvlib->get_survey($_REQUEST["surveyId"]);
 $smarty->assign('survey_info', $survey_info);
 
 // Check if user has taken this survey
-if ($tiki_p_admin != 'y') {
+if ($tiki_p_admin != 'y' || $survey_info['restriction'] == 'y') {
     if ($tikilib->user_has_voted($user, 'survey' . $_REQUEST["surveyId"])) {
         $smarty->assign('msg', tra("You cannot take this survey twice"));
         $smarty->display("error.tpl");

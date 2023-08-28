@@ -205,12 +205,13 @@ class SurveyLib extends TikiLib
      * @param $status
      * @return mixed
      */
-    public function replace_survey($surveyId, $name, $description, $status)
+    public function replace_survey($surveyId, $name, $description, $restriction, $status)
     {
         $newId = $this->surveysTable->insertOrUpdate(
             [
                 'name' => $name,
                 'description' => $description,
+                'restriction' => $restriction,
                 'status' => $status,
             ],
             ['surveyId' => empty($surveyId) ? 0 : $surveyId]

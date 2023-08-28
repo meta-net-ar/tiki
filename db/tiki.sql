@@ -2410,6 +2410,7 @@ CREATE TABLE `tiki_surveys` (
   `surveyId` int(12) NOT NULL auto_increment,
   `name` varchar(200) default NULL,
   `description` text,
+  `restriction` char(1) default NULL,
   `taken` int(10) default NULL,
   `lastTaken` int(14) default NULL,
   `created` int(14) default NULL,
