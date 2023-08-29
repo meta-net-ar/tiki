@@ -249,6 +249,17 @@ class SurveyLib extends TikiLib
         $min_answers = (int) $min_answers;
         $max_answers = (int) $max_answers;
 
+        // For a rate, question option must not be less than 0 or greater than 5 or 10
+        if ($type == 'r') {
+            if (empty($options) || $options < 0 || $options > 5) {
+                $options = 5;
+            }
+        } elseif ($type == 's') {
+            if (empty($options) || $options < 0 || $options > 10) {
+                $options = 10;
+            }
+        }
+
         $newId = $this->questionsTable->insertOrUpdate(
             [
                 'type'        => $type,
@@ -275,6 +286,25 @@ class SurveyLib extends TikiLib
 
         // Reset question options only if not a 'text', 'wiki' or 'filegal choice', because their options are dynamically generated
         if (! in_array($type, ['t', 'g', 'x'])) {
+            if ($type == 'r' || $type == 's') {
+                if ($type == 'r') {
+                    $option = 5;
+                } else {
+                    $option = 10;
+                }
+
+                // Check if the user has set an option for the question
+                if (! empty($userOptions[0]) && $userOptions[0] <= $option && $userOptions[0] > 0) {
+                    $option = intval($userOptions[0]);
+                }
+
+                // Create list options
+                for ($i = 1; $i <= $option; $i++) {
+                    $tempUserOptions [] = $i;
+                }
+                $userOptions = $tempUserOptions;
+            }
+
             foreach ($questionOptions as $qoption) {
                 if (! in_array($qoption['qoption'], $userOptions)) {
                     $this->optionsTable->delete([
@@ -599,8 +629,14 @@ class SurveyLib extends TikiLib
                         $value = $answers["question_" . $questionId];
 
                         if ($question["type"] == 'r' || $question["type"] == 's') {
+                            foreach ($question["qoptions"] as $qoption) {
+                                if ($qoption["qoption"] == $value) {
+                                    $optionId = $qoption["optionId"];
+                                }
+                            }
+                            $this->register_survey_option_vote($questionId, $optionId);
                             $this->register_survey_rate_vote($questionId, $value);
-                            $this->register_user_vote($user, 'survey' . $surveyId . '.' . $questionId, $value);
+                            $this->register_user_vote($user, 'survey' . $surveyId . '.' . $questionId, $optionId);
                         } elseif ($question["type"] == 't' || $question["type"] == 'x') {
                             $optionId = $this->register_survey_text_option_vote($questionId, $value);
                             $this->register_user_vote($user, 'survey' . $surveyId . '.' . $questionId, $optionId);
@@ -678,16 +714,10 @@ class SurveyLib extends TikiLib
         return $ret;
     }
 
-    public function list_users_that_voted($surveyId)
+    public function list_users_that_voted()
     {
-        $conditions['id'] = 'survey' . $surveyId;
-        $conditions['optionId'] = 0;
-        $result = $this->votesTable->fetchAll(['user'], $conditions);
-        $ret = [];
-        foreach ($result as $r) {
-            $ret[] = $r['user'];
-        }
-        return array_unique($ret);
+        $result = $this->votesTable->fetchAll(['user', 'id', 'optionId']);
+        return $result;
     }
 }
 

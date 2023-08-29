@@ -2269,14 +2269,14 @@ class TikiLib extends TikiDb_Bridge
      */
     public function register_user_vote($user, $id, $optionId = false, array $valid_options = [], $allow_revote = false)
     {
-        global $prefs;
+        global $prefs, $tiki_p_admin;
 
         // If an option is specified and the valid options are specified, skip the vote entirely if not valid
         if (false !== $optionId && count($valid_options) > 0 && ! in_array($optionId, $valid_options)) {
             return false;
         }
 
-        if ($user && ! $allow_revote && $this->user_has_voted($user, $id)) {
+        if ($user && ! $allow_revote && $this->user_has_voted($user, $id) && ! $tiki_p_admin) {
             return false;
         }
 
@@ -2314,11 +2314,14 @@ class TikiLib extends TikiDb_Bridge
                 );
             }
         } else {
-            if ($prefs['ip_can_be_checked'] == 'y') {
-                $userVotings->delete(['user' => $user,'id' => $id]);
-                $userVotings->delete(['ip' => $ip,'id' => $id]);
-            } else {
-                $userVotings->delete(['user' => $user,'id' => $id]);
+            // As only admins are allowed to vote more than once, their previous choices should not be deleted
+            if (! $tiki_p_admin) {
+                if ($prefs['ip_can_be_checked'] == 'y') {
+                    $userVotings->delete(['user' => $user,'id' => $id]);
+                    $userVotings->delete(['ip' => $ip,'id' => $id]);
+                } else {
+                    $userVotings->delete(['user' => $user,'id' => $id]);
+                }
             }
             if ($optionId !== false  && $optionId !== 'NULL') {
                 $userVotings->insert(
