@@ -3879,11 +3879,11 @@ body {
 body.fullscreen {
   background: #000000 url("../../../../../vendor_bundled/vendor/components/jqueryui/themes/trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png") 50% top repeat-x;
 }
-.btn-primary, .btn-secondary, .btn-success, .btn-info, .btn-warning, .btn-danger, .pagination > li > a, .pagination > li > span, .pager li > a, .pager li > span, .btn.btn-link.navbar-btn {
+.btn-primary, .btn-secondary, .btn-success, .btn-info, .btn-warning, .btn-danger, .pagination > li > a, .pagination > li > span, .pager li > a, .pager li > span {
   background: url("../../../../../vendor_bundled/vendor/components/jqueryui/themes/trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png") 50% 50% repeat-x;
   color: #b8ec79;
 }
-.btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-info:hover, .btn-warning:hover, .btn-danger:hover, .btn.btn-link.navbar-btn:hover {
+.btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-info:hover, .btn-warning:hover, .btn-danger:hover {
   background: url("../../../../../vendor_bundled/vendor/components/jqueryui/themes/trontastic/images/ui-bg_glass_60_000000_1x400.png") 50% 50% repeat-x;
   color: inherit !important;
 }
@@ -3916,13 +3916,6 @@ body.fullscreen {
 }
 .btn-link:hover {
   color: #a0e64c;
-}
-.btn.btn-link.navbar-btn {
-  border: 1px solid #6f6f6f;
-  text-decoration: none;
-}
-.btn.btn-link.navbar-btn:hover {
-  border: 1px solid #bfee86;
 }
 .text-info {
   color: #c5e9f3 !important;

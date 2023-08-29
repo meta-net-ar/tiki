@@ -11063,14 +11063,6 @@ table.treetable.objectperms td.removed {
 .tiki .wiki.external + .icon-link-external, .tiki .wiki.external .icon-link-external, .editable-inline .icon {
   color: var(--bs-link-color);
 }
-.btn.btn-link.navbar-btn {
-  color: #ffffff !important;
-  background-color: var(--bs-primary);
-}
-.btn.btn-link.navbar-btn:hover {
-  color: #ffffff !important;
-  background-color: var(--bs-btn-hover-bg);
-}
 #ajaxLoadingBG {
   background: transparent url("../../../img/overlay-light.png");
 }
@@ -11957,7 +11949,7 @@ div.table-responsive, .tiki .col1 .table-responsive, .fc-scrollgrid.table-border
 table.table {
   border: 4px solid #000;
 }
-.btn:not(.btn-link).btn-primary, .btn:not(.btn-link).btn-secondary, .btn:not(.btn-link).btn-success, .btn:not(.btn-link).btn-info, .btn:not(.btn-link).btn-warning, .btn:not(.btn-link).btn-danger, .btn:not(.btn-link).btn-light, .btn.btn-link.navbar-btn {
+.btn:not(.btn-link).btn-primary, .btn:not(.btn-link).btn-secondary, .btn:not(.btn-link).btn-success, .btn:not(.btn-link).btn-info, .btn:not(.btn-link).btn-warning, .btn:not(.btn-link).btn-danger, .btn:not(.btn-link).btn-light {
   border: 4px solid #000;
   box-shadow: 0.4rem 0.4rem 0 black;
   margin-right: 8px;

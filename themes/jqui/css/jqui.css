@@ -2931,9 +2931,6 @@ textarea.form-control-lg {
   --bs-btn-font-size: 0.7875rem;
   --bs-btn-border-radius: var(--bs-border-radius-sm);
 }
-.btn.btn-link.navbar-btn, .btn.btn-link.navbar-btn:hover {
-  border: 1px solid #0001a6;
-}
 .fade {
   transition: opacity 0.15s linear;
 }
@@ -11875,7 +11872,7 @@ blockquote {
   background-color: rgba(0, 0, 0, 0.03);
   border-top: 1px solid #999;
 }
-.btn-primary, .btn-secondary, .btn-success, .btn-info, .btn-warning, .btn-danger, .btn.btn-link.navbar-btn {
+.btn-primary, .btn-secondary, .btn-success, .btn-info, .btn-warning, .btn-danger {
   background: #f2f2f2;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f2f2f2), color-stop(46%, #f2f2f2), color-stop(50%, #e6e6e6), color-stop(50%, #eeeeee), color-stop(100%, #eeeeee));
   background: -webkit-linear-gradient(top, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
@@ -11884,7 +11881,7 @@ blockquote {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#f2f2f2", endColorstr="#eeeeee", GradientType=0);
   color: #333;
 }
-.btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-info:hover, .btn-warning:hover, .btn-danger:hover, .btn.btn-link.navbar-btn:hover {
+.btn-primary:hover, .btn-secondary:hover, .btn-success:hover, .btn-info:hover, .btn-warning:hover, .btn-danger:hover {
   background: #eeeeee;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(50%, #eeeeee), color-stop(50%, #e6e6e6), color-stop(54%, #f2f2f2), color-stop(100%, #f2f2f2));
   background: -webkit-linear-gradient(top, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);

@@ -894,9 +894,6 @@ progress {
 .btn-link:hover {
   color: var(--bs-btn-hover-color);
 }
-.btn.btn-link.navbar-btn {
-  color: #212529 !important;
-}
 .btn-lg {
   --bs-btn-padding-y: 0.5rem;
   --bs-btn-padding-x: 1rem;

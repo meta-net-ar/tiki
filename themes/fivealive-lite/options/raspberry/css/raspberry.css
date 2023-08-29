@@ -1350,14 +1350,6 @@ footer#footer .footer_liner .card-header {
 .btn.btn-primary {
   color: #ffffff;
 }
-.btn.btn-link.navbar-btn {
-  color: #ffffff;
-  background-color: var(--bs-primary);
-}
-.btn.btn-link.navbar-btn:hover {
-  background-color: var(--bs-btn-hover-bg);
-  border-color: var(--bs-btn-hover-border-color);
-}
 .bg-dark {
   background-color: #b50964 !important;
 }

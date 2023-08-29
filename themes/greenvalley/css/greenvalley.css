@@ -10972,9 +10972,6 @@ table.treetable.objectperms td.removed {
 .tiki .wiki.external + .icon-link-external, .tiki .wiki.external .icon-link-external, .editable-inline .icon {
   color: var(--bs-link-color);
 }
-.btn.btn-link.navbar-btn {
-  color: #ffffff;
-}
 #ajaxLoadingBG {
   background: transparent url("../../../img/overlay-light.png");
 }
@@ -11895,7 +11892,7 @@ body:not(.tiki-admin) .row-middle::before {
 .card-title {
   color: #222;
 }
-.btn-primary, input[type="reset"], input[type="submit"], .accordion-button.collapsed, .btn.btn-link.navbar-btn {
+.btn-primary, input[type="reset"], input[type="submit"], .accordion-button.collapsed {
   background: url("../images/button_bck.jpg") 100% 50% repeat;
   text-shadow: #21201e 0 1px 1px;
   padding: 0.275rem 0.4rem !important;
@@ -11904,7 +11901,7 @@ body:not(.tiki-admin) .row-middle::before {
   color: #fff;
   text-shadow: #232121 0 2px 3px;
 }
-.btn-primary:hover, input[type="reset"]:hover, input[type="submit"]:hover, .btn.btn-link.navbar-btn:hover {
+.btn-primary:hover, input[type="reset"]:hover, input[type="submit"]:hover {
   color: #a99278;
   background: url("../images/button_bck_hover.jpg") 100% 50% repeat;
   text-shadow: #2b2b2b 0 1px 1px;
