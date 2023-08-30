@@ -13,13 +13,13 @@
 </div>
 <br>
 
-{foreach from=$channels item=channel key=key}
+{foreach $questions as $key => $question}
     <div class="table-responsive">
         <table class="table ">
             <tr>
-                <th colspan="4">{$channel.question|escape|nl2br}</th>
+                <th colspan="4">{$question.question|escape|nl2br}</th>
             </tr>
-            {if $channel.type eq 'r'}
+            {if $question.type eq 'r'}
                 <tr>
                     <td class="odd">{tr}Votes:{/tr}</td>
                     <td class="odd">
@@ -27,24 +27,24 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseR{$key}" aria-expanded="false" aria-controls="flush-collapseR{$key}">
-                                        {$channel.votes}
+                                        {$question.votes}
                                     </button>
                                 </h2>
                                 <div id="flush-collapseR{$key}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushR{$key}">
                                     <div class="accordion-body">
                                         <ul class="list-group list-group-flush">
-                                            {foreach from=$channel.qoptions item=qoption}
-                                                {assign var="users" value=[]}
-                                                {foreach from=$usersthatvoted item=userthatvoted}
+                                            {foreach $question.qoptions as $qoption}
+                                                {$questionVoters = []}
+                                                {foreach $usersthatvoted as $userthatvoted}
                                                     {if $qoption.optionId == $userthatvoted.optionId}
-                                                        {if ! isset($users[$userthatvoted.user])}
-                                                            {$users[$userthatvoted.user] = [1, $qoption.qoption]}
+                                                        {if ! isset($questionVoters[$userthatvoted.user])}
+                                                            {$questionVoters[$userthatvoted.user] = [1, $qoption.qoption]}
                                                         {else}
-                                                            {$users[$userthatvoted.user] = [$users[$userthatvoted.user][0] + 1,  $qoption.qoption]}
+                                                            {$questionVoters[$userthatvoted.user] = [$questionVoters[$userthatvoted.user][0] + 1,  $qoption.qoption]}
                                                         {/if}
                                                     {/if}
                                                 {/foreach}
-                                                {foreach from=$users item=counts key=username}
+                                                {foreach $questionVoters as $username => $counts}
                                                     <li class="list-group-item">{icon name="user"} {$username|userlink} {tr}answered:{/tr} {$counts[0]} {if $counts[0] == 1}{tr}time{/tr}{else}{tr}times{/tr}{/if} {tr}for the option {/tr} {$counts[1]}</li>
                                                 {/foreach}
                                             {/foreach}
@@ -57,9 +57,9 @@
                 </tr>
                 <tr>
                     <td class="odd">{tr}Average:{/tr}</td>
-                    <td class="odd">{$channel.average|string_format:"%.2f"}</td>
+                    <td class="odd">{$question.average|string_format:"%.2f"}</td>
                 </tr>
-            {elseif $channel.type eq 's'}
+            {elseif $question.type eq 's'}
                 <tr>
                     <td class="odd">{tr}Votes:{/tr}</td>
                     <td class="odd">
@@ -67,24 +67,24 @@
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseS{$key}" aria-expanded="false" aria-controls="flush-collapseS{$key}">
-                                        {$channel.votes}
+                                        {$question.votes}
                                     </button>
                                 </h2>
                                 <div id="flush-collapseS{$key}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushS{$key}">
                                     <div class="accordion-body">
                                         <ul class="list-group list-group-flush">
-                                            {foreach from=$channel.qoptions item=qoption}
-                                                {assign var="users" value=[]}
-                                                {foreach from=$usersthatvoted item=userthatvoted}
+                                            {foreach $question.qoptions as $qoption}
+                                                {$questionVoters = []}
+                                                {foreach $usersthatvoted as $userthatvoted}
                                                     {if $qoption.optionId == $userthatvoted.optionId}
-                                                        {if ! isset($users[$userthatvoted.user])}
-                                                            {$users[$userthatvoted.user] = [1, $qoption.qoption]}
+                                                        {if ! isset($questionVoters[$userthatvoted.user])}
+                                                            {$questionVoters[$userthatvoted.user] = [1, $qoption.qoption]}
                                                         {else}
-                                                            {$users[$userthatvoted.user] = [$users[$userthatvoted.user][0] + 1,  $qoption.qoption]}
+                                                            {$questionVoters[$userthatvoted.user] = [$questionVoters[$userthatvoted.user][0] + 1,  $qoption.qoption]}
                                                         {/if}
                                                     {/if}
                                                 {/foreach}
-                                                {foreach from=$users item=counts key=username}
+                                                {foreach $questionVoters as $username => $counts}
                                                     <li class="list-group-item">{icon name="user"} {$username|userlink} {tr}answered:{/tr} {$counts[0]} {if $counts[0] == 1}{tr}time{/tr}{else}{tr}times{/tr}{/if} {tr}for the option {/tr} {$counts[1]}</li>
                                                 {/foreach}
                                             {/foreach}
@@ -97,17 +97,17 @@
                 </tr>
                 <tr>
                     <td class="odd">{tr}Average:{/tr}</td>
-                    <td class="odd">{$channel.average|string_format:"%.2f"}/10</td>
+                    <td class="odd">{$question.average|string_format:"%.2f"}/10</td>
                 </tr>
-            {elseif $channel.type neq 'h'}
-                {foreach from=$channel.qoptions item=qoption key=j}
+            {elseif $question.type neq 'h'}
+                {foreach $question.qoptions as $j => $qoption}
                     <tr>
                         <td class="odd">
                             <div class="accordion accordion-flush" id="accordionFlushH{$key}{$j}">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseH{$key}{$j}" aria-expanded="false" aria-controls="flush-collapseH{$key}{$j}">
-                                            {if $channel.type eq 'g'}
+                                            {if $question.type eq 'g'}
                                                 <div style="float:left">
                                                     {thumb _id=$qoption.qoption _max=40 name='thumb' style='margin:3px;'}
                                                 </div>
@@ -125,17 +125,17 @@
                                     <div id="flush-collapseH{$key}{$j}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushH{$key}{$j}">
                                         <div class="accordion-body">
                                             <ul class="list-group list-group-flush">
-                                                {assign var="users" value=[]}
-                                                {foreach from=$usersthatvoted item=userthatvoted}
+                                                {$questionVoters = []}
+                                                {foreach $usersthatvoted as $userthatvoted}
                                                     {if $userthatvoted.optionId == $qoption.optionId}
-                                                        {if ! isset($users[$userthatvoted.user])}
-                                                            {$users[$userthatvoted.user] = 1}
+                                                        {if ! isset($questionVoters[$userthatvoted.user])}
+                                                            {$questionVoters[$userthatvoted.user] = 1}
                                                         {else}
-                                                            {$users[$userthatvoted.user] = $users[$userthatvoted.user] + 1}
+                                                            {$questionVoters[$userthatvoted.user] = $questionVoters[$userthatvoted.user] + 1}
                                                         {/if}
                                                     {/if}
                                                 {/foreach}
-                                                {foreach from=$users item=counter key=username}
+                                                {foreach $questionVoters as $username => $counter}
                                                 <li class="list-group-item">{icon name="user"} {$username|userlink} {tr}answered:{/tr} {$counter} {if $counter == 1}{tr}time{/tr}{else}{tr}times{/tr}{/if}</li>
                                                 {/foreach}
                                             </ul>
