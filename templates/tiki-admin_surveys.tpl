@@ -115,7 +115,7 @@
             </div>
             <div class="tiki-form-group row">
                 <label for="restriction" class="col-form-label col-sm-2">
-                    {tr}Restrict admin users to one vote:{/tr}
+                    {tr}Restrict admin users to one vote{/tr}
                 </label>
                 <div class="col-sm-10">
                     <input type="checkbox" name="restriction" id="restriction" {if $info.restriction eq 'y'}checked="checked"{/if}>
