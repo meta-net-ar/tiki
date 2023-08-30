@@ -372,23 +372,28 @@ class PreferencesLib
         return $info;
     }
 
+    /**
+     * retrieve all orphan preferences
+     *
+     * @return array
+     */
     public function getOrphanPrefs()
     {
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         $data = $tikilib->table('tiki_preferences');
         $preferences = $data->fetchAll();
-        $orphans = [];
+        $orphanPrefs = [];
 
         $specialPrefs = $this->getSpecialPrefs();
         foreach ($preferences as $pref) {
             $definition = $this->getPreference($pref['name'], true, $prefs);
 
             if (! $definition && ! $this->isSpecialPref($pref['name'], $specialPrefs)) {
-                $orphans[] = $pref;
+                $orphanPrefs[] = $pref;
             }
         }
-        return $orphans;
+        return $orphanPrefs;
     }
 
     /**
@@ -396,6 +401,8 @@ class PreferencesLib
      * while they are not found anywhere in the admin panel
      *
      * This function retrieves all special prefs
+     *
+     * @return array
      */
     public function getSpecialPrefs()
     {
@@ -456,6 +463,7 @@ class PreferencesLib
      *
      * @param string $pref preference name
      * @param array $specialPrefs list of special prefs
+     * @return bool
      */
     public function isSpecialPref($pref, $specialPrefs)
     {
