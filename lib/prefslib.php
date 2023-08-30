@@ -380,10 +380,11 @@ class PreferencesLib
         $preferences = $data->fetchAll();
         $orphans = [];
 
+        $specialPrefs = $this->getSpecialPrefs();
         foreach ($preferences as $pref) {
             $definition = $this->getPreference($pref['name'], true, $prefs);
 
-            if (! $definition && ! $this->isSpecialPref($pref['name'])) {
+            if (! $definition && ! $this->isSpecialPref($pref['name'], $specialPrefs)) {
                 $orphans[] = $pref;
             }
         }
@@ -394,11 +395,9 @@ class PreferencesLib
      * Special preferences are prefs that are declared and used directly in the code
      * while they are not found anywhere in the admin panel
      *
-     * This function retrieves all special prefs and checks if a given pref is one of them
-     *
-     * @param string $pref preference name
+     * This function retrieves all special prefs
      */
-    public function isSpecialPref($pref)
+    public function getSpecialPrefs()
     {
         global $prefs;
         $specialPrefs = [
@@ -449,7 +448,17 @@ class PreferencesLib
                 $specialPrefs[] = $p;
             }
         }
+        return $specialPrefs;
+    }
 
+    /**
+     * checks if a preference is special
+     *
+     * @param string $pref preference name
+     * @param array $specialPrefs list of special prefs
+     */
+    public function isSpecialPref($pref, $specialPrefs)
+    {
         // We also get some preferences created by concatenation of parameters (eg : "pluginalias_" . $name)
         $pluginalias = "pluginalias_";
         $oauth = "oauth_token_";
