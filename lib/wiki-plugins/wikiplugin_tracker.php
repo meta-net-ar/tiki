@@ -740,10 +740,10 @@ function wikiplugin_tracker($data, $params)
     $smarty->loadPlugin('smarty_function_ticket');
 
     $registrationTrackerId = null;
-    $itemId = null;
+    $itemId = $params['itemId'] ?? null;
     $newItemRate = null;
-    $fieldsfill = null;
-    $fieldsfillseparator = '';
+    $fieldsfill = $params['fieldsfill'] ?? null;
+    $fieldsfillseparator = $params['fieldsfillseparator'] ?? '';
     $fill_line_cant = null;
     $fill_flds = [];
     $fill_flds_defaults = [];
@@ -1623,6 +1623,7 @@ function wikiplugin_tracker($data, $params)
                         }
                         $url .= "&ok=y&iTRACKER=$iTRACKER";
                         $url .= "#wikiplugin_tracker$iTRACKER";
+                        Feedback::success(tr('Form saved successfully.'));
                         TikiLib::lib('access')->redirect($url);
                         exit;
                     } else {
