@@ -2,7 +2,7 @@
 
 <div class="navbar" role="navigation">
     {assign var=thispage value=$page|escape:url}
-    {button href="tiki-index.php?page=$thispage" _icon_name="file" _class="btn btn-link navbar-btn" _text="{tr}View page{/tr}"}
+    {button href="tiki-index.php?page=$thispage" _icon_name="file" _class="btn navbar-btn" _text="{tr}View page{/tr}"}
 </div>
 
 <form action="tiki-rename_page.php" method="post" role="form" class="d-flex flex-row flex-wrap align-items-center mt-3">
