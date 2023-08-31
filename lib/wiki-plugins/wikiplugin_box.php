@@ -147,7 +147,7 @@ function wikiplugin_box($data, $params)
         $begin = "<div class='card$class' $id style='$bg $f; margin:1em; margin-$float:0; $w $c $style $align'>";
     }
 
-    if (isset($title)) {
+    if (isset($title) && ! empty($title)) {
         $begin .= "<div class='card-header'>$title</div>";
     }
     $begin .= "<div class='card-body'" . (strlen($bg) > 0 ? " style=\"$bg\"" : "") . ">";
