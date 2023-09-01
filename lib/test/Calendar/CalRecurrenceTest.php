@@ -252,6 +252,7 @@ class Calendar_CalRecurrenceTest extends TikiTestCase
 
     public function testEventComparison(): void
     {
+        self::markTestSkipped("Skip this test until upstream issue https://github.com/sabre-io/vobject/issues/626 is fixed.  See https://gitlab.com/tikiwiki/tiki/-/commit/ec7414275405a8dbfcd798775c18689ff2dbb3b4#note_1539871797 benoitg - 2023-09-01");
         foreach ($this->recIds as $type => $id) {
             $rec = new CalRecurrence($id);
             $rec->createEvents();

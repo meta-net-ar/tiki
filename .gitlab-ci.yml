@@ -252,7 +252,8 @@ composer-validates:
   dependencies: []
   needs: []
 
-#This tests if composer COULD update the current composer.lock (it is coherent and installable).
+#This tests if composer COULD update the current composer.lock (it is coherent and installable).  This is important because a developer wanting to update or add a dependency wouldn't be able to do so without figuring out why a composer.lock cannot be generated even before his changes.
+#What we want to know is if a developper could successfully generate a new composer.lock file to update minor versions, or when adding dependencies.  Not if he could generate a minimal-impact composer.lock file with composer update --lock on stable branches, which is much harder, and not necessary for the master branch.
 #This is a network check, it could fail because composer.tiki.org is not up to date or some other non-code related reason.
 composer-could-update-lock:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
@@ -261,7 +262,7 @@ composer-could-update-lock:
   stage: tiki-check
   script:
     - composer -V | grep "version 2" || composer self-update --2
-    - composer update -d vendor_bundled --lock --dry-run
+    - composer update -d vendor_bundled --dry-run
   dependencies:
     - composer
   needs:
@@ -278,7 +279,7 @@ composer-could-update-lock:
   #This test should only run when composer-validates fail (because changes in the upstream deps can make this fail without code changes).  But I could find no way to have a test only run in gitlab-ci if a specific one fails.  So allow it to fail like composer-lock for now - benoitg 2023-05-03
   allow_failure: true
 
-#This tests if composer WOULD update the current composer.lock.  This should only be important at release
+#This tests if composer update --lock WOULD update the current composer.lock (version hash changes, other changes) even if the dependencies required versions do not change.  This should only be important at release
 .composer-lock:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   stage: tiki-check
