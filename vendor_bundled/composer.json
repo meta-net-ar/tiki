@@ -453,11 +453,17 @@
         "tiki.org": {
             "type": "composer",
             "url": "https://composer.tiki.org",
-            "canonical": true
+            "canonical": false
         },
         "asset-packagist.org": {
             "type": "composer",
-            "url": "https://asset-packagist.org"
+            "url": "https://asset-packagist.org",
+            "canonical": false
+        },
+        "repo.packagist.org": {
+            "type": "composer",
+            "url": "https://repo.packagist.org",
+            "canonical": true
         }
     }
 }
