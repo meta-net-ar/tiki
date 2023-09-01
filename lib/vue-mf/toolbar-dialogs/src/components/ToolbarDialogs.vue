@@ -26,11 +26,11 @@ const table = ref(null);
 
 function showModal() {
     // cheat with jQuery - get the DOM element from the "ref" object
-    // const $modal = $(bootstrapModalRef.value.$el);
-    // if ($modal.parent("body").length === 0) {
-    //     // bootstrap modal divs need to be on the root of body to appear in front of the backdrop
-    //     $modal.appendTo("body");
-    // }
+    const $modal = $(bootstrapModalRef.value.$el);
+    if ($modal.parent("body").length === 0) {
+        // bootstrap modal divs need to be on the root of body to appear in front of the backdrop
+        $modal.appendTo("body");
+    }
     bootstrapModalRef.value.show();
 }
 

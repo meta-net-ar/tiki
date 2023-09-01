@@ -5,7 +5,11 @@
  */
 
 import Modal from "../../../../../vendor_bundled/vendor/twbs/bootstrap/js/src/modal.js";
-import { onMounted, ref } from "vue";
+import {reactive, onMounted, ref} from "vue";
+
+const state = reactive({
+    modal_demo: null,
+});
 
 defineProps({
     title: {
@@ -18,10 +22,9 @@ defineProps({
     }
 });
 let modalElement = ref(null);
-let thisModalObj = null;
 
 onMounted(() => {
-    document.body.appendChild(modalElement.value);
+    state.modal_demo = new bootstrap.Modal(modalElement.value, {})
 });
 
 function _shown(e) {
@@ -29,15 +32,11 @@ function _shown(e) {
 }
 
 function _show() {
-    thisModalObj = new Modal(modalElement.value, {focus: false	});
-    modalElement.value.addEventListener('shown.bs.modal', event => {
-        $("a, input,select", modalElement.value).first().focus();
-    })
-    thisModalObj.show();
+    state.modal_demo.show();
 }
 
 function _close() {
-    thisModalObj.dispose();
+    state.modal_demo.hide();
 }
 
 defineExpose({ show: _show, shown: _shown, close: _close });
