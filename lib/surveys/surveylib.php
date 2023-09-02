@@ -379,7 +379,7 @@ class SurveyLib extends TikiLib
      * @param $find
      * @return array
      */
-    public function list_survey_questions($surveyId, $offset, $maxRecords, $sort_mode, $find, $u = '')
+    public function list_survey_questions($surveyId, $offset, $maxRecords, $sort_mode, $find)
     {
         $filegallib = TikiLib::lib('filegal');
 
@@ -396,12 +396,6 @@ class SurveyLib extends TikiLib
             $this->questionsTable->sortMode($sort_mode)
         );
         $ret = [];
-
-        if ($u) {
-            $userVotedOptions = $this->get_user_voted_options($surveyId, $u);
-        } else {
-            $userVotedOptions = [];
-        }
 
         foreach ($questions as & $question) {
             // save user options
@@ -445,12 +439,6 @@ class SurveyLib extends TikiLib
             TikiLib::lib('smarty')->loadPlugin('smarty_modifier_escape');
 
             foreach ($questionOptions as & $questionOption) {
-                if (in_array($questionOption['optionId'], $userVotedOptions)) {
-                    $questionOption['uservoted'] = true;
-                } else {
-                    $questionOption['uservoted'] = false;
-                }
-
                 if ($total_votes) {
                     $average = ($questionOption["votes"] / $total_votes) * 100;
                 } else {
@@ -701,19 +689,6 @@ class SurveyLib extends TikiLib
             $options = [];
         }
         return $options;
-    }
-
-    private function get_user_voted_options($surveyId, $u)
-    {
-        $conditions['id'] = $this->votesTable->like('survey' . $surveyId . '%');
-        $conditions['user'] = $u;
-        $result = $this->votesTable->fetchAll(['optionId'], $conditions);
-        foreach ($result as $r) {
-            $ret[] = $r['optionId'];
-        }
-
-        return $ret;
-
     }
 
     public function list_users_that_voted($surveyId)

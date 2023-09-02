@@ -46,7 +46,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 
 $usersthatvoted = $srvlib->list_users_that_voted($_REQUEST["surveyId"]);
 $smarty->assign('usersthatvoted', $usersthatvoted);
-$questions = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, $sort_mode, $find, $uservoted);
+$questions = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, $sort_mode, $find);
 
 $cant_pages = ceil($questions["cant"] / $maxRecords);
 $smarty->assign_by_ref('cant_pages', $cant_pages);
