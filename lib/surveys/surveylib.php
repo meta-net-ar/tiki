@@ -711,12 +711,15 @@ class SurveyLib extends TikiLib
         foreach ($result as $r) {
             $ret[] = $r['optionId'];
         }
+
         return $ret;
+
     }
 
-    public function list_users_that_voted()
+    public function list_users_that_voted($surveyId)
     {
-        $result = $this->votesTable->fetchAll(['user', 'id', 'optionId']);
+        $conditions['id'] = $this->votesTable->like('survey' . $surveyId . '.%');
+        $result = $this->votesTable->fetchAll(['user', 'id', 'optionId'], $conditions);
         return $result;
     }
 }
