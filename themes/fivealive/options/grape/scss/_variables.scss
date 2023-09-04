@@ -257,6 +257,7 @@ $bg-dark-info: #00DAE6;
     --tiki-top-bg: linear-gradient(to right, #642759 0%, #732860 19%, #92286b 43%, #a32872 67%, #a52873 100%);
     --tiki-top-color: #{$navbar-light-link-color};
     --tiki-top-hover-color: #{$navbar-light-link-hover-color};
+    --tiki-top-text-color: #{$navbar-light-link-hover-color};
     --tiki-top-border: solid #000;
     --tiki-top-border-color: #152304;
 }
@@ -265,12 +266,14 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-light-bg};
     --tiki-topbar-color: #{$navbar-light-link-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(to right, #642759 0%, #732860 19%, #92286b 43%, #a32872 67%, #a52873 100%);
     --tiki-top-color: #{$navbar-dark-link-color};
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-link-hover-color};
     --tiki-top-border: solid #000;
     --tiki-top-border-color: #152304;
 }
@@ -279,6 +282,7 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-dark-bg};
     --tiki-topbar-color: #{$navbar-dark-link-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {

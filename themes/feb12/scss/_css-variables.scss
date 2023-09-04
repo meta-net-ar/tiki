@@ -8,6 +8,7 @@
     --tiki-top-bg: linear-gradient(to bottom, #3e7ca1 0%, #609ec3 3%, #163866 5%, #0b2d5b 8%, #0f2658 11%, #002552 16%, #002d57 24%, #052b58 27%, #0c3867 43%, #11406e 57%, #1b507c 76%, #235685 86%, #1c5b87 100%);
     --tiki-top-color: #f8f9fa;
     --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
@@ -16,12 +17,14 @@
     --tiki-topbar-bg: linear-gradient(to bottom, #3e7ca1 0%, #609ec3 3%, #163866 5%, #0b2d5b 8%, #0f2658 11%, #002552 16%, #002d57 24%, #052b58 27%, #0c3867 43%, #11406e 57%, #1b507c 76%, #235685 86%, #1c5b87 100%);
     --tiki-topbar-color: #f8f9fa;
     --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
 }
 
 .tiki-top-nav-light {
     --tiki-top-bg: linear-gradient(to bottom, #dbdbdb 0%, #b6b6b6 2%, #acacac 3%, #ababab 5%, #c8c8c8 10%, #d4d4d4 17%, #e6e6e6 48%, #eaeaea 60%, #f3f3f3 77%, #fdfdfd 90%, #ffffff 100%);
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -30,6 +33,7 @@
     --tiki-topbar-bg: linear-gradient(to bottom, #dbdbdb 0%, #b6b6b6 2%, #acacac 3%, #ababab 5%, #c8c8c8 10%, #d4d4d4 17%, #e6e6e6 48%, #eaeaea 60%, #f3f3f3 77%, #fdfdfd 90%, #ffffff 100%);
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-hover-color};
 }
 
 .tiki-top-nav-dark {
@@ -93,12 +97,16 @@
 
 $imagePath: "../images/";
 
-:root {
+body {
     --tiki-feb12-middle-bg: #ffffff url(../images/page.jpg) repeat-x;
     --tiki-feb12-col1-col3-bg: #ffffff url('#{$imagePath}page.jpg') repeat-x;
     --tiki-feb12-col2-bg: #a8cce2 url(../images/columnbg.jpg) repeat-x;
     --tiki-feb12-col2-nav-link-color: $link-color;
     --tiki-feb12-col2-nav-link-hover-color: $link-hover-color;
+}
+
+body.layout_classic {
+    --tiki-feb12-middle-bg: none !important;
 }
 
 [data-bs-theme="dark"] {
@@ -108,4 +116,8 @@ $imagePath: "../images/";
     --bs-navbar-color: #fff;
     --tiki-feb12-col2-nav-link-color: rgba(var(--bs-link-color-rgb));
     --tiki-feb12-col2-nav-link-hover-color: rgba(var(--bs-link-hover-color-rgb));
+}
+
+:root {
+    --tiki-page-content-top-margin: 0 !important; // Any positive value creates a gap between the backgrounds of the topbar and the page content.
 }

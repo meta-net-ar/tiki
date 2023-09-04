@@ -157,8 +157,8 @@ $link-hover-decoration: none !default;
 $link-shade-percentage:                   20% !default; // Bootstrap 5.
 
 // Components
-//$padding-base-vertical: .5rem;
-//$padding-large-vertical: .9rem;
+$component-active-color:      $white !default; // Bootstrap 5.3
+$component-active-bg:         $primary !default;
 
 // Typography
 $font-family-sans-serif: "Open Sans", sans-serif; // Was Lato
@@ -180,12 +180,12 @@ $btn-link-disabled-color:         #777777;
 $input-color-placeholder:         #777777;
 
 // Dropdowns
-$dropdown-bg: #1376a8 !default;
-$dropdown-link-color: $gray-200 !default;
-$dropdown-link-hover-color: #ffffff !default;
-$dropdown-link-hover-bg: darken(#1376a8, 10%) !default;
-$dropdown-link-active-bg: #0e567a !default;
-$dropdown-header-color: #fff !default;
+//$dropdown-bg: #1376a8 !default;
+//$dropdown-link-color: $gray-200 !default;
+//$dropdown-link-hover-color: #ffffff !default;
+//$dropdown-link-hover-bg: darken(#1376a8, 10%) !default;
+//$dropdown-link-active-bg: #0e567a !default;
+//$dropdown-header-color: #fff !default;
 
 // Navs
 $nav-tabs-border-color:             $gray-300 !default;
@@ -201,11 +201,19 @@ $navbar-dark-color:                #efefef;
 $navbar-dark-hover-color:          #fff;
 $navbar-dark-hover-bg:             #000; // transparent;
 
-// Navbar toggle
-$navbar-dark-toggle-hover-bg: #dddddd;
-$navbar-dark-toggle-icon-bar-bg: #888888;
-$navbar-dark-toggle-border-color: #dddddd;
+// Dropdowns
+$dropdown-color:                    var(--#{$prefix}body-color) !default;
+$dropdown-bg:                       var(--#{$prefix}body-bg) !default;
+$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
+$dropdown-divider-bg:               $dropdown-border-color !default;
+$dropdown-link-color:               var(--#{$prefix}body-color) !default;
+$dropdown-link-hover-color:         $dropdown-link-color !default;
+$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
 
+$dropdown-link-active-color:        $component-active-color !default;
+$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 
 // Pagination
 // Jumbotron

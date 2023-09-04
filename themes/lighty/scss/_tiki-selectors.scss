@@ -247,8 +247,8 @@ ul.dropdown-menu {
             background: #F0f0f0 !important;
             text-align: center;
             margin-bottom: 0;
-            margin-left: -6px;
-            margin-right: -6px;
+//            margin-left: -6px;
+//            margin-right: -6px;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
         }
@@ -256,8 +256,8 @@ ul.dropdown-menu {
             background: #F0f0f0 !important;
             text-align: center;
             margin-bottom: 0;
-            margin-left: -6px;
-            margin-right: -6px;
+//            margin-left: -6px;
+//            margin-right: -6px;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
         }
@@ -268,16 +268,16 @@ ul.dropdown-menu {
         background: #F0f0f0 !important;
         text-align: center;
         margin-bottom: 0;
-        margin-left: -6px;
-        margin-right: -6px;
+//        margin-left: -6px; Causes the word to break in header mode.
+//        margin-right: -6px;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
         &:visited {
             background: #F0f0f0 !important;
             text-align: center;
             margin-bottom: 0;
-            margin-left: -6px;
-            margin-right: -6px;
+//            margin-left: -6px;
+//            margin-right: -6px;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
         }
@@ -285,8 +285,8 @@ ul.dropdown-menu {
             background: #F0f0f0 !important;
             text-align: center;
             margin-bottom: 0;
-            margin-left: -6px;
-            margin-right: -6px;
+//            margin-left: -6px;
+//            margin-right: -6px;
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
         }
@@ -297,8 +297,8 @@ ul.dropdown-menu {
         background: #F0f0f0 !important;
         text-align: center;
         margin-bottom: 0;
-        margin-left: -6px;
-        margin-right: -6px;
+//        margin-left: -6px;
+//        margin-right: -6px;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
     }
@@ -310,8 +310,8 @@ li.login_link {
                 background: #F0f0f0 !important;
                 text-align: center;
                 margin-bottom: 0;
-                margin-left: -6px;
-                margin-right: -6px;
+//                margin-left: -6px;
+//                margin-right: -6px;
                 border-bottom-left-radius: 5px;
                 border-bottom-right-radius: 5px;
             }

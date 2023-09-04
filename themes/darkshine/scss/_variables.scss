@@ -101,10 +101,10 @@ $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
 $nav-link-disabled-color: #666E75;
 
 // Navbar
-//$navbar-light-color:                rgba($black, .5) !default;
-//$navbar-light-hover-color:          rgba($black, .7) !default;
-//$navbar-light-active-color:         rgba($black, .9) !default;
-//$navbar-light-disabled-color:       rgba($black, .3) !default;
+$navbar-light-color:                rgba($black, .5) !default;
+$navbar-light-hover-color:          rgba($black, .7) !default;
+$navbar-light-active-color:         rgba($black, .9) !default;
+$navbar-light-disabled-color:       rgba($black, .3) !default;
 
 // Tabs
 //$nav-tabs-border-color: lighten( $body-bg, 90% );

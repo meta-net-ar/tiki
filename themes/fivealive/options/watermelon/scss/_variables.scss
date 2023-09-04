@@ -263,6 +263,7 @@ $postbody-title-card-title-color: #fff;
     --tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
     --tiki-top-color: #{$navbar-light-link-color}; // #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-link-hover-color};
+    --tiki-top-text-color: #{$navbar-light-link-hover-color};
     --tiki-top-border: solid #152304;
     --tiki-top-border-color: #152304;
 }
@@ -271,12 +272,14 @@ $postbody-title-card-title-color: #fff;
     --tiki-topbar-bg: #{$topbar-light-bg};
     --tiki-topbar-color: #{$navbar-light-link-color}; // #{$topbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
     --tiki-top-color: #{$navbar-dark-link-color}; // #{$top-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-link-hover-color};
     --tiki-top-border: solid #152304;
     --tiki-top-border-color: #152304;
 }
@@ -285,6 +288,7 @@ $postbody-title-card-title-color: #fff;
     --tiki-topbar-bg: #{$topbar-dark-bg};
     --tiki-topbar-color: #{$navbar-dark-link-color}; // #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
