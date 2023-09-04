@@ -274,14 +274,25 @@ class Search_Query_WikiBuilder
                 $arguments['gap'] = $time - time();
             }
         }
-        if (! isset($arguments['from']) && isset($arguments['to'], $arguments['gap'])) {
+        if (
+            ! isset($arguments['from']) &&
+            isset($arguments['to'], $arguments['gap']) &&
+            is_numeric($arguments['to']) &&
+            is_numeric($arguments['gap'])
+        ) {
             $arguments['from'] = $arguments['to'] - $arguments['gap'];
         }
-        if (! isset($arguments['to']) && isset($arguments['from'], $arguments['gap']) && $arguments['from'] !== "") {
+        if (
+            ! isset($arguments['to']) &&
+            isset($arguments['from'], $arguments['gap']) &&
+            $arguments['from'] !== '' &&
+            is_numeric($arguments['from']) &&
+            is_numeric($arguments['gap'])
+        ) {
             $arguments['to'] = $arguments['from'] + $arguments['gap'];
         }
         if (! isset($arguments['from'], $arguments['to'])) {
-            Feedback::error(tr('The range filter is missing \"from\" or \"to\".'));
+            Feedback::error(tr('The range filter is missing "from" or "to".'));
         }
         if (isset($arguments['allow_empty']) && $arguments['allow_empty'] == 'y') {
             $allow_empty = true;
