@@ -188,14 +188,14 @@ if (! TIKI_API) {
         } else {
             // check if it was a client-side cookie and turn into a server-side one to get longer than 7 days expiry
             if ($cookie_consent !== 'y') {
-                setcookie($prefs['cookie_consent_name'], 'y', $cookie_consent / 1000);
+                setcookie($prefs['cookie_consent_name'], 'y', intval($cookie_consent / 1000));
             }
             $feature_no_cookie = false;
 
             if ($prefs['cookie_consent_analytics'] === 'y') {
                 $analytics = getCookie($prefs['cookie_consent_name'] . '_analytics');
                 if (is_numeric($analytics)) {   // has been set server-side, so user is opting in to analytics
-                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'y', $analytics / 1000);
+                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'y', intval($analytics / 1000));
                     $feature_no_cookie_analytics = false;
                 } elseif (empty($analytics)) {
                     setcookie($prefs['cookie_consent_name'] . '_analytics', 'n', 24 * 60 * 60 * $prefs['cookie_consent_expires']);
