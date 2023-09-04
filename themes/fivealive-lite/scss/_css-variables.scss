@@ -4,6 +4,7 @@
     --tiki-top-bg: #28AAE1FF; // #{$header_outer-bg};
     --tiki-top-color: #{$navbar-dark-color}; // #{$header-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
     --tiki-top-border-color: #000;
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
@@ -12,12 +13,14 @@
 .tiki-topbar-nav-light {
     --tiki-topbar-color: #{$navbar-dark-color}; // #{$bg-dark};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: #{$header_outer-bg};
     --tiki-top-color: #{$navbar-dark-color}; // #{$header-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
     --tiki-top-border-color: #000;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
@@ -27,6 +30,7 @@
     --tiki-topbar-bg: #{$bg-dark};
     --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {

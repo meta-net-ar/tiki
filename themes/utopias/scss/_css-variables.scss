@@ -5,20 +5,23 @@
     --tiki-top-bg: #252729;
     --tiki-top-color: rgba(255, 255, 255, 0.7);
     --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: #252729;
-    --tiki-top-color: rgba(255, 255, 255, 0.7);
-    --tiki-top-hover-color: #fff;
+    --tiki-topbar-color: rgba(255, 255, 255, 0.7);
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
 }
 
 @mixin top-nav-light {
     --tiki-top-bg: #fff;
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #000;
+    --tiki-top-text-color: #000;
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -27,6 +30,7 @@
     --tiki-topbar-bg: #fff;
     --tiki-topbar-color: #595959;
     --tiki-topbar-hover-color: #888;
+    --tiki-topbar-text-color: #888;
 }
 
 .tiki-top-nav-light {

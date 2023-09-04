@@ -3,6 +3,7 @@
     --tiki-top-bg: #{rgba($gray-800, 1)}; // #{$light};
     --tiki-top-color: #{rgba($white, .6)}; //#{$navbar-light-color};
     --tiki-top-hover-color: #{$white}; //#{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$white};
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -11,12 +12,14 @@
     --tiki-topbar-bg: #444; //#{$light};
     --tiki-topbar-color: #{rgba($white, .6)}; //#{$navbar-light-color};
     --tiki-topbar-hover-color: #{$white}; //#{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$white};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: #{rgba($gray-800, 1)};
     --tiki-top-color: #{rgba($white, .6)};
     --tiki-top-hover-color: #{$white};
+    --tiki-top-text-color: #{$white};
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
@@ -25,6 +28,7 @@
     --tiki-topbar-bg: #444; //#{rgba($gray-800, 1)};
     --tiki-topbar-color: #{rgba($white, .6)};
     --tiki-topbar-hover-color: #{$white};
+    --tiki-topbar-text-color: #{$white};
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //

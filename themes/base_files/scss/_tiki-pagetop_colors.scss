@@ -18,7 +18,7 @@
 .tiki .tiki-top-nav-light
 {
     background: var(--tiki-top-bg) !important;
-    // color: var(--tiki-top-color); // The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
+    color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
     a:not(.navbar-brand,.dropdown-item),
     .btn.btn-link {
         color: var(--tiki-top-color);
@@ -41,7 +41,7 @@
 .admin-content .tiki-nav-light // Legacy admin icons
 {
     background: var(--tiki-topbar-bg) !important;
-    //color: var(--tiki-topbar-color);
+    color: var(--tiki-topbar-text-color);
     a:not(.navbar-brand,.dropdown-item),
     .btn.btn-link,
     a.nav-link {
@@ -66,7 +66,7 @@
 .tiki .tiki-top-nav-dark
 {
     background: var(--tiki-top-bg) !important;
-    // color: var(--tiki-top-color);
+    color: var(--tiki-top-text-color);
     a:not(.navbar-brand,.dropdown-item),
     .btn.btn-link,
     a.nav-link  {
@@ -90,7 +90,7 @@
 .admin-content .tiki-nav-dark // Legacy admin icons
 {
     background: var(--tiki-topbar-bg) !important;
-    // color: var(--tiki-topbar-dark-color);
+    color: var(--tiki-topbar-text-color);
     a:not(.navbar-brand,.dropdown-item),
     .btn.btn-link,
     a.nav-link  {

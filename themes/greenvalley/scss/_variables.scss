@@ -220,7 +220,7 @@ $navbar-light-border: darken($navbar-light-bg, 6.5%);
 
 // Navbar links
 $navbar-light-color: $nav-link-color;
-$navbar-light-hover-color: #cda256;
+$navbar-light-hover-color: $link-hover-color;
 $navbar-light-hover-bg: #42281d;
 $navbar-light-active-color: #555555;
 $navbar-light-toggle-hover-bg: transparent;
@@ -245,6 +245,7 @@ $jumbotron-font-size: ceil(($font-size-base * 1.5));
 
 // Cards
 $card-bg:                           var(--tiki-card-bg);
+$card-cap-color:                    #222;
 
 //$card-bg: #e6ffb2;
 $card-inner-border: #53b042;

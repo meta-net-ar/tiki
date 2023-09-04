@@ -5,6 +5,7 @@
     --tiki-top-bg: #202428;
     --tiki-top-color: var(--bs-link-color);
     --tiki-top-hover-color: var(--bs-link-hover-color);
+    --tiki-top-text-color: var(--bs-link-hover-color);
     --tiki-top-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
@@ -14,6 +15,7 @@
     --tiki-topbar-bg: #202428;
     --tiki-topbar-color: var(--bs-link-color);
     --tiki-topbar-hover-color: var(--bs-link-hover-color);
+    --tiki-topbar-text-color: var(--bs-link-hover-color);
     --tiki-topbar-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
 }
 
@@ -21,6 +23,7 @@
     --tiki-top-bg: rgba(240, 245, 250, 1);
     --tiki-top-color: rgba(0, 0, 0, 0.6);
     --tiki-top-hover-color: #485785;
+    --tiki-top-text-color: #485785;
     --tiki-top-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
@@ -30,6 +33,7 @@
     --tiki-topbar-bg: rgba(240, 245, 250, 1);
     --tiki-topbar-color: #485785;
     --tiki-topbar-hover-color: #485785;
+    --tiki-topbar-text-color: #485785;
     --tiki-topbar-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
 }
 

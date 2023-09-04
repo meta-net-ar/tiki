@@ -127,52 +127,52 @@ hr {
 }
 
 
-.navbar-dark .navbar-collapse,
-.navbar-dark .navbar-form {
-   border-color: transparent;
-}
+//.navbar-dark .navbar-collapse,
+//.navbar-dark .navbar-form {
+//   border-color: transparent;
+//}
+//
+//.navbar .navbar {
+//    background: transparent !important;
+//}
+///
+//.dropdown-menu {
+//    background-color: $dropdown-bg; //#005064;
+//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
+//}
 
-.navbar .navbar {
-    background: transparent !important;
-}
-
-.dropdown-menu {
-    background-color: $dropdown-bg; //#005064;
-    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-}
-
-.tiki .dropdown-item,
-.tiki .dropdown-item a,
-.tiki .dropdown-item .btn.btn-link {
-    color: $dropdown-link-color;
-    &:hover,
-    &:focus {
-        color: $dropdown-link-hover-color;
-        background: $dropdown-link-hover-bg;
-    }
-    &:active,
-    &.active {
-        color: $dropdown-link-hover-color;
-        background: $dropdown-link-active-bg;
-    }
-    &.disabled,
-    &:disabled {
-        color: $dropdown-link-disabled-color;
-    }
-    .dropdown-header {
-        color: $dropdown-header-color;
-    }
-    .dropdown-divider {
-        background: $dropdown-divider-bg;
-    }
-}
-
-.nav-pills > li.active > a,
-.nav-pills > li.active > a:hover,
-.nav-pills > li.active > a:focus {
-    color: #ffffff;
-    background-color: $nav-pills-link-active-bg; //#0b8a98;
-}
+//.tiki .dropdown-item,
+//.tiki .dropdown-item a,
+//.tiki .dropdown-item .btn.btn-link {
+//    color: $dropdown-link-color;
+//    &:hover,
+//    &:focus {
+//        color: $dropdown-link-hover-color;
+//        background: $dropdown-link-hover-bg;
+//    }
+//    &:active,
+//    &.active {
+//        color: $dropdown-link-hover-color;
+//        background: $dropdown-link-active-bg;
+//    }
+//    &.disabled,
+//    &:disabled {
+//        color: $dropdown-link-disabled-color;
+//    }
+//    .dropdown-header {
+//        color: $dropdown-header-color;
+//    }
+//    .dropdown-divider {
+//        background: $dropdown-divider-bg;
+//    }
+//}
+//
+//.nav-pills > li.active > a,
+//.nav-pills > li.active > a:hover,
+//.nav-pills > li.active > a:focus {
+//    color: #ffffff;
+//    background-color: $nav-pills-link-active-bg; //#0b8a98;
+//}
 
 // Pagination
 .pagination > li > a:hover,
@@ -291,10 +291,6 @@ textarea,
 
 .blogpost .card-header {
     background: $post-card-header-bg;
-}
-
-.siteloginbar_popup .dropdown-menu > li > a {
-    color: #ffffff;
 }
 
 header.header .sitetitle,

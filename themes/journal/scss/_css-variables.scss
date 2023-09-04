@@ -5,6 +5,7 @@
     --tiki-top-bg: rgba(42, 62, 80, 1);
     --tiki-top-color: #{rgba($white, .6)};
     --tiki-top-hover-color: #18bc9c;
+    --tiki-top-text-color: #18bc9c;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
@@ -13,12 +14,14 @@
     --tiki-topbar-bg: #20445C; //rgba(42,62,80, 1);
     --tiki-topbar-color: #{rgba($white, .6)};
     --tiki-topbar-hover-color: #18bc9c;
+    --tiki-topbar-text-color: #18bc9c;
 }
 
 @mixin top-nav-light {
     --tiki-top-bg: #{$light};
     --tiki-top-color: rgba(0, 0, 0, 0.55);
     --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-top-text-color: rgba(0, 0, 0, 0.7);
     --tiki-top-border: 1px solid #eee;
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
@@ -28,6 +31,7 @@
     --tiki-top-bg: #{$light};
     --tiki-top-color: rgba(0, 0, 0, 0.55);
     --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-top-text-color: rgba(0, 0, 0, 0.7);
     --tiki-top-border: 1px solid #eee;
 }
 

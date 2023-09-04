@@ -75,10 +75,6 @@ body:not(.tiki-admin) .row-middle::before {
 //    padding-bottom: 20px;
 //}
 
-#page-data {
-    text-shadow: 1px 1px 0 rgb(255, 255, 255);
-}
-
 .card-primary > .card-heading {
     min-height: 52px;
     padding-top: 12px;
@@ -87,12 +83,12 @@ body:not(.tiki-admin) .row-middle::before {
     border: 1px solid #8bc541;
 }
 
-.card-title {
+//.card-title {
 //    font-size: 1.2em;
 //    font-weight: 700;
-    color: #222;
+//    color: #222;
 //    text-shadow: #666 0 2px 3px;
-}
+//}
 
 //.btn:not(.btn-link) {
 //    box-shadow: 2px 2px 3px 1px rgba(43, 43, 43, 0.65);
