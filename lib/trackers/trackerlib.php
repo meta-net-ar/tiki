@@ -5232,7 +5232,9 @@ class TrackerLib extends TikiLib
             $last[$f['fieldId']] = $f['value'];
         }
 
-        $last[-1] = $item_info['status'];
+        if (array_key_exists('status', $item_info)) {
+            $last[-1] = $item_info['status'];
+        }
         if (empty($item_info['itemId'])) {
             $join = 'ttifl.`itemId`';
             $bindvars = array_merge(['trackeritem'], $bindvars);
