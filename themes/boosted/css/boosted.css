@@ -10349,62 +10349,70 @@ textarea.form-control-lg {
 }
 .tiki-top-nav-light {
   --tiki-top-bg: #fff;
-  --tiki-top-color: #000;
-  --tiki-top-hover-color: #ff7900;
+  --tiki-top-color: #ff7900;
+  --tiki-top-hover-color: #000;
   --tiki-top-active-color: #000;
   --tiki-top-active-bg: #ff7900;
+  --tiki-top-text-color: #000;
   --tiki-top-order: solid #000;
   --bs-navbar-brand-color: #f16e00;
   --bs-navbar-brand-hover-color: #f16e00;
 }
 .tiki-topbar-nav-light {
   --tiki-topbar-bg: #fff;
-  --tiki-topbar-color: #000;
-  --tiki-topbar-hover-color: #ff7900;
+  --tiki-topbar-color: #ff7900;
+  --tiki-topbar-hover-color: #000;
   --tiki-topbar-active-color: #000;
   --tiki-topbar-active-bg: #ff7900;
+  --tiki-topbar-text-color: #000;
   --tiki-topbar-border: solid #000;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: rgba(0, 0, 0, 1);
-  --tiki-top-color: #fff;
-  --tiki-top-hover-color: #ff7900;
+  --tiki-top-color: #ff7900;
+  --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: inherit;
   --bs-navbar-brand-hover-color: #ff7900;
 }
 .tiki-topbar-nav-dark {
   --tiki-topbar-bg: rgba(0, 0, 0, 1);
-  --tiki-topbar-color: #fff;
-  --tiki-topbar-hover-color: #ff7900;
+  --tiki-topbar-color: #ff7900;
+  --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: rgba(0, 0, 0, 1);
-  --tiki-top-color: #fff;
-  --tiki-top-hover-color: #ff7900;
+  --tiki-top-color: #ff7900;
+  --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: inherit;
   --bs-navbar-brand-hover-color: #ff7900;
 }
 [data-bs-theme=dark] .tiki-topbar-nav-light {
   --tiki-topbar-bg: rgba(0, 0, 0, 1);
-  --tiki-topbar-color: #fff;
-  --tiki-topbar-hover-color: #ff7900;
+  --tiki-topbar-color: #ff7900;
+  --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 [data-bs-theme=light] .tiki-top-nav-dark {
   --tiki-top-bg: #fff;
-  --tiki-top-color: #000;
-  --tiki-top-hover-color: #ff7900;
+  --tiki-top-color: #ff7900;
+  --tiki-top-hover-color: #000;
   --tiki-top-active-color: #000;
   --tiki-top-active-bg: #ff7900;
+  --tiki-top-text-color: #000;
   --tiki-top-order: solid #000;
   --bs-navbar-brand-color: #f16e00;
   --bs-navbar-brand-hover-color: #f16e00;
 }
 [data-bs-theme=light] .tiki-topbar-nav-dark {
   --tiki-topbar-bg: #fff;
-  --tiki-topbar-color: #000;
-  --tiki-topbar-hover-color: #ff7900;
+  --tiki-topbar-color: #ff7900;
+  --tiki-topbar-hover-color: #000;
   --tiki-topbar-active-color: #000;
   --tiki-topbar-active-bg: #ff7900;
+  --tiki-topbar-text-color: #000;
   --tiki-topbar-border: solid #000;
 }
 :root {
@@ -11376,6 +11384,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11389,6 +11398,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11402,6 +11412,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11415,6 +11426,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -13578,4 +13590,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   background-position: 0.375rem 50%, 100% 0;
   background-size: 0.9375rem, 1.625rem;
 }
-/*# sourceMappingURL=boosted.css.map */
+

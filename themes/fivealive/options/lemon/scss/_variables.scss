@@ -251,27 +251,31 @@ $postbody-title-card-title-color: #fff;
 .tiki-top-nav-light {
     --tiki-top-bg: linear-gradient(90deg, rgba(240, 219, 64, 1) 0%, rgba(211, 205, 85, 1) 97%);
     --tiki-top-color: #151414;
-    --tiki-top-hover-color: lighten(#151414, 8%);
+    --tiki-top-hover-color: #333131;
+    --tiki-top-text-color: #333131;
     --tiki-top-border: solid #000;
 }
 
 .tiki-topbar-nav-light {
     --tiki-topbar-bg: #f0e04f;
     --tiki-topbar-color: #151414;
-    --tiki-topbar-hover-color: lighten(#151414, 8%);
+    --tiki-topbar-hover-color: #333131;
+    --tiki-topbar-text-color: #333131;
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(90deg, rgba(240, 219, 64, 1) 0%, rgba(211, 205, 85, 1) 97%);
     --tiki-top-color: #151414;
-    --tiki-top-hover-color: lighten(#151414, 8%);
+    --tiki-top-hover-color: #333131;
+    --tiki-top-text-color: #333131;
     --tiki-top-border: solid #000;
 }
 
 .tiki-topbar-nav-dark {
     --tiki-topbar-bg: #f0e04f;
     --tiki-topbar-color: #151414;
-    --tiki-topbar-hover-color:  lighten(#151414, 8%);
+    --tiki-topbar-hover-color: #333131;
+    --tiki-topbar-text-color: #333131;
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {

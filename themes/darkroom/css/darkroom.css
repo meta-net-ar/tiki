@@ -10739,6 +10739,7 @@ textarea.form-control-lg {
   --tiki-top-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #f4f4f4;
+  --tiki-top-text-color: #f4f4f4;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #e6e6e6;
 }
@@ -10746,11 +10747,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #f4f4f4;
+  --tiki-topbar-text-color: #f4f4f4;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #f4f4f4;
+  --tiki-top-text-color: #f4f4f4;
   --bs-navbar-brand-color: #f4f4f4;
   --bs-navbar-brand-hover-color: #f4f4f4;
 }
@@ -10758,6 +10761,7 @@ textarea.form-control-lg {
   --tiki-topbar-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #f4f4f4;
+  --tiki-topbar-text-color: #f4f4f4;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-navbar-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
@@ -11719,6 +11723,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11732,6 +11737,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11745,6 +11751,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11758,6 +11765,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12928,4 +12936,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   color: #ffffff;
   background-color: #030511;
 }
-/*# sourceMappingURL=darkroom.css.map */
+

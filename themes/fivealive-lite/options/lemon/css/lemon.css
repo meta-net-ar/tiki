@@ -8,23 +8,27 @@
   --tiki-top-bg: #E7E6AD;
   --tiki-top-color: #413B06;
   --tiki-top-hover-color: #70650a;
+  --tiki-top-text-color: #70650a;
   --tiki-top-border: solid #000;
 }
 .tiki .tiki-topbar-nav-light {
   --tiki-topbar-bg: #f0e04f;
   --tiki-topbar-color: #413B06;
   --tiki-topbar-hover-color: #70650a;
+  --tiki-topbar-text-color: #70650a;
 }
 .tiki .tiki-top-nav-dark {
   --tiki-top-bg: #E7E6AD;
   --tiki-top-color: #000;
   --tiki-top-hover-color: #70650a;
+  --tiki-top-text-color: #70650a;
   --tiki-top-border: solid #000;
 }
 .tiki .tiki-topbar-nav-dark {
   --tiki-topbar-bg:  #f0e04f;
   --tiki-topbar-color: #000;
   --tiki-topbar-hover-color: #70650a;
+  --tiki-topbar-text-color: #70650a;
 }
 .tiki-nav-top-light, .tiki-nav-top-dark {
   --tiki-top-border-width: 0 0 5px 0;
@@ -1093,40 +1097,6 @@ hr {
   background-image: none;
   border: 1px solid var(--bs-border-color);
 }
-.navbar-dark .navbar-collapse, .navbar-dark .navbar-form {
-  border-color: transparent;
-}
-.navbar .navbar {
-  background: transparent !important;
-}
-.dropdown-menu {
-  background-color: #f0e04f;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-.tiki .dropdown-item, .tiki .dropdown-item a, .tiki .dropdown-item .btn.btn-link {
-  color: #000;
-}
-.tiki .dropdown-item:hover, .tiki .dropdown-item:focus, .tiki .dropdown-item a:hover, .tiki .dropdown-item a:focus, .tiki .dropdown-item .btn.btn-link:hover, .tiki .dropdown-item .btn.btn-link:focus {
-  color: #f2f2f2;
-  background: #b25025;
-}
-.tiki .dropdown-item:active, .tiki .dropdown-item.active, .tiki .dropdown-item a:active, .tiki .dropdown-item a.active, .tiki .dropdown-item .btn.btn-link:active, .tiki .dropdown-item .btn.btn-link.active {
-  color: #f2f2f2;
-  background: #c75a28;
-}
-.tiki .dropdown-item.disabled, .tiki .dropdown-item:disabled, .tiki .dropdown-item a.disabled, .tiki .dropdown-item a:disabled, .tiki .dropdown-item .btn.btn-link.disabled, .tiki .dropdown-item .btn.btn-link:disabled {
-  color: #f2f2f2;
-}
-.tiki .dropdown-item .dropdown-header, .tiki .dropdown-item a .dropdown-header, .tiki .dropdown-item .btn.btn-link .dropdown-header {
-  color: #000;
-}
-.tiki .dropdown-item .dropdown-divider, .tiki .dropdown-item a .dropdown-divider, .tiki .dropdown-item .btn.btn-link .dropdown-divider {
-  background: #f0e04f;
-}
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-  color: #ffffff;
-  background-color: #B35123;
-}
 .pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus {
   color: #f9a013;
   background-color: #eeeeee;
@@ -1189,9 +1159,6 @@ header.page-header {
 .blogpost .card-header {
   background: #cb9e10;
 }
-.siteloginbar_popup .dropdown-menu > li > a {
-  color: #ffffff;
-}
 header.header .sitetitle, header.header .sitesubtitle {
   text-shadow: none;
 }
@@ -1226,6 +1193,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -1239,6 +1207,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -1252,6 +1221,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -1265,6 +1235,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -1413,4 +1384,4 @@ footer#footer .footer_liner .card-header {
 .page-item.disabled, .list-group-item.disabled {
   color: var(--bs-secondary-color) !important;
 }
-/*# sourceMappingURL=lemon.css.map */
+

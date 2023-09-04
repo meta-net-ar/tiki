@@ -10524,6 +10524,7 @@ body {
   --tiki-top-bg: #f8f9fa;
   --tiki-top-color: #124987;
   --tiki-top-hover-color: #1861b4;
+  --tiki-top-text-color: #1861b4;
   --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
   --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
 }
@@ -10531,11 +10532,13 @@ body {
   --tiki-topbar-bg: #f7f7f7;
   --tiki-topbar-color: #124987;
   --tiki-topbar-hover-color: #1861b4;
+  --tiki-topbar-text-color: #1861b4;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #373a3c;
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10543,11 +10546,13 @@ body {
   --tiki-topbar-bg: #3D4549;
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: #373a3c;
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10555,6 +10560,7 @@ body {
   --tiki-topbar-bg: #3D4549;
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-navbar-bg: #f7f7f7;
@@ -11506,6 +11512,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11519,6 +11526,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11532,6 +11540,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11545,6 +11554,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12538,4 +12548,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
-/*# sourceMappingURL=cosmo.css.map */
+

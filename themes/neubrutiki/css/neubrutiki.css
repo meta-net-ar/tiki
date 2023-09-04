@@ -10827,6 +10827,7 @@ textarea.form-control-lg {
   --tiki-top-hover-bg: transparent;
   --tiki-top-active-bg: transparent;
   --tiki-top-border: solid #1a1a1a;
+  --tiki-top-text-color: rgba(0, 0, 0, 0.8);
   --tiki-top-box-shadow: none;
 }
 .tiki-topbar-nav-light {
@@ -10836,6 +10837,7 @@ textarea.form-control-lg {
   --tiki-topbar-active-color: rgba(0, 0, 0, 0.8);
   --tiki-topbar-hover-bg: transparent;
   --tiki-topbar-active-bg: transparent;
+  --tiki-topbar-text-color: rgba(0, 0, 0, 0.8);
   --tiki-topbar-border: solid #1a1a1a;
   --tiki-topbar-box-shadow: none;
 }
@@ -10844,6 +10846,7 @@ textarea.form-control-lg {
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: #fff;
   --tiki-top-hover-bg: transparent;
+  --tiki-top-text-color: #fff;
   --tiki-top-border: none;
   --tiki-top-box-shadow: none;
   --bs-navbar-brand-color: #fff;
@@ -10854,6 +10857,7 @@ textarea.form-control-lg {
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: #fff;
   --tiki-topbar-hover-bg: transparent;
+  --tiki-topbar-text-color: #fff;
   --tiki-topbar-border: none;
   --tiki-topbar-box-shadow: none;
   --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
@@ -10864,6 +10868,7 @@ textarea.form-control-lg {
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: #fff;
   --tiki-top-hover-bg: transparent;
+  --tiki-top-text-color: #fff;
   --tiki-top-border: none;
   --tiki-top-box-shadow: none;
   --bs-navbar-brand-color: #fff;
@@ -10874,6 +10879,7 @@ textarea.form-control-lg {
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: #fff;
   --tiki-topbar-hover-bg: transparent;
+  --tiki-topbar-text-color: #fff;
   --tiki-topbar-border: none;
   --tiki-topbar-box-shadow: none;
   --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
@@ -10887,6 +10893,7 @@ textarea.form-control-lg {
   --tiki-top-hover-bg: transparent;
   --tiki-top-active-bg: transparent;
   --tiki-top-border: solid #1a1a1a;
+  --tiki-top-text-color: rgba(0, 0, 0, 0.8);
   --tiki-top-box-shadow: none;
 }
 [data-bs-theme=light] .tiki-topbar-nav-dark {
@@ -10896,6 +10903,7 @@ textarea.form-control-lg {
   --tiki-topbar-active-color: rgba(0, 0, 0, 0.8);
   --tiki-topbar-hover-bg: transparent;
   --tiki-topbar-active-bg: transparent;
+  --tiki-topbar-text-color: rgba(0, 0, 0, 0.8);
   --tiki-topbar-border: solid #1a1a1a;
   --tiki-topbar-box-shadow: none;
 }
@@ -11858,6 +11866,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11871,6 +11880,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11884,6 +11894,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11897,6 +11908,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -13117,4 +13129,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   color: #fff;
   background-color: #0d6efd;
 }
-/*# sourceMappingURL=neubrutiki.css.map */
+

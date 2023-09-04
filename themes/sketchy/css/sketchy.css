@@ -11063,6 +11063,7 @@ pre {
   --tiki-top-bg: rgb(255, 255, 255);
   --tiki-top-color: rgba(0, 0, 0, 0.55);
   --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
+  --tiki-top-text-color: rgba(0, 0, 0, 0.7);
   --tiki-top-border: solid #333;
   --bs-navbar-brand-color: #333;
   --bs-navbar-brand-hover-color: #333;
@@ -11071,12 +11072,14 @@ pre {
   --tiki-topbar-bg: rgb(255, 255, 255);
   --tiki-topbar-color: rgba(0, 0, 0, 0.55);
   --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
+  --tiki-topbar-text-color: rgba(0, 0, 0, 0.7);
   --tiki-topbar-border: solid #333;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #232323FF;
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --tiki-top-border: solid rgb(85, 85, 85);
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
@@ -11085,12 +11088,14 @@ pre {
   --tiki-topbar-bg: #232323FF;
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
   --tiki-topbar-border: solid rgb(85, 85, 85);
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: #232323FF;
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --tiki-top-border: solid rgb(85, 85, 85);
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
@@ -11099,6 +11104,7 @@ pre {
   --tiki-topbar-bg: #232323FF;
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
   --tiki-topbar-border: solid rgb(85, 85, 85);
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
@@ -12055,6 +12061,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -12068,6 +12075,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12081,6 +12089,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -12094,6 +12103,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -13140,4 +13150,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 #col2 .navbar .nav-link:hover {
   color: var(--tiki-vert-nav-link-hover-color);
 }
-/*# sourceMappingURL=sketchy.css.map */
+

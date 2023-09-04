@@ -3,24 +3,28 @@
     --tiki-top-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
     --tiki-top-color: #000;
     --tiki-top-hover-color: #2c2c2c;
+    --tiki-top-text-color: #2c2c2c;
 }
 
 .tiki-topbar-nav-light {
     --tiki-topbar-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
     --tiki-topbar-color: #000;
     --tiki-topbar-hover-color: #2c2c2c;
+    --tiki-topbar-text-color: #2c2c2c;
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
     --tiki-top-color: #b8ec79;
     --tiki-top-hover-color: #c8f197;
+    --tiki-top-text-color: #c8f197;
 }
 
 .tiki-topbar-nav-dark {
     --tiki-topbar-bg: linear-gradient(to bottom, #4c4c4c 0%,#4c4c4c 18%,#404040 52%,#232323 53%,#090909 93%,#070707 99%,#000000 100%);
     --tiki-topbar-color: #b8ec79;
     --tiki-topbar-hover-color: #c8f197;
+    --tiki-topbar-text-color: #c8f197;
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //

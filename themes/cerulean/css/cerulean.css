@@ -10822,6 +10822,7 @@ header.navbar.fixed-top {
   --tiki-top-bg: linear-gradient(#f9fafb, #f8f9fa 60%, #e9eaeb);
   --tiki-top-color: #000;
   --tiki-top-hover-color: #000;
+  --tiki-top-text-color: #000;
   --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
   --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
 }
@@ -10829,11 +10830,13 @@ header.navbar.fixed-top {
   --tiki-topbar-bg: linear-gradient(#f9fafb, #f8f9fa 60%, #e9eaeb);
   --tiki-topbar-color: #000;
   --tiki-topbar-hover-color: #000;
+  --tiki-topbar-text-color: #000;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color:#fff;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10841,11 +10844,13 @@ header.navbar.fixed-top {
   --tiki-topbar-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color:#fff;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10853,6 +10858,7 @@ header.navbar.fixed-top {
   --tiki-topbar-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-navbar-bg: ;
@@ -11802,6 +11808,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11815,6 +11822,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11828,6 +11836,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11841,6 +11850,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12846,4 +12856,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 .accordion-button:not(.collapsed) {
   background: linear-gradient(#50b3eb, #2fa4e7 60%, #2c9ad9);
 }
-/*# sourceMappingURL=cerulean.css.map */
+

@@ -8,23 +8,27 @@
   --tiki-top-bg: #a52874 !important;
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #f9f9f9;
+  --tiki-top-text-color: #f9f9f9;
   --tiki-top-border: solid #000;
 }
 .tiki .tiki-topbar-nav-light {
   --tiki-topbar-bg: #551e3d;
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #f2f2f2;
+  --tiki-topbar-text-color: #f2f2f2;
 }
 .tiki .tiki-top-nav-dark {
   --tiki-top-bg: #a52874 !important;
   --tiki-top-color: #fff;
   --tiki-top-hover-color: #f2f2f2;
+  --tiki-top-text-color: #f2f2f2;
   --tiki-top-border: solid #000;
 }
 .tiki .tiki-topbar-nav-dark {
   --tiki-topbar-bg: #551e3d;
   --tiki-topbar-color: #fff;
   --tiki-topbar-hover-color: #f2f2f2;
+  --tiki-topbar-text-color: #f2f2f2;
 }
 .tiki-nav-top-light, .tiki-nav-top-dark {
   --tiki-top-border-top-width: 0px;
@@ -1091,40 +1095,6 @@ hr {
   background-image: none;
   border: 1px solid var(--bs-border-color);
 }
-.navbar-dark .navbar-collapse, .navbar-dark .navbar-form {
-  border-color: transparent;
-}
-.navbar .navbar {
-  background: transparent !important;
-}
-.dropdown-menu {
-  background-color: #8e286a;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-.tiki .dropdown-item, .tiki .dropdown-item a, .tiki .dropdown-item .btn.btn-link {
-  color: #ffffff;
-}
-.tiki .dropdown-item:hover, .tiki .dropdown-item:focus, .tiki .dropdown-item a:hover, .tiki .dropdown-item a:focus, .tiki .dropdown-item .btn.btn-link:hover, .tiki .dropdown-item .btn.btn-link:focus {
-  color: #f2f2f2;
-  background: #742157;
-}
-.tiki .dropdown-item:active, .tiki .dropdown-item.active, .tiki .dropdown-item a:active, .tiki .dropdown-item a.active, .tiki .dropdown-item .btn.btn-link:active, .tiki .dropdown-item .btn.btn-link.active {
-  color: #f2f2f2;
-  background: #2e1f39;
-}
-.tiki .dropdown-item.disabled, .tiki .dropdown-item:disabled, .tiki .dropdown-item a.disabled, .tiki .dropdown-item a:disabled, .tiki .dropdown-item .btn.btn-link.disabled, .tiki .dropdown-item .btn.btn-link:disabled {
-  color: #f2f2f2;
-}
-.tiki .dropdown-item .dropdown-header, .tiki .dropdown-item a .dropdown-header, .tiki .dropdown-item .btn.btn-link .dropdown-header {
-  color: #ffffff;
-}
-.tiki .dropdown-item .dropdown-divider, .tiki .dropdown-item a .dropdown-divider, .tiki .dropdown-item .btn.btn-link .dropdown-divider {
-  background: #8e286a;
-}
-.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-  color: #ffffff;
-  background-color: #a02871;
-}
 .pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus {
   color: #a02871;
   background-color: #eeeeee;
@@ -1187,9 +1157,6 @@ header.page-header {
 .blogpost .card-header {
   background: #a52874;
 }
-.siteloginbar_popup .dropdown-menu > li > a {
-  color: #ffffff;
-}
 header.header .sitetitle, header.header .sitesubtitle {
   text-shadow: none;
 }
@@ -1224,6 +1191,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -1237,6 +1205,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -1250,6 +1219,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -1263,6 +1233,7 @@ footer#footer .footer_liner .card-header {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -1377,4 +1348,4 @@ footer#footer .footer_liner .card-header {
 .progress-bar.bg-success, .progress-bar.bg-warning {
   color: #000;
 }
-/*# sourceMappingURL=grape.css.map */
+

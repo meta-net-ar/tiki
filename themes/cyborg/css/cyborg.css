@@ -10873,6 +10873,7 @@ legend {
   --tiki-top-bg: #222;
   --tiki-top-color: #2a9fd6;
   --tiki-top-hover-color: #55b2de;
+  --tiki-top-text-color:  #55b2de;
   --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
   --bs-navbar-brand-hover-color: rgba(0, 0, 0, 0.9);
 }
@@ -10880,11 +10881,13 @@ legend {
   --tiki-topbar-bg: #222;
   --tiki-topbar-color: #2a9fd6;
   --tiki-topbar-hover-color: #55b2de;
+  --tiki-topbar-text-color: #55b2de;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #060606;
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --tiki-top-border: 1px solid #282828;
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
@@ -10893,6 +10896,7 @@ legend {
   --tiki-topbar-bg: #060606;
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
   --tiki-topbar-border: 1px solid #282828;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
@@ -11851,6 +11855,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11864,6 +11869,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11877,6 +11883,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11890,6 +11897,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12889,4 +12897,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 .accordion-button:not(.collapsed) {
   background: #222;
 }
-/*# sourceMappingURL=cyborg.css.map */
+

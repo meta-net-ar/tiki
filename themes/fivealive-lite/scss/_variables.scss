@@ -182,12 +182,12 @@ $blockquote-footer-color: $text-muted !default;
 // Forms
 //$input-border-color: var(--#{$prefix}border-color) !default; // #dddddd;
 // Dropdowns
-$dropdown-bg: #1376a8 !default;
-$dropdown-link-color: $gray-200 !default;
-$dropdown-link-hover-color: #ffffff !default;
-$dropdown-link-hover-bg: darken(#1376a8, 10%) !default;
-$dropdown-link-active-bg: #0e567a !default;
-$dropdown-header-color: #fff !default;
+//$dropdown-bg: #1376a8 !default;
+//$dropdown-link-color: $gray-200 !default;
+//$dropdown-link-hover-color: #ffffff !default;
+//$dropdown-link-hover-bg: darken(#1376a8, 10%) !default;
+//$dropdown-link-active-bg: #0e567a !default;
+//$dropdown-header-color: #fff !default;
 
 // Navs
 $nav-tabs-border-color:             $gray-300 !default;
@@ -209,6 +209,20 @@ $navbar-dark-hover-bg: darken($primary, 6.5%) !default;
 $navbar-dark-active-color: #ffffff !default;
 $navbar-dark-active-bg: darken($primary, 6.5%) !default;
 $navbar-dark-disabled-color: #cccccc !default;
+
+// Dropdowns
+$dropdown-color:                    var(--#{$prefix}body-color) !default;
+$dropdown-bg:                       var(--#{$prefix}body-bg) !default;
+$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
+$dropdown-divider-bg:               $dropdown-border-color !default;
+$dropdown-link-color:               var(--#{$prefix}body-color) !default;
+$dropdown-link-hover-color:         $dropdown-link-color !default;
+$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
+
+$dropdown-link-active-color:        $component-active-color !default;
+$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 
 // Pagination
 // Jumbotron

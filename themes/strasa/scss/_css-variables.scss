@@ -6,7 +6,8 @@ $imagePath: "../images/";
 .tiki-top-nav-light {
     --tiki-top-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
     --tiki-top-color: #fff;
-    --tiki-top-hover-color: darken(#fff, 10%);
+    --tiki-top-hover-color: #{$navbar-dark-hover-color}; // darken(#fff, 10%);
+    --tiki-top-text-color: #{$navbar-dark-hover-color}; // darken(#fff, 10%);
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -15,20 +16,23 @@ $imagePath: "../images/";
     --tiki-topbar-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 .tiki-topbar-nav-dark {
     --tiki-topbar-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
-    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-color: #000000a6; //#{$navbar-light-color}; // #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //

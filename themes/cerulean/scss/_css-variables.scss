@@ -4,6 +4,7 @@
     --tiki-top-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
     --tiki-top-color: #{$navbar-dark-link-color};
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-top-text-color:#{$navbar-dark-link-hover-color};
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
@@ -12,12 +13,14 @@
     --tiki-topbar-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
     --tiki-topbar-color: #{$navbar-dark-link-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-top-nav-light {
     --tiki-top-bg: linear-gradient(#f9fafb, #f8f9fa 60%, #e9eaeb); // BLUE OPTION: linear-gradient(#50b3eb, #2fa4e7 60%, #2c9ad9);
     --tiki-top-color: #000; //#{$navbar-light-link-color};
     --tiki-top-hover-color: #000; //#{$navbar-light-link-hover-color};
+    --tiki-top-text-color: #000;
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -26,6 +29,7 @@
     --tiki-topbar-bg: linear-gradient(#f9fafb, #f8f9fa 60%, #e9eaeb); // BLUE OPTION: linear-gradient(#50b3eb, #2fa4e7 60%, #2c9ad9);
     --tiki-topbar-color: #000; // #{$navbar-light-link-color};
     --tiki-topbar-hover-color: #000; // #{$navbar-light-link-hover-color};
+    --tiki-topbar-text-color: #000;
 }
 
 .tiki-top-nav-dark {
