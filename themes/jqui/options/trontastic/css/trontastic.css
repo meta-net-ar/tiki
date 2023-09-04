@@ -2741,21 +2741,25 @@ progress {
   --tiki-top-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
   --tiki-top-color: #000;
   --tiki-top-hover-color: #2c2c2c;
+  --tiki-top-text-color: #2c2c2c;
 }
 .tiki-topbar-nav-light {
   --tiki-topbar-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
   --tiki-topbar-color: #000;
   --tiki-topbar-hover-color: #2c2c2c;
+  --tiki-topbar-text-color: #2c2c2c;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
   --tiki-top-color: #b8ec79;
   --tiki-top-hover-color: #c8f197;
+  --tiki-top-text-color: #c8f197;
 }
 .tiki-topbar-nav-dark {
   --tiki-topbar-bg: linear-gradient(to bottom, #4c4c4c 0%,#4c4c4c 18%,#404040 52%,#232323 53%,#090909 93%,#070707 99%,#000000 100%);
   --tiki-topbar-color: #b8ec79;
   --tiki-topbar-hover-color: #c8f197;
+  --tiki-topbar-text-color: #c8f197;
 }
 .tiki.tiki-admin .tiki-top-nav-light, .tiki .tiki-admin-aside-nav-light, .tiki-admin .tiki-admin-top-nav-light .dropdown-menu, .tiki-admin .tiki-admin-top-nav-light .dropdown-item, .tiki .tiki-admin-top-nav-light {
   --tiki-admin-top-nav-color: #000;
@@ -2795,6 +2799,7 @@ progress {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -2808,6 +2813,7 @@ progress {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -2821,6 +2827,7 @@ progress {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -2834,6 +2841,7 @@ progress {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -4114,4 +4122,4 @@ td.calheadhighlight, td.calheadhighlight a:link, td.calheadhighlight a:visited {
 .card-accordian > .card-header h4.card-title a, .card-accordian > .card-header .card-title.h4 a {
   color: #000;
 }
-/*# sourceMappingURL=trontastic.css.map */
+

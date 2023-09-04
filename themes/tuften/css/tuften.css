@@ -10786,6 +10786,7 @@ textarea.form-control-lg {
   --tiki-top-bg: #fffff8;
   --tiki-top-color: #222;
   --tiki-top-hover-color: black;
+  --tiki-top-text-color: black;
   --bs-navbar-brand-color: #222;
   --bs-navbar-brand-hover-color: #090909;
 }
@@ -10793,11 +10794,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #fffff8;
   --tiki-topbar-color: #222;
   --tiki-topbar-hover-color: black;
+  --tiki-topbar-text-color: black;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #343a40;
   --tiki-top-color: white;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: white;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10805,11 +10808,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #343a40;
   --tiki-topbar-color: white;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: #343a40;
   --tiki-top-color: white;
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: white;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10817,6 +10822,7 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #343a40;
   --tiki-topbar-color: white;
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-top-nav-color: #222;
@@ -11781,6 +11787,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11794,6 +11801,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11807,6 +11815,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11820,6 +11829,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -13257,4 +13267,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   color: #fff;
   background-color: #a25D25;
 }
-/*# sourceMappingURL=tuften.css.map */
+

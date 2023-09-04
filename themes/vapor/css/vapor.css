@@ -11107,18 +11107,21 @@ legend {
   --tiki-top-bg: rgb(111, 66, 193);
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-top-text-color: rgba(255, 255, 255, 0.75);
   --tiki-top-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
 }
 .tiki-topbar-nav-light {
   --tiki-topbar-bg: rgb(111, 66, 193);
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
   --tiki-topbar-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: rgb(111, 66, 193);
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-top-text-color: rgba(255, 255, 255, 0.75);
   --tiki-top-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
@@ -11127,6 +11130,7 @@ legend {
   --tiki-topbar-bg: rgb(111, 66, 193);
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
   --tiki-topbar-box-shadow: 0 0 2px rgba(111, 66, 193, 0.9), 0 0 4px rgba(111, 66, 193, 0.4), 0 0 1rem rgba(111, 66, 193, 0.3), 0 0 4rem rgba(111, 66, 193, 0.1);
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
@@ -12081,6 +12085,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -12094,6 +12099,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12107,6 +12113,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -12120,6 +12127,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -13109,4 +13117,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   color: #fff;
   background-color: #ea39b8;
 }
-/*# sourceMappingURL=vapor.css.map */
+

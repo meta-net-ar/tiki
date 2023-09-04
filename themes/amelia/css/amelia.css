@@ -10754,6 +10754,7 @@ textarea.form-control-lg {
   --tiki-top-bg: #5AE3ED;
   --tiki-top-color: #322B0B;
   --tiki-top-hover-color: #5B5015;
+  --tiki-top-text-color: rgba(0, 0, 0, 0.9);
   --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
   --bs-navbar-brand-hover-color: rgba(0, 0, 0, 0.9);
 }
@@ -10761,11 +10762,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #68D6DE;
   --tiki-topbar-color: #3C320B;
   --tiki-topbar-hover-color: #615314;
+  --tiki-topbar-text-color: #615314;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #ad1d28 !important;
   --tiki-top-color: #f2e8c0;
   --tiki-top-hover-color: white;
+  --tiki-top-text-color: #f2e8c0;
   --bs-navbar-brand-color: #f2e8c0;
   --bs-navbar-brand-hover-color: #f2e8c0;
 }
@@ -10773,11 +10776,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #6e0d0d;
   --tiki-topbar-color: #f2e8c0;
   --tiki-topbar-hover-color: white;
+  --tiki-topbar-text-color: #f2e8c0;
 }
 [data-bs-theme=dark] .tiki-top-nav-light {
   --tiki-top-bg: #ad1d28 !important;
   --tiki-top-color: #f2e8c0;
   --tiki-top-hover-color: white;
+  --tiki-top-text-color: #f2e8c0;
   --bs-navbar-brand-color: #f2e8c0;
   --bs-navbar-brand-hover-color: #f2e8c0;
 }
@@ -10785,6 +10790,7 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #6e0d0d;
   --tiki-topbar-color: #f2e8c0;
   --tiki-topbar-hover-color: white;
+  --tiki-topbar-text-color: #f2e8c0;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-navbar-bg: #68D6DE;
@@ -11746,6 +11752,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11759,6 +11766,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11772,6 +11780,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11785,6 +11794,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12838,4 +12848,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   color: #fff;
   background-color: #F5CDC2;
 }
-/*# sourceMappingURL=amelia.css.map */
+

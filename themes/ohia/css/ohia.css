@@ -10551,6 +10551,7 @@ textarea.form-control-lg {
   --tiki-top-bg: #3585D0;
   --tiki-top-color: #030303;
   --tiki-top-hover-color: #171717;
+  --tiki-top-text-color: #171717;
   --bs-navbar-brand-color: #030303;
   --bs-navbar-brand-hover-color: black;
 }
@@ -10558,11 +10559,13 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #3585D0;
   --tiki-topbar-color: #030303;
   --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: #343a40;
   --tiki-top-color: rgba(255, 255, 255, 0.55);
   --tiki-top-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-top-text-color: rgba(255, 255, 255, 0.75);
   --bs-navbar-brand-color: #fff;
   --bs-navbar-brand-hover-color: #fff;
 }
@@ -10570,6 +10573,7 @@ textarea.form-control-lg {
   --tiki-topbar-bg: #343a40;
   --tiki-topbar-color: rgba(255, 255, 255, 0.55);
   --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
+  --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-navbar-bg: #3585D0;
@@ -11531,6 +11535,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11544,6 +11549,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11557,6 +11563,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11570,6 +11577,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12648,4 +12656,4 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
   --bs-navbar-color: #80A60FFF;
   --bs-navbar-hover-color: #f4f4f4;
 }
-/*# sourceMappingURL=ohia.css.map */
+

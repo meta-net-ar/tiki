@@ -283,6 +283,7 @@ $btn-link-disabled-color:     $gray-600 !default;
     --tiki-top-bg: #E7E6AD;
     --tiki-top-color: #{$top-link-color};
     --tiki-top-hover-color: #{$top-link-hover-color};
+    --tiki-top-text-color: #{$top-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -290,12 +291,14 @@ $btn-link-disabled-color:     $gray-600 !default;
     --tiki-topbar-bg: #f0e04f;
     --tiki-topbar-color: #{$top-light-color}; // #{$topbar-light-color};
     --tiki-topbar-hover-color: #{$top-link-hover-color};
+    --tiki-topbar-text-color: #{$top-link-hover-color};
 }
 
 .tiki .tiki-top-nav-dark {
     --tiki-top-bg: #E7E6AD;
     --tiki-top-color: #000; // {$navbar-dark-link-color};
     --tiki-top-hover-color: #{$top-link-hover-color};
+    --tiki-top-text-color: #{$top-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -303,6 +306,7 @@ $btn-link-disabled-color:     $gray-600 !default;
     --tiki-topbar-bg:  #f0e04f;
     --tiki-topbar-color: #000; //#{$navbar-dark-link-color};
     --tiki-topbar-hover-color: #{$top-link-hover-color};
+    --tiki-topbar-text-color: #{$top-link-hover-color};
 }
 
 .tiki-nav-top-light, .tiki-nav-top-dark {

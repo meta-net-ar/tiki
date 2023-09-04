@@ -5,6 +5,7 @@
     --tiki-top-bg: #{$navbar-dark-bg};
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
 //    --tiki-top-hover-bg: #{darken($navbar-dark-bg, 6.5%)};
     --tiki-top-active-bg: #{darken($navbar-dark-bg, 6.5%)};
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
@@ -15,6 +16,7 @@
     --tiki-topbar-bg: #{$navbar-dark-bg};
     --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 //    --tiki-topbar-hover-bg: #{darken($navbar-dark-bg, 6.5%)};
     --tiki-topbar-active-bg: #{darken($navbar-dark-bg, 6.5%)};
 }
@@ -23,6 +25,7 @@
     --tiki-top-bg: #{$navbar-light-bg};
     --tiki-top-color: #6C727F !important; // #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -31,6 +34,7 @@
     --tiki-topbar-bg: #{$navbar-light-bg};
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-hover-color};
 }
 
 .tiki-top-nav-light {

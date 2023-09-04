@@ -7,6 +7,7 @@
     --tiki-top-color: #{$white};
     --tiki-top-hover-color: #{$white};
     --tiki-top-hover-bg: rgba(255,255,255,.15);
+    --tiki-top-text-color: #{$white};
     --tiki-top-border: none;
     --tiki-top-box-shadow: none;
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
@@ -18,6 +19,7 @@
     --tiki-topbar-color: #{$white};
     --tiki-topbar-hover-color: #{$white};
     --tiki-topbar-hover-bg: rgba(255,255,255,.15);
+    --tiki-topbar-text-color: #{$white};
     --tiki-topbar-border: none;
     --tiki-topbar-box-shadow: none;
     --tiki-top-border-width: 0;
@@ -31,6 +33,7 @@
     --tiki-top-active-color: #{$navbar-light-hover-color};
     --tiki-top-hover-bg: rgba(255,255,255,.15);
     --tiki-top-active-bg: rgba(255,255,255,.15);
+    --tiki-top-text-color: #{$white};
     --tiki-top-border: none;
     --tiki-top-box-shadow: none;
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
@@ -44,6 +47,7 @@
     --tiki-topbar-active-color: #{$white};
     --tiki-topbar-hover-bg: rgba(255,255,255,.15);
     --tiki-topbar-active-bg: rgba(255,255,255,.15);
+    --tiki-topbar-text-color: #{$white};
     --tiki-topbar-border: none; // solid #1a1a1a;
     --tiki-topbar-box-shadow: none;
 }

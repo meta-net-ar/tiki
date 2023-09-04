@@ -10869,6 +10869,7 @@ label, .radio label, .checkbox label, .help-block {
   --tiki-top-bg: rgb(32, 55, 76);
   --tiki-top-color: rgba(255, 255, 255, 0.75);
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
   --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
 }
@@ -10876,11 +10877,13 @@ label, .radio label, .checkbox label, .help-block {
   --tiki-topbar-bg: #2C465E;
   --tiki-topbar-color: rgba(255, 255, 255, 0.75);
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: rgb(32, 55, 76);
   --tiki-top-color: rgba(255, 255, 255, 0.75);
   --tiki-top-hover-color: #fff;
+  --tiki-top-text-color: #fff;
   --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
   --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
 }
@@ -10888,6 +10891,7 @@ label, .radio label, .checkbox label, .help-block {
   --tiki-topbar-bg: #2C465E;
   --tiki-topbar-color: rgba(255, 255, 255, 0.75);
   --tiki-topbar-hover-color: #fff;
+  --tiki-topbar-text-color: #fff;
 }
 .tiki .tiki-admin-top-nav-light, .tiki .tiki-admin-aside-nav-light {
   --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.55);
@@ -11847,6 +11851,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11860,6 +11865,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -11873,6 +11879,7 @@ blockquote {
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
@@ -11886,6 +11893,7 @@ blockquote {
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
@@ -12901,4 +12909,4 @@ body {
 a.linkmodule {
   color: #BBD9F7;
 }
-/*# sourceMappingURL=superhero.css.map */
+

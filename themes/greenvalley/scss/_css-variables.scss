@@ -6,6 +6,7 @@
     --tiki-top-bg: url('#{$imagePath}header_background_ltr.jpg') 0/100% auto no-repeat;
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
@@ -14,12 +15,14 @@
     --tiki-topbar-bg: white; // #473119 url('#{$imagePath}menubar-wood.jpg') 0/100% auto no-repeat;
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg:  url('#{$imagePath}header_background_ltr.jpg') 0/100% auto no-repeat;
     --tiki-top-color: #{$navbar-dark-color};
     --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
     --bs-navbar-brand-color: #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
@@ -28,6 +31,7 @@
     --tiki-topbar-bg: #473119 url('#{$imagePath}menubar-wood.jpg') 50% 50% no-repeat; //var(--tiki-topbar-light-bg);
     --tiki-topbar-color: #{$navbar-dark-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
@@ -87,6 +91,9 @@ $imagePath: "../images/";
 [data-bs-theme="light"] {
     --tiki-greenvalley-row-middle-bg-color: #fff; // url('#{$imagePath}page_background_ltr.jpg') repeat;
     --tiki-greenvalley-row-middle-bg-img-opacity: 1;
+    #page-data {
+        text-shadow: 1px 1px 0 rgb(255, 255, 255);
+    }
 }
 
 [data-bs-theme="dark"] {
