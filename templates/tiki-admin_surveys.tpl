@@ -113,6 +113,14 @@
                     {textarea name="description" rows="6" id="description" class="form-control" _toolbars='y' _simple='y' comments='y'}{$info.description}{/textarea}
                 </div>
             </div>
+            <div class="tiki-form-group row">
+                <label for="restriction" class="col-form-label col-sm-2">
+                    {tr}Restrict admin users to one vote{/tr}
+                </label>
+                <div class="col-sm-10">
+                    <input type="checkbox" name="restriction" id="restriction" {if $info.restriction eq 'y'}checked="checked"{/if}>
+                </div>
+            </div>
             <div class="mb-4">
                 {include file='categorize.tpl' labelcol='2' inputcol='10'}
             </div>

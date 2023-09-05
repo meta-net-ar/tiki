@@ -28,7 +28,12 @@ $tikilib->get_perm_object($_REQUEST['surveyId'], 'survey');
 $access->check_permission('tiki_p_admin_surveys');
 if (isset($_REQUEST["save"])) {
     check_ticket('admin-surveys');
-    $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $_REQUEST["status"]);
+    if (isset($_REQUEST["restriction"]) && $_REQUEST["restriction"] == 'on') {
+        $restriction = 'y';
+    } else {
+        $restriction = 'n';
+    }
+    $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $restriction, $_REQUEST["status"]);
     $cat_type = 'survey';
     $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
     $cat_desc = substr($_REQUEST["description"], 0, 200);

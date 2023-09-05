@@ -43,20 +43,15 @@ if (isset($_REQUEST["find"])) {
 }
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! empty($_REQUEST["uservoted"])) {
-    $uservoted = $_REQUEST["uservoted"];
-} else {
-    $uservoted = '';
-}
-$smarty->assign('uservoted', $uservoted);
+
 $usersthatvoted = $srvlib->list_users_that_voted($_REQUEST["surveyId"]);
 $smarty->assign('usersthatvoted', $usersthatvoted);
+$questions = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, $sort_mode, $find);
 
-$channels = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, $sort_mode, $find, $uservoted);
-$cant_pages = ceil($channels["cant"] / $maxRecords);
+$cant_pages = ceil($questions["cant"] / $maxRecords);
 $smarty->assign_by_ref('cant_pages', $cant_pages);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-if ($channels["cant"] > ($offset + $maxRecords)) {
+if ($questions["cant"] > ($offset + $maxRecords)) {
     $smarty->assign('next_offset', $offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);
@@ -67,7 +62,7 @@ if ($offset > 0) {
 } else {
     $smarty->assign('prev_offset', -1);
 }
-$smarty->assign_by_ref('channels', $channels["data"]);
+$smarty->assign_by_ref('questions', $questions["data"]);
 include_once('tiki-section_options.php');
 ask_ticket('survey-stats-survey');
 // Display the template
