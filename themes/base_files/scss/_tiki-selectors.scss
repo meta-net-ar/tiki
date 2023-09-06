@@ -368,21 +368,23 @@ form.simple label .warning {
 //        border-color: transparent;
 //    }
 //}
-
+//
 .navbar-light {
     .dropdown-toggle,
-    a.nav-link.dropdown-toggle,
-    h1.sitetitle a,
-    h2.sitesubtitle {
+    a.nav-link.dropdown-toggle
+//    h1.sitetitle a,              Styled by CSS variables or fallback to navbar-brand class (here and the 3 elements commented out below.)
+//    h2.sitesubtitle
+        {
     color: $navbar-light-color
     }
 }
 
 .navbar-dark {
     .dropdown-toggle,
-    a.nav-link.dropdown-toggle,
-    h1.sitetitle a,
-    h2.sitesubtitle {
+    a.nav-link.dropdown-toggle
+//    h1.sitetitle a,
+//    h2.sitesubtitle
+         {
     color: $navbar-dark-color
     }
 }

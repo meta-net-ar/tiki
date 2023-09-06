@@ -2804,10 +2804,10 @@ progress {
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
 }
-.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-light .btn.btn-link {
+.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-light .dropdown-toggle, .tiki .tiki-top-nav-light .nav-link.dropdown-toggle, .tiki .tiki-top-nav-light .btn.btn-link {
   color: var(--tiki-top-color);
 }
-.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-light .btn.btn-link:hover {
+.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-light .dropdown-toggle:hover, .tiki .tiki-top-nav-light .nav-link.dropdown-toggle:hover, .tiki .tiki-top-nav-light .btn.btn-link:hover {
   color: var(--tiki-top-hover-color);
   background: var(--tiki-top-hover-bg);
 }
@@ -2818,10 +2818,10 @@ progress {
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
 }
-.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-light .btn.btn-link, .tiki .tiki-topbar-nav-light a.nav-link, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-light .btn.btn-link, .admin-content .tiki-nav-light a.nav-link {
+.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-light .dropdown-toggle, .tiki .tiki-topbar-nav-light .nav-link.dropdown-toggle, .tiki .tiki-topbar-nav-light .btn.btn-link, .tiki .tiki-topbar-nav-light .nav-link, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-light .dropdown-toggle, .admin-content .tiki-nav-light .nav-link.dropdown-toggle, .admin-content .tiki-nav-light .btn.btn-link, .admin-content .tiki-nav-light .nav-link {
   color: var(--tiki-topbar-color);
 }
-.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-light .btn.btn-link:hover, .tiki .tiki-topbar-nav-light a.nav-link:hover, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-light .btn.btn-link:hover, .admin-content .tiki-nav-light a.nav-link:hover {
+.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-light .dropdown-toggle:hover, .tiki .tiki-topbar-nav-light .nav-link.dropdown-toggle:hover, .tiki .tiki-topbar-nav-light .btn.btn-link:hover, .tiki .tiki-topbar-nav-light .nav-link:hover, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-light .dropdown-toggle:hover, .admin-content .tiki-nav-light .nav-link.dropdown-toggle:hover, .admin-content .tiki-nav-light .btn.btn-link:hover, .admin-content .tiki-nav-light .nav-link:hover {
   color: var(--tiki-topbar-hover-color);
   background: var(--tiki-topbar-hover-bg);
 }
@@ -2832,10 +2832,10 @@ progress {
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
 }
-.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-dark .btn.btn-link, .tiki .tiki-top-nav-dark a.nav-link {
+.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-dark .dropdown-toggle, .tiki .tiki-top-nav-dark .nav-link.dropdown-toggle, .tiki .tiki-top-nav-dark .btn.btn-link, .tiki .tiki-top-nav-dark .nav-link {
   color: var(--tiki-top-color);
 }
-.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-dark .btn.btn-link:hover, .tiki .tiki-top-nav-dark a.nav-link:hover {
+.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-dark .dropdown-toggle:hover, .tiki .tiki-top-nav-dark .nav-link.dropdown-toggle:hover, .tiki .tiki-top-nav-dark .btn.btn-link:hover, .tiki .tiki-top-nav-dark .nav-link:hover {
   color: var(--tiki-top-hover-color);
   background: var(--tiki-top-hover-bg);
 }
@@ -2846,10 +2846,10 @@ progress {
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
 }
-.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-dark .btn.btn-link, .tiki .tiki-topbar-nav-dark a.nav-link, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-dark .btn.btn-link, .admin-content .tiki-nav-dark a.nav-link {
+.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-dark .dropdown-toggle, .tiki .tiki-topbar-nav-dark .nav-link.dropdown-toggle, .tiki .tiki-topbar-nav-dark .btn.btn-link, .tiki .tiki-topbar-nav-dark .nav-link, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-dark .dropdown-toggle, .admin-content .tiki-nav-dark .nav-link.dropdown-toggle, .admin-content .tiki-nav-dark .btn.btn-link, .admin-content .tiki-nav-dark .nav-link {
   color: var(--tiki-topbar-color);
 }
-.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-dark .btn.btn-link:hover, .tiki .tiki-topbar-nav-dark a.nav-link:hover, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-dark .btn.btn-link:hover, .admin-content .tiki-nav-dark a.nav-link:hover {
+.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-dark .dropdown-toggle:hover, .tiki .tiki-topbar-nav-dark .nav-link.dropdown-toggle:hover, .tiki .tiki-topbar-nav-dark .btn.btn-link:hover, .tiki .tiki-topbar-nav-dark .nav-link:hover, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-dark .dropdown-toggle:hover, .admin-content .tiki-nav-dark .nav-link.dropdown-toggle:hover, .admin-content .tiki-nav-dark .btn.btn-link:hover, .admin-content .tiki-nav-dark .nav-link:hover {
   color: var(--tiki-topbar-hover-color);
   background: var(--tiki-topbar-hover-bg);
 }
