@@ -132,7 +132,7 @@
         {/foreach}
     </ul>
 {/if}
-
+{if $prefs.theme_iconeditable eq "y" and $tiki_p_admin eq 'y'}
 <script lang="js">
     var iconset = {$icon_picker_set}
 </script>
@@ -264,3 +264,4 @@
         })
     })
 {/jq}
+{/if}
