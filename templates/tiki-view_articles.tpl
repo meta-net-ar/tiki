@@ -91,11 +91,11 @@
                         {if $listpages[ix].show_author eq 'y'}
                             {if $listpages[ix].authorName}
                                 <span class="author">
-                                    {tr}Author:{/tr} {$listpages[ix].authorName|escape}
+                                     {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {$listpages[ix].authorName|escape}
                                 </span>
                             {else}
                                 <span class="author">
-                                    {tr}Author:{/tr} {$listpages[ix].author|username}
+                                     {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {$listpages[ix].author|username}
                                 </span>
                             {/if}
                             {if $listpages[ix].show_pubdate eq 'y' or $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
@@ -104,7 +104,7 @@
                         {/if}
                         {if $listpages[ix].show_pubdate eq 'y'}
                             <span class="pubdate">
-                                {tr}Published{/tr} {$listpages[ix].publishDate|tiki_short_datetime}
+                                 {$listpages[ix].publishDate|tiki_short_datetime}
                             </span>
                             {if $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
                                 -
@@ -276,6 +276,11 @@
                                     <a class="dropdown-item" href="tiki-list_articles.php?remove={$listpages[ix].articleId}">
                                         {icon name='remove'} {tr}Remove{/tr}
                                     </a>
+                                {/if}
+                                {if $listpages[ix].perms.tiki_p_admin_cms eq 'y' or $listpages[ix].perms.tiki_p_assign_perm_cms eq 'y'}
+                                    <span class="dropdown-item">
+                                        {permission_link mode=text type=article permType=articles id=$listpages[ix].articleId parentId=$listpages[ix].topicId}
+                                    </span>
                                 {/if}
                             </div>
                         </div>

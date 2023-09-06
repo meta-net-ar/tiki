@@ -19,9 +19,12 @@
         <div class="card mb-3">
             <div class="card-header">
                 Else
+                <button class="btn btn-info btn-xs float-end tips" @click="onInvertActionsClicked" title='Set "Else" to be the opposite of "Actions"'>
+                    Invert Actions
+                </button>
             </div>
             <div class="card-body else">
-                <ui-predicate v-model="elseData" :columns="actionsColumns" @changed="onChangeElse" @initialized="onChangeElse"/>
+                <ui-predicate v-if="renderElseComponent" v-model="elseData" :columns="actionsColumns" @changed="onChangeElse" @initialized="onChangeElse"/>
             </div>
         </div>
 
@@ -74,6 +77,35 @@
     import BoolArgument from "./vue_BoolArgument.js";
     import CollectionArgument from "./vue_CollectionArgument.js";
 
+    // validate the targets in case options have changed or fields deleted
+    const getPredicates = function (predicates, thisvue) {
+        return predicates.filter(predicate => {
+            let found = thisvue.actionsColumns.targets.find(target => {
+                if (predicate.target_id === target.target_id) {
+                    return true;
+                }
+            });
+            if (! found) {
+                // try for partial matches - can happen if field options change (from or to a collection)
+                found = thisvue.actionsColumns.targets.find(target => {
+                    if (predicate.target_id.indexOf(target.target_id) > -1 || target.target_id.indexOf(predicate.target_id) > -1) {
+                        return true;
+                    }
+                });
+
+                if (found) {
+                    if (predicate.target_id.indexOf("[]") > -1) {
+                        predicate.target_id = predicate.target_id.replace("[]", "");
+                    } else {
+                        predicate.target_id = predicate.target_id + "[]";
+                    }
+                } else {
+                    console.error("Tracker Field Rules: field " + predicate.target_id + " not found in predicates");
+                }
+            }
+            return found;
+        });
+    };
 
     export default {
         name: "tracker-rules",
@@ -81,6 +113,7 @@
         data()
         {
             return {
+                renderElseComponent: true,
                 conditionsoutput: {},
                 actionoutput: {},
                 elseoutput: {},
@@ -187,6 +220,60 @@
                 event.preventDefault();
                 return false;
             },
+            onInvertActionsClicked(event)
+            {
+                const actions = this.actionoutput.toJSON();
+                const thisvue = this;
+                // clone the actions and set them to the opposites
+                let oppositeActions = { ...actions };
+
+                oppositeActions.predicates.forEach(function (pred) {
+                    switch (pred.operator_id) {
+                        case "Show":
+                            pred.operator_id = "Hide";
+                            break;
+                        case "Hide":
+                            pred.operator_id = "Show";
+                            break;
+                        case "Editable":
+                            pred.operator_id = "NotEditable";
+                            break;
+                        case "NotEditable":
+                            pred.operator_id = "Editable";
+                            break;
+                        case "Required":
+                            pred.operator_id = "NotRequired";
+                            break;
+                        case "NotRequired":
+                            pred.operator_id = "Required";
+                            break;
+                    }
+                });
+
+                // update the else actions
+               const both = thisvue.elseData.predicates.concat(
+                        getPredicates(oppositeActions.predicates, thisvue)
+                );
+
+                thisvue.elseData.predicates = both.filter(function (item, pos) {
+                    const found = both.find((pred, i) => (
+                            pred.argument === item.argument &&
+                            pred.operator_id === item.operator_id &&
+                            pred.target_id === item.target_id
+                    ));
+                    return both.indexOf(found) === pos;
+                });
+
+                // trick to make the component re-mount from https://stackoverflow.com/a/68175735/2459703
+                this.renderElseComponent = false;
+                this.$nextTick(() => {
+                    // Add the component back in
+                    this.renderElseComponent = true;
+                });
+
+                event.preventDefault();
+                return false;
+            }
         },
         beforeMount: function () {
 
@@ -230,35 +317,6 @@
                 thisvue.actionsColumns.targets    = actionsTargets;
             }
 
-            // validate the targets in case options have changed or fields deleted
-            let getPredicates = function (predicates) {
-                return predicates.filter(predicate => {
-                    let found = thisvue.actionsColumns.targets.find(target => {
-                        if (predicate.target_id === target.target_id) {
-                            return true;
-                        }
-                    });
-                    if (! found) {
-                        // try for partial matches - can happen if field options change (from or to a collection)
-                        found = thisvue.actionsColumns.targets.find(target => {
-                            if (predicate.target_id.indexOf(target.target_id) > -1 || target.target_id.indexOf(predicate.target_id) > -1) {
-                                return true;
-                            }
-                        });
-
-                        if (found) {
-                            if (predicate.target_id.indexOf("[]") > -1) {
-                                predicate.target_id = predicate.target_id.replace("[]", "");
-                            } else {
-                                predicate.target_id = predicate.target_id + "[]";
-                            }
-                        } else {
-                            console.error("Tracker Field Rules: field " + predicate.target_id + " not found in predicates");
-                        }
-                    }
-                    return found;
-                });
-            };
 
             let defaultCondition = function () {
                 let operatorId = "";
@@ -290,7 +348,7 @@
                 thisvue.conditionsData = defaultCondition();
             } else {
                 thisvue.conditionsData = thisvue.$parent.rules.conditions;
-                thisvue.conditionsData.predicates = getPredicates(thisvue.$parent.rules.conditions.predicates);
+                thisvue.conditionsData.predicates = getPredicates(thisvue.$parent.rules.conditions.predicates, thisvue);
 
                 if (thisvue.conditionsData.predicates.length === 0) {
                     // we need at least one condition
@@ -300,11 +358,11 @@
 
             if (thisvue.$parent.rules.actions) {
                 thisvue.actionsData = thisvue.$parent.rules.actions;
-                thisvue.actionsData.predicates = getPredicates(thisvue.$parent.rules.actions.predicates);
+                thisvue.actionsData.predicates = getPredicates(thisvue.$parent.rules.actions.predicates, thisvue);
             }
             if (thisvue.$parent.rules.else) {
                 thisvue.elseData = thisvue.$parent.rules.else;
-                thisvue.elseData.predicates = getPredicates(thisvue.$parent.rules.else.predicates);
+                thisvue.elseData.predicates = getPredicates(thisvue.$parent.rules.else.predicates, thisvue);
             }
         }
     };

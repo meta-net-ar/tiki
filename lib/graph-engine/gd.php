@@ -223,6 +223,7 @@ class GD_GRenderer extends GRenderer // {{{1
                 array_shift($parts);
                 break;
             case 'Normal':
+                $style['font'] = 3;
                 array_shift($parts);
                 break;
             default:

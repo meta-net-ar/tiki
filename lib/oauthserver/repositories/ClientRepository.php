@@ -29,7 +29,9 @@ class ClientRepository implements ClientRepositoryInterface
         $sql = $this->database->query('SELECT * FROM ' . self::TABLE);
 
         if ($sql && $sql->result) {
-            $result = array_map([ClientEntity, 'build'], $sql->result);
+            $result = array_map(function ($data) {
+                return self::build($data);
+            }, $sql->result);
         }
 
         return $result;

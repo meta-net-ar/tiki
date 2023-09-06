@@ -6,7 +6,7 @@
 </div>
 <form method="post" action="tiki-edit_css.php" class="form">
     {if $action eq "edit"}
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label for="theme" class="col-form-label">
                 {tr}Theme{/tr}
             </label>
@@ -26,7 +26,7 @@
                 {/remarksbox}
             {/if}
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <textarea data-syntax="css" data-codemirror="true" data-line-numbers="true" name="data" wrap="virtual" class="form-control" rows="24">{$data|escape}</textarea>
         </div>
     {else}
@@ -35,7 +35,7 @@
                 <input type="submit" class="btn btn-link btn-sm" name="cancel_try" value="{tr}Cancel{/tr}">
             {/remarksbox}
         {/if}
-        <div class="mb-3 row clearfix">
+        <div class="tiki-form-group row clearfix">
             <label for="theme" class="col-form-label">
                 {tr}Theme{/tr}
             </label>

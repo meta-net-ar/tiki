@@ -856,7 +856,7 @@ return false;";
                 return true;
             }
         } elseif ($type === 'file gallery') {
-            $file = TikiLib::lib('filegal')->get_file_info($objectId);
+            $file = TikiLib::lib('filegal')->get_file_gallery_info($objectId);
             if ($file != false) {
                 return true;
             }

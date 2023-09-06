@@ -103,6 +103,8 @@ $font-family-sans-serif:      Inter, -apple-system, BlinkMacSystemFont, "Segoe U
 $font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
 $font-size-sm:                $font-size-base * .875 !default;
 
+$headings-color:              inherit !default;
+
 // Components
 
 $box-shadow:                  0 1px 2px rgba($black, .05) !default;
@@ -199,6 +201,14 @@ $card-spacer-x:                     1.5rem !default;
 $card-cap-padding-y:                1rem !default;
 $card-cap-padding-x:                1.5rem !default;
 
+// Popovers
+$popover-bg:                        var(--#{$prefix}body-bg) !default;
+$popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
+$popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
+$popover-header-color:              var(--#{$prefix}body-color); //$headings-color !default;
+$popover-body-color:                var(--#{$prefix}body-color) !default;
+
+
 // Toasts
 
 $toast-header-color:                $headings-color !default;
@@ -220,5 +230,5 @@ $breadcrumb-padding-x:              1rem !default;
 $breadcrumb-divider:                quote(">") !default;
 
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                    $body-color; //     $pink !default; // Bootstrap 5.3
 //--------------------------- Tiki SCSS variables

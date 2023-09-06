@@ -32,7 +32,7 @@
                     <div class="options--group-container">
                         <div class="label-group">
                             <div class="input-group input-group-sm" style="max-width: 100%">
-                                <span class="input-group-text drag-handle">{icon name='sort'}</span>
+                                <span class="input-group-text">{icon name='sort'}</span>
                                 <input type="text" class="field-label form-control" value="" placeholder="{tr}New option{/tr}" readonly="readonly">
                                     <span class="tips input-group-text option-edit" title="|{tr}Check this if the option is an alternative to the previous one.{/tr}">
                                         <input type="checkbox" class="samepos">
@@ -131,7 +131,7 @@
 
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
-                                        <span class="input-group-text drag-handle">{icon name='sort'}</span>
+                                        <span class="input-group-text">{icon name='sort'}</span>
                                         <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
                                         <span class="tips input-group-text option-edit" title="|{tr}Check this if the option is an alternative to the previous one.{/tr}">
                                                 <input type="checkbox" class="samepos"{if $option.position eq $prevpos} checked="checked"{/if}>

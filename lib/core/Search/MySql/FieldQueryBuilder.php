@@ -21,6 +21,9 @@ class Search_MySql_FieldQueryBuilder
             function ($node, $childNodes) use ($factory, &$invert) {
                 if ($node instanceof Token) {
                     $string = $node->getValue($factory)->getValue();
+                    if (is_array($string)) {
+                        $string = implode(' ', $string);
+                    }
                     if (false === strpos($string, ' ')) {
                         return $string;
                     } else {

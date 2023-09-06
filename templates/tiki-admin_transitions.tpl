@@ -172,7 +172,7 @@
                 {/if}
                 <fieldset>
                     <legend>{tr}General{/tr}</legend>
-                    <div class="mb-3 row mt-0">
+                    <div class="tiki-form-group row mt-0">
                         <label class="col-form-label" for="new-transition-name">{tr}Label{/tr}</label>
                         <input type="text" name="label" {if $selected_transition}value="{$selected_transition.name|escape}"{/if} class="form-control">
                     </div>
@@ -260,7 +260,7 @@
                     <h2>{tr}New Guard{/tr}</h2>
                     <fieldset>
                         <legend>{tr}General{/tr}</legend>
-                        <div class="mb-3 row mt-0">
+                        <div class="tiki-form-group row mt-0">
                             <label class="col-form-label" for="guard-type">{tr}Type{/tr}</label>
                             <select id="guard-type" name="type" class="form-control">
                                 <option value="exactly">{tr}Exactly{/tr}</option>
@@ -268,7 +268,7 @@
                                 <option value="atMost">{tr}At Most{/tr}</option>
                             </select>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label for="guard-count" class="col-form-label">{tr}Count{/tr}</label>
                             <input type="text" name="count" class="form-control">
                         </div>

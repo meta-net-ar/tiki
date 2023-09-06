@@ -40,12 +40,12 @@ $smarty->assign_by_ref('history', $history);
 
 $sheetIndexes = [];
 if (isset($_REQUEST['idx_0'])) {
-    $sheetIndexes[0] = $_REQUEST['idx_0'];
+    $sheetIndexes[0] = TikiFilter::get('int')->filter($_REQUEST['idx_0']);
 } else {
     $sheetIndexes[0] = 1; //this sets defalut for initial page load
 }
 if (isset($_REQUEST['idx_1'])) {
-    $sheetIndexes[1] = $_REQUEST['idx_1'];
+    $sheetIndexes[1] = TikiFilter::get('int')->filter($_REQUEST['idx_1']);
 } else {
     $sheetIndexes[1] = 0; //this sets defalut for initial page load
 }

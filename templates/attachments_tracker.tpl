@@ -5,7 +5,7 @@
             <input type="hidden" name="trackerId" value="{$trackerId|escape}">
             <input type="hidden" name="itemId" value="{$itemId|escape}">
             <input type="hidden" name="attId" value="{$attId|escape|default:null}">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="MAX_FILE_SIZE" class="col-md-4 col-form-label">
                     {tr}Upload file{/tr}
                 </label>
@@ -13,7 +13,7 @@
                     {if $attach_file|default:null}{tr}Edit:{/tr} {/if}<input type="hidden" name="MAX_FILE_SIZE" value="1000000000"><input name="userfile1" type="file">{if $attach_file|default:null}<br>{$attach_file|escape}{/if}
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="attach_comment" class="col-md-4 col-form-label">
                     {tr}Comment{/tr}
                 </label>
@@ -21,7 +21,7 @@
                     <input type="text" name="attach_comment" id="attach_comment" maxlength="250" value="{$attach_comment|escape|default:null}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="attach_version" class="col-md-4 col-form-label">
                     {tr}Version{/tr}
                 </label>
@@ -29,7 +29,7 @@
                     <input type="text" name="attach_version" id="attach_version" size="5" maxlength="10" value="{$attach_version|escape|default:null}" class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="attach_longdesc" class="col-md-4 col-form-label">
                     {tr}Description{/tr}
                 </label>

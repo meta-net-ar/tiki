@@ -21,6 +21,8 @@ header.navbar.fixed-top {
 :root {
   --tiki-tooltip-link-color: #88b6fc;
   --tiki-tooltip-link-hover-color: var(--bs-body-bg);
+  --tiki-code-color: var(--bs-body-color);
+  --tiki-code-bg: var(--bs-secondary-bg);
 }
 body {
   background: var(--bs-body-bg);
@@ -56,4 +58,4 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .card-title > a, .card-title > small, .card-title > .small, .card-title > small > a, .card-title > .small > a {
   color: inherit;
 }
-/*# sourceMappingURL=newsletter.css.map */
+

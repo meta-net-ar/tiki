@@ -1,13 +1,13 @@
 {if $prefs.jquery_smartmenus_enable eq 'y'}
     {* Smartmenu megamenu navigation *}
-    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}sm-vertical{/if}">
+    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}sm-vertical flex-column{/if}">
         {foreach from=$list item=item}
             {include file='bootstrap_smartmenu.tpl' item=$item}
         {/foreach}
     </ul>
 {else}
     {* Bootstrap 4 navigation *}
-    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto{/if} {if $module_params.type|default:null eq 'vert'}bs-vertical{/if}">
+    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto{/if} {if $module_params.type|default:null eq 'vert'}bs-vertical flex-column{/if}">
         {foreach from=$list item=item}
             {if not empty($item.children)}
                 {if $module_params.type|default:null eq 'horiz'}

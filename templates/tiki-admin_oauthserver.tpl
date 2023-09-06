@@ -25,7 +25,7 @@
                 <h3>{$entityName}</h3>
             </div>
 
-            <div class="mb-3 col-md-6 col-sm-12 form-group-name">
+            <div class="tiki-form-group col-md-6 col-sm-12 form-group-name">
                 <label for="oauth-name">{tr}Name{/tr}</label>
                 <input type="text" class="form-control"
                     name="name"
@@ -33,7 +33,7 @@
                     />
             </div>
 
-            <div class="mb-3 col-md-6 col-sm-12 form-group-client_id">
+            <div class="tiki-form-group col-md-6 col-sm-12 form-group-client_id">
                 <label for="oauth-client_id">{tr}Client_id{/tr}</label>
                 <input type="text" class="form-control"
                     name="client_id"
@@ -41,7 +41,7 @@
                     />
             </div>
 
-            <div class="mb-3 col-sm-12 form-group-client_secret">
+            <div class="tiki-form-group col-sm-12 form-group-client_secret">
                 <label for="oauth-client_secret">{tr}Client_secret{/tr}</label>
                 <input type="text" class="form-control"
                     name="client_secret"
@@ -50,7 +50,7 @@
                     />
             </div>
 
-            <div class="mb-3 col-sm-12 form-group-redirect_uri">
+            <div class="tiki-form-group col-sm-12 form-group-redirect_uri">
                 <label for="oauth-redirect_uri">{tr}Redirect_uri{/tr}</label>
                 <input type="text" class="form-control"
                     name="redirect_uri"
@@ -58,7 +58,7 @@
                     />
             </div>
 
-            <div class="mb-3 col-sm-12 form-group-user">
+            <div class="tiki-form-group col-sm-12 form-group-user">
                 <label for="user_selector_oauth_server">{tr}User{/tr}</label>
                 <a class="tikihelp text-info" title="{tr}User:{/tr} {tr}When remote machine authenticates using the client secret, which user should the related access token act like?{/tr}">
                     {icon name=information}

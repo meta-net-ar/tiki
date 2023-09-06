@@ -28,4 +28,13 @@ class Tiki_Event_Function_EventSample extends Math_Formula_Function
 
         return 1;
     }
+
+    public function evaluateFull($element)
+    {
+        $recorded = $this->evaluateChild($element[0]);
+        $event = $this->evaluateChild($element[1]);
+        $arguments = $this->evaluateChild($element[2]);
+
+        return 1;
+    }
 }

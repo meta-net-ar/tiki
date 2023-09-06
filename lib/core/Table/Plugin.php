@@ -547,7 +547,10 @@ class Table_Plugin
         //tsfilteroptions
         if (! empty($tsfilteroptions) && ! empty($s['filters']['type'])) {
             $tsfo = Table_Check::parseParam($tsfilteroptions);
-            switch ($tsfo[0]['type']) {
+            if (is_array($tsfo) && is_array($tsfo[0])) {
+                $tsfo = $tsfo[0]['type'];
+            }
+            switch ($tsfo) {
                 case 'reset':
                     $s['filters']['type'] = 'reset';
                     break;

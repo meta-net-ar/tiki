@@ -13,7 +13,7 @@
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
         <form method="post" action="{service controller=manager action=upgrade}" id="tiki-manager-upgrade-instance">
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Instances{/tr}
                     <a class="tikihelp text-info"
@@ -29,7 +29,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Tiki Version{/tr}
                     <a class="tikihelp text-info"
@@ -46,7 +46,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Check{/tr}
                     <a class="tikihelp text-info"
@@ -60,7 +60,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Skip Reindex{/tr}
                     <a class="tikihelp text-info"
@@ -74,7 +74,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Skip cache warmup{/tr}
                     <a class="tikihelp text-info"
@@ -88,7 +88,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Live reindex{/tr}
                     <a class="tikihelp text-info"
@@ -102,7 +102,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Lag{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.lag}{/tr}">
@@ -113,7 +113,7 @@
                     <input value="0" class="form-control" type="number" id="lag" name="lag" min="0" max="30">
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Stash{/tr}
                     <a class="tikihelp text-info"
@@ -127,7 +127,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Ignore requirements{/tr}
                     <a class="tikihelp text-info"
@@ -141,7 +141,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="upgrade" value="{tr}Upgrade{/tr}">

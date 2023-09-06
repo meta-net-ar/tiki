@@ -72,8 +72,9 @@ class Services_Diagram_Controller
         if (! empty($input->ticketsAmount->int())) {
             $payload['new_tickets'] = [];
             $accesslib = TikiLib::lib('access');
+            $limit = min($input->ticketsAmount->int(), 100) ;
 
-            for ($i = 0; $i < $input->ticketsAmount->int(); $i++) {
+            for ($i = 0; $i < $limit; $i++) {
                 $accesslib->setTicket();
                 $payload['new_tickets'][] = $accesslib->getTicket();
             }

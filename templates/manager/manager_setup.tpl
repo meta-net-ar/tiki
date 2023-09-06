@@ -13,7 +13,7 @@
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
         <form method="post" action="{service controller=manager action=$inputValues['action']}" id="tiki-manager-{$inputValues['event']}">
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Time for {$inputValues['event']}{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.time}{/tr}">
@@ -24,7 +24,7 @@
                     <input required value="" class="form-control" id="time" type="time" name="time">
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {if $inputValues['action'] == 'manager_backup'}
                         {tr}Instances to be excluded{/tr}
@@ -47,7 +47,7 @@
                     <div class="form-text">{tr}Use Ctrl+Click or Command+Click to select multiple instances{/tr}</div>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Email{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.email}{/tr}">
@@ -60,7 +60,7 @@
                 </div>
             </div>
             {if  $inputValues['action'] == 'manager_backup' }
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Max number of backups to keep{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help['max-backups']}{/tr}">
@@ -72,7 +72,7 @@
                 </div>
             </div>
             {/if}
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="{$inputValues['event']}" value="{tr}Creat Cron Job{/tr}">

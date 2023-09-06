@@ -41,6 +41,16 @@ class Services_Payment_Controller
             throw new Services_Exception_Denied(tr('Reserved for payment administrators'));
         }
 
+        $next_url = parse_url($input->next->utl());
+
+        if (! isset($next_url['host'])) {
+            throw new Services_Exception_Denied(tr('Redirection URL is not valid'));
+        }
+
+        if ($next_url['host'] !== $_SERVER['HTTP_HOST']) {
+            throw new Services_Exception_Denied(tr('Redirection URL not allowed'));
+        }
+
         $paymentlib = TikiLib::lib('payment');
         $paymentlib->capture_payment($input->paymentId->int());
 

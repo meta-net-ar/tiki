@@ -63,16 +63,39 @@ class Search_GlobalSource_PermissionSource implements Search_GlobalSource_Interf
             $groups = array_merge($groups, $this->getAllowedGroups($accessor, $viewPermission));
         }
 
+        // comment view permission is an intersection between comment's parent object view permission and the read comment permission on that object type
+        // Examples:
+        // can view tracker item AND can read comments => yes
+        // can view tracker item BUT can't read comments => no
+        // can't view tracker item BUT can read comments => no (this used to be 'yes' before Aug, 2023)
+        // can't view tracker item AND can't read comments => no
+        if (isset($data['parent_view_permission'])) {
+            $viewPermission = is_object($data['parent_view_permission']) ? $data['parent_view_permission']->getValue() : $data['parent_view_permission'];
+
+            if (isset($data['_permission_accessor'])) {
+                $accessor = $data['_permission_accessor'];
+            } else {
+                $accessor = $this->perms->getAccessor(
+                    [
+                        'type' => $objectType,
+                        'object' => $objectId,
+                    ]
+                );
+            }
+
+            $groups = array_intersect($groups, $this->getAllowedGroups($accessor, $viewPermission));
+        }
+
+        if (! empty($data['_extra_groups'])) {
+            $groups = array_merge($groups, $data['_extra_groups']);
+        }
+
         // Used for comments - must see the parent view permission in addition to a global permission to view comments
         if (isset($data['global_view_permission'])) {
             $globalPermission = $data['global_view_permission'];
             $globalPermission = $globalPermission->getValue();
             $groups = $this->getGroupExpansion($groups);
             $groups = $this->filterWithGlobalPermission($groups, $globalPermission);
-        }
-
-        if (! empty($data['_extra_groups'])) {
-            $groups = array_merge($groups, $data['_extra_groups']);
         }
 
         return [

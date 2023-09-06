@@ -748,6 +748,23 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
+        'feature_banning_attempts' => [
+            'name' => tra('Attempts number'),
+            'description' => tra('Number of attempts user is allowed to login incorrectly before banning them from further attempts.'),
+            'dependencies' => ['feature_banning'],
+            'type' => 'text',
+            'filter' => 'digits',
+            'size' => 2,
+            'default' => 5
+        ],
+        'feature_banning_duration' => [
+            'name' => tra('Banning system'),
+            'description' => tra('The duration of the incorrect login attempts ban in minutes.'),
+            'dependencies' => ['feature_banning'],
+            'type' => 'text',
+            'filter' => 'digits',
+            'default' => 30
+        ],
         'feature_stats' => [
             'name' => tra('Stats'),
             'description' => tra('Record basic statistics about major Tiki features (number of wiki pages, size of file galleries, etc.)'),

@@ -237,9 +237,7 @@ function wikiplugin_googledoc($data, $params)
     if ($editLink == 'both' or $editLink == 'top') {
         $ret .= $editHtml;
     }
-
-    $ret .= '<iframe ';
-    $ret .= " name=\"$frameName\"";
+    $ret .= "~np~<iframe  name=\"$frameName\"";
 
     if (isset($size)) {
         if ($size == 'small') {
@@ -283,7 +281,7 @@ function wikiplugin_googledoc($data, $params)
         $ret .= " scrolling=\"$scrolling\"";
     }
     if (isset($key)) {
-        $ret .= " src=$srcUrl></iframe>";
+        $ret .= " src=$srcUrl></iframe>~/np~";
     }
     if ($editLink == 'both' or $editLink == 'bottom') {
         $ret .= $editHtml;

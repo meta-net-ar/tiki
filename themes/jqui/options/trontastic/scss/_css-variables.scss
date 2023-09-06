@@ -3,24 +3,28 @@
     --tiki-top-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
     --tiki-top-color: #000;
     --tiki-top-hover-color: #2c2c2c;
+    --tiki-top-text-color: #2c2c2c;
 }
 
 .tiki-topbar-nav-light {
     --tiki-topbar-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
     --tiki-topbar-color: #000;
     --tiki-topbar-hover-color: #2c2c2c;
+    --tiki-topbar-text-color: #2c2c2c;
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
     --tiki-top-color: #b8ec79;
     --tiki-top-hover-color: #c8f197;
+    --tiki-top-text-color: #c8f197;
 }
 
 .tiki-topbar-nav-dark {
     --tiki-topbar-bg: linear-gradient(to bottom, #4c4c4c 0%,#4c4c4c 18%,#404040 52%,#232323 53%,#090909 93%,#070707 99%,#000000 100%);
     --tiki-topbar-color: #b8ec79;
     --tiki-topbar-hover-color: #c8f197;
+    --tiki-topbar-text-color: #c8f197;
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
@@ -70,21 +74,11 @@
 }
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
-//.tiki-admin {
-//    --tiki-admin-navbar-dark-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%) !important;
-//    --tiki-admin-dropdown-dark-color: #{$dropdown-dark-color};
-//    --tiki-admin-dropdown-dark-hover-bg: #{$dropdown-dark-link-hover-bg};
-//    --tiki-admin-dropdown-dark-bg: #{$dropdown-dark-bg};
-//    --tiki-admin-navbar-light-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
-//    --tiki-admin-dropdown-light-color: #b8ec79;
-//    --tiki-admin-dropdown-light-hover-color: #c8f197;
-//    --tiki-admin-dropdown-light-bg: #{$dropdown-bg};
-//    --tiki-admin-toggle-light-bg: #{$dropdown-bg};
-//    --tiki-admin-navbar-dark-highlight-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
-//    --tiki-admin-navbar-dark-highlight-color: #{$dropdown-link-hover-color};
-//    --tiki-admin-navbar-light-highlight-bg: #{$dropdown-link-hover-bg};
-//    --tiki-admin-navbar-light-highlight-color: #{$dropdown-link-hover-color};
-//}
+
+:root,
+[data-bs-theme="dark"]{
+    --tiki-code-bg: #303030;
+}
 
 .fc {
     --fc-page-bg-color: #000;

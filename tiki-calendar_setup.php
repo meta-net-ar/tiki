@@ -59,6 +59,11 @@ if (! empty($_REQUEST['day']) && ! empty($_REQUEST['mon']) && ! empty($_REQUEST[
 }
 
 $focusdate = $_REQUEST['todate'];
+if ($focusdate && isset($_REQUEST['tzoffset'])) {
+    $focusdate = TikiDate::convertWithTimezone($_REQUEST, $focusdate);
+    $server_offset = TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $focusdate);
+    $focusdate -= $server_offset;
+}
 $focusDay = TikiLib::date_format("%d", $focusdate);
 $focusMonth = TikiLib::date_format("%m", $focusdate);
 $focusYear = TikiLib::date_format("%Y", $focusdate);
@@ -438,15 +443,13 @@ $smarty->assign(
     'fullCalendarParams',
     [
         'firstDayofWeek'   => $firstDayofWeek,
-        'viewmonth'        => $focus_month,
-        'viewday'          => $focus_day,
-        'viewyear'         => $focus_year,
         'display_timezone' => $prefs['display_timezone'],
         'language'         => $prefs['language'],
         'minHourOfDay'     => $minHourOfDay,
         'maxHourOfDay'     => $maxHourOfDay,
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
+        'initialDate'      => "$focus_year-$focus_month-$focus_day",
     ]
 );
 

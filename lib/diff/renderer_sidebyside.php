@@ -118,8 +118,8 @@ class Text_Diff_Renderer_sidebyside extends Tiki_Text_Diff_Renderer
     protected function _changed($orig, $final)
     {
         $lines = diffChar($orig, $final, $this->words);
-        $this->_deleted([$lines[0]], true);
-        $this->_added([$lines[1]], true);
+        $this->_deleted(preg_split('/<br[ \/]*>/', $lines[0]), true);
+        $this->_added(preg_split('/<br[ \/]*>/', $lines[1]), true);
 /* switch with these lines for no character diff
         $this->_deleted($orig, TRUE);
         $this->_added($final, TRUE);

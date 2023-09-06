@@ -316,6 +316,7 @@
             <br>
             {preference name=federated_enabled}
             {preference name=federated_elastic_url}
+            {preference name=federated_manticore_index_prefix}
 
             <legend>{tr}Configuration{/tr}</legend>
             <ul>

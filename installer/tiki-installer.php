@@ -23,6 +23,7 @@ $inputConfiguration = [
             'admin_account' => 'striptags',
             'admin_email' => 'striptags',
             'browsertitle' => 'striptags',
+            'server_domain' => 'striptags',
             'convert_to_utf8' => 'xss',
             'db' => 'alpha',
             'dbinfo' => 'alpha',
@@ -216,6 +217,7 @@ $smarty->assign('mid', 'tiki-install.tpl');
 $smarty->assign('virt', isset($virt) ? $virt : null);
 $smarty->assign('multi', isset($multi) ? $multi : null);
 $smarty->assign('lang', $language);
+$smarty->assign('default_server_domain_name', isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
 
 // Try to set a longer execution time for the installer
 @ini_set('max_execution_time', '0');
@@ -708,7 +710,7 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
 
     $installer->query(
         "DELETE FROM `tiki_preferences` WHERE `name` IN " .
-        "('browsertitle', 'sender_email', 'https_login', 'https_port', " .
+        "('browsertitle', 'server_domain', 'sender_email', 'https_login', 'https_port', " .
         "'feature_switch_ssl_mode', 'feature_show_stay_in_ssl_mode', 'language'," .
         "'use_proxy', 'proxy_host', 'proxy_port', 'proxy_user', 'proxy_pass'," .
         "'error_reporting_level', 'error_reporting_adminonly', 'smarty_notice_reporting', 'log_tpl')"
@@ -716,6 +718,7 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
 
     $query = "INSERT INTO `tiki_preferences` (`name`, `value`) VALUES"
         . " ('browsertitle', ?),"
+        . " ('server_domain', ?),"
         . " ('sender_email', ?),"
         . " ('https_login', ?),"
         . " ('https_port', ?),"
@@ -736,7 +739,7 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
         . " ('language', ?)";
 
 
-    $installer->query($query, [$_POST['browsertitle'], $_POST['sender_email'], $_POST['https_login'],
+    $installer->query($query, [$_POST['browsertitle'], $_POST['server_domain'], $_POST['sender_email'], $_POST['https_login'],
         $_POST['https_port'], $_POST['error_reporting_level'], $language]);
     $installer->query("UPDATE `users_users` SET `email` = ? WHERE `users_users`.`userId`=1", [$_POST['admin_email']]);
     $logslib->add_log('install', 'updated preferences for browser title, sender email, https and SSL, '

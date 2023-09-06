@@ -78,8 +78,8 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['--foo--', "<strike>foo</strike><br />"],  // strike out
             ['-- foo --', "-- foo --<br />"],   // not parsed
 
-            ['[foo]', '<a class="wiki"  href="foo" rel="" title="External link">foo</a><br />'], // link
-            ['[foo|bar]', '<a class="wiki"  href="foo" rel="" title="External link: bar">bar</a><br />'], // link
+            ['[foo]', '<a class="wiki"   href="foo" rel="">foo</a><br />'], // link
+            ['[foo|bar]', '<a class="wiki"   href="foo" rel="">bar</a><br />'], // link
 
             ['[[foo', '[foo<br />'], // Square brackets
             ['[[foo]]', '[[foo]]<br />'], // Square brackets

@@ -58,6 +58,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'title' => [
+                'required' => false,
                 'name' => tra('Module Title'),
                 'description' => tr(
                     'Title to display at the top of the box, assuming No Title is not set to Yes (%0y%1).',
@@ -107,6 +108,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'nobox' => [
+                'required' => false,
                 'name' => tra('No Box'),
                 'description' => 'y|n ' . tra('Show only the content with no title or borders, etc. around the content.'),
                 'since' => '9.0',
@@ -176,6 +178,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'style' => [
+                'required' => false,
                 'name' => tra('Style'),
                 'description' => tra('CSS styling for the module data itself.'),
                 'since' => '9.0',
@@ -185,6 +188,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'topclass' => [
+                'required' => false,
                 'name' => tra('Containing Class'),
                 'description' => tra('Custom CSS class of div around the module.'),
                 'since' => '9.0',
@@ -194,6 +198,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'class' => [
+                'required' => false,
                 'name' => tra('Class'),
                 'description' => tra('Custom CSS class.'),
                 'since' => '9.0',
@@ -203,6 +208,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'device' => [
+                'required' => false,
                 'name' => tra('Display on device'),
                 'description' => tra('On which device the module must be displayed, by default it is displayed on all devices.'),
                 'since' => '24',
@@ -211,6 +217,7 @@ function wikiplugin_module_info()
                 'advanced' => true
             ],
             'category' => [
+                'required' => false,
                 'name' => tra('Category'),
                 'description' => tra('Module displayed depending on category. Multiple category ids or names can be
                     separated by semi-colons.'),
@@ -221,6 +228,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'nocategory' => [
+                'required' => false,
                 'name' => tra('No Category'),
                 'description' => tra('Module hidden depending on category. Multiple category ids or names can be
                     separated by semi-colons. This takes precedence over the category parameter above.'),
@@ -231,6 +239,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'perspective' => [
+                'required' => false,
                 'name' => tra('Perspective'),
                 'description' => tra('Only display the module if in one of the listed perspective IDs. Semi-colon
                     separated.'),
@@ -241,6 +250,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'lang' => [
+                'required' => false,
                 'name' => tra('Language'),
                 'description' => tra('Module only applicable for the specified languages. Languages are defined as two
                     character language codes. Multiple values can be separated by semi-colons.'),
@@ -251,6 +261,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'section' => [
+                'required' => false,
                 'name' => tra('Section'),
                 'description' => tra('Module only applicable for the specified sections. Multiple values can be
                     separated by semi-colons.'),
@@ -261,6 +272,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'page' => [
+                'required' => false,
                 'name' => tra('Page Filter'),
                 'description' => tra('Module only applicable on the specified page names. Multiple values can be
                     separated by semi-colons.'),
@@ -271,6 +283,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'nopage' => [
+                'required' => false,
                 'name' => tra('No Page'),
                 'description' => tra('Module not applicable on the specified page names. Multiple values can be
                     separated by semi-colons.'),
@@ -281,6 +294,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'theme' => [
+                'required' => false,
                 'name' => tra('Theme'),
                 'description' => tr('Module enabled or disabled depending on the theme file name (e.g.
                     %0thenews.css%1). Specified themes can be either included or excluded. Theme names prefixed by %0!%1
@@ -292,6 +306,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'creator' => [
+                'required' => false,
                 'name' => tra('Creator'),
                 'description' => tr('Module only available based on the relationship of the user with the wiki page.
                     Either only creators (%0y%1) or only non-creators (%0n%1) will see the module.', '<code>', '</code>'),
@@ -301,6 +316,7 @@ function wikiplugin_module_info()
                 'advanced' => true,
             ],
             'contributor' => [
+                'required' => false,
                 'name' => tra('Contributor'),
                 'description' => tra(
                     'Module only available based on the relationship of the user with the wiki page.

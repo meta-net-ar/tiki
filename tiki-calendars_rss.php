@@ -57,8 +57,9 @@ if ($output["data"] == "EMPTY") {
     }
 
     $maxCalEntries = $prefs['feed_calendar_max'];
+    $publishDate = $tikilib->now;
     $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $publishDate));
-    $items = $calendarlib->list_raw_items($calendars, "", $tikilib->now, $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1), 0, $maxCalEntries);
+    $items = $calendarlib->list_raw_items($calendars, "", $publishDate, $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1), 0, $maxCalEntries);
 
     require_once("lib/smarty_tiki/modifier.tiki_short_datetime.php");
     require_once("lib/smarty_tiki/modifier.tiki_long_datetime.php");

@@ -4,11 +4,11 @@
             <a href="tiki-backlinks.php?page={$page|escape:url}" title="{tr}backlinks to{/tr} {$page|escape}">{$page|escape}</a>
         </h1>
     {/if}
-    {if !$is_slideshow eq 'y'}
+    {if isset($is_slideshow) && !$is_slideshow eq 'y'}
         <div class="wikitext">
     {/if}
 {/strip}{$parsed}
-{if !$is_slideshow eq 'y'}
+{if isset($is_slideshow) && !$is_slideshow eq 'y'}
     </div>
 {/if}
 {if !isset($smarty.request.clean)}
@@ -49,6 +49,6 @@
         {include file='tiki-page_bar.tpl'}
     {/if}
 {/if}
-{if $is_slideshow eq 'y'}
+{if isset($is_slideshow) && $is_slideshow eq 'y'}
 <style>[hidden] {ldelim}display: block !important;{rdelim}</style>
 {/if}

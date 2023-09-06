@@ -147,7 +147,7 @@ class Services_Group_Controller
                 Feedback::success($feedback2);
             }
             //return to page
-            return Services_Utilities::refresh($util->extra['referer']);
+            return Services_Utilities::refresh($util->extra['referer'], 'anchor');
         }
     }
 
@@ -485,7 +485,7 @@ class Services_Group_Controller
                 Feedback::success($feedback);
             }
             //return to page
-            return Services_Utilities::refresh($util->extra['referer']);
+            return Services_Utilities::refresh($util->extra['referer'], 'anchor');
         }
     }
 
@@ -576,7 +576,7 @@ class Services_Group_Controller
                 Feedback::success($feedback);
             }
             //return to page
-            return Services_Utilities::refresh($util->extra['referer']);
+            return Services_Utilities::refresh($util->extra['referer'], 'anchor');
         }
     }
 
@@ -663,7 +663,7 @@ class Services_Group_Controller
                 Feedback::success($feedback);
             }
             //return to page
-            return Services_Utilities::refresh($util->extra['referer']);
+            return Services_Utilities::refresh($util->extra['referer'], 'anchor');
         }
     }
 

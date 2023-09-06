@@ -14,9 +14,9 @@ function smarty_function_object_link($params, $smarty)
         $type = $params['type'];
         $object = $params['id'];
     } else {
-        $identifier = explode(':', $params['identifier'], 2);
-        if (count($identifier) != 2) {
-            return tra('No object information provided.');
+        $identifier = isset($params['identifier']) ? explode(':', $params['identifier'], 2) : null;
+        if (is_countable($identifier) && count($identifier) != 2) {
+            return tra('Unable to parse object information provided.');
         }
         list($type, $object) = $identifier;
     }
@@ -352,7 +352,7 @@ function smarty_function_object_link_forumpost($smarty, $object, $title = null, 
 
     while (empty($comment['title'])) {
         $parent = $commentslib->get_comment($comment['parentId']);
-        $comment['title'] = $parent['title'];
+        $comment['title'] = is_array($parent) ? ($parent['title'] ?? '') : '';
         if ($parent['parentId'] == 0) {
             break;
         }

@@ -43,19 +43,7 @@ class ConsoleApplicationBuilder
      */
     protected const ACTION_NOT_CALLABLE = 4;
 
-    protected static $lastInstance;
-
-    public function __construct($statusCode = 1100)
-    {
-        /**
-         * Define our constants, based on what error (if any) was thrown
-         * @see $statusCode For explanations on what these constants these do.
-         */
-        define('DB_RUNNING', $statusCode > 1001);
-        define('DB_STATUS', $statusCode > 1002);
-        define('DB_TIKI_SETUP', $statusCode > 1003);
-        define('DB_SYNCHRONAL', $statusCode > 1004);
-    }
+    private static $lastInstance;
 
     /**
      * List of commands registered on the console
@@ -511,13 +499,22 @@ class ConsoleApplicationBuilder
      * @param boolean $returnLastInstance
      * @return Application
      */
-    public function create(bool $returnLastInstance = false): Application
+    public function create($statusCode = 1100): Application
     {
         global $tikipath;
 
-        if ($returnLastInstance && self::$lastInstance instanceof self) {
+        if (self::$lastInstance) {
             return self::$lastInstance;
         }
+
+        /**
+         * Define our constants, based on what error (if any) was thrown
+         * @see $statusCode For explanations on what these constants these do.
+         */
+        define('DB_RUNNING', $statusCode > 1001);
+        define('DB_STATUS', $statusCode > 1002);
+        define('DB_TIKI_SETUP', $statusCode > 1003);
+        define('DB_SYNCHRONAL', $statusCode > 1004);
 
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();

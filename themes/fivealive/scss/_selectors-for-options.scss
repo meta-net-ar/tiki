@@ -38,24 +38,24 @@ body.layout_social.tiki.navbar-padding {
 //    padding: 30px;
 //}
 
-a,
-.btn-link,
-.page-link {
-    color: $link-color;
-}
+//a,
+//.btn-link,
+//.page-link {
+//    color: $link-color;
+//}
+//
+//a:hover,
+//.btn-link:hover,
+//a:focus,
+//.btn-link:focus {
+//    color: $link-hover-color;
+//}
 
-a:hover,
-.btn-link:hover,
-a:focus,
-.btn-link:focus {
-    color: $link-hover-color;
-}
-
-.nav-tabs .nav-link {
-    color: $input-color;
-    background-color: $input-bg;
-    border-color: $input-border-top-color $input-border-left-color #ffffff;
-}
+//.nav-tabs .nav-link {
+//    color: $input-color;
+//    background-color: $input-bg;
+//    border-color: $input-border-top-color $input-border-left-color #ffffff;
+//}
 
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
 .tiki .wiki.external + .icon-link-external, // wikitext
@@ -112,114 +112,112 @@ hr {
     border: 1px solid $input-border-color;
 }
 
-.navbar-dark a,
-.navbar-dark .navbar-brand,
-.dropdown-item,
-.dropdown-item a,
-.dropdown-menu .tikihelp {
-    color: $navbar-dark-color;
-}
+//.navbar-dark a,
+//.navbar-dark .navbar-brand,
+//.dropdown-item,
+//.dropdown-item a,
+//.dropdown-menu .tikihelp {
+//    color: $navbar-dark-color;
+//}
+//
+//.navbar-dark a:hover,
+//.navbar-dark .navbar-brand:hover,
+//.navbar-dark .navbar-brand:focus {
+//    color: $navbar-dark-hover-color;
+//    background-color: transparent;
+//}
+//
+//.navbar-dark a:hover,
+//.navbar-dark a:focus {
+//    color: $navbar-dark-hover-color;
+////    background-color: $bg-dark-link-hover-bg;
+//}
+//
+//.navbar-dark .active a,
+//.navbar-dark .active a:hover,
+//.navbar-dark .active a:focus {
+//    color: $navbar-dark-active-color;
+//    //  background-color: #063065;
+//}
+//
+//.navbar-dark .disabled a,
+//.navbar-dark .disabled a:hover,
+//.navbar-dark .disabled a:focus {
+//    color: $navbar-dark-disabled-color;
+//    background-color: transparent;
+//}
+//
+//.navbar-dark .navbar-toggle {
+//    border-color: #dddddd;
+//}
+//
+//.navbar-dark .navbar-toggle:hover,
+//.navbar-dark .navbar-toggle:focus {
+//    background-color: #dddddd;
+//}
+//
+//.navbar-dark .navbar-toggle .icon-bar {
+//    background-color: #888888;
+//}
+//
+//.navbar-dark .navbar-collapse,
+//.navbar-dark .navbar-form {
+//    border-color: transparent;
+//}
+//nav:not(.topbar_modules,.top_modules) {
+//    &.navbar-dark .open > a,
+//    &.navbar-dark .open > a:hover,
+//    &.navbar-dark .open > a:focus {
+//    //  background-color: #14899e;
+//    color: $navbar-dark-color;
+//    }
+//}
 
-.navbar-dark a:hover,
-.navbar-dark .navbar-brand:hover,
-.navbar-dark .navbar-brand:focus {
-    color: $navbar-dark-hover-color;
-    background-color: transparent;
-}
+//.navbar-dark .navbar-link:hover {
+//    color: #f9f9f9;
+//}
+//
+//.navbar .navbar {
+//    background: transparent !important;
+//}
 
-.navbar-dark a:hover,
-.navbar-dark a:focus {
-    color: $navbar-dark-hover-color;
-//    background-color: $bg-dark-link-hover-bg;
-}
+//.dropdown-menu {
+//    background-color: $dropdown-bg; //#005064;
+//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
+//}
 
-.navbar-dark .active a,
-.navbar-dark .active a:hover,
-.navbar-dark .active a:focus {
-    color: $navbar-dark-active-color;
-    //  background-color: #063065;
-}
-
-.navbar-dark .disabled a,
-.navbar-dark .disabled a:hover,
-.navbar-dark .disabled a:focus {
-    color: $navbar-dark-disabled-color;
-    background-color: transparent;
-}
-
-.navbar-dark .navbar-toggle {
-    border-color: #dddddd;
-}
-
-.navbar-dark .navbar-toggle:hover,
-.navbar-dark .navbar-toggle:focus {
-    background-color: #dddddd;
-}
-
-.navbar-dark .navbar-toggle .icon-bar {
-    background-color: #888888;
-}
-
-.navbar-dark .navbar-collapse,
-.navbar-dark .navbar-form {
-    border-color: transparent;
-}
-nav:not(.topbar_modules,.top_modules) {
-    &.navbar-dark .open > a,
-    &.navbar-dark .open > a:hover,
-    &.navbar-dark .open > a:focus {
-    //  background-color: #14899e;
-    color: $navbar-dark-color;
-    }
-}
-
-.navbar-dark .navbar-link:hover {
-    color: #f9f9f9;
-}
-
-.navbar .navbar {
-    background: transparent !important;
-}
-
-.dropdown-menu {
-    background-color: $dropdown-bg; //#005064;
-    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-}
-
-.tiki .dropdown-item,
-.tiki .dropdown-item a,
-.tiki .dropdown-item .btn.btn-link {
-    color: $dropdown-link-color;
-    &:hover,
-    &:focus {
-        color: $dropdown-link-hover-color;
-        background: $dropdown-link-hover-bg;
-    }
-    &:active,
-    &.active {
-        color: $dropdown-link-hover-color;
-        background: $dropdown-link-active-bg;
-    }
-    &.disabled,
-    &:disabled {
-        color: $dropdown-link-disabled-color;
-    }
-    .dropdown-header {
-        color: $dropdown-header-color;
-    }
-    .dropdown-divider {
-        background: $dropdown-divider-bg;
-    }
-}
-
-.dropdown-item.btn-link { color: #fff; }
-
-.nav-pills > li.active > a,
-.nav-pills > li.active > a:hover,
-.nav-pills > li.active > a:focus {
-    color: #ffffff;
-    background-color: $nav-pills-link-active-bg; //#0b8a98;
-}
+//.tiki .dropdown-item,
+//.tiki .dropdown-item a,
+//.tiki .dropdown-item .btn.btn-link {
+//    color: $dropdown-link-color;
+//    &:hover,
+//    &:focus {
+//        color: $dropdown-link-hover-color;
+//        background: $dropdown-link-hover-bg;
+//    }
+//    &:active,
+//    &.active {
+//        color: $dropdown-link-hover-color;
+//        background: $dropdown-link-active-bg;
+//    }
+//    &.disabled,
+//    &:disabled {
+//        color: $dropdown-link-disabled-color;
+//    }
+//    .dropdown-header {
+//        color: $dropdown-header-color;
+//    }
+//    .dropdown-divider {
+//        background: $dropdown-divider-bg;
+//    }
+//}
+//
+//.nav-pills > li.active > a,
+////.nav-pills > li.active > a:hover,
+//.nav-pills > li.active > a:focus {
+//    color: #ffffff;
+//    background-color: $nav-pills-link-active-bg; //#0b8a98;
+//}
 
 // Pagination
 .pagination > li > a:hover,
@@ -339,10 +337,6 @@ textarea,
 
 .postbody-title .card-title {
     color: $postbody-title-card-title-color;
-}
-
-.siteloginbar_popup .dropdown-menu > li > a {
-    color: #ffffff;
 }
 
 header.header .sitetitle,

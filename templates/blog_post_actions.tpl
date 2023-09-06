@@ -21,7 +21,7 @@
                     </a>
             {/if}
             {if $tiki_p_admin eq 'y' || $tiki_p_assign_perm_blog eq 'y'}
-                <span class="dropdown-item">{permission_link mode=text type="blog" permType="blogs" id=$post_info.blogId}</span>
+                <span class="dropdown-item">{permission_link mode=text type="blog post" permType="blogs" id=$post_info.postId parentId=$post_info.blogId}</span>
             {/if}
             {if $user and $prefs.feature_notepad eq 'y' and $tiki_p_notepad eq 'y'}
                     {if $blog_post_context eq 'view_blog'}

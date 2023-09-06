@@ -3,24 +3,32 @@
     --tiki-top-bg: #EBD6F9B3;
     --tiki-top-color: rgba(52, 58, 64, 0.8);
     --tiki-top-hover-color: #343a40;
+    --tiki-top-text-color: #343a40;
+    --bs-navbar-brand-color: #{$navbar-light-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
 
 .tiki-topbar-nav-light {
     --tiki-topbar-bg: rgba(233, 233, 232, 1);
     --tiki-topbar-color: rgba(52, 58, 64, 0.8);
     --tiki-topbar-hover-color: #343a40;
+    --tiki-topbar-text-color: #343a40;
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: rgba(232, 50, 131, 1);
     --tiki-top-color: rgba(255, 255, 255, 0.8);
     --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
+    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 .tiki-topbar-nav-dark {
     --tiki-topbar-bg: rgba(232, 50, 131, 1);
     --tiki-topbar-color: rgba(255, 255, 255, 0.8);
     --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
@@ -69,6 +77,7 @@
 
 [data-bs-theme="light"] {
     --tiki-quartz-body-bg-image: #{$body-bg-image};
+    --bs-secondary-bg: linear-gradient(125deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2) 70%);
 }
 
 [data-bs-theme="dark"] {

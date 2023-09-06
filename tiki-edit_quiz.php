@@ -43,10 +43,10 @@ $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $info["publi
 $info["expireDate"] = $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1);
 $info["canRepeat"] = 'n';
 $info["storeResults"] = 'n';
-/*$info["immediateFeedback"] = 'n';
+$info["immediateFeedback"] = 'n';
 $info["showAnswers"] = 'n';
 $info["shuffleQuestions"] = 'n';
-$info["shuffleAnswers"] = 'n';*/
+$info["shuffleAnswers"] = 'n';
 $info["questionsPerPage"] = 10;
 $info["timeLimited"] = 'n';
 $info["passingperct"] = '';
@@ -78,7 +78,7 @@ if (isset($_REQUEST["save"])) {
         $_REQUEST["storeResults"] = 'n';
     }
 
-/*  if (isset($_REQUEST["immediateFeedback"]) && $_REQUEST["immediateFeedback"] == 'on') {
+    if (isset($_REQUEST["immediateFeedback"]) && $_REQUEST["immediateFeedback"] == 'on') {
         $_REQUEST["immediateFeedback"] = 'y';
     } else {
         $_REQUEST["immediateFeedback"] = 'n';
@@ -100,7 +100,7 @@ if (isset($_REQUEST["save"])) {
         $_REQUEST["shuffleAnswers"] = 'y';
     } else {
         $_REQUEST["shuffleAnswers"] = 'n';
-    }*/
+    }
 
     if (isset($_REQUEST["timeLimited"]) && $_REQUEST["timeLimited"] == 'on') {
         $_REQUEST["timeLimited"] = 'y';

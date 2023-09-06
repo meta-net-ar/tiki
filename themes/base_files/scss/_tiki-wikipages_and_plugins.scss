@@ -590,6 +590,9 @@ li .url-group {
     }
 }
 
+.new-option * {
+    cursor: move;
+}
 
 // /* Fullscreen textareas */
 .TextArea-fullscreen {

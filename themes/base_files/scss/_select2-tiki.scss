@@ -4,5 +4,7 @@
 .tiki .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__clear {
     position: absolute;
     top: 50%;
-    right: 3em; // increased from 2.25rem to increase space between "x" and "v" icons.
+    right: 2.75rem; // increased from 2.25rem to increase space between "x" and "v" icons.
+    height: 0.5rem;
+    width: 0.5rem;
 }

@@ -6,7 +6,7 @@
         {ticket}
         <input type="hidden" name="to" value="{$prefs.contact_user|escape}">
         {if $prefs.contact_priority_onoff eq 'y'}
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="priority" class="col-sm-3 col-form-label">{tr}Priority:{/tr}</label>
                 <div class="col-sm-9">
                     <select id="priority" name="priority" class="form-select">
@@ -20,20 +20,20 @@
             </div>
         {/if}
         {if $user eq ''}
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="from" class="col-sm-3 col-form-label">{tr}Your email:{/tr}</label>
                 <div class="col-sm-9">
                     <input type="text" id="from" name="from" value="{$from|escape}" class="form-control">
                 </div>
             </div>
         {/if}
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label for="subject" class="col-sm-3 col-form-label">{tr}Subject:{/tr}</label>
             <div class="col-sm-9">
                 <input type="text" id="subject" name="subject" value="{$subject|escape}" class="form-control">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label for="body" class="col-sm-3 col-form-label">{tr}Message:{/tr}</label>
             <div class="col-sm-9">
                 {textarea rows="20" name="body" id="body" class="form-control" _simple='y' _toolbars='n'}{$body|escape}{/textarea}
@@ -42,7 +42,7 @@
         {if $prefs.feature_antibot eq 'y' && $user eq ''}
             {include file='antibot.tpl' td_style="form"}
         {/if}
-        <div class="mb-3 text-center">
+        <div class="tiki-form-group text-center">
             <input type="submit" class="btn btn-primary" name="send" value="{tr}Send{/tr}">
         </div>
     </form>

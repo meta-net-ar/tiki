@@ -13,7 +13,7 @@ class Services_Score_Controller
     public function action_create_score_event($input)
     {
 
-        $eventType = $input->eventType->text();
+        $eventType = $input->eventType->xss();
 
         if ($input->rowOnly->text() == 'y') {
             $rowOnly = 1;
@@ -22,7 +22,7 @@ class Services_Score_Controller
         }
 
         if ($input->rowCount->text() > 0) {
-            $rowCount = $input->rowCount->text();
+            $rowCount = $input->rowCount->int();
         } else {
             $rowCount = 0;
         }

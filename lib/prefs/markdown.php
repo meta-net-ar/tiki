@@ -14,7 +14,7 @@ function prefs_markdown_list()
             'default' => 'n',
             'help' => 'Markdown',
             'keywords' => 'Markdown',
-            'tags' => ['advanced'],
+            'tags' => ['advanced', 'experimental'],
         ],
         'markdown_gfm' => [
             'name' => tr('Github-flavored markdown'),
@@ -82,7 +82,7 @@ function prefs_markdown_list()
             'name' => tr('Usage Statistics'),
             'description' => tra('Send hostname to Toast UI.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',

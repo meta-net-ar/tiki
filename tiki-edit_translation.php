@@ -56,7 +56,7 @@ if ((! isset($_REQUEST['type']) || $_REQUEST['type'] == 'wiki page' || $_REQUEST
     $smarty->assign('pagedata', TikiLib::htmldecode($edit_data));
 
     if ($prefs['feature_translation_incomplete_notice'] == 'y') {
-        $smarty->assign('translate_message', '{BOX(bg="#fcd9d3" align="left")}' . tra("Translation of this page is incomplete.") . '{BOX}\n\n');
+        $smarty->assign('translate_message', '{BOX(class="text-bg-light")}' . tra("Translation of this page is incomplete.") . '{BOX}\n\n');
     }
 } elseif ($_REQUEST['id']) {
     $smarty->assign('msg', tra("Only wiki pages are supported."));

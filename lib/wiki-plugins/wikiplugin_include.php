@@ -147,6 +147,17 @@ function wikiplugin_include_info()
                 'filter' => 'int',
                 'default' => '',
             ],
+            'recursive_include_warning' => [
+                'required' => false,
+                'name' => tr('Recursive include warning'),
+                'description' => tr('Option to warn when we include a page within itself.'),
+                'default' => 'y',
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => tr('Yes'), 'value' => 'y'],
+                    ['text' => tr('No'), 'value' => 'n'],
+                ],
+            ],
         ],
     ];
 }
@@ -178,6 +189,9 @@ function wikiplugin_include($dataIn, $params)
     if (! isset($max_inclusions)) {
         $max_inclusions = 5;
     }
+    if (! isset($recursive_include_warning)) {
+        $recursive_include_warning = 'y';
+    }
 
     if (isset($replace) && (int) $replace === 1) {
         $linkoriginal = 'n';
@@ -187,7 +201,7 @@ function wikiplugin_include($dataIn, $params)
 
     $returnto = ! empty($GLOBALS['page']) ? $GLOBALS['page'] : $_SERVER['REQUEST_URI'];
 
-    if ($returnto == $page) {
+    if ($returnto == $page && $recursive_include_warning == 'y') {
         Feedback::warning(tr('You can not include a page within itself'));
         trigger_error(tr('You can not include a page within itself (page = "%0")', $page), E_USER_WARNING);
         return '';

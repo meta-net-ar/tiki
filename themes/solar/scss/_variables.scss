@@ -194,7 +194,7 @@ $breadcrumb-border-radius:          .25rem !default;
 $btn-close-color:                       $white !default;
 
 // Code
-$code-color:                        $pink !default;
+$code-color:                      $body-color; //   $pink !default;
 $pre-color:                         inherit !default;
 
 //--------------------------- Tiki SCSS variables

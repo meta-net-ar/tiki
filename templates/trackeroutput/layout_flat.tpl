@@ -28,10 +28,10 @@
                 ($cur_field.type eq 'b' and $cur_field.options_array[0] eq '0')
             }
                 <dt title="{$cur_field.name|tra|escape}" class="col-sm-3">{$cur_field.name|tra|escape}</dt>
-                <dd class="col-sm-9" style="word-break: break-all;">{trackeroutput field=$cur_field item=$item_info showlinks=n list_mode=n}</dd>
+                <dd class="col-sm-9" style="word-wrap: break-word;">{trackeroutput field=$cur_field item=$item_info showlinks=n list_mode=n}</dd>
             {else}
                 <dt title="{$cur_field.name|tra|escape}" class="col-sm-3">{$cur_field.name|tra|escape}</dt>
-                <dd class="col-sm-9" style="word-break: break-all;">{trackeroutput field=$cur_field item=$item_info showlinks=n list_mode=n}</dd>
+                <dd class="col-sm-9" style="word-wrap: break-word;">{trackeroutput field=$cur_field item=$item_info showlinks=n list_mode=n}</dd>
             {/if}
         {/if}
     {/foreach}

@@ -16,6 +16,7 @@ function wikiplugin_calendar_info()
         'introduced' => 4,
         'params' => [
             'calIds' => [
+                'required' => false,
                 'name' => tra('Calendar IDs'),
                 'description' => tra('Comma-separated list of calendar Ids to restrict the events to specified calendars.')
                     . " " . tra('Example values:') . '<code>13</code>, <code>4,7</code> ' . tra('Not set by default.'),
@@ -43,6 +44,7 @@ function wikiplugin_calendar_info()
                 ],
             ],
             'viewmode' => [
+                'required' => false,
                 'name' => tra('View Time Span'),
                 'description' => tr('If in calendar (%0) View Type, determines the time span displayed by the
                     calendar.', '<code>table</code>') . tra('Default is month'),

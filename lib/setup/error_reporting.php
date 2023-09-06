@@ -5,15 +5,17 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
+
+require_once 'lib/tikilib.php';
+
 global $prefs, $tiki_p_admin;
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
     header('location: index.php');
     exit;
 }
 
-/* This file handles reporting PHP errors in the HTML user interface */
+/* This file handles reporting PHP errors in the HTML user interface and glitchtip.  Note that errors thrown from smarty templates are handled differently. */
 
-$smarty = TikiLib::lib('smarty');
 if ($prefs['error_reporting_adminonly'] == 'y' and $tiki_p_admin != 'y') {
     $errorReportingLevel = 0;
 } elseif ($prefs['error_reporting_level'] == 2047) {
@@ -28,23 +30,28 @@ if ($prefs['error_reporting_adminonly'] == 'y' and $tiki_p_admin != 'y') {
     $errorReportingLevel = $prefs['error_reporting_level'];
 }
 
-// Handle Smarty notices
+// Handle Smarty specific error reporting level
+$smarty = TikiLib::lib('smarty');
 if (! empty($prefs['smarty_notice_reporting']) and $prefs['smarty_notice_reporting'] === 'y' && ($prefs['error_reporting_adminonly'] != 'y' || $tiki_p_admin == 'y')) {
     $smartyErrorReportingLevel = $errorReportingLevel | E_NOTICE | E_USER_NOTICE ;
 } else {
-    $smartyErrorReportingLevel = $errorReportingLevel;
+    $smartyErrorReportingLevel = $errorReportingLevel & ~E_NOTICE & ~E_USER_NOTICE;
 }
-$smarty->error_reporting = $smartyErrorReportingLevel; // Ensure that Smarty respects the same level of report as Tiki (pref smarty_notice_reporting is already handled above)
+$smarty->error_reporting = $smartyErrorReportingLevel;
 
 if (php_sapi_name() != 'cli') { // This handler collects errors to display at the bottom of the general template, so don't use it in CLI, otherwise errors would be lost.
-    if ($previousErrorHandler = set_error_handler('tiki_error_handling', $errorReportingLevel)) {
-        if (is_string($previousErrorHandler)) {
-            $previousErrorHandler = Closure::fromCallable($previousErrorHandler);
-        }
-        TikiLib::lib('errortracking')->setErrorHandler($previousErrorHandler);
+    $previousErrorHandler = set_error_handler('tiki_error_handling', $errorReportingLevel);
+    if ($previousErrorHandler === 'tiki_error_handling') {
+        //This is not normal, but actually happens in tiki-installer, so we restore the handler and go on.
+        restore_error_handler();
+        //throw new Exception("Tried to  set_error_handler('tiki_error_handling') while it was already set to tiki_error_handling");
+    } elseif ($previousErrorHandler) {
+        $previousErrorHandler = Closure::fromCallable($previousErrorHandler);
+        TikiLib::lib('errortracking')->setPreviousErrorHandler($previousErrorHandler);
     };
 }
 error_reporting($errorReportingLevel);
+
 
 if ($prefs['log_sql'] == 'y' && $api_tiki == 'adodb') {
     $dbTiki->LogSQL();

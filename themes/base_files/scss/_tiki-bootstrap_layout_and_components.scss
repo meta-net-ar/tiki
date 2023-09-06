@@ -24,7 +24,7 @@
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/transitions";
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/dropdown";
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/button-group";
-@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/nav";  // why is this and the next commented out?
+@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/nav";  // This and the next line were commented out and replaced below but the problem seems fixed now. Recheck. g_c-l
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/navbar";
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/card";
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/accordion";
@@ -50,6 +50,6 @@
 // Utilities
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/utilities/api";
 // scss-docs-end import-stack
-
-@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/nav"; // Needed to move this down to get correct navlink color in ohia and other themes
-@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/navbar"; // Needed to move this down to get correct navbar nav-link color in default theme
+//
+//@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/nav"; // Old comment: Needed to move this down to get correct navlink color in ohia and other themes
+//@import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/navbar"; // Old comment: Needed to move this down to get correct navbar nav-link color in default theme

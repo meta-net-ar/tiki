@@ -264,6 +264,9 @@ if (! timezone) {
     if (empty($object)) {
         $object = current_object();
     }
+    if (empty($object)) {
+        $object = ['type' => '', 'object' => ''];
+    }
     $jqueryTiki['current_object'] = $object;
     $jqueryTiki['usernamePattern'] = $prefs['username_pattern'];
     $jqueryTiki['print_pdf_from_url'] = "{$prefs['print_pdf_from_url']}";
@@ -317,7 +320,7 @@ $(document).on("tiki.modal.redraw", function (event) {
     if (! $modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    if ($modalContent.is(".ui-resizable")) {
+    if ($modalContent.is(".ui-resizable") && $modalContent.resizable("instance").started) {
         $modalContent.resizable( "destroy" );
     }
     $modalContent

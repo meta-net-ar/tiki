@@ -13,7 +13,6 @@ use PDOException;
 class PdoClient
 {
     protected const QUERY_RETRIES = 1;
-    public const DISTRIBUTED_INDEX_NAME = 'tiki_distributed';
 
     protected $dsn;
     protected $port;
@@ -22,8 +21,21 @@ class PdoClient
     public function __construct($dsn, $port = 9306)
     {
         $this->dsn = $dsn;
-        $this->port = $port;
+        $this->port = $port ?? 9306;
         $this->connect();
+    }
+
+    public static function distributedIndexName()
+    {
+        global $prefs;
+
+        if (empty($prefs['federated_manticore_index_prefix'])) {
+            $prefix = 'tiki_';
+        } else {
+            $prefix = $prefs['federated_manticore_index_prefix'];
+        }
+
+        return $prefix . 'distributed';
     }
 
     public function getStatus()
@@ -52,11 +64,18 @@ class PdoClient
         }
     }
 
-    public function getIndicesByPrefix($prefix)
+    public function getIndicesByPrefix($prefix, $type = 'rt')
     {
+        $results = [];
         $stmt = $this->pdo->prepare("SHOW TABLES LIKE ?");
         $stmt->execute([$prefix . '%']);
-        return $stmt->fetchAll();
+        foreach ($stmt->fetchAll() as $row) {
+            if (! empty($type) && $row['Type'] != $type) {
+                continue;
+            }
+            $results[] = $row['Index'];
+        }
+        return $results;
     }
 
     public function createIndex($index, $definition, $settings = [], $silent = false)
@@ -79,15 +98,16 @@ class PdoClient
 
     public function recreateDistributedIndex(array $names)
     {
-        $this->deleteIndex(self::DISTRIBUTED_INDEX_NAME);
+        $this->deleteIndex(self::distributedIndexName());
 
         $list = [];
-        foreach ($names as $name) {
+        foreach ($names as $key => $name) {
             $def = $this->parseDistributedIndexDefinition($name);
             $list[] = $def['type'] . '=?';
+            $names[$key] = preg_replace('/\|\d+:/', ':', $name);
         }
 
-        $stmt = $this->pdo->prepare("CREATE TABLE " . self::DISTRIBUTED_INDEX_NAME . " type='distributed' " . join(' ', $list));
+        $stmt = $this->pdo->prepare("CREATE TABLE " . self::distributedIndexName() . " type='distributed' " . join(' ', $list));
         $this->executeWithRetry($stmt, array_values($names));
     }
 
@@ -95,11 +115,29 @@ class PdoClient
     {
         if (strstr($name, ':')) {
             $parts = explode(':', $name);
+            $host = trim($parts[0]);
+            if (count($parts) > 2) {
+                $ports = trim($parts[1]);
+                $ports = explode('|', $ports);
+            } else {
+                $ports = [];
+            }
+            $index = array_pop($parts);
+            if (count($ports) === 1) {
+                // table definition might come from DESC distributed table syntax which includes only one port, get the other one from extwiki table
+                $extwikis = \TikiLib::lib('admin')->list_extwiki(0, -1, 'extwikiId', '');
+                foreach ($extwikis['data'] as $extwiki) {
+                    if (preg_match('/' . $host . ':' . $ports[0] . '\|(\d+):/', $extwiki['indexname'], $m)) {
+                        $ports[1] = $m[1];
+                    }
+                }
+            }
             return [
                 'type' => 'agent',
-                'host' => trim($parts[0]),
-                'port' => count($parts) > 2 ? trim($parts[1]) : null,
-                'index' => array_pop($parts),
+                'host' => $host,
+                'port_agent' => $ports[0] ?? null,
+                'port_sql' => $ports[1] ?? null,
+                'index' => $index,
             ];
         } else {
             return [
@@ -111,7 +149,7 @@ class PdoClient
 
     public function possibleFacetFields($table)
     {
-        if ($table == self::DISTRIBUTED_INDEX_NAME) {
+        if ($table == self::distributedIndexName()) {
             $stmt = $this->pdo->query("DESC $table");
             $result = $stmt->fetchAll();
             $tables = [];
@@ -126,32 +164,56 @@ class PdoClient
             $def = $this->parseDistributedIndexDefinition($table);
             if ($def['type'] == 'agent') {
                 // remote agent definition
-                // TODO: decide how to specify remote mysql port as the agent definition port is 9312 by default
-                $client = new PdoClient($def['host']);
+                $client = new PdoClient($def['host'], $def['port_sql']);
             } else {
                 // local index
                 $client = $this;
             }
-            $fields[$table] = array_keys($client->describe($def['index']));
+            $fields[$table] = $client->describe($def['index']);
         }
+        $common = [];
         $result = array_shift($fields);
-        foreach ($fields as $arr) {
-            $result = array_intersect($result, $arr);
-        }
         if (! $result) {
             $result = [];
         }
-        return array_values($result);
+        foreach ($result as $field => $opts) {
+            foreach ($fields as $table => $tableFields) {
+                if (! isset($tableFields[$field])) {
+                    continue 2;
+                }
+                if ($opts['types'] != $tableFields[$field]['types']) {
+                    continue 2;
+                }
+                if (strstr($table, ':') && ($field == 'deep_categories' || $field == 'categories')) {
+                    continue 2;
+                }
+            }
+            $common[] = $field;
+        }
+        return $common;
     }
 
     public function deleteIndex($index)
     {
         try {
+            $stmt = $this->pdo->query("DESC " . self::distributedIndexName());
+            $result = $stmt->fetchAll();
+            foreach ($result as $row) {
+                $def = $this->parseDistributedIndexDefinition($row['Agent']);
+                if ($def['type'] == 'local' && $def['index'] == $index) {
+                    Feedback::error(tr("Failed deleting Manticore index %0 as it is currently used in a distributed index.", $index));
+                    return false;
+                }
+            }
+        } catch (PDOException $e) {
+            // no distributed index, continue normally
+        }
+        try {
             $stmt = $this->pdo->prepare("DROP TABLE IF EXISTS $index");
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
-            Feedback::error("Failed deleting Manticore index $index: " . $e->getMessage());
+            Feedback::error(tr("Failed deleting Manticore index %0: ", $index) . $e->getMessage());
             return false;
         }
     }
@@ -261,12 +323,22 @@ class PdoClient
         return $stmt->fetchAll();
     }
 
-    public function fetchAllRowsets($query)
+    public function fetchAllRowsets($query, $retry = true)
     {
         $stmt = $this->pdo->query($query);
         $result = [$stmt->fetchAll()];
         while ($stmt->nextRowset()) {
             $result[] = $stmt->fetchAll();
+        }
+        if ($retry) {
+            $stmt = $this->pdo->query('show warnings');
+            foreach ($stmt->fetchAll() as $row) {
+                if (! empty($row['Message']) && preg_match('/agent.*unknown local table/', $row['Message'])) {
+                    // remote agent rebuild has invalidated this distributed index, need recreate the distributed index with fresh index table names
+                    \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
+                    return $this->fetchAllRowsets($query, false);
+                }
+            }
         }
         return $result;
     }
@@ -282,6 +354,9 @@ class PdoClient
         $parsed = parse_url($dsn);
         if ($parsed === false) {
             throw new Exception(tr("Malformed Manticore connection url: %0", $this->dsn));
+        }
+        if (empty($parsed['host']) && ! empty($parsed['path'])) {
+            $parsed['host'] = $parsed['path'];
         }
 
         $dsn = "mysql:host=" . $parsed['host'] . ";port=" . $this->port;

@@ -21,7 +21,7 @@
         <label for="indexname" class="col-sm-3 col-form-label">{tr}Index{/tr}</label>
         <div class="col-sm-9">
             <input type="text" maxlength="255" class="form-control" name="indexname" id="indexname" value="{$info.indexname|escape}">
-            <p class="form-text">{tr}<em>[prefix]</em>main, such as tiki_main or remote Manticore agent definition like hostname:tiki_main{/tr}</p>
+            <p class="form-text">{tr}<em>[prefix]</em>main, such as tiki_main or remote Manticore agent definition like hostname[:port_agent|port_sql]:tiki_main<br>port_agent defaults to 9312 and port_sql defaults to 9306.{/tr}</p>
         </div>
     </div>
     <div class="mb-3 row">

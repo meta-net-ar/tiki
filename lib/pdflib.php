@@ -105,7 +105,7 @@ class PdfGenerator
                         ['timeout' => 120]
                     );
                 }
-                if (is_array($params['printpages']) || is_array($params['printstructures'])) {
+                if ((isset($params['printpages']) && is_array($params['printpages'])) || (isset($params['printpages']) && is_array($params['printstructures']))) {
                     if (is_array($params['printpages'])) {
                         $params['printpages'] = implode('&', $params['printpages']);
                     } else {
@@ -238,6 +238,16 @@ class PdfGenerator
 
         if ($parsedData != '') {
             $html = $parsedData;
+        } else {
+            $title = tr('Page not printed ! ');
+            $mes = tr('It looks like you are trying to print a blank page.');
+            if (preg_match('/\bpage=([^&]+)/', $url, $matches)) {
+                $page = substr($matches[0], 5, null);
+                Feedback::warning(['mes' => $mes, 'title' => $title]);
+                TikiLib::lib('access')->redirect($page);
+                die();
+            }
+            throw new Services_Exception($title . $mes);
         }
 
        //getting n replacing images
@@ -246,7 +256,7 @@ class PdfGenerator
         //checking and getting plugin_pdf parameters if set
         $pdfSettings = $this->getPDFSettings($html, $prefs, $params);
         //Add page title with content enabled in prefs and page indiviual settings
-        if (($prefs['feature_page_title'] == 'y' && $wikilib->get_page_hide_title($params['page']) == 0 && $pdfSettings['pagetitle'] != 'n') || $pdfSettings['pagetitle'] == 'y') {
+        if (($prefs['feature_page_title'] == 'y' && isset($params['page']) && $wikilib->get_page_hide_title($params['page']) == 0 && $pdfSettings['pagetitle'] != 'n') || $pdfSettings['pagetitle'] == 'y') {
             $html = '<h1>' . $params['page'] . '</h1>' . $html;
         }
 
@@ -302,10 +312,10 @@ class PdfGenerator
         $mpdf->autoScriptToLang = true;
         $mpdf->autoLangToFont = true;
 
-        $mpdf->SetTitle($params['page']);
+        $mpdf->SetTitle($params['page'] ?? '');
 
         //toc levels
-        $mpdf->h2toc = $pdfSettings['toclevels'];
+        $mpdf->h2toc = isset($pdfSettings['toclevels']) ? $pdfSettings['toclevels'] : [];
         //password protection
         if ($pdfSettings['print_pdf_mpdf_password']) {
             $mpdf->SetProtection([], 'UserPassword', $pdfSettings['print_pdf_mpdf_password']);
@@ -320,10 +330,7 @@ class PdfGenerator
         $themeLib = TikiLib::lib('theme');
         $themecss = $themeLib->get_theme_path($prefs['theme'], '', $prefs['theme'] . '.css');
         $themecss = file_get_contents($themecss) . 'b,strong{font-weight:bold !important;}';
-        $extcss = file_get_contents('vendor/jquery/jquery-sheet/jquery.sheet.css');
-
-        //this CSS Overrides bootstrap 4 grid definitions (mPDF doesn't support Bootstrap 4)
-        $customGrid = file_get_contents('themes/base_files/css/custom_grid_pdf.css');
+        $extcss = file_get_contents('vendor_bundled/vendor/jquery/jquery-sheet/jquery.sheet.css');
 
         //checking if print friendly option is enabled, then attach print css otherwise theme styles will be retained by theme css
         if ($pdfSettings['print_pdf_mpdf_printfriendly'] == 'y') {
@@ -336,7 +343,7 @@ class PdfGenerator
         }
 
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
-        $cssStyles = str_replace([".tiki","opacity: 0;","page-break-inside: avoid;"], ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"], '<style>' . $basecss . $themecss . $printcss . $pageCSS . $extcss . $this->bootstrapReplace() . $prefs["header_custom_css"] . '</style>'); //adding css styles with first page content
+        $cssStyles = str_replace([".tiki","opacity: 0;","page-break-inside: avoid;"], ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"], '<style>' . $basecss . $themecss . $printcss . $extcss . $this->bootstrapReplace() . $prefs["header_custom_css"] . '</style>'); //adding css styles with first page content
         //PDF import templates will not work if background color is set, need to replace in css
         if (
             array_filter(array_column($pdfPages, 'pageContent'), function ($var) {
@@ -381,7 +388,7 @@ class PdfGenerator
             if (trim(strtolower($pdfPage['footer'])) != "off") {
                 $mpdf->DefHTMLFooterByName(
                     'footer-without-pagination',
-                    $this->processHeaderFooter($pdfPage['footer'], $params['page'], 'bottom', false)
+                    $this->processHeaderFooter($pdfPage['footer'], $params['page'] ?? '', 'bottom', false)
                 );
             }
 
@@ -461,14 +468,14 @@ class PdfGenerator
                     } else {
                         $pdfPage['header'] == '' ? $header = $pdfSettings['header'] : $header = $pdfPage['header'];
                     }
-                    if (trim(strtolower($pdfPage['footer'])) == "off") {
+                    if (trim(strtolower($pdfPage['footer'])) == "off" || $pdfPage['footer'] == "") {
                         $footer = "";
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
                     }
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page']));
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''));
                     $mpdf->AddPage($pdfPage['orientation'], '', $resetPage, '', '', $pdfPage['margin_left'], $pdfPage['margin_right'], $pdfPage['margin_top'], $pdfPage['margin_bottom'], $pdfPage['margin_header'], $pdfPage['margin_footer'], '', '', '', '', '', '', '', '', '', $pdfPage['pagesize']);
-                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'], 'top')); //footer needs to be reset after page content is added
+                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top')); //footer needs to be reset after page content is added
                     //checking watermark on page
                     $mpdf->SetWatermarkText($pdfPage['watermark']);
                     $mpdf->showWatermarkText = true;
@@ -488,7 +495,7 @@ class PdfGenerator
                         $mpdf->SetColumns(1, 'justify');
                     }
                     $backgroundImage = '';
-                    if (strstr($_GET['display'], 'pdf') != '') {
+                    if (isset($_GET['display']) && strstr($_GET['display'], 'pdf') !== false) {
                         $bgColor = "background: linear-gradient(top, '','');";
                     }
                     if ($pdfPage['background'] != '') {
@@ -500,7 +507,10 @@ class PdfGenerator
                     $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
                     for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pdfLimit) {
-                        $mpdf->WriteHTML(substr($pdfPage['pageContent'], $charLimit, $pdfLimit));
+                        $content_slice = substr($pdfPage['pageContent'], $charLimit, $pdfLimit);
+                        if ($content_slice) {
+                            $mpdf->WriteHTML($content_slice);
+                        }
                     }
                     $mpdf->WriteHTML('</body></html>');
                     $pageNo++;
@@ -513,9 +523,9 @@ class PdfGenerator
             $mpdf->SetWatermarkImage($pdfPage['background_image'], 1);
             $mpdf->watermarkImgBehind = true;
         }
-        trim(strtolower($pdfSettings['header'])) == "off" ? $mpdf->SetHTMLHeader() : $mpdf->SetHTMLHeader($this->processHeaderFooter($pdfSettings['header'], $params['page']));
-        if ($pdfPages[count($pdfPages) - 1]['footer'] == $pdfSettings['footer']) {
-            trim(strtolower($pdfSettings['footer'])) == "off" ? $mpdf->SetHTMLFooter() : $mpdf->SetHTMLFooter($this->processHeaderFooter($pdfSettings['footer'], $params['page'], 'top'));
+        trim(strtolower($pdfSettings['header'])) == "off" ? $mpdf->SetHTMLHeader() : $mpdf->SetHTMLHeader($this->processHeaderFooter($pdfSettings['header'], $params['page'] ?? ''));
+        if (is_array($pdfPages) && ! empty($pdfPages) && $pdfPages[count($pdfPages) - 1]['footer'] == $pdfSettings['footer']) {
+            isset($pdfSettings['footer']) && trim(strtolower($pdfSettings['footer'])) == "off" ? $mpdf->SetHTMLFooter() : $mpdf->SetHTMLFooter($this->processHeaderFooter($pdfSettings['footer'] ?? '', $params['page'] ?? '', 'top'));
         }
 
         $this->clearTempImg($tempImgArr);
@@ -527,6 +537,7 @@ class PdfGenerator
     public function getHtmlLayout($pageContent)
     {
         require_once('tiki-setup.php');
+        $prefslib = TikiLib::lib('prefs');
 
         $modlib = TikiLib::lib('mod');
 
@@ -536,49 +547,63 @@ class PdfGenerator
         clearstatcache();
 
         $modules_to_print = $prefs['print_pdf_modules'];
+
+        $print_pdf_modules = $prefslib->getPreference('print_pdf_modules');
+        if (isset($print_pdf_modules['options'])) {
+            $print_pdf_modules_options = $print_pdf_modules['options'];
+        } else {
+            $print_pdf_modules_options = [];
+        }
+
         $modules_to_print_contents = [];
 
         $modules = $modlib->get_modules_for_user($user);
 
         $modnames = [];
 
-        if (is_array($modules_to_print)) {
-            foreach ($modules_to_print as $module_key) {
-                $content = '';
+        if ($print_pdf_modules_options && is_array($print_pdf_modules_options)) {
+            foreach ($print_pdf_modules_options as $module_key => $module_value) {
+                if (is_string($module_key)) {
+                    if (is_array($modules_to_print) && in_array($module_key, $modules_to_print)) {
+                        $content = '';
 
-                if (isset($modules[$module_key]) && is_array($modules[$module_key])) {
-                    foreach ($modules[$module_key] as & $mod_reference) {
-                        $ref = (array) $mod_reference;
-                        $mod_reference['data'] = new Tiki_Render_Lazy(
-                            function () use ($ref) {
-                                $modlib = TikiLib::lib('mod');
-                                return $modlib->execute_module($ref);
+                        if (isset($modules[$module_key]) && is_array($modules[$module_key])) {
+                            foreach ($modules[$module_key] as & $mod_reference) {
+                                $ref = (array) $mod_reference;
+                                $mod_reference['data'] = new Tiki_Render_Lazy(
+                                    function () use ($ref) {
+                                        $modlib = TikiLib::lib('mod');
+                                        return $modlib->execute_module($ref);
+                                    }
+                                );
+                                $modnames[$ref['name']] = '';
                             }
-                        );
-                        $modnames[$ref['name']] = '';
+
+                            $content = implode(
+                                '',
+                                array_map(
+                                    function ($module) {
+                                        return (isset($module['data']) ? $module['data'] : '');
+                                    },
+                                    $modules[$module_key]
+                                )
+                            );
+                        }
+
+                        $dir = '';
+                        if (Language::isRTL()) {
+                            $dir = ' dir="rtl"';
+                        }
+
+                        $modules_to_print_contents[$module_key] = <<<OUT
+                        <div class="modules" id="$module_key" $dir>
+                            $content
+                        </div>
+                        OUT;
+                    } else {
+                        $modules_to_print_contents[$module_key] = "";
                     }
-
-                    $content = implode(
-                        '',
-                        array_map(
-                            function ($module) {
-                                return (isset($module['data']) ? $module['data'] : '');
-                            },
-                            $modules[$module_key]
-                        )
-                    );
                 }
-
-                $dir = '';
-                if (Language::isRTL()) {
-                    $dir = ' dir="rtl"';
-                }
-
-                $modules_to_print_contents[$module_key] = <<<OUT
-                <div class="modules" id="$module_key" $dir>
-                    $content
-                </div>
-                OUT;
             }
         }
 
@@ -650,81 +675,83 @@ class PdfGenerator
     public function getPDFSettings($html, $prefs, $params)
     {
         $pdfSettings = [];
-        //checking if pdf plugin is set and passed
-        $doc = new DOMDocument();
-        @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        if (! empty($html)) {
+            //checking if pdf plugin is set and passed
+            $doc = new DOMDocument();
+            @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
-        $pdf = $doc->getElementsByTagName('pdfsettings')->item(0);
-        $prefs['print_pdf_mpdf_pagesize'] = $prefs['print_pdf_mpdf_size'];
-        if ($pdf) {
-            if ($pdf->hasAttributes()) {
-                foreach ($pdf->attributes as $attr) {
-                    //overridding global settings
-                    $prefs['print_pdf_mpdf_' . $attr->nodeName] = $attr->nodeValue;
+            $pdf = $doc->getElementsByTagName('pdfsettings')->item(0);
+            $prefs['print_pdf_mpdf_pagesize'] = $prefs['print_pdf_mpdf_size'];
+            if ($pdf) {
+                if ($pdf->hasAttributes()) {
+                    foreach ($pdf->attributes as $attr) {
+                        //overridding global settings
+                        $prefs['print_pdf_mpdf_' . $attr->nodeName] = $attr->nodeValue;
+                    }
                 }
             }
-        }
-        //checking preferences
-        $pdfSettings['print_pdf_mpdf_printfriendly'] = $prefs['print_pdf_mpdf_printfriendly'] != '' ? $prefs['print_pdf_mpdf_printfriendly'] : '';
-        $orientation = ! empty($params['orientation']) ? $params['orientation'] : $prefs['print_pdf_mpdf_orientation'];
-        $pdfSettings['orientation'] = $orientation != '' ? $orientation : 'P';
-        $pdfSettings['pagesize'] = $prefs['print_pdf_mpdf_pagesize'] != '' ? $prefs['print_pdf_mpdf_pagesize'] : 'Letter';
+            //checking preferences
+            $pdfSettings['print_pdf_mpdf_printfriendly'] = $prefs['print_pdf_mpdf_printfriendly'] != '' ? $prefs['print_pdf_mpdf_printfriendly'] : '';
+            $orientation = ! empty($params['orientation']) ? $params['orientation'] : $prefs['print_pdf_mpdf_orientation'];
+            $pdfSettings['orientation'] = $orientation != '' ? $orientation : 'P';
+            $pdfSettings['pagesize'] = $prefs['print_pdf_mpdf_pagesize'] != '' ? $prefs['print_pdf_mpdf_pagesize'] : 'Letter';
 
-        if (in_array($pdfSettings['pagesize'], ['Tabloid/Ledger', 'Tabloid-Ledger'])) {
-            $pdfSettings['pagesize'] = 'Tabloid';
-        }
-
-        //custom size needs to be passed for Tabloid
-        if ($prefs['print_pdf_mpdf_size'] == "Tabloid") {
-            $pdfSettings['pagesize'] = [279,432];
-        } elseif ($pdfSettings['orientation'] == 'L') {
-            $pdfSettings['pagesize'] = $pdfSettings['pagesize'] . '-' . $pdfSettings['orientation'];
-        }
-
-        $pdfSettings['margin_left'] = $prefs['print_pdf_mpdf_margin_left'] != '' ? $prefs['print_pdf_mpdf_margin_left'] : '10';
-        $pdfSettings['margin_right'] = $prefs['print_pdf_mpdf_margin_right'] != '' ? $prefs['print_pdf_mpdf_margin_right'] : '10';
-        $pdfSettings['margin_top'] = $prefs['print_pdf_mpdf_margin_top'] != '' ? $prefs['print_pdf_mpdf_margin_top'] : '10';
-        $pdfSettings['margin_bottom'] = $prefs['print_pdf_mpdf_margin_bottom'] != '' ? $prefs['print_pdf_mpdf_margin_bottom'] : '10';
-        $pdfSettings['margin_header'] = $prefs['print_pdf_mpdf_margin_header'] != '' ? $prefs['print_pdf_mpdf_margin_header'] : '5';
-        $pdfSettings['margin_footer'] = $prefs['print_pdf_mpdf_margin_footer'] != '' ? $prefs['print_pdf_mpdf_margin_footer'] : '5';
-        $pdfSettings['header'] = str_ireplace("{PAGETITLE}", $params['page'], $prefs['print_pdf_mpdf_header']);
-        $pdfSettings['footer'] = str_ireplace("{PAGETITLE}", $params['page'], $prefs['print_pdf_mpdf_footer']);
-        $pdfSettings['print_pdf_mpdf_password'] = $prefs['print_pdf_mpdf_password'];
-        $pdfSettings['toc'] = $prefs['print_pdf_mpdf_toc'] != '' ? $prefs['print_pdf_mpdf_toc'] : 'n';
-        $pdfSettings['toclinks'] = $prefs['print_pdf_mpdf_toclinks'] != '' ? $prefs['print_pdf_mpdf_toclinks'] : 'n';
-        $pdfSettings['tocheading'] = $prefs['print_pdf_mpdf_tocheading'];
-        $pdfSettings['pagetitle'] = $prefs['print_pdf_mpdf_pagetitle'];
-        $pdfSettings['watermark'] = $prefs['print_pdf_mpdf_watermark'];
-        $pdfSettings['watermark_image'] = $prefs['print_pdf_mpdf_watermark_image'];
-        $pdfSettings['coverpage_text_settings'] = str_ireplace("{PAGETITLE}", $params['page'], $prefs['print_pdf_mpdf_coverpage_text_settings']);
-        $pdfSettings['coverpage_image_settings'] = str_ireplace("{PAGETITLE}", $params['page'], $prefs['print_pdf_mpdf_coverpage_image_settings']);
-        $pdfSettings['hyperlinks'] = $prefs['print_pdf_mpdf_hyperlinks'];
-        $pdfSettings['columns'] = $prefs['print_pdf_mpdf_columns'];
-        $pdfSettings['background'] = $prefs['print_pdf_mpdf_background'];
-        $pdfSettings['background_image'] = $prefs['print_pdf_mpdf_background_image'];
-        $pdfSettings['autobookmarks'] = $prefs['print_pdf_mpdf_autobookmarks'];
-
-        if ($pdfSettings['toc'] == 'y') {
-            //toc levels
-            ['H1' => 0, 'H2' => 1, 'H3' => 2];
-            $toclevels = $prefs['print_pdf_mpdf_toclevels'] != '' ? $prefs['print_pdf_mpdf_toclevels'] : 'H1|H2|H3';
-            $toclevels = explode("|", $toclevels);
-            $pdfSettings['toclevels'] = [];
-            for ($toclevel = 0; $toclevel < count($toclevels); $toclevel++) {
-                $pdfSettings['toclevels'][$toclevels[$toclevel]] = $toclevel;
+            if (in_array($pdfSettings['pagesize'], ['Tabloid/Ledger', 'Tabloid-Ledger'])) {
+                $pdfSettings['pagesize'] = 'Tabloid';
             }
-        }
 
-        //Setting PDF bookmarks
-        if ($pdfSettings['autobookmarks']) {
-            $bookmark = explode("|", $pdfSettings['autobookmarks']);
-            $pdfSettings['autobookmarks'] = [];
-            for ($level = 0; $level < count($bookmark); $level++) {
-                $pdfSettings['autobookmarks'][strtoupper($bookmark[$level])] = $level;
+            //custom size needs to be passed for Tabloid
+            if ($prefs['print_pdf_mpdf_size'] == "Tabloid") {
+                $pdfSettings['pagesize'] = [279,432];
+            } elseif ($pdfSettings['orientation'] == 'L') {
+                $pdfSettings['pagesize'] = $pdfSettings['pagesize'] . '-' . $pdfSettings['orientation'];
             }
+
+            $pdfSettings['margin_left'] = $prefs['print_pdf_mpdf_margin_left'] != '' ? $prefs['print_pdf_mpdf_margin_left'] : '10';
+            $pdfSettings['margin_right'] = $prefs['print_pdf_mpdf_margin_right'] != '' ? $prefs['print_pdf_mpdf_margin_right'] : '10';
+            $pdfSettings['margin_top'] = $prefs['print_pdf_mpdf_margin_top'] != '' ? $prefs['print_pdf_mpdf_margin_top'] : '10';
+            $pdfSettings['margin_bottom'] = $prefs['print_pdf_mpdf_margin_bottom'] != '' ? $prefs['print_pdf_mpdf_margin_bottom'] : '10';
+            $pdfSettings['margin_header'] = $prefs['print_pdf_mpdf_margin_header'] != '' ? $prefs['print_pdf_mpdf_margin_header'] : '5';
+            $pdfSettings['margin_footer'] = $prefs['print_pdf_mpdf_margin_footer'] != '' ? $prefs['print_pdf_mpdf_margin_footer'] : '5';
+            $pdfSettings['header'] = str_ireplace("{PAGETITLE}", $params['page'] ?? '', $prefs['print_pdf_mpdf_header']);
+            $pdfSettings['footer'] = str_ireplace("{PAGETITLE}", $params['page'] ?? '', $prefs['print_pdf_mpdf_footer']);
+            $pdfSettings['print_pdf_mpdf_password'] = $prefs['print_pdf_mpdf_password'];
+            $pdfSettings['toc'] = $prefs['print_pdf_mpdf_toc'] != '' ? $prefs['print_pdf_mpdf_toc'] : 'n';
+            $pdfSettings['toclinks'] = $prefs['print_pdf_mpdf_toclinks'] != '' ? $prefs['print_pdf_mpdf_toclinks'] : 'n';
+            $pdfSettings['tocheading'] = $prefs['print_pdf_mpdf_tocheading'];
+            $pdfSettings['pagetitle'] = $prefs['print_pdf_mpdf_pagetitle'];
+            $pdfSettings['watermark'] = $prefs['print_pdf_mpdf_watermark'];
+            $pdfSettings['watermark_image'] = $prefs['print_pdf_mpdf_watermark_image'];
+            $pdfSettings['coverpage_text_settings'] = str_ireplace("{PAGETITLE}", $params['page'] ?? '', $prefs['print_pdf_mpdf_coverpage_text_settings']);
+            $pdfSettings['coverpage_image_settings'] = str_ireplace("{PAGETITLE}", $params['page'] ?? '', $prefs['print_pdf_mpdf_coverpage_image_settings']);
+            $pdfSettings['hyperlinks'] = $prefs['print_pdf_mpdf_hyperlinks'];
+            $pdfSettings['columns'] = $prefs['print_pdf_mpdf_columns'];
+            $pdfSettings['background'] = $prefs['print_pdf_mpdf_background'];
+            $pdfSettings['background_image'] = $prefs['print_pdf_mpdf_background_image'];
+            $pdfSettings['autobookmarks'] = $prefs['print_pdf_mpdf_autobookmarks'];
+
+            if ($pdfSettings['toc'] == 'y') {
+                //toc levels
+                ['H1' => 0, 'H2' => 1, 'H3' => 2];
+                $toclevels = $prefs['print_pdf_mpdf_toclevels'] != '' ? $prefs['print_pdf_mpdf_toclevels'] : 'H1|H2|H3';
+                $toclevels = explode("|", $toclevels);
+                $pdfSettings['toclevels'] = [];
+                for ($toclevel = 0; $toclevel < count($toclevels); $toclevel++) {
+                    $pdfSettings['toclevels'][$toclevels[$toclevel]] = $toclevel;
+                }
+            }
+
+            //Setting PDF bookmarks
+            if ($pdfSettings['autobookmarks']) {
+                $bookmark = explode("|", $pdfSettings['autobookmarks']);
+                $pdfSettings['autobookmarks'] = [];
+                for ($level = 0; $level < count($bookmark); $level++) {
+                    $pdfSettings['autobookmarks'][strtoupper($bookmark[$level])] = $level;
+                }
+            }
+            //PDF settings
+            return $pdfSettings;
         }
-        //PDF settings
-        return $pdfSettings;
     }
 
     //mpdf read page for plugin PDFPage, introduced for advanced pdf creation
@@ -819,7 +846,13 @@ class PdfGenerator
         $html = @$doc->saveHTML();
     }
 
-    public function file_get_contents_by_fget($url)
+    /**
+     * Fetch the contents of a URL using file_get_contents and save it as a temporary image file.
+     *
+     * @param string $url The URL of the image to fetch.
+     * @return string Return the path of the newly created temporary image file.
+     */
+    public function file_get_contents_by_fget($url): string
     {
         global $base_url;
         //check if image is internal with full path
@@ -830,7 +863,7 @@ class PdfGenerator
         //checking for external images
         $checkURL = parse_url($url);
         //not replacing in case of external image
-        if (($checkURL['scheme'] == 'https' || $checkURL['scheme'] == 'http') && ! $internalImg) {
+        if ((isset($checkURL['scheme']) && ($checkURL['scheme'] == 'https' || $checkURL['scheme'] == 'http')) && ! $internalImg) {
             return '';
         }
         if (! $internalImg) {
@@ -840,10 +873,17 @@ class PdfGenerator
             mkdir('temp/pdfimg');
             chmod('temp/pdfimg', 0755);
         }
-        $opts = ['http' => ['header' => 'Cookie: ' . $_SERVER['HTTP_COOKIE'] . "\r\n"]];
+        $cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
+        $opts = [];
+        if (! empty($cookie)) {
+            $opts['http'] = ['header' => 'Cookie: ' . $cookie . "\r\n"];
+        }
         $context = stream_context_create($opts);
         session_write_close();
-        $data = file_get_contents($url, false, $context);
+        $data = @file_get_contents($url, false, $context);
+        if (gettype($data) == 'boolean' && ! $data) {
+            return '';
+        }
         $newFile = 'temp/pdfimg/pdfimg' . mt_rand(9999, 999999) . '.png';
         file_put_contents($newFile, $data);
         chmod($newFile, 0755);
@@ -853,7 +893,9 @@ class PdfGenerator
     public function clearTempImg($tempImgArr)
     {
         foreach ($tempImgArr as $tempImg) {
-            unlink($tempImg);
+            if (file_exists($tempImg)) {
+                unlink($tempImg);
+            }
         }
     }
 
@@ -861,6 +903,7 @@ class PdfGenerator
     {
         //Replace all word separators as this is already fixed with CSS
         $html = str_replace(["<wbr>", "<wbr/>"], "", $html);
+        $html = str_replace('&', '&amp;', $html);
 
         $doc = new DOMDocument();
         $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
@@ -894,7 +937,7 @@ class PdfGenerator
         for ($i = 0; $i < count($sortedContent); $i++) {
             $html = str_replace($tempValue[$i], $sortedContent[$i], $html);
         }
-            $html = cleanContent($html, $tagsArr);
+        $html = cleanContent($html, $tagsArr);
 
             //making tablesorter and pivottable charts wrapper divs visible
         $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
@@ -1114,7 +1157,7 @@ $(".convert-mailto").removeClass("convert-mailto").each(function () {
             $tempValue[] = $tableTag;
             $table->nodeValue = "";
             chmod("temp/#" . $tid . "_" . session_id() . ".txt", 0755);
-        //unlink tmp table file
+            //unlink tmp table file
             unlink("temp/#" . $tid . "_" . session_id() . ".txt");
         }
     }
@@ -1234,7 +1277,7 @@ $(".convert-mailto").removeClass("convert-mailto").each(function () {
             }
         }
         //process and return value
-        return str_ireplace(["{PAGETITLE}","{NB}"], [$page,"{nb}"], TikiLib::lib('parser')->parse_data(html_entity_decode($value), ['is_html' => true, 'parse_wiki' => true]));
+        return str_ireplace(["{PAGETITLE}","{NB}"], [$page,"{nb}"], TikiLib::lib('parser')->parse_data(html_entity_decode($value ?? ''), ['is_html' => true, 'parse_wiki' => true]));
     }
 }
 
@@ -1249,7 +1292,7 @@ function cleanContent($content, $tagArr)
         $list = $xpath->query('//' . $tag[0] . '[contains(concat(\' \', normalize-space(@' . $tag[2] . '), \' \'), "' . $tag[1] . '")]');
         for ($i = 0; $i < $list->length; $i++) {
             $p = $list->item($i);
-            if ($tag[3] == 1) { //the parameter checks if content of tag has to be preserved
+            if (isset($tag[3]) && $tag[3] == 1) { //the parameter checks if content of tag has to be preserved
                 $attributes = $p->attributes;
                 while ($attributes->length) {
                 //preserving href

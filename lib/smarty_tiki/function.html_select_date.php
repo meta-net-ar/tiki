@@ -210,7 +210,7 @@ function smarty_function_html_select_date($params, $smarty)
             //tra('January') tra('February') tra('March') tra('April') tra('May') tra('June')
             // tra('July') tra('August') tra('September') tra('October') tra('November') tra('December')
 
-            $tikidate->setDate(mktime(0, 0, 0, $i, 1, 2000));
+            $tikidate->setLocalTime(1, $i, 2000, 0, 0, 0, 0);
             $month_names[$i] = ucfirst(tra(mb_convert_encoding($tikidate->format($month_format, true), 'UTF-8', 'ISO-8859-1')));
             $month_values[$i] = $tikidate->format($month_value_format, true);
         }
@@ -232,7 +232,7 @@ function smarty_function_html_select_date($params, $smarty)
         }
         $month_result .= $extra_attrs . '>' . "\n";
 
-        $tikidate->setDate(mktime(0, 0, 0, (int) $time[1], 1, 2000));
+        $tikidate->setLocalTime(1, (int) $time[1], 2000, 0, 0, 0, 0);
         $month_result .= smarty_function_html_options(
             [
                 'output'     => $month_names,
@@ -342,15 +342,15 @@ function smarty_function_html_select_date($params, $smarty)
         $c = substr($field_order, $i, 1);
         switch ($c) {
             case 'D':
-                $html_result .= "<div class='col'>$day_result</div>";
+                $html_result .= "<div class='col-sm-4'>$day_result</div>";
                 break;
 
             case 'M':
-                $html_result .= "<div class='col'>$month_result</div>";
+                $html_result .= "<div class='col-sm-4'>$month_result</div>";
                 break;
 
             case 'Y':
-                $html_result .= "<div class='col'>$year_result</div>";
+                $html_result .= "<div class='col-sm-4'>$year_result</div>";
                 break;
         }
         // Add the field seperator

@@ -55,6 +55,12 @@ class Rules
         if (in_array($field['type'], ['R'])) {
             $conditionQualifier = '';
             $selectorQualifier = ':checked';
+        } elseif (
+            in_array($field['type'], ['M']) ||
+            ($field['type'] === 'e' && $field['options_map']['inputtype'] === 'checkbox')
+        ) {
+            $conditionQualifier = '';
+            $selectorQualifier = '';
         } else {
             $conditionQualifier = ':last';
             $selectorQualifier = '';
@@ -67,8 +73,11 @@ class Rules
         foreach ($this->conditions->predicates as $predicate) {
             $selector = '[name=\'' . $predicate->target_id . '\']' . $conditionQualifier;
             $selectors[] = $selector;
-            if (in_array($field['type'], ['R'])) {
-                // radio button value is only relevant for the :checked one
+            if (
+                in_array($field['type'], ['R', 'M']) ||
+                ($field['type'] === 'e' && $field['options_map']['inputtype'] === 'checkbox')
+            ) {
+                // radio button / checkbox value is only relevant for the :checked one
                 $conditionPrefix = '$("' . $selector . $selectorQualifier . '", $(this).form()).length && ';
             } else {
                 $conditionPrefix = '';

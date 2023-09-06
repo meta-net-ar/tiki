@@ -75,11 +75,16 @@
                                 {assign var="hasPageAction" value="1"}
                             </a>
                         {/if}
-                            {if $tiki_p_remove_article eq 'y'}
-                                <a class="dropdown-item" href="tiki-list_articles.php?remove={$articleId}">
-                                    {icon name='remove'} {tr}Remove{/tr}
-                                </a>
-                            {/if}
+                        {if $tiki_p_remove_article eq 'y'}
+                            <a class="dropdown-item" href="tiki-list_articles.php?remove={$articleId}">
+                                {icon name='remove'} {tr}Remove{/tr}
+                            </a>
+                        {/if}
+                        {if $tiki_p_admin_cms eq 'y' or $tiki_p_assign_perm_cms eq 'y'}
+                            <span class="dropdown-item">
+                                {permission_link mode=text type=article permType=articles id=$articleId parentId=$topicId}
+                            </span>
+                        {/if}
                     </div>
                     {if ! $js}</li></ul>{/if}
                 </div>

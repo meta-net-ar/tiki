@@ -181,7 +181,7 @@ class AlchemyLib
     {
         if (null === self::$mimeTypeGuesserInstance) {
             self::$mimeTypeGuesserInstance = new Guesser();
-            MimeTypes::getInstance()->registerGuesser(self::$mimeTypeGuesserInstance);
+            MimeTypes::getDefault()->registerGuesser(self::$mimeTypeGuesserInstance);
         }
 
         return self::$mimeTypeGuesserInstance;

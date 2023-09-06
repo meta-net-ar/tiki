@@ -22,7 +22,7 @@
     <div align="right">{$display_catpath}</div>
 {/if}
 
-{if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($freetags.data[0]) and $prefs.freetags_show_middle eq 'y'}
+{if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($tags[0]) and $prefs.freetags_show_middle eq 'y'}
     {include file='freetag_list.tpl'}
 {/if}
 

@@ -301,6 +301,7 @@ CREATE TABLE `tiki_banning` (
   `use_dates` char(1) default NULL,
   `created` int(14) default NULL,
   `message` text,
+  `attempts` INT NULL,
   PRIMARY KEY (`banId`),
   INDEX ban(`use_dates`, `date_from`, `date_to`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
@@ -413,14 +414,22 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `lang` char(16) NOT NULL default 'en',
   `name` varchar(255) NOT NULL default '',
   `description` blob,
+  `daily` tinyint(1) default 0,
+  `days` int default NULL,
   `weekly` tinyint(1) default '0',
+  `weeks` int default NULL,
   `weekdays` VARCHAR(20) DEFAULT NULL,
   `monthly` tinyint(1) default '0',
+  `months` int default NULL,
   `dayOfMonth` int(2),
   `monthlyType` enum('date','weekday') NULL default NULL,
   `monthlyWeekdayValue` varchar(4) NULL default NULL COMMENT 'Format => (-) + 1digit + 2 letters for weekday (1MO for every 1st Monday or -1TH for last Thursday of each month )',
   `yearly` tinyint(1) default '0',
+  `years` int default NULL,
+  `yearlyType` enum('date','weekday') NULL default NULL,
   `dateOfYear` int(4),
+  `yearlyWeekdayValue` varchar(4) NULL default NULL COMMENT 'Format => (-) + 1digit + 2 letters for weekday (1MO for every 1st Monday or -1TH for last Thursday of each month)',
+  `yearlyWeekMonth` int default NULL,
   `nbRecurrences` int(8),
   `startPeriod` int(14),
   `endPeriod` int(14),
@@ -1651,7 +1660,7 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Sheets','tiki-sheets.php',782,'feature_sheet','tiki_p_view_sheet','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Trackers','tiki-list_trackers.php',800,'feature_trackers','tiki_p_list_trackers','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Trackers','tiki-list_trackers.php',805,'feature_trackers','tiki_p_list_trackers','',0);
-INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Manage Tabular Formats','tiki-tabular-manage',810,'tracker_tabular_enabled','tiki_p_tabular_admin','',0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Manage Tabular Formats','tiki-ajax_services.php?controller=tabular&action=manage',810,'tracker_tabular_enabled','tiki_p_tabular_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Machine Learning','tiki-ml-list',820,'feature_machine_learning','tiki_p_machine_learning','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Models','tiki-ml-list',825,'feature_machine_learning','tiki_p_machine_learning','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s', 'Accounting', 'tiki-accounting_books.php', 830, 'feature_accounting', 'tiki_p_acct_view', '', 0);
@@ -2401,6 +2410,7 @@ CREATE TABLE `tiki_surveys` (
   `surveyId` int(12) NOT NULL auto_increment,
   `name` varchar(200) default NULL,
   `description` text,
+  `restriction` char(1) default NULL,
   `taken` int(10) default NULL,
   `lastTaken` int(14) default NULL,
   `created` int(14) default NULL,
@@ -3491,7 +3501,7 @@ CREATE TABLE `tiki_plugin_security` (
   `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `last_objectType` VARCHAR(20) NOT NULL,
   `last_objectId` VARCHAR(200) NOT NULL,
-  `body` text,
+  `body` MEDIUMTEXT,
   `arguments` text,
   PRIMARY KEY (`fingerprint`(191)),
   KEY `last_object` (last_objectType, last_objectId(171))
@@ -4159,3 +4169,16 @@ CREATE TABLE `tiki_password_blacklist` (
 ) ENGINE=MyISAM;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+DROP TABLE IF EXISTS `tiki_custom_color_modes`;
+CREATE TABLE `tiki_custom_color_modes` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(50) NOT NULL,
+	`icon` VARCHAR(50) NOT NULL,
+  `custom` VARCHAR(2) NOT NULL DEFAULT 'n',
+	`css_variables` TEXT NULL,
+	PRIMARY KEY (`id`),
+  UNIQUE INDEX (`name`)
+) ENGINE=MyISAM;
+
+INSERT INTO `tiki_custom_color_modes` (`name`, `icon`) VALUES ('light', 'sun'), ('dark','moon'), ('auto', 'circle-half');

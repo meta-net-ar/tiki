@@ -15,6 +15,7 @@ function wikiplugin_sheet_info()
         'iconname' => 'table',
         'introduced' => 1,
         'tags' => [ 'basic' ],
+        'validate' => 'arguments',
         'params' => [
             'id' => [
                 'required' => false,
@@ -25,6 +26,7 @@ function wikiplugin_sheet_info()
                 'default' => '',
                 'since' => '1',
                 'profile_reference' => 'sheet',
+                'safe' => true
             ],
             'url' => [
                 'required' => false,
@@ -45,6 +47,7 @@ function wikiplugin_sheet_info()
                 'filter' => 'alpha',
                 'default' => 'n',
                 'since' => '5.0',
+                'safe' => true,
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -59,7 +62,8 @@ function wikiplugin_sheet_info()
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by %).',
                 'default' => 'Page width',
-                'since' => '6.0'
+                'since' => '6.0',
+                'safe' => true
             ],
             'height' => [
                 'required' => false,
@@ -68,7 +72,8 @@ function wikiplugin_sheet_info()
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by %).',
                 'default' => 'Spreadsheet height',
-                'since' => '5.0'
+                'since' => '5.0',
+                'safe' => true
             ],
             'editable' => [
                 'required' => false,
@@ -78,6 +83,7 @@ function wikiplugin_sheet_info()
                 'accepted' => 'y or n',
                 'default' => 'y',
                 'since' => '6.0',
+                'safe' => true,
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -92,6 +98,7 @@ function wikiplugin_sheet_info()
                 'accepted' => 'y or n',
                 'default' => 'y',
                 'since' => '6.0',
+                'safe' => true,
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -107,6 +114,7 @@ function wikiplugin_sheet_info()
                 'accepted' => 'Cell range, e.g. "D1:F3" or "e14:e14"',
                 'default' => 'All cells',
                 'since' => '6.0',
+                'safe' => true
             ],
             'class' => [
                 'required' => false,
@@ -116,6 +124,7 @@ function wikiplugin_sheet_info()
                 'accepted' => 'Any valid CSS class',
                 'default' => '',
                 'since' => '6.0',
+                'safe' => true
             ],
         ],
     ];

@@ -13,7 +13,7 @@ s{extends "layout_view.tpl"}
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
         <form method="post" action="{service controller=manager action=setup_clone}" id="tiki-manager-clone-form">
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Do You Want to Upgrade{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.upgrade}{/tr}">
@@ -28,7 +28,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Instances Source{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.source}{/tr}">
@@ -41,7 +41,7 @@ s{extends "layout_view.tpl"}
                     <div class="form-text" id="source_detail">{tr}Some instances are not upgradeable and thus, they are not listed here.{/tr}</div>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Instances Destination{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.target}{/tr}">
@@ -53,7 +53,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Tiki Branch{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.branch}{/tr}">
@@ -69,7 +69,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Time for Backup{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.time}{/tr}">
@@ -80,7 +80,7 @@ s{extends "layout_view.tpl"}
                     <input required value="" class="form-control" id="crontime" type="text" name="crontime" placeholder="0 0 * * *">
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Prevent using the backup step{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help.direct}{/tr}">
@@ -95,7 +95,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Use last backup?{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help['use-last-backup']}{/tr}">
@@ -110,7 +110,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Keep Backup?{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help['keep-backup']}{/tr}">
@@ -125,7 +125,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Live reindex{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help['live-reindex']}{/tr}">
@@ -140,7 +140,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Skip ReIndex{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help['skip-reindex']}{/tr}">
@@ -155,7 +155,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Skip cache warmup?{/tr}
                     <a class="tikihelp text-info" title="{tr}Description{/tr}| {tr}{$help['skip-cache-warmup']}{/tr}">
@@ -170,7 +170,7 @@ s{extends "layout_view.tpl"}
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="clone" value="{tr}Creat Cron Job{/tr}">

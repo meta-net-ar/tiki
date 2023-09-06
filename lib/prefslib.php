@@ -739,7 +739,7 @@ class PreferencesLib
             $themePath = TikiLib::lib('theme')->get_theme_path($themeName);
             $inc_file = $themePath . "prefs/{$file}.php";
         }
-        if (file_exists($inc_file)) {
+        if (file_exists($inc_file) && $file !== "index") {
             require_once $inc_file;
             $function = "prefs_{$file}_list";
             if (function_exists($function)) {
@@ -1066,6 +1066,10 @@ class PreferencesLib
 
         if (isset($info['filter']) && $filter = TikiFilter::get($info['filter'])) {
             $value = $filter->filter($data[$name]);
+        }
+
+        if (is_array($value)) {
+            return $value;
         }
 
         $value = str_replace("\r", "", $value);

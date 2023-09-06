@@ -8,6 +8,11 @@ class CollectionContains extends Operator
 {
     public function __construct()
     {
-        parent::__construct(tr('contains'), Collection::class, '.collectionContains("%argument%")', [Collection::class]);
+        parent::__construct(
+            tr('contains'),
+            Collection::class,
+            '.collectionContains("%argument%")',
+            [Collection::class]
+        );
     }
 }

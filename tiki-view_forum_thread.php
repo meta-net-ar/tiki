@@ -353,8 +353,12 @@ if ($tiki_p_admin_forum == 'y') {
 if ($prefs['feature_freetags'] == 'y') {
     $cat_type = 'forum post';
     $cat_objid = $comments_parentId;
-    $tags = $freetaglib->get_tags_on_object($cat_objid, $cat_type);
-    $smarty->assign('freetags', $tags);
+    $objectTags = $freetaglib->get_tags_on_object($cat_objid, $cat_type);
+    $tags = [];
+    if ($objectTags) {
+        $tags = $objectTags['data'];
+    }
+    $smarty->assign('tags', $tags);
 }
 $defaultRows = $prefs['default_rows_textarea_forumthread'];
 $smarty->assign('forum_mode', 'y');

@@ -81,7 +81,7 @@ function wikiplugin_pivottable_info()
                 'description' => tr('The order in which column data is provided to the renderer, must be one of "key_a_to_z", "value_a_to_z", "value_z_to_a", ordering by value orders by column total.'),
                 'since' => '',
                 'filter' => 'text',
-                'default' => '',
+                'default' => 'key_a_to_z',
             ],
             'rowOrder' => [
                 'required' => false,
@@ -89,7 +89,7 @@ function wikiplugin_pivottable_info()
                 'description' => tr('The order in which row data is provided to the renderer, must be one of "key_a_to_z", "value_a_to_z", "value_z_to_a", ordering by value orders by row total.'),
                 'since' => '',
                 'filter' => 'text',
-                'default' => '',
+                'default' => 'key_a_to_z',
             ],
             'heatmapDomain' => [
                 'required' => false,
@@ -335,6 +335,14 @@ function wikiplugin_pivottable_info()
                     ['text' => tra('No'), 'value' => 'n'],
                     ['text' => tra('Yes'), 'value' => 'y']
                 ]
+            ],
+            'lang' => [
+                'name' => tr('Language For Pivot Table'),
+                'required' => false,
+                'description' => tr('This helps to avoid pivotUI missing the choosen aggregator next time you change the site language. Default value: "site" if you want to keep using the site language'),
+                'since' => '26',
+                'filter' => 'text',
+                'default' => 'site',
             ]
         ],
     ];
@@ -361,7 +369,18 @@ function wikiplugin_pivottable($data, $params)
     $headerlib->add_jsfile('vendor_bundled/vendor/nagarajanchinnasamy/subtotal/dist/subtotal.min.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-pivottable.js', true);
 
-    $lang = substr($prefs['site_language'], 0, 2);
+    // use default param value if not given
+    $defaults = [];
+    foreach ($info['params'] as $key => $value) {
+        $defaults[$key] = $value['default'] ?? null;
+    }
+    $params = array_merge($defaults, $params);
+
+    if ($params['lang'] == "site") {
+        $lang = substr($prefs['site_language'], 0, 2);
+    } else {
+        $lang = substr($params['lang'], 0, 2); //Here we don't use the site language anymore!
+    }
     if (file_exists('vendor_bundled/vendor/nicolaskruchten/pivottable/dist/pivot.' . $lang . '.js')) {
         $headerlib->add_jsfile('vendor_bundled/vendor/nicolaskruchten/pivottable/dist/pivot.' . $lang . '.js', true);
     }
@@ -405,6 +424,10 @@ function wikiplugin_pivottable($data, $params)
         $height = "1000px";
     }
     $derivedAttributes = [];
+    $definitions = [];
+    $splittedAttributes = [];
+    $attributesOrder = [];
+    $heatmapParams = [];
 
     if ($dataType === "tracker") {
         $trackerIds = preg_split('/\s*,\s*/', $params['data'][1]);
@@ -846,7 +869,7 @@ function wikiplugin_pivottable($data, $params)
     foreach ($fields as $field) {
         $field = wikiplugin_pivottable_field_from_definitions($field['permName'], $definitions, $field);
         $fieldsArr[$field['name']] = $field['permName'];
-        if ($field['type'] == 'f') {
+        if ($field['type'] == 'f' || $field['type'] == 'j') {
             $dateFields[] = $field['name'];
         }
     }
@@ -995,23 +1018,23 @@ function wikiplugin_pivottable($data, $params)
         'fieldsArr' => $fieldsArr,
         'dateFields' => $dateFields,
         'inclusions' => $inclusions,
-        'colOrder' => $params['colOrder'] ?? 'key_a_to_z',
-        'rowOrder' => $params['rowOrder'] ?? 'key_a_to_z',
-        'menuLimit' => empty($params['menuLimit']) ? null : $params['menuLimit'],
+        'colOrder' => $params['colOrder'],
+        'rowOrder' => $params['rowOrder'],
+        'menuLimit' => $params['menuLimit'],
         'aggregateDetails' => implode(':', $params['aggregateDetails']),
-        'aggregateDetailsFormat' => $params['aggregateDetailsFormat'] ?? null,
-        'aggregateDetailsCallback' => $params['aggregateDetailsCallback'] ?? null,
+        'aggregateDetailsFormat' => $params['aggregateDetailsFormat'],
+        'aggregateDetailsCallback' => $params['aggregateDetailsCallback'],
         'attributesOrder' => $attributesOrder,
         'highlight' => $highlight,
-        'highlightMine' => empty($params['highlightMine']) ? null : $params['highlightMine'],
-        'highlightGroup' => empty($params['highlightGroup']) ? null : $params['highlightGroup'],
-        'xAxisLabel' => empty($params['xAxisLabel']) ? null : $params['xAxisLabel'],
-        'yAxisLabel' => empty($params['yAxisLabel']) ? null : $params['yAxisLabel'],
-        'chartTitle' => empty($params['chartTitle']) ? null : $params['chartTitle'],
-        'chartHoverBar' => empty($params['chartHoverBar']) ? null : $params['chartHoverBar'],
-        'translate' => empty($params['translate']) ? null : $params['translate'],
+        'highlightMine' => $params['highlightMine'],
+        'highlightGroup' => $params['highlightGroup'],
+        'xAxisLabel' => $params['xAxisLabel'],
+        'yAxisLabel' => $params['yAxisLabel'],
+        'chartTitle' => $params['chartTitle'],
+        'chartHoverBar' => $params['chartHoverBar'],
+        'translate' => $params['translate'],
         'index' => $id,
-        'allowStickyHeaders' => empty($params['allowStickyHeaders']) ? 'n' : $params['allowStickyHeaders'],
+        'allowStickyHeaders' => $params['allowStickyHeaders'],
     ]);
 
     $out .= $smarty->fetch('wiki-plugins/wikiplugin_pivottable.tpl');

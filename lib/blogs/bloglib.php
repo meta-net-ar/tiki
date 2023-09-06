@@ -1354,7 +1354,7 @@ class BlogLib extends TikiDb_Bridge
 
             /* We don't want to stop this loop until we've counted sufficient displaying
                characters, not just string positions */
-            for ($pos = 0; $tally['char'] < $charCount; $pos++) {
+            for ($pos = 0; $pos < strlen($arrString) && $tally['char'] < $charCount; $pos++) {
                 if ($arrString[$pos] == '<' && $counter == 'char') {
                     $counter = 'tags';
                 } elseif ($arrString[$pos] == '>' && $counter == 'tags') {

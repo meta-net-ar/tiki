@@ -12,7 +12,7 @@
     {if $module_decorations ne 'n'}
         <div class="card-header" {if !empty($module_params.bgcolor)} style="background-color:{$module_params.bgcolor};"{/if}>
             {if ($module_notitle ne 'y' && !empty($module_title)) || ($module_flip eq 'y' and $prefs.javascript_enabled ne 'n') || $prefs.menus_items_icons eq 'y'}
-                <h3 class="card-title clearfix">
+                <h3 class="card-title">
                     {if $module_notitle ne 'y' && !empty($module_title)}
                         <span class="moduletitle">{$module_title}</span>
                     {/if}
@@ -73,7 +73,7 @@
         {/if}
         <div id="mod-{$smarty.capture.name}"
              style="display: {if (!isset($module_display) or $module_display) && (!isset($module_dstate) or $module_dstate == 'o')}block{else}none{/if};{$module_params.style}"
-             class="clearfix card-body{if !empty($module_params.class)} {$module_params.class}{/if}">
+             class="card-body{if !empty($module_params.class)} {$module_params.class}{/if}">
             {else}{* $module_nobox eq 'y' *}
             <div id="module_{$moduleId}" style="{$module_params.style}{$tpl_module_style}"
                  class="module{if !empty($module_params.class)} {$module_params.class}{/if} box-{$module_name}">

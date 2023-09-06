@@ -84,6 +84,7 @@ $prefix: bs-;
 
 // $bg-light: #18a3bb !important; (Changing tactics for Bootstrap 5)
 $body-bg: #fff;
+$body-color: $gray-800 !default;
 
 $link-color: #11606E;
 $link-hover-color:            darken($link-color, 15%);
@@ -114,6 +115,8 @@ $hr-color: #18a3bb;
 $text-success: #288040 !important;
 $text-danger: #d63d00 !important;
 $text-muted:  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- #6B737B;
+
+$headings-color:              #169FB6; // var(--#{$prefix}body-color);
 
 // Tables
 $table-border-color: #1296a9;
@@ -163,7 +166,7 @@ $pagination-disabled-bg: #ffffff;
 $pagination-disabled-border-color: #dddddd;
 
 // Code
-$code-color:                        $pink !default;
+$code-color:                        $body-color; // $pink !default;
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 
@@ -224,6 +227,7 @@ $bg-dark-info: #00DAE6;
     --tiki-top-bg: #{$top-light-bg} !important;
     --tiki-top-color: #{$top-link-color};
     --tiki-top-hover-color: #{$top-link-hover-color};
+    --tiki-top-text-color: #{$top-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -231,12 +235,14 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-light-bg};
     --tiki-topbar-color: #{$topbar-link-color};
     --tiki-topbar-hover-color: #{$navbar-light-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-link-hover-color};
 }
 
 .tiki .tiki-top-nav-dark {
     --tiki-top-bg: #{$top-dark-bg} !important;
     --tiki-top-color: #{$navbar-dark-link-color};
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -244,6 +250,7 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-dark-bg};
     --tiki-topbar-color: #{$navbar-dark-link-color};
     --tiki-topbar-hover-color: #{$navbar-dark-link-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-link-hover-color};
 }
 
 .tiki-nav-top-light, .tiki-nav-top-dark {

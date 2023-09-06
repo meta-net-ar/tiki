@@ -27,31 +27,31 @@
             </fieldset>
             <fieldset>
                 <legend>{tr}Add an available master server{/tr}{help desc='{tr}The InterTiki Server fields are for defining for every master server you want to have access to from this client{/tr}'}</legend>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server name{/tr}{help desc='{tr}Set the name of your target server as defined in the server name field of the master. Use a distinct, but easily understood value.{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[name]" value="" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server host{/tr}{help desc='{tr}The full URL of the master servers primary Tiki (ex: https://tiki.org). Even if your Tiki is not at the top level of your web directory, you will still use the site\'s URL per the ex. above.{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[host]" value="" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server port{/tr}{help desc='{tr}The port number the master tiki responds to HTTP on (usually 80).{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[port]" value="" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server path{/tr}{help desc='{tr}The full path (from the URL root) to the PHP file containing the XMLRPC handler on the server. EX 1: If the master tiki resides at the root of the site, you would enter "/remote.php". EX 2: Say the master tiki is found at http://www.mydomain.com/tiki/mytiki, you would enter "/tiki/mytiki/remote.php" in this field.{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[path]" value="" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server groups{/tr}{help desc='{tr}Groups on the master to authenticate to (only auth users in the groups defined, case-sensitive).{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[groups]" value="" class="form-control">

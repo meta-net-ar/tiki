@@ -352,7 +352,7 @@ if (isset($_REQUEST['page'])) {
     //however other forms that perform actions other than changing preferences should not redirect to avoid infinite loops
     //for these add a hidden input named redirect with a value of 0
     if (
-        $access->csrfResult() && (! isset($_POST['redirect']) || $_POST['redirect'] === 1)
+        $access->csrfResult() && (! isset($_POST['redirect']) || strval($_POST['redirect']) === '1')
         && ! isset($_POST['saveblacklist']) && ! isset($_POST['viewblacklist'])
     ) {
         $access->redirect($_SERVER['REQUEST_URI'], '', 200);
@@ -394,6 +394,8 @@ if ($prefs['feature_version_checks'] == 'y' || $forcecheck) {
     $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
 
     $smarty->assign('upgrade_messages', $upgrades);
+} else {
+    $smarty->assign('upgrade_messages', []);
 }
 
 // SSL setup
@@ -462,6 +464,11 @@ $smarty->assign('db_requires_update', $installer->requiresUpdate());
 $smarty->assign('missing_patches', $installer->missingPatches());
 $smarty->assign('installer_not_locked', $installer->checkInstallerLocked());
 $smarty->assign('db_engine_type', getCurrentEngine());
+
+$smarty->assign('wiki_attachments_migrated', true);
+if ($prefs['feature_wiki_attachments'] === 'y' && $prefs['feature_use_fgal_for_wiki_attachments'] === 'y') {
+    $smarty->assign('wiki_attachments_migrated', TikiLib::lib('wiki')->attachmentsCount() == 0);
+}
 
 $unifiedsearch = \TikiLib::lib('unifiedsearch');
 $smarty->assign('search_index_outdated', $unifiedsearch->isOutdated());

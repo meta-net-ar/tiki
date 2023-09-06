@@ -618,7 +618,7 @@ foreach ($fieldDefinitions as $i => $current_field) {
 $smarty->assign('tracker_item_main_value', $trklib->get_isMain_value($trackerId, $itemId));
 
 //restore types values if there is an error
-if (isset($error)) {
+if (! empty($error)) {
     foreach ($ins_fields["data"] as $i => $current_field) {
         if (isset($error["data"][$i]["value"])) {
             $ins_fields["data"][$i]["value"] = $error["data"][$i]["value"];

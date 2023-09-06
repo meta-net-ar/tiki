@@ -238,7 +238,8 @@ function wikiplugin_freetagged($data, $params)
         $smarty->assign('more', 'n');
     }
 
-    $moreurlparams = 'tag=' . $tags . '&old_type=' . urlencode($type) . '&sort_mode=' . urlencode($params['sort_mode']) . '&find=' . urlencode($find) . '&broaden=' . urlencode($broaden);
+    $moreurlparams = 'tag=' . $tags . '&old_type=' . urlencode($type ?? '') . '&sort_mode=' . urlencode($params['sort_mode'] ?? '') . '&find=' . urlencode($find ?? '') . '&broaden=' . urlencode($broaden ?? '');
+
     if (strpos($moreurl, '?') === false) {
         $moreurl = $moreurl . '?' . $moreurlparams;
     } else {
@@ -300,6 +301,7 @@ function wikiplugin_freetagged($data, $params)
                     }
 
                     $obj['img'] = wikiplugin_img('', $imgparams, 0);
+                    $obj['img'] = WikiPlugin_Helper::resultString($obj['img']);
                     $obj['img'] = str_replace('~np~', '', $obj['img']); // don't nest ~np~
                     $obj['img'] = str_replace('~/np~', '', $obj['img']);
                     break;

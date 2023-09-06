@@ -561,7 +561,7 @@ class ObjectLib extends TikiLib
                 return TikiLib::lib('user')->clean_user($id);
             case 'calendar':
                 $info = TikiLib::lib('calendar')->get_calendar($id);
-                return $info['name'];
+                return isset($info['name']) ? $info['name'] : "";
             case 'calendar event':
             case 'calendaritem':
                 $info = TikiLib::lib('calendar')->get_item($id);
@@ -751,6 +751,12 @@ class ObjectLib extends TikiLib
             'blog' => 'tiki_p_read_blog',
             'quiz' => 'tiki_p_take_quiz',
             'template' => 'tiki_p_use_content_templates',
+            'blog post' => 'tiki_p_read_blog',
+            'article' => 'tiki_p_read_article',
+            'submission' => 'tiki_p_approve_submission',
+            'calendar' => 'tiki_p_view_calendar',
+            'file' => 'tiki_p_download_files',
+            'trackeritem' => $comment ? 'tiki_p_tracker_view_comments' : 'tiki_p_view_trackers',
 
             // overhead - we are checking individual permission on types below, but they
             // can't have individual permissions, although they can be categorized.
@@ -760,18 +766,6 @@ class ObjectLib extends TikiLib
             'directory' => 'tiki_p_view_directory',
             'faq' => 'tiki_p_view_faqs',
             'sheet' => 'tiki_p_view_sheet',
-
-            // these ones are tricky, because permission type is for container, not object itself.
-            // I think we need to refactor permission schemes for them to be wysiwyca - lfagundes
-            //
-            // by now they're not showing, list_category_objects needs support for ignoring permissions
-            // for a type.
-            'blog post' => 'tiki_p_read_blog',
-            'article' => 'tiki_p_read_article',
-            'submission' => 'tiki_p_approve_submission',
-            'calendar' => 'tiki_p_view_calendar',
-            'file' => 'tiki_p_download_files',
-            'trackeritem' => $comment ? 'tiki_p_tracker_view_comments' : 'tiki_p_view_trackers',
 
             // newsletters can't be categorized, although there's some code in tiki-admin_newsletters.php
             // 'newsletter' => ?,

@@ -44,6 +44,13 @@ $red-300: tint-color($red, 40%) !default;
 
 $min-contrast-ratio:   1.45 !default;
 
+// Options
+// Prefix for :root CSS variables
+
+$variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
+$prefix:                      $variable-prefix !default;
+
+
 // Body
 
 $body-color:                #595959; // $gray-600 !default; Modified for Tiki, for WCAG compliance
@@ -63,7 +70,7 @@ $border-radius-sm:            .3rem !default;
 
 // stylelint-disable-next-line value-keyword-case
 $headings-font-family:        Montserrat, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !default;
-$headings-color:              $gray-700 !default;
+$headings-color:              inherit;
 
 // Tables
 
@@ -99,6 +106,14 @@ $pagination-disabled-color:         $white !default;
 $pagination-disabled-bg:            #cce8e0 !default;
 $pagination-disabled-border-color:  $pagination-disabled-bg !default;
 
+// Popovers
+$popover-bg:                        var(--#{$prefix}body-bg) !default;
+$popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
+$popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
+$popover-header-color:              $headings-color !default;
+$popover-body-color:                var(--#{$prefix}body-color) !default;
+
+
 // Alerts
 
 $alert-color-scale:                 0% !default;
@@ -114,5 +129,5 @@ $breadcrumb-active-color:           $breadcrumb-divider-color !default;
 $breadcrumb-border-radius:          .25rem !default;
 
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
 //--------------------------- Tiki SCSS variables

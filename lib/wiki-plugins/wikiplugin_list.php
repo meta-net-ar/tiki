@@ -196,7 +196,7 @@ function wikiplugin_list($data, $params)
             }
         }
     }
-    if (! empty($_REQUEST[$offset_arg])) {
+    if (! empty($_REQUEST[$offset_arg]) && ! empty($args['offset_arg'])) {
         $cacheName .= '_' . $args['offset_arg'] . '=' . $_REQUEST[$offset_arg];
     }
     if (! $multisearch) {

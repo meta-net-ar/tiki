@@ -100,23 +100,31 @@
         {/if}
 
         <form action="tiki-admin_surveys.php" method="post" role="form">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <input type="hidden" name="surveyId" value="{$info.surveyId|escape}">
                 <label for="name" class="col-sm-2 col-form-label">{tr}Name{/tr}</label>
                 <div class="col-sm-10">
                     <input type="text" name="name" id="name" class="form-control" value="{$info.name|escape}">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="description" class="col-sm-2 col-form-label">{tr}Description{/tr}</label>
                 <div class="col-sm-10">
                     {textarea name="description" rows="6" id="description" class="form-control" _toolbars='y' _simple='y' comments='y'}{$info.description}{/textarea}
                 </div>
             </div>
+            <div class="tiki-form-group row">
+                <label for="restriction" class="col-form-label col-sm-2">
+                    {tr}Restrict admin users to one vote{/tr}
+                </label>
+                <div class="col-sm-10">
+                    <input type="checkbox" name="restriction" id="restriction" {if $info.restriction eq 'y'}checked="checked"{/if}>
+                </div>
+            </div>
             <div class="mb-4">
                 {include file='categorize.tpl' labelcol='2' inputcol='10'}
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="status" class="col-sm-2 col-form-label">{tr}Status{/tr}</label>
                 <div class="col-sm-10">
                     <select name="status" class="form-select">
@@ -125,7 +133,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <div class="col-sm-10 offset-sm-2">
                     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
                 </div>

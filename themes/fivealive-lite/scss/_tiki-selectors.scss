@@ -287,10 +287,10 @@ header.header {
     background: $postbody-title-bg; //url('#{$imagePath}siteheader.png') no-repeat -480px -200px;
 }
 
-.siteloginbar_poppedup li > a,
-.siteloginbar_poppedup label {
-    color: $navbar-dark-color;
-}
+//.siteloginbar_poppedup li > a,
+//.siteloginbar_poppedup label {
+//    color: $navbar-dark-color;
+//}
 
 .popover {
     color: $body-color;

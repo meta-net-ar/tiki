@@ -30,6 +30,13 @@
                             </a>
                         </action>
                     {/if}
+                    {if $tiki_p_forums_report eq 'y'}
+                        <action>
+                            {self_link report=$comment.threadId _icon_name='error' _menu_text='y' _menu_icon='y'}
+                                {tr}Report this post{/tr}
+                            {/self_link}
+                        </action>
+                    {/if}
                     {if $tiki_p_admin_forum eq 'y'}
                         <action>
                             <a {if $first eq 'y'} href="{bootstrap_modal controller=forum action=delete_topic forumId={$forum_info.forumId} comments_threshold={$comments_threshold} forumtopic={$comment.threadId} comments_offset={$comments_offset} thread_sort_mode={$thread_sort_mode} comments_find={$smarty.request.topics_find} comments_per_page={$comments_per_page}}"
@@ -38,13 +45,6 @@
                             >
                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete post{/tr}"}
                             </a>
-                        </action>
-                    {/if}
-                    {if $tiki_p_forums_report eq 'y'}
-                        <action>
-                            {self_link report=$comment.threadId _icon_name='error' _menu_text='y' _menu_icon='y'}
-                                {tr}Report this post{/tr}
-                            {/self_link}
                         </action>
                     {/if}
                     {if $user and $prefs.feature_notepad eq 'y' and $tiki_p_notepad eq 'y' and $forumId}

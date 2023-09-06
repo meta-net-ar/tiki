@@ -70,6 +70,7 @@ $needed_prefs = [
     'tiki_cdn' => '',
     'tiki_cdn_ssl' => '',
     'language' => 'en',
+    'site_language' => 'en',
     'lang_use_db' => 'n',
     'feature_fullscreen' => 'n',
     'error_reporting_level' => 0,
@@ -259,8 +260,10 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
     if ($start_session) {
         // enabing silent sessions mean a session is only started when a cookie is presented
         $session_params = session_get_cookie_params();
-        session_set_cookie_params($session_params['lifetime'], $tikiroot);
-        unset($session_params);
+        if (isset($prefs['session_protected']) && $prefs['session_protected'] == 'y') {
+            $session_params['secure'] = true;
+        }
+        session_set_cookie_params($session_params['lifetime'], $tikiroot, $session_params['domain'], $session_params['secure'], $session_params['httponly']);
 
         $error = \TikiSetup::checkSession();
 
@@ -293,7 +296,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
                 } else {
                     $sequence = $tikilib->generate_unique_sequence(16);
                     $_SESSION['extra_validation'] = $sequence;
-                    setcookie($extra_cookie_name, $sequence, time() + 365 * 24 * 3600, ini_get('session.cookie_path'), '', false, true);
+                    setcookie($extra_cookie_name, $sequence, time() + 365 * 24 * 3600, $session_params['path'], $session_params['domain'], $session_params['secure'], $session_params['httponly']);
                     unset($sequence);
                 }
             }
@@ -302,6 +305,8 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
         } catch (Laminas\Stdlib\Exception\InvalidArgumentException $e) {
             // Ignore
         }
+
+        unset($session_params);
     }
 }
 

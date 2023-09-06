@@ -12,7 +12,10 @@ if ($prefs['sitemap_enable'] == 'y') {
 }
 
 echo <<<EOF
-# This is a robot.txt file for Tiki to tell all search bots that we don't want them to crawl in the paths beginning with the strings below.
+# This is a robots.txt file to instruct all search bots that we don't want them to crawl in the paths beginning with the strings below.
+# If you are viewing this via example.org/robots.txt, it is an alias of tiki-robots.php (likely via an instruction in .htaccess)
+# tiki-robots.php permits to dynamically generate a robots.txt file according to preferences set in the admin panel
+# 
 # For an installation in a subdirectory, you have to copy this file in root of your domain and add /yoursubdirname on each line.
 #
 # (c) Copyright by authors of the Tiki Wiki CMS Groupware Project

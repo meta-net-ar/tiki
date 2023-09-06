@@ -7,6 +7,7 @@
 namespace Search\Manticore;
 
 use TikiLib;
+use TikiFilter;
 
 class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 {
@@ -380,7 +381,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         }
 
         if ($query->getForeignQueries()) {
-            $table = PdoClient::DISTRIBUTED_INDEX_NAME;
+            $table = PdoClient::distributedIndexName();
         } else {
             $table = $this->index;
         }
@@ -608,6 +609,9 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         if (! empty($mapping['types']) && in_array('text', $mapping['types'])) {
             return true;
         }
+        if (! empty($mapping['options']) && in_array('indexed', $mapping['options'])) {
+            return true;
+        }
         return false;
     }
 
@@ -632,12 +636,12 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $mapping = $this->getFieldMapping($field);
             if (empty($mapping) && $prefs['search_error_missing_field'] === 'y') {
                 if (preg_match('/^tracker_field_/', $field)) {
-                    $msg = tr('Field %0 does not exist in the current index. Please check field permanent name and if you have any items in that tracker.', $field);
+                    $msg = tr('Field %0 does not exist in the current index. Please check field permanent name and if you have any items in that tracker.', TikiFilter::get('xss')->filter($field));
                     if ($prefs['unified_exclude_nonsearchable_fields'] === 'y') {
                         $msg .= ' ' . tr('You have disabled indexing non-searchable tracker fields. Check if this field is marked as searchable.');
                     }
                 } else {
-                    $msg = tr('Field %0 does not exist in the current index. If this is a tracker field, the proper syntax is tracker_field_%0.', $field, $field);
+                    $msg = tr('Field %0 does not exist in the current index. If this is a tracker field, the proper syntax is tracker_field_%0.', TikiFilter::get('xss')->filter($field), TikiFilter::get('xss')->filter($field));
                 }
                 $e = new Exception($msg);
                 if ($field == 'tracker_id') {

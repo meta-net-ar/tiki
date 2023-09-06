@@ -16,7 +16,7 @@
     <form method="post" action="{service controller=manager_patch action=apply }" class="ajax-reuse-modal">
         <input type="hidden" name="instanceId" value="{$instance->id}">
         {foreach item=option from=$options}
-            <div class="form-group row p-2">
+            <div class="tiki-form-group row p-2">
                 <label class="col-form-label col-sm-3">
                     {tr}{$option.label}{/tr}
                     <a class="tikihelp text-info" title="{tr}{$option.label}:{/tr} {tr}{$option.help}{/tr}">

@@ -112,11 +112,11 @@
         </div>
         <br/>
         {literal}
-            <div class="mb-3 row" style="width:500px">
+            <div class="tiki-form-group row" style="width:500px">
                 <input placeholder="{tr}write a new message...{/tr}" type="text" id="data" size="30" class="form-control col-sm-9" onKeyPress="javascript:if(event.keyCode == 13) {write_msg(document.getElementById('data').value,document.getElementById('role').value,document.getElementById('username').value);}">
                 <button type="button" class="btn btn-primary col-sm-3" onClick="javascript:write_msg(document.getElementById('data').value,document.getElementById('role').value,document.getElementById('username').value);"><span class="fa fa-paper-plane"></span> {tr}send{/tr}</button>
             </div>
-        </div>
+        {/literal}
         
         <script type='text/javascript'>
             /* Activate polling of requests */

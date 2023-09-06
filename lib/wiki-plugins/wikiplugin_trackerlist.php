@@ -1865,6 +1865,7 @@ function wikiplugin_trackerlist($data, $params)
                 $perms = array_merge($perms, $trklib->get_special_group_tracker_perm($tracker_info));
             }
         }
+        $passfields = [];
         for ($i = 0, $count_allf = count($allfields['data']); $i < $count_allf; $i++) {
             if ($allfields['data'][$i]['type'] == 'C') {
                 $infoComputed = $trklib->get_computed_info($allfields['data'][$i]['options_array'][0], $trackerId, $allfields['data']);
@@ -2216,6 +2217,9 @@ function wikiplugin_trackerlist($data, $params)
             if (! empty($compute) && ! empty($items['data'])) {
                 $fs = preg_split('/ *: */', $compute);
                 foreach ($fs as $fieldId) {
+                    if (empty($passfields[$fieldId])) {
+                        continue;
+                    }
                     if (strstr($fieldId, "/")) {
                         list($fieldId, $oper) = preg_split('/ *\/ */', $fieldId);
                         $oper = strtolower($oper);
@@ -2227,6 +2231,7 @@ function wikiplugin_trackerlist($data, $params)
                     } else {
                         $oper = 'sum';
                     }
+                    $amount = [];
                     foreach ($items['data'] as $i => $item) {
                         foreach ($item['field_values'] as $field) {
                             if ($field['fieldId'] == $fieldId) {
@@ -2242,7 +2247,7 @@ function wikiplugin_trackerlist($data, $params)
                         }
                     }
                     $value = array_sum($amount);
-                    if ($oper == 'avg') {
+                    if ($oper == 'avg' && count($amount) > 0) {
                         $value = round($value / count($amount));
                     }
                     $computedFields[$fieldId][] = array_merge(['computedtype' => 'n', 'operator' => $oper, 'value' => $value], $passfields[$fieldId]);

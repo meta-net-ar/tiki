@@ -163,6 +163,25 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $this->assertEquals(1, $this->runner->evaluate());
     }
 
+    public function testContains()
+    {
+        $this->runner->setFormula('(contains test (1,2))');
+
+        $this->runner->setVariables(['test' => 2]);
+        $this->assertEquals(1, $this->runner->evaluate());
+
+        $this->runner->setVariables(['test' => 3]);
+        $this->assertEquals(0, $this->runner->evaluate());
+
+        $this->runner->setFormula('(contains test args.values_by_permname.version)');
+
+        $this->runner->setVariables(['test' => 2, 'args' => ['values_by_permname' => ['version' => "1,2"]]]);
+        $this->assertEquals(1, $this->runner->evaluate());
+
+        $this->runner->setVariables(['test' => 3, 'args' => ['values_by_permname' => ['version' => "1,2"]]]);
+        $this->assertEquals(0, $this->runner->evaluate());
+    }
+
     public function testIf()
     {
         $this->runner->setFormula('(if condition then else)');

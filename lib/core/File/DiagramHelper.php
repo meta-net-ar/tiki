@@ -106,10 +106,12 @@ class DiagramHelper
     {
         $file = TikiFile::id($fileId);
         $type = $file->getParam('filetype');
-        $data = trim($file->getContents());
 
-        if (in_array($type, ['text/plain', 'text/xml']) && (strpos($data, '<mx') === 0)) {
-            return true;
+        if (in_array($type, ['text/plain', 'text/xml'])) {
+            $data = trim($file->getContents());
+            if (strpos($data, '<mx') === 0) {
+                return true;
+            }
         }
 
         return false;

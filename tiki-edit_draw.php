@@ -238,11 +238,11 @@ $galleryId = htmlspecialchars($_REQUEST['galleryId']);
 $name = htmlspecialchars($_REQUEST['name']);
 $archive = isset($_REQUEST['archive']) ? htmlspecialchars($_REQUEST['archive']) : "";
 
-$index = isset($_REQUEST['index']) ? htmlspecialchars($_REQUEST['index']) : "";
-$page = isset($_REQUEST['page']) ? htmlspecialchars($_REQUEST['page']) : "";
-$label = isset($_REQUEST['label']) ? htmlspecialchars($_REQUEST['label']) : "";
-$width = isset($_REQUEST['width']) ? htmlspecialchars($_REQUEST['width']) : 640;
-$height = isset($_REQUEST['height']) ? htmlspecialchars($_REQUEST['height']) : 480;
+$index = isset($_REQUEST['index']) ? htmlspecialchars($_REQUEST['index'], ENT_QUOTES) : "";
+$page = isset($_REQUEST['page']) ? htmlspecialchars($_REQUEST['page'], ENT_QUOTES) : "";
+$label = isset($_REQUEST['label']) ? htmlspecialchars($_REQUEST['label'], ENT_QUOTES) : "";
+$width = isset($_REQUEST['width']) ? htmlspecialchars($_REQUEST['width'], ENT_QUOTES) : 640;
+$height = isset($_REQUEST['height']) ? htmlspecialchars($_REQUEST['height'], ENT_QUOTES) : 480;
 
 $smarty->assign("page", $page);
 $smarty->assign("isFromPage", isset($page));

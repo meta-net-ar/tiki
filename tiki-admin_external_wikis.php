@@ -43,7 +43,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         return $i['id'];
     }, $items);
 
-    $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->word(), $items);
+    $result = $adminlib->replace_extwiki($_REQUEST["extwikiId"], $_REQUEST["extwiki"], $_REQUEST['name'], $jitRequest->indexname->raw(), $items);
     $info = [
         'name' => '',
         'extwiki' => '',

@@ -23,37 +23,37 @@
 {* Add form *}
 <form action="tiki-admin_integrator.php" method="post">
     <input type="hidden" name="repID" value="{$repID|escape}">
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="Human-readable repository name">{tr}Name{/tr}</label>
         <div class="col-sm-7 ">
             <input type="text" name="name" value="{$name|escape}" title="{tr}Human-readable repository name{/tr}" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}Path to repository (local filesystem: relative/absolute web root, remote: prefixed with 'http://'){/tr}">{tr}Path{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="path" value="{$path|escape}" title="{tr}Path to repository (local filesystem: relative/absolute web root, remote: prefixed with 'http://'){/tr}" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}File name of start page{/tr}">{tr}Start page{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="start" value="{$start|escape}" title="{tr}File name of start page{/tr}" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}CSS file to load when browse this repository{/tr}">{tr}CSS File{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="cssfile" value="{$cssfile|escape}" title="{tr}CSS file to load when browse this repository{/tr}" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}Is repository visible to users{/tr}">{tr}Visible{/tr}</label>
         <div class="col-sm-7">
             <input type="checkbox" name="vis" {if $vis eq 'y'}checked="checked"{/if} title="{tr}Is repository visible to users{/tr}">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}Can files from repository be cached{/tr}">{tr}Cacheable{/tr}</label>
         <div class="col-sm-7">
             <input type="checkbox" name="cacheable" {if $cacheable eq 'y'}checked="checked"{/if} title="{tr}Can files from repository be cached{/tr}">
@@ -65,20 +65,20 @@
                 {/if}
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}Seconds count 'till cached page will be expired{/tr}">{tr}Cache expiration{/tr}</label>
         <div class="col-sm-7">
             <input type="number" min="0" name="expiration" value="{$expiration|escape}" title="{tr}Seconds count 'till cached page will be expired{/tr}"
             class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label" title="{tr}Human-readable text description of repository{/tr}">{tr}Description{/tr}</label>
         <div class="col-sm-7">
             <textarea name="description" rows="4" title="{tr}Human-readable text description of repository{/tr}" class="form-control">{$description|escape}</textarea>
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <div class="col-sm-7 offset-sm-3 text-center">
             <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
         </div>

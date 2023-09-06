@@ -41,7 +41,7 @@ function module_last_visitors($mod_reference, $module_params)
     $userlib = TikiLib::lib('user');
 
     $last_visitors = $userlib->get_users(0, $mod_reference["rows"], 'currentLogin_desc');
-    $smarty->assign('modLastVisitors', $last_visitors['data']);
+    $smarty->assign('modLastVisitors', $last_visitors['data'] ? $last_visitors['data'] : '');
     $smarty->assign('maxlen', isset($module_params["maxlen"]) ? $module_params["maxlen"] : 0);
     $smarty->assign('showavatars', isset($module_params["showavatars"]) ? $module_params["showavatars"] : 'n');
     $smarty->assign('nodate', isset($module_params["nodate"]) ? $module_params["nodate"] : 'n');

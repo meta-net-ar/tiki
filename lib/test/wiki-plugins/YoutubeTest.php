@@ -22,7 +22,7 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
     public function provider(): array
     {
         return [
-            ['', '{BOX(bg="#fcd9d3" align="left")}Plugin YouTube error: the movie parameter is empty.{BOX}'],
+            ['', '{BOX(class="text-bg-light")}Plugin YouTube error: the movie parameter is empty.{BOX}'],
             ['', '~np~<iframe src="//www.youtube.com/embed/bPHuY7QL568?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568']],
             ['', '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'https://www.youtube.com/watch?v=deby_Yb1-ac']],
             ['', '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'https://youtu.be/deby_Yb1-ac']],

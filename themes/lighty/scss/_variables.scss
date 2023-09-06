@@ -166,7 +166,10 @@ $navbar-light-border:            transparent;
 // Navbarlinks - Variable names updated for Bootstrap 5 ("-link" removed)
 $navbar-light-color:                #6C727F; //$gray-500;
 $navbar-light-hover-color:          $gray-800;
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
 $navbar-light-toggle-icon-bar-bg:        #cccccc;
+$navbar-light-brand-color:          $navbar-light-active-color !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color !default;
 
 $navbar-dark-bg: #222;
 $navbar-dark-color:                 #ffffff;
@@ -174,6 +177,9 @@ $navbar-dark-hover-color:           $gray-300;
 $navbar-dark-hover-bg:              darken($navbar-dark-bg, 6.5%);
 $navbar-dark-active-color:          #ffffff;
 $navbar-dark-active-bg:            darken($navbar-dark-bg, 6.5%);
+$navbar-dark-brand-color:           $navbar-dark-active-color !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
+
 // Pagination
 // Jumbotron
 // Cards
@@ -201,5 +207,5 @@ $figure-caption-color: #6F7680;
 // Carousel
 // Close
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //

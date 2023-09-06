@@ -9,6 +9,7 @@ class Search_ContentSource_CommentSource implements Search_ContentSource_Interfa
     private $types;
     private $db;
     private $permissionMap;
+    private $permissionParentMap;
     private $indexer;
 
     public function __construct($types)
@@ -18,6 +19,7 @@ class Search_ContentSource_CommentSource implements Search_ContentSource_Interfa
         $this->db = TikiDb::get();
 
         $this->permissionMap = TikiLib::lib('object')->map_object_type_to_permission(true);
+        $this->permissionParentMap = TikiLib::lib('object')->map_object_type_to_permission(false);
     }
 
     public function getDocuments()
@@ -71,7 +73,8 @@ class Search_ContentSource_CommentSource implements Search_ContentSource_Interfa
 
             'parent_object_type' => $typeFactory->identifier($comment['objectType']),
             'parent_object_id' => $typeFactory->identifier($comment['object']),
-            'view_permission' => $typeFactory->identifier($this->getParentPermissionForType($comment['objectType'])),
+            'view_permission' => $typeFactory->identifier($this->getPermissionForType($comment['objectType'])),
+            'parent_view_permission' => $typeFactory->identifier($this->getParentPermissionForType($comment['objectType'])),
             'global_view_permission' => $typeFactory->identifier('tiki_p_read_comments'),
 
             'url' => $typeFactory->identifier($url),
@@ -149,10 +152,17 @@ class Search_ContentSource_CommentSource implements Search_ContentSource_Interfa
         ];
     }
 
-    private function getParentPermissionForType($type)
+    private function getPermissionForType($type)
     {
         if (isset($this->permissionMap[$type])) {
             return $this->permissionMap[$type];
+        }
+    }
+
+    private function getParentPermissionForType($type)
+    {
+        if (isset($this->permissionParentMap[$type])) {
+            return $this->permissionParentMap[$type];
         }
     }
 

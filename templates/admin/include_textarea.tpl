@@ -254,6 +254,7 @@
                                 <tr>
                                     <th></th>
                                     <th>{tr}Plugin Alias{/tr}</th>
+                                    <th>{tr}System Name{/tr}</th>
                                     <th>{tr}Base{/tr}</th>
                                     <th>{tr}Edit{/tr}</th>
                                     <th>{tr}Delete{/tr}</th>
@@ -267,6 +268,9 @@
                                             <a href="tiki-admin.php?page=textarea&amp;plugin_alias={$name|escape}" title="{$pluginInfo.description.name|escape} ({$name|escape})|{$pluginInfo.description.description|escape}" class="tips">
                                                 {$pluginInfo.description.name|escape}
                                             </a>
+                                        </td>
+                                        <td>
+                                            {$pluginInfo.plugin_name|escape}
                                         </td>
                                         <td>
                                             {$pluginInfo.implementation|escape}
@@ -315,7 +319,7 @@
 
                         <div class="mb-3 row">
                             <label class="col-form-label col-sm-4" for="plugin_alias">
-                                {tr}Plugin name{/tr}
+                                {tr}System name{/tr}
                             </label>
                             <div class="col-sm-8">
                                 {if not empty($smarty.request.plugin_alias)}

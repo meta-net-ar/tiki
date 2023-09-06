@@ -1781,7 +1781,7 @@ class FileGalLib extends TikiLib
             } elseif ($type == 'trackeritem') {
                 foreach ($list as $object) {
                     $item = Tracker_Item::fromId($object['itemId']);
-                    if ($item->canView()) {
+                    if ($item && $item->canView()) {
                         return false;
                     }
                 }

@@ -272,7 +272,7 @@ $("#' . $id . '_showSelected").click( function () {
     }
 
     // start writing the table
-    $html .= $nl . '<table id="' . $id . '" class="' . $class . '">' . $nl;
+    $html .= $nl . '<table id="' . $id . '" class="' . $class . ' position-relative">' . $nl;
 
     // write the table header
     $html .= '<thead><tr>';

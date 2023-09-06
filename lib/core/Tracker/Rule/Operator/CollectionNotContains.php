@@ -8,6 +8,11 @@ class CollectionNotContains extends Operator
 {
     public function __construct()
     {
-        parent::__construct(tr("doesn't contain"), Collection::class, '.val().indexOf("%argument%")===-1', [Collection::class]);
+        parent::__construct(
+            tr("doesn't contain"),
+            Collection::class,
+            '.collectionNotContains("%argument%")',
+            [Collection::class]
+        );
     }
 }

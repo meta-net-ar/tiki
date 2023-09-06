@@ -73,14 +73,14 @@ try {
 
 $exitCode = Command::SUCCESS;
 $output = new ConsoleOutput();
-$console = new ConsoleApplicationBuilder($statusCode);
+$console = new ConsoleApplicationBuilder();
+$console = $console->create($statusCode);
 if (DB_TIKI_SETUP) {
     $asUser = $input->getParameterOption(['--as-user']) ?: 'admin';
     if (TikiLib::lib('user')->user_exists($asUser)) {
         $permissionContext = new Perms_Context($asUser);
     }
 }
-$console = $console->create();
 $console->setAutoExit(false);
 try {
     $exitCode = $console->run(null, $output);

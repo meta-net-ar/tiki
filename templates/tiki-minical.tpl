@@ -128,6 +128,7 @@
 
     <a class="link" href="tiki-minical.php?view={$view}&amp;removeold=1">{tr}Remove old events{/tr}</a>
     <form action="tiki-minical.php" method="post">
+        {ticket}
         <input type="hidden" name="view" value="{$view|escape}">
         <div class="table-responsive">
             <table class="table">

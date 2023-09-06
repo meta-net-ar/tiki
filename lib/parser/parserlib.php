@@ -1607,6 +1607,7 @@ class ParserLib extends TikiDb_Bridge
             $class = 'class="wiki"';
             $ext_icon = '';
             $rel = '';
+            $title = '';
 
             if ($prefs['popupLinks'] == 'y') {
                 $target = 'target="_blank"';
@@ -1624,6 +1625,7 @@ class ParserLib extends TikiDb_Bridge
                 if ($prefs['feature_wiki_ext_rel_nofollow'] == 'y') {
                     $rel .= ' nofollow';
                 }
+                $title = 'title="' . tra('External link') . '"';
             }
 
             // The (?<!\[) stuff below is to give users an easy way to
@@ -1636,24 +1638,22 @@ class ParserLib extends TikiDb_Bridge
 
                 $link2 = str_replace("/", "\/", preg_quote($link));
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)\|([^\]\|]+)\|([^\]]+)\]/"; //< last param expected here is always nocache
-                $data = preg_replace($pattern, "<a $class $target href=\"$link\" rel=\"$2 $rel\">$1</a>$ext_icon", $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$2 $rel\">$1</a>$ext_icon", $data);
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)\|([^\]]+)\]/";//< last param here ($2) is used for relation (rel) attribute (e.g. shadowbox) or nocache
                 preg_match($pattern, $data, $matches);
                 if (isset($matches[2]) && $matches[2] == 'nocache') {
-                    $data = preg_replace($pattern, "<a $class $target href=\"$link\" rel=\"$rel\">$1</a>$ext_icon", $data);
+                    $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$1</a>$ext_icon", $data);
                 } else {
-                    $data = preg_replace($pattern, "<a $class $target href=\"$link\" rel=\"$rel\" data-box=\"$2\">$1</a>$ext_icon $cosa", $data);
+                    $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\" data-box=\"$2\">$1</a>$ext_icon $cosa", $data);
                 }
                 $pattern = "/(?<!\[)\[$link2\|(§.*§)\]/";
-                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $link, $rel, $ext_icon, $cosa) {
-                    return "<a $class $target href=\"$link\" rel=\"$rel\" >{$matches[1]}</a>$ext_icon $cosa";
+                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $title, $link, $rel, $ext_icon, $cosa) {
+                    return "<a $class $target $title href=\"$link\" rel=\"$rel\" >{$matches[1]}</a>$ext_icon $cosa";
                 }, $data);
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)\]/";
-                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $link, $rel, $ext_icon, $cosa) {
-                    return "<a $class $target href=\"$link\" rel=\"$rel\" title=\"" . tra('External link') . ": " . str_replace('"', '', strip_tags($this->parse_data($matches[1]))) . "\">{$matches[1]}</a>$ext_icon $cosa";
-                }, $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$1</a>$ext_icon $cosa", $data);
                 $pattern = "/(?<!\[)\[$link2\]/";
-                $data = preg_replace($pattern, "<a $class $target href=\"$link\" rel=\"$rel\" title=\"" . tra('External link') . "\">$link</a>$ext_icon $cosa", $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$link</a>$ext_icon $cosa", $data);
             } else {
                 $link2 = str_replace("/", "\/", preg_quote($link));
                 $link = trim($link);
@@ -1661,19 +1661,17 @@ class ParserLib extends TikiDb_Bridge
                 $data = str_replace("|nocache", "", $data);
 
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)\|([^\]]+)\]/";
-                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $link, $rel, $ext_icon) {
-                    return "<a $class $target href=\"$link\" rel=\"$rel\" data-box=\"" . str_replace('"', '%22', $matches[2]) . "\">{$matches[1]}</a>$ext_icon";
+                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $title, $link, $rel, $ext_icon) {
+                    return "<a $class $target $title href=\"$link\" rel=\"$rel\" data-box=\"" . str_replace('"', '%22', $matches[2]) . "\">{$matches[1]}</a>$ext_icon";
                 }, $data);
                 $pattern = "/(?<!\[)\[$link2\|(§.*§)\]/";
-                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $link, $rel, $ext_icon) {
-                    return "<a $class $target href=\"$link\" rel=\"$rel\" >{$matches[1]}</a>$ext_icon";
+                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $title, $link, $rel, $ext_icon) {
+                    return "<a $class $target $title href=\"$link\" rel=\"$rel\" >{$matches[1]}</a>$ext_icon";
                 }, $data);
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)([^\]])*\]/";
-                $data = preg_replace_callback($pattern, function ($matches) use ($class, $target, $link, $rel, $ext_icon) {
-                    return "<a $class $target href=\"$link\" rel=\"$rel\" title=\"" . tra('External link') . ": " . str_replace('"', '', strip_tags($this->parse_data($matches[1]))) . "\">{$matches[1]}</a>$ext_icon";
-                }, $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$1</a>$ext_icon", $data);
                 $pattern = "/(?<!\[)\[$link2\|?\]/";
-                $data = preg_replace($pattern, "<a $class $target href=\"$link\" rel=\"$rel\" title=\"" . tra('External link') . "\">$link</a>$ext_icon", $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$link</a>$ext_icon", $data);
             }
         }
 
@@ -1848,7 +1846,7 @@ class ParserLib extends TikiDb_Bridge
         }
 
         if ($prefs['feature_wiki_argvariable'] == 'y' && ! $this->option['wysiwyg']) {
-            if (preg_match_all("/\\{\\{((\w+)(\\|([^\\}]*))?)\\}\\}/", $data, $args, PREG_SET_ORDER)) {
+            if (preg_match_all("/\\{\\{((\w+)(\\|([^\\}]*))?)\\}\\}/", $data ?? '', $args, PREG_SET_ORDER)) {
                 $needles = [];
                 $replacements = [];
 

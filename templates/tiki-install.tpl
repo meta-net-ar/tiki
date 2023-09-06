@@ -635,6 +635,15 @@
                                 </legend>
                                 <div class="mb-3 row mx-0">
                                     <label class="col-form-label" for="browsertitle">
+                                        {tr}Server domain name:{/tr}
+                                    </label>
+                                    <input class="form-control" type="text" name="server_domain" id="server_domain" value="{if !empty($prefs.server_domain)}{$prefs.server_domain|escape}{else}{tr}{$default_server_domain_name}{/tr}{/if}">
+                                    <span class="form-text">
+                                        {tr}The value that will be used by default as the server domain name of your Tiki site.{/tr}
+                                    </span>
+                                </div>
+                                <div class="mb-3 row mx-0">
+                                    <label class="col-form-label" for="browsertitle">
                                         {tr}Browser title:{/tr}
                                     </label>
                                     <input class="form-control" type="text" size="40" name="browsertitle" id="browsertitle" value="{if !empty($prefs.browsertitle)}{$prefs.browsertitle|escape}{else}{tr}My Tiki{/tr}{/if}">

@@ -1,0 +1,1 @@
+UPDATE `tiki_menu_options` SET `url` = "tiki-ajax_services.php?controller=tabular&action=manage" WHERE `menuId` = 42 AND `url` = "tiki-tabular-manage";

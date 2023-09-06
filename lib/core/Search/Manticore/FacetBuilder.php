@@ -16,6 +16,7 @@ class FacetBuilder
     {
         $this->index = $index;
         $this->count = $count;
+        $this->possibleFields = [];
     }
 
     public function setPossibleFields(array $fields)
@@ -41,7 +42,7 @@ class FacetBuilder
         $out = '';
 
         $field = strtolower($facet->getField());
-        if ($this->possibleFields && ! in_array($field, $this->possibleFields)) {
+        if (! in_array($field, $this->possibleFields)) {
             return $out;
         }
 

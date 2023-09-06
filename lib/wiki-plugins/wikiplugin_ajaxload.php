@@ -160,6 +160,7 @@ function wikiplugin_ajaxload($data, $params)
             }
         }
 
+        TikiLib::lib('header')->add_jsfile("vendor_bundled/vendor/npm-asset/dompurify/dist/purify.min.js");
         TikiLib::lib('header')->add_jq_onready('
 (function ($) {
     var $el = $("' . $id . '");
@@ -169,6 +170,7 @@ function wikiplugin_ajaxload($data, $params)
         dataType: "html",
         method: "GET"
     }).done(function(data) {
+        data = DOMPurify.sanitize(data);
       ' . $js . '
       ' . $data . '
       $el.html(data);

@@ -30,32 +30,34 @@ function wikiplugin_showpref($data, $params)
 {
     global $prefs;
     $tikilib = TikiLib::lib('tiki');
+    global $tikipath;
 
     $name = $params['pref'];
+    $file = 'global';
+    $lib_path = 'lib/prefs';
+    $extension_path = '';
     if (substr($name, 0, 3) == 'tp_') {
         $midpos = strpos($name, '_', 3);
-        $pos = strpos($name, '_', $midpos + 1);
-        $file = substr($name, 0, $pos);
+        if ($midpos) {
+            $paths = \Tiki\Package\ExtensionManager::getPaths();
+            $package = str_replace('__', '/', substr($name, 3));
+            if (isset($paths[$package])) {
+                $lib_path = $paths[$package] . '/prefs';
+                $file = $name;
+            }
+        }
     } elseif (false !== $pos = strpos($name, '_')) {
         $file = substr($name, 0, $pos);
-    } else {
-        $file = 'global';
     }
 
-    $inc_file = "lib/prefs/{$file}.php";
-    if (substr($file, 0, 3) == "tp_") {
-        $paths = \Tiki\Package\ExtensionManager::getPaths();
-        $package = str_replace('_', '/', substr($file, 3));
-        $inc_file = $paths[$package] . "/prefs/{$file}.php";
-    }
-
-    if (file_exists($inc_file)) {
+    $inc_file = "{$lib_path}/{$file}.php";
+    $preffile = [];
+    $realpath = realpath(dirname($inc_file));
+    if (file_exists($inc_file) && $realpath == $tikipath . $lib_path) {
         require_once $inc_file;
         $function = "prefs_{$file}_list";
         if (function_exists($function)) {
             $preffile = $function();
-        } else {
-            $preffile = [];
         }
     }
 

@@ -137,8 +137,8 @@ function _enlightColor($matches)
 // q= for Google, p= for Yahoo
 function _refererhi()
 {
-    $referer = parse_url($_SERVER['HTTP_REFERER']);
-    if (empty($referer['query'])) {
+    $referer = isset($_SERVER['HTTP_REFERER']) ? parse_url($_SERVER['HTTP_REFERER']) : null;
+    if ($referer === null || empty($referer['query'])) {
         return '';
     }
     parse_str($referer['query'], $vars);

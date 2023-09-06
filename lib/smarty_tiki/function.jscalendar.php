@@ -48,8 +48,17 @@ function smarty_function_jscalendar($params, $smarty)
         '$.datepickerAdjustAltField("' . ((! isset($params['showtime']) || $params['showtime'] === 'n') ? 'datepicker' : 'datetimepicker') . '", inst);' .
         '}';
     if (! empty($params['goto'])) {
-        $datepicker_options .= ', onSelect: function(dateText, inst) { window.location="' .
-            $params['goto'] . '".replace("%s",$("#' . $params['id'] . '").val()/1000); }';
+        $datepicker_options .= ', onSelect: function(dateText, inst) {
+            var url = "' . $params['goto'] . '".replace("%s",$("#' . $params['id'] . '").val()/1000);
+            if (url.indexOf("?") > -1) {
+                url += "&";
+            } else {
+                url += "?";
+            }
+            url += "tzname=" + $(this).closest("form").find("input[name=tzname]").val();
+            url += "&tzoffset=" + $(this).closest("form").find("input[name=tzoffset]").val();
+            window.location = url;
+        }';
     }
 
     if (! empty($params['notAfter'])) {

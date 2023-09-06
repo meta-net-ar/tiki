@@ -335,140 +335,148 @@ blockquote,
     margin-right: -15px;
 }
 
-// Dropdowns
-// Pagination
-// Placeholders
-// Cards
-.card-title {
-    color: #8A0700;
-    font: 1.8rem arial, verdana, helvetica, sans-serif;
-}
+// Legacy admin anchors, light mode
+.tiki .admin-content {
+    .tiki-topbar-nav-dark,
+    .adminanchors.card {
+        background: linear-gradient(to bottom, #040404 0%, #060606 2%, #121212 55%, #0f0f0f 57%, #030303 59%, #000000 61%, #000000 100%) !important;
+    }
 
-.bg-danger,
-.bg-warning,
-.bg-primary,
-.bg-secondary,
-.bg-success,
-.bg-info {
+    // Dropdowns
+    // Pagination
+    // Placeholders
+    // Cards
     .card-title {
-        color: #fff;
-    }
-}
-
-#col2 .card,
-#col3 .card,
-#col2 .card-header,
-#col3 .card-header {
-    border: none;
-    background: transparent;
-}
-
-.main-footer {
-    .footer_liner.w-100 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+        color: var(--bs-heading-color);
+        font: 1.8rem arial, verdana, helvetica, sans-serif;
     }
 
-    .card {
+    .bg-danger,
+    .bg-warning,
+    .bg-primary,
+    .bg-secondary,
+    .bg-success,
+    .bg-info {
+        .card-title {
+            color: #fff;
+        }
+    }
+
+    #col2 .card,
+    #col3 .card,
+    #col2 .card-header,
+    #col3 .card-header {
         border: none;
         background: transparent;
-        -webkit-box-shadow: none;
-        box-shadow: none;
     }
 
-    .card-header {
-        background: transparent;
-        border-color: transparent;
+    .main-footer {
+        .footer_liner.w-100 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .card {
+            border: none;
+            background: transparent;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+        }
+
+        .card-header {
+            background: transparent;
+            border-color: transparent;
+        }
     }
-}
-.footer_liner.w-100 {
-    padding: 0 !important;
-}
-// Accordion
-.accordion-button {
-    color: #000;
-}
-
-// Popovers
-.popover-body .table .table,
-.popover-body .table-hover {
-    background: #ffffff;
-}
-
-// Toasts
-// Badges
-// Modals
-// Alerts
-.alert-light {
-    color: #57575C;
-}
-
-// Progress bars
-.progress-bar {
-    .bg-info,
-    .bg-warning {
-        color: #fff;
+    .footer_liner.w-100 {
+        padding: 0 !important;
     }
-}
+    // Accordion
+    .accordion-button {
+        color: #000;
+    }
 
-// List group
-.list-group-item-light {
-    color: #707275;
-}
+    // Popovers
+    .popover-body .table .table,
+    .popover-body .table-hover {
+        background: #ffffff;
+    }
 
-// Image thumbnails
-// Figures
-// Breadcrumbs
-// Carousel
-// Spinners
-// Close
-// Offcanvas
-// Code
+    // Toasts
+    // Badges
+    // Modals
+    // Alerts
+    .alert-light {
+        color: #57575C;
+    }
 
-
-.main-footer,
-footer.footer {
-    color: lighten(#9d9d9d, 15%);
-
-    a {
-        color: #9d9d9d;
-
-        &:hover,
-        &:focus {
-            color: lighten(#9d9d9d, 15%);
+    // Progress bars
+    .progress-bar {
+        .bg-info,
+        .bg-warning {
+            color: #fff;
         }
     }
 
-    h1, h2, h3, h4, h5 {
-        color: #9D9D1B;
+    // List group
+    .list-group-item-light {
+        color: #707275;
     }
-}
 
-// /* Autosave Preview handle */
-#autosave_preview {
-    background: #f3f3f3;
-    color: $body-color;
-}
+    // Image thumbnails
+    // Figures
+    // Breadcrumbs
+    // Carousel
+    // Spinners
+    // Close
+    // Offcanvas
+    // Code
 
-// Other
 
-// override for converseJS chatbox background colors
-.tiki #conversejs, .tiki #conversejs.converse-embedded {
-    #controlbox {
-        .box-flyout {
-            background-color: #f3f3f3;
+    .main-footer,
+    footer.footer {
+        color: lighten(#9d9d9d, 15%);
+
+        a {
+            color: #9d9d9d;
+
+            &:hover,
+            &:focus {
+                color: lighten(#9d9d9d, 15%);
+            }
+        }
+
+        h1, h2, h3, h4, h5 {
+            color: #9D9D1B;
         }
     }
 
-    .chatbox {
-        .box-flyout {
-            background-color: #f3f3f3;
+    // /* Autosave Preview handle */
+    #autosave_preview {
+        background: #f3f3f3;
+        color: $body-color;
+    }
+
+    // Other
+
+    // override for converseJS chatbox background colors
+    .tiki #conversejs, .tiki #conversejs.converse-embedded {
+        #controlbox {
+            .box-flyout {
+                background-color: #f3f3f3;
+            }
+        }
+
+        .chatbox {
+            .box-flyout {
+                background-color: #f3f3f3;
+            }
         }
     }
-}
 
-// override for some cypht background colors
-body.tiki.tiki-webmail {
-    background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0;
+    // override for some cypht background colors
+    body.tiki.tiki-webmail {
+        background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0;
+    }
 }
 

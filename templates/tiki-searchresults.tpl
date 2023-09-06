@@ -14,7 +14,7 @@
 
     {if $prefs.feature_search_show_search_box eq 'y' or $searchStyle eq "menu"}
         <form action="tiki-searchresults.php" method="get" id="search-form" class="d-flex flex-row flex-wrap align-items-center" role="form">
-            <div class="mb-3">
+            <div class="tiki-form-group">
                 <label class="sr-only">{tr}Search{/tr}</label>
                 <input id="highlight{$iSearch}" name="highlight" class="form-control me-3" type="text" accesskey="s" placeholder="{tr}Search{/tr}" value="{$words|escape}">
                 {*/div*}
@@ -30,7 +30,7 @@
                 </div>
 
                 {if $prefs.feature_search_show_last_modification eq 'y'}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="searchdate col-form-label" for="date">{tr}Date Search:{/tr}</label>
                         <select id="date" class="form-control" name="date" onchange="javascript:submit()">
                             {section name=date start=0 loop=12 step=1}

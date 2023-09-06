@@ -21,11 +21,40 @@ class BanLib extends TikiLib
      */
     public function get_rule($banId)
     {
-        $query = "select * from `tiki_banning` where `banId`=?";
+        $query = 'select * from `tiki_banning` where `banId`=?';
 
         $result = $this->query($query, [$banId]);
         $res = $result->fetchRow();
+        $query2 = 'select `section` from `tiki_banning_sections` where `banId`=?';
+        $result2 = $this->query($query2, [$banId]);
         $aux = [];
+
+        while ($res2 = $result2->fetchRow()) {
+            $aux[] = $res2['section'];
+        }
+
+        $res['sections'] = $aux;
+        return $res;
+    }
+
+    /**
+     * @param $ip
+     *
+     * @return array|int
+     */
+    public function getValidateEmailRule($ip)
+    {
+        $banIp = explode('.', $ip);
+
+        $query = "select * from `tiki_banning` where `ip1`=? and `ip2`=? and `ip3`=? and `ip4`=?";
+        $result = $this->query($query, $banIp);
+        $res = $result->fetchRow();
+
+        if (! isset($res)) {
+            $this->replace_rule(0, 'ip', 'validating unique email', $banIp[0], $banIp[1], $banIp[2], $banIp[3], 'user', $this->now, $this->now, 'n', '', []);
+            return $this->getValidateEmailRule($ip);
+        }
+        $banId = $res['banId'];
         $query2 = "select `section` from `tiki_banning_sections` where `banId`=?";
         $result2 = $this->query($query2, [$banId]);
         $aux = [];
@@ -241,7 +270,7 @@ class BanLib extends TikiLib
      * @param $sections
      * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
      */
-    public function replace_rule($banId, $mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $sections)
+    public function replace_rule($banId, $mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $sections, $attempt = 0)
     {
         if (empty($title)) {
             $title = empty($user) ? "$ip1.$ip2.$ip3.$ip4" : $user;
@@ -258,13 +287,13 @@ class BanLib extends TikiLib
         $count = TikiDb::get()->table('tiki_banning')->fetchCount(['banId' => $banId]);
         if ($banId && $count > 0) {
             $query = "update `tiki_banning` set `title`=?, `ip1`=?, `ip2`=?, `ip3`=?, `ip4`=?, `user`=?, " .
-                "`date_from` = FROM_UNIXTIME(?), `date_to` = FROM_UNIXTIME(?), `use_dates` = ?, `message` = ? where `banId`=?";
+                "`date_from` = FROM_UNIXTIME(?), `date_to` = FROM_UNIXTIME(?), `use_dates` = ?, `message` = ?,`attempts` = ? where `banId`=?";
 
-            $resultUpdate = $this->query($query, [$title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $banId]);
+            $resultUpdate = $this->query($query, [$title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $attempt,$banId]);
         } else {
-            $query = "insert into `tiki_banning`(`mode`,`title`,`ip1`,`ip2`,`ip3`,`ip4`,`user`,`date_from`,`date_to`,`use_dates`,`message`,`created`) " .
-                "values(?,?,?,?,?,?,?,FROM_UNIXTIME(?),FROM_UNIXTIME(?),?,?,?)";
-            $resultInsert = $this->query($query, [$mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $this->now]);
+            $query = "insert into `tiki_banning`(`mode`,`title`,`ip1`,`ip2`,`ip3`,`ip4`,`user`,`date_from`,`date_to`,`use_dates`,`message`,`attempts`,`created`) " .
+                "values(?,?,?,?,?,?,?,FROM_UNIXTIME(?),FROM_UNIXTIME(?),?,?,?,?)";
+            $resultInsert = $this->query($query, [$mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $attempt, $this->now]);
             $banId = $this->getOne("select max(`banId`) from `tiki_banning` where `created`=?", [$this->now]);
         }
 

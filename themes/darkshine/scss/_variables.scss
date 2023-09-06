@@ -88,7 +88,7 @@ $table-border-color:          var(--#{$prefix}border-color);
 $input-bg: var(--#{$prefix}body-bg);
 $input-border-color:                    var(--#{$prefix}border-color);
 $input-group-addon-bg: #E9ECEF;
-$form-text-color: #485060;
+$form-text-color: var(--#{$prefix}secondary-color) !default;; // #485060;
 
 // Form validation
 $form-feedback-valid-color: #1B7E2B;
@@ -101,10 +101,10 @@ $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
 $nav-link-disabled-color: #666E75;
 
 // Navbar
-//$navbar-light-color:                rgba($black, .5) !default;
-//$navbar-light-hover-color:          rgba($black, .7) !default;
-//$navbar-light-active-color:         rgba($black, .9) !default;
-//$navbar-light-disabled-color:       rgba($black, .3) !default;
+$navbar-light-color:                rgba($black, .5) !default;
+$navbar-light-hover-color:          rgba($black, .7) !default;
+$navbar-light-active-color:         rgba($black, .9) !default;
+$navbar-light-disabled-color:       rgba($black, .3) !default;
 
 // Tabs
 //$nav-tabs-border-color: lighten( $body-bg, 90% );

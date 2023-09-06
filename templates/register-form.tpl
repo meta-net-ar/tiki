@@ -7,7 +7,7 @@
 {if isset($customfields)}
     {section name=ir loop=$customfields}
         {if $customfields[ir].show}
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label" for="{$customfields[ir].prefName}">{tr}{$customfields[ir].label}:{/tr}</label>
                 <div class="col-sm-8">
                     <input type="{$customfields[ir].type}" name="{$customfields[ir].prefName}" value="{$customfields[ir].value}" size="{$customfields[ir].size}" id="{$customfields[ir].prefName}" class="form-control" >

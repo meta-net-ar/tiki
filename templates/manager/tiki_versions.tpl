@@ -13,7 +13,7 @@
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
         <form method="post" action="{service controller=manager action=tiki_versions}" id="tiki-manager-tiki-versions">
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Version Control System{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.vcs}{/tr}">
@@ -28,7 +28,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="filter" value="{tr}Filter{/tr}">

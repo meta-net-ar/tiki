@@ -14,7 +14,7 @@
     {else}
         <form method="post" action="{service controller=manager action=clone}">
             {foreach item=option from=$options}
-            <div class="form-group row p-2">
+            <div class="tiki-form-group row p-2">
                 <label class="col-form-label col-sm-3">
                     {tr}{$option.label}{/tr}
                     <a class="tikihelp text-info" title="{tr}{$option.label}:{/tr} {tr}{$option.help}{/tr}">
@@ -37,7 +37,7 @@
             </div>
             {/foreach}
 
-            <div class="form-group row p-2">
+            <div class="tiki-form-group row p-2">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="clone" value="{tr}Clone instance{/tr}">

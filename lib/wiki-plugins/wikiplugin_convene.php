@@ -340,7 +340,7 @@ function wikiplugin_convene($data, $params): string
     $smarty->assign('params', $params);
     $smarty->assign('comments', $dataArrayComments);
 
-    if ($params['locked'] === "y") {
+    if ($params['locked'] === "y" && $currentObject) {
         $vote_infos = [
             "autolock" => $params['autolock'],
             "object" => $currentObject['object'],

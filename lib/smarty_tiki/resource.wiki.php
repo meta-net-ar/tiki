@@ -15,7 +15,7 @@
  */
 class Smarty_Resource_Wiki extends Smarty_Resource_Custom
 {
-    protected function fetch($name, &$source, &$mtime)
+    protected function fetch($name, &$source, &$mtime): void
     {
         /** @var \Smarty_Tiki $smarty */
         $smarty = TikiLib::lib('smarty');
@@ -23,10 +23,14 @@ class Smarty_Resource_Wiki extends Smarty_Resource_Custom
 
         if ($info) {
             $source = TikiLib::lib('parser')->parse_data($info['data'], ['is_html' => $info['is_html'], 'print' => 'y', 'inside_pretty' => true]);
+            if (preg_match('/\{\w+.*?}/', $source) && ! str_contains($source, '{literal}')) {
+                // when used as the output template in a list plugin tags like `{display name="title"}` upset smarty
+                $source = "{literal}{$source}{/literal}";
+            }
         }
     }
 
-    protected function fetchTimestamp($name)
+    protected function fetchTimestamp($name): ?int
     {
         global $tikilib;
         $info = $tikilib->get_page_info($name);

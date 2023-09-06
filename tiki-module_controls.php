@@ -69,8 +69,11 @@ foreach ($actions as $action => $settings) {
 }
 
 // Fix locaton if parameter was removed...
-if ($url != $request_uri || (isset($_POST['redirect']) && $_POST['redirect'])) {
-    $access->redirect($url);
+if (defined('TIKI_SETUP_FINISHED') && TIKI_SETUP_FINISHED) {
+    if ($url != $request_uri || (isset($_POST['redirect']) && $_POST['redirect'])) {
+        $access->redirect($url);
+    }
 }
+
 $smarty->assign('current_location', $url);
 $smarty->assign('mpchar', (strpos($url, '?') ? '&' : '?'));

@@ -22,7 +22,7 @@ You can approve or reject the post at the following URL:{/tr}
 
 {if !empty($approvalhash)}{tr}To instantly approve this post without logging in, use the following URL:{/tr}
 
-{mailurl}tiki-forum_queue.php?forumId={$forumId}&qId={$queueId}&ahash={$approvalhash}{/if}{/mailurl}
+{mailurl}tiki-forum_queue.php?forumId={$forumId}&qId={$queueId}&ahash={$approvalhash}{/mailurl}{/if}
 {/if}
 
 

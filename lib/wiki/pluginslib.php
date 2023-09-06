@@ -235,7 +235,7 @@ class PluginsLibUtil
                             $closelink = '))';
             }
             if (! $aInfo) {
-                $sOutput .= '*' . $openlink . $aPage[$aPrincipalField['field']] . $closelink . "\n";
+                $sOutput .= '* ' . $openlink . $aPage[$aPrincipalField['field']] . $closelink . "\n";
                 //First column
             } elseif (isset($aPage[$aPrincipalField['field']])) {
                 if (is_array($aPage[$aPrincipalField['field']])) {

@@ -2,7 +2,7 @@
     {foreach key=key item=item from=$fgal_options}
         {if $key eq 'default_view'}
         {elseif $key eq 'icon_fileId'}
-            <div class="mb-3 row mx-0">
+            <div class="tiki-form-group row mx-0">
                 <label class="col-sm-4 col-form-label" for="fgal_{$key}">
                     {$item.name}
                 </label>
@@ -63,7 +63,7 @@
 
 {if is_array($fgal_listing_conf) and count($fgal_listing_conf) gt 0}
     {foreach key=key item=item from=$fgal_listing_conf}
-        <div class="mb-3 row mx-0">
+        <div class="tiki-form-group row mx-0">
             <label class="col-sm-4 col-form-label" for="fgal_list_{$key}">
                 {$item.name}
             </label>

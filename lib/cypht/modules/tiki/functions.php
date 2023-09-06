@@ -176,7 +176,7 @@ if (! hm_exists('tiki_add_attached_images')) {
             $cids = array_pop($matches);
             foreach ($cids as $id) {
                 $part = $message->getPartByContentId($id);
-                if (substr($part->getContentType(), 0, 5) != 'image') {
+                if (! $part || substr($part->getContentType(), 0, 5) != 'image') {
                     continue;
                 }
                 $txt = str_replace('cid:' . $id, 'data:' . $part->getContentType() . ';base64,' . base64_encode($part->getContent()), $txt);

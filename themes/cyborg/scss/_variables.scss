@@ -49,7 +49,7 @@ $prefix:                      $variable-prefix !default;
 // Body
 
 $body-bg:       #060606 !default;
-$body-color:    $gray-400 !default;
+$body-color:    #999999; // $gray-400 !default; Lightened to meet WCAG minimum
 
 // Links
 //

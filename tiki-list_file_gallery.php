@@ -1138,7 +1138,7 @@ if (isset($_GET['slideshow'])) {
             );
             $smarty->assign('cant', $files['cant']);
             if ($view == 'page') {
-                $file = $files['data'][0];
+                $file = $files['data'][0] ?? null;
             }
         }
         if ($view == 'page') {

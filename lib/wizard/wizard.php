@@ -86,7 +86,9 @@ abstract class Wizard
         $changes = [];
         // Commit any preferences on the page
         if ($this->isEditable()) {
-            if (isset($_REQUEST['lm_preference'])) {
+            $perms = Perms::get();
+
+            if (isset($_REQUEST['lm_preference']) && $perms->admin) {
                 $prefslib = TikiLib::lib('prefs');
                 $changes = $prefslib->applyChanges((array) $_REQUEST['lm_preference'], $_REQUEST);
             }

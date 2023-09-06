@@ -23,8 +23,10 @@ if (isset($_REQUEST['remove2'])) {
 }
 if (isset($_REQUEST['delete'])) {
     $access->check_authenticity();
-    foreach (array_keys($_REQUEST["event"]) as $ev) {
-        $minicallib->minical_remove_event($user, $ev);
+    if (is_array($_REQUEST["event"]) && ! empty($_REQUEST["event"])) {
+        foreach (array_keys($_REQUEST["event"]) as $ev) {
+            $minicallib->minical_remove_event($user, $ev);
+        }
     }
 }
 if (isset($_REQUEST['day']) && isset($_REQUEST['mon']) && isset($_REQUEST['year'])) {

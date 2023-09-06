@@ -192,13 +192,11 @@ class Perms
         $remaining = [];
 
         foreach ($data as $entry) {
-            if ($dataKey) {
-                $value = $entry[$dataKey];
+            if ($dataKey && isset($entry[$dataKey])) {
+                $remaining[] = $entry[$dataKey];
             } else {
-                $value = $entry;
+                $remaining[] = $entry;
             }
-
-            $remaining[] = $value;
         }
 
         if (count($remaining)) {
@@ -261,7 +259,9 @@ class Perms
     {
         $context = $baseContext;
         foreach ($contextMap as $to => $from) {
-            $context[$to] = $entry[$from];
+            if (isset($entry[$from])) {
+                $context[$to] = $entry[$from];
+            }
         }
 
         $accessor = self::get($context);

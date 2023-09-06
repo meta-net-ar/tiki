@@ -7,4 +7,4 @@
 {tr}to:{/tr}        {$mail_data.end|tiki_long_datetime}
 
 {tr}View item calendar at:{/tr}
-{mailurl}{service controller='calendar' action='view_item' calitemId=$mail_calitemId calIds[]=$mail_data.calendarId}{/mailurl}
+{mailurl}{$view_item_url}{/mailurl}

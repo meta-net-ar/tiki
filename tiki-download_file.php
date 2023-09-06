@@ -464,8 +464,7 @@ if ((! $content_changed and ! isset($_GET['display'])) || isset($_GET['pdf'])) {
     header("Content-Disposition: filename=\"$file\"");
     $downloading  = false;
 }
-
-if (! empty($filepath) and ! $content_changed) {
+if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
     $filesize = filesize($filepath);
     header("Accept-Ranges: bytes");
     if (empty($_SERVER['HTTP_RANGE'])) {

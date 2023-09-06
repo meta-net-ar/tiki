@@ -435,6 +435,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                     }
                     include_once('lib/wiki-plugins/wikiplugin_img.php');
                     $ret = wikiplugin_img('', $params);
+                    $ret = WikiPlugin_Helper::resultString($ret);
                 } elseif ($this->getOption('displayMode') == 'vimeo') { // Vimeo videos stored as filegal REMOTEs
                     include_once('lib/wiki-plugins/wikiplugin_vimeo.php');
                     $ret = wikiplugin_vimeo('', $params);

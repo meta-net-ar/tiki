@@ -54,7 +54,7 @@ $border-color-translucent-dark:     rgba($white, .15) !default;
 $headings-color-dark:               null !default;
 $link-color-dark:                   tint-color($primary, 40%) !default;
 $link-hover-color-dark:             shift-color($link-color-dark, -$link-shade-percentage) !default;
-$code-color-dark:                   tint-color($code-color, 40%) !default;
+$code-color-dark:                   #cbcaca; // tint-color($code-color, 40%) !default;
 
 
 //

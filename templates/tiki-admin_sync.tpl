@@ -7,13 +7,13 @@
 {/remarksbox}
 <form action="tiki-admin_sync.php" method="post" role="form">
     {ticket}
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label for="url" class="col-sm-3 col-form-label">{tr}Remote Server Address{/tr}</label>
         <div class="col-sm-9">
             <input type="text" maxlength="255" class="form-control" name="url" value="">
         </div>
     </div>
-    <div class="mb-3 text-center">
+    <div class="tiki-form-group text-center">
         <input type="submit" class="btn btn-primary" name="submit" value="{tr}Show diff{/tr}">
     </div>
 </form>

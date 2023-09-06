@@ -105,7 +105,7 @@ if ($output["data"] == "EMPTY") {
     $authorId = "author";
     $readrepl = "tiki-read_article.php?$id=%s";
 
-    $tmp = $prefs['feed__' . $feed . '_title'];
+    $tmp = $prefs['feed_' . $feed . '_title'];
     if ($tmp <> '') {
         $title = $tmp;
     }

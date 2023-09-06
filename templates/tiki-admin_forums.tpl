@@ -153,7 +153,7 @@
             </div>
             {if !$ts.ajax}
                 {if $channels}
-                    <div class="text-start mb-3 row">
+                    <div class="text-start tiki-form-group row">
                         <br>
                         <label for="action" class="col-lg"></label>
                         <div class="col-sm-6 input-group">
@@ -201,19 +201,19 @@
                     <input type="hidden" name="parentId" value="{$parentId|escape}">
                     <fieldset>
                         <legend>{tr}Main details{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="name">{tr}Name{/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="name" class="form-control" id="name" value="{$name|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="name">{tr}Description{/tr}</label>
                             <div class="col-sm-8">
                                 <textarea name="description" rows="4" class="form-control" id="description">{$description|escape}</textarea>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="section">{tr}Section{/tr}</label>
                             <div class="col-sm-4">
                                 <select name="section" id="section" class="form-control">
@@ -231,7 +231,7 @@
 
                         {include file='categorize.tpl' labelcol='4' inputcol='8'}
                         {if $prefs.feature_multilingual eq 'y'}
-                            <div class="mb-3 row">
+                            <div class="tiki-form-group row">
                                 <label class="col-sm-4 col-form-label" for="forumLanguage">{tr}Language{/tr}</label>
                                 <div class="col-sm-8">
                                     <select name="forumLanguage" id="forumLanguage" class="form-control">
@@ -244,7 +244,7 @@
                             </div>
                         {/if}
                         {if $prefs.feature_file_galleries eq 'y' && $prefs.forum_image_file_gallery}
-                            <div class="mb-3 row">
+                            <div class="tiki-form-group row">
                                 <label class="col-sm-4 col-form-label" for="image">{tr}Image{/tr}</label>
                                 <div class="col-sm-8">
                                     {file_selector name="image" value=$image type="image/*" galleryId=$prefs.forum_image_file_gallery}
@@ -254,7 +254,7 @@
                                 </div>
                             </div>
                         {/if}
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="image">{tr}Forum Order{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-text">
@@ -262,7 +262,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="is_flat">{tr}Only allow replies to the first message (flat forum){/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -270,33 +270,33 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="moderator_user">{tr}Moderator user{/tr}</label>
                             <div class="col-sm-8">
                                 <input id="moderator_user" class="form-control" type="text" name="moderator" value="{$moderator|escape}">
                                 {autocomplete element='#moderator_user' type='username'}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="moderator_group">{tr}Moderator group{/tr}</label>
                             <div class="col-sm-8">
                                 <input id="moderator_group" type="text" class="form-control" name="moderator_group" id="moderator_group" value="{$moderator_group|escape}">
                                 {autocomplete element='#moderator_group' type='groupname'}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="forum_use_password">{tr}Password protected{/tr}</label>
                             <div class="col-sm-4">
                                 {html_options name=forum_use_password class="form-control" options=$forum_use_password_options selected=$forum_use_password}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="forum_password">{tr}Forum password{/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="forum_password" id="forum_password" class="form-control" value="{$forum_password|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="controlFlood">{tr}Prevent flooding{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -304,13 +304,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="floodInterval">{tr}Minimum time between posts{/tr}</label>
                             <div class="col-sm-4">
                                 {html_options name=floodInterval id=floodInterval class="form-control" options=$flood_options selected=$floodInterval}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <div class="col-sm-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="useMail" id="useMail" {if $useMail eq 'y'}checked="checked"{/if}>
@@ -321,7 +321,7 @@
                                 <input type="text" class="form-control" name="mail" value="{$mail|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <div class="col-sm-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="usePruneUnreplied" id="usePruneUnreplied" {if $usePruneUnreplied eq 'y'}checked="checked"{/if}>
@@ -332,7 +332,7 @@
                                 {html_options name=pruneUnrepliedAge class="form-control" options=$pruneUnrepliedAge_options selected=$pruneUnrepliedAge}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <div class="col-sm-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" name="usePruneOld" id="usePruneOld" {if $usePruneOld eq 'y'}checked="checked"{/if}>
@@ -347,13 +347,13 @@
 
                     <fieldset>
                         <legend>{tr}Forum-mailing list synchronization{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="outbound_address">{tr}Forward messages to this forum to this email address, in a format that can be used for sending back to the inbound forum email address{/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="outbound_address" id="outbound_address" class="form-control" value="{$outbound_address|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="outbound_mails_for_inbound_mails">{tr}Send emails even when the post is generated by an inbound email{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -361,7 +361,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="outbound_mails_reply_link">{tr}Append a reply link to outbound mails{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -369,28 +369,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="outbound_from">{tr}Originating email address for emails from this forum{/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="outbound_from" id="outbound_from" class="form-control" value="{$outbound_from|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label">{tr}Add messages from this email to the forum{/tr}</label>
                             <div class="col-sm-8">
-                                <div class="mb-3 row">
+                                <div class="tiki-form-group row">
                                     <label class="col-sm-4 col-form-label" for="inbound_pop_server">{tr}POP3 server{/tr}</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="inbound_pop_server" id="inbound_pop_server" class="form-control" value="{$inbound_pop_server|escape}">
                                     </div>
                                 </div>
-                                <div class="mb-3 row">
+                                <div class="tiki-form-group row">
                                     <label class="col-sm-4 col-form-label" for="inbound_pop_user">{tr}User{/tr}</label>
                                     <div class="col-sm-8">
                                         <input type="text" name="inbound_pop_user" id="inbound_pop_user" class="form-control"value="{$inbound_pop_user|escape}" autocomplete="off">
                                     </div>
                                 </div>
-                                <div class="mb-3 row">
+                                <div class="tiki-form-group row">
                                     <label class="col-sm-4 col-form-label" for="inbound_pop_password">{tr}Password{/tr}</label>
                                     <div class="col-sm-8">
                                         <input type="password" name="inbound_pop_password" id="inbound_pop_password" class="form-control" value="{$inbound_pop_password|escape}" autocomplete="new-password">
@@ -402,7 +402,7 @@
 
                     <fieldset>
                         <legend>{tr}Forums list{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="show_description">{tr}Show description{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -410,7 +410,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="forum_last_n">{tr}Display last post titles{/tr}</label>
                             <div class="col-sm-4">
                                 {html_options name=forum_last_n id=forum_last_n class="form-control" options=$forum_last_n_options selected=$forum_last_n}
@@ -420,19 +420,19 @@
 
                     <fieldset>
                         <legend>{tr}Forum topics (threads) list{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="topicOrdering">{tr}Default order of topics{/tr}</label>
                             <div class="col-sm-8">
                                 {html_options name=topicOrdering id=topicOrdering class="form-control" options=$topicOrdering_options selected=$topicOrdering}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="topicsPerPage">{tr}Topics per page{/tr}</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control" name="topicsPerPage" id="topicsPerPage" value="{$topicsPerPage|escape}">
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label">{tr}Topic list configuration{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -477,7 +477,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="topic_smileys">{tr}Use topic smileys{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -485,7 +485,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="topic_summary">{tr}Show topic summary{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -497,19 +497,19 @@
 
                     <fieldset>
                         <legend>{tr}Forum threads{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="threadOrdering">{tr}Default ordering of threads{/tr}</label>
                             <div class="col-sm-8">
                                 {html_options name=threadOrdering id=threadOrdering class="form-control" options=$threadOrdering_options selected=$threadOrdering}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="threadStyle">{tr}Default style of threads{/tr}</label>
                             <div class="col-sm-8">
                                 {html_options name=threadStyle id=threadStyle class="form-control" options=$threadStyle_options selected=$threadStyle}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="commentsPerPage">{tr}Default number of comments per page{/tr}</label>
                             <div class="col-sm-8">
                                 {html_options name=commentsPerPage id=commentsPerPage class="form-control" options=$commentsPerPage_options selected=$commentsPerPage}
@@ -519,13 +519,13 @@
 
                     <fieldset>
                         <legend>{tr}Posts{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="approval_type">{tr}Approval type{/tr}</label>
                             <div class="col-sm-4">
                                 {html_options name=approval_type for=approval_type id=approval_type class="form-control" options=$approval_options selected=$approval_type}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label">{tr}User information display{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -565,7 +565,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="vote_threads">{tr}Posts can be rated{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -577,13 +577,13 @@
 
                     <fieldset>
                         <legend>{tr}Attachments{/tr}</legend>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="att">{tr}Permission{/tr}</label>
                             <div class="col-sm-8">
                                 {html_options name=att id=att class="form-control" options=$attachment_options selected=$att}
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="att_store_db">{tr}Store attachments in{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -600,14 +600,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-form-label col-sm-4" for="att_max_size">{tr}Max attachment size (bytes){/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="att_max_size" id="att_max_size" class="form-control" value="{$att_max_size|escape}">
                                 <span class="form-text">{tr}Max:{/tr} {$maxAttachSize|escape} ({$maxAttachSize|kbsize})</span>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 form-check-label" for="att_list_nb">{tr}Shows number of attachments of the all thread in forum list{/tr}</label>
                                 <div class="col-sm-8">
                                     <div class="form-check">
@@ -626,19 +626,19 @@
                 <h2>{tr}Duplicate Forum{/tr}</h2>
                 <form action="tiki-admin_forums.php" method="post" role="form">
                     {ticket}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label" for="duplicate_name">{tr}Name{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" name="duplicate_name" id="duplicate_name" class="form-control" value="{$name|escape}">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label" for="duplicate_description">{tr}Description{/tr}</label>
                         <div class="col-sm-8">
                             <textarea name="description" rows="4" id="duplicate_description" class="form-control">{$description|escape}</textarea>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label" for="duplicate_forumId">{tr}Forum{/tr}</label>
                         <div class="col-sm-8">
                             <select name="duplicate_forumId" id="duplicate_forumId" class="form-control">
@@ -648,7 +648,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 form-check-label" for="duplicate_categories">{tr}Duplicate categories{/tr}</label>
                         <div class="col-sm-8">
                             <div class="form-check">
@@ -656,7 +656,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-4 form-check-label" for="duplicate_perms">{tr}Duplicate permissions{/tr}</label>
                         <div class="col-sm-8">
                             <div class="form-check">

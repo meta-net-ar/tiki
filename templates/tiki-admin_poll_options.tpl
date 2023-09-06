@@ -23,19 +23,19 @@
     <input type="hidden" name="optionId" value="{$optionId|escape}">
     <input type="hidden" name="pollId" value="{$pollId|escape}">
 
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label">{tr}Option{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="title" value="{$title|escape}" maxlength="40" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label">{tr}Position{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="position" value="{$position|escape}" maxlength="4" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label"></label>
         <div class="col-sm-7">
             <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">

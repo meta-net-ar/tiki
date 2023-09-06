@@ -221,7 +221,7 @@ function wikiplugin_trackertimeline($data, $params)
     $instance++;
 
     if (! isset($params['tracker'])) {
-        return '{BOX(bg="#fcd9d3" align="left")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
+        return '{BOX(class="text-bg-light")}' . tr("Missing parameter: %0", 'tracker') . '{BOX}';
     }
 
     $default = ['scale1' => 'hour', 'simile_timeline' => 'n', 'height' => '250px', 'band2_height' => 30];
@@ -233,7 +233,7 @@ function wikiplugin_trackertimeline($data, $params)
     $size = $end - $start;
 
     if ($size <= 0) {
-        return '{BOX(bg="#fcd9d3" align="left")}' . tr("Start date after end date.") . '{BOX}';
+        return '{BOX(class="text-bg-light")}' . tr("Start date after end date.") . '{BOX}';
     }
 
     $fieldIds = [

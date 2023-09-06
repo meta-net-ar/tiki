@@ -3,7 +3,9 @@
     {block name=title}{/block}
 {/if}
 {block name=content}{/block}
-{if $headerlib}
+{* Add JS when it is not an action confirm prompt to avoid adding JS twice.
+This is managed by $confirmation_action variable initiated in lib/tikiaccesslib.php *}
+{if $headerlib && empty($confirmation_action) and $confirmation_action ne 'y'}
     {$headerlib->output_js_config()}
     {$headerlib->output_js_files()}
     {$headerlib->output_js()}

@@ -241,17 +241,27 @@ class Services_Manager_Controller
     public function action_delete($input)
     {
         $cmd = new TikiManager\Command\DeleteInstanceCommand();
-        $input = new ArrayInput([
-            'command' => $cmd->getName(),
-            '-i' => $input->instanceId->int(),
-        ]);
-        $this->runCommand($cmd, $input);
-        return [
-            'override_action' => 'info',
-            'title' => tr('Tiki Manager Delete Instance'),
-            'info' => $this->manager_output->fetch(),
-            'refresh' => true,
-        ];
+        $instanceId = $input->instanceId->int();
+        if (TikiManager\Application\Instance::getInstance($instanceId)) {
+            $input = new ArrayInput([
+                'command' => $cmd->getName(),
+                '-i' => $instanceId
+            ]);
+            $this->runCommand($cmd, $input);
+            return [
+                'override_action' => 'info',
+                'title' => tr('Tiki Manager Delete Instance'),
+                'info' => $this->manager_output->fetch(),
+                'refresh' => true,
+            ];
+        } else {
+            Feedback::error(tr('Instance to delete not found'));
+            return [
+                'FORWARD' => [
+                    'action' => 'index',
+                ],
+            ];
+        }
     }
 
     public function action_watch($input)
@@ -469,6 +479,7 @@ class Services_Manager_Controller
                 "--backup-user" => $input->backup_user->text(),
                 "--backup-group" => $input->backup_group->text(),
                 "--backup-permission" => $input->backup_permission->text(),
+                "--phpexec" => $input->phpexec->text(),
             ]);
 
             $this->runCommand($cmd, $inputCommand);
@@ -494,6 +505,7 @@ class Services_Manager_Controller
                     'backup_user' => $instance->getProp('backup_user'),
                     'backup_group' => $instance->getProp('backup_group'),
                     'backup_permission' => decoct($instance->getProp('backup_perm')),
+                    'phpexec' => $instance->phpexec,
                 ];
 
                 return [

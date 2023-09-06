@@ -110,7 +110,7 @@ function smarty_function_html_select_time($params, $smarty)
             $selected = $time == '--' ? $hour_empty : TikiLib::date_format($hour_fmt, $time);
         }
 
-        $html_result .= '<div class="col"><select class="' . $class . '" name=';
+        $html_result .= '<div class="col-sm-3 ps-0"><select class="' . $class . '" name=';
 
         if (null !== $field_array) {
             $html_result .= '"' . $field_array . '[' . $prefix . 'Hour]"';
@@ -194,7 +194,7 @@ function smarty_function_html_select_time($params, $smarty)
             $selected = '0' . $selected;
         }
 
-        $html_result .= '<div class="col"><select class="' . $class . '" name=';
+        $html_result .= '<div class="col-sm-3 pe-0"><select class="' . $class . '" name=';
         if (null !== $field_array) {
             $html_result .= '"' . $field_array . '[' . $prefix . 'Minute]"';
         } else {
@@ -277,7 +277,7 @@ function smarty_function_html_select_time($params, $smarty)
     }
 
     if (! $use_24_hours) {
-        $html_result .= '<div class="col"><select class="' . $class . '" name=';
+        $html_result .= '<div class="col-sm-3 ps-0"><select class="' . $class . '" name=';
         if (null !== $field_array) {
             $html_result .= '"' . $field_array . '[' . $prefix . 'Meridian]"';
         } else {

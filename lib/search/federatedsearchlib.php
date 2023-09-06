@@ -71,7 +71,14 @@ class FederatedSearchLib
             $sub->applyTransform($trans);
         }
 
-        $query->includeForeign($indexName, $sub);
+        if (strstr($indexName, ':')) {
+            $parts = explode(':', $indexName);
+            $prefix = array_pop($parts);
+        } else {
+            $prefix = $indexName;
+        }
+
+        $query->includeForeign($prefix, $sub);
 
         return $sub;
     }
@@ -109,26 +116,24 @@ class FederatedSearchLib
             $def = $client->parseDistributedIndexDefinition($indexName);
             if ($def['type'] == 'agent') {
                 // remote agent definition
-                // TODO: decide how to specify remote mysql port as the agent definition port is 9312 by default
-                $indexClient = new ManticoreClient($def['host']);
-                // TODO: remote agent rebuild will invalidate this distributed index, need to ping back this server to recreate the distributed index
+                $indexClient = new ManticoreClient($def['host'], $def['port_sql']);
             } else {
                 // local index
                 $indexClient = $client;
             }
             $available = $indexClient->getIndicesByPrefix($def['index']);
             $latest = '';
-            foreach ($available as $row) {
-                if ($row['Type'] != 'rt') {
-                    continue;
-                }
+            foreach ($available as $candidate) {
                 if (empty($latest)) {
-                    $latest = $row['Index'];
+                    $latest = $candidate;
                     continue;
                 }
-                if (strcmp($latest, $row['Index']) < 0) {
-                    $latest = $row['Index'];
+                if (strcmp($latest, $candidate) < 0) {
+                    $latest = $candidate;
                 }
+            }
+            if (empty($latest)) {
+                $latest = $def['index'];
             }
             if ($def['type'] == 'agent') {
                 $parts = explode(':', $indexName);

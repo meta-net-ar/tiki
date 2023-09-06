@@ -52,7 +52,7 @@ function smarty_function_formitem($params, $smarty)
     if ($params['is_checkbox'] == 'y') {
         $html = '<div class="form-check"><label>' . $params['_field'] . $params['_label'] . '</label> ' . $popup . '</div>';
     } else {
-        $html = '<div ' . $id . ' class="mb-3 row ' . $params['class'] . '"><label>' . $params['_label'] . '</label> ' . $popup . $help . $params['_field'] . '</div>';
+        $html = '<div ' . $id . ' class="tiki-form-group row ' . $params['class'] . '"><label>' . $params['_label'] . '</label> ' . $popup . $help . $params['_field'] . '</div>';
     }
 
 

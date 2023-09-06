@@ -151,5 +151,5 @@ $list-group-active-bg:              $list-group-bg !default;
 $list-group-disabled-color:         lighten($list-group-bg, 30%) !default;
 
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
 //--------------------------- Tiki SCSS variables

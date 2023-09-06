@@ -44,4 +44,20 @@ class WikiPlugin_Helper
 
         return true;
     }
+
+    /**
+     * When wikiplugin is outside the normal context of wikiplugins.
+     * This method help to get return of wikiplugin as string
+     *
+     * @param string|WikiParser_PluginOutput $result
+     * @return string
+     */
+    public static function resultString($result): string
+    {
+        if ($result instanceof WikiParser_PluginOutput) {
+            $result = $result->toWiki();
+        }
+
+        return $result;
+    }
 }

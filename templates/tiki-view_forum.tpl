@@ -851,7 +851,7 @@
                                             </a>
                                         </action>
                                         <action>
-                                            {permission_link mode=text type="thread" permType="forums" id=$comments_coms[ix].threadId title=$comments_coms[ix].title}
+                                            {permission_link mode=text type="thread" permType="forums" id=$comments_coms[ix].threadId title=$comments_coms[ix].title parentId=$comments_coms[ix].object}
                                         </action>
                                     {/if}
                                 {/strip}

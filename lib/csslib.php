@@ -118,23 +118,25 @@ class cssLib extends TikiLib
     {
         $back = [];
 
-        $handle = opendir($path);
+        if (is_dir($path)) {
+            $handle = opendir($path);
 
-        while ($file = readdir($handle)) {
-            if ((substr($file, -4, 4) == $extension) and (preg_match('/^[-_a-zA-Z0-9\.]*$/', $file))) {
-                $back[] = "$path/$file";
-            } elseif (
-                $recursive
-                                && $file != '.svn'
-                                && $file != '.'
-                                && $file != '..'
-                                && is_dir("$path/$file")
-                                && ! file_exists("db/$file/local.php")
-            ) {
-                $back = array_merge($back, $this->list_files("$path/$file", $extension, $recursive));
+            while ($file = readdir($handle)) {
+                if ((substr($file, -4, 4) == $extension) and (preg_match('/^[-_a-zA-Z0-9\.]*$/', $file))) {
+                    $back[] = "$path/$file";
+                } elseif (
+                    $recursive
+                                    && $file != '.svn'
+                                    && $file != '.'
+                                    && $file != '..'
+                                    && is_dir("$path/$file")
+                                    && ! file_exists("db/$file/local.php")
+                ) {
+                    $back = array_merge($back, $this->list_files("$path/$file", $extension, $recursive));
+                }
             }
+            closedir($handle);
         }
-        closedir($handle);
         sort($back);
         return $back;
     }

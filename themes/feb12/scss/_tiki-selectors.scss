@@ -302,10 +302,10 @@ body.fullscreen {
     border-width: 0 1px;
 }
 
-#bottom_modules:has(div) {
-    background: #A8CCE2;
-    border-top: none;
-}
+//#bottom_modules:has(div) {
+//    background: #A8CCE2;
+//    border-top: none;
+//}
 
 .autotoc .dropdown-item {
     color: $link-color;
@@ -333,4 +333,11 @@ blockquote,
     &.bg-danger {
         color: #000;
     }
+}
+
+// Prevent visible double padding.
+.main-footer {
+    padding-left: 0;
+    padding-right: 0;
+    background: #A8CCE2;
 }

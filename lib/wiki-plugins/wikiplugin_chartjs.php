@@ -21,6 +21,7 @@ function wikiplugin_chartjs_info()
             'id' => [
                 'name' => tra('Chart Id'),
                 'description' => tr('A custom ID for the chart.'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => 'tikiChart1, tikiChart2 etc',
                 'since' => '16.0',
@@ -28,6 +29,7 @@ function wikiplugin_chartjs_info()
             'type' => [
                 'name' => tra('Chart Type'),
                 'description' => tr('The type of chart. Currently works with pie, bar and doughnut'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => 'pie',
                 'since' => '16.0',
@@ -35,6 +37,7 @@ function wikiplugin_chartjs_info()
             'height' => [
                 'name' => tra('Chart Height'),
                 'description' => tr('The height of the chart in px'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => '200',
                 'since' => '16.0',
@@ -42,6 +45,7 @@ function wikiplugin_chartjs_info()
             'width' => [
                 'name' => tra('Chart Width'),
                 'description' => tr('The width of the chart in px'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => '200',
                 'since' => '16.0',
@@ -49,6 +53,7 @@ function wikiplugin_chartjs_info()
             'values' => [
                 'name' => tra('Chart data values'),
                 'description' => tr('Colon-separated values for the chart (required if not using JSON encoded data in the plugin body)'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => '',
                 'since' => '16.0',
@@ -56,6 +61,7 @@ function wikiplugin_chartjs_info()
             'data_labels' => [
                 'name' => tra('Chart data labels'),
                 'description' => tr('Colon-separated labels for the datasets in the chart. Max 10, if left empty'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => 'A:B:C:D:E:F:G:H:I:J',
                 'since' => '16.0',
@@ -63,6 +69,7 @@ function wikiplugin_chartjs_info()
             'data_colors' => [
                 'name' => tra('Chart colors'),
                 'description' => tr('Colon-separated colors for the datasets in the chart. Max 10, if left empty'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => 'red:blue:green:purple:grey:orange:yellow:black:brown:cyan',
                 'since' => '16.0',
@@ -70,6 +77,7 @@ function wikiplugin_chartjs_info()
             'data_highlights' => [
                 'name' => tra('Chart highlight'),
                 'description' => tr('Colon-separated color of chart section when highlighted'),
+                'required' => false,
                 'filter' => 'text',
                 'default' => '',
                 'since' => '16.0',
@@ -77,6 +85,7 @@ function wikiplugin_chartjs_info()
             'debug' => [
                 'name' => tra('Debug Mode'),
                 'description' => tr('Uses the non-minified version of the chart.js library for easier debugging.'),
+                'required' => false,
                 'filter' => 'digits',
                 'default' => 0,
                 'advanced' => true,
@@ -93,6 +102,10 @@ function wikiplugin_chartjs($data, $params)
 
     static $instance = 0;
     $instance++;
+
+    if (! empty($params['id'])) {
+        $params['id'] = preg_replace('/[^A-Za-z0-9_]/', '', $params['id']);
+    }
 
     if (empty($params['id'])) {
         $params['id'] = "tikiChart$instance";

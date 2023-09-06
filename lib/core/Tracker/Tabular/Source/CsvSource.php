@@ -72,13 +72,16 @@ class CsvSource implements SourceInterface
     {
         return $this->schema;
     }
-
-    private function decode(string $str): string
+    /**
+    * @param string|null $str
+    * @return string
+    */
+    private function decode(?string $str): string
     {
-        if ($this->encoding) {
+        if ($this->encoding && $str) {
             return mb_convert_encoding($str, 'UTF-8', $this->encoding);
         } else {
-            return $str;
+            return $str ?? '';
         }
     }
 }

@@ -46,7 +46,7 @@
         {permission name=payment_request}
             {tab name="{tr}Request{/tr}"}
                 <form method="post" action=""><br>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-3 col-form-label text-end" for="description">
                             {tr}Description{/tr}
                         </label>
@@ -54,7 +54,7 @@
                             <input class="form-control" type="text" id="description" name="description">
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-3 col-form-label text-end" for="detail">
                             {tr}Detail{/tr}
                         </label>
@@ -62,7 +62,7 @@
                             <textarea class="form-control" id="detail" name="detail" style="width: 100%;" rows="6"></textarea>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-3 col-form-label text-end" for="amount">
                             {tr}Amount{/tr}
                         </label>

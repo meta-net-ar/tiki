@@ -77,6 +77,17 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
                             1 => tr('Yes'),
                         ],
                     ],
+                    'confirmed' => [
+                        'name' => tr("Confirmation of the email address"),
+                        'description' => tr("Enable this to ask for a confirmation of the email address with a second input field"),
+                        'deprecated' => false,
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -134,6 +145,9 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
             'value' => (isset($requestData[$ins_id]))
                 ? $requestData[$ins_id]
                 : $this->getValue(),
+            'value_confirmed' => (isset($requestData[$ins_id . "_confirm"]))
+            ? $requestData[$ins_id . "_confirm"]
+            : $this->getValue(),
         ];
     }
 

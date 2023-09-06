@@ -1,5 +1,5 @@
 <div class="apply_fields">
-    <div class="form-group row mb-3">
+    <div class="tiki-form-group row">
         <label class="col-form-label col-sm-3">
             {tr}Repository{/tr}
             <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}Click the button next to the field to Load the available profiles from the repository. {/tr}">
@@ -14,7 +14,7 @@
         </div>
 
     </div>
-    <div class="form-group row mb-3">
+    <div class="tiki-form-group row">
         <label class="col-form-label col-sm-3">
             {tr}Profile{/tr}
             <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}Profile To Apply{/tr}">

@@ -2797,6 +2797,7 @@ class Services_Tracker_Controller
             return '';
         }
         $fieldHandler = $trklib->get_field_handler($field, [
+            'itemId' => $input->itemId->int(),
             $input->fieldIdHere->int() => $input->value->text()
         ]);
         if (! $fieldHandler) {

@@ -149,9 +149,9 @@ function diffChar($orig, $final, $words = 0, $function = 'character')
     $glue = strpos($function, 'inline') !== false ? "<br />" : "\n";
     if ($words) {
         preg_match_all("/\w+\s+(?=\w)|\w+|\W/u", implode($glue, $orig), $matches);
-        $line1 = $matches[0];
+        $line1 = restoreLineBreaks($matches[0], $glue);
         preg_match_all("/\w+\s+(?=\w)|\w+|\W/u", implode($glue, $final), $matches);
-        $line2 = $matches[0];
+        $line2 = restoreLineBreaks($matches[0], $glue);
     } else {
         $line1 = preg_split('//u', implode($glue, $orig), -1, PREG_SPLIT_NO_EMPTY);
         $line2 = preg_split('//u', implode($glue, $final), -1, PREG_SPLIT_NO_EMPTY);
@@ -166,6 +166,18 @@ function diffChar($orig, $final, $words = 0, $function = 'character')
       $new = "Text_Diff_Renderer_$function";
     $renderer = new $new(count($line1));
     return $renderer->render($z);
+}
+
+function restoreLineBreaks($lines, $glue)
+{
+    foreach ($lines as $key => $line) {
+        if (str_ends_with($line, $glue)) {
+            $lines[$key] = substr($line, 0, -1);
+            array_splice($lines, $key + 1, 0, $glue);
+        }
+    }
+
+    return $lines;
 }
 
 function compileRendererClass($function)

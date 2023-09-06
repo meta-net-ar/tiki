@@ -520,7 +520,7 @@ if ( \$('#$id') ) {
 
             //This was added to remove the table of contents sometimes returned by other plugins, to use, simply have global $killtoc, and $killtoc = true;
             if ($killtoc == true) {
-                while (($maketoc_start = strpos($output, "{maketoc")) !== false) {
+                while (($maketoc_start = strpos($output ?? '', "{maketoc")) !== false) {
                     $maketoc_end = strpos($output, "}");
                     $output = substr_replace($output, "", $maketoc_start, $maketoc_end - $maketoc_start + 1);
                 }

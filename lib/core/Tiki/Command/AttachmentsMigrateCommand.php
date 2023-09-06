@@ -26,6 +26,12 @@ class AttachmentsMigrateCommand extends Command
         $this
             ->setName('attachments:migrate')
             ->setDescription(tra('Convert legacy wiki attachment storage to file galleries or vice versa depending on settings.'))
+            ->addOption(
+                'remove-orphans',
+                null,
+                InputOption::VALUE_NONE,
+                'Remove wiki attachments to pages that no longer exist.'
+            )
         ;
     }
 
@@ -54,6 +60,8 @@ class AttachmentsMigrateCommand extends Command
             return Command::SUCCESS;
         }
 
+        $remove_orphans = $input->getOption('remove-orphans');
+
         if ($prefs['feature_use_fgal_for_wiki_attachments'] === 'y') {
             $count = 0;
             $result = $wikilib->list_all_attachments();
@@ -62,7 +70,13 @@ class AttachmentsMigrateCommand extends Command
                 // find or create attachments gallery for the corresponding wiki apge
                 $galleryId = $filegallib->get_attachment_gallery($att['page'], 'wiki page', true);
                 if (! $galleryId) {
-                    $output->writeln('<error>' . tr('File gallery for page %0 could not be found or created. Does the page exist?', $att['page']) . '</error>');
+                    if ($remove_orphans) {
+                        $output->writeln(tr('Wiki page no found, removing attachment...'));
+                        $wikilib->remove_wiki_attachment($att['attId']);
+                    } else {
+                        $output->writeln('<error>' . tr('File gallery for page %0 could not be found or created. Does the page exist?', $att['page']) . '</error>');
+                        $output->writeln(tr('Hint: run this command with --remove-orphans to delete these attachments.'));
+                    }
                     continue;
                 }
                 // create file and replace its contents
@@ -96,12 +110,14 @@ class AttachmentsMigrateCommand extends Command
                                 } elseif ($key == 'src' && preg_match('/tiki-download_wiki_attachment\.php\?attId=(\d+)/', $val, $m) && $m[1] == $att['attId']) {
                                     $newArgs[] = "fileId=$fileId";
                                     $modified = true;
+                                } elseif ($key == 'type' && $val == 'attId') {
+                                    $newArgs[] = "type=fileId";
                                 } else {
                                     $newArgs[] = "$key=\"$val\"";
                                 }
                             }
                             if ($modified) {
-                                $match->replaceWith('{file ' . implode(' ', $newArgs) . '}');
+                                $match->replaceWith('{img ' . implode(' ', $newArgs) . '}');
                                 $updated = true;
                             }
                         } elseif ($pluginName == 'file') {

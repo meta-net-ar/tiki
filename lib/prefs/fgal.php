@@ -254,6 +254,15 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'tags' => ['advanced'],
             'dependencies' => ['fgal_keep_fileId'],
         ],
+        'fgal_upload_from_source_domains' => [
+            'name' => tra('Domains'),
+            'description' => tra('Allowed domains'),
+            'hint' => tra('One domain per line'),
+            'type' => 'textarea',
+            'default' => '',
+            'tags' => ['advanced'],
+            'dependencies' => ['fgal_upload_from_source'],
+        ],
         'fgal_source_refresh_frequency' => [
             'name' => tra('Remote source refresh frequency limit'),
             'description' => tra('Minimum number of seconds to elapse between remote source checks to prevent flooding the server with requests.'),

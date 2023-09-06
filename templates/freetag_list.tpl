@@ -1,6 +1,6 @@
-{if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($freetags.data[0])}
+{if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($tags[0])}
     <div class="freetaglist">{icon name="tags" class="tips btn btn-link btn-sm" title=":{tr}Browse Tags{/tr}" href="tiki-browse_freetags.php"}
-        {foreach from=$freetags.data item=taginfo}
+        {foreach from=$tags item=taginfo}
             {capture name=tagurl}{if (strstr($taginfo.tag, ' '))}"{$taginfo.tag}"{else}{$taginfo.tag}{/if}{/capture}
             {if isset($links_inactive) and $links_inactive eq 'y'}
                 <a class="btn-primary btn-sm" href="#">{$taginfo.tag|escape}</a>

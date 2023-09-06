@@ -290,7 +290,7 @@ if ($prefs['fgal_limit_hits_per_file'] == 'y') {
 }
 
 if (! empty($fileInfo['fileId'])) {
-    $smarty->assign('metarray', $filegallib->metadataAction($fileInfo['fileId']), 'get_array');
+    $smarty->assign('metarray', $filegallib->metadataAction($fileInfo['fileId']));
 }
 
 $is_iis = TikiInit::isIIS();

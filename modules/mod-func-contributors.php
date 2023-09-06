@@ -30,7 +30,7 @@ function module_contributors($mod_reference, $module_params)
     $headerlib = TikiLib::lib('header');
     $wikilib = TikiLib::lib('wiki');
     $currentObject = current_object();
-    if ($currentObject['type'] == 'wiki page') {
+    if ($currentObject && $currentObject['type'] == 'wiki page') {
         $objectperms = Perms::get(['type' => 'wiki page', 'object' => $currentObject['object']]);
         if ($objectperms->view) {
             $contributors = $wikilib->get_contributors($currentObject['object']);

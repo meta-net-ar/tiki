@@ -152,7 +152,7 @@
         <input type="hidden" name="width" value="{$im_width}">
         <input type="hidden" name="height" value="{$im_height}">
 
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-4">{tr}Title:{/tr}</label>
             <div class="col-sm-4">
                 <input type="text" name="title" value="{$title}" class="form-control" onchange="renderWikiPlugin()">
@@ -198,7 +198,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-4">{tr}Vertical Scale:{/tr}</label>
                 <div class="col-sm-2">
                     <div class="form-check">
@@ -223,7 +223,7 @@
             {tr}Series:{/tr}
         </div>
         {section name=i loop=$series}
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-4">{$series[i]}</label>
                 <div class="col-sm-4">
                     <input type="text" name="series[{$series[i]}]" class="form-control" onchange="renderWikiPlugin()">

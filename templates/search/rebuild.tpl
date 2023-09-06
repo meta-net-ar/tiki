@@ -14,7 +14,7 @@
     {if !empty($search_engine)}
         <div class="alert alert-info">
             <p>{tr}Unified search engine:{/tr} <b>{$search_engine}</b>{if !empty($search_version)}, {tr}version{/tr} <b>{$search_version}</b>{/if}{if $search_index}, index <b>{$search_index}</b>{/if}</p>
-            {if $fallback_search_set && !empty($fallback_search_engine)}
+            {if !empty($fallback_search_engine)}
                 <p>{tr}Unified search engine fallback:{/tr} <b>{$fallback_search_engine}</b>{if !empty($fallback_search_version)}, {tr}version{/tr} <b>{$fallback_search_version}</b>{/if}{if $fallback_search_index}, index <b>{$fallback_search_index}</b>{/if}</p>
             {/if}
         </div>
@@ -33,7 +33,7 @@
                         {tr}Enable logging{/tr}
                     </label>
                     <div class="form-text">{tr _0=$log_file_browser}Log file is saved as %0{/tr}</div>
-                    {if $fallback_search_set}
+                    {if !empty($fallback_search_engine)}
                         <div class="form-text">{tr _0=$fallback_log_file_browser}Fallback engine log file is saved as %0{/tr}</div>
                     {/if}
                 </div>
@@ -65,7 +65,7 @@
             <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} index:rebuild</kbd><br>
             <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} index:rebuild --log</kbd><br>
             <p>{tr _0=$log_file_console}Log file is saved as %0{/tr}</p>
-            {if $fallback_search_set}
+            {if !empty($fallback_search_engine)}
                 <p>{tr _0=$fallback_log_file_console}Fallback engine log file is saved as %0{/tr}</p>
             {/if}
         {/remarksbox}

@@ -22,4 +22,12 @@ class Tiki_Event_Function_EventRecord extends Math_Formula_Function
 
         return 1;
     }
+
+    public function evaluateFull($element)
+    {
+        $event = $this->evaluateChild($element[0]);
+        $arguments = $this->evaluateChild($element[1]);
+
+        return 1;
+    }
 }

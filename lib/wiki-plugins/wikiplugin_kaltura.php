@@ -42,6 +42,7 @@ function wikiplugin_kaltura_info()
                 'iconname' => 'video',
             ],
             'player_id' => [
+                'required' => false,
                 'name' => tra('Kaltura Video Player ID'),
                 'description' => tra('Kaltura Dynamic Player (KDP) user interface configuration ID'),
                 'since' => '10.0',

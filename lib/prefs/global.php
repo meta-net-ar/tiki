@@ -18,6 +18,14 @@ function prefs_global_list($partial = false)
             'public' => true,
             'translatable' => true,
         ],
+        'server_domain' => [
+            'name' => tra('Server domain name'),
+            'description' => tra('The value that will be used by default as the server domain name of your Tiki site.'),
+            'type' => 'text',
+            'default' => '',
+            'tags' => ['basic'],
+            'public' => true,
+        ],
         'fallbackBaseUrl' => [
             'name' => tra('Fallback for tiki base URL'),
             'description' => tra('The full URL to the Tiki base URL including protocol, domain and path (example: https://example.com/tiki/), used when the current URL can not be determined, example, when executing from the command line.'),

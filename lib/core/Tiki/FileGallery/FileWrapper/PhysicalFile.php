@@ -32,7 +32,7 @@ class PhysicalFile implements WrapperInterface
     public function getChecksum()
     {
         $tmpfname = $this->fullPath();
-        if (filesize($tmpfname) > 0) {
+        if (is_file($tmpfname) && filesize($tmpfname) > 0) {
             return md5_file($tmpfname);
         } else {
             return md5(time());

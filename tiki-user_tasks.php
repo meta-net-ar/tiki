@@ -505,7 +505,7 @@ if ((isset($_REQUEST['save'])) || (isset($_REQUEST['preview']))) {
 if (isset($_REQUEST['save']) && empty($errors)) {
     if (isset($_REQUEST['task_info_message']) and strlen($_REQUEST['task_info_message']) > 1) {
         $task_info_message = "\n__" . tra("Info message") . ":__\n";
-        $task_info_message .= '{BOX(bg="#fcd9d3" align="left")}' . $_REQUEST['task_info_message'] . "{BOX}\n\n";
+        $task_info_message .= '{BOX(class="text-bg-light")}' . $_REQUEST['task_info_message'] . "{BOX}\n\n";
     } else {
         $task_info_message = '';
     }
@@ -601,8 +601,8 @@ if (isset($_REQUEST['save']) && empty($errors)) {
     }
     if ($send_message and $userlib->user_has_permission($msg_from, 'tiki_p_messages') and $userlib->user_has_permission($msg_to, 'tiki_p_messages')) {
         $msg_body = "__" . tra('Task') . ":__";
-        $msg_body .= '{BOX(bg="#fcd9d3" align="left")}[tiki-user_tasks.php?taskId=' . $info['taskId'] . "|" . $info['title'] . "]{BOX}\n";
-        $msg_body .= $task_info_message . $msg_changes_head . '{BOX(bg="#fcd9d3" align="left")}' . $msg_changes . '{BOX}';
+        $msg_body .= '{BOX(class="text-bg-light")}[tiki-user_tasks.php?taskId=' . $info['taskId'] . "|" . $info['title'] . "]{BOX}\n";
+        $msg_body .= $task_info_message . $msg_changes_head . '{BOX(class="text-bg-light")}' . $msg_changes . '{BOX}';
         $messulib->post_message(
             $msg_to, //user
             $msg_from, //from

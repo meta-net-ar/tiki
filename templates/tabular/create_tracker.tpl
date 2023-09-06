@@ -15,19 +15,19 @@
 {block name="content"}
 
     <form class="edit-tabular" method="post" action="{service controller=tabular action=create_tracker}" enctype="multipart/form-data">
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-3">{tr}Name{/tr}</label>
             <div class="col-sm-9">
                 <input class="form-control" type="text" name="name" maxlength="255" required>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-3">{tr}Tracker Name{/tr}</label>
             <div class="col-sm-9">
                 <input class="form-control" type="text" name="tracker_name" maxlength="255" required>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-3">{tr}File Delimiter{/tr}</label>
             <div class="col-sm-9">
                 <select class="form-select file-delimiter">
@@ -37,7 +37,7 @@
                 <input type="hidden" id="delimiter" name="delimiter" value="comma">
             </div>
         </div>
-        <div class="mb-3 row file-container">
+        <div class="tiki-form-group row file-container">
             <label class="col-form-label col-sm-3">{tr}File{/tr}</label>
             <div class="col-sm-9">
                 <input type="file" name="file" accept="text/csv" class="form-control" required>
@@ -46,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <div id="tracker-columns" class="mb-3 row" style="display:none">
+        <div id="tracker-columns" class="tiki-form-group row" style="display:none">
             <div class="col-sm-12">
                 <table class="table fields">
                     <thead>
@@ -79,7 +79,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="mb-3">
+                        <td class="tiki-form-group">
                             <select class="form-select type">
                                 {foreach from=$types key=k item=info}
                                     <option value="{$k}" {if $k eq 't'}selected{/if}>{$info.name|escape} {if !empty($info.deprecated)}- Deprecated{/if}</option>
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="form-check-label col-sm-3">{tr}Simple headers{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
@@ -125,7 +125,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="form-check-label col-sm-3">{tr}Import updates{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
@@ -136,7 +136,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="form-check-label col-sm-3">{tr}Ignore blanks{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
@@ -147,7 +147,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="form-check-label col-sm-3">{tr}Transactional import{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
@@ -158,7 +158,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="form-check-label col-sm-3">{tr}Bulk import{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
@@ -169,7 +169,7 @@
                 </div>
             </div>
         </div>
-        <div class="mb-3 submit">
+        <div class="tiki-form-group submit">
             <div class="col-sm-9 offset-sm-3">
                 <input type="submit" class="btn btn-primary" value="{tr}Import{/tr}">
             </div>

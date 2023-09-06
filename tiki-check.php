@@ -588,19 +588,19 @@ if ($standalone && ! $locked) {
 <h2>Database credentials</h2>
 Couldn't connect to database, please provide valid credentials.
 <form method="post" action="{$_SERVER['SCRIPT_NAME']}">
-    <div class="mb-3 mt-3">
+    <div class="tiki-form-group mt-3">
         <label for="dbhost">Database host</label>
         <input class="form-control" type="text" id="dbhost" name="dbhost" value="localhost" />
     </div>
-    <div class="mb-3">
+    <div class="tiki-form-group">
         <label for="dbuser">Database username</label>
         <input class="form-control" type="text" id="dbuser" name="dbuser" />
     </div>
-    <div class="mb-3">
+    <div class="tiki-form-group">
         <label for="dbpass">Database password</label>
         <input class="form-control" type="password" id="dbpass" name="dbpass" />
     </div>
-    <div class="mb-3">
+    <div class="tiki-form-group">
         <input type="submit" class="btn btn-primary btn-sm" value=" Connect " />
     </div>
 </form>
@@ -1596,21 +1596,6 @@ if ($s) {
         'fitness' => tra('info'),
         'setting' => 'Not available',
         'message' => tra('This extension is used by Tiki for some types of web services.')
-    );
-}
-
-$s = extension_loaded('carray');
-if ($s) {
-    $php_properties['carray'] = array(
-        'fitness' => tra('good'),
-        'setting' => 'Loaded',
-        'message' => tra('High-performance scientific computing library for PHP')
-    );
-} else {
-    $php_properties['carray'] = array(
-        'fitness' => tra('info'),
-        'setting' => 'Not available',
-        'message' => tra('High-performance scientific computing library for PHP')
     );
 }
 
@@ -3225,13 +3210,13 @@ if ($standalone && ! $nagios) {
             $render .= '<p>Unable to check the server compatibility and the recommended Tiki version.<br>';
             $render .= 'Use the form bellow to select the Database engine and version, to detect the recommended version.</p>';
             $render .= '<form method="post" action="' . $_SERVER['SCRIPT_NAME'] . '">';
-            $render .= '<div class="mb-3 mt-3"><label for="db-engine">Database Engine</label>:';
+            $render .= '<div class="tiki-form-group mt-3"><label for="db-engine">Database Engine</label>:';
             $render .= '<select name="db-engine" class="form-control">';
             $render .= '<option value="mysql" ' . ($dbEngine == 'mysql' ? 'selected' : '') . '>MySQL</option>';
             $render .= '<option value="mariadb" ' . ($dbEngine == 'mariadb' ? 'selected' : '') . '>MariaDB</option>';
             $render .= '</select></div>';
-            $render .= '<div class="mb-3"><label for="db-engine">Database Version</label>: <input type="text"  class="form-control" id="db-version" name="db-version" value="' . $dbVersion . '"/></div>';
-            $render .= '<div class="mb-3"><input type="submit" class="btn btn-primary btn-sm" value="Check compatibility" /></div>';
+            $render .= '<div class="tiki-form-group"><label for="db-engine">Database Version</label>: <input type="text"  class="form-control" id="db-version" name="db-version" value="' . $dbVersion . '"/></div>';
+            $render .= '<div class="tiki-form-group"><input type="submit" class="btn btn-primary btn-sm" value="Check compatibility" /></div>';
             $render .= '</form>';
         }
 
@@ -3270,8 +3255,8 @@ if ($standalone && ! $nagios) {
             renderTable($mail);
         } else {
             $render .= '<form method="post" action="' . $_SERVER['SCRIPT_NAME'] . '">';
-            $render .= '<div class="mb-3 mt-3"><label for="e-mail">e-mail address to send test mail to</label>: <input type="text"  class="form-control" id="email_test_to" name="email_test_to" /></div>';
-            $render .= '<div class="mb-3"><input type="submit" class="btn btn-primary btn-sm" value=" Send e-mail " /></div>';
+            $render .= '<div class="tiki-form-group mt-3"><label for="e-mail">e-mail address to send test mail to</label>: <input type="text"  class="form-control" id="email_test_to" name="email_test_to" /></div>';
+            $render .= '<div class="tiki-form-group"><input type="submit" class="btn btn-primary btn-sm" value=" Send e-mail " /></div>';
             $render .= '<p><input type="hidden" id="dbhost" name="dbhost" value="';
             if (isset($_POST['dbhost'])) {
                 $render .= htmlentities(strip_tags($_POST['dbhost']));

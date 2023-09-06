@@ -2,7 +2,7 @@
 /*  The Trontastic theme option file for the Jqui theme of Tiki Wiki CMS Groupware. */
 @import url(http://fonts.googleapis.com/css?family=Play);
 /*!
-   * Bootstrap  v5.3.0 (https://getbootstrap.com/)
+   * Bootstrap  v5.3.1 (https://getbootstrap.com/)
    * Copyright 2011-2023 The Bootstrap Authors
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    */
@@ -27,6 +27,8 @@ header.navbar.fixed-top {
 :root {
   --tiki-tooltip-link-color: #88b6fc;
   --tiki-tooltip-link-hover-color: var(--bs-body-bg);
+  --tiki-code-color: var(--bs-body-color);
+  --tiki-code-bg: var(--bs-secondary-bg);
 }
 .badge {
   --bs-badge-padding-x: 0.65em;
@@ -997,7 +999,7 @@ header.navbar.fixed-top {
   --bs-link-hover-color: #a0e64c;
   --bs-link-hover-color-rgb: 160, 230, 76;
   --bs-link-hover-decoration: underline;
-  --bs-code-color: var(--bs-secondary-color);
+  --bs-code-color: var(--bs-body-color);
   --bs-highlight-bg: #fff3cd;
   --bs-border-width: 1px;
   --bs-border-style: solid;
@@ -1348,8 +1350,8 @@ legend + * {
   height: auto;
 }
 [type="search"] {
-  outline-offset: -2px;
   -webkit-appearance: textfield;
+  outline-offset: -2px;
 }
 /* rtl:raw:
 [type="tel"],
@@ -1788,7 +1790,7 @@ progress {
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(184, 236, 121, 0.25);
 }
-.nav-link.disabled {
+.nav-link.disabled, .nav-link:disabled {
   color: var(--bs-nav-link-disabled-color);
   pointer-events: none;
   cursor: default;
@@ -1813,11 +1815,6 @@ progress {
   isolation: isolate;
   border-color: var(--bs-nav-tabs-link-hover-border-color);
 }
-.nav-tabs .nav-link.disabled, .nav-tabs .nav-link:disabled {
-  color: var(--bs-nav-link-disabled-color);
-  background-color: transparent;
-  border-color: transparent;
-}
 .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
   color: var(--bs-nav-tabs-link-active-color);
   background-color: var(--bs-nav-tabs-link-active-bg);
@@ -1835,11 +1832,6 @@ progress {
 }
 .nav-pills .nav-link {
   border-radius: var(--bs-nav-pills-border-radius);
-}
-.nav-pills .nav-link:disabled {
-  color: var(--bs-nav-link-disabled-color);
-  background-color: transparent;
-  border-color: transparent;
 }
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: var(--bs-nav-pills-link-active-color);
@@ -2749,21 +2741,25 @@ progress {
   --tiki-top-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
   --tiki-top-color: #000;
   --tiki-top-hover-color: #2c2c2c;
+  --tiki-top-text-color: #2c2c2c;
 }
 .tiki-topbar-nav-light {
   --tiki-topbar-bg: linear-gradient(to bottom, #cbeba5 0%, #caeba2 30%, #c4e999 52%, #b4e27c 53%, #a4dc60 98%, #a3dc5f 99%, #9fda58 100%);
   --tiki-topbar-color: #000;
   --tiki-topbar-hover-color: #2c2c2c;
+  --tiki-topbar-text-color: #2c2c2c;
 }
 .tiki-top-nav-dark {
   --tiki-top-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
   --tiki-top-color: #b8ec79;
   --tiki-top-hover-color: #c8f197;
+  --tiki-top-text-color: #c8f197;
 }
 .tiki-topbar-nav-dark {
   --tiki-topbar-bg: linear-gradient(to bottom, #4c4c4c 0%,#4c4c4c 18%,#404040 52%,#232323 53%,#090909 93%,#070707 99%,#000000 100%);
   --tiki-topbar-color: #b8ec79;
   --tiki-topbar-hover-color: #c8f197;
+  --tiki-topbar-text-color: #c8f197;
 }
 .tiki.tiki-admin .tiki-top-nav-light, .tiki .tiki-admin-aside-nav-light, .tiki-admin .tiki-admin-top-nav-light .dropdown-menu, .tiki-admin .tiki-admin-top-nav-light .dropdown-item, .tiki .tiki-admin-top-nav-light {
   --tiki-admin-top-nav-color: #000;
@@ -2795,58 +2791,65 @@ progress {
 .tiki.tiki-admin .top_modules.navbar-dark-parent {
   --tiki-admin-top-nav-bg: linear-gradient(to bottom, #4c4c4c 0%, #4c4c4c 18%, #404040 52%, #232323 53%, #090909 93%, #070707 99%, #000000 100%);
 }
+:root, [data-bs-theme="dark"] {
+  --tiki-code-bg: #303030;
+}
 .fc {
   --fc-page-bg-color: #000;
 }
 .tiki .tiki-top-nav-light {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
 }
-.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-light .btn.btn-link {
+.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-light .dropdown-toggle, .tiki .tiki-top-nav-light .nav-link.dropdown-toggle, .tiki .tiki-top-nav-light .btn.btn-link {
   color: var(--tiki-top-color);
 }
-.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-light .btn.btn-link:hover {
+.tiki .tiki-top-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-light .dropdown-toggle:hover, .tiki .tiki-top-nav-light .nav-link.dropdown-toggle:hover, .tiki .tiki-top-nav-light .btn.btn-link:hover {
   color: var(--tiki-top-hover-color);
   background: var(--tiki-top-hover-bg);
 }
 .tiki .tiki-topbar-nav-light, .admin-content .tiki-nav-light {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
 }
-.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-light .btn.btn-link, .tiki .tiki-topbar-nav-light a.nav-link, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-light .btn.btn-link, .admin-content .tiki-nav-light a.nav-link {
+.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-light .dropdown-toggle, .tiki .tiki-topbar-nav-light .nav-link.dropdown-toggle, .tiki .tiki-topbar-nav-light .btn.btn-link, .tiki .tiki-topbar-nav-light .nav-link, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-light .dropdown-toggle, .admin-content .tiki-nav-light .nav-link.dropdown-toggle, .admin-content .tiki-nav-light .btn.btn-link, .admin-content .tiki-nav-light .nav-link {
   color: var(--tiki-topbar-color);
 }
-.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-light .btn.btn-link:hover, .tiki .tiki-topbar-nav-light a.nav-link:hover, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-light .btn.btn-link:hover, .admin-content .tiki-nav-light a.nav-link:hover {
+.tiki .tiki-topbar-nav-light a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-light .dropdown-toggle:hover, .tiki .tiki-topbar-nav-light .nav-link.dropdown-toggle:hover, .tiki .tiki-topbar-nav-light .btn.btn-link:hover, .tiki .tiki-topbar-nav-light .nav-link:hover, .admin-content .tiki-nav-light a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-light .dropdown-toggle:hover, .admin-content .tiki-nav-light .nav-link.dropdown-toggle:hover, .admin-content .tiki-nav-light .btn.btn-link:hover, .admin-content .tiki-nav-light .nav-link:hover {
   color: var(--tiki-topbar-hover-color);
   background: var(--tiki-topbar-hover-bg);
 }
 .tiki .tiki-top-nav-dark {
   background: var(--tiki-top-bg) !important;
+  color: var(--tiki-top-text-color);
   border: var(--tiki-top-border);
   border-width: var(--tiki-top-border-width);
   box-shadow: var(--tiki-top-box-shadow);
 }
-.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-dark .btn.btn-link, .tiki .tiki-top-nav-dark a.nav-link {
+.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-top-nav-dark .dropdown-toggle, .tiki .tiki-top-nav-dark .nav-link.dropdown-toggle, .tiki .tiki-top-nav-dark .btn.btn-link, .tiki .tiki-top-nav-dark .nav-link {
   color: var(--tiki-top-color);
 }
-.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-dark .btn.btn-link:hover, .tiki .tiki-top-nav-dark a.nav-link:hover {
+.tiki .tiki-top-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-top-nav-dark .dropdown-toggle:hover, .tiki .tiki-top-nav-dark .nav-link.dropdown-toggle:hover, .tiki .tiki-top-nav-dark .btn.btn-link:hover, .tiki .tiki-top-nav-dark .nav-link:hover {
   color: var(--tiki-top-hover-color);
   background: var(--tiki-top-hover-bg);
 }
 .tiki .tiki-topbar-nav-dark, .admin-content .tiki-nav-dark {
   background: var(--tiki-topbar-bg) !important;
+  color: var(--tiki-topbar-text-color);
   border: var(--tiki-topbar-border);
   border-width: var(--tiki-topbar-border-width);
   box-shadow: var(--tiki-topbar-box-shadow);
 }
-.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-dark .btn.btn-link, .tiki .tiki-topbar-nav-dark a.nav-link, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-dark .btn.btn-link, .admin-content .tiki-nav-dark a.nav-link {
+.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item), .tiki .tiki-topbar-nav-dark .dropdown-toggle, .tiki .tiki-topbar-nav-dark .nav-link.dropdown-toggle, .tiki .tiki-topbar-nav-dark .btn.btn-link, .tiki .tiki-topbar-nav-dark .nav-link, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item), .admin-content .tiki-nav-dark .dropdown-toggle, .admin-content .tiki-nav-dark .nav-link.dropdown-toggle, .admin-content .tiki-nav-dark .btn.btn-link, .admin-content .tiki-nav-dark .nav-link {
   color: var(--tiki-topbar-color);
 }
-.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-dark .btn.btn-link:hover, .tiki .tiki-topbar-nav-dark a.nav-link:hover, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-dark .btn.btn-link:hover, .admin-content .tiki-nav-dark a.nav-link:hover {
+.tiki .tiki-topbar-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .tiki .tiki-topbar-nav-dark .dropdown-toggle:hover, .tiki .tiki-topbar-nav-dark .nav-link.dropdown-toggle:hover, .tiki .tiki-topbar-nav-dark .btn.btn-link:hover, .tiki .tiki-topbar-nav-dark .nav-link:hover, .admin-content .tiki-nav-dark a:not(.navbar-brand, .dropdown-item):hover, .admin-content .tiki-nav-dark .dropdown-toggle:hover, .admin-content .tiki-nav-dark .nav-link.dropdown-toggle:hover, .admin-content .tiki-nav-dark .btn.btn-link:hover, .admin-content .tiki-nav-dark .nav-link:hover {
   color: var(--tiki-topbar-hover-color);
   background: var(--tiki-topbar-hover-bg);
 }
@@ -3754,7 +3757,9 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 .tiki .select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear, .tiki .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__clear {
   position: absolute;
   top: 50%;
-  right: 3em;
+  right: 2.75rem;
+  height: 0.5rem;
+  width: 0.5rem;
 }
 .tiki .toastui-editor-contents {
   font-family: var(--bs-font-sans-serif);
@@ -3810,7 +3815,7 @@ div.ts-wrapperdiv div.ts-pager .right-margin {
 }
 .tiki .toastui-editor-contents code {
   font-size: 1rem;
-  color: var(--bs-secondary-color);
+  color: var(--bs-body-color);
   background-color: var(--bs-secondary-bg);
 }
 .tiki .toastui-editor-contents table {
@@ -4114,11 +4119,7 @@ td.calheadhighlight, td.calheadhighlight a:link, td.calheadhighlight a:visited {
   color: #222222;
   font-weight: bold;
 }
-code, pre.codelisting {
-  background: #f8f8f8;
-  color: #111111;
-}
 .card-accordian > .card-header h4.card-title a, .card-accordian > .card-header .card-title.h4 a {
   color: #000;
 }
-/*# sourceMappingURL=trontastic.css.map */
+

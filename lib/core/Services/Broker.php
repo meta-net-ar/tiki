@@ -156,6 +156,7 @@ class Services_Broker
         //if template doesn't exists, simply return the array given from the action
         //if noTemplate is specified in the query string, it will skip the template
         if (! $smarty->templateExists($template) || strpos($_SERVER['QUERY_STRING'], '&noTemplate') !== false) {
+            header('Content-Type: application/json');
             return json_encode($output);
         }
 

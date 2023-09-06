@@ -123,7 +123,7 @@ $('#scblink').click(function(e){
             </tbody>
         </table>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label for="additional_languages" class="control-lable">
             {tr}Displayed languages:{/tr}
         </label>

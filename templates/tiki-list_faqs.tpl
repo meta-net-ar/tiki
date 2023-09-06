@@ -85,7 +85,7 @@
 
             <form action="tiki-list_faqs.php" method="post">
                 <input type="hidden" name="faqId" value="{$faqId|escape}">
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-form-label col-md-4">
                         {tr}Title:{/tr}
                     </label>
@@ -101,7 +101,7 @@
                         {/jq}
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-form-label col-md-4">
                         {tr}Description:{/tr}
                     </label>
@@ -109,7 +109,7 @@
                         <textarea name="description" class="form-control">{$description|escape}</textarea>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-form-label col-md-4">
                         {tr}Users can suggest questions:{/tr}
                     </label>
@@ -119,7 +119,7 @@
                 </div>
                 {include file='categorize.tpl'}
                 <div class="row">
-                    <div class="mb-3 col-lg-12 clearfix">
+                    <div class="tiki-form-group col-lg-12 clearfix">
                         <div class="text-center">
                             <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
                         </div>

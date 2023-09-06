@@ -50,7 +50,7 @@
 @import "_tiki-debugger_console.scss";
 //@import "_pivot-tiki.scss";
 //@import "_conversejs-tiki.scss";
-@import "_tiki-selectors.scss";
+//@import "_tiki-selectors.scss";
 
 // Sticky tables
 .tiki .table-sticky {
@@ -71,6 +71,10 @@
     max-width: 100px;
     left: 0px;
     z-index: 1;
+}
+// Icon to toggle table formatting
+.toggle-table-wrap .btn {
+  font-family: 'Font Awesome 6 Free' !important;
 }
 
 

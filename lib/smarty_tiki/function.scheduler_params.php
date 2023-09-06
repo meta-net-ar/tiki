@@ -59,7 +59,7 @@ HTML;
             }
 
             $html .= <<<HTML
-<div class="form-group row mb-3" data-task-name="{$params['name']}" style="display:none">
+<div class="tiki-form-group row" data-task-name="{$params['name']}" style="display:none">
     <label class="col-sm-2 col-form-label" for="{$inputKey}">{$param['name']}{$required}</label>
     <div class="col-sm-10">
         {$input}

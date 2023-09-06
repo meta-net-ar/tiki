@@ -117,7 +117,7 @@ class PrefsDoc extends TWVersion
 
         $this->docTable = '{TABS(name="' . $tabName . '" tabs="Tiki Version ' . implode('|', $this->state->files->{$tabName}) . "\" toggle=\"n\")}";
         $imageArray = [];
-        $images = explode('|', $images);
+        $images = explode('|', $images ?? "");
         foreach ($images as $key => $image) {
             $image = explode(':', $image);
             $imageArray[$image[0]][0] = @$image[1];
@@ -221,7 +221,7 @@ class PrefsDoc extends TWVersion
         $this->prefDefaultFull = '';
 
         // set default
-        if (! empty($param->options) && isset($param->default) && $param->default !== '') {
+        if (! empty($param->options) && ! empty($param->default) && isset($param->options->{$param->default})) {
             $this->prefDefault = $param->options->{$param->default};
         } elseif ($param->default === 'n') {
             $this->prefDefault = 'Disabled';
@@ -233,7 +233,9 @@ class PrefsDoc extends TWVersion
             $this->prefDefault = $param->default;
         }
         // end first processing the below should be applied to the above.... not a continuation (eg. empty array)
+        $this->prefDefault = $this->prefDefault ?? '';
         $this->prefDefault = trim($this->prefDefault);
+
         if ($this->prefDefault == '') {
             $this->prefDefault = '~~gray:None~~';
         } elseif (! empty($param->units)) {
@@ -289,7 +291,7 @@ class PrefsDoc extends TWVersion
             }
         }
 
-        if ($param->warning) {
+        if (isset($param->warning) && $param->warning) {
             if ($this->prefDescription) {                   // new line if existing content
                 $this->prefDescription .= '<br>';
             }

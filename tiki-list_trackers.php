@@ -59,7 +59,7 @@ foreach ($trackers["data"] as &$tracker) {
 
     if ($tiki_p_admin_trackers !== 'y') {
         $tracker_info = $trklib->get_tracker_options($tracker['trackerId']);
-        if ($tracker_info['adminOnlyViewEditItem'] === 'y') {
+        if (isset($tracker_info['adminOnlyViewEditItem']) && $tracker_info['adminOnlyViewEditItem'] === 'y') {
             $tracker = null;
         }
     }

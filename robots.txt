@@ -1,4 +1,4 @@
-# This is a robot.txt file for Tiki to tell all search bots that we don't want them to crawl in the paths beginning with the strings below.
+# This is a robots.txt file for Tiki to tell all search bots that we don't want them to crawl in the paths beginning with the strings below.
 # For an installation in a subdirectory, you have to copy this file in root of your domain and add /yoursubdirname on each line.
 #
 # (c) Copyright by authors of the Tiki Wiki CMS Groupware Project

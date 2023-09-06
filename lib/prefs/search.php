@@ -167,7 +167,7 @@ now/m,now+1m/m,Next Month
             'type' => 'text',
             'filter' => 'word',
             'separator' => ',',
-            'default' => [],
+            'default' => ['title_initial', 'title_firstword'],
             'dependencies' => [
                 'search_use_facets',
             ],

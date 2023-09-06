@@ -9,6 +9,11 @@ class CollectionEmpty extends Operator
 {
     public function __construct()
     {
-        parent::__construct(tr('is empty'), Nothing::class, '.val().length===0', [Collection::class]);
+        parent::__construct(
+            tr('is empty'),
+            Nothing::class,
+            '.collectionEmpty()',
+            [Collection::class]
+        );
     }
 }

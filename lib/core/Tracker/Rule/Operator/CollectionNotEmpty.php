@@ -9,6 +9,11 @@ class CollectionNotEmpty extends Operator
 {
     public function __construct()
     {
-        parent::__construct(tr('is not empty'), Nothing::class, '.val().length>0', [Collection::class]);
+        parent::__construct(
+            tr('is not empty'),
+            Nothing::class,
+            '.collectionNotEmpty()',
+            [Collection::class]
+        );
     }
 }

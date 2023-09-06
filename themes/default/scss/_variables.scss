@@ -3,9 +3,10 @@
 $link-decoration: none !default;
 $lead-font-weight: inherit;
 
+
 @import "../../../vendor_bundled/vendor/twbs/bootstrap/scss/variables";
 
-
+$code-color: $body-color;
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 

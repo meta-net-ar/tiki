@@ -64,13 +64,15 @@ if ($prefs['feature_freetags'] == 'y') {
     $freetaglib = TikiLib::lib('freetag');
     $here = $sections[$section];
     if (isset($here['itemkey']) and isset($_REQUEST[$here['itemkey']])) {
-        $tags = $freetaglib->get_tags_on_object($_REQUEST[$here['itemkey']], "article " . $_REQUEST[$here['key']]);
+        $objectTags = $freetaglib->get_tags_on_object($_REQUEST[$here['itemkey']], "article " . $_REQUEST[$here['key']]);
     } elseif (isset($here['key']) and isset($_REQUEST[$here['key']])) {
-        $tags = $freetaglib->get_tags_on_object($_REQUEST[$here['key']], "article");
-    } else {
-        $tags = [];
+        $objectTags = $freetaglib->get_tags_on_object($_REQUEST[$here['key']], "article");
     }
-    $smarty->assign('freetags', $tags);
+    $tags = [];
+    if ($objectTags) {
+        $tags = $objectTags['data'];
+    }
+    $smarty->assign('tags', $tags);
 }
 $artlib->add_article_hit($_REQUEST["articleId"]);
 $smarty->assign('articleId', $_REQUEST["articleId"]);

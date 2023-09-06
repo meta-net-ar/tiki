@@ -53,6 +53,7 @@ class RSSLib extends TikiDb_Bridge
     /**
      * Return the feed format code (2 for rss and 5 for atom)
      * we currently use (user param or default value)
+     * if the user parameter is other than 2 or 5, we return the default value.
      *
      * @return int $ver
      */
@@ -60,7 +61,7 @@ class RSSLib extends TikiDb_Bridge
     {
         global $prefs;
 
-        if (isset($_REQUEST['ver'])) {
+        if (isset($_REQUEST['ver']) && ($_REQUEST['ver'] == 2 || $_REQUEST['ver'] == 5)) {
             $ver = $_REQUEST['ver'];
         } else {
             $ver = $prefs['feed_default_version'];
@@ -297,7 +298,7 @@ class RSSLib extends TikiDb_Bridge
             $item->setDateCreated((int) $data[$dateId]);
             $item->setDateModified((int) $data[$dateId]);
 
-            if ($authorId != '' && $prefs['feed_' . $section . '_showAuthor'] == 'y') {
+            if ($authorId != '' && array_key_exists('feed_' . $section . '_showAuthor', $prefs) && $prefs['feed_' . $section . '_showAuthor'] == 'y') {
                 $author = $this->process_item_author($data[$authorId]);
 
                 if (array_key_exists('name', $author) && ! empty($author['name']) && is_string($author['name'])) {
@@ -628,12 +629,14 @@ class RSSLib extends TikiDb_Bridge
             }
 
             $htmlContent = $entry->getContent();
-            @$DOM->loadHTML($htmlContent);
-            $rows = $DOM->getElementsByTagName('tr');
-            foreach ($rows as $row) {
-                $cols = $row->getElementsByTagName('td');
-                if (isset($cols[0]) && $cols[1]) {
-                    $data[str_replace(' ', '', $cols[0]->textContent)] = $cols[1]->textContent;
+            if (! empty($htmlContent)) {
+                @$DOM->loadHTML($htmlContent);
+                $rows = $DOM->getElementsByTagName('tr');
+                foreach ($rows as $row) {
+                    $cols = $row->getElementsByTagName('td');
+                    if (isset($cols[0]) && $cols[1]) {
+                        $data[str_replace(' ', '', $cols[0]->textContent)] = $cols[1]->textContent;
+                    }
                 }
             }
 

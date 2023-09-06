@@ -51,7 +51,7 @@ class Search_MySql_QueryBuffer
         $this->db->queryError($query, $error);
 
         if ($error) {
-            throw new Search_MySql_LimitReachedException(tr("Could not perform index modification: %0", $error));
+            throw new Search_MySql_LimitReachedException(tr("Could not perform index modification: %0", TikiFilter::get('xss')->filter($error)));
         }
 
         $this->clear();

@@ -9,3 +9,30 @@
         </span>
     {/if}
 </div>
+{if $field.options_map.confirmed eq 'y'}
+<div class="{if !empty($field.options_map.labelasplaceholder)} input-group {/if} mt-1">
+        <input type="email"  class="form-control emailCheck" placeholder="{tr}Please, write your email address again{/tr}" name="{$field.ins_id}_confirm" required >
+        <div id="myEmailCheck">
+            <div id="match" style="display:none">
+                    {icon name='ok' istyle='color:#0ca908'} {tr}Email matches{/tr}
+            </div>
+            <div id="nomatch" style="display:none">
+                {icon name='error' istyle='color:#ff0000'} {tr}Email does not match{/tr}
+            </div>
+        </div>
+</div>
+{/if}
+{jq}
+    $(".emailCheck").keyup(function(){
+        var $email = $(".emailVerify").val();
+        var $email_2 = $(".emailCheck").val();
+        if ($email == $email_2) {
+            $("#myEmailCheck").children("#match").show();
+            $("#myEmailCheck").children("#nomatch").hide();
+        } else {
+            $("#myEmailCheck").children("#nomatch").show();
+            $("#myEmailCheck").children("#match").hide();
+        }
+
+    })
+{/jq}

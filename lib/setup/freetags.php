@@ -40,13 +40,14 @@ if (isset($section) and isset($sections[$section])) {
         die;
     }
 
+    $tags = [];
     if ($object = current_object()) {
-        $tags = $freetaglib->get_tags_on_object($object['object'], $object['type']);
-    } else {
-        $tags = [];
+        $objectTags = $freetaglib->get_tags_on_object($object['object'], $object['type']);
+        if ($objectTags) {
+            $tags = $objectTags['data'];
+        }
     }
-
-    $smarty->assign('freetags', $tags);
+    $smarty->assign('tags', $tags);
 
     if ($tiki_p_freetags_tag == 'y' && $prefs['freetags_multilingual'] == 'y') {
         $ft_lang = null;

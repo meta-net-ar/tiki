@@ -96,7 +96,7 @@ function wikiplugin_signature($data, $params)
     );
 
     $defaults = [
-        'name' => $params['name'],
+        'name' => $params['name'] ?? '',
         'editPerm' => $editPerm ? 1 : 0,
         'data' => $data,
         'height' => '200px',

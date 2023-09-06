@@ -459,7 +459,7 @@ class Services_Wiki_Controller
                         $feedback = [
                             'tpl' => 'link',
                             'mes' => $msg,
-                            'items' => $destinationPage,
+                            'items' => is_array($destinationPage) ? $destinationPage : [$destinationPage],
                         ];
                         Feedback::note($feedback);
                     }

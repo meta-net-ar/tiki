@@ -323,19 +323,22 @@ function _breadcrumb_getTitle($crumbs, $loc)
         $class = "";
         $metadata = '';
 
-        $current = current_object();
-        $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($current['object'], $current['type']));
+        if ($current = current_object()) {
+            $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($current['object'], $current['type']));
 
-        if ($coordinates = TikiLib::lib('geo')->get_coordinates($current['type'], $current['object'])) {
-            $class = ' geolocated primary';
-            $metadata = " data-geo-lat=\"{$coordinates['lat']}\" data-geo-lon=\"{$coordinates['lon']}\"";
+            if ($coordinates = TikiLib::lib('geo')->get_coordinates($current['type'], $current['object'])) {
+                $class = ' geolocated primary';
+                $metadata = " data-geo-lat=\"{$coordinates['lat']}\" data-geo-lon=\"{$coordinates['lon']}\"";
 
-            if (isset($coordinates['zoom'])) {
-                $metadata .= " data-geo-zoom=\"{$coordinates['zoom']}\"";
+                if (isset($coordinates['zoom'])) {
+                    $metadata .= " data-geo-zoom=\"{$coordinates['zoom']}\"";
+                }
             }
-        }
 
-        $ret = '<a class="' . $class . '"' . $metadata . ' title="' . tra("refresh") . '" href="' . $escapedHref . '">';
+            $ret = '<a class="' . $class . '"' . $metadata . ' title="' . tra("refresh") . '" href="' . $escapedHref . '">';
+        } else {
+            $ret = '';
+        }
     } else {
         $class = "crumblink";
         $ret = '<a class="' . $class . '" title="';

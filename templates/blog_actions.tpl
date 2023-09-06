@@ -53,6 +53,9 @@
                         {assign var="hasPageAction" value="1"}
                 </a>
             {/if}
+            {if $tiki_p_admin eq 'y' || $tiki_p_assign_perm_blog eq 'y'}
+                <span class="dropdown-item">{permission_link mode=text type="blog" permType="blogs" id=$post_info.blogId}</span>
+            {/if}
         </div>
         {if ! $js}</li></ul>{/if}
         {if $user and $prefs.feature_user_watches eq 'y'}

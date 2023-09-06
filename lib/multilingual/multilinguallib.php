@@ -678,7 +678,7 @@ class MultilingualLib extends TikiLib
         $bits = [];
         while ($row = $result->fetchRow()) {
             if ($page_unique) {
-                $bits[$row['bits.page_id']] = $row['translation_bit_id'];
+                $bits[$row['page_id']] = $row['translation_bit_id'];
             } else {
                 $bits[] = $row['translation_bit_id'];
             }

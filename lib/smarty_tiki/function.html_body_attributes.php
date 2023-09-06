@@ -46,6 +46,11 @@ function smarty_function_html_body_attributes($params, $smarty)
         $class .= ' fullscreen';
     }
 
+    if (! empty($_COOKIE['sidebar_collapsed'])) {
+        $class .= empty($class) ? ' ' : '';
+        $class .= ' sidebar_collapsed';
+    }
+
     if (isset($prefs['layout_add_body_group_class']) && $prefs['layout_add_body_group_class'] === 'y') {
         if (empty($user)) {
             $class .= ' grp_Anonymous';

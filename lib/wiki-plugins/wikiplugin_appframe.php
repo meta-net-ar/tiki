@@ -34,7 +34,7 @@ function wikiplugin_appframe_info()
                 'since' => '10.0',
             ],
             'hideleft' => [
-                'requred' => false,
+                'required' => false,
                 'name' => tr('Hide left column'),
                 'description' => tr('Hide the left column when the application frame is in use to provide more space to the application.'),
                 'default' => 'n',
@@ -45,7 +45,7 @@ function wikiplugin_appframe_info()
                 ],
             ],
             'hideright' => [
-                'requred' => false,
+                'required' => false,
                 'name' => tr('Hide right column'),
                 'description' => tr('Hide the right column when the application frame is in use to provide more space to the application.'),
                 'default' => 'n',

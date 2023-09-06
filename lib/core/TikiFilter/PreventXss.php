@@ -164,6 +164,7 @@ class TikiFilter_PreventXss implements Laminas\Filter\FilterInterface
     {
         static $patterns = null;
         static $replacements = null;
+        $val = $val ?? '';
         $val_before = $val;
         $found = true;
 

@@ -2931,6 +2931,10 @@ class TrackerLib extends TikiLib
                         $erroneous_values[] = $f;
                     }
                 }
+                if (isset($f['options_map']['confirmed']) && $f['options_map']['confirmed'] == 'y' && $f['value'] != $f['value_confirmed']) {
+                    $f['errorMsg'] = tra('Confirmation %0 do not match', $f['name']);
+                    $erroneous_values[] = $f;
+                }
                 if ($f['type'] != 'q' and isset($f['isMandatory']) && $f['isMandatory'] == 'y') {
                     if (($f['type'] == 'e' || in_array($f['fieldId'], $categorized_fields)) && empty($f['value'])) {    // category: value is now categ id's
                         $mandatory_fields[] = $f;
@@ -5228,7 +5232,9 @@ class TrackerLib extends TikiLib
             $last[$f['fieldId']] = $f['value'];
         }
 
-        $last[-1] = $item_info['status'];
+        if (array_key_exists('status', $item_info)) {
+            $last[-1] = $item_info['status'];
+        }
         if (empty($item_info['itemId'])) {
             $join = 'ttifl.`itemId`';
             $bindvars = array_merge(['trackeritem'], $bindvars);
@@ -6481,8 +6487,10 @@ class TrackerLib extends TikiLib
                 $fieldPermName = $field['permName'];
                 TikiLib::lib('smarty')->assign("f_$fieldPermName", $r);
             }
-            return $r;
+            return is_null($r) ? '' : $r;
         }
+
+        return '';
     }
 
     public function get_child_items($itemId)

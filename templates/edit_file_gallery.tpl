@@ -12,7 +12,7 @@
         {tabset name="list_file_gallery"}
             {tab name="{tr}Properties{/tr}"}
                 <h2>{tr}Properties{/tr}</h2><br>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="name" class="col-sm-4 col-form-label">{tr}Name{/tr}</label>
                     <div class="col-sm-8">
                         {if $galleryId eq $treeRootId or $gal_info.type eq 'user' or $gal_info.type eq 'attachments'}
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 {if $prefs.feature_file_galleries_templates eq 'y'}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="fgal_template" class="col-sm-4 col-form-label">{tr}Template{/tr}</label>
                         <div class="col-sm-8">
                             <select name="fgal_template" id="fgal_template" class="form-control">
@@ -41,7 +41,7 @@
                                 {jq}
 $('#fgal_template').change( function() {
 var otherTabs = $('ul.nav-tabs li:not(.active)');
-var otherParams = $('#description').parents('div.mb-3').nextAll('div.mb-3');
+var otherParams = $('#description').parents('div.tiki-form-group').nextAll('div.tiki-form-group');
 
 if ($(this).val() != '') {
     // Select template, hide parameters
@@ -58,7 +58,7 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                 {/if}
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="fgal_type" class="col-sm-4 col-form-label">{tr}Type{/tr}</label>
                     <div class="col-sm-8">
                         {if $galleryId eq $treeRootId or $gal_info.type eq 'user' or $gal_info.type eq 'attachments' or ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
@@ -85,7 +85,7 @@ if ($(this).val() != '') {
                 {if $tiki_p_admin eq 'y' and not ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
                 <fieldset class="fgal_type_dependent direct_childcontainer" {if $gal_info.type neq 'direct'}style="display:none"{/if}>
                     <legend>{tr}Direct mapping settings{/tr}</legend>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="direct_adapter" class="col-sm-4 col-form-label">{tr}Adapter{/tr}</label>
                         <div class="col-sm-8">
                             <select name="direct[adapter]" id="direct_adapter" class="form-control">
@@ -105,109 +105,109 @@ if ($(this).val() != '') {
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent local_childcontainer" {if $gal_info.direct.adapter neq 'local'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent local_childcontainer" {if $gal_info.direct.adapter neq 'local'}style="display:none"{/if}>
                         <label for="direct_path" class="col-sm-4 col-form-label">{tr}Local filesystem path{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_path" name="direct[path]" value="{$gal_info.direct.path|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_host" class="col-sm-4 col-form-label">{tr}Hostname{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_host" name="direct[host]" value="{$gal_info.direct.host|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent webdav_childcontainer" {if $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent webdav_childcontainer" {if $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
                         <label for="direct_base_uri" class="col-sm-4 col-form-label">{tr}Base URI{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_base_uri" name="direct[base_uri]" value="{$gal_info.direct.base_uri|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_root" class="col-sm-4 col-form-label">{tr}Root path{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_root" name="direct[root]" value="{$gal_info.direct.root|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer webdav_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp' and $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer webdav_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp' and $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
                         <label for="direct_username" class="col-sm-4 col-form-label">{tr}Username{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_username" name="direct[username]" value="{$gal_info.direct.username|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer webdav_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp' and $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer webdav_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp' and $gal_info.direct.adapter neq 'webdav'}style="display:none"{/if}>
                         <label for="direct_password" class="col-sm-4 col-form-label">{tr}Password{/tr}</label>
                         <div class="col-sm-8">
                             <input type="password" id="direct_password" name="direct[password]" value="{$gal_info.direct.password|escape}" class="form-control" autocomplete="new-password">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_port" class="col-sm-4 col-form-label">{tr}Port{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_port" name="direct[port]" value="{$gal_info.direct.port|escape}" class="form-control" placeholder="{tr}e.g. 21 or 22{/tr}">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
                         <label for="direct_ssl" class="col-sm-4 col-form-label">{tr}SSL{/tr}</label>
                         <div class="col-sm-8">
                             <input type="checkbox" class="form-check-input" id="direct_ssl" name="direct[ssl]" {if !empty($gal_info.direct.ssl)}checked="checked"{/if} value="1">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer sftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp' and $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_timeout" class="col-sm-4 col-form-label">{tr}Timeout{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_timeout" name="direct[timeout]" value="{$gal_info.direct.timeout|escape}" class="form-control" placeholder="{tr}e.g. 90{/tr}">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
                         <label for="direct_utf8" class="col-sm-4 col-form-label">{tr}UTF8{/tr}</label>
                         <div class="col-sm-8">
                             <input type="checkbox" class="form-check-input" id="direct_utf8" name="direct[utf8]" {if $gal_info.direct.utf8}checked="checked"{/if} value="1">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent ftp_childcontainer" {if $gal_info.direct.adapter neq 'ftp'}style="display:none"{/if}>
                         <label for="direct_passive" class="col-sm-4 col-form-label">{tr}Passive mode{/tr}</label>
                         <div class="col-sm-8">
                             <input type="checkbox" class="form-check-input" id="direct_passive" name="direct[passive]" {if !empty($gal_info.direct.passive)}checked="checked"{/if} value="1">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent sftp_childcontainer" {if $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent sftp_childcontainer" {if $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_private_key" class="col-sm-4 col-form-label">{tr}Private key path{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_private_key" name="direct[private_key]" value="{$gal_info.direct.private_key|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent sftp_childcontainer" {if $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent sftp_childcontainer" {if $gal_info.direct.adapter neq 'sftp'}style="display:none"{/if}>
                         <label for="direct_private_key_password" class="col-sm-4 col-form-label">{tr}Private key password{/tr}</label>
                         <div class="col-sm-8">
                             <input type="password" id="direct_private_key_password" name="direct[private_key_password]" value="{$gal_info.direct.private_key_password|escape}" class="form-control" autocomplete="new-password">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
                         <label for="direct_region" class="col-sm-4 col-form-label">{tr}Region{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_region" name="direct[region]" value="{$gal_info.direct.region|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
                         <label for="direct_key" class="col-sm-4 col-form-label">{tr}Key{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_key" name="direct[key]" value="{$gal_info.direct.key|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
                         <label for="direct_secret" class="col-sm-4 col-form-label">{tr}Secret{/tr}</label>
                         <div class="col-sm-8">
                             <input type="password" id="direct_secret" name="direct[secret]" value="{$gal_info.direct.secret|escape}" class="form-control" autocomplete="new-password">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
                         <label for="direct_bucket" class="col-sm-4 col-form-label">{tr}Bucket{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_bucket" name="direct[bucket]" value="{$gal_info.direct.bucket|escape}" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3 row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
+                    <div class="tiki-form-group row direct_adapter_dependent s3_childcontainer" {if $gal_info.direct.adapter neq 's3'}style="display:none"{/if}>
                         <label for="direct_path_prefix" class="col-sm-4 col-form-label">{tr}Path prefix{/tr}</label>
                         <div class="col-sm-8">
                             <input type="text" id="direct_path_prefix" name="direct[path_prefix]" value="{$gal_info.direct.path_prefix|escape}" class="form-control">
@@ -216,14 +216,14 @@ if ($(this).val() != '') {
                     <hr/>
                 </fieldset>
                 {/if}
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="description" class="col-sm-4 col-form-label">{tr}Description{/tr}</label>
                     <div class="col-sm-8">
                         <textarea rows="3" id="description" name="description" class="form-control">{$gal_info.description|escape}</textarea>
                         <span class="form-text">{tr}Required for podcasts{/tr}.</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="visible" class="col-sm-4">{tr}Gallery is visible to non-admin users{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
@@ -231,7 +231,7 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="public" class="col-sm-4">{tr}Gallery is unlocked{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
@@ -241,7 +241,7 @@ if ($(this).val() != '') {
                     </div>
                 </div>
                 {if $tiki_p_admin_file_galleries eq 'y' or $gal_info.type neq 'user'}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="backlinkPerms" class="col-sm-4">{tr}Respect permissions for backlinks to view a file{/tr}</label>
                         <div class="col-sm-8">
                             <div class="form-check">
@@ -249,7 +249,7 @@ if ($(this).val() != '') {
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="lockable" class="col-sm-4">{tr}Files can be locked at download{/tr}.</label>
                         <div class="col-sm-8">
                             <div class="form-check">
@@ -257,7 +257,7 @@ if ($(this).val() != '') {
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="archives" class="col-sm-4 col-form-label">{tr}Maximum number of archives for each file{/tr}</label>
                         <div class="col-sm-8">
                             <div class="form-control-plaintext">
@@ -268,7 +268,7 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                     {if $galleryId neq $treeRootId and not ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label for="parentId" class="col-sm-4 col-form-label">{tr}Parent gallery{/tr}</label>
                             <div class="col-sm-8">
                                 <select name="parentId" id="parentId" class="form-control">
@@ -286,7 +286,7 @@ if ($(this).val() != '') {
                     {/if}
                 {/if}
                 {if $tiki_p_admin eq 'y' or $tiki_p_admin_file_galleries eq 'y'}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="user" class="col-sm-4 col-form-label">{tr}Owner of the gallery{/tr}</label>
                         <div class="col-sm-8">
                             {user_selector user=$creator id='user'}
@@ -294,7 +294,7 @@ if ($(this).val() != '') {
                     </div>
 
                     {if $prefs.fgal_quota_per_fgal eq 'y'}
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label for="quota" class="col-sm-4 col-form-label">{tr}Quota{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="input-group col-sm-4">
@@ -316,7 +316,7 @@ if ($(this).val() != '') {
                     {/if}
 
                     {if $prefs.feature_groupalert eq 'y'}
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label for="groupforAlert" class="col-sm-4 col-form-label">{tr}Group of users alerted when file gallery is modified{/tr}</label>
                             <div class="col-sm-8">
                                 <select id="groupforAlert" name="groupforAlert" class="form-control">
@@ -327,7 +327,7 @@ if ($(this).val() != '') {
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <label for="showeachuser" class="col-sm-4">{tr}Allows each user to be selected for small groups{/tr}</label>
                             <div class="col-sm-8">
                                 <div class="form-check">
@@ -337,7 +337,7 @@ if ($(this).val() != '') {
                         </div>
                     {/if}
                 {/if}
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="image_max_size_x" class="col-sm-4 col-form-label">{tr}Maximum width of images in gallery{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
@@ -349,7 +349,7 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="image_max_size_y" class="col-sm-4 col-form-label">{tr}Maximum height of images in gallery{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
@@ -361,7 +361,7 @@ if ($(this).val() != '') {
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="wiki_syntax" class="col-sm-4 col-form-label">{tr}Wiki markup to enter when image selected from "file gallery manager"{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
@@ -374,7 +374,7 @@ if ($(this).val() != '') {
                 </div>
             {if $prefs.ocr_enable eq 'y'}
                 {if $selectedLanguages || $languages}
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label for="ocr_lang" class="col-md-4 col-form-label">{tr}Override Default OCR Languages{/tr}</label>
                         <div class="col-md-8">
                             <select multiple id="ocr_lang" class="form-control" name="ocr_lang[]">
@@ -398,7 +398,7 @@ if ($(this).val() != '') {
 {* display properties *}
             {tab name="{tr}Display Settings{/tr}"}
                 <h2>{tr}Display Settings{/tr}</h2><br>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="fgal_default_view">
                         {tr}Default View{/tr}
                     </label>
@@ -421,7 +421,7 @@ if ($(this).val() != '') {
                         </select>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="sortorder" class="col-sm-4 col-form-label">{tr}Default sort order{/tr}</label>
                     <div class="col-sm-8">
                         <select name="sortorder" id="sortorder" class="form-control">
@@ -447,13 +447,13 @@ if ($(this).val() != '') {
                     {include file='fgal_listing_conf.tpl'}
                 </div>
                 <hr>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="max_desc" class="col-sm-4 col-form-label">{tr}Max description display size{/tr}</label>
                     <div class="col-sm-8">
                         <input type="text" id="max_desc" name="max_desc" value="{$max_desc|escape}" class="form-control">
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label for="maxRows" class="col-sm-4 col-form-label">{tr}Max rows per page{/tr}</label>
                     <div class="col-sm-8">
                         <input type="text" id="maxRows" name="maxRows" value="{$maxRows|escape}" class="form-control">
@@ -461,7 +461,7 @@ if ($(this).val() != '') {
                 </div>
             {/tab}
         {/tabset}
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label for="viewitem" class="col-sm-4">
                 {tr}View inserted gallery after save{/tr}
             </label>
@@ -472,7 +472,7 @@ if ($(this).val() != '') {
             </div>
         </div>
 
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <div class="col-md-8 offset-md-4">
                 <input type="submit" class="btn btn-primary" value="{tr}Save{/tr}" name="edit">
             </div>

@@ -95,5 +95,6 @@
         <service id="tiki.controller.ids" class="Services_IDS_Controller"/>
         <service id="tiki.controller.performance" class="Services_Performance_Controller"/>
         <service id="tiki.controller.iconpicker" class="Services_IconPicker_Controller"/>
+        <service id="tiki.controller.colormodes" class="Services_ColorModes_Controller"/>
     </services>
 </container>

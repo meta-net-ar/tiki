@@ -687,7 +687,7 @@ class HeaderLib
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
-                    if ($this->skip_minify[$file] === true) {
+                    if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
                         $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
@@ -763,60 +763,63 @@ class HeaderLib
         // add list of minified js files to output
             $topMsg .= "\n/* list of files for rank:$rank */\n";
             $topMsg .= '/* ' . print_r($jsfiles[$rank], true) . ' */' . "\n";
-            foreach ($jsfiles[$rank] as $f) {
-                // important - some scripts like vendor_bundled/vendor/jquery/plugins/async/jquery.async.js do not terminate their last bits with a ';'
-                // this is bad practise and that causes issues when putting them all in one file!
-                $minified = ';';
-                $msg = '';
-                // if the name contains not  'min' and that file is not blacklisted for minification assume it is minified
-                // preferable is to set $skip_minify proper
-                if (! preg_match('/\bmin\./', $f) && $this->skip_minify[$f] !== true) {
-                    set_time_limit(600);
-                    try {
-                        // remove cache-buster parameters from the end of the filename
-                        $pos = strpos($f, '?');
-                        if ($pos !== false) {
-                            $f = substr($f, 0, $pos);
-                        }
-                        // to optimize processing time for changed js requirements, cache the minified version of each file
-                        $hash = md5($f);
-                        // filename without extension - makes it easier to identify the compressed files if needed.
-                        $prefix = basename($f, '.js');
-                        $minifyFile = $tempDir . "min_s_" . $prefix . "_" . $hash . ".js";
-                        if (file_exists($minifyFile)) {
-                            $temp = file_get_contents($minifyFile);
-                        } else {
-                            // if the file does not exist MatthiasMullie\Minify takes the input to be the file content
-                            // which causes js errors and can break the whole site
-                            if (! file_exists($f)) {
-                                Feedback::error(tr('JavaScript file "%0" cannot be found so will not be minified.', $f));
-                                throw new Exception('File not found');
+
+            if (isset($jsfiles[$rank])) {
+                foreach ($jsfiles[$rank] as $f) {
+                    // important - some scripts like vendor_bundled/vendor/jquery/plugins/async/jquery.async.js do not terminate their last bits with a ';'
+                    // this is bad practise and that causes issues when putting them all in one file!
+                    $minified = ';';
+                    $msg = '';
+                    // if the name contains not  'min' and that file is not blacklisted for minification assume it is minified
+                    // preferable is to set $skip_minify proper
+                    if (! preg_match('/\bmin\./', $f) && isset($this->skip_minify[$f]) && $this->skip_minify[$f] !== true) {
+                        set_time_limit(600);
+                        try {
+                            // remove cache-buster parameters from the end of the filename
+                            $pos = strpos($f, '?');
+                            if ($pos !== false) {
+                                $f = substr($f, 0, $pos);
                             }
-                            $minifier = new MatthiasMullie\Minify\JS($f);
-                            $temp = $minifier->minify($minifyFile);
-                            chmod($minifyFile, 0644);
+                            // to optimize processing time for changed js requirements, cache the minified version of each file
+                            $hash = md5($f);
+                            // filename without extension - makes it easier to identify the compressed files if needed.
+                            $prefix = basename($f, '.js');
+                            $minifyFile = $tempDir . "min_s_" . $prefix . "_" . $hash . ".js";
+                            if (file_exists($minifyFile)) {
+                                $temp = file_get_contents($minifyFile);
+                            } else {
+                                // if the file does not exist MatthiasMullie\Minify takes the input to be the file content
+                                // which causes js errors and can break the whole site
+                                if (! file_exists($f)) {
+                                    Feedback::error(tr('JavaScript file "%0" cannot be found so will not be minified.', $f));
+                                    throw new Exception('File not found');
+                                }
+                                $minifier = new MatthiasMullie\Minify\JS($f);
+                                $temp = $minifier->minify($minifyFile);
+                                chmod($minifyFile, 0644);
+                            }
+                            $msg .= "\n/* rank:$rank - minify:ok. $f */\n";
+                            $topMsg .= $msg;
+                            $minified .= $msg;
+                            $minified .= $temp;
+                        } catch (Exception $e) {
+                            $content = file_get_contents($f);
+                            $error = $e->getMessage();
+                            $msg .= "\n/* rank:$rank - minify:error ($error) - adding raw file. $f */\n";
+                            $topMsg .= $msg;
+                            $minified .= $msg;
+                            $minified .= $content;
                         }
-                        $msg .= "\n/* rank:$rank - minify:ok. $f */\n";
-                        $topMsg .= $msg;
-                        $minified .= $msg;
-                        $minified .= $temp;
-                    } catch (Exception $e) {
+                    } else {
                         $content = file_get_contents($f);
-                        $error = $e->getMessage();
-                        $msg .= "\n/* rank:$rank - minify:error ($error) - adding raw file. $f */\n";
+                        $msg .= "\n/* rank:$rank - minify:disabled - adding raw file. $f */\n";
                         $topMsg .= $msg;
                         $minified .= $msg;
                         $minified .= $content;
                     }
-                } else {
-                    $content = file_get_contents($f);
-                    $msg .= "\n/* rank:$rank - minify:disabled - adding raw file. $f */\n";
-                    $topMsg .= $msg;
-                    $minified .= $msg;
-                    $minified .= $content;
-                }
 
-                $minifiedAll .= $minified;
+                    $minifiedAll .= $minified;
+                }
             }
         }
 

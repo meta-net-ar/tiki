@@ -253,7 +253,7 @@
                 <div class="row">
                 {if $prefs.fgal_search eq 'y'}
                     <div class="col-sm-6">
-                        {include file='find.tpl' find_show_num_rows = 'y' find_show_categories_multi='y' find_durations=$find_durations find_show_sub='y' find_in="<ul><li>{tr}Name{/tr}</li><li>{tr}Filename{/tr}</li><li>{tr}Description{/tr}</li></ul>"}
+                        {include file='find.tpl' find_show_num_rows = 'y' find_show_categories_multi='y' find_durations=$find_durations find_show_sub='y' find_in="<ul><li>{tr}Name,{/tr}</li><li>{tr}Filename,{/tr}</li><li>{tr}Description{/tr}</li></ul>"|strip_tags}
                     </div>
                 {/if}
                 {if ($prefs.fgal_search_in_content eq 'y' or $prefs.fgal_search eq 'y') and $galleryId > 0}

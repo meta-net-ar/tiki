@@ -186,6 +186,8 @@
             {preference name=feature_banning}
             <div class="adminoptionboxchild" id="feature_banning_childcontainer">
                 {preference name=feature_banning_email}
+                {preference name=feature_banning_attempts}
+                {preference name=feature_banning_duration}
             </div>
 
             {preference name=feature_comments_moderation}

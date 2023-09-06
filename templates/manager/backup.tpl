@@ -14,7 +14,7 @@
     {else}
         <form method="post" action="{service controller=manager action=backup}" id="tiki-manager-backup-instance">
             <input id="instanceId" type="hidden" name="instanceId" value="{$inputValues['instanceId']}">
-            <div class="form-group row mb-3 preference">
+            <div class="tiki-form-group row preference">
                 <label class="col-form-label col-sm-3">
                     {tr}Backup Type{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.partial}{/tr}">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Email{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.email}{/tr}">
@@ -44,7 +44,7 @@
                     <div class="form-text">{tr}You can add several email addresses by separating them with commas.{/tr}</div>
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Max number of backups to keep{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help['max-backups']}{/tr}">
@@ -55,7 +55,7 @@
                     <input value="" class="form-control" id="number_backups_to_keep" type="text" name="number_backups_to_keep" placeholder="100">
                 </div>
             </div>
-            <div class="form-group row mb-3">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3"></label>
                 <div class="col-sm-9">
                     <input class="btn btn-primary" type="submit" name="backup" value="{tr}Backup instance{/tr}">

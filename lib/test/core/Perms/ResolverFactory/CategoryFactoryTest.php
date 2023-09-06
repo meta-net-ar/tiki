@@ -219,7 +219,7 @@ class Perms_ResolverFactory_CategoryFactoryTest extends PHPUnit\Framework\TestCa
                 'Anonymous' => ['tracker_admin'],
                 'Registered' => ['tracker_edit', 'tracker_view'],
             ],
-            'category'
+            'parent category'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'trackeritem', 'object' => 12]));

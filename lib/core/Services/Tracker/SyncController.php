@@ -37,6 +37,10 @@ class Services_Tracker_SyncController
 
     public function action_clone_remote($input)
     {
+        if (! Perms::get()->admin) {
+            throw new Services_Exception(tr('Permission Denied'), 401);
+        }
+
         $url = $input->url->url();
         $remoteTracker = $input->remote_tracker_id->int();
 

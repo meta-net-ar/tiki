@@ -71,6 +71,16 @@ class Search_Query_WikiBuilder
             $function = "wpquery_{$name}_{$key}";
             $group = empty($arguments['group']) ? null : 'wikibuilder_' . $arguments['group'];
 
+            if ($key != 'editable' && ! empty($arguments['editable'])) {
+                $fields = $this->get_fields_from_arguments($arguments);
+                foreach ($fields as $fieldNum => $fieldName) {
+                    $filter = $this->getEditableFilter($fieldName, $arguments['editable'], $fields[0]);
+                    if ($filter->getControl()->hasValue()) {
+                        continue 2;
+                    }
+                }
+            }
+
             if (method_exists($this, $function)) {
                 call_user_func([$this, $function], $this->query->getSubQuery($group), $value, $arguments);
                 $called = true;
@@ -101,21 +111,7 @@ class Search_Query_WikiBuilder
         $masterField = null;
         $subquery = new Search_Query(null, 'or');
         foreach ($fields as $fieldNum => $fieldName) {
-            $isTrackerField = strstr($fieldName, 'tracker_field_');
-            $fieldName = str_replace('tracker_field_', '', $fieldName);
-            if ($fieldNum == 0) {
-                $input = $this->input;
-                $masterField = $fieldName;
-            } else {
-                $input = [];
-                foreach ($this->input->asArray() as $key => $val) {
-                    $key = str_replace($masterField, $fieldName, $key);
-                    $input[$key] = $val;
-                }
-                $input = new JitFilter($input);
-            }
-            $filter = Tracker\Filter\Collection::getFilter($fieldName, $editableType, $isTrackerField);
-            $filter->applyInput($input);
+            $filter = $this->getEditableFilter($fieldName, $editableType, $fields[0]);
             $filter->applyCondition($subquery);
         }
         $query->getExpr()->addPart($subquery->getExpr());
@@ -278,14 +274,25 @@ class Search_Query_WikiBuilder
                 $arguments['gap'] = $time - time();
             }
         }
-        if (! isset($arguments['from']) && isset($arguments['to'], $arguments['gap'])) {
+        if (
+            ! isset($arguments['from']) &&
+            isset($arguments['to'], $arguments['gap']) &&
+            is_numeric($arguments['to']) &&
+            is_numeric($arguments['gap'])
+        ) {
             $arguments['from'] = $arguments['to'] - $arguments['gap'];
         }
-        if (! isset($arguments['to']) && isset($arguments['from'], $arguments['gap']) && $arguments['from'] !== "") {
+        if (
+            ! isset($arguments['to']) &&
+            isset($arguments['from'], $arguments['gap']) &&
+            $arguments['from'] !== '' &&
+            is_numeric($arguments['from']) &&
+            is_numeric($arguments['gap'])
+        ) {
             $arguments['to'] = $arguments['from'] + $arguments['gap'];
         }
         if (! isset($arguments['from'], $arguments['to'])) {
-            Feedback::error(tr('The range filter is missing \"from\" or \"to\".'));
+            Feedback::error(tr('The range filter is missing "from" or "to".'));
         }
         if (isset($arguments['allow_empty']) && $arguments['allow_empty'] == 'y') {
             $allow_empty = true;
@@ -656,5 +663,25 @@ class Search_Query_WikiBuilder
             $fields = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
         }
         return $fields;
+    }
+
+    private function getEditableFilter($fieldName, $editableType, $firstFieldName)
+    {
+        $isTrackerField = strstr($fieldName, 'tracker_field_');
+        $fieldName = str_replace('tracker_field_', '', $fieldName);
+        $firstFieldName = str_replace('tracker_field_', '', $firstFieldName);
+        if ($fieldName == $firstFieldName) {
+            $input = $this->input;
+        } else {
+            $input = [];
+            foreach ($this->input->asArray() as $key => $val) {
+                $key = str_replace($firstFieldName, $fieldName, $key);
+                $input[$key] = $val;
+            }
+            $input = new JitFilter($input);
+        }
+        $filter = Tracker\Filter\Collection::getFilter($fieldName, $editableType, $isTrackerField);
+        $filter->applyInput($input);
+        return $filter;
     }
 }

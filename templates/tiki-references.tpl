@@ -11,19 +11,19 @@
     {tab name="{tr}References{/tr}"}
         <h2>{tr}References{/tr}</h2>
         <form method="get" class="small" action="tiki-references.php">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-4" for="find">{tr}Find{/tr}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-4" for="numrows">{tr}Number of displayed rows{/tr}</label>
                 <div class="col-sm-8">
                     <input class="form-control form-control-sm" type="number" id="maxRecords" name="maxRecords" value="{$maxRecords|escape}">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <div class="col-sm-8 offset-sm-4">
                     <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
                 </div>
@@ -124,80 +124,80 @@
     <form class="form" action="tiki-references.php" method="post" enctype="multipart/form-data" id="references-edit-form" name="RegForm" autocomplete="off">
         {ticket}
         {if empty($referenceinfo.biblio_code)}
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-2 col-form-label" for="add_ref_auto_biblio_code">{tr}Auto generate Biblio Code:{/tr}</label>
                 <div class="col-sm-10">
                     <input type="checkbox" class="form-check wikiedit" name="ref_auto_biblio_code" id="add_ref_auto_biblio_code" checked="checked" />
                 </div>
             </div>
         {/if}
-        <div class="mb-3 row" id="ref_biblio_code_block" {if empty($referenceinfo.biblio_code)}style="display: none;"{/if}>
+        <div class="tiki-form-group row" id="ref_biblio_code_block" {if empty($referenceinfo.biblio_code)}style="display: none;"{/if}>
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_biblio_code">{tr}Biblio Code{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_biblio_code' class="form-control" name='ref_biblio_code' value="{$referenceinfo.biblio_code|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_author">{tr}Author{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_author' class="form-control" name='ref_author' value="{$referenceinfo.author|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Title{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_title' class="form-control" name='ref_title' value="{$referenceinfo.title|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Year{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_year' class="form-control" name='ref_year' value="{$referenceinfo.year|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Part{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_part' class="form-control" name='ref_part' value="{$referenceinfo.part|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}URI{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_uri' class="form-control" name='ref_uri' value="{$referenceinfo.uri|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Code{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_code' class="form-control" name='ref_code' value="{$referenceinfo.code|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Publisher{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_publisher' class="form-control" name='ref_publisher' value="{$referenceinfo.publisher|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Location{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_location' class="form-control" name='ref_location' value="{$referenceinfo.location|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Style{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_style' class="form-control" name='ref_style' value="{$referenceinfo.style|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Template{/tr}</label>
             <div class="col-sm-7 col-md-6">
                 <input type="text" id='ref_template' class="form-control" name='ref_template' value="{$referenceinfo.template|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <div class="col-sm-7 col-md-6 offset-sm-3 offset-md-2">
                 {if isset($referenceinfo.ref_id) && $referenceinfo.ref_id}
                     <input type="hidden" name="referenceId" value="{$referenceinfo.ref_id|escape}">

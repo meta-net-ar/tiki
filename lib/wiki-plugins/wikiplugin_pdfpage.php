@@ -20,8 +20,8 @@ function wikiplugin_pdfpage_info()
                 'iconname' => 'pdf',
                 'introduced' => 18,
                 'params' => [
-
                     'orientation' => [
+                        'required' => false,
                         'name' => tra('PDF Orientation'),
                         'description' => tra('Landscape or portrait'),
                         'type' => 'list',
@@ -34,25 +34,26 @@ function wikiplugin_pdfpage_info()
 
                     ],
                     'pagesize' => [
-                    'name' => tra('PDF page size'),
-                    'description' => tra('ISO Standard sizes: A0, A1, A2, A3, A4, A5 or North American paper sizes: Letter, Legal, Tabloid/Ledger (for ledger, select landscape orientation)'),
-                    'type' => 'list',
-                    'options' => [
-                        ['text' => 'Default','value' => ''],
-                        ['text' => 'Letter','value' => 'Letter'],
-                        ['text' => 'Legal','value' => 'Legal'],
-                        ['text' => 'Tabloid/Ledger','value' => 'Tabloid/Ledger'],
-                        ['text' => 'A0','value' => 'A0'],
-                        ['text' => 'A1','value' => 'A1'],
-                        ['text' => 'A2','value' => 'A2'],
-                        ['text' => 'A3','value' => 'A3'],
-                        ['text' => 'A4','value' => 'A4'],
-                        ['text' => 'A5','value' => 'A5'],
-                        ['text' => 'A6','value' => 'A6']
-                        ]
+                        'required' => false,
+                        'name' => tra('PDF page size'),
+                        'description' => tra('ISO Standard sizes: A0, A1, A2, A3, A4, A5 or North American paper sizes: Letter, Legal, Tabloid/Ledger (for ledger, select landscape orientation)'),
+                        'type' => 'list',
+                        'options' => [
+                            ['text' => 'Default','value' => ''],
+                            ['text' => 'Letter','value' => 'Letter'],
+                            ['text' => 'Legal','value' => 'Legal'],
+                            ['text' => 'Tabloid/Ledger','value' => 'Tabloid/Ledger'],
+                            ['text' => 'A0','value' => 'A0'],
+                            ['text' => 'A1','value' => 'A1'],
+                            ['text' => 'A2','value' => 'A2'],
+                            ['text' => 'A3','value' => 'A3'],
+                            ['text' => 'A4','value' => 'A4'],
+                            ['text' => 'A5','value' => 'A5'],
+                            ['text' => 'A6','value' => 'A6']
+                            ]
                     ],
-
                     'header' => [
+                        'required' => false,
                         'name' => tra('PDF page header text'),
                         'description' => tra('Enter Wiki Syntax / HTML code / Plain text. <br /> Possible values: <code>Custom HTML / Wiki Syntax / text </code>, <code>{PAGENO}</code>, <code>{DATE j-m-Y}</code>, <code> Page {PAGENO} of {NB}, Left text| Center Text | Right Text</code>. <br />Set header value as <code>off</code>, to turn off header from page'),
                         'tags' => ['basic'],
@@ -60,12 +61,14 @@ function wikiplugin_pdfpage_info()
                         'default' => $prefs['print_pdf_mpdf_header'],
                     ],
                     'footer' => [
+                        'required' => false,
                         'name' => tra('PDF page footer text'),
                         'description' => tra('Possible values: <code>HTML / Wiki Syntax / Plain text</code>,  <code>{include page="wiki_page_name"}</code> <code>{PAGENO}</code>, <code>{DATE j-m-Y}</code>. <br/> For example: <code>{PAGETITLE}|Center Text|{PAGENO}</code>, <code> Page {PAGENO} of {NB}</code>, <code>{include page="wiki_page_name"}</code>. <br /> Set footer value as <code>off</code>, to remove footer from page'),
                         'type' => 'text',
                         'default' => $prefs['print_pdf_mpdf_footer'],
                     ],
                     'margin_left' => [
+                        'required' => false,
                         'name' => tra('Left margin'),
                         'description' => tra('Numeric value.For example 10'),
                         'type' => 'text',
@@ -74,6 +77,7 @@ function wikiplugin_pdfpage_info()
                         'filter' => 'digits',
                     ],
                     'margin_right' => [
+                        'required' => false,
                         'name' => tra('Right margin'),
                         'description' => tra('Numeric value, no need to add px. For example 10'),
                         'type' => 'text',
@@ -82,6 +86,7 @@ function wikiplugin_pdfpage_info()
                         'filter' => 'digits',
                     ],
                     'margin_top' => [
+                        'required' => false,
                         'name' => tra('Top margin'),
                         'description' => tra('Numeric value, no need to add px. For example 10'),
                         'type' => 'text',
@@ -90,6 +95,7 @@ function wikiplugin_pdfpage_info()
                         'filter' => 'digits',
                     ],
                     'margin_bottom' => [
+                        'required' => false,
                         'name' => tra('Bottom margin'),
                         'description' => tra('Numeric value, no need to add px. For example 10'),
                         'type' => 'text',
@@ -98,6 +104,7 @@ function wikiplugin_pdfpage_info()
                         'filter' => 'digits',
                     ],
                     'margin_header' => [
+                        'required' => false,
                         'name' => tra('Header margin from top of document'),
                         'description' => tra('Only applicable if header is set. Numeric value only, no need to add px.Warning: Header can overlap text if top margin is not set properly'),
                         'type' => 'text',
@@ -107,6 +114,7 @@ function wikiplugin_pdfpage_info()
 
                     ],
                     'margin_footer' => [
+                        'required' => false,
                         'name' => tra('Footer margin from bottom of document'),
                         'description' => tra('Only applicable if footer is set.Numeric value only, no need to add px. Warning: Footer can overlap text if bottom margin is not set properly'),
                         'type' => 'text',
@@ -115,6 +123,7 @@ function wikiplugin_pdfpage_info()
                         'filter' => 'digits',
                     ],
                     'hyperlinks' => [
+                        'required' => false,
                         'name' => tra('Hyperlink behaviour in PDF'),
                         'description' => tra(''),
                         'tags' => ['advanced'],
@@ -127,6 +136,7 @@ function wikiplugin_pdfpage_info()
                         ]
                     ],
                     'columns' => [
+                        'required' => false,
                         'name' => tra('Number of columns'),
                         'description' => tra(''),
                         'tags' => ['advanced'],
@@ -140,24 +150,28 @@ function wikiplugin_pdfpage_info()
                         ]
                     ],
                     'watermark' => [
+                        'required' => false,
                         'name' => tra('Watermark text for this page. Set value as "off", to turn off watermark of the page'),
                         'description' => tra('Watermark text value, for example: Confidential, Draft etc.'),
                         'type' => 'text',
                         'default' => '',
                     ],
                     'watermark_image' => [
+                        'required' => false,
                         'name' => tra('Watermark image, enter full url'),
                         'description' => tra('To turn off watermark image on the page, set value as <code>off</code>'),
                         'type' => 'text',
                         'default' => 'Full URL of watermark image',
                     ],
                     'background' => [
+                        'required' => false,
                         'name' => tra('Page background color'),
                         'description' => tra('Enter a valid CSS color code.'),
                         'type' => 'text',
                         'default' => '',
                     ],
                     'background_image' => [
+                        'required' => false,
                         'name' => tra('Page background image'),
                         'description' => tra('Enter the full URL.'),
                         'type' => 'text',

@@ -129,35 +129,46 @@ $smarty->assign('display', isset($_REQUEST['display']) ? $_REQUEST['display'] : 
 
 // Allow PDF export by installing a Mod that define an appropriate function
 if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
-    require_once 'lib/pdflib.php';
-    $generator = new PdfGenerator();
-    if (! empty($generator->error)) {
-        Feedback::error($generator->error);
-        $access->redirect($page);
+    // Detect if we have a PDF export mod installed
+    $smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
+    $smarty->assign('pdf_warning', 'n');
+
+    if ($prefs['print_pdf_from_url'] != 'none') {
+        require_once 'lib/pdflib.php';
+        $generator = new PdfGenerator($prefs['print_pdf_from_url']);
+        if (! empty($generator->error)) {
+            Feedback::error($generator->error);
+            $access->redirect($page);
+        } else {
+            // One can override the default file name and title with the filename URL parameter
+            if (isset($_REQUEST['filename'])) {
+                $page = $_REQUEST['filename'];
+            }
+            try {
+                $pdf = $generator->getPdf('tiki-print.php', ['page' => $page], $pdata);
+                $length = strlen($pdf);
+                header('Cache-Control: private, must-revalidate');
+                header('Pragma: private');
+                header("Content-Description: File Transfer");
+                $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
+                $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
+                header('Content-disposition: attachment; filename="' . $page . '.pdf"');
+                header("Content-Type: application/pdf");
+                header("Content-Transfer-Encoding: binary");
+                header('Content-Length: ' . $length);
+                echo $pdf;
+            } catch (\Exception $e) {
+                $smarty->assign('print_page', 'n');
+                $smarty->assign('msg', tra($e->getMessage()));
+                $smarty->display('error.tpl');
+                die;
+            }
+        }
     } else {
-        // One can override the default file name and title with the filename URL parameter
-        if (isset($_REQUEST['filename'])) {
-            $page = $_REQUEST['filename'];
-        }
-        try {
-            $pdf = $generator->getPdf('tiki-print.php', ['page' => $page], $pdata);
-            $length = strlen($pdf);
-            header('Cache-Control: private, must-revalidate');
-            header('Pragma: private');
-            header("Content-Description: File Transfer");
-            $page = preg_replace('/\W+/u', '_', $page); // Replace non words with underscores for valid file names
-            $page = \TikiLib::lib('tiki')->remove_non_word_characters_and_accents($page);
-            header('Content-disposition: attachment; filename="' . $page . '.pdf"');
-            header("Content-Type: application/pdf");
-            header("Content-Transfer-Encoding: binary");
-            header('Content-Length: ' . $length);
-            echo $pdf;
-        } catch (\Exception $e) {
-            $smarty->assign('print_page', 'n');
-            $smarty->assign('msg', tra($e->getMessage()));
-            $smarty->display('error.tpl');
-            die;
-        }
+        $smarty->assign('print_page', 'n');
+        $errormsg = tr("You don't have a pdf export module installed. Go to %0 to install one, then select an export method in %1.", '<a href="tiki-admin.php?page=packages" target="_blank">' . tr('Admin->Packages') . '</a>', '<a href="tiki-admin.php?page=print" target="_blank>' . tr('PDF Settings') . '(' . tr('PDF from URL') . ')</a>');
+        Feedback::error($errormsg);
+        $access->redirect($page);
     }
 } else {
     $smarty->display('tiki-print.tpl');

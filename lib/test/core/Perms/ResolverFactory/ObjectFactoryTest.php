@@ -143,7 +143,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Admins' => ['tracker_admin'],
                 'Anonymous' => ['modify_object_categories', 'tracker_view'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'trackeritem', 'object' => 2]));
@@ -172,7 +172,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Registered' => ['edit_gallery_file'],
                 'Anonymous' => ['view_file_gallery'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'file', 'object' => 2]));
@@ -201,7 +201,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Registered' => ['edit_article'],
                 'Anonymous' => ['read_article'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'article', 'object' => 2]));
@@ -230,7 +230,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Registered' => ['blog_post'],
                 'Anonymous' => ['read_blog'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'blog post', 'object' => 2]));
@@ -259,7 +259,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Registered' => ['forum_post'],
                 'Anonymous' => ['forum_read'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'thread', 'object' => 2]));
@@ -288,7 +288,7 @@ class Perms_ResolverFactory_ObjectFactoryTest extends PHPUnit\Framework\TestCase
                 'Registered' => ['view_events'],
                 'Anonymous' => ['view_calendar'],
             ],
-            'parent'
+            'parent object'
         );
 
         $this->assertEquals($expect, $factory->getResolver(['type' => 'calendaritem', 'object' => 2]));

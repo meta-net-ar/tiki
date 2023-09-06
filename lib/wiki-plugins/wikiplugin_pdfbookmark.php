@@ -17,6 +17,7 @@ function wikiplugin_pdfbookmark_info()
                 'introduced' => 18,
                 'params' => [
                     'content' => [
+                        'required' => false,
                         'name' => tra('Bookmark Label'),
                         'description' => tra(''),
                         'tags' => ['advanced'],
@@ -24,6 +25,7 @@ function wikiplugin_pdfbookmark_info()
                         'default' => ''
                     ],
                     'level' => [
+                        'required' => false,
                         'name' => tra('Bookmark level'),
                         'description' => tra(''),
                         'tags' => ['advanced'],

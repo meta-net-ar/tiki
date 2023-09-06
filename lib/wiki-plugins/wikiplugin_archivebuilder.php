@@ -29,7 +29,7 @@ function wikiplugin_archivebuilder_info()
 function wikiplugin_archivebuilder($data, $params)
 {
     if (! class_exists('ZipArchive')) {
-        return '{BOX(bg="#fcd9d3" align="left")}' . tra('Missing ".zip" file name extension.') . '{BOX}';
+        return '{BOX(class="text-bg-light")}' . tra('Missing ".zip" file name extension.') . '{BOX}';
     }
 
     $archive = md5(serialize([ $data, $params ]));

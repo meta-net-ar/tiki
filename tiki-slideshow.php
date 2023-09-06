@@ -129,8 +129,15 @@ $parserlib->replace_preparse($pdata, $preparsed, $noparsed);
 
 $slidePluginData = $parserlib->getPlugins($info["data"], ['slideshow']);
 
+$slidePluginHeadingLevelSlideSeparator = 3;
 if (! empty($slidePluginData)) {
-    $slidePluginHeadingLevelSlideSeparator = $slidePluginData[0]['arguments']['headingLevelSlideSeparator'];
+    if (array_key_exists('headingLevelSlideSeparator', $slidePluginData[0]['arguments'])) {
+        $slidePluginHeadingLevelSlideSeparator = $slidePluginData[0]['arguments']['headingLevelSlideSeparator'];
+        // Check if variable $headingLevelSlideSeparator is empty or a string or if inferior to 1, then assign default value
+        if (empty($slidePluginHeadingLevelSlideSeparator) || (filter_var($slidePluginHeadingLevelSlideSeparator, FILTER_VALIDATE_INT) === false) || ($slidePluginHeadingLevelSlideSeparator < 1)) {
+            $slidePluginHeadingLevelSlideSeparator = 3;
+        }
+    }
 }
 
 $pdata = formatContent($pdata, $tagsArr, $slidePluginHeadingLevelSlideSeparator);
@@ -139,7 +146,7 @@ if (isset($_REQUEST['pdf'])) {
     $access->check_feature("feature_slideshow_pdfexport");
     set_time_limit(777);
 
-    $_POST["html"] = urldecode($_POST["html"]);
+    $_POST["html"] = urldecode($_POST["html"] ?? '');
 
     if (isset($_POST["html"])) {
         $generator = new PdfGenerator(PdfGenerator::MPDF);
@@ -166,7 +173,9 @@ if (isset($_REQUEST['pdf'])) {
         ];
         $filename = TikiLib::lib('tiki')
             ->remove_non_word_characters_and_accents($_REQUEST['page']);
-        if ($_REQUEST['pdfSettings']) {
+
+        $pdfSettings = $_REQUEST['pdfSettings'] ?? null;
+        if ($pdfSettings !== null) {
             $_POST['html'] = '<' . $_REQUEST['pdfSettings'] . ' />'
                 . $_POST['html'];
         }
@@ -408,11 +417,17 @@ $headerlib->add_jq_onready(
         '
 );
 
+$params = [];
+
+foreach ($_GET as $key => $value) {
+    $key = htmlentities($key, ENT_QUOTES);
+    $params[$key] = htmlentities($value, ENT_QUOTES);
+}
+
 if (empty($parserlib->getPlugins($info["data"], ['slideshow']))) {
     // If {slideshow} is not in the page, inject necessary Reveal related configurations
-    $params = array_merge(SlideshowHelper::getDefaultPluginValues(), $_GET);
+    $params = array_merge(SlideshowHelper::getDefaultPluginValues(), $params);
     $revealSettings = SlideshowHelper::getRevealSettingsAsString($params);
-
     $headerlib->add_js(
         "Reveal.configure({" . $revealSettings . "});"
     );
@@ -516,7 +531,10 @@ function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator
     }
 
     $slideContent = '';
-
+    // Checking if $headingsTags has more than one element, skip the first, as the first slide is empty, otherwise keep the first element
+    if (count($headingsTags) > 1) {
+        unset($headingsTags[0]);
+    }
     foreach ($headingsTags as $slide) {
         if ($firstSlide == 0) {
             //checking if first slide has pluginSlideShowSlide instance, then concat with main text, otherwise ignore

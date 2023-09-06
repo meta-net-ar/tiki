@@ -33,7 +33,7 @@ function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_l
         $urlAnchor = '#threadId=' . (int)$source;
         $type = substr($type, 0, strlen($type) - 8);
         $info = TikiLib::lib('comments')->get_comment((int)$source);
-        $source = $info['object'];
+        $source = $info['object'] ?? $source;
     }
 
     switch ($type) {

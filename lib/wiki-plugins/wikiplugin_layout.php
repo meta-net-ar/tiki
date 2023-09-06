@@ -389,7 +389,7 @@ function wikiplugin_layout($data, $params)
             ".container-std.container-fluid #page-data {margin-left: 0; margin-right: 0} .container-std.container-fluid #page-data > .row {margin-left: 0; margin-right: 0;} .col1 {padding-left: 0; padding-right: 0;} "
         );
     }
-    if (isset($params['fgalId']) || $params['fileIds']) {
+    if (isset($params['fgalId']) || isset($params['fileIds'])) {
         //checking if gallery is choosen
         $filegallib = TikiLib::lib('filegal');
         if ($params['fgalId']) {

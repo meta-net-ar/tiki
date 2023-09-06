@@ -81,7 +81,7 @@
 </div>
 
 {if $posts and $tiki_p_blog_admin eq 'y'}
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label for="remove" class="col-form-label">{tr}Perform action with selected{/tr}</label>
             <div class="input-group col-sm-4">
                 <select name="remove" class="form-control text-danger">

@@ -24,6 +24,16 @@
 
 {title help="Banning"}{tr}Banning system{/tr}{/title}
 
+<h2 id="Import_rules_as_CSV">{tr}Banning constraint rule{/tr}</h2>
+<div class="mb-3 row">
+    <label class="col-sm-4 col-form-label" for="csv">{tr}Attempts number{/tr}</label>
+    <label class="col-sm-8">{$prefs.feature_banning_attempts} {tr}times{/tr}</label>
+</div>
+<div class="mb-3 row">
+    <label class="col-sm-4 col-form-label" for="csv">{tr}Banning period{/tr}</label>
+    <label class="col-sm-8">{$prefs.feature_banning_duration} {tr}minutes{/tr}</label>
+</div>
+
 <div class="t_navbar">
     <form action="tiki-admin_banning.php" method="post">
         {ticket}

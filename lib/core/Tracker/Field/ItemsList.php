@@ -210,7 +210,8 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
             action: "itemslist_output",
             field: "' . $this->getConfiguration('fieldId') . '",
             fieldIdHere: "' . $this->getOption('fieldIdHere') . '",
-            value: $(this).val()
+            value: $(this).val(),
+            itemId: "' . $this->getItemId() . '"
         },
         function(data, status) {
             $ddl = $("div[name=' . $this->getInsertId() . ']");
@@ -889,12 +890,18 @@ $(document).on("click", "a.itemslist-btn", $.clickModal({
             trackerId: $itemsList.data("trackerid"),
             itemId: $itemsList.data("itemid"),
             fieldId: $itemsList.data("fieldid"),
-            listMode: $itemsList.data("list_mode"),
+            listMode: $itemsList.data("listmode"),
             mode: "output"
         })
         $.closeModal();
 
-        $itemsList.tikiModal(tr("Loading...")).load(url.replace(/&amp;/g, "&"), function () {$itemsList.tikiModal();});
+        if (' . (empty($this->getOption('fieldIdHere')) ? 'false' : 'true') . ') {
+            $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . $this->getOption('fieldIdHere') . ']").trigger("change", "custom");
+        } else {
+            $itemsList.tikiModal(tr("Loading...")).load(url.replace(/&amp;/g, "&"), function () {
+                $itemsList.find(".itemslist-field").unwrap(); $itemsList.tikiModal();
+            });
+        }
     }
 }));'
         );

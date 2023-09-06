@@ -24,7 +24,7 @@
     <input type="hidden" name="contentId" value="{$contentId|escape}">
     <input type="hidden" name="pId" value="{$pId|escape}">
 
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label">{tr}Content Type{/tr}</label>
         <div class="col-sm-7">
             <select name="content_type" class="form-control type-selector">
@@ -33,26 +33,26 @@
             </select>
         </div>
     </div>
-    <div class="mb-3 type-cond for-page">
+    <div class="tiki-form-group type-cond for-page">
         <label class="col-sm-3 col-form-label">{tr}Page Name{/tr}</label>
         <div class="col-sm-7">
             <input type="text" name="page_name" value="{$info.page_name|escape}" class="form-control">
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label">{tr}Content{/tr}</label>
         <div class="col-sm-7">
             <textarea rows="5" cols="40" name="data" class="form-control">{$info.data|escape}</textarea>
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label">{tr}Publising Date{/tr}</label>
         <div class="col-sm-7">
             {html_select_date time=$publishDate end_year="+1" field_order=$prefs.display_field_order}
             {tr}at{/tr} {html_select_time time=$publishDate display_seconds=false use_24_hours=$use_24hr_clock}
         </div>
     </div>
-    <div class="mb-3 row">
+    <div class="tiki-form-group row">
         <label class="col-sm-3 col-form-label"></label>
         <div class="col-sm-7">
             <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">

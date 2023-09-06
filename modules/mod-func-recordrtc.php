@@ -19,7 +19,7 @@ function module_recordrtc_info()
 {
     return [
         'name' => tra('Record RTC'),
-        'description' => tra('Multi-purpose search module (go or edit page by name and/or search site)'),
+        'description' => tra('Capture audio and video in real-time for seamless collaboration'),
         'prefs' => ['fgal_use_record_rtc_screen'],
         'packages_required' => ['npm-asset/recordrtc' => VendorHelper::getAvailableVendorPath('recordrtc', '/npm-asset/recordrtc/RecordRTC.js')],
     ];

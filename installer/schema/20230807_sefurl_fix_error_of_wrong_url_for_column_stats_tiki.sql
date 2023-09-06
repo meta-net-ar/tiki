@@ -1,0 +1,1 @@
+UPDATE `tiki_sefurl_regex_out` SET `right` = 'statistics' WHERE `left` = 'tiki-stats.php' AND `right` = 'stats';

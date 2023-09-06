@@ -107,7 +107,7 @@
                             title="{tr}Reset Perms:{/tr}{$title}"
                     {/if}
                     <input type="submit" class="btn btn-secondary btn-sm" name="copy" value="{tr}Copy{/tr}" class="tips" title="{tr}Permissions Clipboard{/tr}|{tr}Copy the permissions set here{/tr}">
-                    {if !empty($perms_clipboard_source)}<input type="submit" class="btn btn-primary btn-sm" name="paste" value="{tr}Paste{/tr}" class="tips" title="{tr}Permissions Clipboard{/tr}|{tr}Paste copied permissions from {/tr}<em>{$perms_clipboard_source}</em>" />{/if}
+                    {if !empty($perms_clipboard_source)}<input type="submit" class="btn btn-primary btn-sm" name="paste" value="{tr}Paste{/tr}" class="tips" title="{tr}Permissions Clipboard{/tr}|{tr}Paste copied permissions from: {/tr}{$perms_clipboard_source}" />{/if}
                 </div>
 
                 {if $objectType eq 'category'}

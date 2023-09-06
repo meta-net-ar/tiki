@@ -133,7 +133,7 @@ class Services_ActivityStream_ManageController
             );
             //replaceRule sends error message so no need to here
             if ($result) {
-                if ($id && $result->numRows()) {
+                if ($id && ((is_object($result) && $result->numRows()) || $result == $id)) {
                     Feedback::success(tr('Sample activity rule %0 updated', $id));
                 } elseif (! $id) {
                     Feedback::success(tr('Sample activity rule %0 created', $result));
@@ -195,7 +195,7 @@ class Services_ActivityStream_ManageController
             );
             //replaceRule sends error message so no need to here
             if ($result) {
-                if ($id && $result->numRows()) {
+                if ($id && ((is_object($result) && $result->numRows()) || $result == $id)) {
                     Feedback::success(tr('Basic activity rule %0 updated', $id));
                 } elseif (! $id) {
                     Feedback::success(tr('Basic activity rule %0 created', $result));
@@ -250,7 +250,7 @@ $customArguments
             );
             //replaceRule sends error message so no need to here
             if ($result) {
-                if ($id && $result->numRows()) {
+                if ($id && ((is_object($result) && $result->numRows()) || $result == $id)) {
                     Feedback::success(tr('Tracker activity rule %0 updated', $id));
                 } elseif (! $id) {
                     Feedback::success(tr('Tracker activity rule %0 created', $result));
@@ -312,7 +312,7 @@ $customArguments
             );
             //replaceRule sends error message so no need to here
             if ($result) {
-                if ($id && $result->numRows()) {
+                if ($id && ((is_object($result) && $result->numRows()) || $result == $id)) {
                     Feedback::success(tr('Advanced activity rule %0 updated', $id));
                 } elseif (! $id) {
                     Feedback::success(tr('Advanced activity rule %0 created', $result));
@@ -447,7 +447,7 @@ $customArguments
                 'notes'
             );
             //replaceRule sends error message so no need to here
-            if ($result->numRows()) {
+            if ((is_object($result) && $result->numRows()) || $result == $id) {
                 Feedback::success(tr('Type changed for activity rule %0', $id));
             }
         }
@@ -494,7 +494,7 @@ $customArguments
                 'notes'
             );
             //replaceRule sends error message so no need to here
-            if ($result->numRows()) {
+            if ((is_object($result) && $result->numRows()) || $result == $id) {
                 Feedback::success(tr('Status changed for activity rule %0', $id));
             }
         }

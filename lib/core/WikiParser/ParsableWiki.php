@@ -102,7 +102,7 @@ class WikiParser_ParsableWiki extends ParserLib
         // Replace boxes
         $delim = (isset($prefs['feature_simplebox_delim']) && $prefs['feature_simplebox_delim'] != "" ) ? preg_quote($prefs['feature_simplebox_delim']) : preg_quote("^");
         if ($this->option['markdown_conversion']) {
-            $data = preg_replace("/{$delim}(.+?){$delim}/s", "{BOX(html=1)}$1{BOX}", $data);
+            $data = preg_replace("/{$delim}(.+?){$delim}/s", "{BOX(class='bg-light')}$1{BOX}", $data);
         } else {
             $data = preg_replace("/{$delim}(.+?){$delim}/s", "<div class=\"card bg-light\"><div class=\"card-body\">$1</div></div>", $data);
         }

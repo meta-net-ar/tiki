@@ -23,5 +23,12 @@ function prefs_federated_list()
             'default' => '',
             'size' => 40,
         ],
+        'federated_manticore_index_prefix' => [
+            'name' => tra('Manticore distributed index prefix'),
+            'description' => tra('The prefix used when creating distributed index in Manticore. This needs to be the same for all sites participating in the federation.'),
+            'type' => 'text',
+            'default' => 'tiki_',
+            'size' => 40,
+        ],
     ];
 }

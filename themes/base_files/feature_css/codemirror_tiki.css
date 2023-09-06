@@ -3,9 +3,10 @@
     border: 1px solid gray;
     cursor: text;
     font: 1em Arial,Helvetica,sans-serif ! important;
-    clear: both;
     height: auto;
     margin-bottom: .5em;
+    z-index: -1 ! important;
+    padding: 5px ! important;
 }
 
 /*from the codemirror website*/

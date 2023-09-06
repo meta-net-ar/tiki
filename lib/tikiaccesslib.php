@@ -408,7 +408,8 @@ class TikiAccessLib extends TikiLib
         $cipherTicket = $this->encryptCsrfTicket($this->ticket);
 
         // you can set even if is the same value
-        setcookie(session_name() . '_CSRF', $cipherTicket, 0, '', '', false, true);
+        $session_params = session_get_cookie_params();
+        setcookie(session_name() . '_CSRF', $cipherTicket, 0, $session_params['path'], $session_params['domain'], $session_params['secure'], true);
     }
 
 
@@ -793,6 +794,7 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('post', $_REQUEST);
             $smarty->assign('print_page', 'n');
             $smarty->assign('title', tra('Please confirm action'));
+            $smarty->assign('confirmation_action', 'y');
             $smarty->assign('confirmation_text', $confirmText);
             $smarty->assign('mid', 'confirm.tpl');
             $smarty->display('tiki.tpl');
@@ -863,6 +865,7 @@ class TikiAccessLib extends TikiLib
                     $smarty = TikiLib::lib('smarty');
                     $smarty->assign('post', $_REQUEST);
                     $smarty->assign('print_page', 'n');
+                    $smarty->assign('confirmation_action', 'y');
                     $smarty->assign('confirmation_text', $confirmation_text);
                     $smarty->assign('confirmaction', $confirmaction);
                     $smarty->assign('mid', 'confirm.tpl');
@@ -1520,7 +1523,7 @@ class TikiAccessLib extends TikiLib
         }
 
         if ($prefs['twoFactorAuth'] === 'y' && $error_login === tra('Invalid two-factor code ')) {
-            $twoFactorAuthCode = '<div class="pass mb-3 row mx-0 clearfix">
+            $twoFactorAuthCode = '<div class="pass tiki-form-group row mx-0 clearfix">
     <label for="login-2fa">Two-factor Authenticator Code</label>
     <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa">
 </div>

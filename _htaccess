@@ -126,6 +126,10 @@ FileETag none
         ExpiresActive on
         ExpiresDefault "access plus 1 month"
     </FilesMatch>
+    <FilesMatch "(?i)\.(woff|woff2)$">
+        ExpiresActive on
+        ExpiresDefault "access plus 1 month"
+    </FilesMatch>
 </IfModule>
 
 <IfModule mod_rewrite.c>

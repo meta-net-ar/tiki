@@ -67,7 +67,11 @@ require_once('tiki-setup_base.php');
 
 // Attempt setting locales. This code is just a start, locales should be set per-user.
 // Also, different operating systems use different locale strings. en_US.utf8 is valid on POSIX systems, maybe not on Windows, feel free to add alternative locale strings.
-setlocale(LC_ALL, ''); // Attempt changing the locale to the system default.
+// Getting the system default locale
+$default_locale = Locale::getDefault();
+if ($default_locale) {
+    setlocale(LC_ALL, $default_locale); // Attempt changing the locale to the system default.
+}
 // Since the system default may not be UTF-8 but we may be dealing with multilingual content, attempt ensuring the collations are intelligent by forcing a general UTF-8 collation.
 // This will have no effect if the locale string is not valid or if the designated locale is not generated.
 
@@ -144,6 +148,26 @@ require_once('lib/setup/user_prefs.php');
 require_once('lib/setup/language.php');
 require_once('lib/setup/wiki.php');
 
+$user_groups = $userlib->get_user_groups($user);
+$assigned_modules = TikiLib::lib('mod')->get_assigned_modules();
+$prefs['switch_color_module_assigned'] = 'n';
+foreach ($assigned_modules as $position => $modules) {
+    foreach ($modules as $module) {
+        if ($module['name'] == 'switch_color_mode') {
+            $prefs['switch_color_module_assigned'] = 'y';
+            break;
+        }
+    }
+}
+
+try {
+    $custom_color_mode = TikiDb::get()->fetchAll("SELECT css_variables FROM tiki_custom_color_modes WHERE custom='y'", null, -1, -1, 'exception');
+    $prefs['custom_color_mode'] = $custom_color_mode;
+} catch (Exception $e) {
+    //failed to pull css variables from DB
+    $prefs['custom_color_mode'] = [];
+}
+
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
@@ -184,14 +208,14 @@ if (! TIKI_API) {
         } else {
             // check if it was a client-side cookie and turn into a server-side one to get longer than 7 days expiry
             if ($cookie_consent !== 'y') {
-                setcookie($prefs['cookie_consent_name'], 'y', $cookie_consent / 1000);
+                setcookie($prefs['cookie_consent_name'], 'y', intval($cookie_consent / 1000));
             }
             $feature_no_cookie = false;
 
             if ($prefs['cookie_consent_analytics'] === 'y') {
                 $analytics = getCookie($prefs['cookie_consent_name'] . '_analytics');
                 if (is_numeric($analytics)) {   // has been set server-side, so user is opting in to analytics
-                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'y', $analytics / 1000);
+                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'y', intval($analytics / 1000));
                     $feature_no_cookie_analytics = false;
                 } elseif (empty($analytics)) {
                     setcookie($prefs['cookie_consent_name'] . '_analytics', 'n', 24 * 60 * 60 * $prefs['cookie_consent_expires']);
@@ -327,7 +351,7 @@ if ($prefs['metatag_robotscustom'] == 'y') {
     if (empty($object)) {
         $object = current_object();
     }
-    if ($object['type'] == 'wiki page') {
+    if ($object && $object['type'] == 'wiki page') {
         $wikilib = TikiLib::lib('wiki');
         $smarty->assign('metatag_robotscustom', $wikilib->getPageMetatagRobotscustom($object['object']));
     }
@@ -768,11 +792,13 @@ if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotat
     $commentController = new Services_Comment_Controller();
 
     if (
+        $object &&
         $commentController->isEnabled($object['type'], $object['object']) &&
         $commentController->canView($object['type'], $object['object'])
     ) {
         $canPost = $commentController->canPost($object['type'], $object['object']);
-        $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);    // spoof a URI from type and id
+        // spoof a URI from type and id
+        $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
 
         $headerlib
             ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
@@ -956,3 +982,6 @@ if ($prefs['feature_tiki_manager'] == 'y') {
 if ($prefs['feature_realtime'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-websockets.js');
 }
+
+// use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not
+define('TIKI_SETUP_FINISHED', true);

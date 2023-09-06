@@ -767,9 +767,15 @@ class SheetLib extends TikiLib
             for ($row = 0; $row < $count_longest($grids1[$i]->dataGrid, $grids2[$i]->dataGrid); $row++) { //cycle through rows
                 $result1 .= "<tr>";
                 $result2 .= "<tr>";
-                for ($col = 0; $col < $count_longest($grids1[$i]->dataGrid[$row], $grids2[$i]->dataGrid[$row]); $col++) { //cycle through columns
-                    $cellValue1 = is_array($grids1[$i]->dataGrid[$row][$col]) ? $grids1[$i]->dataGrid[$row][$col]["value"] : $grids1[$i]->dataGrid[$row][$col];
-                    $cellValue2 = is_array($grids2[$i]->dataGrid[$row][$col]) ? $grids2[$i]->dataGrid[$row][$col]["value"] : $grids2[$i]->dataGrid[$row][$col];
+                for ($col = 0; $col < $count_longest($grids1[$i]->dataGrid[$row] ?? [], $grids2[$i]->dataGrid[$row] ?? []); $col++) { //cycle through columns
+                    if (array_key_exists($col, $grids1[$i]->dataGrid[$row])) {
+                        $cellValue1 = isset($grids1[$i]->dataGrid[$row][$col]) && is_array($grids1[$i]->dataGrid[$row][$col])
+                            ? $grids1[$i]->dataGrid[$row][$col]["value"] ?? ''
+                            : $grids1[$i]->dataGrid[$row][$col] ?? '';
+                    }
+                    $cellValue2 = isset($grids2[$i]->dataGrid[$row][$col]) && is_array($grids2[$i]->dataGrid[$row][$col])
+                        ? $grids2[$i]->dataGrid[$row][$col]["value"] ?? ''
+                        : $grids2[$i]->dataGrid[$row][$col] ?? '';
                     $diff = new Text_Diff($sanitize_for_diff(html_entity_decode($cellValue1)), $sanitize_for_diff(html_entity_decode($cellValue2)));
                     $changes = $diff->getDiff();
 

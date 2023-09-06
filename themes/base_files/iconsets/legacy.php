@@ -865,6 +865,9 @@ function iconset_legacy()
             'zip' => [
                 'id' => 'mime/zip',
             ],
+            'circle-half' => [
+                'id' => 'halffilledcircle'
+            ]
         ],
         'defaults' => [
             'add',

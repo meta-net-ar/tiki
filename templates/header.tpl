@@ -12,9 +12,9 @@
 {include file="canonical.tpl"}
 
 {if !empty($forum_info.name) & $prefs.metatag_threadtitle eq 'y'}
-    <meta name="keywords" content="{tr}Forum{/tr} {$forum_info.name|escape} {$thread_info.title|escape} {if $prefs.feature_freetags eq 'y'}{foreach from=$freetags.data item=taginfo}{$taginfo.tag|escape} {/foreach}{/if}">
+    <meta name="keywords" content="{tr}Forum{/tr} {$forum_info.name|escape} {$thread_info.title|escape} {if $prefs.feature_freetags eq 'y' and isset($tags)}{foreach from=$tags item=taginfo}{$taginfo.tag|escape} {/foreach}{/if}">
 {elseif $prefs.metatag_keywords neq '' or !empty($metatag_local_keywords)}
-    <meta name="keywords" content="{if not empty($prefs.metatag_keywords_translated)}{$prefs.metatag_keywords_translated|escape}{else}{$prefs.metatag_keywords|escape}{/if} {if $prefs.feature_freetags eq 'y'}{foreach from=$freetags.data item="taginfo"}{$taginfo.tag|escape} {/foreach}{/if} {$metatag_local_keywords|escape}">
+    <meta name="keywords" content="{if not empty($prefs.metatag_keywords_translated)}{$prefs.metatag_keywords_translated|escape}{else}{$prefs.metatag_keywords|escape}{/if} {if $prefs.feature_freetags eq 'y' and isset($tags)}{foreach from=$tags item="taginfo"}{$taginfo.tag|escape} {/foreach}{/if} {$metatag_local_keywords|escape}">
 {/if}
 {if $prefs.metatag_author neq ''}
     <meta name="author" content="{$prefs.metatag_author|escape}">
@@ -287,6 +287,31 @@
 {if $headerlib}        {$headerlib->output_headers()}{/if}
 {if !empty($prefs.feature_custom_html_head_content)}
     {eval var=$prefs.feature_custom_html_head_content}
+{/if}
+
+
+{if $prefs.switch_color_module_assigned eq 'y'}
+    <script>
+        const getStoredTheme = () => localStorage.getItem("theme");
+        const setStoredTheme = (theme) => localStorage.setItem("theme", theme);
+        const getPreferredTheme = () => {
+            const storedTheme = getStoredTheme();
+            if (storedTheme)  return storedTheme;
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        };
+        const setTheme = (theme) => {
+            if (theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches)  document.documentElement.setAttribute("data-bs-theme", "dark"); 
+            else document.documentElement.setAttribute("data-bs-theme", theme);
+        };
+        setTheme(getPreferredTheme());
+    </script>
+    <style>
+        {foreach from=$prefs['custom_color_mode'] item=mode}
+            {if null !== $mode['css_variables']}
+                {$mode['css_variables']}
+            {/if}
+        {/foreach}
+    </style>
 {/if}
 
 {* Include mautic snipet code with mautic *}

@@ -125,6 +125,7 @@ function wikiplugin_tour_info()
             ],
             'show_until_dismiss' => [
                 'name' => tra('Show Until Dismissed'),
+                'required' => false,
                 'description' => tra('Show automatically only until dismissed. tour_id should also be set if there are multiple tours.'),
                 'since' => '16.0',
                 'filter' => 'alpha',

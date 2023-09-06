@@ -26,6 +26,7 @@
     RewriteRule "^(vendor/ckeditor).*/.*\.html$" "-" [PT,L]
     RewriteRule "^(vendor/npm-asset/converse\.js/).*/.*\.html$" "-" [PT,L]
     RewriteRule "^(vendor/npm-asset/reveal.js/).*/.*\.html$" "-" [PT,L]
+    RewriteRule "^(vendor/svg-edit/).*/.*\.xml$" "-" [PT,L]
 
     # -- Deny Everything Not Matched Above -- #
     RewriteRule "/*" "-" [F]

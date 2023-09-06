@@ -14,8 +14,27 @@ $access->check_permission(['tiki_p_clean_cache']);
 $done = '';
 $output = '';
 $buf = '';
+$errors = false;
 
 $cachelib = TikiLib::lib('cache');
+
+$tmp_dir = sys_get_temp_dir();
+if (! is_dir($tmp_dir)) {
+    $new_tmp_dir = mkdir($tmp_dir, 0777, true);
+    if (! $new_tmp_dir) {
+        $errors = true;
+    }
+} else {
+    if (! TikiSetup::is_writeable($tmp_dir)) {
+        $errors = true;
+    }
+}
+if ($errors) {
+    $smarty->assign('msg', "Temporary folder is set to $tmp_dir, but it is not accessible by Tiki");
+    $smarty->display('error.tpl');
+    die;
+}
+
 if (isset($_GET['do'])) {
     $cachelib->empty_cache($_GET['do']);
     if ($_GET['do'] === 'all') {

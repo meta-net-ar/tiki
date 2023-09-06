@@ -102,8 +102,6 @@ function tiki_error_handling($errno, $errstr, $errfile, $errline): bool
 {
     global $prefs, $phpErrors;
 
-    TikiLib::lib('errortracking')->handleError($errno, $errstr, $errfile, $errline);
-
     if (0 === (error_reporting() & $errno)) {
         // This error was triggered when evaluating an expression prepended by the at sign (@) error control operator, but since we are in a custom error handler, we have to ignore it manually.
         // See http://ca3.php.net/manual/en/language.operators.errorcontrol.php#98895 and http://php.net/set_error_handler
@@ -146,16 +144,20 @@ function tiki_error_handling($errno, $errstr, $errfile, $errline): bool
         case E_USER_NOTICE:
         case E_DEPRECATED:
         case E_USER_DEPRECATED:
-            if (! defined('THIRD_PARTY_LIBS_PATTERN') ||  ! preg_match(THIRD_PARTY_LIBS_PATTERN, $errfile)) {
+            //Ok, the following should no longer be needed.  There was a bug were we set smarty error level bitmask incorrectly.  Then another where we clobbered what we set in the constructor.  Leaving it only if there are cases we missed . benoitg - 2023-07-03
+            /*if (! defined('THIRD_PARTY_LIBS_PATTERN') ||  ! preg_match(THIRD_PARTY_LIBS_PATTERN, $errfile)) {
                 if (! empty($prefs['smarty_notice_reporting']) && $prefs['smarty_notice_reporting'] != 'y' && strstr($errfile, '.tpl.php')) {
                     return true;
                 }
-            }
+            }*/
             $type = 'NOTICE';
             break;
         default:
-            return true;
+            //Unknow error type, we still want to display/report it
+            $type = 'UNKNOWN';
     }
+    //This will log to glitchtip, and also call any handlers that were registered BEFORE tiki.  So we don't care about what they tell us to do in their return value.
+    $retval = TikiLib::lib('errortracking')->handleError($errno, $errstr, $errfile, $errline);
 
     $back = "<div class='rbox-data p-3 mb-3' style='font-size: 12px; border: 1px solid'>";
     $back .= $type . " ($err[$errno]): <b>" . $errstr . "</b><br />";
@@ -163,6 +165,7 @@ function tiki_error_handling($errno, $errstr, $errfile, $errline): bool
     $back .= "</div>";
 
     $phpErrors[] = $back;
+    //Skip any other error processing, custom error handlers registered AFTER us have called us, so have processed.  Handlers registered BEFORE US (if any) have been called by handleError(), but we now ignore the return value and stop any further error processing.
     return true;
 }
 

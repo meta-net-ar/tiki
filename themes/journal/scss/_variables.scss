@@ -45,6 +45,9 @@ $red-300: tint-color($red, 40%) !default;
 
 $min-contrast-ratio:   1.28 !default;
 
+// Body
+$body-color: $gray-800 !default;
+
 // Links
 $link-color:                #eb6864;
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
@@ -75,4 +78,4 @@ $pagination-hover-bg:               $primary !default;
 $pagination-hover-border-color:     $primary !default;
 
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3

@@ -392,7 +392,7 @@ class Search_Query implements Search_Query_Interface
 
         foreach ($this->foreignQueries as $indexName => $query) {
             $resultset->applyTransform(function ($entry) use ($query, $indexName) {
-                if (isset($entry['_index']) && $entry['_index'] == $indexName) {
+                if (isset($entry['_index']) && ($entry['_index'] == $indexName || strstr($entry['_index'], $indexName))) {
                     foreach ($query->transformations as $trans) {
                         if (is_callable($trans)) {
                             $entry = $trans($entry);

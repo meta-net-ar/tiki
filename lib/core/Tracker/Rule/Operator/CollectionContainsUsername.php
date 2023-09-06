@@ -9,6 +9,11 @@ class CollectionContainsUsername extends Operator
 {
     public function __construct()
     {
-        parent::__construct(tr('contains username'), Nothing::class, '.val().indexOf(jqueryTiki.username)>-1', [Collection::class]);
+        parent::__construct(
+            tr('contains username'),
+            Nothing::class,
+            '.collectionContains(jqueryTiki.username)',
+            [Collection::class]
+        );
     }
 }

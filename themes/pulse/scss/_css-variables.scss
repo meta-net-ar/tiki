@@ -6,12 +6,16 @@
     --tiki-top-bg: rgba(89, 49, 150, 1);
     --tiki-top-color: rgba(255, 255, 255, 0.55);
     --tiki-top-hover-color: rgba(255, 255, 255, 0.9);
+    --tiki-top-text-color: rgba(255, 255, 255, 0.9);
+    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: rgba(89, 49, 150, 1);
     --tiki-topbar-color: rgba(255, 255, 255, 0.55);
     --tiki-topbar-hover-color: rgba(255, 255, 255, 0.9);
+    --tiki-topbar-text-color: rgba(255, 255, 255, 0.9);
 }
 
 @mixin top-nav-light {
@@ -19,6 +23,8 @@
 //    --tiki-top-bg: rgba(249, 248, 252, 1);
 //    --tiki-top-color: rgba(0, 0, 0, 0.7);
 //    --tiki-top-hover-color: rgba(0, 0, 0, 0.9);
+    --bs-navbar-brand-color: #{$navbar-light-brand-color};
+    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
 
 @mixin topbar-nav-light {

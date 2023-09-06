@@ -18,6 +18,7 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 }
 
 require_once __DIR__ . '/../setup/third_party.php';
+require_once __DIR__ . '/SmartyTikiErrorHandler.php';
 
 /**
  * extends Smarty_Security
@@ -25,13 +26,12 @@ require_once __DIR__ . '/../setup/third_party.php';
  */
 class Tiki_Security_Policy extends Smarty_Security
 {
+    public $trusted_uri = [];
+
     /**
      * needs a proper description
      * @var array $secure_dir
      */
-
-    public $trusted_uri = [];
-
     public $secure_dir = [];
 
     /**
@@ -159,6 +159,16 @@ class Smarty_Tiki extends Smarty
      */
     public $main_template_dir = null;
 
+    private $customErrorHandler;
+
+    private function activateCustomErrorHandler()
+    {
+        $this->customErrorHandler->activate();
+    }
+    private function deactivateCustomErrorHandler()
+    {
+        $this->customErrorHandler->deactivate();
+    }
     /**
      * needs a proper description
      */
@@ -167,6 +177,7 @@ class Smarty_Tiki extends Smarty
         parent::__construct();
         global $prefs, $base_uri;
 
+        $this->customErrorHandler = new SmartyTikiErrorHandler();
         $this->initializePaths();
 
         $this->setConfigDir(null);
@@ -194,11 +205,7 @@ class Smarty_Tiki extends Smarty
         }
         $this->use_sub_dirs = false;
         $this->url_overriding_prefix_stack = [];
-        if (! empty($prefs['smarty_notice_reporting']) and $prefs['smarty_notice_reporting'] === 'y') {
-            $this->error_reporting = E_ALL;
-        } else {
-            $this->error_reporting = E_ALL ^ E_NOTICE;
-        }
+
         if (! empty($prefs['smarty_cache_perms'])) {
             $this->_file_perms = (int) $prefs['smarty_cache_perms'];
         }
@@ -283,6 +290,7 @@ class Smarty_Tiki extends Smarty
      */
     public function fetch($_smarty_tpl_file = null, $_smarty_cache_id = null, $_smarty_compile_id = null, $parent = null, $_smarty_display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
+        $this->activateCustomErrorHandler();
         if (strpos($_smarty_tpl_file, 'extends:') === 0) {
             // temporarily disable extends_recursion which restores smarty < 3.1.28 behaviour
             // see note at vendor_bundled/vendor/smarty/smarty/libs/Smarty.class.php:296 for more
@@ -315,6 +323,7 @@ class Smarty_Tiki extends Smarty
         if (! $this->extends_recursion) {
                 $this->extends_recursion = true;
         }
+        $this->deactivateCustomErrorHandler();
         return $html;
     }
 
@@ -377,6 +386,7 @@ class Smarty_Tiki extends Smarty
     {
 
         global $prefs;
+        $this->activateCustomErrorHandler();
 
         if (! empty($prefs['feature_htmlpurifier_output']) and $prefs['feature_htmlpurifier_output'] == 'y') {
             static $loaded = false;
@@ -489,6 +499,9 @@ class Smarty_Tiki extends Smarty
             $html .= '</pre>';
             echo $html;
         }
+
+        $this->deactivateCustomErrorHandler();
+
         //This cannot possibly work, display never returns anything.  Presumably this was meant for fetch() - benoitg - 2023-06-07
 
         if (! empty($prefs['feature_htmlpurifier_output']) and $prefs['feature_htmlpurifier_output'] == 'y') {

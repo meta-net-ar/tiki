@@ -102,6 +102,12 @@ function wikiplugin_addrelation($data, $params)
     } else {
         $target_object = current_object();
     }
+    if (empty($source_object)) {
+        return tra('Missing source object.');
+    }
+    if (empty($target_object)) {
+        return tra('Missing target object.');
+    }
     if ($source_object == $target_object) {
         return tra('Source and target object cannot be the same');
     }

@@ -93,6 +93,9 @@ $prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$pre
 
 $min-contrast-ratio:   1.9 !default;
 
+// Body
+$body-color: $gray-800 !default;
+
 // Links
 $link-color: #007EA8; // Darkened for WCAG compliance
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
@@ -199,6 +202,6 @@ $btn-close-opacity:          .6 !default;
 $btn-close-hover-opacity:    1 !default;
 
 // Code
-$code-color:                        $pink !default; // Bootstrap 5.3
+$code-color:                     $body-color; //    $pink !default; // Bootstrap 5.3
 
 //--------------------------- Tiki SCSS variables

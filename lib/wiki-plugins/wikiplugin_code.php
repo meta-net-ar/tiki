@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Symfony\Component\Yaml\Yaml;
+
 function wikiplugin_code_info()
 {
     global $tikipath;
@@ -151,6 +153,7 @@ function wikiplugin_code($data, $params)
         } else {
             // codemirror expects language names in lower case
             $colors = strtolower($colors);
+            check_valid_code($colors, $code);
         }
     }
 
@@ -187,4 +190,33 @@ function wikiplugin_code($data, $params)
         . '</div>';
 
     return $out;
+}
+
+/**
+ * Check whether the code provided in the specific language is valid.
+ * Feel free to add more patterns to check for other languages. Any supported language listed at http://codemirror.net/mode/
+ *
+ * @param $colors string containing language name
+ * @param $code string containing code to check
+ *
+ * @return bool
+ *
+ * @throws Exception If the code is not valid in the provided language
+ *
+ */
+function check_valid_code($colors, $code)
+{
+    switch ($colors) {
+        case 'yaml':
+            try {
+                Yaml::parse($code);
+            } catch (Exception $e) {
+                Feedback::error(tr('Could not parse YAML code: "%0"', $e->getMessage()));
+            }
+            break;
+
+        default:
+            return true;
+    }
+    return true;
 }

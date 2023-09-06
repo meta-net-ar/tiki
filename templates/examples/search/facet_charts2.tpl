@@ -82,10 +82,10 @@ Debugging:
                 {$values = []}
                 {$labels = []}
                 {foreach from=$facet.options key=value item=label}
-                    {if strpos($label, 'trackeritem:0 ') !== false}
+                    {if isset($label) && strpos($label, 'trackeritem:0 ') !== false}
                         {continue}
                     {/if}
-                    {if preg_match('/(.*?)\s+\((\d+)\)/', $label|escape, $matches)}
+                    {if isset($label, $matches) && preg_match('/(.*?)\s+\((\d+)\)/', $label|escape, $matches)}
                         {$labels[] = $matches[1]}
                         {$values[] = $matches[2]}
                     {/if}

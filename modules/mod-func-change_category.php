@@ -83,7 +83,7 @@ function module_change_category($mod_reference, $module_params)
     $smarty->assign('showmodule', false);
 
     $object = current_object();
-    if (($object['type'] && $object['object']) || $modlib->is_admin_mode(true)) {
+    if (($object && $object['type'] && $object['object']) || $modlib->is_admin_mode(true)) {
         $categlib = TikiLib::lib('categ');
 
         if (! empty($module_params['id'])) {
@@ -110,8 +110,8 @@ function module_change_category($mod_reference, $module_params)
         $smarty->assign('multiple', $multiple);
 
 
-        $cat_type = $object['type'];
-        $cat_objid = $object['object'];
+        $cat_type = $object['type'] ?? '';
+        $cat_objid = $object['object'] ?? '';
 
         $categories = $categlib->getCategories($id ? ['identifier' => $id, 'type' => 'descendants'] : null);
 

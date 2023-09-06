@@ -63,31 +63,31 @@
 
         <form action="tiki-admin_tokens.php" method="post">
             <input type="hidden" name="action" value="add">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label">{tr}Full URL{/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="text" id='entry' name='entry' class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label">{tr}Timeout in seconds (-1 for unlimited){/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="text" id='timeout' name='timeout' class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label">{tr}Maximum number of hits (-1 for unlimited){/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="text" id='maxhits' name='maxhits' class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label">{tr}Groups (separated by comma){/tr}</label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="text" id='groups' name='groups' class="form-control">
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-7 offset-sm-1">
                     <input type="submit" class="btn btn-primary btn-sm" value="{tr}Add{/tr}">

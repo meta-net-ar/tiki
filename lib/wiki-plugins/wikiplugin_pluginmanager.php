@@ -86,7 +86,7 @@ class WikiPluginPluginManager extends PluginsLib
                     $file = $filepath . $useritem . '.php';
                     $confirm = in_array($file, $all);
                     if ($confirm === false) {
-                        return '{BOX(bg="#fcd9d3" align="left")}' . tr('Plugin Manager error: %0%1 not found', $useritem, $type) . '{BOX}';
+                        return '{BOX(class="text-bg-light")}' . tr('Plugin Manager error: %0%1 not found', $useritem, $type) . '{BOX}';
                     } else {
                         $aPlugins[] = $file;
                     }
@@ -111,7 +111,7 @@ class WikiPluginPluginManager extends PluginsLib
                             $type = '';
                         }
                     }
-                    return '{BOX(bg="#fcd9d3" align="left")}' . tr('Plugin Manager error: %0%1%2%3%4 not found', $beginerror, $type, $and, $enderror, $type2) . '{BOX}';
+                    return '{BOX(class="text-bg-light")}' . tr('Plugin Manager error: %0%1%2%3%4 not found', $beginerror, $type, $and, $enderror, $type2) . '{BOX}';
                 } elseif ($end > $begin) {
                     $aPlugins = array_slice($aPlugins, $begin, $end - $begin + 1);
                 } else {
@@ -120,7 +120,7 @@ class WikiPluginPluginManager extends PluginsLib
             } elseif (! empty($limit)) {
                 $begin = array_search($filepath . $plugin . '.php', $aPlugins);
                 if ($begin === false) {
-                    return '{BOX(bg="#fcd9d3" align="left")}' . tr('Plugin Manager error: %0%1 not found', $begin, $type) . '{BOX)}';
+                    return '{BOX(class="text-bg-light")}' . tr('Plugin Manager error: %0%1 not found', $begin, $type) . '{BOX)}';
                 } else {
                     $aPlugins = array_slice($aPlugins, $begin, $limit);
                 }
@@ -128,7 +128,7 @@ class WikiPluginPluginManager extends PluginsLib
                 $file = $filepath . $plugin . '.php';
                 $confirm = in_array($file, $aPlugins);
                 if ($confirm === false) {
-                    return '{BOX(bg="#fcd9d3" align="left")}' . tr('Plugin Manager error:  %0%1 not found', $plugin, $type) . '{BOX}';
+                    return '{BOX(class="text-bg-light")}' . tr('Plugin Manager error:  %0%1 not found', $plugin, $type) . '{BOX}';
                 } else {
                     $aPlugins = [];
                     $aPlugins[] = $file;
@@ -235,7 +235,7 @@ class WikiPluginPluginManager extends PluginsLib
             }
             $headbegin = "\n\t\t" . '<th class="heading">';
             $cellbegin = "\n\t\t" . '<td>';
-            $header = "\n\t" . '<tr class="heading sticky-top bg-light">' . $headbegin . 'Parameters</td>';
+            $header = "\n\t" . '<tr class="heading sticky-top bg-light">' . $headbegin . 'Parameters</th>';
             $rows = '';
             if (isset($numparams) && $numparams > 0) {
                 $header .= $headbegin . tra('Accepted Values') . '</th>';
@@ -263,7 +263,7 @@ class WikiPluginPluginManager extends PluginsLib
                         || (! empty($paraminfo['doctype']) && $params['paramtype'] == $paraminfo['doctype']))
                     ) {
                         $filteredparams[] = $paraminfo;
-                        $rows .= "\n\t" . '<tr style="word-break: break-all;">' . $cellbegin;
+                        $rows .= "\n\t" . '<tr style="word-break: break-word;">' . $cellbegin;
                         //Parameters column
                         if (isset($paraminfo['required']) && $paraminfo['required'] == true) {
                             $rows .= '<strong><code>' . $paramname . '</code></strong>';
@@ -364,7 +364,7 @@ class WikiPluginPluginManager extends PluginsLib
             $title .= isset($infoPlugin['introduced']) && $params['showtopinfo'] !== 'n' ? '<em>' .
                 tr('Introduced in %0', 'Tiki ' . $infoPlugin['introduced']) . '.</em>' : '';
             $link = '[' . $sourcecode . '|' . tra('Go to the source code') . ']';
-            $required = ! empty($filteredparams) ? array_column($filteredparams, 'required') : false;
+            $required = ! empty($filteredparams) ? array_column($filteredparams, 'required') : [];
             $bold = in_array(true, $required) > 0 ? '<em> ' . tr(
                 'Required parameters are in%0 %1bold%2',
                 '</em>',
@@ -536,6 +536,9 @@ function get_module_params($sPluginFile)
     include_once('modules/' . $sPluginFile);
     $info_func = "module_{$sPlugin}_info";
     $infoPlugin = $info_func();
+    foreach ($infoPlugin['params'] as &$param) {
+        $param['required'] = ! empty($param['required']);
+    }
     $numparams = isset($infoPlugin['params']) ? count($infoPlugin['params']) : 0;
     return $infoPlugin;
 }

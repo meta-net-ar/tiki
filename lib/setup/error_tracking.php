@@ -31,7 +31,7 @@ class ErrorTracking
 
     protected array $stack = [];
 
-    protected ?closure $errorHandler;
+    private ?closure $previousErrorHandler = null;
 
     /**
      * Check if external error reporting for JavaScript is enabled.
@@ -246,25 +246,28 @@ class ErrorTracking
 
     /**
  * A callback for PHP set_error_handler()
+ *
+ * In practice, this is called directly by initlib::tiki_error_handling
+ *
  * Set how Tiki will report Errors
  * @param $errno
  * @param $errstr
  * @param $errfile
  * @param $errline
  *
- * @return bool Run the built-in php error handler after this.
+ * @return bool Skip running any other error handler after this one.
  */
     public function handleError($errno, $errstr, $errfile, $errline): bool
     {
-        if ($this->errorHandler ?? false) {
-            return false !== ($this->errorHandler)($errno, $errstr, $errfile, $errline);
+        if ($this->previousErrorHandler) {
+            return ($this->previousErrorHandler)($errno, $errstr, $errfile, $errline);
         }
-
-        return false;
+        //If there was no previousErrorHandler, we do not want PHPs default handler to run.
+        return true;
     }
 
-    public function setErrorHandler(Closure $handler)
+    public function setPreviousErrorHandler(Closure $handler)
     {
-        $this->errorHandler = $handler;
+        $this->previousErrorHandler = $handler;
     }
 }

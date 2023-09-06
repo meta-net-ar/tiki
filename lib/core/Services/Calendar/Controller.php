@@ -136,7 +136,7 @@ class Services_Calendar_Controller
         $viewend = new DateTime($viewend);
         $viewend = $viewend->getTimestamp();
 
-        if ($_SESSION['CalendarViewGroups']) {
+        if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
             $listevents = $this->calendarLib->list_raw_items(
                 $_SESSION['CalendarViewGroups'],
                 $user,
@@ -257,7 +257,7 @@ class Services_Calendar_Controller
                 $calitem = $this->processParticipants($calitem);
 
                 // save event
-                if ($input->act->word() === 'save' || $input->act->word() === 'saveas') {
+                if ($input->act->word() === 'saveitem' || $input->act->word() === 'saveas') {
                     if (! $input->calendarchanged->int()) {
                         $saved = $this->saveEvent($calitem, $calendar, $input);
 
@@ -285,27 +285,31 @@ class Services_Calendar_Controller
             $calendar = $this->calendarLib->get_calendar($calendarId);
             $title = tr('Calendar event : %0', $calitem['name']);
 
-            $timezone = new DateTimeZone($prefs['display_timezone']);
-            $start = new DateTime('@' . $calitem['start']);
-            $end   = new DateTime('@' . $calitem['end']);
+            $start = new TikiDate();
+            $start->setDate($calitem['start']);
+            $start->setTZbyID($displayTimezone);
+            $end = new TikiDate();
+            $end->setDate($calitem['end']);
+            $end->setTZbyID($displayTimezone);
 
             $allDay = $calitem['allday'] != 0;
             if (! $allDay) {
-                $start->setTimezone($timezone);
-                $end->setTimezone($timezone);
+                $start->convertTimeToUTC();
+                $end->convertTimeToUTC();
             } else {
-                $start->setTime(0, 0);
-                $end->setTime(0, 0);
+                $start->convertTimeToUTC(0, 0, 0);
+                $end->convertTimeToUTC(0, 0, 0);
             }
-            $calitem['start'] = $start->format('U');
-            $calitem['end']   = $end->format('U');
+
+            $calitem['start'] = $start->getTime();
+            $calitem['end']   = $end->getTime();
             $calitem['duration'] = 0;
         } else {
             // new event
             $title = tr('Calendar event : %0', tr('New'));
             $calitemId = 0;
             $calendar = $calendars[0];
-            $calendarId = $calendar['calendarId'];
+            $calendarId = $input->defaultCalendarId->int() > 0 ? $input->defaultCalendarId->int() : $calendar['calendarId'];
 
             // set up default start and end
             $dateNow->setTZbyID($displayTimezone);
@@ -663,6 +667,15 @@ class Services_Calendar_Controller
                 }
 
                 global $user;
+
+                // if local browser offset or timezone identifier is submitted, convert timestamp to server-based timezone
+                $calitem['start'] = TikiDate::convertWithTimezone($input->asArray(), $calitem['start']);
+                $server_offset = TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $calitem['start']);
+                $calitem['start'] -= $server_offset;
+                $calitem['end'] = TikiDate::convertWithTimezone($input->asArray(), $calitem['end']);
+                $server_offset = TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $calitem['end']);
+                $calitem['end'] -= $server_offset;
+
                 $calitemId = $this->calendarLib->set_item($user, $calitem['calitemId'] ?? 0, $calitem);
                 // Save the ip at the log for the addition of new calendar items
                 if ($this->logsLib) {
@@ -724,6 +737,8 @@ class Services_Calendar_Controller
             ! empty($input->recurrenceId->int()) ? $input->recurrenceId->int() : -1
         );
         $recurrence->setCalendarId($calitem['calendarId']);
+        $calitem['start'] = TikiDate::convertWithTimezone($input->asArray(), $calitem['start']);
+        $calitem['end'] = TikiDate::convertWithTimezone($input->asArray(), $calitem['end']);
         $tz = date_default_timezone_get();
         date_default_timezone_set('UTC');
         $tikidateStart = new TikiDate();
@@ -745,33 +760,52 @@ class Services_Calendar_Controller
         $recurrence->setDescription($calitem['description']);
         $recurrence->setRecurenceDstTimezone($input->recurrenceDstTimezone->text());
         switch ($input->recurrenceType->word()) {
-            case "weekly":
-                $recurrence->setWeekly(true);
-                $recurrence->setWeekdays(implode(',', $input->asArray('weekdays')));
+            case "daily":
+                $recurrence->setDaily(true);
+                $recurrence->setWeekly(false);
                 $recurrence->setMonthly(false);
                 $recurrence->setYearly(false);
+                $recurrence->setDays($input->days->int());
+                break;
+            case "weekly":
+                $recurrence->setDaily(false);
+                $recurrence->setWeekly(true);
+                $recurrence->setMonthly(false);
+                $recurrence->setYearly(false);
+                $recurrence->setWeeks($input->weeks->int());
+                $recurrence->setWeekdays(implode(',', $input->asArray('weekdays')));
                 break;
             case "monthly":
+                $recurrence->setDaily(false);
                 $recurrence->setWeekly(false);
                 $recurrence->setMonthly(true);
                 $recurrence->setYearly(false);
+                $recurrence->setMonths($input->months->int());
                 $recurrence->setMonthlyType($input->recurrenceTypeMonthy->word());
                 if ($input->recurrenceTypeMonthy->word() === 'weekday') {
-                    // actually ints
-                    $monthlyWeekdayValue = $input->weekNumberByMonth->word() . $input->monthlyWeekday->word();
+                    $monthlyWeekdayValue = $input->monthlyWeekNumber->word() . $input->monthlyWeekday->word();
                     $recurrence->setMonthlyWeekdayValue($monthlyWeekdayValue);
                 } else {
-                    $recurrence->setDayOfMonth($input->dayOfMonth->word());
+                    $recurrence->setDayOfMonth(implode(',', $input->asArray('dayOfMonth')));
                 }
                 break;
             case "yearly":
+                $recurrence->setDaily(false);
                 $recurrence->setWeekly(false);
                 $recurrence->setMonthly(false);
                 $recurrence->setYearly(true);
-                $recurrence->setDateOfYear(
-                    str_pad($input->dateOfYear_month->word(), 2, '0', STR_PAD_LEFT) .
-                    str_pad($input->dateOfYear_day->word(), 2, '0', STR_PAD_LEFT)
-                );
+                $recurrence->setYears($input->years->int());
+                $recurrence->setYearlyType($input->recurrenceTypeYearly->word());
+                if ($input->recurrenceTypeYearly->word() === 'weekday') {
+                    $yearlyWeekdayValue = $input->yearlyWeekNumber->word() . $input->yearlyWeekday->word();
+                    $recurrence->setYearlyWeekdayValue($yearlyWeekdayValue);
+                    $recurrence->setYearlyWeekMonth($input->yearlyWeekMonth->int());
+                } else {
+                    $recurrence->setDateOfYear(
+                        str_pad($input->yearlyMonth->word(), 2, '0', STR_PAD_LEFT) .
+                        str_pad($input->yearlyDay->word(), 2, '0', STR_PAD_LEFT)
+                    );
+                }
                 break;
         }
         // startPeriod does not exist when using the old non-jscalendar time selector with 3 dropdowns
@@ -816,6 +850,9 @@ class Services_Calendar_Controller
      */
     private function processParticipants(array $calitem): array
     {
+        if (is_string($calitem['organizers'])) {
+            $calitem['organizers'] = preg_split('/\s*,\s*/', $calitem['organizers']);
+        }
         if ($calitem['organizers']) {
             $calitem['organizers'] = array_filter($calitem['organizers']);
         }

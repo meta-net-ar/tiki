@@ -348,7 +348,9 @@ class ReconcileExifIptcXmp
         foreach ($types as $type => $val) {
             if (isset($metadata[$type])) {
                 foreach ($metadata[$type] as $group => $fields) {
-                    $finalall[$type][$group] = array_intersect_key($omni['all'][$type], $fields);
+                    if (isset($omni['all'][$type])) {
+                        $finalall[$type][$group] = array_intersect_key($omni['all'][$type], $fields);
+                    }
                 }
             }
         }

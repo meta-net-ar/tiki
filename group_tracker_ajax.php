@@ -36,7 +36,7 @@ if (! empty($re['usersTrackerId']) && ! empty($re['registrationUsersFieldIds']))
 
     $json_data['res'] .= $headerlib->output_js();
 } else {
-    $json_data['res'] = '<div class="mb-3 row"><label class="col-sm-4 col-form-label">' . tr('Group') . '</label>' .
+    $json_data['res'] = '<div class="tiki-form-group row"><label class="col-sm-4 col-form-label">' . tr('Group') . '</label>' .
         '<div class="col-sm-8"><div class="form-control"><span class="text-muted">' . $_REQUEST['chosenGroup'] . '</span></div></div></div>';
     $json_data['debug'] = $re;
 }

@@ -26,7 +26,7 @@ if (
 ) {
     $check = false;
     $userDefaultHomepage = $userlib->get_user_default_homepage($user);
-    if ((! isset($_REQUEST['page']) && ! isset($_REQUEST['page_ref_id']) && ! isset($_REQUEST['page_id'])) || $_REQUEST['page'] === $userDefaultHomepage) {
+    if ((! isset($_REQUEST['page']) && ! isset($_REQUEST['page_ref_id']) && ! isset($_REQUEST['page_id'])) || (isset($_REQUEST['page']) && $_REQUEST['page'] === $userDefaultHomepage)) {
         $_REQUEST['page'] = $userDefaultHomepage;
         $check = true;
     }

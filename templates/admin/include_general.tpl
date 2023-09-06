@@ -16,6 +16,7 @@
             </fieldset>
             <fieldset>
                 <legend>{tr}Site identity{/tr}</legend>
+                {preference name=server_domain}
                 {preference name=browsertitle}
                 {preference name=fallbackBaseUrl}
                 {preference name=site_title_location}

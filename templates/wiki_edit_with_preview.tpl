@@ -5,7 +5,7 @@
         {/tab}
         {tab name="{tr}Preview{/tr}"}
             <div class="card">
-                <div id="preview_div_{$textarea_id}" class="textarea-preview card-body"></div>
+                <div id="preview_div_{$textarea_id}" class="textarea-preview card-body overflow-auto"></div>
             </div>
         {/tab}
     {/tabset}

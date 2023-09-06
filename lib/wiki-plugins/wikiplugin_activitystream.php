@@ -26,6 +26,7 @@ function wikiplugin_activitystream_info()
             'auto' => [
                 'name' => tr('Auto-Scroll'),
                 'description' => tr('Automatically load next page of results when scrolling down.'),
+                'required' => false,
                 'default' => 0,
                 'filter' => 'digits',
                 'since' => '12.0',

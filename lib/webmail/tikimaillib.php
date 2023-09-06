@@ -40,7 +40,9 @@ class TikiMail
             if ($userlib->user_exists($user)) {
                 $to = $userlib->get_user_email($user);
                 $tikilib->get_user_preferences($user, ['mailCharset']);
-                $this->charset = $user_preferences[$user]['mailCharset'];
+                if (isset($user_preferences[$user]['mailCharset'])) {
+                    $this->charset = $user_preferences[$user]['mailCharset'];
+                }
             } else {
                 $str = tra('Mail to: User not found');
                 trigger_error($str);

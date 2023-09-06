@@ -50,8 +50,8 @@ class Text_Diff_Renderer_character extends Tiki_Text_Diff_Renderer
     {
         if ($type == 'context') {
             foreach ($lines as $line) {
-                $this->orig .= htmlspecialchars($line);
-                $this->final .= htmlspecialchars($line);
+                $this->orig .= empty($line) ? '<br>' : htmlspecialchars($line);
+                $this->final .= empty($line) ? '<br>' : htmlspecialchars($line);
             }
         } elseif ($type == 'added' || $type == 'change-added') {
             $l = "";

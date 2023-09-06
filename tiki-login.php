@@ -91,7 +91,7 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
         }
         if ($prefs['user_show_realnames'] == 'y') {
             $finalusers = $userlib->find_best_user([$_REQUEST['username']], '', 'login');
-            if (count($finalusers[0]) === 1 && ! empty($finalusers[0])) {
+            if (count($finalusers) === 1 && ! empty($finalusers[0])) {
                 $_REQUEST['username'] = $finalusers[0];
             }
         }

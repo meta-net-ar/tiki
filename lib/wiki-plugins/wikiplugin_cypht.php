@@ -160,6 +160,7 @@ function wikiplugin_cypht_info()
             'group' => [
                 'name' => tra('Group'),
                 'description' => tra('GroupMail: Group (e.g. "Help Team")'),
+                'required' => false,
                 'filter' => 'striptags',
                 'default' => '',
                 'since' => '20.0',
@@ -167,6 +168,7 @@ function wikiplugin_cypht_info()
             'trackerId' => [
                 'name' => tra('Tracker ID'),
                 'description' => tra('GroupMail: Tracker ID (to store GroupMail activity)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker',
                 'default' => '',
@@ -175,6 +177,7 @@ function wikiplugin_cypht_info()
             'fromFId' => [
                 'name' => tra('From Field ID'),
                 'description' => tra('GroupMail: From Field (Id of field in tracker to store email From header)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -183,6 +186,7 @@ function wikiplugin_cypht_info()
             'subjectFId' => [
                 'name' => tra('Subject Field ID'),
                 'description' => tra('GroupMail: Subject Field (Id of field in tracker to store email Subject header)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -191,6 +195,7 @@ function wikiplugin_cypht_info()
             'messageFId' => [
                 'name' => tra('Message Field ID'),
                 'description' => tra('GroupMail: Message Field (Id of field in tracker to store email message identifier)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -199,6 +204,7 @@ function wikiplugin_cypht_info()
             'contentFId' => [
                 'name' => tra('Content Field ID'),
                 'description' => tra('GroupMail: Content Field (Id of field in tracker to store email message body content)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -207,6 +213,7 @@ function wikiplugin_cypht_info()
             'accountFId' => [
                 'name' => tra('Account Field ID'),
                 'description' => tra('GroupMail: Account Field (Id of field in tracker to store Webmail account name)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -215,6 +222,7 @@ function wikiplugin_cypht_info()
             'datetimeFId' => [
                 'name' => tra('DateTime Field Id'),
                 'description' => tra('GroupMail: Date Time Field (Id of field in tracker to store email sent timestamp)'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',
@@ -223,6 +231,7 @@ function wikiplugin_cypht_info()
             'operatorFId' => [
                 'name' => tra('Operator Field ID'),
                 'description' => tra('GroupMail: Operator Field (Id of field in tracker to store operator name (username))'),
+                'required' => false,
                 'filter' => 'int',
                 'profile_reference' => 'tracker_field',
                 'default' => '',

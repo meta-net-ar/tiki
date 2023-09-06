@@ -412,6 +412,13 @@ class Services_File_Controller
             return [
                 'galleryId' => $gal_info['galleryId'],
             ];
+        } else {
+            $AllowedDomains = explode("\n", $prefs['fgal_upload_from_source_domains']);
+            $host = parse_url($url, PHP_URL_HOST);
+
+            if (! in_array($host, $AllowedDomains)) {
+                throw new Services_Exception(tr('The domain %0 is not allowed to upload from', $host), 401);
+            }
         }
 
         $filegallib = TikiLib::lib('filegal');

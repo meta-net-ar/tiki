@@ -879,10 +879,16 @@ class ArtLib extends TikiLib
     //Get articles count for a user (if actionlog is not clean)
     public function getArticlesCount($user)
     {
-        $countquery = "select count(DISTINCT `articleId`) as count from `tiki_articles` where `author`= ?";
-        $result = $this->fetchAll($countquery, [$user]);
-        $articlesCount = Perms::filter(['type' => 'article'], 'object', $result, ['object' => 'articleId'], 'read_article');
-        return $articlesCount[0]['count'];
+        $query = "select `articleId` from `tiki_articles` where `author` = ?";
+        $result = $this->fetchAll($query, [$user]);
+
+        $articleIds = [];
+        foreach ($result as $row) {
+            $articleIds[] = $row['articleId'];
+        }
+        $filteredArticleIds = Perms::filter(['type' => 'article'], 'object', $articleIds, ['object' => 'articleId'], 'read_article');
+        $articlesCount = count($filteredArticleIds);
+        return $articlesCount;
     }
 
     public function import_csv($fileName, &$msgs, $csvDelimiter = ',')

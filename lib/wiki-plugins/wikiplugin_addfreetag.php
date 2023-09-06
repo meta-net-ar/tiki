@@ -39,6 +39,8 @@ function wikiplugin_addfreetag($data, $params)
 
     if (isset($params['object']) && false !== strpos($params['object'], ':')) {
         list($object['type'], $object['object']) = explode(':', $params['object'], 2);
+    } elseif (empty($object)) {
+        return '';
     }
     if ($object['type'] == 'wiki page' && ! ctype_digit($object['object'])) {
         $identifier = 'wp_addfreetag_' . str_replace([':',' '], ['_',''], TikiLib::lib('tiki')->get_page_id_from_name($object['object']));

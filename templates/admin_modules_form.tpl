@@ -99,7 +99,7 @@
                     <fieldset id="param_section_{$sect}">
                         {foreach from=$params key=name item=param}
                             <div class="admin2cols adminoptionbox clearfix">
-                                <label for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)}<span class="attention">({tr}required{/tr})</span>{/if}</label>
+                                <label for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)} <span class="attention">({tr}required{/tr})</span>{/if}</label>
                                 {if isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
                                     <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control">
                                         <option value="horiz" {if isset($param.value) && $param.value eq 'horiz'}selected="selected"{/if}>horiz</option>

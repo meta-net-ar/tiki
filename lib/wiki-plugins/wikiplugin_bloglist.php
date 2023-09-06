@@ -240,7 +240,7 @@ function wikiplugin_bloglist($data, $params)
 
         $smarty->assign('ownsblog', $user && ! empty($blog_data["user"]) && $user == $blog_data["user"] ? 'y' : 'n');
 
-        if ($params['showIcons'] == 'n') {
+        if (isset($params['showIcons']) && $params['showIcons'] == 'n') {
             $smarty->assign('excerpt', 'y');
         }
 

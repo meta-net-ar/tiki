@@ -75,11 +75,10 @@
 
 {* begin second table *}
 <h2>{tr}Stats for this quiz Questions {/tr}</h2>
-
 {*first section beginning *}
 {section name=ix loop=$questions}
     {tr}Question:{/tr}
-    <a class="link" href="tiki-edit_quiz_questions.php?quizId={$quizId.questionId}">{$questions[ix].question|escape}<br></a>
+    <a class="link" href="tiki-edit_quiz_questions.php?quizId={$quizId}&questionId={$questions[ix].questionId|escape}">{$questions[ix].question|escape}<br></a>
 
     <div class="table-responsive">
         <table class="table">

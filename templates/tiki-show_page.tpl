@@ -83,7 +83,7 @@ Note: The show content block must be defined at root level to use the include. A
 
     <article id="top" class="wikitext clearfix{if $prefs.feature_page_title neq 'y'} nopagetitle{/if}">
         {if !isset($hide_page_header) or !$hide_page_header}
-            {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($freetags.data[0]) and $prefs.freetags_show_middle eq 'y'}
+            {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and isset($tags[0]) and $prefs.freetags_show_middle eq 'y'}
                 {include file='freetag_list.tpl'}
             {/if}
 

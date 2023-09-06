@@ -45,7 +45,7 @@ $tiki-table-column-bg-odd: var(--bs-table-striped-bg); // darken($table-accent-b
 $tiki-bootstrap-path: "../../../twbs/bootstrap/scss/" !default;
 
 // inline code
-$code-color: var(--bs-secondary-color); // $gray-900;
+$code-color: var(--bs-body-color); // $body-color; // var(--bs-body-color); // $gray-900;
 $code-bg: var(--bs-secondary-bg); //  $gray-100;
 
 // Tracker
@@ -145,4 +145,6 @@ header.navbar.fixed-top {
 :root {
     --tiki-tooltip-link-color: #88b6fc; // Default link color lightened for readability on #000 background; more elaborate method coming for Bootstrap 5.3. - g_c-l
     --tiki-tooltip-link-hover-color: #{$tooltip-color};
+    --tiki-code-color: var(--bs-body-color);
+    --tiki-code-bg: var(--bs-secondary-bg);
 }

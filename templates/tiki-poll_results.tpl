@@ -14,7 +14,7 @@
     {if !empty($list)}<input type="hidden" name="list" value="{$list|escape}">{/if}
     {if !empty($offset)}<input type="hidden" name="list" value="{$offset|escape}">{/if}
     {if empty($pollId) and !isset($list_votes)}
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-4">
                 {if empty($what)}{tr}Find the poll{/tr}{else}{tr}{$what}{/tr}{/if}
             </label>
@@ -22,7 +22,7 @@
                 <input type="text" name="find" class="form-control" value="{$find|escape}">
             </div>
         </div>
-        <div class="mb-3 row">
+        <div class="tiki-form-group row">
             <label class="col-form-label col-sm-4">
                 {tr}Number of top voted polls to show{/tr}
             </label>

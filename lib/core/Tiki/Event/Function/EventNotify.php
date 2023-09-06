@@ -87,4 +87,15 @@ class Tiki_Event_Function_EventNotify extends Math_Formula_Function
 
         return $users;
     }
+
+    public function evaluateFull($element)
+    {
+        $event = $this->evaluateChild($element[0]);
+        $arguments = $this->evaluateChild($element[1]);
+
+        $priority = $this->evaluateChild($element[2]);
+        $userpath = $this->evaluateChild($element[3]);
+
+        return 1;
+    }
 }

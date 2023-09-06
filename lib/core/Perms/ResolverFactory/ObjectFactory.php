@@ -183,7 +183,7 @@ class Perms_ResolverFactory_ObjectFactory implements Perms_ResolverFactory
         if (count($perms) == 0) {
             return null;
         } else {
-            return new Perms_Resolver_Static($perms, $this->parent ? 'parent' : 'object');
+            return new Perms_Resolver_Static($perms, $this->parent ? 'parent object' : 'object');
         }
     }
 

@@ -208,109 +208,80 @@
 
                     {if $user_pages|@count > 0}
                         <h3>{tr}Wiki Pages{/tr}</h3>
-                        <div class="table normal">
-                            {section name=ix loop=$user_pages}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View:{/tr} {$user_pages[ix].pageName|escape}" href="tiki-index.php?page={$user_pages[ix].pageName|escape:"url"}">
-                                            {$user_pages[ix].pageName|truncate:40:"(...)"|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_pages as $page}
+                                <li>
+                                    <a class="link" title="{tr}View:{/tr} {$page.pageName|escape}" href="tiki-index.php?page={$page.pageName|escape:"url"}">{$page.pageName|truncate:40:"(...)"|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if $user_blogs|@count > 0}
                         <h3>{tr}Blogs{/tr}</h3>
-                        <div class="table normal">
-
-                            {section name=ix loop=$user_blogs}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="{$user_blogs[ix].blogId|sefurl:blog}">
-                                            {$user_blogs[ix].title|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_blogs as $blog}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="{$blog.blogId|sefurl:blog}">{$blog.title|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if isset($user_blog_posts) && $user_blog_posts|@count > 0}
                         <h3>{tr}Blogs Posts{/tr}</h3>
-
-                        <div class="table normal">
-                            {section name=ix loop=$user_blog_posts}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="{$user_blog_posts[ix].postId|sefurl:blogpost}">
-                                            {$user_blog_posts[ix].title|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_blog_posts as $post}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="{$post.postId|sefurl:blogpost}">{$post.title|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if $user_articles|@count > 0}
                         <h3>{tr}Articles{/tr}</h3>
-                        <div class="table normal">
-
-                            {section name=ix loop=$user_articles}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="{$user_articles[ix].articleId|sefurl:article}">
-                                            {$user_articles[ix].title|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_articles as $article}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="{$article.articleId|sefurl:article}">{$article.title|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if $user_forum_comments|@count > 0}
                         <h3>{tr}Forum comments{/tr}</h3>
-                        <div class="table normal">
-
-                            {section name=ix loop=$user_forum_comments}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="tiki-view_forum_thread.php?comments_parentId={$user_forum_comments[ix].threadId}">
-                                            {$user_forum_comments[ix].title|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_forum_comments as $comment}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="tiki-view_forum_thread.php?comments_parentId={$comment.threadId}">{$comment.title|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if $user_forum_topics|@count > 0}
                         <h3>{tr}Forum topics{/tr}</h3>
-                        <div class="table normal">
-
-                            {section name=ix loop=$user_forum_topics}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="tiki-view_forum_thread.php?comments_parentId={$user_forum_topics[ix].threadId}">
-                                            {$user_forum_topics[ix].title|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_forum_topics as $topic}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="tiki-view_forum_thread.php?comments_parentId={$topic.threadId}">{$topic.title|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
+                    
                     {if $user_items|@count > 0}
                         <h3>{tr}User Items{/tr}</h3>
-                        <div class="table normal">
-
-                            {section name=ix loop=$user_items}
-                                <div>
-                                    <div>
-                                        <a class="link" title="{tr}View{/tr}" href="tiki-view_tracker_item.php?trackerId={$user_items[ix].trackerId}&amp;itemId={$user_items[ix].itemId}">
-                                            {$user_items[ix].name|escape} : {$user_items[ix].value|escape}
-                                        </a>
-                                    </div>
-                                </div>
-                            {/section}
-                        </div>
+                        <ul class="list-unstyled ps-3">
+                            {foreach $user_items as $item}
+                                <li>
+                                    <a class="link" title="{tr}View{/tr}" href="tiki-view_tracker_item.php?trackerId={$item.trackerId}&amp;itemId={$item.itemId}">{$item.name|escape} : {$item.value|escape}</a>
+                                </li>
+                            {/foreach}
+                        </ul>
                     {/if}
-
                 </div>
             </div>
         {/tab}

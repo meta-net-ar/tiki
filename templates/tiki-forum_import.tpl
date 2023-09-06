@@ -110,7 +110,7 @@
             <form action="tiki-forum_import.php" method="post">
                 <input type="hidden" name="step1" value="true">
                 <input type="hidden" name="import" value="sql">
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-sm-3 col-form-label">{tr}Forum Type:{/tr}</label>
                     <div class="col-sm-7">
                         <select name="ftype" class="form-control">
@@ -121,13 +121,13 @@
                         </select>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-sm-3 col-form-label">{tr}DB Prefix:{/tr}</label>
                     <div class="col-sm-7">
                         <input type="text" name="prefix" value="{$fi_prefixes[0]}" class="form-control">
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-sm-3 col-form-label">{tr}Local SQL Filename on Server (path will be stripped):{/tr}</label>
                     <div class="col-sm-7">
                         <input type="text" name="server" class="form-control">
@@ -136,7 +136,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="tiki-form-group row">
                     <label class="col-sm-3 col-form-label"></label>
                     <div class="col-sm-7">
                         <input type="submit" class="btn btn-primary btn-sm" value="{tr}Get Forum List{/tr}">

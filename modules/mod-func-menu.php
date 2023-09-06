@@ -27,12 +27,12 @@ function module_menu_info()
             ],
             'type' => [
                 'name' => tra('Type'),
-                'description' => tra('Orientation of menu: horiz or vert (default vert)'),
+                'description' => tra('Orientation of menu: horiz or vert (default: vert)'),
                 'filter' => 'text',
             ],
             'bootstrap' => [
                 'name' => tra('Use Bootstrap menu'),
-                'description' => tra('') . ' ( y / n )',
+                'description' => tra('If Bootstrap menu isn\'t chosen, the result will be a legacy-style vertical menu.') . ' ( y / n )',
                 'default' => 'y',
             ],
             'megamenu' => [
@@ -64,8 +64,8 @@ function module_menu_info()
             ],
             'navbar_class' => [
                 'name' => tra('CSS class(es) for the menu nav element'),
-                'description' => tra('Default specified is for Bootstrap menus. Replace "navbar-light bg-light" with "navbar-dark bg-dark" for a dark navbar."'),
-                'default' => 'navbar navbar-expand-lg navbar-light bg-light',
+                'description' => tra('To set the color style of horizontal menus, use the Look and Feel Admin "Navbar background color" option and, for horizontal menus in the top and topbar module zones especially and also in other locations, use CSS variables (recommended method - see https://themes.tiki.org/Pagetop Styles and CSS Variables). Note: 1) the previous default classes "navbar navbar-expand-lg" and "navbar-light bg-light" or "navbar-dark bg-dark" are no longer needed here, 2) special coloring of vertical menus will require specific CSS rules in a stylesheet or Look and Feel Admin Custom CSS, etc.'),
+                'default' => '',
             ],
             'menu_id' => [
                 'name' => tra('DOM #id'),
@@ -77,7 +77,7 @@ function module_menu_info()
                 'filter' => 'text',
             ],
             'sectionLevel' => [
-                'name' => tra('Lower limiit on visible menu levels'),
+                'name' => tra('Lower limit on visible menu levels'),
                 'description' => tra('In a menu with many levels such as made with a wiki structure, menu levels lower than this won\'t be displayed.'),
                 'filter' => 'int',
             ],

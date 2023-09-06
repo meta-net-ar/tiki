@@ -205,6 +205,15 @@ function tiki_route($path)
         if (in_array($extension, ['css', 'gif', 'jpg', 'png', 'php', 'html', 'js', 'htm', 'shtml', 'cgi', 'sql', 'phtml', 'txt', 'ihtml'])) {
             return;
         }
+        // incorrect favicon config or simple browser curiosity might result in browsers trying to access this path
+        // serving the default homepage here results in more problems like accidental perspective switching
+        if ($path === 'favicon.ico') {
+            return;
+        }
+    }
+
+    if (preg_match('/\.js\.map$/', $path)) {
+            return;
     }
 
     tiki_route_attempt_custom_route_redirect();

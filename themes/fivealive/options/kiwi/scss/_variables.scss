@@ -100,6 +100,8 @@ $color-contrast-light:            $white;
 // Prefix
 $prefix: bs-;
 
+// Body
+$body-color: $black;
 
 // $bg-light: #a59705; //#a59705 !important;  (Changing tactics for Bootstrap 5)
 
@@ -187,7 +189,7 @@ $enable-shadows: true;
 
 // Code
 
-$code-color:                        $pink !default;
+$code-color:                     $body-color; //    $pink !default;
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 //$bg-light-alt: #117485 !important;
 
@@ -270,6 +272,7 @@ $bg-dark-info: #00DAE6;
     --tiki-top-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
     --tiki-top-color: #{$navbar-light-link-color};
     --tiki-top-hover-color: #{$navbar-light-link-hover-color};
+    --tiki-top-text-color: #{$navbar-light-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -277,12 +280,14 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-light-bg};
     --tiki-topbar-color: #fff;
     --tiki-topbar-hover-color: darken(#fff, 8%);
+    --tiki-topbar-text-color: darken(#fff, 8%);
 }
 
 .tiki-top-nav-dark {
     --tiki-top-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
     --tiki-top-color: #{$top-dark-link-color};
     --tiki-top-hover-color: #{$top-link-hover-color};
+    --tiki-top-text-color: #{$top-link-hover-color};
     --tiki-top-border: solid #000;
 }
 
@@ -290,6 +295,7 @@ $bg-dark-info: #00DAE6;
     --tiki-topbar-bg: #{$topbar-dark-bg};
     --tiki-topbar-color: #fff;
     --tiki-topbar-hover-color: darken(#fff, 8%);
+    --tiki-topbar-text-color: darken(#fff, 8%);
 }
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
@@ -310,7 +316,7 @@ header.navbar.fixed-top {
 // Light navbar minus top nav
 .tiki .tiki-admin-top-nav-light,
 .tiki .tiki-admin-aside-nav-light {
-    --tiki-admin-top-nav-color: #{$navbar-light-color};
+//    --tiki-admin-top-nav-color: #{$navbar-light-color};
     --tiki-admin-top-nav-color: #{$navbar-light-link-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-light-link-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;

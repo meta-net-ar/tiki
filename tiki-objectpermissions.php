@@ -130,7 +130,7 @@ if ($_REQUEST['objectType'] == 'category') {
         }
     }
     $templatedGroupId = TikiLib::lib('attribute')->get_attribute("category", $_REQUEST['objectId'], "tiki.category.templatedgroupid");
-    if ($categ["parentId"] > 0 && $templatedGroupId) {
+    if (isset($categ["parentId"]) && $categ["parentId"] > 0 && $templatedGroupId) {
         $roles = TikiLib::lib("roles")->getAvailableCategoriesRolesIds($categ["parentId"]);
         $groupRole = ! empty($roles);
     }
@@ -146,7 +146,7 @@ if (isset($_REQUEST['feature_select'])) {
     $cookietab = '1';
 }
 
-$feature_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_features'));
+$feature_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_features') ?? "");
 
 // apply group filter change
 if (isset($_REQUEST['group_select'])) {

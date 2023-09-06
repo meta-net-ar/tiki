@@ -37,7 +37,7 @@ class JitFilter implements ArrayAccess, Iterator, Countable
     public function offsetGet($key)
     {
         // Composed objects go through
-        if ($this->stored[$key] instanceof self) {
+        if (isset($this->stored[$key]) && $this->stored[$key] instanceof self) {
             return $this->stored[$key];
         }
 

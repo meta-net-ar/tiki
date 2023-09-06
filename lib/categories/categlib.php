@@ -2216,7 +2216,11 @@ class CategLib extends ObjectLib
     {
         if (! isset($this->parentCategories[$categId])) {
             $category = $this->get_category($categId);
-            $this->parentCategories[$categId] = array_keys($category['tepath']);
+            if ($category) {
+                $this->parentCategories[$categId] = array_keys($category['tepath']);
+            } else {
+                return [];
+            }
         }
 
         return $this->parentCategories[$categId];

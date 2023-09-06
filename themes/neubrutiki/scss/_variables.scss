@@ -1096,6 +1096,7 @@ $form-feedback-tooltip-border-radius: $tooltip-border-radius !default;
 
 
 // Popovers
+$popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
 
 // scss-docs-start popover-variables
 $popover-font-size:                 $font-size-sm !default;
@@ -1107,7 +1108,7 @@ $popover-border-radius:             $border-radius-lg !default;
 $popover-inner-border-radius:       subtract($popover-border-radius, $popover-border-width) !default;
 $popover-box-shadow:                $box-shadow !default;
 
-$popover-header-bg:                 shade-color($popover-bg, 6%) !default;
+//$popover-header-bg:                 shade-color($popover-bg, 6%) !default;
 $popover-header-color:              $headings-color !default;
 $popover-header-padding-y:          .5rem !default;
 $popover-header-padding-x:          $spacer !default;
@@ -1390,7 +1391,7 @@ $offcanvas-backdrop-opacity:        $modal-backdrop-opacity !default;
 // Code
 
 $code-font-size:                    $small-font-size !default;
-$code-color:                        $pink !default;
+$code-color:                      $body-color; //   $pink !default;
 
 $kbd-padding-y:                     .2rem !default;
 $kbd-padding-x:                     .4rem !default;

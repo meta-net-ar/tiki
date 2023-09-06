@@ -87,7 +87,11 @@ function wikiplugin_relations($data, $params)
     foreach ($params['qualifiers'] as $qualifier) {
         $name = $singlelist ? 'singlelist' : tra($qualifier);
 
-        $found = $relationlib->get_relations_from($object['type'], $object['object'], $qualifier);
+        if (! empty($object)) {
+            $found = $relationlib->get_relations_from($object['type'], $object['object'], $qualifier);
+        } else {
+            $found = [];
+        }
 
         foreach ($found as $relation) {
             $type = $relation['type'];

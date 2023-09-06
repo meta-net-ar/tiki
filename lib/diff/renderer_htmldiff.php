@@ -140,11 +140,11 @@ class Text_Diff_Renderer_htmldiff extends Tiki_Text_Diff_Renderer
 
                     $this->_count_tags($line, 'original');
                     $this->_count_tags($line, 'final');
-                    if ($this->lspan === true) {
+                    if (isset($this->original[$this->n]) && $this->lspan === true) {
                         $this->original[$this->n] .= "</span>";
                         $this->lspan = false;
                     }
-                    if ($this->rspan === true) {
+                    if (isset($this->final[$this->n]) && $this->rspan === true) {
                         $this->final[$this->n] .= "</span>";
                         $this->rspan = false;
                     }
@@ -162,6 +162,9 @@ class Text_Diff_Renderer_htmldiff extends Tiki_Text_Diff_Renderer
             case 'added':
                 foreach ($lines as $line) {
                     if ($line != '') {
+                        if (! isset($this->final[$this->n])) {
+                            $this->final[$this->n] = '';
+                        }
                         $this->_count_tags($line, 'final');
                         $this->final[$this->n] .= $this->_insert_tag($line, 'diffadded', $this->rspan);
                         $context = 0;

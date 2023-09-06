@@ -15,7 +15,7 @@ if ($prefs['sitemap_enable'] == 'y') {
 
     // filter valid file names
     if (
-        preg_match('^.*\.(xml)$', $siteMapFile, $matches)
+        preg_match('/^.*\.(xml)$/', $siteMapFile, $matches)
         || ! file_exists($path . $siteMapFile)
     ) {
         die(tra('Sitemap file not available'));

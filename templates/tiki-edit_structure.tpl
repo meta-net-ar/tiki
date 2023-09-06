@@ -61,7 +61,7 @@
     <h2>{tr}Structure Layout{/tr}</h2>
     {if $editable eq 'y'}
         <form action="tiki-edit_structure.php?page_ref_id={$page_ref_id}" method="post" class="d-flex flex-row flex-wrap align-items-center" role="form" style="display: inline-block">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label for="pageAlias" class="col-sm-4 col-form-label">{tr}Alias:{/tr}</label>
                 <div class="col-sm-8">
                     <input type="hidden" name="page_ref_id" value="{$structure_id}">
@@ -132,7 +132,7 @@
             <div class="card-body">
                 <div>
                     <input type="hidden" name="page_ref_id" value="{$page_ref_id}">
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="sr-only" for="find_objects">{tr}Find{/tr}</label>
                         <div class="input-group">
                             <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
@@ -141,7 +141,7 @@
                         </div>
                     </div>
                     {if $prefs.feature_categories eq 'y'}
-                        <div class="mb-3 row">
+                        <div class="tiki-form-group row">
                             <select name="categId" class="form-control form-select-sm">
                                 <option value='' {if $find_categId eq ''}selected="selected"{/if}>{tr}any category{/tr}</option>
                                 {foreach $categories as $catix}
@@ -208,14 +208,14 @@
     <div id="newpage_dialog" style="display: none;">
         <form action="tiki-edit_structure.php" method="post">
             <input type="hidden" name="page_ref_id" value="{$page_ref_id}">
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-3 col-form-label">{tr}Create Page{/tr}</label>
                 <div class="col-sm-7">
                     <input type="text" name="name" id="name" class="form-control">
                     {autocomplete element='#name' type='pagename'}
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="tiki-form-group row">
                 <label class="col-sm-3 col-form-label"></label>
                 <div class="col-sm-7">
                     <input type="submit" class="btn btn-primary" name="create" value="{tr}Update{/tr}">

@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_banning` ADD `attempts` INT NULL;

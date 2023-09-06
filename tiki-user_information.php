@@ -16,7 +16,7 @@ $inputConfiguration = [[
         'subject'       => 'text',
         'body'          => 'html',
         'to'            => 'text',
-        'bccme'         => 'bcc',
+        'bccme'         => 'bool',
         'priority'      => 'digits',
         'replytome'     => 'bool',
     ],

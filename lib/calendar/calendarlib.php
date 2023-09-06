@@ -837,7 +837,12 @@ class CalendarLib extends TikiLib
             $mail = new TikiMail();
             $smarty->assign('mail_new', $new);
             $smarty->assign('mail_data', $data);
-            $smarty->assign('mail_calitemId', $calitemId);
+            $smarty->assign('view_item_url', TikiLib::lib('service')->getUrl([
+                'controller' => 'calendar',
+                'action' => 'view_item',
+                'calitemId' => $calitemId,
+                'calIds' => [$data['calendarId']],
+            ]));
             $defaultLanguage = $prefs['site_language'];
             foreach ($nots as $not) {
                 $mail->setUser($not['user']);
@@ -1664,7 +1669,7 @@ class CalendarLib extends TikiLib
                                     $leday_item['name'] = $lte['name'] ?? '' . ' (x ' . $leday_item['action'] . ')';
                                     $leday_item['desc_name'] = $leday_item['action'] . ' ' . tra($item_name);
                                     if ($lte['show_description'] == 'y' && ! empty($lte['description'])) {
-                                        $leday_item['description'] .= ",\n<br /> - <b>" . $lte['when'] . '</b> : ' . tra($lte['action']) . ' ' . $lte['description'];
+                                        $leday_item['description'] .= ",\n<br /> - <b>" . $lte['when'] . '</b> : ' . tra($lte['action'] ?? '') . ' ' . $lte['description'];
                                         $leday_item['show_description'] = 'y';
                                     }
                                 }

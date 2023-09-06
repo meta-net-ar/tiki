@@ -268,7 +268,232 @@
             <hr>
         {/tab}
         {tab name="{tr}Customization{/tr}"}
-            <br>
+            {if !$color_mode_error && $prefs.switch_color_module_assigned eq 'y'}
+                {*-- off canvas --*}
+                {*  TODO add a custom picker with rgba mode and add variable that must be defined in RGB  
+                    Missing variables
+                    --bs-body-color-rgb: 173, 181, 189;
+                    --bs-body-bg-rgb: 33, 37, 41;
+                    --bs-emphasis-color-rgb: 255, 255, 255;
+                    --bs-secondary-color: rgba(173, 181, 189, 0.75);
+                    --bs-secondary-color-rgb: 173, 181, 189;
+                    --bs-secondary-bg-rgb: 52, 58, 64;
+                    --bs-tertiary-color: rgba(173, 181, 189, 0.5);
+                    --bs-tertiary-color-rgb: 173, 181, 189;
+                    --bs-tertiary-bg-rgb: 43, 48, 53;
+                    --bs-link-color-rgb: 110, 168, 254;
+                    --bs-link-hover-color-rgb: 139, 185, 254;
+                    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+                *}
+                <style>
+                    #cm-action-off-canvas{
+                        position:fixed;
+                        top:0;
+                        right:-100vw;
+                        width : 40vw;
+                        height: 100vh;
+                        overflow-y: auto;
+                        padding: 20px;
+                        z-index: 100000;
+                        color : var(--bs-body-color);
+                        background-color: var(--bs-body-bg);
+                    }
+                    .close-cm-canvas{
+                        position: absolute;
+                        right : 5px;
+                        top: 5px;
+                        height: 30px;
+                        width: 30px;
+                        cursor: pointer;
+                        font-weight: bolder;
+                        font-size: 20px;
+                    }
+                    @media screen and (max-width:1024px){
+                        #cm-action-off-canvas{
+                            width : 50vw;
+                        }
+                    }
+                    @media screen and (max-width:767px){
+                        #cm-action-off-canvas{
+                            width : 70vw;
+                        }
+                    }
+                    @media screen and (max-width:400px){
+                        #cm-action-off-canvas{
+                            width : 100vw;
+                        }
+                    }
+                </style>
+                <div id="cm-action-off-canvas" class="border border-light">
+                    <div class="close-cm-canvas"><span>x</span></div>
+                    <div class="my-2 p-1 p-md-5" id="cm-modal-content">
+                        <input type="hidden" name="operation" value="create"/>
+                        <input type="hidden" name="id" value=""/>
+                        <div class="mb-3">
+                            <label class="form-label">Color mode name</label>
+                            <input
+                                type="text"
+                                value=""
+                                name="mode"
+                                class="form-control"
+                                placeholder="dark blue"
+                                />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mode icon name</label>
+                            <input
+                                type="text"
+                                value=""
+                                name="icon"
+                                class="form-control"
+                                placeholder="icon name"
+                                />
+                        </div>
+                        <div class="p-3 d-flex gap-2 flex-column rounded border border-light mb-2">
+                            <span class="fw-bolder">Body</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-body-color" onclick="toggle_css_variable(this,'--bs-body-color')">--bs-body-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-body-bg" onclick="toggle_css_variable(this,'--bs-body-bg')">--bs-body-bg</span>
+                            </div>
+
+                            <span class="fw-bolder">Emphasis</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-emphasis-color" onclick="toggle_css_variable(this,'--bs-emphasis-color')">--bs-emphasis-color</span>
+                            </div>
+
+                            <span class="fw-bolder">Secondary</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-bg" onclick="toggle_css_variable(this,'--bs-secondary-bg')">--bs-secondary-bg</span>
+                            </div>
+
+                            <span class="fw-bolder">Tertiary</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-tertiary-bg" onclick="toggle_css_variable(this,'--bs-tertiary-bg')">--bs-tertiary-bg</span>
+                            </div>
+
+                            <span class="fw-bolder">Text Emphasis</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-text-emphasis" onclick="toggle_css_variable(this,'--bs-primary-text-emphasis')">--bs-primary-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-text-emphasis" onclick="toggle_css_variable(this,'--bs-secondary-text-emphasis')">--bs-secondary-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-success-text-emphasis" onclick="toggle_css_variable(this,'--bs-success-text-emphasis')">--bs-success-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-info-text-emphasis" onclick="toggle_css_variable(this,'--bs-info-text-emphasis')">--bs-info-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-warning-text-emphasis" onclick="toggle_css_variable(this,'--bs-warning-text-emphasis')">--bs-warning-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-danger-text-emphasis" onclick="toggle_css_variable(this,'--bs-danger-text-emphasis')">--bs-danger-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-light-text-emphasis" onclick="toggle_css_variable(this,'--bs-light-text-emphasis')">--bs-light-text-emphasis</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-dark-text-emphasis" onclick="toggle_css_variable(this,'--bs-dark-text-emphasis')">--bs-dark-text-emphasis</span>
+                            </div>
+
+                            <span class="fw-bolder">Background Subtle</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-bg-subtle" onclick="toggle_css_variable(this,'--bs-primary-bg-subtle')">--bs-primary-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-bg-subtle" onclick="toggle_css_variable(this,'--bs-secondary-bg-subtle')">--bs-secondary-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-success-bg-subtle" onclick="toggle_css_variable(this,'--bs-success-bg-subtle')">--bs-success-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-info-bg-subtle" onclick="toggle_css_variable(this,'--bs-info-bg-subtle')">--bs-info-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-warning-bg-subtle" onclick="toggle_css_variable(this,'--bs-warning-bg-subtle')">--bs-warning-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-danger-bg-subtle" onclick="toggle_css_variable(this,'--bs-danger-bg-subtle')">--bs-danger-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-light-bg-subtle" onclick="toggle_css_variable(this,'--bs-light-bg-subtle')">--bs-light-bg-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-dark-bg-subtle" onclick="toggle_css_variable(this,'--bs-dark-bg-subtle')">--bs-dark-bg-subtle</span>
+                            </div>
+
+                            <span class="fw-bolder">Border Subtle</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-border-subtle" onclick="toggle_css_variable(this,'--bs-primary-border-subtle')">--bs-primary-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-border-subtle" onclick="toggle_css_variable(this,'--bs-secondary-border-subtle')">--bs-secondary-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-success-border-subtle" onclick="toggle_css_variable(this,'--bs-success-border-subtle')">--bs-success-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-info-border-subtle" onclick="toggle_css_variable(this,'--bs-info-border-subtle')">--bs-info-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-warning-border-subtle" onclick="toggle_css_variable(this,'--bs-warning-border-subtle')">--bs-warning-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-danger-border-subtle" onclick="toggle_css_variable(this,'--bs-danger-border-subtle')">--bs-danger-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-light-border-subtle" onclick="toggle_css_variable(this,'--bs-light-border-subtle')">--bs-light-border-subtle</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-dark-border-subtle" onclick="toggle_css_variable(this,'--bs-dark-border-subtle')">--bs-dark-border-subtle</span>
+                            </div>
+
+                            <span class="fw-bolder">Navbars</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-top-bg" onclick="toggle_css_variable(this,'--tiki-top-bg')">--tiki-top-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-top-color" onclick="toggle_css_variable(this,'--tiki-top-color')">--tiki-top-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-top-hover-color" onclick="toggle_css_variable(this,'--tiki-top-hover-color')">--tiki-top-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-top-hover-bg" onclick="toggle_css_variable(this,'--tiki-top-hover-bg')">--tiki-top-hover-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-top-border" onclick="toggle_css_variable(this,'--tiki-top-border')">--tiki-top-border</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-bg" onclick="toggle_css_variable(this,'--tiki-topbar-bg')">--tiki-topbar-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-color" onclick="toggle_css_variable(this,'--tiki-topbar-color')">--tiki-topbar-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-hover-color" onclick="toggle_css_variable(this,'--tiki-topbar-hover-color')">--tiki-topbar-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-hover-bg" onclick="toggle_css_variable(this,'--tiki-topbar-hover-bg')">--tiki-topbar-hover-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-border" onclick="toggle_css_variable(this,'--tiki-topbar-border')">--tiki-topbar-border</span>
+                            </div>
+
+                            <span class="fw-bolder">Site Title</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-site-title-color" onclick="toggle_css_variable(this,'--tiki-site-title-color')">--tiki-site-title-color</span>
+                            </div>
+
+                            <span class="fw-bolder">Unified Admin Backend</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-top-nav-bg" onclick="toggle_css_variable(this,'--tiki-admin-top-nav-bg')">--tiki-admin-top-nav-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-top-nav-color" onclick="toggle_css_variable(this,'--tiki-admin-top-nav-color')">--tiki-admin-top-nav-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-top-nav-hover-color" onclick="toggle_css_variable(this,'--tiki-admin-top-nav-hover-color')">--tiki-admin-top-nav-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-top-nav-hover-bg" onclick="toggle_css_variable(this,'--tiki-admin-top-nav-hover-bg')">--tiki-admin-top-nav-hover-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-aside-nav-bg" onclick="toggle_css_variable(this,'--tiki-admin-aside-nav-bg')">--tiki-admin-aside-nav-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-aside-nav-color" onclick="toggle_css_variable(this,'--tiki-admin-aside-nav-color')">--tiki-admin-aside-nav-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-aside-nav-hover-color" onclick="toggle_css_variable(this,'--tiki-admin-aside-nav-hover-color')">--tiki-admin-aside-nav-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-dropdown-bg" onclick="toggle_css_variable(this,'--tiki-admin-dropdown-bg')">--tiki-admin-dropdown-bg</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-dropdown-link-color" onclick="toggle_css_variable(this,'--tiki-admin-dropdown-link-color')">--tiki-admin-dropdown-link-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-dropdown-link-hover-color" onclick="toggle_css_variable(this,'--tiki-admin-dropdown-link-hover-color')">--tiki-admin-dropdown-link-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-dropdown-link-hover-bg" onclick="toggle_css_variable(this,'--tiki-admin-dropdown-link-hover-bg')">--tiki-admin-dropdown-link-hover-bg</span>
+                            </div>
+
+                            <span class="fw-bolder">Other</span>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-heading-color" onclick="toggle_css_variable(this,'--bs-heading-color')">--bs-heading-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-link-color" onclick="toggle_css_variable(this,'--bs-link-color')">--bs-link-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-navbar-color" onclick="toggle_css_variable(this,'--bs-navbar-color')">--bs-navbar-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-navbar-hover-color" onclick="toggle_css_variable(this,'--bs-navbar-hover-color')">--bs-navbar-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-link-hover-color" onclick="toggle_css_variable(this,'--bs-link-hover-color')">--bs-link-hover-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-code-color" onclick="toggle_css_variable(this,'--bs-code-color')">--bs-code-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-border-color" onclick="toggle_css_variable(this,'--bs-border-color')">--bs-border-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-form-valid-color" onclick="toggle_css_variable(this,'--bs-form-valid-color')">--bs-form-valid-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-form-valid-border-color" onclick="toggle_css_variable(this,'--bs-form-valid-border-color')">--bs-form-valid-border-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-form-invalid-color" onclick="toggle_css_variable(this,'--bs-form-invalid-color')">--bs-form-invalid-color</span>
+                                <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-form-invalid-border-color" onclick="toggle_css_variable(this,'--bs-form-invalid-border-color')">--bs-form-invalid-border-color</span>
+                            </div>
+                        </div>
+                        <div class="css_colors"></div>
+                        <button class="btn btn-primary mt-5g px-5 mt-4" onclick="return handle_mode_create_edit(this)">save</button>
+                    </div>
+                </div>
+                {* end off-canvas *}
+                <fieldset>
+                    <legend>{tr}Switch Color modes module settings{/tr}</legend>
+                    {*
+                    <p>
+                        {tr}Default modes{/tr}
+                        <br>
+                        <small class="fw-lighter">{tr}you can only change their icons{/tr}</small>
+                    </p>
+                    {foreach $default_modes item=mode}
+                        <div class="input-group mb-3 w-100">
+                            <button class="btn btn-outline-secondary" style="cursor:inherit" type="button">Mode</button>
+                            <span style="cursor:not-allowed" class="input-group-text">{$mode.name}</span>
+                            <button class="btn btn-outline-secondary" style="cursor:inherit" style="cursor:text;" type="button">Icon</button>
+                            <input data-icon-name-for='{$mode.name}' onkeydown="return cancel_submit(event)" type="text" onchange="sync_color_mode_state(this.value,'{$mode.name}')" value="{$mode.icon}" class="form-control" placeholder="icon" style="max-width : 180px;">
+                            <button class="btn btn-outline-secondary" style="cursor:inherit" type="button">{icon name=$mode.icon}</button>
+                        </div>
+                    {/foreach}
+                    <button class="btn btn-primary" id='cm-save-default' onclick="return save_default_color_mode_icons(this)">Save</button>
+                    *}
+                    <p>
+                        {tr}Custom color modes settings{/tr}
+                    </p>
+                    <div>
+                        {foreach $custom_modes item=mode}
+                            <div class="input-group mb-3 w-100" data-mode-name='{$mode.name}' data-mode-icon='{$mode.icon}'>
+                                <code class="d-none">{$mode.css_variables}</code>
+                                <button class="btn btn-primary rounded" style="cursor:default" type="button">{icon name=$mode.icon} {$mode.name} <span style="cursor: pointer;" onclick="edit_custom_mode(this,'{$mode.id}','{$mode.name}','{$mode.icon}')">{icon name='edit'}</span> <span style="cursor: pointer;" class="text-danger" onclick="delete_custom_mode(this,'{$mode.id}','{$mode.name}')">{icon name='trash'}</span></button>
+                            </div>
+                        {/foreach}
+                    </div>
+                    <button onclick="return  add_custom_mode(this)" class="btn btn-primary mb-5">Setup a new mode</button>
+                </fieldset>
+            {/if}
             <fieldset>
                 <legend>{tr}Custom code{/tr}</legend>
                 {preference name="header_custom_css" syntax="css"}
@@ -280,7 +505,6 @@
                 {preference name=categories_add_class_to_body_tag}
             </fieldset>
             <hr>
-
             <fieldset>
                 <legend>{tr}Editing{/tr}</legend>
                 {preference name=theme_customizer}

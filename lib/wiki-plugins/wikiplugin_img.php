@@ -680,8 +680,10 @@ function wikiplugin_img($data, $params)
         return WikiParser_PluginOutput::error(tr('Plugin Image'), tr('Use one and only one of the following parameters: fileId, randomGalleryId, fgalId, attId or src.'));
     }
     // Clean up src URLs to exclude javascript
-    if (stristr(str_replace(' ', '', $imgdata['src']), 'javascript:')) {
-        $imgdata['src']  = '';
+    $imgdata['src'] = $imgdata['src'] ?? '';
+    $imgdata['src'] = str_replace(' ', '', $imgdata['src']);
+    if (stristr($imgdata['src'], 'javascript:')) {
+        $imgdata['src'] = '';
     }
     if (strstr($imgdata['src'], 'javascript:')) {
         $imgdata['src']  = '';
@@ -727,7 +729,8 @@ function wikiplugin_img($data, $params)
             $params[$id] = trim($value);
             $params['fgalId'] = '';
             $params['type'] = $id;
-            $repl .= wikiplugin_img($data, $params);
+            $pluginResult = wikiplugin_img($data, $params);
+            $repl .= WikiPlugin_Helper::resultString($pluginResult);
         }
         if (strpos($repl, $notice) !== false) {
             return $repl;
@@ -997,7 +1000,7 @@ function wikiplugin_img($data, $params)
                     $imgalthumb == true;
                 }
                 $height = $imgdata['height'];
-                if (empty($imgdata['width']) && $fheight > 1) {
+                if (empty($imgdata['width']) && $fheight > 1 && is_numeric($height)) {
                     $width = floor($height * $fwidth / $fheight);
                 } else {
                     $width = $imgdata['width'];
@@ -1285,7 +1288,7 @@ function wikiplugin_img($data, $params)
     }
 
     //src
-    if (! empty($imgdata['src']) || ! empty($src)) {
+    if ((! empty($imgdata['src']) || ! empty($src)) && strpos($replimg, 'src="' . $src . '"') == false) {
         $replimg .= ' src="' . $src . '"';
     }
 
