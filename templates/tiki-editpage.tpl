@@ -35,6 +35,7 @@
             {/self_link}
         </div>
         {jq} $(".previewBtn").click(function(){
+            $("body > .popover").hide();
             auto_save('editwiki', autoSaveId);
             if ($('#autosave_preview:visible').length === 0) {
                 if (!ajaxPreviewWindow) {
