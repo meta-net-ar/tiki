@@ -330,7 +330,7 @@ class WikiPluginPluginManager extends PluginsLib
                         }
                         //Description column
                         if (isset($paraminfo['description'])) {
-                        $rows .= $cellbegin . $paraminfo['description'] . '</td>';
+                            $rows .= $cellbegin . $paraminfo['description'] . '</td>';
                         }
                         //Default column
                         if ($rowCounter == 1) {
