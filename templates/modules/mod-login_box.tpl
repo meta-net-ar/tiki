@@ -235,15 +235,6 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
                 {icon name='error' istyle="vertical-align:middle"} {tr}CapsLock is on.{/tr}
             </div>
         </div>
-        {jq}
-        $("#login-user_{{$module_logo_instance}}, #login-pass_{{$module_logo_instance}}").on("change", function() {
-            if ($('#login-user_{{$module_logo_instance}}').val() !== $.trim($('#login-user_{{$module_logo_instance}}').val())) {
-                alert(tr("Username contains a leading or trailing space"));
-            } else if ($('#login-pass_{{$module_logo_instance}}').val() !== $.trim($('#login-pass_{{$module_logo_instance}}').val())) {
-                alert(tr("Password contains a leading or trailing space"));
-            }
-        });
-        {/jq}
         {if isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y' and $prefs.twoFactorAuth eq 'y'}
         <div class="pass mb-3 row mx-0 clearfix">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor Authenticator Code:{/tr}</label>
