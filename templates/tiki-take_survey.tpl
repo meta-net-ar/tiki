@@ -82,14 +82,8 @@
                         {/section}
                     </div>
                 {elseif $questions[ix].type eq 'r' or $questions[ix].type eq 's'}
+                    {assign var="max" value={$questions[ix].options}}
                     <div class="range_container">
-                    {if $questions[ix].options}
-                        {assign var="max" value=count($questions[ix].explode)}
-                    {elseif $questions[ix].type eq 'r'}
-                        {assign var="max" value=5}
-                    {elseif $questions[ix].type eq 's'}
-                        {assign var="max" value=10}
-                    {/if}
                     <input type="range" min="1" max="{$max}" name="{$questionId}" value="{$answer}" class="range_slider">
                     <div class="range_selector">
                         <div class="range_selectBtn"></div>
