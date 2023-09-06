@@ -184,7 +184,7 @@ if (isset($_REQUEST['pdf'])) {
         $imgBackgroundCSS = '';
 
         //checking if to export slideshow
-        if ($_REQUEST['printslides']) {
+        if (isset($_REQUEST['printslides'])) {
             $customCSS
                 = "<style type='text/css'>img{max-height:300px;width:auto;} body{font-size:1em} h1{font-size:1.5em;text-transform:none !important;}  section{height:300px;border:1px solid #000;margin-bottom:1%;padding:1%;}</style> ";
             $pdata = $customCSS . '<pdfsettings printFriendly="y" header="off" footer="off"></pdfsettings>' . $pdata;
@@ -468,7 +468,6 @@ $smarty->display("tiki_full.tpl");
 
 function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator)
 {
-
     $doc = new DOMDocument();
 
     // set error level
@@ -529,34 +528,39 @@ function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator
         $slideStart = '</td></tr><tr><td>';
         $slideEnd = "</td></tr></table>";
     }
-
     $slideContent = '';
-    // Checking if $headingsTags has more than one element, skip the first, as the first slide is empty, otherwise keep the first element
-    if (count($headingsTags) > 1) {
-        unset($headingsTags[0]);
-    }
-    foreach ($headingsTags as $slide) {
-        if ($firstSlide == 0) {
-            //checking if first slide has pluginSlideShowSlide instance, then concat with main text, otherwise ignore
-            $sectionCheck = strpos($slide, '<sslide');
-            if ($sectionCheck == true) {
-                $slideContent .= str_replace("sslide", "section", $slide);
+    // Check if $headingsTags is an array before processing
+    // This condition ensures that preg_split didn't fail, resulting in an array.
+    if (is_array($headingsTags)) {
+        // Checking if $headingsTags has more than one element, skip the first, as the first slide is empty, otherwise keep the first element
+        if (count($headingsTags) > 1) {
+            unset($headingsTags[0]);
+        }
+
+
+        foreach ($headingsTags as $slide) {
+            if ($firstSlide == 0) {
+                //checking if first slide has pluginSlideShowSlide instance, then concat with main text, otherwise ignore
+                $sectionCheck = strpos($slide, '<sslide');
+                if ($sectionCheck == true) {
+                    $slideContent .= str_replace("sslide", "section", $slide);
+                } else {
+                    $slideContent .= slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $slidePluginHeadingLevelSlideSeparator);
+                }
+                $firstSlide = 1;
             } else {
                 $slideContent .= slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $slidePluginHeadingLevelSlideSeparator);
             }
-            $firstSlide = 1;
-        } else {
-            $slideContent .= slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $slidePluginHeadingLevelSlideSeparator);
         }
+        //images alignment left or right
+        //replacment for slideshowslide
     }
 
-    //images alignment left or right
-    //replacment for slideshowslide
 
     return html_entity_decode(str_replace(
-        ['<sslide', '<sheading','</sheading>', '</sslide>'],
-        [$slideEnd . '</section><section', $headingStart . '<h1','</h1>' . $slideStart],
-        $slideContent
+        ['<sslide', '<sheading', '</sheading>', '</sslide>'],
+        [$slideEnd . '</section><section', $headingStart . '<h1', '</h1>' . $slideStart],
+        $slideContent ?: $content // Changed to use $content instead of $slideContent
     ));
 }
 
