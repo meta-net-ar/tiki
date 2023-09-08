@@ -113,6 +113,7 @@ add_output('settings', 'enable_gmail_contacts_module_setting', true, 'tiki', 'en
 add_handler('message', 'tracker_message_list_type', true, 'core', 'message_list_type', 'after');
 add_handler('message', 'tiki_download_message', true, 'core', 'message_list_type', 'after');
 add_handler('message_list', 'check_path_redirect', true, 'core', 'load_user_data', 'after');
+add_handler('compose', 'tiki_presave_sent', true, 'smtp', 'imap_save_sent', 'before');
 add_handler('compose', 'tiki_mark_as_answered', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 'after');
 add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
