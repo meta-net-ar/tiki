@@ -329,7 +329,9 @@ class WikiPluginPluginManager extends PluginsLib
                             $rows .= '</td>';
                         }
                         //Description column
-                        $rows .= $cellbegin . $paraminfo['description'] . '</td>';
+                        if (isset($paraminfo['description'])) {
+                            $rows .= $cellbegin . $paraminfo['description'] . '</td>';
+                        }
                         //Default column
                         if ($rowCounter == 1) {
                             $header .= $headbegin . tra('Default') . '</th>';
