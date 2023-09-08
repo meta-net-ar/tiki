@@ -233,7 +233,7 @@ function wikiplugin_gdgraph($data, $params)
 
     $ret = '<div class="wp-gdgraph ' . $params['class'] . '" id="' . $params['divid'] .
            '" style="width: ' . $params['width'] . 'px; margin-left: 10px; margin-right: 10px; ' . $f . $c . ' " >' .
-           '<img src="tiki-gdgraph.php?' . http_build_query($imgparams, '', '&amp;') . '" alt="' . $params['alttag'] . '">' .
+           '<img src="tiki-gdgraph.php?' . html_entity_decode(http_build_query($imgparams, '', '&amp;')) . '" alt="' . $params['alttag'] . '">' .
            '</div>';
 
     return $ret;
