@@ -130,8 +130,10 @@ $rootlangs = [];
 foreach ($tagList as $tagGroup) {
     foreach ($tagGroup as $k => $tag) {
         array_merge($used_languages, [$k]);
-        if ($tag['tagset'] == $tag['tagId']) {
-            $rootlangs[$tag['tagset']] = $tag['lang'];
+        if (isset($tag['tagset'])) {
+            if ($tag['tagset'] == $tag['tagId']) {
+                $rootlangs[$tag['tagset']] = $tag['lang'];
+            }
         }
     }
 }
