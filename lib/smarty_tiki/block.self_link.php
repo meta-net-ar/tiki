@@ -211,7 +211,9 @@ function smarty_block_self_link($params, $content, $smarty, &$repeat = false)
                     unset($params[$k]);
                 }
             }
-            $link .= $ret;
+            if (isset($ret)) {
+                $link .= $ret;
+            }
 
             if (isset($params['_confirm'])) {
                 $link .= ' data-confirm="' . smarty_modifier_escape($params['_confirm']) . '"';
