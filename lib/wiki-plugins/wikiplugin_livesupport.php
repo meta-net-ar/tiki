@@ -57,6 +57,7 @@ function wikiplugin_livesupport($data, $params)
     global $prefs;
     global $lslib;
     global $lsadminlib;
+    global $user;
     include_once('lib/live_support/lsadminlib.php');
     include_once('lib/live_support/lslib.php');
     $smarty = TikiLib::lib('smarty');
