@@ -820,11 +820,11 @@ class TikiAccessLib extends TikiLib
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
             . tr('seconds') . '(' . $prefs['site_security_timeout'] / 60 . ' minutes)' . PHP_EOL
-            . '  SCRIPT_NAME: ' . $_SERVER['SCRIPT_NAME'] ?? 'unknown' . PHP_EOL
-            . '  REQUEST_URI: ' . $_SERVER['REQUEST_URI'] ?? 'unknown' . PHP_EOL
-            . '  HTTP_ORIGIN: ' . $_SERVER['HTTP_ORIGIN'] ?? 'unknown' . PHP_EOL
-            . '  HTTP_REFERER: ' . $_SERVER['HTTP_REFERER'] ?? 'unknown' . PHP_EOL
-            . '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] ?? 'unknown' . PHP_EOL);
+            . (isset($_SERVER['SCRIPT_NAME']) ? '  SCRIPT_NAME: ' . $_SERVER['SCRIPT_NAME'] . PHP_EOL : '')
+            . (isset($_SERVER['REQUEST_URI']) ? '  REQUEST_URI: ' . $_SERVER['REQUEST_URI'] . PHP_EOL : '')
+            . (isset($_SERVER['HTTP_ORIGIN']) ? '  HTTP_ORIGIN: ' . $_SERVER['HTTP_ORIGIN'] . PHP_EOL : '')
+            . (isset($_SERVER['HTTP_REFERER']) ? '  HTTP_REFERER: ' . $_SERVER['HTTP_REFERER'] . PHP_EOL : '')
+            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
         error_log(PHP_EOL
