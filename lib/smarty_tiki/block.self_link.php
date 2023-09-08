@@ -211,7 +211,7 @@ function smarty_block_self_link($params, $content, $smarty, &$repeat = false)
                     unset($params[$k]);
                 }
             }
-            if(isset($ret)) {
+            if (isset($ret)) {
                 $link .= $ret;
             }
 
