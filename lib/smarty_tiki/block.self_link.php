@@ -211,6 +211,7 @@ function smarty_block_self_link($params, $content, $smarty, &$repeat = false)
                     unset($params[$k]);
                 }
             }
+            $ret = smarty_function_query($params, $smarty);
             $link .= $ret;
 
             if (isset($params['_confirm'])) {
