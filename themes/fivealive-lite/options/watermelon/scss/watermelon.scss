@@ -1,7 +1,7 @@
 /* The Watermelon theme option file for the FiveAlive-lite theme of Tiki Wiki CMS Groupware. */
 
 // Required
-@import "../../../../../vendor_bundled/vendor/twbs/bootstrap/scss/functions";
+@import "../../../../base_files/scss/_tiki-bootstrap_functions";
 
 @import "variables";
 @import "variables-dark";
@@ -15,6 +15,7 @@
 @import "../../../../../vendor_bundled/vendor/twbs/bootstrap/scss/reboot";
 @import "../../../../../vendor_bundled/vendor/twbs/bootstrap/scss/buttons";
 @import "../../../../../vendor_bundled/vendor/twbs/bootstrap/scss/nav";
+@import "../../../../../vendor_bundled/vendor/twbs/bootstrap/scss/alert";
 
 @import "../../../scss/selectors-for-options";
 @import "../../../../base_files/scss/tiki-pagetop_colors";

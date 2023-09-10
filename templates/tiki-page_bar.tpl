@@ -2,7 +2,7 @@
     {capture assign=more_section}
         {if $page|lower ne 'sandbox'}
             {if $tiki_p_remove eq 'y' && (isset($editable) and $editable)}
-                <a class="dropdown-item btn alert alert-danger bg-danger alert-link border-0 rounded-0 mb-0 py-0 px-4" style="font-weight: inherit;" href="{bootstrap_modal controller=wiki action=remove_pages checked=$page version='last'}">
+                <a class="dropdown-item btn btn-link alert alert-danger alert-link border-0 rounded-0 mb-0 py-0 px-4" style="font-weight: inherit;" href="{bootstrap_modal controller=wiki action=remove_pages checked=$page version='last'}">
                     {tr}Remove{/tr}
                 </a>
             {/if}
