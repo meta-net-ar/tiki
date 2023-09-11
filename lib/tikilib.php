@@ -5492,7 +5492,7 @@ class TikiLib extends TikiDb_Bridge
 
             $dummy_output = '';
             if ($parserlib->plugin_enabled($plugin_name, $dummy_output)) {
-                $status = $parserlib->plugin_can_execute($plugin_name, $body, $arguments, true);
+                $status = $parserlib->plugin_can_execute($plugin_name, $body, $arguments, true, $context);
 
                 // when plugin status is pending, $status equals plugin fingerprint
                 if ($prefs['wikipluginprefs_pending_notification'] == 'y' && $status !== true && $status != 'rejected') {

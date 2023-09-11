@@ -643,7 +643,7 @@ class ParserLib extends TikiDb_Bridge
      * @return bool|string Boolean true if can execute, string 'rejected' if can't execute and plugin fingerprint if pending
      */
     //*
-    public function plugin_can_execute($name, $data = '', $args = [], $dont_modify = false)
+    public function plugin_can_execute($name, $data = '', $args = [], $dont_modify = false, $context = [])
     {
         global $prefs;
 
@@ -664,7 +664,7 @@ class ParserLib extends TikiDb_Bridge
             return true;
         }
 
-        $val = $this->plugin_fingerprint_check($fingerprint, $data, $args, $dont_modify);
+        $val = $this->plugin_fingerprint_check($fingerprint, $data, $args, $dont_modify, $context);
         if (strpos($val, 'accept') === 0) {
             return true;
         } elseif (strpos($val, 'reject') === 0) {
@@ -704,7 +704,7 @@ class ParserLib extends TikiDb_Bridge
     }
 
     //*
-    public function plugin_fingerprint_check($fp, $body, $args, $dont_modify = false)
+    public function plugin_fingerprint_check($fp, $body, $args, $dont_modify = false, $context = [])
     {
         global $prefs, $base_url, $user;
         $tikilib = TikiLib::lib('tiki');
@@ -728,13 +728,14 @@ class ParserLib extends TikiDb_Bridge
             $needUpdate = true;
         }
 
-        if ($needUpdate && ! $dont_modify) {
+        // Context is available on TikiLib::plugin_post_save_actions
+        if (($needUpdate && ! $dont_modify) || ! empty($context)) {
             if ($this->option['page']) {
                 $objectType = 'wiki page';
                 $objectId = $this->option['page'];
             } else {
-                $objectType = '';
-                $objectId = '';
+                $objectId = $context['object'] ?? '';
+                $objectType = $context['type'] ?? '';
             }
 
             if (! $user) {

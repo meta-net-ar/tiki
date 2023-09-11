@@ -30,8 +30,10 @@
                         <td class="checkbox-cell"><div class="form-check"><input type="checkbox" name="clear[]" value="{$plugin.fingerprint|escape}" id="{$plugin.fingerprint|escape}"></div></td>
                         <td class="text"><label for="{$plugin.fingerprint|escape}"><strong>{$plugin.fingerprint|substring:0:20|escape|replace:"-":"</strong> <br>{tr}Signature:{/tr} "}...</label></td>
                         <td class="text">
-                            {if $plugin.last_objectType eq 'wiki page'}
-                                {tr _0=$plugin.last_objectId|sefurl:'wiki page' _1=$plugin.last_objectId|escape _2=$plugin.fingerprint}Wiki page: <a href="%0#%2" title="View this page.">%1</a>{/tr}
+                            {if $plugin.last_objectType}
+                                {tr _0=$plugin.last_objectId|sefurl:$plugin.last_objectType _1=$plugin.last_objectId|escape _2=$plugin.fingerprint}{$plugin.last_objectType}
+                                    : <a href="%0#%2" title="View this page.">{object_title type=$plugin.last_objectType id=$plugin.last_objectId}</a>
+                                {/tr}
                             {else}
                                 {tr}Unknown{/tr}
                             {/if}
