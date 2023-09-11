@@ -221,14 +221,14 @@ class PrefsDoc extends TWVersion
         $this->prefDefaultFull = '';
 
         // set default
-        if (! empty($param->options) && ! empty($param->default) && isset($param->options->{$param->default})) {
+        if (is_array($param->default)) {
+            $this->prefDefault = implode(', ', $param->default);
+        } elseif ($param->options !== null && ! empty($param->options) && ! empty($param->default) && isset($param->options->{$param->default})) {
             $this->prefDefault = $param->options->{$param->default};
         } elseif ($param->default === 'n') {
             $this->prefDefault = 'Disabled';
         } elseif ($param->default === 'y') {
             $this->prefDefault = 'Enabled';                        // Change default codes to human readable format
-        } elseif (is_array($param->default)) {
-            $this->prefDefault = implode(', ', $param->default);
         } else {
             $this->prefDefault = $param->default;
         }
