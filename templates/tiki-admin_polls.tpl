@@ -1,4 +1,4 @@
-{title help="Polls" admpage="polls"}{tr}Admin Polls{/tr}{/title}
+{title help="Polls" admpage="polls" url="tiki-admin_polls.php"}{tr}Admin Polls{/tr}{/title}
 
 <div class="t_navbar mb-4">
     <form action="tiki-admin_polls.php" method="post">
@@ -169,10 +169,11 @@
                                         {/self_link}
                                     </action>
                                     <action>
-                                        <a href="tiki-admin_polls.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;remove={$channels[user].pollId}" onclick="confirmPopup('{tr}Delete poll?{/tr}', '{ticket mode=get}')">
-                                            {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
-                                        </a>
-                                    </action>
+    <a href="tiki-admin_polls.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;remove={$channels[user].pollId}" onclick="confirmPopup('{tr _0=$channels[user].pollId|escape:'attr' _1=$channels[user].title|escape:'attr'}Delete poll %0: %1?{/tr}', '{ticket mode=get}')">
+        {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
+    </a>
+</action>
+
                                 {/strip}
                             {/actions}
                         </td>
