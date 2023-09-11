@@ -534,6 +534,46 @@ class PdfGenerator
         return $mpdf->Output('', 'S');                  // Return as a string
     }
 
+    /**
+     * @param string $html - The data to be parsed
+     * @param mixed $config [optional] - array of configuration options applied to the data to be parsed
+     * @param string $encoding [optional]
+     * The encoding parameter sets the encoding for
+     * input/output documents. The possible values for encoding are:
+     * ascii, latin0, latin1,
+     * raw, utf8, iso2022,
+     * mac, win1252, ibm858,
+     * utf16, utf16le, utf16be,
+     * big5, and shiftjis.
+     * @return string
+     */
+    public function cleanHtml($html, $config = null, $encoding = 'utf8')
+    {
+        if (extension_loaded('tidy') == true) {
+            $default = [
+                'clean' => true,
+                'output-xhtml' => true,
+                'show-body-only' => false,
+                'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
+                'new-empty-tags' => 'embed keygen source track wbr',
+                'new-inline-tags' => 'svg audio command datalist embed mark menuitem meter output progress source time video wbr',
+                'repeated-attributes' => 'keep-first',
+                'drop-proprietary-attributes' => false,
+                'wrap' => 0,
+                'coerce-endtags' => true,
+                'quote-ampersand' => true,
+                'quote-marks' => false,
+            ];
+            $config = (is_array($config) == true) ? array_merge($default, $config) : $default;
+            $html_ = tidy_parse_string($html, $config, $encoding);
+            $html_->cleanRepair();
+
+            return (string) $html_;
+        }
+
+        return $html;
+    }
+
     public function getHtmlLayout($pageContent)
     {
         require_once('tiki-setup.php');
@@ -678,6 +718,7 @@ class PdfGenerator
         if (! empty($html)) {
             //checking if pdf plugin is set and passed
             $doc = new DOMDocument();
+            $html = $this->cleanHtml($html, null, 'utf8');
             @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
             $pdf = $doc->getElementsByTagName('pdfsettings')->item(0);
@@ -759,7 +800,8 @@ class PdfGenerator
     {
         //checking if pdf page tag exists
         $doc = new DOMDocument();
-        $doc->loadHTML($html);
+        $html = $this->cleanHtml($html, null, 'utf8');
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         $xpath = new DOMXpath($doc);
         //Getting pdf page custom pages from content
         $pdfPages = $doc->getElementsByTagName('pdfpage');
@@ -825,6 +867,7 @@ class PdfGenerator
     public function _getImages(&$html, &$tempImgArr)
     {
         $doc = new DOMDocument();
+        $html = $this->cleanHtml($html, null, 'utf8');
         @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $tags = $doc->getElementsByTagName('img');
@@ -906,6 +949,7 @@ class PdfGenerator
         $html = str_replace('&', '&amp;', $html);
 
         $doc = new DOMDocument();
+        $html = $this->cleanHtml($html, null, 'utf8');
         $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
         $tables = $doc->getElementsByTagName('table');
@@ -939,7 +983,7 @@ class PdfGenerator
         }
         $html = cleanContent($html, $tagsArr);
 
-            //making tablesorter and pivottable charts wrapper divs visible
+        //making tablesorter and pivottable charts wrapper divs visible
         $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         $this->checkLargeTables($doc); //hack function for large data columns
         $xpath = new DOMXpath($doc);
@@ -1033,6 +1077,7 @@ class PdfGenerator
     public function fontawesome(&$html)
     {
         $doc = new DOMDocument();
+        $html = $this->cleanHtml($html, null, 'utf8');
         $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         $xpath = new DOMXpath($doc);
       //font awesome code insertion
@@ -1167,6 +1212,7 @@ $(".convert-mailto").removeClass("convert-mailto").each(function () {
         global $base_url;
 
         $doc = new DOMDocument();
+        $content = $this->cleanHtml($content, null, 'utf8');
         $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
         $anchors = $doc->getElementsByTagName('a');
         $len = $anchors->length;
@@ -1285,7 +1331,8 @@ $(".convert-mailto").removeClass("convert-mailto").each(function () {
 function cleanContent($content, $tagArr)
 {
     $doc = new DOMDocument();
-    $doc->loadHTML($content);
+    $content = cleanHtml($content, null, 'utf8');
+    $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
     $xpath = new DOMXpath($doc);
 
     foreach ($tagArr as $tag) {

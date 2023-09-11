@@ -1629,6 +1629,21 @@ if ($s) {
     );
 }
 
+$s = extension_loaded('tidy');
+if ($s) {
+    $php_properties['tidy'] = array(
+        'fitness' => tra('good'),
+        'setting' => 'Loaded',
+        'message' => tra('This extension is required by Tiki PdfGenerator for parsing an html document stored in a string.')
+    );
+} else {
+    $php_properties['tidy'] = array(
+        'fitness' => tra('bad'),
+        'setting' => 'Not available',
+        'message' => tra('This extension is required by Tiki PdfGenerator for parsing an html document stored in a string.')
+    );
+}
+
 /*
 *    If TortoiseSVN 1.7 is used, it uses an sqlite database to store the SVN info. sqlite3 extention needed to read svn info.
 */
