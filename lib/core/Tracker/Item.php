@@ -263,8 +263,7 @@ class Tracker_Item
                 return $accessor;
             }
         } else {
-            $itemId = $this->info['itemId'] ?? '';
-            return Perms::get('trackeritem', $itemId, $this->info['trackerId']);
+            return Perms::get('trackeritem', $this->info['itemId'] ?? '', $this->info['trackerId'] ?? '');
         }
     }
 
