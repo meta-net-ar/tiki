@@ -427,6 +427,7 @@ function prefs_feature_list($partial = false)
         'feature_live_support' => [
             'name' => tra('Live support system'),
             'description' => tra('One-on-one chatting with customer'),
+            'keywords' => 'livesupport live-support live_support',
             'help' => 'Live-Support',
             'type' => 'flag',
             'default' => 'n',
