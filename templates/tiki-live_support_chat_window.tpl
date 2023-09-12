@@ -12,7 +12,7 @@
             <script type="text/javascript" src="vendor_bundled/vendor/components/jquery/jquery.js"></script>
         {/literal}
     </head>
-    <body onUnload="javascript:chat_close(document.getElementById('role').value,document.getElementById('username').value);" style="background-color: white">
+    <body onUnload="javascript:chat_close(document.getElementById('role').value,document.getElementById('username').value);" style="background-color: white; margin-left: 1rem; margin-right: 1rem;">
         <input type="hidden" id="reqId" value="{$reqId|escape}">
         <input type="hidden" id="senderId" value="{$senderId|escape}">
         <input type="hidden" id="role" value="{$role|escape}">
@@ -112,9 +112,9 @@
         </div>
         <br/>
         {literal}
-            <div class="tiki-form-group row" style="width:500px">
+            <div class="tiki-form-group row" style="width:500px; margin-left: 0; margin-right: 0;">
                 <input placeholder="{tr}write a new message...{/tr}" type="text" id="data" size="30" class="form-control col-sm-9" onKeyPress="javascript:if(event.keyCode == 13) {write_msg(document.getElementById('data').value,document.getElementById('role').value,document.getElementById('username').value);}">
-                <button type="button" class="btn btn-primary col-sm-3" onClick="javascript:write_msg(document.getElementById('data').value,document.getElementById('role').value,document.getElementById('username').value);"><span class="fa fa-paper-plane"></span> {tr}send{/tr}</button>
+                <button type="button" class="btn btn-primary col-sm-3 mt-3" onClick="javascript:write_msg(document.getElementById('data').value,document.getElementById('role').value,document.getElementById('username').value);"><span class="fa fa-paper-plane"></span> {tr}send{/tr}</button>
             </div>
         {/literal}
         
