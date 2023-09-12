@@ -22,8 +22,6 @@ class BrowseTreeMaker extends TreeMaker
     /// Generate HTML code for tree. Need to redefine to add javascript cookies block
     public function make_tree($rootid, $ar)
     {
-        $headerlib = TikiLib::lib('header');
-
         $r = '<ul class="tree root">' . "\n";
 
         $r .= $this->make_tree_r($rootid, $ar) . "</ul>\n";
@@ -51,17 +49,17 @@ class BrowseTreeMaker extends TreeMaker
     //
     public function indent($nodeinfo)
     {
-        return "\t\t";
+        return '';
     }
 
     public function node_start_code_flip($nodeinfo, $count = 0)
     {
-        return "\t" . '<li class="treenode withflip ' . (($count % 2) ? 'odd' : 'even') . '">';
+        return '<li class="treenode withflip ' . (($count % 2) ? 'odd' : 'even') . '">';
     }
 
     public function node_start_code($nodeinfo, $count = 0)
     {
-        return "\t" . '<li class="treenode ' . (($count % 2) ? 'odd' : 'even') . '">';
+        return '<li class="treenode ' . (($count % 2) ? 'odd' : 'even') . '">';
     }
 
     //
@@ -79,7 +77,7 @@ class BrowseTreeMaker extends TreeMaker
     //
     public function node_data_end_code($nodeinfo)
     {
-        return "\n";
+        return '';
     }
 
     //
@@ -106,6 +104,6 @@ class BrowseTreeMaker extends TreeMaker
     //
     public function node_end_code($nodeinfo)
     {
-        return "\t" . '</li>';
+        return '</li>';
     }
 }
