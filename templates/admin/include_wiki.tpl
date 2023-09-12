@@ -409,7 +409,7 @@
                         <div class="col-sm-4">
                             <select name="tagname" class="form-select" {if $tags|@count eq '0'} disabled="disabled"{/if}>
                                 {section name=sel loop=$tags}
-                                    <option value="{$tags[sel]|escape}">{$tags[sel]}</option>
+                                    <option value="{$tags[sel].tag|escape}">{$tags[sel].tag}</option>
                                     {sectionelse}
                                     <option value=''>{tr}None{/tr}</option>
                                 {/section}
