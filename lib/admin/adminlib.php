@@ -287,7 +287,7 @@ class AdminLib extends TikiLib
         $ret = [];
 
         while ($res = $result->fetchRow()) {
-            $ret[] = ["tag" => $res["tagName"]];
+            $ret[] = $res["tagName"];
         }
 
         return $ret;

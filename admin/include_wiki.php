@@ -126,5 +126,5 @@ if ($prefs['feature_wiki_attachments'] === 'y') {
 
 $smarty->assign('isDump', is_file($path));
 $smarty->assign('dumpPath', $path);
-$tags = $adminlib->get_tags();
-$smarty->assign_by_ref('tags', $tags);
+$wiki_tags = $adminlib->get_tags();
+$smarty->assign_by_ref('wiki_tags', $wiki_tags);
