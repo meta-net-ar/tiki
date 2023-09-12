@@ -68,8 +68,6 @@ abstract class TreeMaker
                 }
             }
 
-            $ind = "";
-            //
             $count = -1;
             foreach ($cli as $i) {
                 $count++;
@@ -79,9 +77,6 @@ abstract class TreeMaker
                 //
                 // NOTE: The main rule is to call all methods in
                 //       stricty defined order!
-                //
-                $nl = "\n";
-                $ind .= "\t";
 
                 if ($have_childs) {
                     $flipper = $this->node_flipper_code($i);
@@ -100,12 +95,12 @@ abstract class TreeMaker
                 if ($have_childs) {
                     $ncsc = $this->node_child_start_code($i);
                     $ncec = $this->node_child_end_code($i);
-                    $ind .= $this->indent($i);
                 }
 
                 $nec = $this->node_end_code($i);
                 // Form result
-                $result .= $nsc . $flipper . $ndsc . $i["data"] . $nl . $ind . $ncsc . $nl . $ind . $ind . $child_result . $ncec . $nl . $ind . $ind . $ndec . $nec . $nl . $ind; // this sort is for lists kind of tree
+                // this sort is for lists kind of tree
+                $result .= $nsc . $flipper . $ndsc . $i["data"] . $ncsc . $child_result . $ncec . $ndec . $nec . "\n";
             }
         }
 
