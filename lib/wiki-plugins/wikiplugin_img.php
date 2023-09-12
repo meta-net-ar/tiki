@@ -1161,7 +1161,7 @@ function wikiplugin_img($data, $params)
     $tagName = '';
     if (! empty($dbinfo['filetype'])  && ! empty($mimetypes['svg']) && $dbinfo['filetype'] == $mimetypes['svg']) {
         $tagName = 'div';
-        $repldata = $dbinfo['data'];
+        $repldata = $dbinfo['data'] ? $dbinfo['data'] : $imgdata['file']->getContents();
         if (! empty($fwidth) && ! empty($fheight) && ! empty($imgdata_dim)) {       // change svg attributes to show at the correct size
             $svgAttributes = $imgdata_dim . ' viewBox="0 0 ' . $fwidth . ' ' . $fheight . '" preserveAspectRatio="xMinYMin meet"';
             $repldata = preg_replace('/width="' . $fwidth . '" height="' . $fheight . '"/', $svgAttributes, $repldata);
