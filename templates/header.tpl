@@ -14,7 +14,7 @@
 {if !empty($forum_info.name) & $prefs.metatag_threadtitle eq 'y'}
     <meta name="keywords" content="{tr}Forum{/tr} {$forum_info.name|escape} {$thread_info.title|escape} {if $prefs.feature_freetags eq 'y' and isset($tags)}{foreach from=$tags item=taginfo}{$taginfo.tag|escape} {/foreach}{/if}">
 {elseif $prefs.metatag_keywords neq '' or !empty($metatag_local_keywords)}
-    <meta name="keywords" content="{if not empty($prefs.metatag_keywords_translated)}{$prefs.metatag_keywords_translated|escape}{else}{$prefs.metatag_keywords|escape}{/if} {if $prefs.feature_freetags eq 'y' and isset($tags)}{foreach from=$tags item="taginfo"}{$taginfo.tag|escape} {/foreach}{/if} {$metatag_local_keywords|escape}">
+    <meta name="keywords" content="{if not empty($prefs.metatag_keywords_translated)}{$prefs.metatag_keywords_translated|escape}, {else}{$prefs.metatag_keywords|escape}, {/if}{if $prefs.feature_freetags eq 'y' and isset($tags)}{foreach from=$tags item="taginfo"}{$taginfo.tag|escape}, {/foreach}{/if}{$metatag_local_keywords|escape}">
 {/if}
 {if $prefs.metatag_author neq ''}
     <meta name="author" content="{$prefs.metatag_author|escape}">

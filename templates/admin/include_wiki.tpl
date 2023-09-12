@@ -407,17 +407,17 @@
                     <div class="mb-3 row">
                         <label for="databasetag" class="col-form-label col-sm-4">{tr}Wiki database{/tr}</label>
                         <div class="col-sm-4">
-                            <select name="tagname" class="form-select" {if $tags|@count eq '0'} disabled="disabled"{/if}>
-                                {section name=sel loop=$tags}
-                                    <option value="{$tags[sel]|escape}">{$tags[sel]}</option>
+                            <select name="tagname" class="form-select" {if $wiki_tags|@count eq '0'} disabled="disabled"{/if}>
+                                {section name=sel loop=$wiki_tags}
+                                    <option value="{$wiki_tags[sel]|escape}">{$wiki_tags[sel]}</option>
                                     {sectionelse}
                                     <option value=''>{tr}None{/tr}</option>
                                 {/section}
                             </select>
                         </div>
                         <div class="col-sm-4">
-                            <input type="submit" class="btn btn-primary" name="restoretag" value="{tr}Restore{/tr}"{if $tags|@count eq '0'} disabled="disabled"{/if}>
-                            <input type="submit" class="btn btn-danger" name="removetag" value="{tr}Remove{/tr}"{if $tags|@count eq '0'} disabled="disabled"{/if}>
+                            <input type="submit" class="btn btn-primary" name="restoretag" value="{tr}Restore{/tr}"{if $wiki_tags|@count eq '0'} disabled="disabled"{/if}>
+                            <input type="submit" class="btn btn-danger" name="removetag" value="{tr}Remove{/tr}"{if $wiki_tags|@count eq '0'} disabled="disabled"{/if}>
                         </div>
                     </div>
                 </fieldset>
