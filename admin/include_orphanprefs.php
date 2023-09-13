@@ -36,4 +36,34 @@ if (isset($_REQUEST['clear']) && ! empty($orphanPrefs)) {
     }
     $orphanPrefs = $prefslib->getOrphanPrefs();
 }
+
+// Prepare Fancytable
+$ts = new Table_Plugin();
+$ts->setSettings(
+    'wpfancytable' . 'OrphanPrefs',
+    'n',
+    'type:reset',
+    '[0,0],[1,0]',
+    null,
+    'type:text;|type:text;|type:nofilter',
+    'type:reset',
+    'max:50',
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+);
+if (is_array($ts->settings)) {
+    $ts->settings['resizable'] = true;
+    Table_Factory::build('plugin', $ts->settings);
+}
+$msg = "";
+if ($prefs['feature_jquery_tablesorter'] === 'n') {
+    $msg = tra('The jQuery Sortable Tables feature must be activated for the sort feature to work.');
+} elseif ($prefs['javascript_enabled'] !== 'y') {
+    $msg = tra('JavaScript must be enabled for the sort feature to work.');
+}
+$smarty->assign('msg', $msg);
 $smarty->assign('orphanPrefs', $orphanPrefs);
