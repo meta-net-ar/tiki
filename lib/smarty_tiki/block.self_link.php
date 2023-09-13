@@ -189,6 +189,7 @@ function smarty_block_self_link($params, $content, $smarty, &$repeat = false)
                 }
             }
 
+            $dataAttributes = '';
             $link = ( ! empty($params['_class']) ? 'class="' . $params['_class'] . '" ' : '' )
                 . ( ! empty($params['_style']) ? 'style="' . $params['_style'] . '" ' : '' )
                 . ( ! empty($params['_title']) ? 'title="' . str_replace('"', '\"', $params['_title']) . '" ' : '' )
