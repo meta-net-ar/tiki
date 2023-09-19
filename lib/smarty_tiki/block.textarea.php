@@ -242,7 +242,7 @@ this.instances.' . $as_id . '.resetDirty();
         }
         $smarty->assign('textarea_syntax', $params['syntax']);
 
-        $smarty->assignByRef('textareadata', $content);
+        $smarty->assign_by_ref('textareadata', $content);
         $html .= $smarty->fetch('wiki_edit.tpl');
 
         $html .= "\n" . '<input type="hidden" name="wysiwyg" value="n" />';

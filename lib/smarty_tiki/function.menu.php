@@ -62,17 +62,17 @@ function smarty_function_menu($params, $smarty)
     if (empty($translate)) {
         $translate = 'y';
     }
-    $smarty->assignByRef('translate', $translate);
+    $smarty->assign_by_ref('translate', $translate);
 
     if (empty($menu_cookie)) {
         $menu_cookie = 'y';
     }
-    $smarty->assignByRef('menu_cookie', $menu_cookie);
+    $smarty->assign_by_ref('menu_cookie', $menu_cookie);
 
     if (empty($bs_menu_class)) {
         $bs_menu_class = '';
     }
-    $smarty->assignByRef('bs_menu_class', $bs_menu_class);
+    $smarty->assign_by_ref('bs_menu_class', $bs_menu_class);
 
     list($menu_info, $channels) = get_menu_with_selections($params);
     $smarty->assign('menu_channels', $channels['data'] ?? []);

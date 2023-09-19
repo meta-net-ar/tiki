@@ -52,12 +52,12 @@ class UserWizardUserTracker extends Wizard
             return;
         }
 
-        $smarty->assignByRef('merged_prefs', $registrationlib->merged_prefs);
+        $smarty->assign_by_ref('merged_prefs', $registrationlib->merged_prefs);
 
 
         //get custom fields
         $customfields = $registrationlib->get_customfields();
-        $smarty->assignByRef('customfields', $customfields);
+        $smarty->assign_by_ref('customfields', $customfields);
 
         if ($registrationlib->merged_prefs['userTracker'] == 'y') {
             $smarty->assign('trackerEditFormId', 1);    // switch on to make mandatory_star *'s appear even though the tracker form is loaded by ajax

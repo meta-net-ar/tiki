@@ -55,9 +55,9 @@ if ($prefs['connect_server_mode'] === 'y') {
     }
     $smarty->assign('cserver_search_text', $search_str);
     $receivedDataStats = $connectlib->getReceivedDataStats();
-    $smarty->assignByRef('connect_stats', $receivedDataStats);
+    $smarty->assign_by_ref('connect_stats', $receivedDataStats);
     $matchingConnections = $connectlib->getMatchingConnections($search_str);
-    $smarty->assignByRef('connect_recent', $matchingConnections);
+    $smarty->assign_by_ref('connect_recent', $matchingConnections);
 } else {
     $smarty->assign('connect_stats', null);
     $smarty->assign('connect_recent', null);

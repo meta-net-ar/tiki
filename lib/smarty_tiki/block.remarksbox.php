@@ -150,6 +150,6 @@ function smarty_block_remarksbox($params, $content, $smarty, &$repeat)
     $smarty->assign('remarksbox_width', $params['width']);
     $smarty->assign('remarksbox_title_tag', $params['title_tag']);
     $smarty->assign('remarksbox_title_class', $params['title_class']);
-    $smarty->assignByRef('remarksbox_content', $content);
+    $smarty->assign_by_ref('remarksbox_content', $content);
     return $smarty->fetch('remarksbox.tpl');
 }

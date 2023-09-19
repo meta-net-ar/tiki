@@ -91,6 +91,6 @@ function smarty_block_tikimodule($params, $content, $smarty, &$repeat)
         $type = "module";
     }
     $smarty->assign('module_type', $type);
-    $smarty->assignByRef('module_content', $content);
+    $smarty->assign_by_ref('module_content', $content);
     return $smarty->fetch('module.tpl');
 }

@@ -267,7 +267,7 @@ require_once('lib/tikilib.php');
 // Get list of available languages
 $langLib = TikiLib::lib('language');
 $languages = $langLib->list_languages(false, null, true);
-$smarty->assignByRef("languages", $languages);
+$smarty->assign_by_ref("languages", $languages);
 
 $logslib = TikiLib::lib('logs');
 
@@ -789,11 +789,11 @@ $headerlib->add_js($js, 100);
 
 $iconset = TikiLib::lib('iconset')->getIconsetForTheme('default', '');
 
-$smarty->assignByRef('headerlib', $headerlib);
+$smarty->assign_by_ref('headerlib', $headerlib);
 
 $smarty->assign('install_step', $install_step);
 $smarty->assign('install_type', $install_type);
-$smarty->assignByRef('prefs', $prefs);
+$smarty->assign_by_ref('prefs', $prefs);
 $smarty->assign('detected_https', isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == 'on');
 
 $client_charset = '';

@@ -22,7 +22,7 @@ function smarty_function_user_registration($params, $smarty)
     if (is_a($registrationlib->merged_prefs, "RegistrationError")) {
         Feedback::error(['mes' => $registrationlib->merged_prefs->msg]);
     }
-    $smarty->assignByRef('merged_prefs', $registrationlib->merged_prefs);
+    $smarty->assign_by_ref('merged_prefs', $registrationlib->merged_prefs);
     $smarty->assign('allowRegister', 'y');
 
 // NOTE that this is not a standard access check, it checks for the opposite of that, i.e. whether logged in already
@@ -39,7 +39,7 @@ function smarty_function_user_registration($params, $smarty)
     }
 //get custom fields
     $customfields = $registrationlib->get_customfields();
-    $smarty->assignByRef('customfields', $customfields);
+    $smarty->assign_by_ref('customfields', $customfields);
 
 //groups choice
     if (count($registrationlib->merged_prefs['choosable_groups'])) {
