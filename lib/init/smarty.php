@@ -21,7 +21,7 @@ require_once __DIR__ . '/../setup/third_party.php';
 require_once __DIR__ . '/SmartyTikiErrorHandler.php';
 
 /**
- * extends Smarty_Security
+ * extends \Smarty\Security
  * @package TikiWiki\lib\init
  */
 class Tiki_Security_Policy extends \Smarty\Security
@@ -36,7 +36,7 @@ class Tiki_Security_Policy extends \Smarty\Security
 
     /**
      * needs a proper description
-     * @param Smarty $smarty
+     * @param \Smarty\Smarty $smarty
      */
     public function __construct($smarty)
     {
@@ -136,7 +136,7 @@ class Tiki_Security_Policy extends \Smarty\Security
 }
 
 /**
- * extends Smarty.
+ * extends \Smarty\Smarty
  *
  * Centralizing overrides here will avoid problems when upgrading to newer versions of the Smarty library.
  * @package TikiWiki\lib\init
@@ -206,10 +206,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->use_sub_dirs = false;
         $this->url_overriding_prefix_stack = [];
 
-        if (! empty($prefs['smarty_cache_perms'])) {
-            $this->_file_perms = (int) $prefs['smarty_cache_perms'];
-        }
-
         $this->loadFilter('pre', 'tr');
         $this->loadFilter('pre', 'jq');
 
@@ -224,16 +220,12 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->assign('prefs', $prefs);
 
         if (! empty($prefs['log_tpl']) && $prefs['log_tpl'] === 'y') {
-            $this->loadFilter('pre', 'log_tpl');
+            $this->registerFilter('pre', 'log_tpl');
         }
         if (! empty($prefs['feature_sefurl_filter']) && $prefs['feature_sefurl_filter'] === 'y') {
             require_once('tiki-sefurl.php');
             $this->registerFilter('output', 'filter_out_sefurl');
         }
-
-        // restore tiki's own escape function
-        //$this->loadPlugin('smarty_modifier_escape'); // TODO5: check how plugins work
-        //$this->registerPlugin('modifier', 'escape', 'smarty_modifier_escape');
 
         // register PHP functions used as smarty modifiers in Tiki templates
         $builtin = ['addslashes', 'array_reverse', 'count', 'explode', 'implode', 'is_array', 'json_decode', 'json_encode', 'md5', 'stristr', 'strpos', 'trim', 'ucfirst', 'ucwords', 'urlencode', 'var_dump'];
@@ -291,12 +283,6 @@ class Smarty_Tiki extends \Smarty\Smarty
     public function fetch($_smarty_tpl_file = null, $_smarty_cache_id = null, $_smarty_compile_id = null, $parent = null, $_smarty_display = false, $merge_tpl_vars = true, $no_output_filter = false)
     {
         $this->activateCustomErrorHandler();
-        if (strpos($_smarty_tpl_file, 'extends:') === 0) {
-            // temporarily disable extends_recursion which restores smarty < 3.1.28 behaviour
-            // see note at vendor_bundled/vendor/smarty/smarty/libs/Smarty.class.php:296 for more
-
-            $this->extends_recursion = false;
-        }
 
         $this->refreshLanguage();
 
@@ -320,9 +306,6 @@ class Smarty_Tiki extends \Smarty\Smarty
             $html .= '</pre>';
         }
 
-        if (! $this->extends_recursion) {
-                $this->extends_recursion = true;
-        }
         $this->deactivateCustomErrorHandler();
         return $html;
     }
@@ -698,7 +681,6 @@ class Smarty_Tiki extends \Smarty\Smarty
             $this->setPluginsDir(
                 [   // the directory order must be like this to overload a plugin
                     TIKI_PATH . '/' . TIKI_SMARTY_DIR,
-                    //SMARTY_DIR . 'plugins' // TODO5: check what replaces this
                 ]
             );
         }
@@ -835,7 +817,7 @@ class Smarty_Tiki extends \Smarty\Smarty
             }
             if ($nonAdminEditorGroups) {
                 $groupString = implode(', ', $nonAdminEditorGroups);
-                TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
+                //TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                 $pageLink = '<a href="' . smarty_modifier_sefurl($page) . '" class="alert-link">' . $page . '</a>';
                 if (count($nonAdminEditorGroups) > 1) {
                     $message = 'The %0 groups can edit this template page %1 but are not wiki administrators';
