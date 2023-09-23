@@ -847,8 +847,6 @@ if ($install_step == '6') {
     $smarty->assign('disableAccounts', list_disable_accounts());
 }
 
-$smarty->loadPlugin('smarty_modifier_ternary');
-
 $mid_data = $smarty->fetch('tiki-install.tpl');
 $smarty->assign('mid_data', $mid_data);
 
