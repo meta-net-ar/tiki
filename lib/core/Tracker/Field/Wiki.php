@@ -22,6 +22,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 'prefs' => ['trackerfield_wiki'],
                 'tags' => ['basic'],
                 'default' => 'y',
+                'supported_changes' => ['a'],
                 'params' => [
                     'samerow' => [
                         'name' => tr('Same Row'),
@@ -529,6 +530,124 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
 
         return $schema;
     }
+
+    /**
+     * Convert all items data to the only supported field type: TextArea
+     * This needs to be quick as it can run on potentially huge dataset, thus the raw db layer.
+     *
+     * @param string $type - the field type to convert to
+     * @return array - converted field options
+     * @throws Exception
+     */
+    public function convertFieldTo(string $type): array
+    {
+        if ($type !== 'a') {
+            throw new Exception(
+                tr(
+                    'Unsupported field conversion type: from %0 to %1',
+                    $this->getConfiguration('type'),
+                    $type
+                )
+            );
+        }
+
+        $trklib = TikiLib::lib('trk');
+        $relationlib = TikiLib::lib('relation');
+
+        $trackerId = $this->getConfiguration('trackerId');
+        $fieldId = $this->getConfiguration('fieldId');
+        $options = $this->getConfiguration('options_map');
+        $pageTable = $trklib->table('tiki_pages');
+
+        $tx = $trklib->begin();
+        $result = $trklib->fetchAll("SELECT tti.`itemId`, ttif.`value`
+            FROM `tiki_tracker_items` tti, `tiki_tracker_item_fields` ttif
+            WHERE tti.`trackerId` = ?
+                AND tti.`itemId` = ttif.`itemId`
+                AND ttif.`fieldId` = ?", [$trackerId, $fieldId]);
+
+        foreach ($result as $row) {
+            $itemId = $row['itemId'];
+            $pageName = $row['value'];
+
+            $pageData = $pageTable->fetchColumn('data', [
+                'pageName' => $pageName,
+            ]);
+
+            if (empty($pageData)) {
+                // page might have been renamed? Check if there's a relation to an existing page
+                $related = $relationlib->get_relations_to('trackeritem', $itemId, 'tiki.wiki.linkeditem');
+                foreach ($related as $rel) {
+                    $pageName = $rel['itemId'];
+                    $pageData = $pageTable->fetchColumn('data', [
+                        'pageName' => $pageName,
+                    ]);
+                    if (count($pageData) === 1) {
+                        break;
+                    }
+                }
+            }
+
+            if (count($pageData) === 1) {
+                // remove the relations first
+                $relations = $relationlib->get_relations_from('wiki page', $pageName);
+                foreach ($relations as $relation) {
+                    foreach (['tiki.wiki.linkeditem', 'tiki.wiki.linkedfield'] as $relationType) {
+                        if ($relation['relation'] === $relationType) {
+                            $relationlib->remove_relations_from('wiki page', $pageName, $relationType);
+                        }
+                    }
+                }
+                if (strlen($pageData[0]) < 65535) {
+                    $trklib->table('tiki_tracker_item_fields')->update(
+                        ['value' => $pageData[0]],
+                        ['itemId' => $itemId, 'fieldId' => $fieldId]
+                    );
+                    // too slow and doesn't do relations?
+                    TikiLib::lib('tiki')->remove_all_versions($pageName);
+                } else {
+                    $trklib->table('tiki_tracker_item_fields')->update(
+                        ['value' => "Converting Wiki Page field to TextArea
+Page too big, so included below:
+
+{include page=\"{$pageName}\"}"],
+                        ['itemId' => $itemId, 'fieldId' => $fieldId]
+                    );
+                    Feedback::warning(
+                        tr(
+                            'Converting Wiki Page field to TextArea: ((%0)) page content too big on itemId %1 (so added an include plugin)',
+                            $pageName,
+                            $itemId
+                        )
+                    );
+                }
+            } else {
+                $trklib->table('tiki_tracker_item_fields')->update(
+                    ['value' => "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"}"],
+                    ['itemId' => $itemId, 'fieldId' => $fieldId]
+                );
+                Feedback::error(
+                    tr(
+                        'Converting Wiki Page field to TextArea: "%0" page not found for itemId %1',
+                        $pageName,
+                        $itemId
+                    )
+                );
+            }
+        }
+        $tx->commit();
+        return [
+            'samerow' => $options['samerow'],
+            'toolbars' => $options['toolbars'],
+            'width' => $options['width'],
+            'height' => $options['height'],
+            'max' => $options['max'],
+            'wordmax' => $options['wordmax'],
+            'wysiwyg' => $options['wysiwyg'],
+        ];
+    }
+
+
 
     protected function attemptParse($text)
     {
