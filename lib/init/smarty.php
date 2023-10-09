@@ -180,6 +180,13 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->customErrorHandler = new SmartyTikiErrorHandler();
         $this->initializePaths();
 
+        // Extensions order must be like this override smarty default extension
+        $this->setExtensions([
+            new Smarty\Extension\CoreExtension(),
+            new SmartyTiki\Extension\SmartyTikiExtension(),
+            new Smarty\Extension\DefaultExtension(),
+        ]);
+
         $this->setConfigDir(null);
         if (! isset($prefs['smarty_compilation'])) {
             $prefs['smarty_compilation'] = '';
@@ -206,8 +213,11 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->use_sub_dirs = false;
         $this->url_overriding_prefix_stack = [];
 
-        $this->loadFilter('pre', 'tr');
-        $this->loadFilter('pre', 'jq');
+        require_once(__DIR__ . '/../smarty_tiki/prefilter.tr.php');
+        $this->registerFilter('pre', 'smarty_prefilter_tr');
+
+        require_once(__DIR__ . '/../smarty_tiki/prefilter.jq.php');
+        $this->registerFilter('pre', 'smarty_prefilter_jq');
 
         include_once(__DIR__ . '/../smarty_tiki/resource.tplwiki.php');
         $this->registerResource('tplwiki', new Smarty_Resource_Tplwiki());
@@ -678,11 +688,6 @@ class Smarty_Tiki extends \Smarty\Smarty
             // First run only
             $this->main_template_dir = TIKI_PATH . '/templates/';
             $this->setCompileDir(TIKI_PATH . "/temp/templates_c");
-            $this->setPluginsDir(
-                [   // the directory order must be like this to overload a plugin
-                    TIKI_PATH . '/' . TIKI_SMARTY_DIR,
-                ]
-            );
         }
 
         $this->setTemplateDir([]);  //Load main templates/ dir

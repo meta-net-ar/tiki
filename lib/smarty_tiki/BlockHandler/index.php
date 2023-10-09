@@ -4,12 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_count($params, $smarty)
-{
-    extract($params);
-    if (empty($var)) {
-        trigger_error("count: missing 'var' parameter");
-        return;
-    }
-    print(count($var));
-}
+// This redirects to the sites root to prevent directory browsing
+header("location: ../index.php");
+die;

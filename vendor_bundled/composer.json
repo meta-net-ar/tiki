@@ -382,7 +382,8 @@
                 "../lib/core/"
             ],
             "Tiki\\Lib\\": "../lib/",
-            "Tiki\\Lib\\Payment\\": "../lib/payment"
+            "Tiki\\Lib\\Payment\\": "../lib/payment",
+            "SmartyTiki\\": "../lib/smarty_tiki"
         },
         "classmap": [
             "../installer/",
