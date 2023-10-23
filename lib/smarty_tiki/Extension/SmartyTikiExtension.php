@@ -354,4 +354,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         return $input ? $true : $false;
     }
+
+    public function smarty_modifier_zone_is_empty($zoneName)
+    {
+        return zone_is_empty($zoneName);
+    }
 }
