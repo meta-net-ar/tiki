@@ -31,6 +31,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_stringfix'];
             case 'ternary':
                 return [$this, 'smarty_modifier_ternary'];
+            case 'trim':
+                return [$this, 'smarty_modifier_trim'];
             case 'username':
                 return [$this, 'smarty_modifier_username'];
             case 'zone_is_empty':
@@ -392,6 +394,16 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_ternary($input, $true = '', $false = '')
     {
         return $input ? $true : $false;
+    }
+
+    /**
+     * @param string $string - Required. Specifies the string to check
+     * @param string $chars - Optional. Specifies which characters to remove from the string. If omitted, the following characters will be removed: " \t\n\r\0\x0B"
+     * 
+     * @return string - String trimed  
+     */
+    public function smarty_modifier_trim($string, $chars = null) {
+        return empty($chars) ? trim($string) : trim($string, $chars);
     }
 
     public function smarty_modifier_username($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
