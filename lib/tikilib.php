@@ -7139,8 +7139,7 @@ class TikiLib extends TikiDb_Bridge
         $parserlib = TikiLib::lib('parser');
         $table = $this->table('tiki_object_relations');
 
-        $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
+        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
 
         foreach ($parserlib->get_pages($edit, true) as $pointedPage => $types) {
             if (empty($types[0]) || $types[0] != 'alias') {
@@ -7159,7 +7158,7 @@ class TikiLib extends TikiDb_Bridge
 
             $url = [];
             foreach ($conflictPages as $pageName) {
-                $url[] = sprintf('<a href="%s">%s</a>', smarty_modifier_sefurl($pageName, 'wiki'), $pageName);
+                $url[] = sprintf('<a href="%s">%s</a>', $smartyTikiExtension->smarty_modifier_sefurl($pageName, 'wiki'), $pageName);
             }
 
             $errors[] = tr('Alias <b>%0</b> link already present in %1 page(s)', $pointedPage, implode(', ', $url));
