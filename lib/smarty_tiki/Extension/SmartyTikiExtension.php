@@ -62,9 +62,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
+                break;
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'html_body_attributes':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
