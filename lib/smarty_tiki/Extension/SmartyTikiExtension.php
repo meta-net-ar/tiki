@@ -33,6 +33,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_ternary'];
             case 'trim':
                 return [$this, 'smarty_modifier_trim'];
+            case 'tr_if':
+                return [$this, 'smarty_modifier_tr_if'];
             case 'username':
                 return [$this, 'smarty_modifier_username'];
             case 'zone_is_empty':
@@ -404,6 +406,26 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      */
     public function smarty_modifier_trim($string, $chars = null) {
         return empty($chars) ? trim($string) : trim($string, $chars);
+    }
+
+    public function smarty_modifier_tr_if($source)
+    {
+        global $prefs;
+        $args = array_slice(func_get_args(), 1);
+
+        if ($prefs['language'] != 'en') {
+            include_once('lib/init/tra.php');
+            return tra($source, '', false, $args);
+        } else {
+            $replace = array_values($args);
+            $search = array_map(
+                function ($arg) {
+                    return '%' . $arg;
+                },
+                array_keys($args)
+            );
+            return str_replace($search, $replace, $source);
+        }
     }
 
     public function smarty_modifier_username($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
