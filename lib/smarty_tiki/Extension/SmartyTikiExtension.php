@@ -72,6 +72,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
                 break;
+            case 'rating':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rating();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
