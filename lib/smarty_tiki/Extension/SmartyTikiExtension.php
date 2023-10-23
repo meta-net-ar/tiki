@@ -53,6 +53,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
+            case 'wikiplugin':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Wikiplugin();
+                break;
         }
 
         return $this->blockHandlers[$blockTagName] ?? null;
