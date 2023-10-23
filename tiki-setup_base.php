@@ -798,9 +798,6 @@ unset($GLOBALS['HTTP_SERVER_VARS']);
 unset($GLOBALS['HTTP_SESSION_VARS']);
 unset($GLOBALS['HTTP_POST_FILES']);
 // --------------------------------------------------------------
-if (isset($_REQUEST['highlight']) || (isset($prefs['feature_referer_highlight']) && $prefs['feature_referer_highlight'] == 'y')) {
-    $smarty->loadFilter('output', 'highlight');
-}
 if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding("UTF-8");
 }
