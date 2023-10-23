@@ -36,6 +36,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getBlockHandler(string $blockTagName): ?BlockHandlerInterface
     {
         switch ($blockTagName) {
+            case 'remarksbox':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Remarksbox();
+                break;
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
