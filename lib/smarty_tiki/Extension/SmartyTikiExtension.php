@@ -29,6 +29,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_sefurl'];
             case 'ternary':
                 return [$this, 'smarty_modifier_ternary'];
+            case 'username':
+                return [$this, 'smarty_modifier_username'];
+            case 'zone_is_empty':
+                return [$this, 'smarty_modifier_zone_is_empty'];
+
         }
         return null;
     }
@@ -362,6 +367,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_ternary($input, $true = '', $false = '')
     {
         return $input ? $true : $false;
+    }
+
+    public function smarty_modifier_username($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
+    {
+        global $prefs;
+        $userlib = \TikiLib::lib('user');
+
+        $return = $userlib->clean_user($user, !$check_user_show_realnames, $login_fallback);
+
+        if ($html_encoding) {
+            $return = htmlspecialchars($return);
+        }
+        return $return;
     }
 
     public function smarty_modifier_zone_is_empty($zoneName)
