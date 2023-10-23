@@ -57,6 +57,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
+            case 'icon':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
