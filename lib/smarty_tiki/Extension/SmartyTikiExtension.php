@@ -54,6 +54,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'activity':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Activity();
                 break;
+            case 'breadcrumbs':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Breadcrumbs();
+                break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
