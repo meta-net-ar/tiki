@@ -39,6 +39,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_trim'];
             case 'tr_if':
                 return [$this, 'smarty_modifier_tr_if'];
+            case 'userlink':
+                return [$this, 'smarty_modifier_userlink'];
             case 'username':
                 return [$this, 'smarty_modifier_username'];
             case 'zone_is_empty':
@@ -601,6 +603,65 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             );
             return str_replace($search, $replace, $source);
         }
+    }
+
+    /**
+     * \brief Smarty modifier to create user links with optional mouseover info
+     *
+     * - type:     modifier
+     * - name:     userlink
+     * - purpose:  to return a user link
+     *
+     * @param string class (optional)
+     * @param string idletime (optional)
+     * @param string fullname (optional)
+     * @param integer max_length (optional)
+     * @return string user link
+     *
+     * Syntax: {$foo|userlink[:"<class>"][:"<idletime>"][:"<fullname>"][:<max_length>]} (optional params in brackets)
+     *
+     * Example: {$userinfo.login|userlink:'link':::25}
+     */
+
+    public function smarty_modifier_userlink($other_user, $class = 'userlink', $idletime = 'not_set', $fullname = '', $max_length = 0, $popup = '')
+    {
+        global $prefs;
+
+        if (empty($other_user)) {
+            return "";
+        }
+        if (is_array($other_user)) {
+            if (count($other_user) > 1) {
+                $other_user = array_map(
+                    function ($username) use ($class, $idletime, $popup) {
+                        $username = \TikiLib::lib('user')->distinguish_anonymous_users($username);
+                        return $this->smarty_modifier_userlink($username, $class, $idletime, '', 0, $popup);
+                    },
+                    $other_user
+                );
+
+                $last = array_pop($other_user);
+                return tr('%0 and %1', implode(', ', $other_user), $last);
+            } else {
+                $other_user = \TikiLib::lib('user')->distinguish_anonymous_users(reset($other_user));
+            }
+        } else {
+            $other_user = \TikiLib::lib('user')->distinguish_anonymous_users($other_user);
+        }
+        if (!$fullname) {
+            $fullname = \TikiLib::lib('user')->clean_user($other_user);
+        }
+        if ($max_length) {
+            $fullname = $this->smarty_modifier_truncate($fullname, $max_length, '...', true);
+        }
+
+        if (empty($popup) && $prefs['feature_community_mouseover'] == 'n') {
+            $popup = 'n';
+        } else {
+            $popup = 'y';
+        }
+
+        return \TikiLib::lib('user')->build_userinfo_tag($other_user, htmlspecialchars($fullname, ENT_QUOTES), $class, $popup);
     }
 
     public function smarty_modifier_username($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
