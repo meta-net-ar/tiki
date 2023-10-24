@@ -91,6 +91,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
+            case 'query':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Query();
+                break;
             case 'rating':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rating();
                 break;
