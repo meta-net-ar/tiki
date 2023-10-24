@@ -103,6 +103,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'service':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Service();
                 break;
+            case 'show_short':
+                $this->blockHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
