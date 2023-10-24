@@ -50,7 +50,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         switch ($blockTagName) {
             case 'ajax_href':
-                $this->functionHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
+                break;
+            case 'self_link':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
             case 'remarksbox':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Remarksbox();
@@ -104,7 +107,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Service();
                 break;
             case 'show_short':
-                $this->blockHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
                 break;
         }
         return $this->functionHandlers[$functionName] ?? null;
