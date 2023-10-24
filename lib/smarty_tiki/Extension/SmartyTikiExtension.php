@@ -49,6 +49,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getBlockHandler(string $blockTagName): ?BlockHandlerInterface
     {
         switch ($blockTagName) {
+            case 'ajax_href':
+                $this->functionHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
+                break;
             case 'remarksbox':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Remarksbox();
                 break;
