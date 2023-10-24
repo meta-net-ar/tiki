@@ -94,6 +94,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rating':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rating();
                 break;
+            case 'service':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Service();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
