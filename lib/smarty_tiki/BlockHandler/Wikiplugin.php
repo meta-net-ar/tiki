@@ -19,14 +19,14 @@ class Wikiplugin implements BlockHandlerInterface
             return '';
         }
 
-        if (!isset($params['_name'])) {
+        if (! isset($params['_name'])) {
             return '<div class="alert alert-warning">' . tra('Plugin name not specified.') . '</div>';
         }
 
         $name = $params['_name'];
         unset($params['_name']);
 
-        if (!empty($params['_compactArguments_'])) {
+        if (! empty($params['_compactArguments_'])) {
             $params = $params['_compactArguments_'];
         }
 

@@ -39,11 +39,11 @@ class Icon extends \Smarty\FunctionHandler\Base
         if (! is_array($params)) {
             $params = [];
         }
-    
+
         global $prefs, $tc_theme, $tc_theme_option, $url_path, $base_url, $tikipath, $iconset;
         $cachelib = \TikiLib::lib('cache');
         $smarty = \TikiLib::lib('smarty');
-    
+
         if (empty($tc_theme)) {
             $current_theme = ! empty($prefs['theme']) ? $prefs['theme'] : '';
             $current_theme_option = isset($prefs['theme_option']) ? $prefs['theme_option'] : '';
@@ -51,7 +51,7 @@ class Icon extends \Smarty\FunctionHandler\Base
             $current_theme = $tc_theme;
             $current_theme_option = ! empty($tc_theme_option) ? $tc_theme_option : '';
         }
-    
+
         if (isset($params['_type'])) {
             if ($params['_type'] === 'absolute_uri') {
                 $params['path_prefix'] = $base_url;
@@ -59,13 +59,13 @@ class Icon extends \Smarty\FunctionHandler\Base
                 $params['path_prefix'] = $url_path;
             }
         }
-    
+
         $serialized_params = serialize(array_merge($params, [$current_theme, $current_theme_option, isset($_SERVER['HTTPS'])]));
         $cache_key = \TikiLib::contextualizeKey('icons_' . '_' . md5($serialized_params), 'language', 'external');
         if ($cached = $cachelib->getCached($cache_key)) {
             return $cached;
         }
-    
+
         $basedirs = ['img/icons', 'img/icons/mime'];
         $icons_extension = empty($params['_extension']) ? '.png' : '.' . $params['_extension'];
         $tag = 'img';
@@ -77,7 +77,7 @@ class Icon extends \Smarty\FunctionHandler\Base
         $menu_icon = false;
         $confirm = '';
         $html = '';
-    
+
         if (empty($params['_id'])) {
             if (isset($params['_defaultdir']) && $params['_defaultdir'] == 'img/icons/large') {
                 $params['_id'] = 'green_question48x48';
@@ -101,7 +101,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 /* Generate a link for the icon if href or title (for tips) parameter is set.
                  * This will produce a link element (<a>) around the icon.
                  * If you want a button element (<button>), use the {button} smarty_tiki function */
-    
+
                 //collect link components
                 if (! empty($params['title'])) { //add title if not empty
                     $a_title = $params['title'];
@@ -120,19 +120,19 @@ class Icon extends \Smarty\FunctionHandler\Base
                 } else {
                     $a_class = 'btn btn-link'; //the default classes to be used
                 }
-    
+
                 if (! empty($params['href'])) { //use href if not empty
                     $a_href = 'href="' . $params['href'] . '"';
                 } else {
                     $a_href = '';
                 }
-    
+
                 if (isset($params['data-toggle'])) { //add data-toggle if set
                     $a_datatoggle = 'data-bs-toggle="' . $params['data-toggle'] . '"';
                 } else {
                     $a_datatoggle = '';
                 }
-    
+
                 if (isset($params['onclick'])) { //add onclick if set
                     $a_onclick = 'onclick="' . $params['onclick'] . '"';
                 } elseif (isset($params['_confirm'])) {
@@ -140,7 +140,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 } else {
                     $a_onclick = '';
                 }
-    
+
                 //assemble the link from the components
                 if ($menu_text) {
                     $icon = isset($params['_menu_icon']) && $params['_menu_icon'] === 'y' ? $html : '';
@@ -152,19 +152,19 @@ class Icon extends \Smarty\FunctionHandler\Base
             //return the icon
             return $html;
         } //ICONSET END
-    
+
         // Handle _ids that contains the real filename and path
         if (strpos($params['_id'], '/') !== false || strpos($params['_id'], '.') !== false) {
             if (($icons_basedir = dirname($params['_id'])) == '') {
                 $icons_basedir = $basedirs[0];
             }
-    
+
             $icons_basedir .= '/';
-    
+
             if (($pos = strrpos($params['_id'], '.')) !== false) {
                 $icons_extension = substr($params['_id'], $pos);
             }
-    
+
             $params['_id'] = preg_replace(
                 '/^' . str_replace('/', '\/', $icons_basedir) . '|' . $icons_extension . '$/',
                 '',
@@ -173,21 +173,20 @@ class Icon extends \Smarty\FunctionHandler\Base
         } else {
             $icons_basedir = $basedirs[0] . '/';
         }
-    
+
         if (! preg_match('/^[a-z0-9_-]+$/i', $params['_id'])) {
             return;
         }
-    
-    
+
         // Include smarty functions used below
         $smartyFunctionHtmlImageHandler = new \Smarty\FunctionHandler\HtmlImage();
-    
+
         // auto-detect 'alt' param if not set
         if (! isset($params['alt'])) {
             $alt_pos = ( ($alt_pos = strrpos($params['_id'], '_')) === false ) ? 0 : $alt_pos + 1;
             $params['alt'] = tra(ucfirst(substr($params['_id'], $alt_pos)));
         }
-    
+
         // handle special params and clean unrecognized params
         foreach ($params as $k => $v) {
             if ($k[0] == '_') {
@@ -197,48 +196,48 @@ class Icon extends \Smarty\FunctionHandler\Base
                         $v = $icons_basedir . $img_file;
                         $themelib = \TikiLib::lib('theme');
                         $v2 = $themelib->get_theme_path($current_theme, $current_theme_option, $img_file, 'icons/');
-    
+
                         if (! empty($v2)) {
                             $params['file'] = $v2;
                         } else {
                             $params['file'] = $v;
                         }
                         break;
-    
+
                     case '_notag':
                         $notag = ($v == 'y');
                         break;
-    
+
                     case '_menu_text':
                         $menu_text = ($v == 'y');
                         $menu_icon = ( isset($params['_menu_icon']) && $params['_menu_icon'] == 'y' );
                         break;
-    
+
                     case '_tag':
                         $tag = $v;
                         break;
-    
+
                     case '_confirm':
                         if ($prefs['javascript_enabled'] == 'y') {
                             $params['onclick'] = "return confirm('" . str_replace("'", "\'", $v) . "');";
                         }
                         break;
                 }
-    
+
                 unset($params[$k]);
             }
         }
-    
+
         // default values for some params
-    
+
         if (isset($params['path_prefix'])) {
             $params['basedir'] = $tikipath;
             $params['file'] = '/' . $params['file'];
         }
-    
+
         if ($tag == 'img' && is_readable($params['file'])) {
             $dim = getimagesize($params['file']);
-    
+
             if (! isset($params['width'])) {
                 $params['width'] = $dim[0] ? $dim[0] : $default_width;
             }
@@ -246,7 +245,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 $params['height'] = $dim[1] ? $dim[1] : $default_height;
             }
         }
-    
+
         if ($notag) {
             $html = (isset($params['path_prefix']) ? $params['path_prefix'] : '') . $params['file'];
         } else {
@@ -258,20 +257,20 @@ class Icon extends \Smarty\FunctionHandler\Base
             if (! isset($params['class'])) {
                 $params['class'] = $default_class;
             }
-    
+
             // remove empty arguments
             foreach ($params as $k => $v) {
                 if ($v == '') {
                     unset($params[$k]);
                 }
             }
-    
+
             // No need to add a title on a menu icon since there will be the same text just after the icon
             if ($menu_text) {
                 $menu_text_val = $params['title'];
                 unset($params['title']);
             }
-    
+
             if ($tag != 'img') {
                 $params['src'] = \TikiLib::tikiUrlOpt($params['file']);
                 unset($params['file']);
@@ -279,13 +278,13 @@ class Icon extends \Smarty\FunctionHandler\Base
                     $html .= ' ' . htmlspecialchars($k, ENT_QUOTES, 'UTF-8') . '="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '"';
                 }
             }
-    
+
             if (! empty($params['file'])) {
                 $headerlib = \TikiLib::lib('header');
                 $params['file'] = $headerlib->convert_cdn($params['file']);
                 $params['file'] = \TikiLib::tikiUrlOpt($params['file']);
             }
-    
+
             switch ($tag) {
                 case 'input_image':
                     $html = '<input type="image"' . $html . ' />';
@@ -298,12 +297,12 @@ class Icon extends \Smarty\FunctionHandler\Base
                         $html = '<span class="icon error" title="' . tra('Error:') . ' ' . $e->getMessage() . '">?</span>';
                     }
             }
-    
+
             if ($tag != 'img') {
                 // Add a span tag to be able to apply a CSS style on hover for the icon
                 $html = "<span>$html</span>";
             }
-    
+
             if ($menu_text) {
                 if (! $menu_icon) {
                     $html = '';
@@ -311,7 +310,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 $html = '<div class="iconmenu">' . $html . '<span class="iconmenutext"> ' . $menu_text_val . '</span></div>';
             }
         }
-    
+
         $cachelib->cacheItem($cache_key, $html);
         return $html;
     }

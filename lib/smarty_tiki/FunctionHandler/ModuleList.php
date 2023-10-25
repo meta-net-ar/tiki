@@ -12,7 +12,7 @@ use Smarty\Template;
 
 class ModuleList extends Base
 {
-    function handle($params, Template $template)
+    public function handle($params, Template $template)
     {
         $smarty = \TikiLib::lib('smarty');
         $moduleZones = $smarty->getTemplateVars('module_zones');
@@ -93,4 +93,3 @@ class ModuleList extends Base
     OUT;
     }
 }
-

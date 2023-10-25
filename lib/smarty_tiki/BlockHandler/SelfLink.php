@@ -12,7 +12,7 @@ use Smarty\Template;
 
 /**
  *
- * smarty_block_self_link : add a link (with A tag) to the current page on a text (passed through $content argument).
+ * smarty_block_self_link handler : add a link (with A tag) to the current page on a text (passed through $content argument).
  *
  *   The generated link uses other smarty functions like query and show_sort to handle AJAX, sorting fields, and sorting icons.
  *   This block is very useful to handle table columns sorting links.
@@ -39,7 +39,7 @@ use Smarty\Template;
  */
 class SelfLink extends Base
 {
-    function handle($params, $content, Template $template, &$repeat = false)
+    public function handle($params, $content, Template $template, &$repeat = false)
     {
         $default_type = 'absolute_path';
         $default_icon_type = 'relative';
@@ -48,33 +48,33 @@ class SelfLink extends Base
             return;
         }
 
-        $smartyFunctionQueryHandler = new \SmartyTiki\FunctionHandler\Query;
+        $smartyFunctionQueryHandler = new \SmartyTiki\FunctionHandler\Query();
 
         if (is_array($params)) {
-            if (!isset($content)) {
+            if (! isset($content)) {
                 $content = '';
             }
-            if (!isset($params['_ajax'])) {
+            if (! isset($params['_ajax'])) {
                 $params['_ajax'] = 'y';
             }
-            if (!isset($params['_script'])) {
+            if (! isset($params['_script'])) {
                 $params['_script'] = '';
             }
-            if (!isset($params['_tag'])) {
+            if (! isset($params['_tag'])) {
                 $params['_tag'] = 'y';
             }
-            if (!empty($params['_anchor'])) {
+            if (! empty($params['_anchor'])) {
                 $anchor = $params['_anchor'];
             } else {
                 $anchor = '';
             }
             if (empty($params['_disabled'])) {
-                if (!isset($params['_sort_arg'])) {
+                if (! isset($params['_sort_arg'])) {
                     $params['_sort_arg'] = 'sort';
                 }
-                if (!isset($params['_sort_field'])) {
+                if (! isset($params['_sort_field'])) {
                     $params['_sort_field'] = '';
-                } elseif ($params['_sort_arg'] != '' and !isset($params[$params['_sort_arg']])) {
+                } elseif ($params['_sort_arg'] != '' and ! isset($params[$params['_sort_arg']])) {
                     if (preg_match('/(_nasc|_ndesc)$/', $params['_sort_field'])) {
                         $params['_sort_field'] = preg_replace('/(_nasc|_ndesc)$/', '', $params['_sort_field']);
                         $params[$params['_sort_arg']] = $params['_sort_field'] . '_nasc,' . $params['_sort_field'] . '_ndesc';
@@ -83,7 +83,7 @@ class SelfLink extends Base
                     }
                 }
                 // Complete _script path if needed (not empty, not an anchor, ...)
-                if (!empty($params['_script']) && $params['_script'][0] != '#' && $params['_script'] != 'javascript:void(0)' && stripos($params['_script'], 'mailto:') !== 0) {
+                if (! empty($params['_script']) && $params['_script'][0] != '#' && $params['_script'] != 'javascript:void(0)' && stripos($params['_script'], 'mailto:') !== 0) {
                     if ($_SERVER['PHP_SELF'][0] == '/' && strpos($params['_script'], '/') === false) {
                         $self_dir = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
                         $params['_script'] = ($self_dir == '/' ? '' : $self_dir) . '/' . $params['_script'];
@@ -94,7 +94,7 @@ class SelfLink extends Base
                 }
 
                 $dataAttributes = '';
-                if (!empty($params['data'])) {
+                if (! empty($params['data'])) {
                     parse_str($params['data'], $attrs);
 
                     foreach ($attrs as $attr => $value) {
@@ -112,19 +112,19 @@ class SelfLink extends Base
                 if (empty($params['_disabled'])) {
                     if ($params['_ajax'] === 'y' && $params['_script'] === '') {
                         $martyBlockAjaxHrefHandler = new \SmartyTiki\BlockHandler\AjaxHref();
-                        if (!isset($params['_htmlelement'])) {
+                        if (! isset($params['_htmlelement'])) {
                             $params['_htmlelement'] = 'role_main';
                         }
-                        if (!isset($params['_onclick'])) {
+                        if (! isset($params['_onclick'])) {
                             $params['_onclick'] = '';
                         }
-                        if (!isset($params['_template'])) {
+                        if (! isset($params['_template'])) {
                             $params['_template'] = basename($_SERVER['PHP_SELF'], '.php') . '.tpl';
                             if ($params['_template'] == 'tiki-index.tpl') {
                                 $params['_template'] = 'tiki-show_page.tpl';
                             }
                         }
-                        if (!file_exists('templates/' . $params['_template']) || $params['_template'] == 'noauto') {
+                        if (! file_exists('templates/' . $params['_template']) || $params['_template'] == 'noauto') {
                             $params['_htmlelement'] = '';
                             $params['_template'] = '';
                         }
@@ -147,7 +147,7 @@ class SelfLink extends Base
 
                 if (isset($params['_icon']) || isset($params['_icon_name'])) {
                     if (
-                        !isset($params['_title']) && $content != '' && (!isset($params['_rel']) ||
+                        ! isset($params['_title']) && $content != '' && (! isset($params['_rel']) ||
                             strpos($params['_rel'], 'box') === false)
                     ) {
                         $params['_title'] = $content;
@@ -196,12 +196,12 @@ class SelfLink extends Base
                     }
                 }
 
-                $link = (!empty($params['_class']) ? 'class="' . $params['_class'] . '" ' : '')
-                    . (!empty($params['_style']) ? 'style="' . $params['_style'] . '" ' : '')
-                    . (!empty($params['_title']) ? 'title="' . str_replace('"', '\"', $params['_title']) . '" ' : '')
+                $link = (! empty($params['_class']) ? 'class="' . $params['_class'] . '" ' : '')
+                    . (! empty($params['_style']) ? 'style="' . $params['_style'] . '" ' : '')
+                    . (! empty($params['_title']) ? 'title="' . str_replace('"', '\"', $params['_title']) . '" ' : '')
                     . $dataAttributes;
 
-                if (!empty($params['_rel'])) {
+                if (! empty($params['_rel'])) {
                     if (strpos($params['_rel'], 'box') !== false) {
                         $rel = 'data-box="box" ';
                     } else {
@@ -212,7 +212,7 @@ class SelfLink extends Base
                 }
                 $link .= $rel;
                 foreach ($params as $k => $v) {
-                    if (strlen($k) > 3 && substr($k, 0, 3) == '_on' && !empty($v)) {
+                    if (strlen($k) > 3 && substr($k, 0, 3) == '_on' && ! empty($v)) {
                         $link .= htmlentities(substr($k, 1)) . '="' . $v . '" '; // $v should be already htmlentitized in the template
                         unset($params[$k]);
                     }
@@ -226,13 +226,13 @@ class SelfLink extends Base
 
                 $ret = "<a $link>" . $content . '</a>';
 
-                if (!empty($params['_sort_field'])) {
+                if (! empty($params['_sort_field'])) {
                     $smartyFunctionShowShortHandler = new \SmartyTiki\FunctionHandler\ShowShort();
                     $ret = "<a $link style='text-decoration:none;'>" . $content .
                     $smartyFunctionShowShortHandler->handle(
-                            ['sort' => $params['_sort_arg'], 'var' => $params['_sort_field']],
-                            $template
-                        ) . '</a>';
+                        ['sort' => $params['_sort_arg'], 'var' => $params['_sort_field']],
+                        $template
+                    ) . '</a>';
                 }
             }
         } else {
@@ -243,4 +243,3 @@ class SelfLink extends Base
         return $ret;
     }
 }
-

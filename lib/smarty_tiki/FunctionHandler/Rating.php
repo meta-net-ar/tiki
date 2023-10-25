@@ -18,7 +18,7 @@ class Rating extends Base
         $ratinglib = \TikiLib::lib('rating');
         $smarty = \TikiLib::lib('smarty');
 
-        if (!isset($params['type'], $params['id'])) {
+        if (! isset($params['type'], $params['id'])) {
             return tra('No object information provided for rating.');
         }
 
@@ -33,7 +33,7 @@ class Rating extends Base
         if (isset($_REQUEST['rating_value'][$type][$id], $_REQUEST['rating_prev'][$type][$id])) {
             $value = $_REQUEST['rating_value'][$type][$id];
             $prev = $_REQUEST['rating_prev'][$type][$id];
-            if ((!$changemandated || $value != $prev) && $ratinglib->record_vote($type, $id, $value)) {
+            if ((! $changemandated || $value != $prev) && $ratinglib->record_vote($type, $id, $value)) {
                 // Handle type-specific actions
                 if ($type == 'comment') {
                     if ($user) {

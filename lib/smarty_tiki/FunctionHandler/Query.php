@@ -19,7 +19,7 @@ class Query extends Base
         static $request = null;
 
         // Modify explicit params to be prefixed if they need to (used in a plugin, module, ...)
-        if (!empty($smarty->url_overriding_prefix)) {
+        if (! empty($smarty->url_overriding_prefix)) {
             foreach ($smarty->url_overriding_prefix[1] as $v) {
                 if (isset($params[$v])) {
                     $params[$smarty->url_overriding_prefix[0] . $v] = $params[$v];
@@ -37,11 +37,11 @@ class Query extends Base
                 $query[$param_name] = $param_value;
             }
             // Even if _noauto is set, 'filegals_manager' is a special param that has to be kept all the time
-            if (!isset($params['filegals_manager']) && isset($_REQUEST['filegals_manager'])) {
+            if (! isset($params['filegals_manager']) && isset($_REQUEST['filegals_manager'])) {
                 $query['filegals_manager'] = $_REQUEST['filegals_manager'];
             }
             // Even if _noauto is set, 'insertion_syntax' is a special param that has to be kept all the time
-            if (!isset($params['insertion_syntax']) && isset($_REQUEST['insertion_syntax'])) {
+            if (! isset($params['insertion_syntax']) && isset($_REQUEST['insertion_syntax'])) {
                 $query['insertion_syntax'] = $_REQUEST['insertion_syntax'];
             }
         } else {
@@ -50,12 +50,12 @@ class Query extends Base
                 // make a copy of the $_GET and $_POST arrays as it seems php7 assigns these by reference now
                 // and so they get directly modified below instead of just the query string being set
                 $request = [];
-                if (!empty($_GET)) {
+                if (! empty($_GET)) {
                     foreach ($_GET as $k => $v) {
                         $request[$k] = $v;
                     }
                 }
-                if (!empty($_POST)) {
+                if (! empty($_POST)) {
                     foreach ($_POST as $k => $v) {
                         $request[$k] = $v;
                     }
@@ -98,9 +98,9 @@ class Query extends Base
         if (is_array($query)) {
             // Only keep params explicitely specified when calling this function or specified in the $auto_query_args global var
             // This is to avoid including unwanted params (like actions : remove, save...)
-            if ((!isset($params['_keepall']) || $params['_keepall'] != 'y') && is_array($auto_query_args)) {
+            if ((! isset($params['_keepall']) || $params['_keepall'] != 'y') && is_array($auto_query_args)) {
                 foreach ($query as $k => $v) {
-                    if (!in_array($k, $auto_query_args) && !(is_array($params) && array_key_exists($k, $params))) {
+                    if (! in_array($k, $auto_query_args) && ! (is_array($params) && array_key_exists($k, $params))) {
                         unset($query[$k]);
                     }
                 }
@@ -131,7 +131,7 @@ class Query extends Base
                 if (isset($params['controller'], $params['action']) && $prefs['feature_sefurl'] == 'y') {
                     unset($query['controller'], $query['action']);
                 }
-                if (!isset($params['_urlencode'])) {
+                if (! isset($params['_urlencode'])) {
                     $params['_urlencode'] = 'y';
                 }
                 $sep = $params['_urlencode'] == 'n' ? '&' : '&amp;';
@@ -143,7 +143,7 @@ class Query extends Base
             global $base_host;
 
             // Check for anchor used as script
-            if (!empty($params['_script']) && $params['_script'][0] == '#') {
+            if (! empty($params['_script']) && $params['_script'][0] == '#') {
                 if (empty($params['_anchor'])) {
                     $params['_anchor'] = substr($params['_script'], 1);
                 }
@@ -164,7 +164,7 @@ class Query extends Base
                 if ($php_self != 'javascript:void(0)' && strpos($php_self, '/') === false && $_SERVER['PHP_SELF'][0] == '/' && stripos($params['_script'], 'mailto:') !== 0) {
                     $php_self = str_replace('\\', '/', dirname($_SERVER['PHP_SELF'])) . '/' . $php_self;
                 }
-            } elseif (empty($params['_anchor']) || !empty($ret)) {
+            } elseif (empty($params['_anchor']) || ! empty($ret)) {
                 // Use current script explicitely, except if there is only an anchor (i.e. no script and no URL argument) which is enough
                 // This also implies that if no anchor, every current URL params will be loosed
 
@@ -195,11 +195,11 @@ class Query extends Base
                 // If we just have an anchor, return only this anchor, usual types other than 'anchor' are irrelevant
                 $params['_type'] = 'anchor';
             }
-            if (!empty($php_self)) {
+            if (! empty($php_self)) {
                 if (basename($php_self) === 'route.php') {
                     global $inclusion;
                     $php_self = str_replace('route.php', $inclusion, $php_self);
-                } elseif (basename($php_self) === 'tiki-ajax_services.php' && !empty($_SERVER['HTTP_REFERER'])) {
+                } elseif (basename($php_self) === 'tiki-ajax_services.php' && ! empty($_SERVER['HTTP_REFERER'])) {
                     //$php_self = str_replace('tiki-ajax_services.php', basename($_SERVER['HTTP_REFERER']), $php_self); // TODO: figure out if this was really needed for anything as it was wrongly replacing the link with the last visited referrer in the PluginH5P Edit button
                     $pos = strpos($php_self, '?');
                     if ($pos !== false) {

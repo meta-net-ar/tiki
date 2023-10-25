@@ -21,7 +21,7 @@ use Smarty\Template;
  *
  * @return string remarksbox
  * @throws \Smarty\Exception
- * 
+ *
  * To make a box, a template may contain something like this:
  * \code
  *  {remarksbox title="Welcome to the control panels"}
@@ -45,9 +45,8 @@ use Smarty\Template;
  *  - width         e.g. "50%", "200px" default=""
  *  - store_cookie  "y|n" default y, set to n to not store closed state in a cookie
  */
-
- class Remarksbox implements BlockHandlerInterface
- {
+class Remarksbox implements BlockHandlerInterface
+{
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs;
@@ -174,4 +173,4 @@ use Smarty\Template;
     {
         return true;
     }
- }
+}

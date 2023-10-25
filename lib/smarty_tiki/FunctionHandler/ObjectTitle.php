@@ -17,7 +17,7 @@ class ObjectTitle extends Base
         if (! isset($params['type'], $params['id']) && ! isset($params['identifier'])) {
             return tra('No object information provided.');
         }
-    
+
         if (isset($params['type'], $params['id'])) {
             $type = $params['type'];
             $object = $params['id'];
@@ -29,7 +29,7 @@ class ObjectTitle extends Base
         } else {
             list($type, $object) = explode(':', $params['identifier'], 2);
         }
-    
+
         $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
         return $smartyTikiExtension->smarty_modifier_escape(\TikiLib::lib('object')->get_title($type, $object));
     }

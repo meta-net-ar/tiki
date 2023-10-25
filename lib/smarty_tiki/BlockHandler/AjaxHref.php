@@ -6,11 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 namespace SmartyTiki\BlockHandler;
+
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
 
 /**
- * smarty_block_ajax_href creates the href for a link in Smarty according to AJAX prefs
+ * smarty block ajax_href creates the href for a link in Smarty according to AJAX prefs
  *
  * Params:
  *
@@ -24,7 +25,7 @@ class AjaxHref extends Base
         if ($repeat) {
             return;
         }
-    
+
         if (! empty($params['_onclick'])) {
             $onclick = $params['_onclick'];
             if (substr($onclick, -1) != ';') {
@@ -33,7 +34,7 @@ class AjaxHref extends Base
         } else {
             $onclick = '';
         }
-    
+
         $attributes = " href=\"" . $content . '" ';
         if (! empty($onclick)) {
             $attributes .= "onclick=\"$onclick\" ";

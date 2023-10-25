@@ -36,7 +36,7 @@ class HtmlBodyAttributes extends Base
             $class .= ' fixed_width';
         }
 
-        if (!empty($_REQUEST["page"]) && strtolower($_REQUEST["page"]) === 'sandbox') {
+        if (! empty($_REQUEST["page"]) && strtolower($_REQUEST["page"]) === 'sandbox') {
             $class .= ' sandbox ';
         }
 
@@ -44,7 +44,7 @@ class HtmlBodyAttributes extends Base
             $class .= ' layout_' . $prefs['site_layout'];
         }
 
-        if (!empty($_REQUEST['filegals_manager'])) {
+        if (! empty($_REQUEST['filegals_manager'])) {
             $class .= ' filegal_popup';
         }
 
@@ -53,7 +53,7 @@ class HtmlBodyAttributes extends Base
             $class .= ' fullscreen';
         }
 
-        if (!empty($_COOKIE['sidebar_collapsed'])) {
+        if (! empty($_COOKIE['sidebar_collapsed'])) {
             $class .= empty($class) ? ' ' : '';
             $class .= ' sidebar_collapsed';
         }
@@ -73,7 +73,7 @@ class HtmlBodyAttributes extends Base
             $perspectivelib = \TikiLib::lib('perspective');
             $perspectiveId = 0;
             $perspectiveName = '';
-            if (!empty($_SESSION['current_perspective'])) {
+            if (! empty($_SESSION['current_perspective'])) {
                 $perspectiveId = $_SESSION['current_perspective'];
                 $perspectiveName = $_SESSION['current_perspective_name'];
             } elseif (empty($_SESSION['current_perspective']) && $perspectivelib->get_current_perspective($prefs) && $perspectivelib->get_current_perspective($prefs) > 0) {
@@ -95,11 +95,11 @@ class HtmlBodyAttributes extends Base
             }
         }
 
-        if (!empty($page) && $page == $prefs['tikiIndex']) {
+        if (! empty($page) && $page == $prefs['tikiIndex']) {
             $class .= ' homepage';
         }
 
-        if (!empty($pageLang)) {
+        if (! empty($pageLang)) {
             $class .= ' lang_' . $pageLang;
         } else {
             $class .= ' lang_' . $prefs['language'];
@@ -117,16 +117,14 @@ class HtmlBodyAttributes extends Base
             $class .= ' uol'; // add class to display all the ordered lists sub-items indented with unique numbering like "1.2", "1.2.1", etc.
         }
 
-        if (!empty($onload)) {
+        if (! empty($onload)) {
             $back .= ' onload="' . $onload . '"';
         }
 
-        if (!empty($class)) {
+        if (! empty($class)) {
             $back .= ' class="' . $class . '"';
         }
 
         return $back;
     }
 }
-
-

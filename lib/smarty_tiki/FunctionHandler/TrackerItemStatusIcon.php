@@ -22,11 +22,11 @@ class TrackerItemStatusIcon extends Base
 
         $item = $params['item'];
 
-        if (!is_object($item)) {
+        if (! is_object($item)) {
             $item = \Tracker_Item::fromId($item);
         }
 
-        if (!empty($prefs['tracker_status_in_objectlink'])) {
+        if (! empty($prefs['tracker_status_in_objectlink'])) {
             $show_status = $prefs['tracker_status_in_objectlink'];
         } else {
             $show_status = 'y';

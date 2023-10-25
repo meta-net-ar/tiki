@@ -222,7 +222,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * @param bool $double_encode
      * @return string
      */
-    function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
+    public function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
     {
         switch ($esc_type) {
             case 'html':
@@ -240,7 +240,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
             case 'htmlall':
                 $return = htmlentities($string ?? '', ENT_QUOTES, $char_set);
-                if (!strlen($return) && strlen($string)) { // Bug php when there is non utf8 characters in the string(http://bugs.php.net/bug.php?id=43549, http://bugs.php.net/bug.php?id=43294)
+                if (! strlen($return) && strlen($string)) { // Bug php when there is non utf8 characters in the string(http://bugs.php.net/bug.php?id=43549, http://bugs.php.net/bug.php?id=43294)
                     $return = htmlentities($string, ENT_QUOTES);
                 }
 
@@ -502,7 +502,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         }
     }
 
-       /**
+    /**
      * \brief Smarty modifier to replace strings
      *
      * - type:     modifier
@@ -520,10 +520,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Example: {$country|stringfix:"_":" "}
      */
 
-     function smarty_modifier_stringfix($string, $what = '_', $by = ' ')
-     {
-         return str_replace($what, $by, $string);
-     }
+    public function smarty_modifier_stringfix($string, $what = '_', $by = ' ')
+    {
+        return str_replace($what, $by, $string);
+    }
 
     /*
     * Smarty plugin
@@ -555,7 +555,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      */
     public function smarty_modifier_truncate($string, $length = 80, $etc = '...', $break_words = false, $middle = false)
     {
-        if (!isset($string) || $length == 0) {
+        if (! isset($string) || $length == 0) {
             return '';
         }
 
@@ -567,10 +567,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             } else {
                 $func = 'substr';
             }
-            if (!$break_words && !$middle) {
+            if (! $break_words && ! $middle) {
                 $string = preg_replace('/\s+?(\S+)?$/', '', $func($string, 0, $length + 1));
             }
-            if (!$middle) {
+            if (! $middle) {
                 return $func($string, 0, $length) . $etc;
             } else {
                 return $func($string, 0, $length / 2) . $etc . $func($string, -$length / 2);
@@ -583,10 +583,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     /**
      * @param string $string - Required. Specifies the string to check
      * @param string $chars - Optional. Specifies which characters to remove from the string. If omitted, the following characters will be removed: " \t\n\r\0\x0B"
-     * 
-     * @return string - String trimed  
+     *
+     * @return string - String trimed
      */
-    public function smarty_modifier_trim($string, $chars = null) {
+    public function smarty_modifier_trim($string, $chars = null)
+    {
         return empty($chars) ? trim($string) : trim($string, $chars);
     }
 
@@ -627,7 +628,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      *
      * Example: {$userinfo.login|userlink:'link':::25}
      */
-
     public function smarty_modifier_userlink($other_user, $class = 'userlink', $idletime = 'not_set', $fullname = '', $max_length = 0, $popup = '')
     {
         global $prefs;
@@ -653,7 +653,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         } else {
             $other_user = \TikiLib::lib('user')->distinguish_anonymous_users($other_user);
         }
-        if (!$fullname) {
+        if (! $fullname) {
             $fullname = \TikiLib::lib('user')->clean_user($other_user);
         }
         if ($max_length) {
@@ -674,7 +674,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         global $prefs;
         $userlib = \TikiLib::lib('user');
 
-        $return = $userlib->clean_user($user, !$check_user_show_realnames, $login_fallback);
+        $return = $userlib->clean_user($user, ! $check_user_show_realnames, $login_fallback);
 
         if ($html_encoding) {
             $return = htmlspecialchars($return);
