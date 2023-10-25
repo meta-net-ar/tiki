@@ -47,8 +47,8 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
         $smarty = new Smarty_Tiki();
 
         if ($this->changeDelimiters) {
-            $smarty->left_delimiter = '{{';
-            $smarty->right_delimiter = '}}';
+            $smarty->setLeftDelimiter('{{');
+            $smarty->setRightDelimiter('}}');
         }
 
         foreach ($this->data as $key => $value) {

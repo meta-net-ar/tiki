@@ -452,8 +452,8 @@ class OIntegrate_Engine_Smarty implements OIntegrate_Engine
         $smarty->setTemplateDir(dirname($templateFile));
 
         if ($this->changeDelimiters) {
-            $smarty->left_delimiter = '{{';
-            $smarty->right_delimiter = '}}';
+            $smarty->setLeftDelimiter('{{');
+            $smarty->setRightDelimiter('}}');
         }
 
         $smarty->assign('response', $data);

@@ -1585,10 +1585,10 @@ function wikiplugin_trackerlist($data, $params)
         $smarty->assign_by_ref('export', $export);
 
         if (! empty($ldelim)) {
-            $smarty->left_delimiter = $ldelim;
+            $smarty->setLeftDelimiter($ldelim);
         }
         if (! empty($rdelim)) {
-            $smarty->right_delimiter = $rdelim;
+            $smarty->setRightDelimiter($rdelim);
         }
 
         if (isset($checkbox)) {
