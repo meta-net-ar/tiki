@@ -45,7 +45,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_username'];
             case 'zone_is_empty':
                 return [$this, 'smarty_modifier_zone_is_empty'];
-
         }
         return null;
     }
@@ -55,6 +54,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         switch ($blockTagName) {
             case 'ajax_href':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
+                break;
+            case 'jq':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Jq();
                 break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
