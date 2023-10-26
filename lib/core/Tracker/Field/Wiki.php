@@ -553,32 +553,81 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
 
         $trklib = TikiLib::lib('trk');
         $relationlib = TikiLib::lib('relation');
+        $logslib = TikiLib::lib('logs');
+//        $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+        $tikilib = TikiLib::lib('tiki');
 
-        $trackerId = $this->getConfiguration('trackerId');
         $fieldId = $this->getConfiguration('fieldId');
+        $pagenameField = $this->getOption('fieldIdForPagename');
         $options = $this->getConfiguration('options_map');
         $pageTable = $trklib->table('tiki_pages');
+        $trackerItemFieldsTable = $trklib->table('tiki_tracker_item_fields');
+
+        $pageNamePrefix = $this->getOption('customnamespace', '');
 
         $tx = $trklib->begin();
-        $result = $trklib->fetchAll("SELECT tti.`itemId`, ttif.`value`
-            FROM `tiki_tracker_items` tti, `tiki_tracker_item_fields` ttif
-            WHERE tti.`trackerId` = ?
-                AND tti.`itemId` = ttif.`itemId`
-                AND ttif.`fieldId` = ?", [$trackerId, $fieldId]);
+
+        $result = $trackerItemFieldsTable->fetchAll(
+            ['itemId', 'value'],
+            ['fieldId' => $fieldId],
+            -1,
+            -1,
+            ['itemId' => 'ASC']
+        );
 
         foreach ($result as $row) {
             $itemId = $row['itemId'];
-            $pageName = $row['value'];
+            $pageData = [];
+            $finalValue = '';
 
-            $pageData = $pageTable->fetchColumn('data', [
-                'pageName' => $pageName,
-            ]);
+            $pageName = trim($row['value']);
 
-            if (empty($pageData)) {
+            if (! $pageName) {
+                // tracker field value missing so try the pagename field (usually the title)
+                $pageName = $trackerItemFieldsTable->fetchOne(
+                    'value',
+                    [
+                        'fieldId' => $pagenameField,
+                        'itemId' => $itemId,
+                    ]
+                );
+            }
+
+            if ($pageName) {
+                $pageData = $pageTable->fetchColumn('data', [
+                    'pageName' => $pageName,
+                ]);
+                if (empty(array_filter($pageData))) {
+                    // try again with the cleaned version of the page
+                    $originalPageName = $pageName;
+                    $pageName = $this->cleanPageName($pageName);
+
+                    $pageData = $pageTable->fetchColumn('data', [
+                        'pageName' => $pageName,
+                    ]);
+
+                    if (
+                        empty(array_filter($pageData)) &&
+                        (! $pageNamePrefix || strpos($pageName, $pageNamePrefix) !== 0)
+                    ) {
+                        // try again with the prefix as old bugs created bad data
+                        $pageName = $this->getFullPageName($originalPageName);
+
+                        $pageData = $pageTable->fetchColumn('data', [
+                            'pageName' => $pageName,
+                        ]);
+                    }
+                }
+            }
+
+            if (empty(array_filter($pageData))) {
                 // page might have been renamed? Check if there's a relation to an existing page
                 $related = $relationlib->get_relations_to('trackeritem', $itemId, 'tiki.wiki.linkeditem');
                 foreach ($related as $rel) {
                     $pageName = $rel['itemId'];
+                    if (strlen($page_name) > 160) {
+                        $page_name = substr($page_name, 0, 160);
+                    }
                     $pageData = $pageTable->fetchColumn('data', [
                         'pageName' => $pageName,
                     ]);
@@ -599,18 +648,21 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                     }
                 }
                 if (strlen($pageData[0]) < 65535) {
+                    $finalValue = $pageData[0];
                     $trklib->table('tiki_tracker_item_fields')->update(
-                        ['value' => $pageData[0]],
+                        ['value' => $finalValue],
                         ['itemId' => $itemId, 'fieldId' => $fieldId]
                     );
-                    // too slow and doesn't do relations?
-                    TikiLib::lib('tiki')->remove_all_versions($pageName);
+                    // delete the page
+                    $tikilib->remove_all_versions($pageName);
                 } else {
-                    $trklib->table('tiki_tracker_item_fields')->update(
-                        ['value' => "Converting Wiki Page field to TextArea
+                    $finalValue = "Converting Wiki Page field to TextArea
 Page too big, so included below:
 
-{include page=\"{$pageName}\"}"],
+{include page=\"{$pageName}\"}";
+
+                    $trklib->table('tiki_tracker_item_fields')->update(
+                        ['value' => $finalValue],
                         ['itemId' => $itemId, 'fieldId' => $fieldId]
                     );
                     Feedback::warning(
@@ -622,8 +674,9 @@ Page too big, so included below:
                     );
                 }
             } else {
+                $finalValue = "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"}";
                 $trklib->table('tiki_tracker_item_fields')->update(
-                    ['value' => "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"}"],
+                    ['value' => $finalValue],
                     ['itemId' => $itemId, 'fieldId' => $fieldId]
                 );
                 Feedback::error(
@@ -634,6 +687,13 @@ Page too big, so included below:
                     )
                 );
             }
+            // record the change
+            $version = $trklib->last_log_version($itemId) + 1;
+            $logslib->add_action('Updated', $itemId, 'trackeritem', $version);
+            $trklib->log($version, $itemId, $fieldId, $finalValue);
+
+            // don't mark item as needing reindexing - a full index rebuild will usually be quicker
+            //$unifiedsearchlib->invalidateObject('trackeritem', $itemId);
         }
         $tx->commit();
         return [
