@@ -142,6 +142,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'show_short':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
                 break;
+            case 'ticket':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ticket();
+                break;
             case 'tracker_item_status_icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
                 break;
