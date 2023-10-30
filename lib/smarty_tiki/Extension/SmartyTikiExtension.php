@@ -94,6 +94,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'bootstrap_modal':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\BootstrapModal();
                 break;
+            case 'button':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Button();
+                break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
