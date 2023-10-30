@@ -141,6 +141,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getPreFilters(): array
     {
         $this->preFilters = [
+            new \SmartyTiki\Filter\Pre\Tr(),
             new \SmartyTiki\Filter\Pre\Jq()
         ];
 

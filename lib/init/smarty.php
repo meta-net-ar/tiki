@@ -213,10 +213,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->use_sub_dirs = false;
         $this->url_overriding_prefix_stack = [];
 
-        require_once(__DIR__ . '/../smarty_tiki/prefilter.tr.php');
-        $this->registerFilter('pre', 'smarty_prefilter_tr');
-
-
         include_once(__DIR__ . '/../smarty_tiki/resource.tplwiki.php');
         $this->registerResource('tplwiki', new Smarty_Resource_Tplwiki());
 
