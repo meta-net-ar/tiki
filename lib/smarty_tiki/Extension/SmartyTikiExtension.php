@@ -104,6 +104,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
+            case 'monitor_link':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MonitorLink();
+                break;
             case 'object_title':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectTitle();
                 break;
