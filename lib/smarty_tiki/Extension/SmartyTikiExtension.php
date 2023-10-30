@@ -91,6 +91,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'breadcrumbs':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Breadcrumbs();
                 break;
+            case 'bootstrap_modal':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\BootstrapModal();
+                break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
