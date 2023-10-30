@@ -44,6 +44,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_userlink'];
             case 'username':
                 return [$this, 'smarty_modifier_username'];
+            case 'virtual_path':
+                return [$this, 'smarty_modifier_virtual_path'];
             case 'zone_is_empty':
                 return [$this, 'smarty_modifier_zone_is_empty'];
         }
@@ -694,6 +696,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $return = htmlspecialchars($return);
         }
         return $return;
+    }
+
+    public function smarty_modifier_virtual_path($fileOrPageId, $type = 'file')
+    {
+        global $prefs, $base_url;
+
+        $filegallib = \TikiLib::lib('filegal');
+
+        if ($type == 'wiki page') {
+            return $base_url . 'tiki-webdav.php/Wiki Pages/' . $fileOrPageId;
+        } else {
+            return $base_url . 'tiki-webdav.php' . ($filegallib->get_full_virtual_path($fileOrPageId, $type));
+        }
     }
 
     public function smarty_modifier_zone_is_empty($zoneName)
