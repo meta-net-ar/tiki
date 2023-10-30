@@ -14,7 +14,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 {
     private $blockHandlers = [];
     private $functionHandlers = [];
-    private $outputfilters = [];
+    private $outputFilters = [];
+    private $preFilters = [];
 
     public function getModifierCallback(string $modifierName)
     {
@@ -131,10 +132,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getOutputFilters(): array
     {
         if (isset($_REQUEST['highlight']) || (isset($prefs['feature_referer_highlight']) && $prefs['feature_referer_highlight'] == 'y')) {
-            $this->outputfilters[] = new \SmartyTiki\Filter\Output\Highlight();
+            $this->outputFilters[] = new \SmartyTiki\Filter\Output\Highlight();
         }
 
-        return $this->outputfilters;
+        return $this->outputFilters;
+    }
+
+    public function getPreFilters(): array
+    {
+        $this->preFilters = [
+            new \SmartyTiki\Filter\Pre\Jq()
+        ];
+
+        return $this->preFilters;
     }
 
     /*

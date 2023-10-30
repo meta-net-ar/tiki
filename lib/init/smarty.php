@@ -216,8 +216,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         require_once(__DIR__ . '/../smarty_tiki/prefilter.tr.php');
         $this->registerFilter('pre', 'smarty_prefilter_tr');
 
-        require_once(__DIR__ . '/../smarty_tiki/prefilter.jq.php');
-        $this->registerFilter('pre', 'smarty_prefilter_jq');
 
         include_once(__DIR__ . '/../smarty_tiki/resource.tplwiki.php');
         $this->registerResource('tplwiki', new Smarty_Resource_Tplwiki());
