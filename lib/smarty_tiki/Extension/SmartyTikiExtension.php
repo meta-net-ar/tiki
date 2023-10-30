@@ -94,6 +94,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
+            case 'favorite':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
+                break;
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
