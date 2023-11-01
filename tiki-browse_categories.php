@@ -272,7 +272,6 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     global $prefsgroups, $tiki_p_admin_users, $tiki_p_admin;
     $categlib = TikiLib::lib('categ');
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_icon');
     $smarty->loadPlugin('smarty_function_popup');
 
     $section = 'categories';
