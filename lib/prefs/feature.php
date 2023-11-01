@@ -2996,5 +2996,21 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['advanced'],
         ],
+        'feature_robots_allow' => [
+            'name' => tra('robots link allow'),
+            'description' => tra("allows you to add new authorized urls to robots files"),
+            'type' => 'text',
+            'shorthint' => tra('use a | to separate urls, e.g. /tiki-view_forum.php| /tiki-read_article.php'),
+            'size' => '50',
+            'default' => '',
+        ],
+        'feature_robots_disallow' => [
+            'name' => tra('robots link disallow'),
+            'description' => tra("adds new disallowed urls to robots files"),
+            'type' => 'text',
+            'shorthint' => tra('use a | to separate urls, e.g. /temp/public/ | /addons/'),
+            'size' => '50',
+            'default' => '',
+        ],
     ];
 }
