@@ -59,17 +59,7 @@
             {preference name=metatag_revisitafter}
             {preference name=feature_robots_allow}
             {preference name=feature_robots_disallow}
-
-            {remarksbox type="info" title="{tr}Regenerate robots.txt file{/tr}" close="n"}
-            
-                {tr}you have two possibilities, firstly you add just your new link to an existinf link in robots.txt or you remove all content of files and you add just your new link{/tr}
-                <br>
-                {button href="tiki-admin.php?page=metatags&regenerate=1" class="btn btn-primary" _text="{tr}Regenerate with old content{/tr}"}
-                {button href="tiki-admin.php?page=metatags&regenerate=deleteOld" class="btn btn-danger" _text="{tr}Regenerate without old content{/tr}"}
-                <br>
-                {tr} Note: when you regenerate without the old content, it will be not possible, on this interface, to revert your action {/tr}
-
-            {/remarksbox}
+            {preference name=feature_robots_remove_base}
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

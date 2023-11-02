@@ -3001,7 +3001,7 @@ function prefs_feature_list($partial = false)
             'description' => tra("allows you to add new authorized urls to robots files"),
             'type' => 'text',
             'shorthint' => tra('use a | to separate urls, e.g. /tiki-view_forum.php| /tiki-read_article.php'),
-            'size' => '50',
+            'size' => '500',
             'default' => '',
         ],
         'feature_robots_disallow' => [
@@ -3009,8 +3009,19 @@ function prefs_feature_list($partial = false)
             'description' => tra("adds new disallowed urls to robots files"),
             'type' => 'text',
             'shorthint' => tra('use a | to separate urls, e.g. /temp/public/ | /addons/'),
-            'size' => '50',
+            'size' => '500',
             'default' => '',
         ],
+        'feature_robots_remove_base' => [
+            'name' => tra('robots base file'),
+            'description' => tra("keeps or deletes the basic content of the robots.txt file"),
+            'type' => 'list',
+            'shorthint' => tra("if no directive is given, but you decide to delete the basic content, TIKI will block all links and the robots.txt file will be: dissallow: /"),
+            'options' => [
+                'n' => tra('Keep base file'),
+                'y' => tra('Delete base file'),
+            ],
+            'default' => 'n',
+        ]
     ];
 }

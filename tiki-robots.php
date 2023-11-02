@@ -17,7 +17,7 @@ if (isset($prefs['feature_robots_disallow'])) {
     $links = $prefs['feature_robots_allow'];
     $disallowLinks = explode("|", $links);
 }
-
+if ($prefs['feature_robots_remove_base'] == 'n') {
 echo <<<EOF
 # This is a robots.txt file to instruct all search bots that we don't want them to crawl in the paths beginning with the strings below.
 # If you are viewing this via example.org/robots.txt, it is an alias of tiki-robots.php (likely via an instruction in .htaccess)
@@ -105,10 +105,18 @@ Disallow: /*print=y*
 Disallow: /*fullscreen=y*
 Disallow: /*mode=mobile*
 EOF;
-foreach($allowLinks as $allowLink) {
-    echo 'Allow: '. $allowLink . PHP_EOL;
+echo "\n";
 }
-
-foreach($disallowLinks as $disallowLink) {
-    echo 'Disallow: '. $disallowLink . PHP_EOL;
+if (isset($allowLinks)) {
+    foreach ($allowLinks as $allowLink) {
+        echo 'Allow: ' . $allowLink . PHP_EOL;
+    }
+}
+if (isset($disallowLinks)) {
+    foreach ($disallowLinks as $disallowLink) {
+        echo 'Disallow: ' . $disallowLink . PHP_EOL;
+    }
+}
+if ($prefs['feature_robots_remove_base'] == 'y' && ! isset($allowLinks) && ! isset($disallowLinks)) {
+    echo 'Disallow: /';
 }
