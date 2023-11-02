@@ -18,7 +18,7 @@ if (isset($prefs['feature_robots_disallow'])) {
     $disallowLinks = explode("|", $links);
 }
 if ($prefs['feature_robots_remove_base'] == 'n') {
-echo <<<EOF
+    echo <<<EOF
 # This is a robots.txt file to instruct all search bots that we don't want them to crawl in the paths beginning with the strings below.
 # If you are viewing this via example.org/robots.txt, it is an alias of tiki-robots.php (likely via an instruction in .htaccess)
 # tiki-robots.php permits to dynamically generate a robots.txt file according to preferences set in the admin panel
@@ -105,7 +105,7 @@ Disallow: /*print=y*
 Disallow: /*fullscreen=y*
 Disallow: /*mode=mobile*
 EOF;
-echo "\n";
+    echo "\n";
 }
 if (isset($allowLinks)) {
     foreach ($allowLinks as $allowLink) {
