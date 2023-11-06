@@ -130,6 +130,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'permission_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PermissionLink();
                 break;
+            case 'preference':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Preference();
+                break;
             case 'query':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Query();
                 break;
