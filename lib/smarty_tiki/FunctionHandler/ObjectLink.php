@@ -104,7 +104,6 @@ class ObjectLink extends Base
 function smarty_function_object_link_default($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
 {
     global $base_url;
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
 
     if (empty($title)) {
         $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
@@ -122,16 +121,16 @@ function smarty_function_object_link_default($template, $object, $title = null, 
     $text = $title;
     $titleAttribute = '';
     if ($type == 'wiki page') {
-        $titleAttribute .= ' title="' . $smartyTikiExtension->smarty_modifier_escape($title) . '"';
+        $titleAttribute .= ' title="' . smarty_modifier_escape($title) . '"';
         $text = \TikiLib::lib('wiki')->get_without_namespace($title);
     }
 
-    $escapedText = $smartyTikiExtension->smarty_modifier_escape($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
+    $escapedText = smarty_modifier_escape($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
 
     if ($url) {
-        $escapedHref = $smartyTikiExtension->smarty_modifier_escape(\TikiLib::tikiUrlOpt($url));
+        $escapedHref = smarty_modifier_escape(\TikiLib::tikiUrlOpt($url));
     } else {
-        $escapedHref = $smartyTikiExtension->smarty_modifier_escape($smartyTikiExtension->smarty_modifier_sefurl($object, $type));
+        $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($object, $type));
     }
 
     $classList = [];
@@ -167,10 +166,8 @@ function smarty_function_object_link_default($template, $object, $title = null, 
 
     global $prefs;
     if (isset($attributes['tiki.content.source']) && $prefs['fgal_source_show_refresh'] == 'y') {
-        $smartyFunctionIconHandler = new \SmartyTiki\FunctionHandler\Icon();
-        $smartyFunctionServiceHandler = new \SmartyTiki\FunctionHandler\Service();
         $html .= '<a class="file-refresh" href="' .
-        $smartyFunctionServiceHandler->handle(
+        smarty_function_service(
             [
                 'controller' => 'file',
                 'action' => 'refresh',
@@ -178,7 +175,7 @@ function smarty_function_object_link_default($template, $object, $title = null, 
             ],
             $template
         ) . '">' .
-        $smartyFunctionIconHandler->handle(
+        smarty_function_icon(
             ['_id' => 'arrow_refresh',],
             $template
         ) . '</a>';
@@ -194,10 +191,10 @@ function smarty_function_object_link_default($template, $object, $title = null, 
     }
 
     if (! empty($params['metaItemId'])) {
-        $html .= $smartyFunctionIconHandler->handle([
+        $html .= smarty_function_icon([
             'name' => 'clipboard-list',
             'title' => tr('show metadata'),
-            'href' => $smartyTikiExtension->smarty_modifier_escape($smartyTikiExtension->smarty_modifier_sefurl($params['metaItemId'], 'trackeritem')),
+            'href' => smarty_modifier_escape(smarty_modifier_sefurl($params['metaItemId'], 'trackeritem')),
         ], $template) . '</a>';
     }
 
@@ -206,10 +203,9 @@ function smarty_function_object_link_default($template, $object, $title = null, 
 
 function smarty_function_object_link_comment($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
     $comments_lib = \TikiLib::lib('comments');
     $comment = $comments_lib->get_comment($object);
-    $url = $smartyTikiExtension->smarty_modifier_sefurl($object, $comment['objectType'] . '_comment');
+    $url = smarty_modifier_sefurl($object, $comment['objectType'] . '_comment');
 
     if (empty($title)) {
         $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format']);
@@ -222,8 +218,7 @@ function smarty_function_object_link_trackeritem($template, $object, $title = nu
 {
     $item = \Tracker_Item::fromId($object);
 
-    $smartyfunctionTrackerItemStatusIconHandler = new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
-    $pre = $smartyfunctionTrackerItemStatusIconHandler->handle(['item' => $item], $template);
+    $pre = smarty_function_tracker_item_status_icon(['item' => $item], $template);
     if (! empty($pre)) {
         $pre .= " ";
     }
@@ -231,28 +226,23 @@ function smarty_function_object_link_trackeritem($template, $object, $title = nu
     if ($item && $item->canView()) {
         return $pre . smarty_function_object_link_default($template, $object, $title, $type, $url, $params);
     } else {
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-
         if (empty($title)) {
             $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
         }
 
-        return $pre . $smartyTikiExtension->smarty_modifier_escape($title);
+        return $pre . smarty_modifier_escape($title);
     }
 }
 
 function smarty_function_object_link_user($template, $user, $title = null)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-
-    return $smartyTikiExtension->smarty_modifier_userlink($user, 'link', 'not_set', $title ? $title : '');
+    return smarty_modifier_userlink($user, 'link', 'not_set', $title ? $title : '');
 }
 
 function smarty_function_object_link_external($template, $link_orig, $title = null, $type = null)
 {
     $cachelib = \TikiLib::lib('cache');
     $tikilib = \TikiLib::lib('tiki');
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
 
     if (substr($link_orig, 0, 4) === 'www.') {
         $link = 'http://' . $link_orig;
@@ -273,9 +263,9 @@ function smarty_function_object_link_external($template, $link_orig, $title = nu
         }
     }
 
-    $escapedHref = $smartyTikiExtension->smarty_modifier_escape($link);
-    $escapedLink = $smartyTikiExtension->smarty_modifier_escape($link_orig);
-    $escapedTitle = $smartyTikiExtension->smarty_modifier_escape($title);
+    $escapedHref = smarty_modifier_escape($link);
+    $escapedLink = smarty_modifier_escape($link_orig);
+    $escapedTitle =smarty_modifier_escape($title);
 
     if ($type == 'external_extended' && "$link_orig" != "$title") {
         $data = '<a rel="external" href="' . $escapedHref . '">' . $escapedLink . '</a>'

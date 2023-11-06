@@ -30,7 +30,6 @@ class ObjectTitle extends Base
             list($type, $object) = explode(':', $params['identifier'], 2);
         }
 
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-        return $smartyTikiExtension->smarty_modifier_escape(\TikiLib::lib('object')->get_title($type, $object));
+        return smarty_modifier_escape(\TikiLib::lib('object')->get_title($type, $object));
     }
 }

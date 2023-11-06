@@ -28,15 +28,13 @@ class ShowShort extends Base
             $order = substr($p, strrpos($p, '_') + 1);
 
             if (strtolower($prop) == strtolower(trim($params['var']))) {
-                $smartyFunctionIconHandler = new \SmartyTiki\FunctionHandler\Icon();
-
                 switch ($order) {
                     case 'asc':
                     case 'nasc':
-                        return ' ' . $smartyFunctionIconHandler->handle(['name' => 'sort-up'], $template);
+                        return ' ' . smarty_function_icon(['name' => 'sort-up'], $template);
                     case 'desc':
                     case 'ndesc':
-                        return ' ' . $smartyFunctionIconHandler->handle(['name' => 'sort-down'], $template);
+                        return ' ' . smarty_function_icon(['name' => 'sort-down'], $template);
                 }
             }
         }

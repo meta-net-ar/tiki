@@ -44,9 +44,8 @@ class Attachments extends Base
             $gal_info = $filegallib->default_file_gallery();
             $gal_info['name'] = $page . ' *';   // temp name with * - not displayed in most configs
         } elseif (! $gal_info = $filegallib->get_file_gallery($galleryId)) {
-            $smartyBlockRemarksboxHandler = new \smartytiki\BlockHandler\Remarksbox();
             $repeat = false;
-            return $smartyBlockRemarksboxHandler->handle(
+            return smarty_block_remarksbox(
                 ['type' => 'errors', 'title' => tra('Wrong attachments gallery')],
                 tra('You are attempting to display a gallery that is not a valid attachment gallery') . ' (ID=' . $galleryId . ')',
                 $template,
@@ -160,8 +159,6 @@ function s_f_attachments_actionshandler($params)
                 if (isset($objectperms) && ( $objectperms->wiki_admin_attachments || $objectperms->wiki_attach_files )) {
                     /* check_ticket('index'); */
 
-                    $smartyFunctionQueryHandler = new \SmartyTiki\FunctionHandler\Query();
-
                     $galleryId = $filegallib->get_attachment_gallery($params['page'], 'wiki page', true);
                     if ($access->checkCsrf()) {
                         $result = $filegallib->actionHandler(
@@ -169,7 +166,7 @@ function s_f_attachments_actionshandler($params)
                             [
                                 'galleryId' => [$galleryId],
                                 'comment' => [$params['comment']],
-                                'returnUrl' => $smartyFunctionQueryHandler->handle(
+                                'returnUrl' => smarty_function_query(
                                     [
                                         '_type' => 'absolute_path',
                                         's_f_attachments-upload' => 'NULL',

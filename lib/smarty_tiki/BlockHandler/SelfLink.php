@@ -48,8 +48,6 @@ class SelfLink extends Base
             return;
         }
 
-        $smartyFunctionQueryHandler = new \SmartyTiki\FunctionHandler\Query();
-
         if (is_array($params)) {
             if (! isset($content)) {
                 $content = '';
@@ -105,13 +103,12 @@ class SelfLink extends Base
 
                 $params['_type'] = $default_type;
 
-                $ret = $smartyFunctionQueryHandler->handle($params, $template);
+                $ret = smarty_function_query($params, $template);
             }
 
             if ($params['_tag'] == 'y') {
                 if (empty($params['_disabled'])) {
                     if ($params['_ajax'] === 'y' && $params['_script'] === '') {
-                        $martyBlockAjaxHrefHandler = new \SmartyTiki\BlockHandler\AjaxHref();
                         if (! isset($params['_htmlelement'])) {
                             $params['_htmlelement'] = 'role_main';
                         }
@@ -128,7 +125,7 @@ class SelfLink extends Base
                             $params['_htmlelement'] = '';
                             $params['_template'] = '';
                         }
-                        $ret = $martyBlockAjaxHrefHandler->handle(
+                        $ret = smarty_block_ajax_href(
                             [
                                 'template' => $params['_template'],
                                 'htmlelement' => $params['_htmlelement'],
@@ -153,7 +150,6 @@ class SelfLink extends Base
                         $params['_title'] = $content;
                     }
 
-                    $smartyFunctionIconHandler = new \SmartyTiki\FunctionHandler\Icon();
                     if (isset($params['_icon'])) {
                         $icon_params['_id'] = $params['_icon'];
                     } else {
@@ -189,7 +185,7 @@ class SelfLink extends Base
                         $icon_params['height'] = $params['_height'];
                     }
 
-                    $content = $smartyFunctionIconHandler->handle($icon_params, $template);
+                    $content = smarty_function_icon($icon_params, $template);
 
                     if (isset($params['_text'])) {
                         $content .= ' ' . $params['_text'];
@@ -220,16 +216,14 @@ class SelfLink extends Base
                 $link .= $ret;
 
                 if (isset($params['_confirm'])) {
-                    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-                    $link .= ' data-confirm="' . $smartyTikiExtension->smarty_modifier_escape($params['_confirm']) . '"';
+                    $link .= ' data-confirm="' . smarty_modifier_escape($params['_confirm']) . '"';
                 }
 
                 $ret = "<a $link>" . $content . '</a>';
 
                 if (! empty($params['_sort_field'])) {
-                    $smartyFunctionShowShortHandler = new \SmartyTiki\FunctionHandler\ShowShort();
                     $ret = "<a $link style='text-decoration:none;'>" . $content .
-                    $smartyFunctionShowShortHandler->handle(
+                    smarty_function_show_sort(
                         ['sort' => $params['_sort_arg'], 'var' => $params['_sort_field']],
                         $template
                     ) . '</a>';
@@ -237,7 +231,7 @@ class SelfLink extends Base
             }
         } else {
             $params = ['_type' => $default_type];
-            $ret = $smartyFunctionQueryHandler->handle($params, $template);
+            $ret = smarty_function_query($params, $template);
         }
 
         return $ret;

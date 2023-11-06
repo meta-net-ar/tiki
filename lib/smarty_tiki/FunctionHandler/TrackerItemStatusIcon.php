@@ -33,8 +33,7 @@ class TrackerItemStatusIcon extends Base
         }
 
         if (($show_status == 'y') && $item && $status = $item->getDisplayedStatus()) {
-            $smartyFunctionIconHandler = new \SmartyTiki\FunctionHandler\Icon();
-            return $smartyFunctionIconHandler->handle([
+            return smarty_function_icon([
                 'name' => 'status-' . $status,
                 'iclass' => 'tips',
                 'ititle' => ':' . tr($status),

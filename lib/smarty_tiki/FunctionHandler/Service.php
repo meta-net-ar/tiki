@@ -15,7 +15,6 @@ class Service extends Base
     public function handle($params, Template $template)
     {
         $servicelib = \TikiLib::lib('service');
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
 
         if (! isset($params['controller'])) {
             return 'missing-controller';
@@ -27,6 +26,6 @@ class Service extends Base
         }
 
         $url = $servicelib->getUrl($params);
-        return $smartyTikiExtension->smarty_modifier_escape($url);
+        return smarty_modifier_escape($url);
     }
 }

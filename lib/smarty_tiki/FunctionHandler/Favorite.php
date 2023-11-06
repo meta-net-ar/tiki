@@ -23,7 +23,6 @@ class Favorite extends Base
 
         $servicelib =\TikiLib::lib('service');
         $smarty = \TikiLib::lib('smarty');
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
 
         $url = $servicelib->getUrl([
             'controller' => 'favorite',
@@ -32,8 +31,8 @@ class Favorite extends Base
             'object' => $params['object'],
         ]);
 
-        $url = $smartyTikiExtension->smarty_modifier_escape($url);
-        $e_user = $smartyTikiExtension->smarty_modifier_escape($user);
+        $url = smarty_modifier_escape($url);
+        $e_user = smarty_modifier_escape($user);
 
         if (isset($params['label'])) {
             $label = $params['label'];

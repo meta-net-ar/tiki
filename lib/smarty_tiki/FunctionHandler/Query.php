@@ -168,10 +168,8 @@ class Query extends Base
                 // Use current script explicitely, except if there is only an anchor (i.e. no script and no URL argument) which is enough
                 // This also implies that if no anchor, every current URL params will be loosed
 
-                $smartyFunctionServiceHandler = new \SmartyTiki\FunctionHandler\Service();
-
                 if (isset($params['controller'], $params['action'])) {
-                    $php_self = $smartyFunctionServiceHandler->handle(
+                    $php_self = smarty_function_service(
                         [
                             'controller' => $params['controller'],
                             'action' => $params['action'],
@@ -180,7 +178,7 @@ class Query extends Base
                     );
                 } else {
                     if ($_SERVER['PHP_SELF'] == 'tiki-ajax_services.php' && isset($_GET['controller'], $_GET['action'])) {
-                        $php_self = $smartyFunctionServiceHandler->handle(
+                        $php_self = smarty_function_service(
                             [
                                 'controller' => $_GET['controller'],
                                 'action' => $_GET['action'],

@@ -519,15 +519,13 @@ class HeaderLib
         $this->throwIfHeadersAlreadyOutput();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
 
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-
         ksort($this->cssfiles);
         ksort($this->css);
         ksort($this->rssfeeds);
 
         $back = "\n";
         if ($this->title) {
-            $back = '<title>' . $smartyTikiExtension->smarty_modifier_escape($this->title) . "</title>\n\n";
+            $back = '<title>' . smarty_modifier_escape($this->title) . "</title>\n\n";
         }
 
         if ($this->rawhtml) {
@@ -538,7 +536,7 @@ class HeaderLib
             foreach ($this->metatags as $n => $m) {
                 // check if the meta name starts with OpenGraph protocol prefix and use property instead of name if true
                 $nameattrib = preg_match('/^og\:/', $n) ? 'property' : 'name';
-                $back .= '<meta ' . $nameattrib . '="' . $smartyTikiExtension->smarty_modifier_escape($n) . '" content="' . $smartyTikiExtension->smarty_modifier_escape($m) . "\">\n";
+                $back .= '<meta ' . $nameattrib . '="' . smarty_modifier_escape($n) . '" content="' . smarty_modifier_escape($m) . "\">\n";
             }
             $back .= "\n";
         }
@@ -577,7 +575,7 @@ class HeaderLib
             foreach ($this->rssfeeds as $x => $rssf) {
                 $back .= "<!-- rss $x -->\n";
                 foreach ($rssf as $rsstitle => $rssurl) {
-                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . $smartyTikiExtension->smarty_modifier_escape($this->convert_cdn($rsstitle)) . "\" href=\"" . $smartyTikiExtension->smarty_modifier_escape($rssurl) . "\">\n";
+                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . smarty_modifier_escape($this->convert_cdn($rsstitle)) . "\" href=\"" . smarty_modifier_escape($rssurl) . "\">\n";
                 }
             }
             $back .= "\n";
@@ -636,8 +634,6 @@ class HeaderLib
             return [];
         }
 
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-
         ksort($this->jsfiles);
         $jsfiles = $this->jsfiles;
 
@@ -650,7 +646,7 @@ class HeaderLib
         foreach ($ranks as $rank) {
             if (isset($jsfiles[$rank])) {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
                 }
             }
         }
@@ -666,7 +662,7 @@ class HeaderLib
                 if (isset($jsfiles[$rank])) {
                     foreach ($jsfiles[$rank] as $entry) {
                         $entry = $this->convert_cdn($entry, $rank);
-                        $output[] = '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($entry) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
                     }
                 }
             }
@@ -679,23 +675,23 @@ class HeaderLib
 
             $ranks = ['30dependency', '40external', '50standard'];
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
-            $output[] .= '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($entry) . '"></script>';
+            $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
 
             $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y' ? true : false;
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
                     if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
-                        $output[] .= '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($file) . '"></script>';
+                        $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
                 }
                 // handling of user defined cdn servers is done inside minifyJSFiles()
                 $entry = $this->minifyJSFiles($jsfiles, [$rank]);
-                $output[] .= '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($entry) . '"></script>';
+                $output[] .= '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
             } else {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . $smartyTikiExtension->smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
                 }
             }
         }
@@ -1094,8 +1090,6 @@ class HeaderLib
     private function output_css_files_list($files, $media = '')
     {
         global $prefs;
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-
         $back = '';
 
         // remove any remote css files
@@ -1121,9 +1115,9 @@ class HeaderLib
 
         foreach ($files as $file) {
             $file = $this->convert_cdn($file);
-            $back .= "<link rel=\"stylesheet\" href=\"" . $smartyTikiExtension->smarty_modifier_escape($file) . "\" type=\"text/css\"";
+            $back .= "<link rel=\"stylesheet\" href=\"" . smarty_modifier_escape($file) . "\" type=\"text/css\"";
             if (! empty($media)) {
-                $back .= " media=\"" . $smartyTikiExtension->smarty_modifier_escape($media) . "\"";
+                $back .= " media=\"" . smarty_modifier_escape($media) . "\"";
             }
             $back .= ">\n";
         }
