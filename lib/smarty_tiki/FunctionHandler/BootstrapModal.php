@@ -19,7 +19,7 @@ class BootstrapModal extends Base
     /**
      * Returns a string with the href and data attributes to make a bootstrap modal appear on a link
      * Note: Expects to be inside a "double quoted" href attribute in an html anchor
-     * 
+     *
      * @param array $params [size => 'modal-sm|modal-lg|modal-xl' (default: 'modal-md')]
      * @param \Smarty\Template $template
      *
@@ -28,15 +28,14 @@ class BootstrapModal extends Base
      */
     public function handle($params, Template $template)
     {
-        $smartyFunctionServiceHandler = new \smartytiki\FunctionHandler\Service();
-        if (!empty($params['size'])) {
+        if (! empty($params['size'])) {
             $size = '" data-size="' . $params['size'];
             unset($params['size']);
         } else {
             $size = '';
         }
         $params['modal'] = 1;
-        $href = $smartyFunctionServiceHandler->handle($params, $template);
+        $href = smarty_function_service($params, $template);
         return "$href\" data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".modal.fade:not(.show):first$size";
     }
 }

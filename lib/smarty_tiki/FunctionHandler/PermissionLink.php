@@ -41,7 +41,7 @@ class PermissionLink extends Base
         $type = $params->type->text();
         $objectType = $params->objectType->text();
 
-        if (!$objectType) {
+        if (! $objectType) {
             $objectType = $type;
         }
         $id = $params->id->none();
@@ -78,7 +78,7 @@ class PermissionLink extends Base
             $arguments['parentId'] = $params->parentId->text();
         }
 
-        if (!empty($arguments)) {
+        if (! empty($arguments)) {
             $link = 'tiki-objectpermissions.php?' . http_build_query($arguments, '', '&');
         } else {
             $link = 'tiki-objectpermissions.php';

@@ -265,7 +265,7 @@ function smarty_function_object_link_external($template, $link_orig, $title = nu
 
     $escapedHref = smarty_modifier_escape($link);
     $escapedLink = smarty_modifier_escape($link_orig);
-    $escapedTitle =smarty_modifier_escape($title);
+    $escapedTitle = smarty_modifier_escape($title);
 
     if ($type == 'external_extended' && "$link_orig" != "$title") {
         $data = '<a rel="external" href="' . $escapedHref . '">' . $escapedLink . '</a>'

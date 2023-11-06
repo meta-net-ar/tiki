@@ -36,7 +36,8 @@ use Smarty\Template;
  *  - _selected_text: button text to use if _selected is set to y
  *  - _selected_icon_name: button icon to use if _selected is set to y
  */
-class Button extends Base{
+class Button extends Base
+{
     public function handle($params, Template $template)
     {
         if (! is_array($params) || (! isset($params['_text']) && ! isset($params['_icon_name']))) {
@@ -45,9 +46,9 @@ class Button extends Base{
         global $tikilib, $prefs, $auto_query_args;
 
         $class = null;
-    
+
         $smartyBlockSelfLinkHandler = new \SmartyTiki\BlockHandler\SelfLink();
-    
+
         $selected = false ;
         if (! empty($params['_selected'])) {
             if ($params['_selected'] == 'y') {
@@ -118,7 +119,7 @@ class Button extends Base{
         }
 
         unset($params['_class']);
-    
+
         //target parameter
         if (! empty($params['_target'])) {
             $target = $params['_target'];
@@ -127,7 +128,7 @@ class Button extends Base{
         }
 
         unset($params['_target']);
-    
+
         if (! $disabled) {
             $flip_id = '';
             if (! empty($params['_flip_id'])) {

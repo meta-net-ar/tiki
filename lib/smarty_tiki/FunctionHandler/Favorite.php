@@ -21,8 +21,7 @@ class Favorite extends Base
             return;
         }
 
-        $servicelib =\TikiLib::lib('service');
-        $smarty = \TikiLib::lib('smarty');
+        $servicelib = \TikiLib::lib('service');
 
         $url = $servicelib->getUrl([
             'controller' => 'favorite',

@@ -36,7 +36,7 @@ class Attachments extends Base
         }
 
         $galleryId = $filegallib->get_attachment_gallery($params['_id'], $params['_type']);
-    
+
         /*** If anything in this function is changed, please change lib/wiki-plugins/wikiplugin_attach.php as well. ***/
         /* but wikiplugin_attach doesn't seem to work at all with file gals attachemnts??? jonnyb tiki12 */
 
@@ -102,7 +102,7 @@ class Attachments extends Base
         $params['gal_info'] = $gal_info;
         $params['files'] = $files['data'];
         $params['cant'] = $files['cant'];
-    
+
         $return = "\n" . $smarty->plugin_fetch('fgal_attachments.tpl', $params) . "\n";
 
         $smarty->remove_request_overriders($url_override_prefix, $url_overrided_arguments);

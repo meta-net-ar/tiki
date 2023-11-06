@@ -7,6 +7,6 @@
 
 function smarty_function_tracker_item_status_icon($params, \Smarty\Template $template)
 {
-    $smartyFunctionTrackerItemStatusIcon =new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
+    $smartyFunctionTrackerItemStatusIcon = new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
     return $smartyFunctionTrackerItemStatusIcon->handle($params, $template);
 }

@@ -17,7 +17,7 @@ class Preference extends Base
         global $prefs, $user_overrider_prefs;
         $prefslib = \TikiLib::lib('prefs');
         $smarty = \TikiLib::lib('smarty');
-        if (!isset($params['name'])) {
+        if (! isset($params['name'])) {
             return 'Preference name not specified.';
         }
 
@@ -43,7 +43,7 @@ class Preference extends Base
                 // For passwords, autocomplete=off should ne replaced with autocomplete=new-password
                 $autocomplete = ($info['autocomplete'] === 'off' && $info['type'] === 'password') ? 'new-password' : $info['autocomplete'];
                 $info['params'] .= ' autocomplete="' . $autocomplete . '" ';
-            } elseif ($info['type'] === 'password' && !isset($info['parameters'], $info['parameters']['autocomplete'])) {
+            } elseif ($info['type'] === 'password' && ! isset($info['parameters'], $info['parameters']['autocomplete'])) {
                 $info['params'] .= ' autocomplete="new-password" '; // by default preferences of type password should not be autocomplete
             }
 
@@ -72,7 +72,7 @@ class Preference extends Base
             }
             $info['pages'] = $pages_string;
 
-            if (!isset($info['separator'])) {
+            if (! isset($info['separator'])) {
                 $info['separator'] = '';
             }
             if (isset($params['size'])) {
@@ -81,7 +81,7 @@ class Preference extends Base
             if (isset($params['fgal_picker'])) {
                 $info['fgal_picker'] = true;
             }
-            if (isset($params['show_tags']) && !$params['show_tags']) {
+            if (isset($params['show_tags']) && ! $params['show_tags']) {
                 $info['tags'] = [];
             }
 
@@ -99,7 +99,7 @@ class Preference extends Base
             $smarty->assign('codemirror');
             $smarty->assign('syntax');
 
-            if (!empty($params['syntax'])) {
+            if (! empty($params['syntax'])) {
                 $smarty->assign('codemirror', 'true');
                 $smarty->assign('syntax', $params['syntax']);
             }
