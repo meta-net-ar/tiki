@@ -98,7 +98,6 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractField impleme
     private function renderImage($code, $label)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_escape');
         return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '" />';
     }
 

@@ -22,7 +22,6 @@
 function smarty_function_html_select_duration($params, $smarty_tpl)
 {
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_html_options');
     $html_result = '';
     $default = ['prefix' => 'Duration_', 'default_unit' => 'week', 'default' => '', 'default_value' => '', 'id' => ''];
     $params = array_merge($default, $params);

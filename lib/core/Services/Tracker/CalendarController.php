@@ -77,7 +77,6 @@ class Services_Tracker_CalendarController
         }
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         $trklib = TikiLib::lib('trk');
         foreach ($result as $row) {
             $item = Tracker_Item::fromId($row['object_id']);

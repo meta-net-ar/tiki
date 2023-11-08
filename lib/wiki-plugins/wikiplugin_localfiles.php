@@ -93,7 +93,6 @@ function wikiplugin_localfiles($data, $params)
             // thanks http://www.php.net/manual/en/function.pathinfo.php#107461
         }
         if ($params['icons'] === 'y') {
-            $smartylib->loadPlugin('smarty_modifier_iconify');
             $iconhtml = smarty_modifier_iconify($info['basename']);
         }
 

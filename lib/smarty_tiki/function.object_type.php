@@ -16,6 +16,5 @@ function smarty_function_object_type($params, $smarty)
         list($type, $object) = explode(':', $params['identifier'], 2);
     }
 
-    $smarty->loadPlugin('smarty_modifier_escape');
     return smarty_modifier_escape(TikiLib::lib('object')->get_verbose_type($type));
 }

@@ -95,8 +95,6 @@ class FileHelper
 
                     $exportLink = sprintf('tiki-download_file.php?fileId=%s&pdf', $_REQUEST['fileId']);
                 }
-
-                $smarty->loadPlugin('smarty_modifier_sefurl');
                 $sourceLink = smarty_modifier_sefurl($_REQUEST['fileId'], 'display');
             }
 

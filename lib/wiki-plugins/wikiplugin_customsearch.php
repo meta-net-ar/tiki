@@ -193,7 +193,6 @@ function wikiplugin_customsearch($data, $params)
     if ($prefs['javascript_enabled'] !== 'y') {
         require_once('lib/wiki-plugins/wikiplugin_list.php');
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_block_remarksbox');
         $repeat = false;
 
         $out = smarty_block_remarksbox(
@@ -202,7 +201,7 @@ function wikiplugin_customsearch($data, $params)
                 'title' => tr('JavaScript disabled'),
             ],
             tr('JavaScript is required for this search feature'),
-            $smarty,
+            $smarty->getEmptyInternalTemplate(),
             $repeat
         );
 
@@ -547,7 +546,6 @@ window.customsearch_$id = customsearch$id;
     //get iconset icon if daterange is one of the fields
     if ($dr) {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_js_insert_icon');
         $iconinsert = smarty_function_js_insert_icon(['type' => 'jscalendar', 'return' => 'y'], $smarty->getEmptyInternalTemplate());
     } else {
         $iconinsert = '';
@@ -1072,7 +1070,6 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
     extract($arguments, EXTR_SKIP);
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_jscalendar');
 
     if (! empty($default['from'])) {
         $_from = $default['from'];

@@ -46,8 +46,6 @@ function wikiplugin_h5p($data, $params)
 
     $smarty = TikiLib::lib('smarty');
 
-    $smarty->loadPlugin('smarty_function_service_inline');
-
     $params['controller'] = 'h5p';
     $params['action'] = 'embed';
 

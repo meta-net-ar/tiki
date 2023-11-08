@@ -614,7 +614,6 @@ class WikiPlugin_Negotiator_Wiki
                 . '    $(this).prev().removeClass("ui-state-highlight");'
                 . '});'
             );
-            $smarty->loadPlugin('smarty_function_icon');
 
             $button = '<a id="' . $id . '" class="editplugin tips"' . $iconDisplayStyle . '>' .
                         smarty_function_icon(['name' => 'plugin', 'iclass' => 'tips',

@@ -222,7 +222,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             $groupIds = $this->checkGroupsExist($groupIds);
 
             if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
-                $smarty->loadPlugin('smarty_modifier_username');
                 $aname = [];
                 foreach ($value as $v) {
                     $aname[] = smarty_modifier_username($v) . " (" . $v . ")"; // This is very important otherwise on next save the realName and not the username is saved in the db
@@ -253,7 +252,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
                         $selected_groups[] = $group;
                     }
                     if ($this->getOption('showRealname')) {
-                        $smarty->loadPlugin('smarty_modifier_username');
                         $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
                     } else {
                         $usrs = array_combine($usrs, $usrs);
@@ -266,7 +264,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
                     'selected_groups' => $selected_groups,
                 ]);
             } else {
-                $smarty->loadPlugin('smarty_function_user_selector');
                 return smarty_function_user_selector(
                     [
                         'user' => $name,
@@ -285,7 +282,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             }
         } else {
             if ($this->getOption('showRealname')) {
-                $smarty->loadPlugin('smarty_modifier_username');
                 $out = implode(', ', array_map('smarty_modifier_username', $value));
             } else {
                 $out = implode(', ', $value);
@@ -343,7 +339,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
                 });
             }
             if ($this->getOption('showRealname')) {
-                TikiLib::lib('smarty')->loadPlugin('smarty_modifier_username');
                 return implode(', ', array_map('smarty_modifier_username', $value));
             } else {
                 return implode(', ', $value);
@@ -400,7 +395,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
         $parsedValue = TikiLib::lib('trk')->parse_user_field($value);
 
         if ($this->getOption('showRealname')) {
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_username');
             $realName = implode(', ', array_map('smarty_modifier_username', $parsedValue));
         } else {
             $realName = implode(', ', $parsedValue);    // add the _text option even if not using showRealname so we don't need to check
@@ -536,7 +530,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             ->setPlainReplacement('username')
             ->setRenderTransform(function ($value) {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_modifier_userlink');
 
                 if ($value) {
                     return implode(', ', array_map('smarty_modifier_userlink', TikiLib::lib('trk')->parse_user_field($value)));
@@ -549,7 +542,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             ->setReadOnly(true)
             ->setRenderTransform(function ($value) {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_modifier_username');
 
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
@@ -567,7 +559,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             ->addQuerySource('itemId', 'object_id')
             ->setRenderTransform(function ($value, $extra) {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
 
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
@@ -589,8 +580,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             ->addQuerySource('itemId', 'object_id')
             ->setRenderTransform(function ($value, $extra) {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
-                $smarty->loadPlugin('smarty_modifier_username');
 
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
@@ -635,7 +624,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
             $userlib = TikiLib::lib('user');
             $tikilib = TikiLib::lib('tiki');
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_modifier_username');
             $users = [];
 
             $groupIds = $this->getOption('groupIds');
@@ -678,7 +666,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
 
         if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_modifier_username');
             $showRealname = true;
         } else {
             $showRealname = false;

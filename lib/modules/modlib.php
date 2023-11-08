@@ -1112,15 +1112,13 @@ class ModLib extends TikiLib
 
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
-                    $smarty->loadPlugin('smarty_block_remarksbox');
-
                     return smarty_block_remarksbox(
                         [
                             'type' => 'warning',
                             'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
                         ],
                         tr('Required features: ' . $mod_reference['name'] . '. If you do not have permission to activate these features, ask the site administrator.'),
-                        $smarty,
+                        $smarty->getEmptyInternalTemplate(),
                         $repeat
                     );
                 }
@@ -1210,7 +1208,6 @@ class ModLib extends TikiLib
 
             return $data;
         } catch (Exception $e) {
-            $smarty->loadPlugin('smarty_block_remarksbox');
             if ($tiki_p_admin == 'y') {
                 $message = $e->getMessage();
             } else {
@@ -1223,7 +1220,7 @@ class ModLib extends TikiLib
                     'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
                 ],
                 html_entity_decode($message),
-                $smarty,
+                $smarty->getEmptyInternalTemplate(),
                 $repeat
             );
         }

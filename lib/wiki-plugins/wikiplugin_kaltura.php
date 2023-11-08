@@ -125,7 +125,6 @@ function wikiplugin_kaltura($data, $params)
     if (empty($params['id'])) {
         if ($tiki_p_upload_videos === 'y') {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_function_button');
 
             $json_page = json_encode($page);
             $json_instance = json_encode($instance);

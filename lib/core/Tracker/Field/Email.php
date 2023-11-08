@@ -193,7 +193,6 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
 
         $permName = $this->getConfiguration('permName');
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_escape');
 
         $schema->addNew($permName, 'default')
             ->setLabel($this->getConfiguration('name'))

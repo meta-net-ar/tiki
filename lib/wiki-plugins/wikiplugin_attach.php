@@ -300,7 +300,6 @@ function wikiplugin_attach($data, $params)
                 $link .= '">';
                 if (isset($icon)) {
                     $smarty = TikiLib::lib('smarty');
-                    $smarty->loadPlugin('smarty_modifier_iconify');
                     $iconhtml = smarty_modifier_iconify($atts['data'][$n]['filename']);
                     $link .= $iconhtml . '&nbsp';
                 }

@@ -6,12 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // @param numeric $id: id of the payment
 // @params url $returnurl: optional return url
-function smarty_function_payment($params, $smarty)
+function smarty_function_payment($params, \Smarty\Template $template)
 {
     global $prefs, $user, $globalperms;
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $paymentlib = TikiLib::lib('payment');
+    $smarty = TikiLib::lib('smarty');
     $invoice = (int) $params['id'];
 
     $objectperms = Perms::get('payment', $invoice);
@@ -115,7 +116,6 @@ function smarty_function_payment($params, $smarty)
         $smarty_cache_id = $smarty_compile_id = $prefs['language'] . md5('tiki-payment-single.tpl');
         return $smarty->fetch('tiki-payment-single.tpl', $smarty_cache_id, $smarty_compile_id);
     } else {
-        $smarty->loadPlugin('smarty_block_remarksbox');
         $repeat = false;
 
         return smarty_block_remarksbox(
@@ -124,7 +124,7 @@ function smarty_function_payment($params, $smarty)
                 'title' => tra('Payment error'),
             ],
             tra('This invoice does not exist or access to it is restricted.'),
-            $smarty,
+            $smarty->getEmptyInternalTemplate(),
             $repeat
         );
     }

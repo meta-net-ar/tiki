@@ -45,7 +45,6 @@ function wikiplugin_modulelist($data, $params)
     include_once 'tiki-modules.php';
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_modulelist');
 
     if (! isset($params['zone'])) {
         return WikiParser_PluginOutput::argumentError(['zone']);

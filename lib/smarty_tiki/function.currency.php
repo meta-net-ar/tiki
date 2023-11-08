@@ -64,7 +64,6 @@ function smarty_function_currency($params, $smarty)
     // which makes $smarty->fetch here leak a lot - e.g. indexing 50K tracker items requiring 5GB+ of RAM
     // build the output inline here for now instead of fetching currency_output.tpl and switch to the tpl once the issue is resolved
 
-    $smarty->loadPlugin('smarty_modifier_money_format');
     $id = uniqid();
 
     $export = isset($csv) && $csv;

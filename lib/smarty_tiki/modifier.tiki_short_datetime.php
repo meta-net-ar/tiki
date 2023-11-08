@@ -17,7 +17,6 @@ function smarty_modifier_tiki_short_datetime($string, $intro = '', $same = 'y')
 {
     global $prefs;
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_tiki_date_format');
     $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
     $time = smarty_modifier_tiki_date_format($string, $prefs['short_time_format']);
 

@@ -84,8 +84,6 @@ class Tracker_Field_File extends \Tracker\Field\AbstractField
         $attachment = TikiLib::lib('trk')->get_item_attachment($att_id);
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_block_self_link');
-        $smarty->loadPlugin('smarty_function_icon');
 
         $link = smarty_block_self_link(
             [
@@ -94,7 +92,7 @@ class Tracker_Field_File extends \Tracker\Field\AbstractField
             ],
             smarty_function_icon(['_id' => 'disk', 'alt' => tra('Download')], $smarty->getEmptyInternalTemplate()) . ' ' .
             $attachment['filename'],
-            $smarty
+            $smarty->getEmptyInternalTemplate()
         );
         return $link;
     }

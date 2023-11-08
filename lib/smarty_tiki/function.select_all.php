@@ -42,8 +42,6 @@ function smarty_function_select_all($params, $smarty)
         $hidden_too = '';
     }
 
-    $smarty->loadPlugin('smarty_modifier_escape');
-
     if (isset($params['tablesorter']) &&  $params['tablesorter'] == '1') {
         $onclick = '';
     } else {

@@ -274,7 +274,6 @@ class Services_Category_Controller
         $subset = $input->asArray('subset', ',');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $smarty->loadPlugin('smarty_modifier_sefurl');
             $name = $objectlib->get_title($type, $object);
             $url = smarty_modifier_sefurl($object, $type);
             $targetCategories = (array) $input->categories->int();

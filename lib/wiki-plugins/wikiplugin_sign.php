@@ -76,7 +76,6 @@ function wikiplugin_sign($data, $params, $offset)
 
     $tip = $smarty->fetch('wiki-plugins/wikiplugin_sign.tpl');
 
-    $smarty->loadPlugin('smarty_function_icon');
     $icon = smarty_function_icon(['name' => 'pencil', 'title' => '', 'iclass' => 'sign-icon'], $smarty->getEmptyInternalTemplate());
 
     TikiLib::lib('header')-> add_jq_onready(

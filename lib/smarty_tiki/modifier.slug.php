@@ -27,7 +27,6 @@
 function smarty_modifier_slug($string, $maxLength = 70, $mixedCase = false, $breakWords = false)
 {
     global $prefs;
-    TikiLib::lib('smarty')->loadPlugin('smarty_modifier_nonp');
     $length = strlen($string);
 
     if (! $breakWords && $length > $maxLength) {

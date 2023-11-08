@@ -102,7 +102,6 @@ function wikiplugin_wysiwyg($data, $params)
         $namespace = htmlspecialchars($namespace);
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_ticket');
 
         $html = "<div id='$exec_key' class='{$class}'$style data-initial='$namespace' data-html='{$params['use_html']}' data-ticket='"
             . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . "'>" . $html . '</div>';

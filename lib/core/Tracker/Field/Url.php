@@ -73,7 +73,6 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractField implements \Tracker
     public function renderOutput($context = [])
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_object_link');
 
         $url = $this->getConfiguration('value');
 

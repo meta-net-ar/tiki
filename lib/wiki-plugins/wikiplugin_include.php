@@ -340,8 +340,6 @@ function wikiplugin_include($dataIn, $params)
             $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-include.js');
 
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_function_ticket');
-            $smarty->loadPlugin('smarty_function_icon');
 
             $tip = tr('Include Plugin') . ' | ' . tr('This section is included, click if you want to customize the content.');
 
@@ -395,8 +393,6 @@ function wikiplugin_include($dataIn, $params)
     if ($page_edit_icon != 'n') {
         if (isset($perms) && $perms['tiki_p_edit'] === 'y' && strpos($_SERVER['PHP_SELF'], 'tiki-send_newsletters.php') === false) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_block_ajax_href');
-            $smarty->loadPlugin('smarty_function_icon');
             $tip = tr('Include Plugin') . ' | ' . tr('Edit the included page:') . ' &quot;' . $page . '&quot;';
             if (empty($_REQUEST['display']) || $_REQUEST['display'] != 'pdf') {
                 $text .= '<a class="editplugin" ' . // ironically smarty_block_self_link doesn't work for this! ;)

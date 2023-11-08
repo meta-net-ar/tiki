@@ -25,8 +25,6 @@ function smarty_function_initials_filter_links($params, $smarty)
 
     // Include smarty functions used below
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_block_ajax_href');
-    $smarty->loadPlugin('smarty_function_query');
 
     $tag_start = "\n" . '<a class="' . $params['_class'] . '" ' . smarty_block_ajax_href(
         ['template' => $params['_template'], 'htmlelement' => $params['_htmlelement']],

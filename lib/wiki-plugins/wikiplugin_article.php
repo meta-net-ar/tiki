@@ -58,7 +58,6 @@ function wikiplugin_article($data, $params)
         $tiki_p_admin_cms == 'y' || $tikilib->user_has_perm_on_object($user, $Id, 'article', 'tiki_p_edit_article')
         || (isset($article_data) && $article_data["author"] == $user && $article_data["creator_edit"] == 'y')
     ) {
-        $smarty->loadPlugin('smarty_function_icon');
         $add = "&nbsp;<a href='tiki-edit_article.php?articleId=$Id' class='editplugin'>" .
             smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a>';
     } else {

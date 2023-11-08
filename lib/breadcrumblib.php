@@ -205,7 +205,6 @@ function breadcrumb_buildStructureTrail($structure_path, $cnt, $loclass, $showLi
 {
     global $structure, $info, $page;
     $len = count($structure_path) + $cnt;
-    TikiLib::lib('smarty')->loadPlugin('smarty_function_sefurl');       // special sefurl only for structures - TODO merge with others
 
     if ($structure != 'y' || ! $info) {
         return false;
@@ -317,9 +316,6 @@ function _breadcrumb_getTitle($crumbs, $loc)
     $len = count($crumbs);
 
     if ($prefs['feature_breadcrumbs'] == 'n' || $prefs['feature_sitetitle'] == 'title') {
-        $smarty->loadPlugin('smarty_modifier_sefurl');
-        $smarty->loadPlugin('smarty_modifier_escape');
-
         $class = "";
         $metadata = '';
 
@@ -373,7 +369,6 @@ function _breadcrumb_getTitle($crumbs, $loc)
     }
     $ret .= help_doclink(['crumb' => $crumbs[$len - 1]]);
     if (isset($info['flag']) && $info['flag'] == 'L' && $print_page != 'y') {
-        $smarty->loadPlugin('smarty_function_icon');
         $ret .= smarty_function_icon(['name' => 'lock', 'iclass' => 'tips', 'ititle' => ':' . tr('Locked by %0', $info['user']) ], $smarty->getEmptyInternalTemplate());
     }
     return $ret;

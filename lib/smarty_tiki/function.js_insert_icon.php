@@ -22,16 +22,16 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  * @return string
  * @throws Exception
  */
-function smarty_function_js_insert_icon($params, $smarty)
+function smarty_function_js_insert_icon($params, \Smarty\Template $template)
 {
+    $smarty = \Tikilib::lib("smarty");
     if (! empty($params['type'])) {
         //set icon
         $iconmap = [
             'jscalendar' => 'calendar'
         ];
         $iconname = ! empty($params['iconname']) ? $params['iconname'] : $iconmap[$params['type']];
-        $smarty->loadPlugin('smarty_function_icon');
-        $icon = smarty_function_icon(['name' => $iconname], $smarty);
+        $icon = smarty_function_icon(['name' => $iconname], $smarty->getEmptyInternalTemplate());
         //set js
         switch ($params['type']) {
             case 'jscalendar':

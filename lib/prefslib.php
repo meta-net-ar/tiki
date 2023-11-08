@@ -283,7 +283,6 @@ class PreferencesLib
         }
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
 
         if (! empty($info['admin']) || ! empty($info['permission']) || ! empty($info['view']) || ! empty($info['module']) || ! empty($info['plugin'])) {
             $info['popup_html'] = '<ul class="list-unstyled">';

@@ -737,8 +737,6 @@ function wikiplugin_tracker($data, $params)
     $smarty = TikiLib::lib('smarty');
     $captchalib = TikiLib::lib('captcha');
 
-    $smarty->loadPlugin('smarty_function_ticket');
-
     $registrationTrackerId = null;
     $itemId = null;
     $newItemRate = null;
@@ -1829,7 +1827,6 @@ function wikiplugin_tracker($data, $params)
                 $_REQUEST['error'] = 'y';
             }
             if (isset($field_errors['err_outputwiki'])) {
-                $smarty->loadPlugin('smarty_function_icon');
                 $icon = smarty_function_icon(['name' => 'warning'], $smarty->getEmptyInternalTemplate());
                 $back .= '<div class="alert alert-warning">' . $icon . ' ';
                 $back .= $field_errors['err_outputwiki'];
@@ -2248,7 +2245,6 @@ function wikiplugin_tracker($data, $params)
         }
 
         if ($datepicker) {
-            $smarty->loadPlugin('smarty_function_js_insert_icon');
             $back .= smarty_function_js_insert_icon(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
         }
 

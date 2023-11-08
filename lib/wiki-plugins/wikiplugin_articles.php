@@ -332,7 +332,6 @@ function wikiplugin_articles($data, $params)
             }
         }
         $paramsnext['_type'] = 'absolute_path';
-        $smarty->loadPlugin('smarty_function_query');
         $urlnext = smarty_function_query($paramsnext, $smarty->getEmptyInternalTemplate());
     }
 

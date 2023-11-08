@@ -105,7 +105,6 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         }
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_jscalendar');
 
         $params = [ 'fieldname' => $this->getConfiguration('ins_id') ? $this->getConfiguration('ins_id') : $this->getInsertId()];
         $params['showtime'] = $this->getOption('datetime') === 'd' ? 'n' : 'y';

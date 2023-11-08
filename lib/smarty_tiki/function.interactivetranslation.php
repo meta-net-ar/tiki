@@ -19,7 +19,6 @@ function smarty_function_interactivetranslation($params, $smarty)
     $strings = json_encode($strings);
 
     // add wrench icon link
-    $smarty->loadPlugin('smarty_block_self_link');
     $help .= smarty_block_self_link(
         [
             '_icon' => 'wrench',

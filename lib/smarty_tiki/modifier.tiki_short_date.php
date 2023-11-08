@@ -15,7 +15,6 @@ function smarty_modifier_tiki_short_date($string, $same = 'y')
 {
     global $prefs;
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_tiki_date_format');
     $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
 
     if ($prefs['jquery_timeago'] === 'y' && $same === 'y') {

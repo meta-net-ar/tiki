@@ -110,7 +110,6 @@ function smarty_block_textarea($params, $content, $smarty, $repeat)
     $auto_save_warning = '';
     $as_id = $params['id'];
 
-    $smarty->loadPlugin('smarty_block_remarksbox');
     $tmp_var = $smarty->getTemplateVars('page');
     $editWarning = $prefs['wiki_timeout_warning'] === 'y' && isset($tmp_var) && $tmp_var !== 'sandbox';
     if ($params['_simple'] === 'n' && $editWarning) {
@@ -140,7 +139,6 @@ function smarty_block_textarea($params, $content, $smarty, $repeat)
 
     if ($prefs['feature_ajax'] == 'y' && $prefs['ajax_autosave'] == 'y' && $params['_simple'] == 'n' && $params['autosave'] == 'y') {
         // retrieve autosaved content
-        $smarty->loadPlugin('smarty_block_self_link');
         $auto_save_referrer = TikiLib::lib('autosave')->ensureReferrer();
         if (empty($_REQUEST['autosave'])) {
             $_REQUEST['autosave'] = 'n';

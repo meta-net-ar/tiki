@@ -225,7 +225,6 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractField implements \Tr
                         $str = $category['name'];
                     }
                     if (strpos($this->getOption('outputtype'), 'links') !== false && $rendered) {
-                        TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                         $deep = $this->getOption('descendants') != 0;
                         $href = smarty_modifier_sefurl($categId, 'category', $deep, '', 'y', $str);
                         if ($deep) {
@@ -504,7 +503,6 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractField implements \Tr
     private function addCheckboxColumn($schema, $matching, $permName, $categId, $categName)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
 
         $schema->addNew($permName, 'icon-' . $categId)
             ->setLabel($categName)

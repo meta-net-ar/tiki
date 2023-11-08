@@ -43,8 +43,6 @@ function smarty_function_formitem($params, $smarty)
         $popup = '<a tabindex="0" data-bs-toggle="popover" data-bs-trigger="focus" title="' . $params['_help-popup-title'] . '" data-bs-content="' . $params['_help-popup'] . '"><span class="fas fa-question-circle"></span></a>';
     }
 
-    $smarty->loadPlugin('smarty_block_self_link');
-
     if ($params["mandatory"] == "y") { //override optional label
         $params['_field'] = preg_replace("/(\&nbsp\;\<small\>\<i\>\(\w*\)\<\/i\>\<\/small\>)*(.*)/", "$2", $params['_field']);
     }

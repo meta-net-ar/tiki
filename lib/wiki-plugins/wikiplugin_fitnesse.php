@@ -71,7 +71,6 @@ function wp_fixture_tracker_math($data, $params)
     }
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $url = smarty_modifier_sefurl($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Math for [%0|%1]', $url, $tracker->getConfiguration('name')));
 
@@ -127,7 +126,6 @@ function wp_fixture_tracker_data($data, $params, $mock)
     }
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $url = smarty_modifier_sefurl($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Data for [%0|%1]', $url, $tracker->getConfiguration('name')));
 

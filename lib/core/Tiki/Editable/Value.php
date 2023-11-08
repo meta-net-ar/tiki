@@ -49,7 +49,6 @@ class Tiki_Editable_Value
             $value .= '&nbsp;';
         }
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
         return "<$tag class=\"editable-inline\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\">$value " . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty->getEmptyInternalTemplate()) . "</$tag>";
     }
 }

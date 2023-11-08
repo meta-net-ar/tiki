@@ -52,7 +52,6 @@ function wikiplugin_profilesymbolvalue($data, $params)
     $package = isset($params['package']) ? $params['package'] : '';
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_profilesymbolvalue');
     return smarty_function_profilesymbolvalue([
         'domain' => $domain,
         'profile' => $profile,

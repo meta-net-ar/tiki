@@ -34,7 +34,6 @@ if ($newDiagram && ! $xmlContent) {
 
 if ($newDiagram) {
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $backLocation = smarty_modifier_sefurl($page ?: $galleryId, $page ? 'wikipage' : 'filegallery');
 }
 $fileId = null;

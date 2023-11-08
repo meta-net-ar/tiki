@@ -9,7 +9,6 @@ class Search_Formatter_ValueFormatter_Objectlink extends Search_Formatter_ValueF
     public function render($name, $value, array $entry)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_object_link');
 
         $params = [
             'type' => $entry['object_type'],

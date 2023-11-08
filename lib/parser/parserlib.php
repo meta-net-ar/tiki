@@ -2761,7 +2761,6 @@ class ParserLib extends TikiDb_Bridge
 
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' )) {
                             $smarty = TikiLib::lib('smarty');
-                            $smarty->loadPlugin('smarty_function_icon');
                             $headingLink = '<a href="#' . $thisid . '" class="heading-link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
                         } else {
                             $headingLink = '';

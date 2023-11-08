@@ -28,8 +28,6 @@
 function smarty_block_actions($params, $content, $smarty, $repeat = false)
 {
     global $prefs;
-    $smarty->loadPlugin('smarty_function_popup');
-    $smarty->loadPlugin('smarty_function_icon');
 
     if ($repeat) {
         return ('');

@@ -49,8 +49,6 @@ class Search_Formatter_ValueFormatter_Categorylist extends Search_Formatter_Valu
     public function render($name, $value, array $entry)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_object_link');
-
         $arr = TikiLib::lib('categ')->getCategories();
         $list = '';
 

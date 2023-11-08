@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_rating_result($params, $smarty)
+function smarty_function_rating_result($params, \Smarty\Template $template)
 {
     global $prefs;
     $ratinglib = TikiLib::lib('rating');
@@ -28,9 +28,9 @@ function smarty_function_rating_result($params, $smarty)
             </td>';
         }
     } elseif ($votings) {
-        // $smarty->loadPlugin('function_rating_result_avg'); apparently "plugin function_rating_result_avg is not a valid name format"
         include_once('lib/smarty_tiki/function.rating_result_avg.php');
-        return smarty_function_rating_result_avg($params, $smarty);
+        $smarty = TikiLib::lib('smarty');
+        return smarty_function_rating_result_avg($params, $smarty->getEmptyInternalTemplate());
     }
 
     return "<table class='ratingDeliberationResultTable' style='width:100%;'><tr>" . $tableBody . "</tr></table>";

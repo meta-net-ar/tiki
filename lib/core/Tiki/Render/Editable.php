@@ -46,7 +46,6 @@ class Tiki_Render_Editable
     public function __toString()
     {
         global $prefs;
-        TikiLib::lib('smarty')->loadPlugin('smarty_modifier_escape');
 
         if ($prefs['ajax_inline_edit'] != 'y') {
             return $this->inner === null ? '' : $this->inner;
@@ -79,7 +78,6 @@ class Tiki_Render_Editable
 
         $group = smarty_modifier_escape($this->group);
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
-        return "<$tag class=\"$class\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\" data-group=\"$group\" data-label=\"$label\" data-field-id=\"$fieldId\" data-field-type=\"$fieldType\">$value" . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty) . "</$tag>";
+        return "<$tag class=\"$class\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\" data-group=\"$group\" data-label=\"$label\" data-field-id=\"$fieldId\" data-field-type=\"$fieldType\">$value" . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty->getEmptyInternalTemplate()) . "</$tag>";
     }
 }

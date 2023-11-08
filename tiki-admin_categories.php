@@ -396,11 +396,6 @@ if (empty($categories) && $tiki_p_admin_categories != 'y') {
 $smarty->assign('categories', $categories);
 
 $treeNodes = [];
-$smarty->loadPlugin('smarty_function_icon');
-$smarty->loadPlugin('smarty_function_popup');
-$smarty->loadPlugin('smarty_function_permission_link');
-$smarty->loadPlugin('smarty_function_ticket');
-$smarty->loadPlugin('smarty_modifier_escape');
 
 $fetchCountIcon = smarty_function_icon(
     [
@@ -434,7 +429,7 @@ foreach ($categories as $category) {
             . '&amp;removeCat='
             . $category['categId']
             . '" onclick="confirmPopup(\'' . tr('Delete category?') . '\', \''
-            . smarty_function_ticket(['mode' => 'get'], $smarty) . '\')">'
+            . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\')">'
             . smarty_function_icon(
                 [
                     'name' => 'remove',

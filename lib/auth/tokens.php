@@ -125,7 +125,6 @@ class AuthTokens
                 return null;
             }
 
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
             $sefurl = $tikiroot . smarty_modifier_sefurl($_GET[$key], $seftype);
 
             // add an extra conversion to prevent false positives due to url encoding

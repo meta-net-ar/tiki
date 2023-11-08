@@ -66,10 +66,10 @@
  */
 /**
  * @param array $params
- * @param Smarty $smarty
+ * @param Smarty\Template $smarty
  * @return string html output
  */
-function smarty_function_treetable($params, $smarty)
+function smarty_function_treetable($params, \Smarty\Template $template)
 {
     global $tree_table_id, $prefs;
     $headerlib = TikiLib::lib('header');
@@ -185,7 +185,6 @@ function smarty_function_treetable($params, $smarty)
 */
 
     if ($_listFilter == 'y' && count($_data) > $_filterMinRows) {
-        $smarty->loadPlugin('smarty_function_listfilter');
         $html .= smarty_function_listfilter(
             [
                 'id' => $id . '_filter',
@@ -193,25 +192,24 @@ function smarty_function_treetable($params, $smarty)
                 'parentSelector' => "#$id .collapsed:not(\".leaf\"), #$id .expanded:not(\".leaf\")",
                 'exclude' => ""
             ],
-            $smarty
+            $template
         );
     }
 
     if ($_openall == 'y') {
-        $smarty->loadPlugin('smarty_function_icon');
         $html .= '&nbsp;<label id="' . $id . '_openall" style="cursor:pointer">'
             . smarty_function_icon(
                 [
                     'name' => 'file-archive',
                 ],
-                $smarty
+                $template
             )
             . smarty_function_icon(
                 [
                     'name' => 'file-archive-open',
                     'istyle' => 'display:none'
                 ],
-                $smarty
+                $template
             )
             . ' ' . tra('Toggle sections') . '</label>';
 
@@ -254,7 +252,6 @@ $("#' . $id . '_openall").click( function () {
     }
 
     if ($_showSelected == 'y') {
-        $smarty->loadPlugin('smarty_function_icon');
         $html .= ' <input type="checkbox" id="' . $id . '_showSelected" title="' . tra('Show only selected') . '" />';
         $html .= ' <label for="' . $id . '_showSelected">' . tra('Show only selected') . '</label>';
 
@@ -277,7 +274,6 @@ $("#' . $id . '_showSelected").click( function () {
     // write the table header
     $html .= '<thead><tr>';
     if (! empty($_checkbox)) {
-        $smarty->loadPlugin('smarty_function_select_all');
         for ($i = 0, $icount_checkbox = count($_checkbox); $i < $icount_checkbox; $i++) {
             $html .= '<th class="checkBoxHeader">';
             $html .= smarty_function_select_all(
@@ -286,7 +282,7 @@ $("#' . $id . '_showSelected").click( function () {
                     'label' => empty($_checkboxTitles) ? '' : htmlspecialchars(tra($_checkboxTitles[$i])),
                     'hidden_too' => $_selectAllHiddenToo,
                 ],
-                $smarty
+                $template
             );
             $html .= '</th>';
         }

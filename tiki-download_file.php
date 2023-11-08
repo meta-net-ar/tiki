@@ -146,7 +146,6 @@ $attributelib = TikiLib::lib('attribute');
 $attributes = $attributelib->get_attributes('file', $info['fileId']);
 
 if (isset($attributes['tiki.content.url'])) {
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $src = smarty_modifier_sefurl($info['fileId'], 'file');
     session_write_close();
 

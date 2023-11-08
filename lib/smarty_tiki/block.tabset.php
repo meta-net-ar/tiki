@@ -76,7 +76,6 @@ function smarty_block_tabset($params, $content, $smarty, &$repeat)
         //closing
         if ($prefs['feature_tabs'] == 'y') {
             if (empty($params['toggle']) || $params['toggle'] != 'n') {
-                $smarty->loadPlugin('smarty_function_button');
                 if ($cookietab == 'n') {
                     $button_params['_text'] = tra('Tab View');
                 } else {

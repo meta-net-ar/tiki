@@ -90,7 +90,6 @@ class Tracker_Field_PageSelector extends \Tracker\Field\AbstractField
                 return $value;
             } else {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
                 return smarty_function_object_link(
                     [
                         'type' => 'wikipage',

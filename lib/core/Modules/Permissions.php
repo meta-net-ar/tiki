@@ -171,7 +171,6 @@ class Permissions
         $loaded['perms'] = $results;
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_permission_link');
         if ($loaded['from'] == 'parent object' && $parentId && $parentType) {
             $loaded['edit_link'] = smarty_function_permission_link([
                 'mode' => 'icon',

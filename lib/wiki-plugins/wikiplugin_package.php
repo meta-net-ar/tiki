@@ -40,7 +40,5 @@ function wikiplugin_package($data, $params)
 {
     global $smarty;
 
-    TikiLib::lib('smarty')->loadPlugin('smarty_block_packageplugin');
-
-    return "~np~" . smarty_block_packageplugin($params, $data, $smarty) . "~/np~";
+    return "~np~" . smarty_block_packageplugin($params, $data, $smarty->getEmptyInternalTemplate()) . "~/np~";
 }

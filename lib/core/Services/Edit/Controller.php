@@ -306,7 +306,6 @@ $(window).on("load", function(){
     public function action_inline_dialog($input)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_service_inline');
 
         $display = [];
         foreach ($input->fields as $field) {

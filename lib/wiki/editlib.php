@@ -1456,7 +1456,6 @@ class EditLib
                 $count = 1;
                 $tikiLibUser = TikiLib::lib('user');
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
 
                 $objectUrl = smarty_function_object_link(
                     ['type' => $arguments['type'],  'id' => $arguments['object']],

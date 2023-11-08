@@ -346,12 +346,11 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                 include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
                 tikiElFinder::loadJSCSS();
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_ticket');
                 $context['onclick'] = 'return openElFinderDialog(this, {
     defaultGalleryId:' . $defaultGalleryId . ',
     deepGallerySearch: ' . $deepGallerySearch . ',
     defaultVolumeId:' . $defaultVolumeId . ',
-    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty) . '\',
+    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
     getFileCallback: function(file,elfinder){ window.handleFinderFile(file,elfinder); },
     eventOrigin:this
 });';
@@ -492,8 +491,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                     }
                 } elseif ($this->getOption('displayMode') == 'barelink') {
                         $smarty = TikiLib::lib('smarty');
-                        $smarty->loadPlugin('smarty_function_object_link');
-                        $smarty->loadPlugin('smarty_modifier_sefurl');
                     foreach ($this->getConfiguration('files') as $fileId => $file) {
                         $ret .= smarty_modifier_sefurl($file['fileId'], 'file');
                     }
@@ -505,9 +502,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                 $ret = preg_replace('/~\/?np~/', '', $ret);
             } else {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
-                $smarty->loadPlugin('smarty_modifier_iconify');
-
                 $composerManager = new ComposerManager($tikipath);
                 $pdfjsIsInstalled = $composerManager->isInstalled("npm-asset/pdfjs-dist-viewer-min");
 
@@ -534,7 +528,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                         $file['filetype'] == $mimetypes["png"] ||
                         $file['filetype'] == $mimetypes["tiff"])
                     ) {
-                        $smarty->loadPlugin('smarty_function_icon');
                         $editicon = smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate());
                         $ret .= " <a href='tiki-edit_draw.php?fileId=" . $file['fileId']
                             . "' onclick='return $(this).ajaxEditDraw();' class='tips' title='Edit: " . $file['name']
@@ -543,7 +536,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                         </a>";
                     }
 
-                    $smarty->loadPlugin('smarty_function_icon');
                     $viewicon = smarty_function_icon(['name' => 'view'], $smarty->getEmptyInternalTemplate());
 
                     if ($file['filetype'] == $mimetypes["pdf"] || (PDFHelper::canConvertToPDF($file['filetype']) && $prefs['fgal_convert_documents_pdf'] == 'y')) {
@@ -716,9 +708,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
     public function renderDiff($context = [])
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
-        $smarty->loadPlugin('smarty_modifier_escape');
-        $smarty->loadPlugin('smarty_modifier_iconify');
 
         if ($context['oldValue']) {
             $old = $context['oldValue'];
@@ -824,7 +813,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                     $itemId = $this->getItemId();
                     if ($itemId) {
                         $smarty = TikiLib::lib('smarty');
-                        $smarty->loadPlugin('smarty_function_object_link');
 
                         Feedback::warning(
                             tr(
@@ -836,7 +824,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                                         'id'   => $itemId,
                                         'type' => 'trackeritem',
                                     ],
-                                    $smarty
+                                    $smarty->getEmptyInternalTemplate()
                                 )
                             )
                         );
@@ -906,7 +894,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         $baseKey = $this->getBaseKey();
 
         if ($this->getOption('indexGeometry') && $this->getValue()) {
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
             $urls = [];
 
             foreach (explode(',', $this->getValue()) as $value) {
@@ -1013,7 +1000,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
             ->setRenderTransform(function ($value) {
                 global $base_url;
 
-                TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                 $urls = [];
                 $fileIds = explode(',', $value);
                 foreach ($fileIds as $fileId) {

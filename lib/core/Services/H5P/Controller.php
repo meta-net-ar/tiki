@@ -39,7 +39,6 @@ class Services_H5P_Controller
     public function action_embed($input)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_button');
 
         $fileId = $input->fileId->int();
         $page = $input->page->pagename();

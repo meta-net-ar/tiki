@@ -11,7 +11,6 @@
 require_once('tiki-setup.php');
 $trklib = TikiLib::lib('trk');
 $rsslib = TikiLib::lib('rss');
-$smarty->loadPlugin('smarty_modifier_sefurl');
 
 if ($prefs['feed_tracker'] != 'y') {
     $errmsg = tra("rss feed disabled");

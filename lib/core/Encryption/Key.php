@@ -71,8 +71,7 @@ class Key
     public function manualEntry()
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_bootstrap_modal');
-        $href = smarty_function_bootstrap_modal(['controller' => 'encryption', 'action' => 'enter_key', 'keyId' => $this->encryption_key['keyId']], $smarty);
+        $href = smarty_function_bootstrap_modal(['controller' => 'encryption', 'action' => 'enter_key', 'keyId' => $this->encryption_key['keyId']], $smarty->getEmptyInternalTemplate());
         return '<a href="' . $href . '" class="encryption-key-entry">' . tr('Try with a manually entered key.') . '</a>';
     }
 }

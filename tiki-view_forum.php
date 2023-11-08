@@ -194,7 +194,6 @@ if (isset($_REQUEST['comments_postComment'])) {
     if ($threadId && count($errors) === 0) {
         // If the samely titled comment already
         // exists, go straight to it.
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         $url = smarty_modifier_sefurl($threadId, 'forumthread');
         header('location: ' . $url);
         exit;

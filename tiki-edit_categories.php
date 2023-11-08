@@ -19,7 +19,6 @@ $inputConfiguration = [[
 require_once 'tiki-setup.php';
 $categlib = TikiLib::lib('categ');
 $smarty = TikiLib::lib('smarty');
-$smarty->loadPlugin('smarty_function_ticket');
 require_once 'lib/tree/BrowseTreeMaker.php';
 
 $access->check_feature('feature_categories');
@@ -42,9 +41,9 @@ foreach ($ctall as $c) {
     $perms = Perms::get('category', $c['categId']);
 
     $add = $perms->add_object ? '<span class="control categ-add float-end" style="cursor: pointer" data-ticket="'
-        . smarty_function_ticket(['mode' => 'get'], $smarty) . '"></span>' : '';
+        . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '"></span>' : '';
     $remove = $perms->remove_object ? '<span class="control categ-remove float-end" style="cursor: pointer" data-ticket="'
-        . smarty_function_ticket(['mode' => 'get'], $smarty) . '"></span>' : '';
+        . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '"></span>' : '';
 
     $body = <<<BODY
 $add

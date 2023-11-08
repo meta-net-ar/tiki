@@ -313,7 +313,6 @@ if (! empty($_REQUEST['remove'])) {
 
     $transaction->commit();
 
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     // redirect to the tracker item list of the last item deleted
     if (isset($item_info) && ! empty($item_info['trackerId'])) {
         $access->redirect(smarty_modifier_sefurl($item_info['trackerId'], 'tracker'));

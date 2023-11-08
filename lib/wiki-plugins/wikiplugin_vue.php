@@ -54,9 +54,8 @@ function wikiplugin_vue($data, $params)
 
     $smarty = TikiLib::lib('smarty');
 
-    $smarty->loadPlugin('smarty_block_vue');
     $repeat = false;
 
-    $ret = smarty_block_vue($params, $data, $smarty, $repeat);
+    $ret = smarty_block_vue($params, $data, $smarty->getEmptyInternalTemplate(), $repeat);
     return $ret;
 }

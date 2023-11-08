@@ -56,7 +56,6 @@ class Hm_Handler_check_path_redirect extends Hm_Handler_Module
     public function process()
     {
         global $smarty;
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         $path = $this->request->get['list_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
             $url = smarty_modifier_sefurl($m[1], 'trackeritem');
@@ -75,7 +74,6 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
     public function process()
     {
         global $smarty;
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         if (! $this->get('msg_sent')) {
             return;
         }

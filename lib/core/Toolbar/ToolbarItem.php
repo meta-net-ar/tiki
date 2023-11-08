@@ -530,7 +530,6 @@ abstract class ToolbarItem
             $iname = 'help';
         }
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
         return smarty_function_icon(
             [
             'name'   => $iname,
@@ -570,7 +569,6 @@ abstract class ToolbarItem
             $params['_menu_text'] = 'y';
             $params['_menu_icon'] = 'y';
         }
-        $smarty->loadPlugin('smarty_block_self_link');
         return smarty_block_self_link($params, $content, $smarty->getEmptyInternalTemplate());
     }
 

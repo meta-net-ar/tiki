@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_function_defaultmapcenter($params, $smarty)
 {
-    $smarty->loadPlugin('smarty_modifier_escape');
     global $prefs;
     $geolib = TikiLib::lib('geo');
     $coords = $geolib->parse_coordinates($prefs['gmap_defaultx'] . ',' . $prefs['gmap_defaulty'] . ',' . $prefs['gmap_defaultz']);

@@ -161,7 +161,6 @@ function wikiplugin_sheet($data, $params)
                 $page = htmlentities($page);
                 $content = htmlentities($data);
                 $formId = "form$index";
-                $smarty->loadPlugin('smarty_function_ticket');
                 $ticket = smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
                 return <<<EOF
                 ~np~
@@ -269,8 +268,6 @@ EOF;
     $ret = '<div id="tiki_sheet' . $index . '" class="tiki_sheet' . $class . '" style="overflow:hidden;' . $style . '">' . $ret . '</div>';
 
     if ($editable && ($objectperms->edit_sheet  || $objectperms->admin_sheet || $tiki_p_admin == 'y')) {
-        $smarty->loadPlugin('smarty_function_button');
-
         //If you've given the sheet a url, you can't edit it, disable if not possible
         if (! isset($url)) {
             $button_params = ['_text' => tra("Edit Sheet"), '_script' => "tiki-view_sheets.php?sheetId=$id&parse=edit$urlHeight&page=$page", '_class' => "tiki_sheeteditbtn"];

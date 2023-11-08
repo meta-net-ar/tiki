@@ -55,9 +55,6 @@ if (count($filter) || count($postfilter)) {
         ;
 
         $results = tiki_searchindex_get_results($filter, $postfilter, $offset, $maxRecords);
-
-        $smarty->loadPlugin('smarty_function_object_link');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         foreach ($results as &$res) {
             foreach ($fetchFields as $f) {
                 if (isset($res[$f])) {

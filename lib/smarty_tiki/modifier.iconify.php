@@ -26,14 +26,11 @@ function smarty_modifier_iconify($string, $filetype = null, $fileId = null, $siz
     $smarty = TikiLib::lib('smarty');
     global $prefs;
 
-    $smarty->loadPlugin('smarty_function_icon');
     $icon = '';
     $ext = strtolower(substr($string, strrpos($string, '.') + 1));
     if ($fileId && substr($filetype, 0, 6) == 'image/') {
         // Special handling for file gallery images,
         // display thumbnail
-        $smarty->loadPlugin('smarty_modifier_sefurl');
-        $smarty->loadPlugin('smarty_modifier_escape');
         $icon = smarty_modifier_sefurl($fileId, 'thumbnail');
         $icon = smarty_modifier_escape($icon);
         $width = 16 * $size;

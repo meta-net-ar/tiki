@@ -112,7 +112,6 @@ class Tracker_Field_Checkbox extends \Tracker\Field\AbstractField implements \Tr
         $name = $this->getConfiguration('name');
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
 
         $schema->addNew($permName, 'y/n')
             ->setLabel($name)

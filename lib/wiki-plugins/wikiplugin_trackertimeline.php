@@ -320,7 +320,6 @@ function wikiplugin_trackertimeline($data, $params)
         return $smarty->fetch('wiki-plugins/wikiplugin_trackertimeline.tpl');
     } else {    // SIMILE Timeline Widget setup
         $headerlib = TikiLib::lib('header');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
 
         // static js moved to lib
         $headerlib->add_jsfile('lib/simile_tiki/tiki-timeline.js');

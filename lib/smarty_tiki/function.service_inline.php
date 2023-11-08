@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_service_inline($params, $smarty)
+function smarty_function_service_inline($params, \Smarty\Template $template)
 {
     $servicelib = TikiLib::lib('service');
 
@@ -31,9 +31,8 @@ function smarty_function_service_inline($params, $smarty)
         return $servicelib->render($controller, $action, $params, $extensionPackage);
     } catch (Services_Exception $e) {
         if (empty($params['_silent'])) {
-            $smarty->loadPlugin('smarty_block_remarksbox');
             $repeat = false;
-            return smarty_block_remarksbox(['type' => 'warning', 'title' => tr('Unavailable')], $e->getMessage(), $smarty, $repeat);
+            return smarty_block_remarksbox(['type' => 'warning', 'title' => tr('Unavailable')], $e->getMessage(), $template, $repeat);
         }
     }
 }

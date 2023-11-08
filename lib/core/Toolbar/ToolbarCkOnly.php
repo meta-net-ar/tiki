@@ -167,7 +167,6 @@ class ToolbarCkOnly extends ToolbarItem
     {
         if (! empty($this->iconname)) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_function_icon');
             return smarty_function_icon(
                 [
                                             'name'   => $this->iconname,

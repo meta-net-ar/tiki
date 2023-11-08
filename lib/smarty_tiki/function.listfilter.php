@@ -29,7 +29,7 @@
 
 
 
-function smarty_function_listfilter($params, $smarty)
+function smarty_function_listfilter($params, \Smarty\Template $template)
 {
     global $prefs, $listfilter_id;
     $headerlib = TikiLib::lib('header');
@@ -104,8 +104,7 @@ function smarty_function_listfilter($params, $smarty)
 
         $input .= "><div class='input-group-append'>";
         $smartylib = TikiLib::lib('smarty');
-        $smartylib->loadPlugin('smarty_function_icon');
-        $icon = smarty_function_icon(['name' => 'times-circle'], $smarty);
+        $icon = smarty_function_icon(['name' => 'times-circle'], $smartylib->getEmptyInternalTemplate());
         $input .= "<a href='#' onclick=\"\$('#$id').val('').focus().keyup();return false;\" class='btn input-group-text closeicon tips' title=':"
                 . tr('Clear filter') . "'>$icon</a>";
         $input .= '</div></div></div></div></div>';

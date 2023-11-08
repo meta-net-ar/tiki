@@ -26,7 +26,6 @@ class ToolbarFileGallery extends ToolbarUtilityItem
         /** @var Smarty_Tiki $smarty */
         $smarty = TikiLib::lib('smarty');
         if ($prefs['fgal_elfinder_feature'] !== 'y' || $prefs['fgal_elfinder_on_toolbar'] !== 'y') {
-            $smarty->loadPlugin('smarty_function_filegal_manager_url');
             return 'openFgalsWindow(\'' . htmlentities(
                 smarty_function_filegal_manager_url(['area_id' => $this->domElementId], $smarty->getEmptyInternalTemplate())
             ) . '\', true);';
@@ -46,7 +45,6 @@ class ToolbarFileGallery extends ToolbarUtilityItem
                     );
                 };'
             );
-            $smarty->loadPlugin('smarty_function_ticket');
             return '
             var area_id = (typeof editor === \'undefined\' ?  \'' . $this->domElementId . '\' : editor.name);
             openElFinderDialog(
@@ -54,7 +52,7 @@ class ToolbarFileGallery extends ToolbarUtilityItem
                 {
                     defaultGalleryId: ' . (empty($prefs['home_file_gallery']) ? $prefs['fgal_root_id'] : $prefs['home_file_gallery']) . ',
                     deepGallerySearch: true,
-                    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty) . '\',
+                    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
                     getFileCallback: function(file,elfinder) {
                             window.handleFinderInsertAt(file,elfinder,area_id);
                         },

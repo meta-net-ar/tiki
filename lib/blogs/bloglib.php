@@ -1363,7 +1363,6 @@ class BlogLib extends TikiDb_Bridge
                 $tally[$counter]++;
             }
             $segLength = $charCount + $tally['tags'];
-            $smarty->loadPlugin('smarty_modifier_truncate');
             $blogItems['data'][$i]['parsed_data'] =
                 smarty_modifier_truncate(
                     $blogItems['data'][$i]['parsed_data'],

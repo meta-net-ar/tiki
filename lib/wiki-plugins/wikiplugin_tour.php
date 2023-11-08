@@ -224,7 +224,6 @@ if (tour) {
         $html = '<span id="' . $unique . '"></span>';
         if (! empty($params['show_restart_button'])) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_function_button');
             $html .= smarty_function_button([
                     '_text' => tra($params['show_restart_button']),
                     '_id' => $unique . '_restart',

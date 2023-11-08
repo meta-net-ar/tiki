@@ -96,8 +96,6 @@ class WikiPut implements ActionInterface
 
         if (strlen($page) > 160) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_modifier_truncate');
-
             $page = smarty_modifier_truncate($page, 159, '...', false, true);
         }
 

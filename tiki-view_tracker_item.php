@@ -844,7 +844,6 @@ if ($itemObject->canModify() && $prefs['tracker_legacy_insert'] == 'y' && $prefs
         ]
     );
     if ($otherUser && $otherUser !== $user) {
-        $smarty->loadPlugin('smarty_modifier_username');
         $msg = tr("This tracker item is being edited by user %0. Please check with the user before editing, otherwise conflicts will occur and data might be lost.", smarty_modifier_username($otherUser));
         $msg .= '<br /><br /><a href="' . filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId . '&conflictoverride=y') . '">' . tra('Override lock and carry on with edit') . '</a>';
         $smarty->assign('msg', $msg);
@@ -941,9 +940,8 @@ try {
     } else {
         $smarty->display('tiki.tpl');
     }
-} catch (SmartyException $e) {
+} catch (\Smarty\Exception $e) {
     $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
     trigger_error($e->getMessage(), E_USER_ERROR);
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $access->redirect(smarty_modifier_sefurl($info['trackerId'], 'tracker'), $message, 302, 'error');
 }

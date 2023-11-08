@@ -136,7 +136,6 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         }
         $value = parent::renderInnerOutput($context);
         if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_escape');
             $value = smarty_modifier_escape($value);
         }
 
@@ -389,7 +388,6 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         $renderLink = function ($lang) {
             return function ($value, $extra) use ($lang) {
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_link');
 
                 if (isset($extra['text'])) {
                     $value = $extra['text'];

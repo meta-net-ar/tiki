@@ -110,7 +110,6 @@ if ((isset($_REQUEST['reset']) && $section != 'global') || (isset($_REQUEST['res
     $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
     $tikilib->delete_preference($prefName);
     $tikilib->set_preference($prefName . 'modified', 'n');
-    $smarty->loadPlugin('smarty_function_query');
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 
@@ -125,7 +124,6 @@ if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // i
         $_REQUEST['tool_plugin']
     );
 
-    $smarty->loadPlugin('smarty_function_query');
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 

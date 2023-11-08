@@ -1951,7 +1951,6 @@ function wikiplugin_trackerlist($data, $params)
             $smarty->assign('urlquery', '');
         }
         if (! empty($export) && $export != 'n' && $perms['tiki_p_export_tracker'] == 'y') {
-            $smarty->loadPlugin('smarty_function_service');
             $exportParams = [
                 'controller' => 'tracker',
                 'action' => 'export',
@@ -2421,7 +2420,7 @@ function wikiplugin_trackerlist($data, $params)
                 $smarty->assign('context', $params);
                 try {
                     $str = $smarty->fetch('wiki-plugins/wikiplugin_trackerlist.tpl');
-                } catch (SmartyException $e) {
+                } catch (\Smarty\Exception $e) {
                     $str = $e->getMessage();
                 }
                 if ($save_fc !== null) {

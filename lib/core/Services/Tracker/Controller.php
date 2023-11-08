@@ -205,7 +205,6 @@ class Services_Tracker_Controller
                     ]
                 );
                 if ($dupeFields) {
-                    TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                     foreach ($dupeFields as & $df) {
                         $df['message'] = tr('Warning: There is a conflict in permanent names, which can cause indexing errors.') .
                             '<br><a href="' . smarty_modifier_sefurl($df['trackerId'], 'trackerfields') . '">' .
@@ -1202,7 +1201,6 @@ class Services_Tracker_Controller
             } catch (Services_Exception_EditConflict $e) {
                 if ($input->modal->int() && TikiLib::lib('access')->is_xml_http_request()) {
                     $smarty = TikiLib::lib('smarty');
-                    $smarty->loadPlugin('smarty_function_service');
                     $href = smarty_function_service([
                         'controller' => 'tracker',
                         'action' => 'update_item',
@@ -1211,7 +1209,7 @@ class Services_Tracker_Controller
                         'redirect' => $input->redirect->url(),
                         'conflictoverride' => 1,
                         'modal' => 1,
-                    ], $smarty);
+                    ], $smarty->getEmptyInternalTemplate());
                     TikiLib::lib('header')->add_jq_onready('
     var lock_link = $(\'<a href="' . $href . '">' . tra('Override lock and carry on with edit') . '</a>\');
     lock_link.on("click", function(e) {
@@ -1695,10 +1693,9 @@ class Services_Tracker_Controller
         try {
             $smarty->assign('print_page', 'y');
             $smarty->display('templates/tracker/preview_item.tpl');
-        } catch (SmartyException $e) {
+        } catch (\Smarty\Exception $e) {
             $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
             trigger_error($e->getMessage(), E_USER_ERROR);
-            $smarty->loadPlugin('smarty_modifier_sefurl');
             $access = TikiLib::lib('access');
             $access->redirect(smarty_modifier_sefurl($trackerId, 'tracker'), $message, 302, 'error');
         }
@@ -2367,7 +2364,6 @@ class Services_Tracker_Controller
                 $items = $trklib->list_items($trackerId, $recordsOffset, $recordsMax, 'itemId_asc', $fields, $filterField, $filterValue);
 
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_modifier_tiki_short_datetime');
                 foreach ($items['data'] as $row) {
                     $toDisplay = [];
                     if ($showItemId) {

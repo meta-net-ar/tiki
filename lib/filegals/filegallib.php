@@ -1469,10 +1469,8 @@ class FileGalLib extends TikiLib
         $galleryIdentifier = is_null($galleryIdentifier) ? $prefs['fgal_root_id'] : $galleryIdentifier;
         $subGalleries = $this->getSubGalleries($galleryIdentifier, true, 'view_file_gallery', true);
 
-        $smarty->loadPlugin('smarty_function_icon');
         $icon = '&nbsp;' . smarty_function_icon(['name' => 'file-archive-open'], $smarty->getEmptyInternalTemplate()) . '&nbsp;';
 
-        $smarty->loadPlugin('smarty_block_self_link');
         $linkParameters = ['_script' => 'tiki-list_file_gallery.php', '_class' => 'fgalname'];
         if (! empty($_REQUEST['filegals_manager'])) {
             $linkParameters['filegals_manager'] = $_REQUEST['filegals_manager'];

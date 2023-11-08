@@ -23,13 +23,12 @@
  * an input box with autocomplete if there are more users
  * than $prefs['user_selector_threshold']
  */
-function smarty_function_user_selector($params, $smarty)
+function smarty_function_user_selector($params, \Smarty\Template $template)
 {
     global $prefs, $user, $tiki_p_admin;
     $tikilib = TikiLib::lib('tiki');
     $headerlib = TikiLib::lib('header');
     $userlib = TikiLib::lib('user');
-    $smarty->loadPlugin('smarty_modifier_username');
 
     static $iUserSelector = 0;
     $iUserSelector++;

@@ -590,7 +590,6 @@ function wikiplugin_img($data, $params)
     global $tikidomain, $prefs, $user;
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_icon');
 
     $imgdata = [];
 
@@ -772,7 +771,6 @@ function wikiplugin_img($data, $params)
 
     if (empty($imgdata['src'])) {
         if (! empty($imgdata['fileId'])) {
-            $smarty->loadPlugin('smarty_modifier_sefurl');
             $src = smarty_modifier_sefurl($imgdata['fileId'], 'file');
 
             if ($absolute_links) {
@@ -1391,8 +1389,6 @@ function wikiplugin_img($data, $params)
             if ((isset($imgdata['responsive']) && $imgdata['responsive'] != 'y') && ($fwidth > 400 || $fheight > 400)) {
                 $popup_params['trigger'] = 'focus';
             }
-
-            $smarty->loadPlugin('smarty_function_popup');
 
             $mouseover = ' ' . smarty_function_popup($popup_params, $smarty->getEmptyInternalTemplate());
         } else {

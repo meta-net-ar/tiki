@@ -138,7 +138,6 @@ class WikiParser_Parsable extends ParserLib
     {
         global $tikilib, $tiki_p_edit, $prefs, $pluginskiplist;
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
 
         if (! is_array($pluginskiplist)) {
             $pluginskiplist = [];
@@ -281,7 +280,6 @@ class WikiParser_Parsable extends ParserLib
 
             if ($this->plugin_is_editable($plugin_name, $arguments) && (empty($this->option['preview_mode']) || ! $this->option['preview_mode']) && empty($this->option['indexing']) && (empty($this->option['print']) || ! $this->option['print']) && ! $this->option['suppress_icons']) {
                 $headerlib = TikiLib::lib('header');
-                $smarty->loadPlugin('smarty_function_icon');
 
                 $id = 'plugin-edit-' . $plugin_name . $current_index;
                 if (strlen($plugin_data) > 2000) {

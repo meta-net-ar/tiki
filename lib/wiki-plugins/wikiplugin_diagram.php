@@ -352,7 +352,6 @@ function loadImageAnnotate($annotate)
     $file = \Tiki\FileGallery\File::id($annotate);
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $url = smarty_modifier_sefurl($annotate, 'display');
 
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {

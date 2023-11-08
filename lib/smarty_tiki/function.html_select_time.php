@@ -23,8 +23,6 @@
 function smarty_function_html_select_time($params, $smarty)
 {
     global $tikilib;
-    $smarty->loadPlugin('smarty_shared_make_timestamp');
-    $smarty->loadPlugin('smarty_function_html_options');
 
     /* Default values. */
     $prefix             = "Time_";

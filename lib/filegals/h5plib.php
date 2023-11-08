@@ -491,7 +491,6 @@ class H5PLib
         */
 
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_service');
         $embedUrl = smarty_function_service([
             'controller' => 'h5p',
             'action' => 'embed',

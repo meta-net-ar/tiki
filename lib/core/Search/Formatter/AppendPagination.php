@@ -36,7 +36,6 @@ class Search_Formatter_AppendPagination implements Search_Formatter_Plugin_Inter
             return $this->parent->renderEntries($entries);
         }
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_block_pagination_links');
         $arguments = $this->arguments;
         $arguments['resultset'] = $entries;
         $tmp = false;
@@ -53,7 +52,7 @@ class Search_Formatter_AppendPagination implements Search_Formatter_Plugin_Inter
         }
         $url .= '?' . http_build_query($filters);
 
-        $pagination = smarty_block_pagination_links($arguments, $url, $smarty, $tmp);
+        $pagination = smarty_block_pagination_links($arguments, $url, $smarty->getEmptyInternalTemplate(), $tmp);
 
         if ($this->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
             $pagination = "~np~$pagination~/np~";

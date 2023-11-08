@@ -168,7 +168,6 @@ function wikiplugin_wikidiff($data, $params)
     $params['show_version_info'] = $params['show_version_info'] !== 'n';
 
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_wikidiff');
 
     $ret = smarty_function_wikidiff($params, $smarty->getEmptyInternalTemplate());
     return $ret;

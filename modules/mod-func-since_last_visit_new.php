@@ -103,7 +103,6 @@ function module_since_last_visit_new($mod_reference, $params = null)
     global $prefs;
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
-    $smarty->loadPlugin('smarty_modifier_username');
 
     $ret = [];
     if ($params == null) {
@@ -269,7 +268,6 @@ function module_since_last_visit_new($mod_reference, $params = null)
         $query = 'select `pageName`, `user`, `lastModif` from `tiki_pages` where `lastModif`>? order by `lastModif` desc';
         $result = $tikilib->query($query, [(int) $last], $resultCount);
 
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['pageName'], 'wiki page', 'tiki_p_view')) {

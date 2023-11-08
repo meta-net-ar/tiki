@@ -233,12 +233,11 @@ function wikiplugin_vimeo($data, $params)
         global $page;
         $smarty = TikiLib::lib('smarty');
         if ($prefs['vimeo_upload'] !== 'y') {
-            $smarty->loadPlugin('smarty_block_remarksbox');
             $repeat = false;
             return smarty_block_remarksbox(
                 ['type' => 'error', 'title' => tra('Feature required')],
                 tra('Feature "vimeo_upload" is required to be able to add videos here.'),
-                $smarty,
+                $smarty->getEmptyInternalTemplate(),
                 $repeat
             );
         }
@@ -270,8 +269,6 @@ function wikiplugin_vimeo($data, $params)
         }
 
         // set up for an upload
-        $smarty->loadPlugin('smarty_function_button');
-        $smarty->loadPlugin('smarty_function_service');
         $html = smarty_function_button(
             [
                 '_keepall' => 'y',

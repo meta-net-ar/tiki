@@ -105,11 +105,6 @@ function smarty_block_pagination_links($params, $url, $smarty, &$repeat)
         return '';
     }
 
-    // Include smarty functions used below
-    $smarty->loadPlugin('smarty_block_ajax_href');
-    $smarty->loadPlugin('smarty_function_query');
-    $smarty->loadPlugin('smarty_function_icon');
-
     // Make sure every params are initialized
     if (! isset($params['itemname'])) {
         $params['itemname'] = 'Page';

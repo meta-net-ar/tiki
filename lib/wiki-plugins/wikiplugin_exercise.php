@@ -39,7 +39,6 @@ function wikiplugin_exercise($data, $params)
 {
     static $nextId = 1;
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_escape');
 
     $params = new JitFilter($params);
     $answer = $params->answer->text();
@@ -149,7 +148,6 @@ JS;
 function wikiplugin_exercise_finalize()
 {
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_icon');
 
     $checkYourScore = smarty_modifier_escape(tr('Check your score'));
     $yourScoreIs = tr('You scored %0 out of %1', '~SCORE~', '~TOTAL~');

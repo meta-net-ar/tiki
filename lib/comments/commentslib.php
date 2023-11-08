@@ -2359,7 +2359,6 @@ class Comments extends TikiLib
     {
         global $prefs;
         if ($prefs['comments_notitle'] === 'y') {
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_truncate');
             return '"' .
                     smarty_modifier_truncate(
                         strip_tags(TikiLib::lib('parser')->parse_data($comment['data'])),
@@ -3840,7 +3839,6 @@ class Comments extends TikiLib
             }
 
             if ($threadId = $this->check_for_topic($params['comments_title'], $forum_info['forumId'])) {
-                $smarty->loadPlugin('smarty_modifier_sefurl');
                 $url = smarty_modifier_sefurl($threadId, 'forumthread');
                 $link = sprintf('<a href="%s">%s</a>', $url, $params['comments_title']);
                 $errors[] = tr('This topic already exists in this forum. Visit: %0', $link);

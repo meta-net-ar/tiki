@@ -251,7 +251,6 @@ class Item
 
                     require_once('tiki-sefurl.php');
                     $smarty = TikiLib::lib('smarty');
-                    $smarty->loadPlugin('smarty_modifier_sefurl');
                     $isExternal = TikiLib::setExternalContext(true);
                     $url = smarty_modifier_sefurl($objectId, $type);
                     TikiLib::setExternalContext($isExternal);
@@ -287,7 +286,6 @@ class Item
 
                 require_once('tiki-sefurl.php');
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_modifier_sefurl');
                 $isExternal = TikiLib::setExternalContext(true);
                 $url = smarty_modifier_sefurl($itemId, 'trackeritem');
                 TikiLib::setExternalContext($isExternal);

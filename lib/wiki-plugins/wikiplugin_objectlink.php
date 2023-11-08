@@ -48,7 +48,6 @@ function wikiplugin_objectlink($data, $params)
         return;
     }
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_object_link');
 
     return smarty_function_object_link(
         [

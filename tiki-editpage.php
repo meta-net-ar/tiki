@@ -638,7 +638,6 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
             );
             if ($uploads) {
                 if (isset($_REQUEST['edit'])) {
-                    $smarty->loadPlugin('smarty_modifier_sefurl');
                     foreach ($uploads as $upload) {
                         $_REQUEST['edit'] .= '[' . smarty_modifier_sefurl($upload['fileId'], 'file') . '|' . $upload['name'] . ']';
                     }
@@ -1488,12 +1487,11 @@ if (
                 $structure_info = $structlib->s_get_page_info($structure_info['parent_id']);
             }
             if ($structure_info) {
-                $smarty->loadPlugin('smarty_function_sefurl');
                 $url = smarty_function_sefurl([
                     'page' => $page,
                     'structure' => $structure_info['pageName'],
                     'page_ref_id' => $page_ref_id,
-                ], $smarty);
+                ], $smarty->getEmptyInternalTemplate());
             } else {
                 $url = $wikilib->sefurl($page);
             }
@@ -1765,9 +1763,6 @@ if ($need_lang) {
 
         if (Perms::get()->admin) {
             $smarty = TikiLib::lib('smarty');
-            $smarty->loadPlugin('smarty_function_preference');
-            $smarty->loadPlugin('smarty_modifier_escape');
-            $smarty->loadPlugin('smarty_function_ticket');
 
             $content .= "<form method='post' action='tiki-admin.php'>";
             $content .= str_replace('"', "&quot;", smarty_function_preference(['name' => 'ajax_autosave'], $smarty->getEmptyInternalTemplate()));
@@ -1776,7 +1771,6 @@ if ($need_lang) {
             $content .= smarty_modifier_escape(tra('Apply')) . "'>";
             $content .= '</form>';
         }
-        $smarty->loadPlugin('smarty_block_remarksbox');
         $remrepeat = false;
         $smartyTemplate = $smarty->getEmptyInternalTemplate();
         $remarksbox = str_replace('"', "'", smarty_block_remarksbox(['type' => 'warning', 'title' => 'Autosave', 'close' => 'y'], $content, $smartyTemplate, $remrepeat));

@@ -130,7 +130,6 @@ class WikiParser_ParsableMarkdown extends ParserLib
     private function addHeadingLinks($data)
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
         $icon = smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate());
         $all_anchors = [];
 

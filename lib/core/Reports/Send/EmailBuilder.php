@@ -49,7 +49,6 @@ class Reports_Send_EmailBuilder
 
         /** @var \Smarty_Tiki $smarty */
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_modifier_username');
 
         $smarty->assign('report_preferences', $report_preferences);
         $smarty->assign('report_user', ucfirst(smarty_modifier_username($user_data['login'])));

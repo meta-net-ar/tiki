@@ -24,7 +24,6 @@ class Table_Code_Other extends Table_Code_Manager
     public function setCode()
     {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
         $jq = [];
         //column selector
         if (parent::$s['colselect']['type'] === true) {

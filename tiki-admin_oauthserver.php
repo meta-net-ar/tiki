@@ -26,5 +26,4 @@ $smarty->assign('client_modify_url', TikiLib::lib('service')->getUrl([
 
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $smarty->assign('mid', 'tiki-admin_oauthserver.tpl');
-$smarty->loadPlugin('smarty_modifier_ternary');
 $smarty->display("tiki.tpl");

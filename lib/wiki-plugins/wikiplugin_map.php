@@ -182,7 +182,6 @@ function wikiplugin_map_info()
 function wikiplugin_map($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_escape');
 
     $width = '100%';
     if (isset($params['width'])) {
@@ -369,8 +368,6 @@ function wp_map_plugin_searchlayer($body, $args)
     unset($args['popup_width'], $args['popup_height']);
 
     $args->setDefaultFilter('text');
-
-    TikiLib::lib('smarty')->loadPlugin('smarty_modifier_escape');
 
     $filters = '';
     foreach ($args as $key => $arg) {

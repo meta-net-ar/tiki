@@ -43,10 +43,6 @@ function smarty_function_html_select_date($params, $smarty)
 {
     global $tikilib, $prefs; // TIKI
 
-    $smarty->loadPlugin('smarty_shared_escape_special_chars');
-    $smarty->loadPlugin('smarty_shared_make_timestamp');
-    $smarty->loadPlugin('smarty_function_html_options');
-
     /* Default values. */
     $prefix          = "Date_";
     $start_year      = $prefs['display_start_year'];

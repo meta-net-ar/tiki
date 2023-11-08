@@ -8,7 +8,6 @@ function smarty_function_datetime_range($params, $smarty)
 {
     global $prefs;
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_modifier_tiki_date_format');
 
     if (! is_array($params) || ! isset($params['from']) || ! isset($params['to'])) {
         trigger_error(tra("Missing 'to' or 'from' parameter"));

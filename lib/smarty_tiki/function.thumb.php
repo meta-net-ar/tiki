@@ -23,9 +23,6 @@ function smarty_function_thumb($params, $smarty)
         $params['_max'] = $prefs['fgal_thumb_max_size']; // default thumbnail size
     }
 
-    // Include smarty functions used below
-    $smarty->loadPlugin('smarty_function_html_image');
-
     // Smarty html_image has some problems to detect height and width of such a file...
     //  $html = smarty_function_html_image(array(
     //      'src' => 'tiki-download_file.php?fileId='.((int)$params['_id']).'&amp;thumbnail&amp;max='.((int)$params['_max'])

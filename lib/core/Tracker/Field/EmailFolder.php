@@ -204,7 +204,6 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         if (! empty($parsed_fields['source_id'])) {
             $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
             if ($page_info && stristr($page_info['data'], "cypht")) {
-                TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                 $view_path = smarty_modifier_sefurl($page_info['pageName']);
                 if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
                     $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
@@ -266,7 +265,6 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
 
         if ($compose_page = $this->getOption('composePage')) {
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
             $compose_path = smarty_modifier_sefurl($compose_page);
             if (preg_match("/tiki-index\.php\?page=.*/", $compose_path)) {
                 $compose_path = "tiki-index.php?page_id=" . TikiLib::lib('tiki')->get_page_id_from_name($compose_page);

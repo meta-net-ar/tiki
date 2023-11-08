@@ -145,9 +145,6 @@ function wikiplugin_convene($data, $params): string
     $tikilib = TikiLib::lib('tiki');
     /** @var Smarty_Tiki $smarty */
     $smarty = TikiLib::lib('smarty');
-    $smarty->loadPlugin('smarty_function_icon');
-    $smarty->loadPlugin('smarty_modifier_userlink');
-    $smarty->loadPlugin('smarty_modifier_avatarize');
 
     if (! isset($params['voteoptions'])) {
         $params['voteoptions'] = default_voteoptions();
@@ -290,7 +287,6 @@ function wikiplugin_convene($data, $params): string
         $lockDate = new TikiDate();
         $lockDate->setDate($params['autolock']);
 
-        $smarty->loadPlugin('smarty_modifier_tiki_short_datetime');
         if ($lockDate < $tikiDate) {
             $params['locked'] = 'y';
             $autolockMessage = tr('Voting ended: %0', smarty_modifier_tiki_short_datetime($params['autolock']));

@@ -21,11 +21,12 @@
  * @return string
  * @throws Exception
  */
-function smarty_function_jscalendar($params, $smarty)
+function smarty_function_jscalendar($params, \Smarty\Template $template)
 {
     global $prefs;
     $headerlib = TikiLib::lib('header');
     $tikilib = TikiLib::lib('tiki');
+    $smarty = TikiLib::lib('smarty');
 
     $uiCalendarInstance = uniqid();
 
@@ -209,8 +210,7 @@ var tm = { hour: dt.getHours(), minute: dt.getMinutes(), second: dt.getSeconds()
         $timeclass = ' datetime';
     }
 
-    $smarty->loadPlugin('smarty_function_icon');
-    $icon = smarty_function_icon(['name' => 'calendar'], $smarty);
+    $icon = smarty_function_icon(['name' => 'calendar'], $smarty->getEmptyInternalTemplate());
     $headerlib->add_jq_onready("$('#" . $params['id'] . "').closest('div.jscal').find(' button.ui-datepicker-trigger').empty().append('$icon').addClass('btn btn-sm btn-link').css({'padding' : '0px', 'font-size': '16px'});");
 
     return '<div class="jscal' . $timeclass . '" style="margin-bottom:10px">' . $html . '</div>';

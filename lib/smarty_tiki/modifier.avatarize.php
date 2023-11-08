@@ -22,7 +22,6 @@ function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag 
 
     if (! $avatar && $default) {
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_icon');
         $name = TikiLib::lib('user')->clean_user($user);
         $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
     }

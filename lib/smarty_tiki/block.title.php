@@ -26,10 +26,6 @@ function smarty_block_title($params, $content, $template, &$repeat)
         return;
     }
 
-    $template->loadPlugin('smarty_function_icon');
-    $template->loadPlugin('smarty_modifier_sefurl');
-    $template->loadPlugin('smarty_modifier_escape');
-
     if (! isset($params['help'])) {
         $params['help'] = '';
     }

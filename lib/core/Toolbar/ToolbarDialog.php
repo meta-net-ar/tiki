@@ -60,7 +60,6 @@ class ToolbarDialog extends ToolbarItem
                 $wysiwyg = '';
 
                 $smarty = TikiLib::lib('smarty');
-                $smarty->loadPlugin('smarty_function_object_selector');
                 $object_selector = smarty_function_object_selector(
                     [
                                                                        '_id'        => 'tbOLinkObjectSelector',

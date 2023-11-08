@@ -540,8 +540,6 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
         $label = $this->renderInnerOutput($context);
 
         if ($item && ! is_array($item) && ( ! isset($context['list_mode']) || $context['list_mode'] !== 'csv') && $this->getOption('fieldId')) {
-            $smarty->loadPlugin('smarty_function_object_link');
-
             if ($this->getOption('linkPage')) {
                 $link = smarty_function_object_link(
                     [

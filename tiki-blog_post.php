@@ -238,7 +238,6 @@ if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
     include_once("categorize.php");
 
     require_once('tiki-sefurl.php');
-    $smarty->loadPlugin('smarty_modifier_sefurl');
     $url = smarty_modifier_sefurl($postId, 'blogpost');
     header("location: $url");
     exit;

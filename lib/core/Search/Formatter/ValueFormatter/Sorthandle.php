@@ -6,11 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_Formatter_ValueFormatter_Sorthandle extends Search_Formatter_ValueFormatter_Abstract
 {
-    public function __construct()
-    {
-        TikiLib::lib('smarty')->loadPlugin('smarty_modifier_escape');
-    }
-
     public function render($name, $value, array $entry)
     {
         if (substr($name, 0, 14) !== 'tracker_field_') {

@@ -94,12 +94,10 @@ class ObjectSelector implements Control
             $params['_simplevalue'] = implode(',', $value);
             $params['_separator'] = ',';
 
-            $smarty->loadPlugin('smarty_function_object_selector_multi');
             $result = smarty_function_object_selector_multi($params, $smarty->getEmptyInternalTemplate());
         } else {
             $params['_simplevalue'] = $this->value;
 
-            $smarty->loadPlugin('smarty_function_object_selector');
             $result = smarty_function_object_selector($params, $smarty->getEmptyInternalTemplate());
         }
 

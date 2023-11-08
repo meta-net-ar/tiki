@@ -581,8 +581,6 @@ if (! hm_exists('sender_callback')) {
     function sender_callback($vals, $style, $output_mod)
     {
         global $smarty, $tikiroot;
-        $smarty->loadPlugin('smarty_block_self_link');
-        $smarty->loadPlugin('smarty_modifier_sefurl');
         list($class, $from, $operator, $contactId, $wikiPage) = $vals;
         if ($contactId > 0) {
             $output = smarty_block_self_link([

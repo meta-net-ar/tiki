@@ -13,7 +13,7 @@
  * These keys treat the template setting in the tracker as a default value and will therefore override if present.
  * They only apply if the default setting would apply - i.e sectionformat must be set to configured.
  */
-function smarty_function_trackerfields($params, $smarty)
+function smarty_function_trackerfields($params, \Smarty\Template $template)
 {
     if (! isset($params['fields']) || ! is_array($params['fields'])) {
         return tr('Invalid fields provided.');
@@ -27,9 +27,6 @@ function smarty_function_trackerfields($params, $smarty)
         $params['mode'] = 'edit';
     }
 
-    $smarty->loadPlugin('smarty_function_trackeroutput');
-    $smarty->loadPlugin('smarty_function_trackerinput');
-
     $sectionFormat = $definition->getConfiguration('sectionFormat', 'flat');
 
     if (! empty($params['format'])) {
@@ -39,6 +36,7 @@ function smarty_function_trackerfields($params, $smarty)
     $editItemPretty = isset($params['editItemPretty']) ? $params['editItemPretty'] : '';
     $viewItemPretty = isset($params['viewItemPretty']) ? $params['viewItemPretty'] : '';
 
+    $smarty = TikiLib::lib('smarty');
     $trklib = TikiLib::lib('trk');
     $trklib->registerSectionFormat('config', 'edit', $editItemPretty, tr('Configured'));
     $trklib->registerSectionFormat('config', 'view', $viewItemPretty, tr('Configured'));
@@ -87,7 +85,7 @@ function smarty_function_trackerfields($params, $smarty)
                 'showlinks' => 'n',
                 'list_mode' => 'n',
                 'item' => $item,
-            ], $smarty);
+            ], $template);
         });
 
 
@@ -98,7 +96,7 @@ function smarty_function_trackerfields($params, $smarty)
                 'showlinks' => 'n',
                 'list_mode' => 'n',
                 'itemId' => $itemId,
-            ], $smarty);
+            ], $smarty->getEmptyInternalTemplate());
         });
 
 
@@ -111,7 +109,7 @@ function smarty_function_trackerfields($params, $smarty)
                     'list_mode' => 'n',
                     'editable' => 'inline',
                     'itemId' => $itemId,
-                ], $smarty);
+                ], $smarty->getEmptyInternalTemplate());
             });
         }
 
@@ -179,8 +177,7 @@ function smarty_function_trackerfields($params, $smarty)
     }
 
     if ($datepicker) {
-        $smarty->loadPlugin('smarty_function_js_insert_icon');
-        $result .= smarty_function_js_insert_icon(['type' => "jscalendar"], $smarty);
+        $result .= smarty_function_js_insert_icon(['type' => "jscalendar"], $template);
     }
 
     return $result;

@@ -94,7 +94,6 @@ function wikiplugin_translationof($data, $params)
     $link = 'javascript:void(0)';
     $popup_html = "<a href=\"tiki-edit_translation.php?page=$orig_page$translation_lang_arg$translation_name_arg#new_translation\">" . tr("Translate this link") . "</a>";
     $popup_params = [ 'text' => $popup_html, 'sticky' => true, 'trigger' => 'mouseover'];
-    $smarty->loadPlugin('smarty_function_popup');
     $mouseover = ' ' . smarty_function_popup($popup_params, $smarty->getEmptyInternalTemplate());
     $html = "<a href=\"tiki-index.php?page=$orig_page\" $mouseover>$anchor_text</a>";
 

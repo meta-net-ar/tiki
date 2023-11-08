@@ -59,8 +59,7 @@ function smarty_modifier_tasklink($taskId, $class_name = "link", $offset = "0", 
 
         $tooltipContent .= "<hr />" . $description;
 
-        $smarty->loadPlugin('smarty_function_popup');
-        $popupAttributes = smarty_function_popup(['text' => $tooltipContent, 'fullhtml' => true], $smarty);
+        $popupAttributes = smarty_function_popup(['text' => $tooltipContent, 'fullhtml' => true], $smarty->getEmptyInternalTemplate());
     } else {
         $popupAttributes = '';
     }

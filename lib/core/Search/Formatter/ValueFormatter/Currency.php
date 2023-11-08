@@ -102,11 +102,9 @@ class Search_Formatter_ValueFormatter_Currency extends Search_Formatter_ValueFor
         }
 
         if ($this->amount_only) {
-            TikiLib::lib('smarty')->loadPlugin('smarty_modifier_number_format');
             return '~np~' . smarty_modifier_number_format($amount, 2, '.', '') . '~/np~';
             ;
         } else {
-            TikiLib::lib('smarty')->loadPlugin('smarty_function_currency');
             return smarty_function_currency(
                 [
                 'amount' => $amount,

@@ -1323,7 +1323,6 @@ class WikiLib extends TikiLib
                 $newQueryStr = http_build_query($queryArray, '', '&');
                 $with_next = (empty($newQueryStr) ? '' : $newQueryStr);
 
-                TikiLib::lib('smarty')->loadPlugin('smarty_modifier_sefurl');
                 $new_url = smarty_modifier_sefurl($newPage, '', $with_next);
             }
             // redirect to the new url

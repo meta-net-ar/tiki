@@ -47,7 +47,6 @@ class WikiPluginBackLinks extends PluginsLib
 
         //Format the backlink using object link
         $smarty = TikiLib::lib('smarty');
-        $smarty->loadPlugin('smarty_function_object_link');
 
         $backlink = smarty_function_object_link(
             [
