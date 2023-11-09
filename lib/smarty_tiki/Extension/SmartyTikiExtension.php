@@ -166,10 +166,16 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getPreFilters(): array
     {
+        global $prefs;
+
         $this->preFilters = [
             new \SmartyTiki\Filter\Pre\Tr(),
             new \SmartyTiki\Filter\Pre\Jq()
         ];
+
+        if (! empty($prefs['log_tpl']) && $prefs['log_tpl'] === 'y') {
+            $this->preFilters[] = new \SmartyTiki\Filter\Pre\LogTpl();
+        }
 
         return $this->preFilters;
     }

@@ -223,9 +223,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         // Assign the prefs array in smarty, by reference
         $this->assign('prefs', $prefs);
 
-        if (! empty($prefs['log_tpl']) && $prefs['log_tpl'] === 'y') {
-            $this->registerFilter('pre', 'log_tpl');
-        }
         if (! empty($prefs['feature_sefurl_filter']) && $prefs['feature_sefurl_filter'] === 'y') {
             require_once('tiki-sefurl.php');
             $this->registerFilter('output', 'filter_out_sefurl');
