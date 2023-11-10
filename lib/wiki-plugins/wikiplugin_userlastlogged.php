@@ -53,6 +53,7 @@ function wikiplugin_userlastlogged($data, $params)
 
     $allowed_methods = ['long_date', 'short_date', 'long_time', 'short_time', 'long_datetime', 'short_datetime', 'iso8601_datetime',
                         'compact_iso8601_datetime'];
+                        
     $lastLogin = $info['lastLogin'] ?? null;
 
     if (! empty($params['user'])) {
