@@ -55,6 +55,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getBlockHandler(string $blockTagName): ?BlockHandlerInterface
     {
         switch ($blockTagName) {
+            case 'accordion_group':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AccordionGroup();
+                break;
             case 'accordion':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Accordion();
                 break;
