@@ -55,6 +55,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getBlockHandler(string $blockTagName): ?BlockHandlerInterface
     {
         switch ($blockTagName) {
+            case 'accordion':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Accordion();
+                break;
             case 'ajax_href':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
                 break;
