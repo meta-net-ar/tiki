@@ -61,6 +61,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'accordion':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Accordion();
                 break;
+            case 'actions':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Actions();
+                break;
             case 'ajax_href':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
                 break;
