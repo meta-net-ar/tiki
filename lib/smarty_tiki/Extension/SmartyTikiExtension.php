@@ -76,6 +76,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'display':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Display();
                 break;
+            case 'filter':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Filter();
+                break;
             case 'jq':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Jq();
                 break;
