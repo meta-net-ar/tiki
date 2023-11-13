@@ -4,22 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_block_ifsearchexists($params, $content, $smarty, &$repeat)
+function smarty_block_ifsearchexists($params, $content, \Smarty\Template $template, &$repeat)
 {
-    if (empty($params['type']) || empty($params['id'])) {
-        return '';
-    }
-
-    TikiLib::lib('access')->check_feature('feature_search');
-
-    $query = new Search_Query();
-    $query->addObject($params['type'], $params['id']);
-    $index = TikiLib::lib('unifiedsearch')->getIndex();
-    $result = $query->search($index);
-
-    if ($result->count() > 0) {
-        return $content;
-    } else {
-        return '';
-    }
+    $smartyBlockIfSearchExistsHandler = new \SmartyTiki\BlockHandler\IfSearchExists();
+    return $smartyBlockIfSearchExistsHandler->handle($params, $content, $template, $repeat);
 }
