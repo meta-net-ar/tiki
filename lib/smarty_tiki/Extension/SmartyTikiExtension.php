@@ -70,6 +70,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'ajax_href':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
                 break;
+            case 'compact':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Compact();
+                break;
             case 'jq':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Jq();
                 break;
