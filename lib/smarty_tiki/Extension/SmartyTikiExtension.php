@@ -94,6 +94,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'mailurl':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\MailUrl();
                 break;
+            case 'modules_list':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\ModulesList();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
