@@ -64,6 +64,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'actions':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Actions();
                 break;
+            case 'activityframe':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\ActivityFrame();
+                break;
             case 'ajax_href':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\AjaxHref();
                 break;
