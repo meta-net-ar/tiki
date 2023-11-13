@@ -85,6 +85,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'ifsearchnotexists':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\IfSearchNotExists();
                 break;
+            case 'itemfield':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\ItemField();
+                break;
             case 'jq':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Jq();
                 break;
