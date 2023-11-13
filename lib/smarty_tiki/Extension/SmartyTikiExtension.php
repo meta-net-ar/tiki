@@ -97,6 +97,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'modules_list':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\ModulesList();
                 break;
+            case 'packageplugin':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\PackagePlugin();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
