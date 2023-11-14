@@ -130,6 +130,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'textarea':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\TextArea();
                 break;
+            case 'tikimodule':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\TikiModule();
+                break;
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
