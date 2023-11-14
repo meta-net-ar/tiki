@@ -139,6 +139,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
+            case 'trackeritemcheck':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\TrackerItemCheck();
+                break;
             case 'wikiplugin':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Wikiplugin();
                 break;
