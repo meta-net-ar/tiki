@@ -142,6 +142,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'trackeritemcheck':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\TrackerItemCheck();
                 break;
+            case 'translation':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Translation();
+                break;
             case 'wikiplugin':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Wikiplugin();
                 break;
