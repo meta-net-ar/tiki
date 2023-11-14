@@ -109,6 +109,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'popup_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\PopupLink();
                 break;
+            case 'repeat':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Repeat();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
