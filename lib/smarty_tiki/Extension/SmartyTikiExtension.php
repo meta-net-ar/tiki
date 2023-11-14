@@ -103,6 +103,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'pagination_links':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\PaginationLinks();
                 break;
+            case 'permission':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Permission();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
