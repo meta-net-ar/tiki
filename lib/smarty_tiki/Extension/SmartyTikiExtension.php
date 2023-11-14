@@ -148,6 +148,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'vue':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Vue();
                 break;
+            case 'wiki':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Wiki();
+                break;
             case 'wikiplugin':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Wikiplugin();
                 break;
