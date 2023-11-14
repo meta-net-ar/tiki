@@ -121,6 +121,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'remarksbox':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Remarksbox();
                 break;
+            case 'tab':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tab();
+                break;
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
