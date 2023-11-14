@@ -124,6 +124,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'tab':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tab();
                 break;
+            case 'tabset':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tabset();
+                break;
             case 'tr':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Tr();
                 break;
