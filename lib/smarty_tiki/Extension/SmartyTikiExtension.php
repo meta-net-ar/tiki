@@ -112,6 +112,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'repeat':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Repeat();
                 break;
+            case 'sortlinks':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SortLinks();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
