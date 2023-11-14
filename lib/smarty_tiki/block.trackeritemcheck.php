@@ -8,5 +8,5 @@
 function smarty_block_trackeritemcheck($params, $content, \Smarty\Template $template, $repeat)
 {
     $smartyBlockTrackerItemCheckHandler = new \SmartyTiki\BlockHandler\TrackerItemCheck();
-    return $$$smartyBlockTrackerItemCheckHandler->handle($params, $content, $template, $repeat);
+    return $smartyBlockTrackerItemCheckHandler->handle($params, $content, $template, $repeat);
 }
