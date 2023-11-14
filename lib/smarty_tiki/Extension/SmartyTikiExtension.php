@@ -106,6 +106,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'permission':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\Permission();
                 break;
+            case 'popup_link':
+                $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\PopupLink();
+                break;
             case 'self_link':
                 $this->blockHandlers[$blockTagName] = new \SmartyTiki\BlockHandler\SelfLink();
                 break;
