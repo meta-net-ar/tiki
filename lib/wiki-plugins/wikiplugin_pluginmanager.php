@@ -280,7 +280,9 @@ class WikiPluginPluginManager extends PluginsLib
                         $rows .= '</td>';
                         //Accepted Values column
                         $rows .= $cellbegin;
-                        if (isset($paraminfo['separator']) && !is_array($paraminfo['separator'])) {
+                        if (
+                            isset($paraminfo['separator']) && !is_array($paraminfo['separator'])
+                           ) {
                             $sep = $paraminfo['separator'];
                             $septext = tr('%0separator:%1 ', '<em>', '</em>') . '<code>' . $paraminfo['separator'] .
                                 '</code>';
