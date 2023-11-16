@@ -196,6 +196,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'categoryselector':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\CategorySelector();
                 break;
+            case 'content':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Content();
+                break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
