@@ -178,6 +178,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'autocomplete':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Autocomplete();
                 break;
+            case 'banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Banner();
+                break;
             case 'breadcrumbs':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Breadcrumbs();
                 break;
