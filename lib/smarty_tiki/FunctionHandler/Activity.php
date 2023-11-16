@@ -15,12 +15,12 @@ class Activity extends Base
 {
     public function handle($params, Template $template)
     {
-        $smarty = TikiLib::lib('smarty');
+        $smarty = \TikiLib::lib('smarty');
 
         if (isset($params['info'])) {
             $activity = $params['info'];
         } else {
-            $lib = TikiLib::lib('unifiedsearch');
+            $lib = \TikiLib::lib('unifiedsearch');
             $docs = $lib->getDocuments('activity', $params['id']);
 
             $activity = reset($docs);
@@ -29,7 +29,7 @@ class Activity extends Base
                 return tr('Not found.');
             }
 
-            $activity = TikiLib::lib('unifiedsearch')->getRawArray($activity);
+            $activity = \TikiLib::lib('unifiedsearch')->getRawArray($activity);
         }
 
         $smarty->assign('activity', $activity);
