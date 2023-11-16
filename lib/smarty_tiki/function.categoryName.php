@@ -4,13 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_categoryName($params, $smarty)
+function smarty_function_categoryName($params, \Smarty\Template $template)
 {
-    if (! isset($params['id'])) {
-        trigger_error("categoryName: missing 'id' parameter");
-        return;
-    }
-
-    $categlib = TikiLib::lib('categ');
-    return $categlib->get_category_name($params['id']);
+    $smartyFunctionCategoryNameHandler = new \SmartyTiki\FunctionHandler\CategoryName();
+    return $smartyFunctionCategoryNameHandler->handle($params, $template);
 }
