@@ -175,6 +175,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'attachments':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Attachments();
                 break;
+            case 'autocomplete':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Autocomplete();
+                break;
             case 'breadcrumbs':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Breadcrumbs();
                 break;
