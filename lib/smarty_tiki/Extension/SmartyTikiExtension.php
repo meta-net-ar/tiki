@@ -169,6 +169,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'activity':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Activity();
                 break;
+            case 'article':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Article();
+                break;
             case 'attachments':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Attachments();
                 break;
