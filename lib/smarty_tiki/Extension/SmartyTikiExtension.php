@@ -217,14 +217,17 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'datetime_range':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DatetimeRange();
                 break;
-            case 'Debugger':
+            case 'debugger':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Debugger();
                 break;
-            case 'DefaultMapCenter':
+            case 'defaultmapcenter':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DefaultMapCenter();
                 break;
-            case 'Ed':
+            case 'ed':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ed();
+                break;
+            case 'elapsed':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Elapsed();
                 break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
