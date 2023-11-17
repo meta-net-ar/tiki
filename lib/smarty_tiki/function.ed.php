@@ -4,16 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_ed($params, $smarty)
+function smarty_function_ed($params, \Smarty\Template $template)
 {
-    global $tikilib;
-    extract($params);
-    // Param = zone
-
-    if (empty($id)) {
-        trigger_error("ed: missing 'id' parameter");
-        return;
-    }
-
-    print($banner);
+    $smartyFunctionEdHandler = new \SmartyTiki\FunctionHandler\Ed();
+    return $smartyFunctionEdHandler->handle($params, $template);
 }

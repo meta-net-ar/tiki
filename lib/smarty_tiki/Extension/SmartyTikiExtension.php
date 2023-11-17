@@ -223,6 +223,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'DefaultMapCenter':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DefaultMapCenter();
                 break;
+            case 'Ed':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ed();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
