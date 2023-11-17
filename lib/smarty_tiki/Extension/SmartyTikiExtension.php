@@ -235,6 +235,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'fgal_browse':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
+                break;
             case 'html_body_attributes':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;
