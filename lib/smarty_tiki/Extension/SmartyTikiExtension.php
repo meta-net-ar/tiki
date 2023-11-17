@@ -220,6 +220,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'Debugger':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Debugger();
                 break;
+            case 'DefaultMapCenter':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DefaultMapCenter();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
