@@ -214,6 +214,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'custom_template':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\CustomTemplate();
                 break;
+            case 'datetime_range':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DatetimeRange();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
