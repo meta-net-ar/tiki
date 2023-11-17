@@ -238,6 +238,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;
+            case 'file_selector':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileSelector();
+                break;
             case 'html_body_attributes':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;

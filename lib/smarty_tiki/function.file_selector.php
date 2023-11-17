@@ -18,27 +18,8 @@
  * The component will build a drop list for the object selector if the results fit in a reasonable amount
  * of space or will use autocomplete on the object title otherwise.
  */
-function smarty_function_file_selector($params, $smarty)
+function smarty_function_file_selector($params, \Smarty\Template $template)
 {
-    static $uniqid = 0;
-
-    $arguments = [
-        'name' => null,
-        'value' => null,
-        'limit' => 1,
-        'type' => null,
-        'galleryId' => 0,
-    ];
-
-    $input = new JitFilter(array_merge($arguments, $params));
-    $input->replaceFilter('value', 'int');
-
-    $smarty->assign('file_selector', [
-        'name' => $input->name->text(),
-        'value' => array_filter($input->asArray('value', ',')),
-        'limit' => $input->limit->digits() ?: 1,
-        'type' => $input->type->text(),
-        'galleryId' => $input->galleryId->int(),
-    ]);
-    return $smarty->fetch('file_selector.tpl');
+    $smartyFunctionFileSelectorHandler = new \SmartyTiki\FunctionHandler\FileSelector();
+    return $smartyFunctionFileSelectorHandler->handle($params, $template);
 }
