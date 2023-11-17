@@ -199,6 +199,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'content':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Content();
                 break;
+            case 'cookie_jar':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\CookieJar();
+                break;
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
