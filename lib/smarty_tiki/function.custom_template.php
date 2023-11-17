@@ -9,7 +9,8 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
     exit;
 }
 
-function smarty_function_custom_template($params, $smarty)
+function smarty_function_custom_template($params, \Smarty\Template $template)
 {
-    return TikiLib::custom_template($params['basetpl'], $params['modifiers']);
+    $smartyFunctionCustomTemplateHandler = new \SmartyTiki\FunctionHandler\CustomTemplate();
+    return $smartyFunctionCustomTemplateHandler->handle($params, $template);
 }

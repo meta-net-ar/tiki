@@ -211,6 +211,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'currency':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Currency();
                 break;
+            case 'custom_template':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\CustomTemplate();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
