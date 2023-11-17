@@ -217,6 +217,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'datetime_range':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\DatetimeRange();
                 break;
+            case 'Debugger':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Debugger();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
