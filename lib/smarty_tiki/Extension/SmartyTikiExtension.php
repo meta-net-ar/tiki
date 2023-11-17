@@ -241,6 +241,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'file_selector':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileSelector();
                 break;
+            case 'filegal_manager_url':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalManagerUrl();
+                break;
             case 'html_body_attributes':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;
