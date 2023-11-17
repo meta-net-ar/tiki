@@ -208,6 +208,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'count':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Count();
                 break;
+            case 'currency':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Currency();
+                break;
             case 'favorite':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Favorite();
                 break;
