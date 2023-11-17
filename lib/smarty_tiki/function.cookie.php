@@ -4,12 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_cookie($params, $smarty)
+function smarty_function_cookie($params, \Smarty\Template $template)
 {
-    global $tikilib;
-    extract($params);
-    // Param = zone
-
-    $data = $tikilib->pick_cookie();
-    print($data);
+    $smartyFunctionCookieHandler = new \SmartyTiki\FunctionHandler\Cookie();
+    return $smartyFunctionCookieHandler->handle($params, $template);
 }
