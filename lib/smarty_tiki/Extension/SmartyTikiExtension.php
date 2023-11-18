@@ -334,6 +334,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'object_score':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectScore();
                 break;
+            case 'object_selector_multi':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectSelectorMulti();
+                break;
             case 'permission_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PermissionLink();
                 break;
