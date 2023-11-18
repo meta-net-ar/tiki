@@ -280,6 +280,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'js_insert_icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\JsInsertIcon();
                 break;
+            case 'js_maxlength':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\JsMaxLength();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
