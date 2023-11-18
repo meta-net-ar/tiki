@@ -271,6 +271,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
                 break;
+            case 'initials_filter_links':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
