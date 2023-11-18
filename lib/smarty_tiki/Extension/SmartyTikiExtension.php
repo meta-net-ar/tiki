@@ -316,6 +316,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'multilike':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MultiLike();
                 break;
+            case 'norecords':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\NoRecords();
+                break;
             case 'object_title':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectTitle();
                 break;
