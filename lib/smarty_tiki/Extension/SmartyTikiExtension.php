@@ -298,6 +298,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'lock':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Lock();
                 break;
+            case 'memusage':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MemUsage();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
