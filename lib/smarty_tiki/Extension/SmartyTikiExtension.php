@@ -283,6 +283,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'js_maxlength':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\JsMaxLength();
                 break;
+            case 'jscalendar':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\JsCalendar();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
