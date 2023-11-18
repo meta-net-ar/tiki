@@ -262,6 +262,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'html_select_date':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlSelectDate();
                 break;
+            case 'html_select_duration':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlSelectDuration();
+                break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
                 break;
