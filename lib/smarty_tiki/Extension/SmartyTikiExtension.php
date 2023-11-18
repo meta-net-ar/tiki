@@ -295,6 +295,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'listfilter':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ListFilter();
                 break;
+            case 'lock':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Lock();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
