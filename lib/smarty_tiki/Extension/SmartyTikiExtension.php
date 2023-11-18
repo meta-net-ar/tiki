@@ -301,6 +301,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'memusage':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MemUsage();
                 break;
+            case 'menu':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Menu();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
