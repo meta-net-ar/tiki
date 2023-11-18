@@ -292,6 +292,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'like':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Like();
                 break;
+            case 'listfilter':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ListFilter();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
