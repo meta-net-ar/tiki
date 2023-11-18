@@ -322,6 +322,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'notification_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\NotificationLink();
                 break;
+            case 'obj_in_cat':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjInCat();
+                break;
             case 'object_title':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectTitle();
                 break;
