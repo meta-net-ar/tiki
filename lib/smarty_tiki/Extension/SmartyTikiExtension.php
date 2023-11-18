@@ -313,6 +313,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'monitor_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MonitorLink();
                 break;
+            case 'multilike':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\MultiLike();
+                break;
             case 'object_title':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectTitle();
                 break;
