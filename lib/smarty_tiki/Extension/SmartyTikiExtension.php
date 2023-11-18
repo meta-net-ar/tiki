@@ -247,6 +247,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'filegal_uploader':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalUploader();
                 break;
+            case 'fileinfo':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileInfo();
+                break;
             case 'html_body_attributes':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;
