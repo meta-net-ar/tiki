@@ -319,6 +319,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'norecords':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\NoRecords();
                 break;
+            case 'notification_link':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\NotificationLink();
+                break;
             case 'object_title':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectTitle();
                 break;

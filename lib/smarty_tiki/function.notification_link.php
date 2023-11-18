@@ -4,21 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_notification_link($params)
+function smarty_function_notification_link($params, \Smarty\Template $template)
 {
-    global $user, $prefs;
-
-    if ($prefs['monitor_enabled'] != 'y') {
-        return;
-    }
-
-    if (! $user) {
-        return '';
-    }
-
-    $servicelib = TikiLib::lib('service');
-
-    $smarty = TikiLib::lib('smarty');
-    $smarty->assign('monitor_link', $params);
-    return $smarty->fetch('monitor/notification_link.tpl');
+    $smartyFunctionNotificationLinkHandler = new \SmartyTiki\FunctionHandler\NotificationLink();
+    return $smartyFunctionNotificationLinkHandler->handle($params, $template);
 }
