@@ -4,13 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_help($params, $smarty)
+function smarty_function_help($params, \Smarty\Template $template)
 {
-    extract($params);
-    // Param = zone
-    if (empty($url) && empty($desc) && empty($crumb)) {
-        trigger_error("assign: missing parameter: help (url desc)|crumb");
-        return;
-    }
-    print help_doclink($params);
+    $smartyFunctionHelpHandler = new \SmartyTiki\FunctionHandler\Help();
+    return $smartyFunctionHelpHandler->handle($params, $template);
 }

@@ -253,6 +253,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'formitem':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FormItem();
                 break;
+            case 'help':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Help();
+                break;
             case 'html_body_attributes':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
                 break;
