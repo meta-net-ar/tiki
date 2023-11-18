@@ -277,6 +277,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'interactivetranslation':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InteractiveTranslation();
                 break;
+            case 'js_insert_icon':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\JsInsertIcon();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
