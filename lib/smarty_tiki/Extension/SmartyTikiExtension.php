@@ -304,6 +304,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'menu':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Menu();
                 break;
+            case 'module':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Module();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
