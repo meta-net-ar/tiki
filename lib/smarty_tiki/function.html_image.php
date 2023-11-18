@@ -7,6 +7,6 @@
 
 function smarty_function_html_image($params, \Smarty\Template $template)
 {
-    $smartfunctionHtmlImageHandler = new \Smarty\FunctionHandler\HtmlImage();
-    return $smartfunctionHtmlImageHandler->handle($params, $template);
+    $smartyFunctionHtmlImageHandler = new \Smarty\FunctionHandler\HtmlImage();
+    return $smartyFunctionHtmlImageHandler->handle($params, $template);
 }
