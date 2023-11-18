@@ -274,6 +274,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'initials_filter_links':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
                 break;
+            case 'interactivetranslation':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InteractiveTranslation();
+                break;
             case 'modulelist':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ModuleList();
                 break;
