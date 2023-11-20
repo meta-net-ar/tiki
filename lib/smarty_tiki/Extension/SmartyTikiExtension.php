@@ -382,6 +382,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rating_choice':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingChoice();
                 break;
+            case 'rating_override_menu':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingOverrideMenu();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
