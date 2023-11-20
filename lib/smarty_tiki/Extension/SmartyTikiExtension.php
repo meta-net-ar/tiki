@@ -385,6 +385,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rating_override_menu':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingOverrideMenu();
                 break;
+            case 'rating_result_avg':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingResultAvg();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
