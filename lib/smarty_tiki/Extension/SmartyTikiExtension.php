@@ -454,6 +454,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'trackerfields':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerFields();
                 break;
+            case 'trackerheader':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerHeader();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
