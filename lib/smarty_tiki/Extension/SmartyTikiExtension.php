@@ -430,6 +430,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'show_short':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
                 break;
+            case 'svn_lastup':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnLastup();
+                break;
             case 'ticket':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ticket();
                 break;

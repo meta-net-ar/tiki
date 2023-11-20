@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_svn_lastup()
+function smarty_function_svn_lastup($params, \Smarty\Template $template)
 {
-    $svn = svn_last_update();
-    return $svn['wcdb_mtime'] ?? null;
+    $smartyFunctionSvnLastupHandler = new \SmartyTiki\FunctionHandler\SvnLastup();
+    return $smartyFunctionSvnLastupHandler->handle($params, $template);
 }
