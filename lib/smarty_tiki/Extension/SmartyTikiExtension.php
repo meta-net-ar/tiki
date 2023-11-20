@@ -406,6 +406,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rss':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rss();
                 break;
+            case 'sameurl':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SameUrl();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
