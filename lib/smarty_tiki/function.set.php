@@ -4,10 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/* {set var=$name value=$value}
- * do the same than assign but accept a varaible as var name
- */
-function smarty_function_set($params, $smarty)
+
+function smarty_function_set($params, \Smarty\Template $template)
 {
-    $smarty->assign($params['var'], $params['value']);
+    $smartyFunctionSetHandler = new \SmartyTiki\FunctionHandler\Set();
+    return $smartyFunctionSetHandler->handle($params, $template);
 }
