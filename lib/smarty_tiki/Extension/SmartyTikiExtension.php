@@ -394,6 +394,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rcontent':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rcontent();
                 break;
+            case 'redirect':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Redirect();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
