@@ -451,6 +451,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'tracker_item_status_icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
                 break;
+            case 'trackerfields':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerFields();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
