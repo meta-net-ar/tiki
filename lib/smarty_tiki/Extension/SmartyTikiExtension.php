@@ -460,6 +460,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'trackerinput':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerInput();
                 break;
+            case 'trackeroutput':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerOutput();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }

@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_trackeroutput($params, $smarty)
+function smarty_function_trackeroutput($params, \Smarty\Template $template)
 {
-    $trklib = TikiLib::lib('trk');
-    return $trklib->field_render_value($params);
+    $smartyFunctionTrackerOutputHandler = new \SmartyTiki\FunctionHandler\TrackerOutput();
+    return $smartyFunctionTrackerOutputHandler->handle($params, $template);
 }
