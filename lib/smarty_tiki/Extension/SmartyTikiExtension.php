@@ -403,6 +403,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'router_params':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RouterParams();
                 break;
+            case 'rss':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rss();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
