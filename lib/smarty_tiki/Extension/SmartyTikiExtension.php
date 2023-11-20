@@ -349,6 +349,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'page_in_structure':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PageInStructure();
                 break;
+            case 'payment':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Payment();
+                break;
             case 'permission_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PermissionLink();
                 break;
