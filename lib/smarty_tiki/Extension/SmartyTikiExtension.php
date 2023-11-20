@@ -373,6 +373,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'query':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Query();
                 break;
+            case 'quotabar':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Quotabar();
+                break;
             case 'rating':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Rating();
                 break;
