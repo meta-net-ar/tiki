@@ -439,6 +439,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'syntax':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Syntax();
                 break;
+            case 'thumb':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Thumb();
+                break;
             case 'ticket':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ticket();
                 break;
