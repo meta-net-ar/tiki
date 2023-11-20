@@ -472,6 +472,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'user_registration':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\UserRegistration();
                 break;
+            case 'user_selector':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\UserSelector();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
