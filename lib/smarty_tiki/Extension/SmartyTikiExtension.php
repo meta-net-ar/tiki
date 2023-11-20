@@ -388,6 +388,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'rating_result_avg':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingResultAvg();
                 break;
+            case 'rating_result':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RatingResult();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;

@@ -6,32 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_function_rating_result($params, \Smarty\Template $template)
 {
-    global $prefs;
-    $ratinglib = TikiLib::lib('rating');
-    $votings = $ratinglib->votings($params['id'], $params['type']);
-    $smiles = ($prefs['rating_smileys'] == 'y' ? $ratinglib->get_options_smiles($params['type'], $params['id'], true) : null);
-    $tableBody = "";
-
-    if ($prefs['rating_results_detailed'] == 'y') {
-        foreach ($votings as $vote => $voting) {
-            if ($prefs['rating_results_detailed_percent'] == 'y') {
-                $extra_info = '/' . $voting['percent'] . '%)';
-            } else {
-                $extra_info = ')';
-            }
-            $tableBody .= '<td style="width:' . $voting['percent'] . '%; text-align: center;">
-                <div class="ui-widget-content">' .
-                    ($prefs['rating_smileys'] == 'y' ? '<img src="' . $smiles[$vote]['img'] . '"/> ' : '<b>' . $vote . '</b> ') .
-                    '(' . $voting['votes'] . $extra_info .
-                    ($prefs['rating_smileys'] == 'y' ? '<div style="background-color: ' . $smiles[$vote]['color'] . ';">&nbsp;</div>' : '') .
-                '</div>
-            </td>';
-        }
-    } elseif ($votings) {
-        include_once('lib/smarty_tiki/function.rating_result_avg.php');
-        $smarty = TikiLib::lib('smarty');
-        return smarty_function_rating_result_avg($params, $smarty->getEmptyInternalTemplate());
-    }
-
-    return "<table class='ratingDeliberationResultTable' style='width:100%;'><tr>" . $tableBody . "</tr></table>";
+    $smartyFunctionRatingResultHandler = new \SmartyTiki\FunctionHandler\RatingResult();
+    return $smartyFunctionRatingResultHandler->handle($params, $template);
 }
