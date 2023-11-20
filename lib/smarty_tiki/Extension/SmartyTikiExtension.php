@@ -445,6 +445,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'ticket':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ticket();
                 break;
+            case 'toolbars':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Toolbars();
+                break;
             case 'tracker_item_status_icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerItemStatusIcon();
                 break;
