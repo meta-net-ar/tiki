@@ -478,6 +478,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'var_dump':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VarDump();
                 break;
+            case 'vimeo_uploader':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VimeoUploader();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
