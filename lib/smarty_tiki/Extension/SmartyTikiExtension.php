@@ -484,6 +484,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'wiki_diff':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\WikiDiff();
                 break;
+            case 'wikistructure':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\WikiStructure();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
