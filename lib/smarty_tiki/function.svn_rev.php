@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_svn_rev()
+function smarty_function_svn_rev($params, \Smarty\Template $template)
 {
-    $svn = svn_last_update();
-    return isset($svn['svnrev']) ? $svn['svnrev'] : null;
+    $smartyFunctionSvnRevHandler = new \SmartyTiki\FunctionHandler\SvnRev();
+    return $smartyFunctionSvnRevHandler->handle($params, $template);
 }
