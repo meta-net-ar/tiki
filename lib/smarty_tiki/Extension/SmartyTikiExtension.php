@@ -466,6 +466,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'trackerrules':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TrackerRules();
                 break;
+            case 'treetable':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TreeTable();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
