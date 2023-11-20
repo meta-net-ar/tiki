@@ -469,6 +469,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'treetable':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\TreeTable();
                 break;
+            case 'user_registration':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\UserRegistration();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
