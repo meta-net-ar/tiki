@@ -337,6 +337,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'object_selector_multi':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectSelectorMulti();
                 break;
+            case 'object_selector':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ObjectSelector();
+                break;
             case 'permission_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PermissionLink();
                 break;
