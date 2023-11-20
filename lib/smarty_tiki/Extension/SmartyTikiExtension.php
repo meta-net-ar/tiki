@@ -400,6 +400,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'reindex_file_pixel':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ReindexFilePixel();
                 break;
+            case 'router_params':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\RouterParams();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
