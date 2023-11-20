@@ -4,8 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-function smarty_function_rcontent($params, $smarty)
+function smarty_function_rcontent($params, \Smarty\Template $template)
 {
-    $dcslib = TikiLib::lib('dcs');
-    return $dcslib->get_random_content($params['id']);
+    $smartyFunctionRcontentHandler = new \SmartyTiki\FunctionHandler\Rcontent();
+    return $smartyFunctionRcontentHandler->handle($params, $template);
 }
