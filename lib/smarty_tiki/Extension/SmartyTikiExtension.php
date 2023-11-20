@@ -409,6 +409,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'sameurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SameUrl();
                 break;
+            case 'scheduler_params':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SchedulerParams();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
