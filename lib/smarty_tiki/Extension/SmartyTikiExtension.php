@@ -358,6 +358,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'pluralize':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Pluralize();
                 break;
+            case 'poll':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Poll();
+                break;
             case 'preference':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Preference();
                 break;
