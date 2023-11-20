@@ -436,6 +436,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'svn_rev':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnRev();
                 break;
+            case 'syntax':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Syntax();
+                break;
             case 'ticket':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Ticket();
                 break;

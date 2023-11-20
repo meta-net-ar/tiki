@@ -4,11 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/*
- * ignore syntax lines in tpls and other smarty parsed code
- * they are used to distinguish if content is markdown or tiki
- */
-function smarty_function_syntax($params, $smarty)
+
+function smarty_function_syntax($params, \Smarty\Template $template)
 {
-    return '';
+    $smartyFunctionSyntaxHandler = new \SmartyTiki\FunctionHandler\Syntax();
+    return $smartyFunctionSyntaxHandler->handle($params, $template);
 }
