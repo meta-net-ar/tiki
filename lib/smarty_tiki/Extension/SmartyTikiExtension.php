@@ -397,6 +397,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'redirect':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Redirect();
                 break;
+            case 'reindex_file_pixel':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ReindexFilePixel();
+                break;
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
