@@ -346,6 +346,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'page_alias':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PageAlias();
                 break;
+            case 'page_in_structure':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PageInStructure();
+                break;
             case 'permission_link':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\PermissionLink();
                 break;
