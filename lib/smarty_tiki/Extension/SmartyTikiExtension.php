@@ -475,6 +475,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'user_selector':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\UserSelector();
                 break;
+            case 'var_dump':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VarDump();
+                break;
         }
         return $this->functionHandlers[$functionName] ?? null;
     }
