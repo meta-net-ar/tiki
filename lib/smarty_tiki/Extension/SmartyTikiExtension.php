@@ -361,6 +361,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'poll':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Poll();
                 break;
+            case 'popup':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Popup();
+                break;
             case 'preference':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Preference();
                 break;
