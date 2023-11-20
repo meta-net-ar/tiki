@@ -4,20 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/**
- * \brief Smarty plugin to return plural or singular form of given word based on count
- * Usage format {pluralize word_count=2 singular_form="mouse" plural_form="mice"}
- *
- */
-function smarty_function_pluralize($params, &$smarty)
+
+function smarty_function_pluralize($params, \Smarty\Template $template)
 {
-    if (empty($params['singular_form']) || ! isset($params['word_count'])) {
-        return;
-    }
-
-    if (empty($params['plural_form'])) {
-        $params['plural_form'] = $params['singular_form'] . 's';
-    }
-
-    return ($params['word_count'] == 1) ? $params['singular_form'] : $params['plural_form'];
+    $smartyFunctionPluralizeHandler = new \SmartyTiki\FunctionHandler\Pluralize();
+    return $smartyFunctionPluralizeHandler->handle($params, $template);
 }
