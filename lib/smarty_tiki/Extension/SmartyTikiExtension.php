@@ -367,6 +367,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'preference':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Preference();
                 break;
+            case 'profilesymbolvalue':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ProfileSymbolValue();
+                break;
             case 'query':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Query();
                 break;
