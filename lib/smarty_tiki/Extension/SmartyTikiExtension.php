@@ -415,6 +415,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'sefurl':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Sefurl();
                 break;
+            case 'select_all':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SelectAll();
+                break;
             case 'service':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Service();
                 break;
