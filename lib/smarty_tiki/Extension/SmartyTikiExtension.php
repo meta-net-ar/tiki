@@ -418,6 +418,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'select_all':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SelectAll();
                 break;
+            case 'service_inline':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ServiceInline();
+                break;
             case 'service':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Service();
                 break;
