@@ -57,6 +57,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_forumtopiccount'];
             case 'groupmembercount':
                 return [$this, 'smarty_modifier_groupmembercount'];
+            case 'how_many_user_inscriptions':
+                return [$this, 'smarty_modifier_how_many_user_inscriptions'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -860,6 +862,32 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         return TikiLib::lib('user')->nb_users_in_group($group);
     }
+
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     lcfirst
+    * Purpose:  to use with the tracker field type "User inscription"
+    *           if $text="12[13], 14[15], 16[17]"
+    *           then return 48 (=13+1+15+1+17+1)
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_how_many_user_inscriptions($text)
+    {
+
+        $pattern = "/\d+\[(\d+)\]/";
+        $out = preg_match_all($pattern, $text, $match);
+
+        $nb = 0;
+
+        foreach ($match[1] as $n) {
+            $nb += ($n + 1);
+        }
+
+        return $nb;
+    }
+
 
     /**
      * Smarty escape modifier
