@@ -2,5 +2,6 @@
 
 function smarty_modifier_groupmembercount($group)
 {
-    return TikiLib::lib('user')->nb_users_in_group($group);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_groupmembercount($group);
 }

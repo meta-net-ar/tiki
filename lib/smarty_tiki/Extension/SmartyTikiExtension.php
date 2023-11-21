@@ -45,6 +45,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_duration_short'];
             case 'duration':
                 return [$this, 'smarty_modifier_duration'];
+            case 'escape':
+                return [$this, 'smarty_modifier_escape'];
             case 'file_can_convert_to_pdf':
                 return [$this, 'smarty_modifier_file_can_convert_to_pdf'];
             case 'file_diagram':
@@ -53,8 +55,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_forumname'];
             case 'forumtopiccount':
                 return [$this, 'smarty_modifier_forumtopiccount'];
-            case 'escape':
-                return [$this, 'smarty_modifier_escape'];
+            case 'groupmembercount':
+                return [$this, 'smarty_modifier_groupmembercount'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -849,9 +851,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return $ret['name'];
     }
 
-    function smarty_modifier_forumtopiccount($forumId)
+    public function smarty_modifier_forumtopiccount($forumId)
     {
         return TikiLib::lib('comments')->count_forum_topics($forumId);
+    }
+
+    public function smarty_modifier_groupmembercount($group)
+    {
+        return TikiLib::lib('user')->nb_users_in_group($group);
     }
 
     /**
