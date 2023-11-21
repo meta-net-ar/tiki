@@ -21,12 +21,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getModifierCallback(string $modifierName)
     {
         switch ($modifierName) {
-            case 'avatarize':
-                return [$this, 'smarty_modifier_avatarize'];
             case 'a_or_an':
                 return [$this, 'smarty_modifier_a_or_an'];
             case 'adjust':
                 return [$this, 'smarty_modifier_adjust'];
+            case 'avatarize':
+                return [$this, 'smarty_modifier_avatarize'];
+            case 'breakline':
+                return [$this, 'smarty_modifier_breakline'];
             case 'count':
                 return [$this, 'smarty_modifier_count'];
             case 'escape':
@@ -519,32 +521,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return $this->preFilters;
     }
 
-    /**
-    * Smarty modifier avatarize
-    * -------------------------------------------------------------
-    * Purpose:  show avatar for a given user name
-    * -------------------------------------------------------------
-    */
-    public function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
-    {
-        if (!$user) {
-            return '';
-        }
-
-        $avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
-
-        if (!$avatar && $default) {
-            $smarty = TikiLib::lib('smarty');
-            $name = TikiLib::lib('user')->clean_user($user);
-            $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
-        }
-
-        if ($avatar != '' && $show_tag == 'y') {
-            $avatar = TikiLib::lib('user')->build_userinfo_tag($user, $avatar);
-        }
-        return $avatar;
-    }
-
     /*
     * Smarty plugin
     * -------------------------------------------------------------
@@ -606,6 +582,45 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         } else {
             return $string;
         }
+    }
+
+    /**
+    * Smarty modifier avatarize
+    * -------------------------------------------------------------
+    * Purpose:  show avatar for a given user name
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
+    {
+        if (!$user) {
+            return '';
+        }
+
+        $avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
+
+        if (!$avatar && $default) {
+            $smarty = TikiLib::lib('smarty');
+            $name = TikiLib::lib('user')->clean_user($user);
+            $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
+        }
+
+        if ($avatar != '' && $show_tag == 'y') {
+            $avatar = TikiLib::lib('user')->build_userinfo_tag($user, $avatar);
+        }
+        return $avatar;
+    }
+
+    /**
+     * This modifier allows the unique "[breakline]" into a string to split into separate lines replaced by <br /> after the use of escape modifier which unallows any html tag.
+     * usefull for <label> when they need to be long and/or when automatic breaklines particularly after translations creates a split line in an unapproriate place.
+     *
+     * @param mixed $str_content
+     * @access public
+     * @return void
+     */
+    public function smarty_modifier_breakline($str_content)
+    {
+        return str_replace('[breakline]', '<br />', $str_content);
     }
 
     public function smarty_modifier_count($arrayOrObject, $mode = 0)
