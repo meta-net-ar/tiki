@@ -33,6 +33,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_categid'];
             case 'compactisodate':
                 return [$this, 'smarty_modifier_compactisodate'];
+            case 'contryflag':
+                return [$this, 'smarty_modifier_contryflag'];
             case 'count':
                 return [$this, 'smarty_modifier_count'];
             case 'escape':
@@ -640,6 +642,30 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         global $tikilib;
         return $tikilib->get_compact_iso8601_datetime($string);
+    }
+
+    /**
+     * \brief Smarty modifier plugin to add user's country flag
+     *
+     * - type:     modifier
+     * - name:     countryflag
+     * - purpose:  Returns a specified user's country flag
+     *
+     * @author
+     * @param string
+     * @return string
+     *
+     * Example: {$userinfo.login|countryflag}
+     */
+    function smarty_modifier_countryflag($user)
+    {
+        global $tikilib;
+        $flag = $tikilib->get_user_preference($user, 'country', 'Other');
+        if ($flag == 'Other' || empty($flag)) {
+            return '';
+        }
+        return "<img alt='" . tra(str_replace('_', ' ', $flag)) . "' src='img/flags/" . str_replace(' ', '_', $flag) .
+            ".png' title='" . tra(str_replace('_', ' ', $flag)) . "' />";
     }
 
     public function smarty_modifier_count($arrayOrObject, $mode = 0)
