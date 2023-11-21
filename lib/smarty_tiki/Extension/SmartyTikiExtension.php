@@ -9,6 +9,7 @@ namespace SmartyTiki\Extension;
 
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\FunctionHandler\FunctionHandlerInterface;
+use TikiLib;
 
 class SmartyTikiExtension extends \Smarty\Extension\Base
 {
@@ -20,6 +21,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function getModifierCallback(string $modifierName)
     {
         switch ($modifierName) {
+            case 'avatarize':
+                return [$this, 'smarty_modifier_avatarize'];
             case 'a_or_an':
                 return [$this, 'smarty_modifier_a_or_an'];
             case 'adjust':
@@ -516,6 +519,32 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return $this->preFilters;
     }
 
+    /**
+    * Smarty modifier avatarize
+    * -------------------------------------------------------------
+    * Purpose:  show avatar for a given user name
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
+    {
+        if (!$user) {
+            return '';
+        }
+
+        $avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
+
+        if (!$avatar && $default) {
+            $smarty = TikiLib::lib('smarty');
+            $name = TikiLib::lib('user')->clean_user($user);
+            $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
+        }
+
+        if ($avatar != '' && $show_tag == 'y') {
+            $avatar = TikiLib::lib('user')->build_userinfo_tag($user, $avatar);
+        }
+        return $avatar;
+    }
+
     /*
     * Smarty plugin
     * -------------------------------------------------------------
@@ -541,7 +570,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     }
 
     /*
-    * Smarty plugin
+    * Smarty modifier adjust
     * -------------------------------------------------------------
     * Type:     modifier
     * Name:     adjust
