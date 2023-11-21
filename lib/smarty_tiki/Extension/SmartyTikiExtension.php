@@ -51,6 +51,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_file_diagram'];
             case 'forumname':
                 return [$this, 'smarty_modifier_forumname'];
+            case 'forumtopiccount':
+                return [$this, 'smarty_modifier_forumtopiccount'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -845,6 +847,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         $ret = $comments->get_forum($forum_id);
         $cachelib->cacheItem($cacheItem, $ret['name']);
         return $ret['name'];
+    }
+
+    function smarty_modifier_forumtopiccount($forumId)
+    {
+        return TikiLib::lib('comments')->count_forum_topics($forumId);
     }
 
     /**
