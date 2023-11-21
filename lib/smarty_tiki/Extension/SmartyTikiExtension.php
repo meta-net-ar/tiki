@@ -27,6 +27,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_adjust'];
             case 'avatarize':
                 return [$this, 'smarty_modifier_avatarize'];
+            case 'categid':
+                return [$this, 'smarty_modifier_categid'];
             case 'breakline':
                 return [$this, 'smarty_modifier_breakline'];
             case 'count':
@@ -621,6 +623,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_breakline($str_content)
     {
         return str_replace('[breakline]', '<br />', $str_content);
+    }
+
+    /**
+     * Gets Category Id from the Category name
+     */
+
+    public function smarty_modifier_categid($category)
+    {
+        return TikiLib::lib('categ')->get_category_id($category);
     }
 
     public function smarty_modifier_count($arrayOrObject, $mode = 0)

@@ -6,5 +6,6 @@
 
 function smarty_modifier_categid($category)
 {
-    return TikiLib::lib('categ')->get_category_id($category);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_categid($category);
 }
