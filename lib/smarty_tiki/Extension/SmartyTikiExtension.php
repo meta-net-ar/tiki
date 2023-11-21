@@ -65,6 +65,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_iconify'];
             case 'in_group':
                 return [$this, 'smarty_modifier_in_group'];
+            case 'isodate':
+                return [$this, 'smarty_modifier_isodate'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -867,6 +869,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_groupmembercount($group)
     {
         return TikiLib::lib('user')->nb_users_in_group($group);
+    }
+
+    function smarty_modifier_isodate($string)
+    {
+        global $tikilib;
+        return $tikilib->get_iso8601_datetime($string);
     }
 
     /*
