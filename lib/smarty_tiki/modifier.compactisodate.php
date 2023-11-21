@@ -7,6 +7,6 @@
 // this returns the compact ISO 8601 date for microformats
 function smarty_modifier_compactisodate($string)
 {
-    global $tikilib;
-    return $tikilib->get_compact_iso8601_datetime($string);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_compactisodate($string);
 }

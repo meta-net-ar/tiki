@@ -27,10 +27,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_adjust'];
             case 'avatarize':
                 return [$this, 'smarty_modifier_avatarize'];
-            case 'categid':
-                return [$this, 'smarty_modifier_categid'];
             case 'breakline':
                 return [$this, 'smarty_modifier_breakline'];
+            case 'categid':
+                return [$this, 'smarty_modifier_categid'];
+            case 'compactisodate':
+                return [$this, 'smarty_modifier_compactisodate'];
             case 'count':
                 return [$this, 'smarty_modifier_count'];
             case 'escape':
@@ -632,6 +634,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_categid($category)
     {
         return TikiLib::lib('categ')->get_category_id($category);
+    }
+
+    public function smarty_modifier_compactisodate($string)
+    {
+        global $tikilib;
+        return $tikilib->get_compact_iso8601_datetime($string);
     }
 
     public function smarty_modifier_count($arrayOrObject, $mode = 0)
