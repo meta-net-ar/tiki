@@ -49,6 +49,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_file_can_convert_to_pdf'];
             case 'file_diagram':
                 return [$this, 'smarty_modifier_file_diagram'];
+            case 'forumname':
+                return [$this, 'smarty_modifier_forumname'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -736,7 +738,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * Purpose:  formats a duration from seconds
     * -------------------------------------------------------------
     */
-    function smarty_modifier_duration_short($string)
+    public function smarty_modifier_duration_short($string)
     {
         $result = '';
         if ($string > 60 * 60 * 24) {
@@ -766,7 +768,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * Purpose:  formats a duration from seconds
     * -------------------------------------------------------------
     */
-    function smarty_modifier_duration($string, $long = true, $maxLevel = false)
+    public function smarty_modifier_duration($string, $long = true, $maxLevel = false)
     {
         if (!is_numeric($string)) {
             return $string;
@@ -805,7 +807,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * Purpose:  Checks if mimetype is supported to convert to PDF
     * -------------------------------------------------------------
     */
-    function smarty_modifier_file_can_convert_to_pdf($string)
+    public function smarty_modifier_file_can_convert_to_pdf($string)
     {
         return \Tiki\File\PDFHelper::canConvertToPDF($string);
     }
@@ -813,9 +815,36 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     /**
      * Checks if a given file id is a diagram
      */
-    function smarty_modifier_file_diagram($fileId)
+    public function smarty_modifier_file_diagram($fileId)
     {
         return \Tiki\File\DiagramHelper::isDiagram($fileId);
+    }
+
+    public function smarty_modifier_forumname($commentid, $retrun_forumid = 'n')
+    {
+        global $tikilib;
+        $cachelib = TikiLib::lib('cache');
+        require_once 'lib/comments/commentslib.php';
+        $comments = new \Comments();
+
+        if ($retrun_forumid == 'y') {
+            $cacheItem = "retrun_forumid" . $commentid;
+        } else {
+            $cacheItem = "retrun_forumname" . $commentid;
+        }
+
+        if ($cached = $cachelib->getCached($cacheItem)) {
+            return $cached;
+        }
+
+        $forum_id = $comments->get_comment_forum_id($commentid);
+        $cachelib->cacheItem($cacheItem, $forum_id);
+        if ($retrun_forumid == 'y') {
+            return $forum_id;
+        }
+        $ret = $comments->get_forum($forum_id);
+        $cachelib->cacheItem($cacheItem, $ret['name']);
+        return $ret['name'];
     }
 
     /**
