@@ -59,6 +59,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_groupmembercount'];
             case 'how_many_user_inscriptions':
                 return [$this, 'smarty_modifier_how_many_user_inscriptions'];
+            case 'htmldecode':
+                return [$this, 'smarty_modifier_htmldecode'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -888,6 +890,18 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return $nb;
     }
 
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     htmldecode
+    * Purpose:  Convert all HTML entities to their applicable characters
+    * -------------------------------------------------------------
+    */
+    function smarty_modifier_htmldecode($s)
+    {
+        return TikiLib::htmldecode($s);
+    }
 
     /**
      * Smarty escape modifier
