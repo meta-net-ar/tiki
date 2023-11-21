@@ -45,6 +45,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_duration_short'];
             case 'duration':
                 return [$this, 'smarty_modifier_duration'];
+            case 'file_can_convert_to_pdf':
+                return [$this, 'smarty_modifier_file_can_convert_to_pdf'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -791,6 +793,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             }
         }
         return implode(' ', $result);
+    }
+
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     file_can_convert_to_pdf
+    * Purpose:  Checks if mimetype is supported to convert to PDF
+    * -------------------------------------------------------------
+    */
+    function smarty_modifier_file_can_convert_to_pdf($string)
+    {
+        return \Tiki\File\PDFHelper::canConvertToPDF($string);
     }
 
 

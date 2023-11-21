@@ -4,15 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/*
- * Smarty plugin
- * -------------------------------------------------------------
- * Type:     modifier
- * Name:     file_can_convert_to_pdf
- * Purpose:  Checks if mimetype is supported to convert to PDF
- * -------------------------------------------------------------
- */
+
 function smarty_modifier_file_can_convert_to_pdf($string)
 {
-    return \Tiki\File\PDFHelper::canConvertToPDF($string);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_file_can_convert_to_pdf($string);
 }
