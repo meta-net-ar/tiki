@@ -4,22 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/*
- * Smarty plugin
- * -------------------------------------------------------------
- * Type:     modifier
- *
- * -------------------------------------------------------------
- */
+
 function smarty_modifier_div($string, $num, $max = 10)
 {
-    if ($num == 0) {
-        return 0;
-    }
-
-    if (ceil(strlen($string) / $num) > $max) {
-        return $max;
-    }
-
-    return ceil(strlen($string) / $num);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_div($string, $num, $max);
 }

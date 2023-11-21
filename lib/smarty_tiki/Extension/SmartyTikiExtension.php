@@ -39,6 +39,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_count'];
             case 'dbg':
                 return [$this, 'smarty_modifier_dbg'];
+            case 'div':
+                return [$this, 'smarty_modifier_div'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -685,7 +687,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      *
      * \author zaufi <zaufi@sendmail.ru>
      */
-
     /**
      * \brief Smarty modifier plugin to add string to debug console log w/o modify output
      * Usage format {$smarty_var|dbg}
@@ -697,6 +698,26 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         //
         $debugger->msg('Smarty log' . ((strlen($label) > 0) ? ': ' . $label : '') . ': ' . $string);
         return $string;
+    }
+
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    *
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_div($string, $num, $max = 10)
+    {
+        if ($num == 0) {
+            return 0;
+        }
+
+        if (ceil(strlen($string) / $num) > $max) {
+            return $max;
+        }
+
+        return ceil(strlen($string) / $num);
     }
 
     /**
