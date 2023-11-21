@@ -47,6 +47,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_duration'];
             case 'file_can_convert_to_pdf':
                 return [$this, 'smarty_modifier_file_can_convert_to_pdf'];
+            case 'file_diagram':
+                return [$this, 'smarty_modifier_file_diagram'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -808,6 +810,13 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return \Tiki\File\PDFHelper::canConvertToPDF($string);
     }
 
+    /**
+     * Checks if a given file id is a diagram
+     */
+    function smarty_modifier_file_diagram($fileId)
+    {
+        return \Tiki\File\DiagramHelper::isDiagram($fileId);
+    }
 
     /**
      * Smarty escape modifier
