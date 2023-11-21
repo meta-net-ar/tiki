@@ -37,6 +37,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_contryflag'];
             case 'count':
                 return [$this, 'smarty_modifier_count'];
+            case 'dbg':
+                return [$this, 'smarty_modifier_dbg'];
             case 'escape':
                 return [$this, 'smarty_modifier_escape'];
             case 'sefurl':
@@ -657,7 +659,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      *
      * Example: {$userinfo.login|countryflag}
      */
-    function smarty_modifier_countryflag($user)
+    public function smarty_modifier_countryflag($user)
     {
         global $tikilib;
         $flag = $tikilib->get_user_preference($user, 'country', 'Other');
@@ -676,6 +678,25 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             return 0;
         }
         return 1;
+    }
+
+    /** \file
+     *
+     *
+     * \author zaufi <zaufi@sendmail.ru>
+     */
+
+    /**
+     * \brief Smarty modifier plugin to add string to debug console log w/o modify output
+     * Usage format {$smarty_var|dbg}
+     */
+    public function smarty_modifier_dbg($string, $label = '')
+    {
+        global $debugger;
+        require_once('lib/debug/debugger.php');
+        //
+        $debugger->msg('Smarty log' . ((strlen($label) > 0) ? ': ' . $label : '') . ': ' . $string);
+        return $string;
     }
 
     /**
