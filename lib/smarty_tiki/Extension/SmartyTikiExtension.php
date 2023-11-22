@@ -135,10 +135,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_short_time'];
             case 'times':
                 return [$this, 'smarty_modifier_times'];
-            case 'truncate':
-                return [$this, 'smarty_modifier_truncate'];
             case 'trim':
                 return [$this, 'smarty_modifier_trim'];
+            case 'truncate':
+                return [$this, 'smarty_modifier_truncate'];
+            case 'truex':
+                return [$this, 'smarty_modifier_truex'];
             case 'tr_if':
                 return [$this, 'smarty_modifier_tr_if'];
             case 'userlink':
@@ -2213,6 +2215,23 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         return empty($chars) ? trim($string) : trim($string, $chars);
     }
+
+     /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Replaces 1 (=TRUE) with a 'x'. Anything else with '-'
+    * used for example to output file permissions in
+    * tiki-admin_security
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_truex($string)
+   {
+       if ((int) $string == 1) {
+           return('x');
+       }
+       return('-');
+   }
 
     public function smarty_modifier_tr_if($source)
     {
