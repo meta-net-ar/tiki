@@ -81,6 +81,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_namspace'];
             case 'nonamespace':
                 return [$this, 'smarty_modifier_nonamspace'];
+            case 'nonp':
+                return [$this, 'smarty_modifier_nonp'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1429,6 +1431,24 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
    {
        return TikiLib::lib('wiki')->get_without_namespace($pageName);
    }
+
+   /**
+     * Smarty modifier plugin to remove ~np~ tags from smarty variable. For use in templates used by the {list} wiki plugin
+     *
+     * - type:     modifier
+     * - name:     nonp (short for "no nonparsed")
+     * - purpose:  to return a usable string
+     *
+     * @param string to be replaced (optional)
+     * @return corrected string
+     *
+     * Example: {if $row.title|nonp eq ''}
+     */
+
+    public function smarty_modifier_nonp($string)
+    {
+        return preg_replace('/~[\/]?np~/', '', $string);
+    }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
