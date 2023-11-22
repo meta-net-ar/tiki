@@ -4,21 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/**
- * Smarty plugin
- * @package Smarty
- * @subpackage plugins
- */
 
-/**
- * Smarty replacei modifier plugin
- *
- * Type:     modifier<br>
- * Name:     replacei<br>
- * Purpose:  Returns a case insensitive replaced string.
- *           Same arguments as PHP str_ireplace function.
- */
 function smarty_modifier_replacei($string, $find, $replacement)
 {
-    return str_ireplace($find, $replacement, $string);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_replacei($string, $find, $replacement);
 }

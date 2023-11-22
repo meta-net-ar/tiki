@@ -97,6 +97,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_percent'];
             case 'quoted':
                 return [$this, 'smarty_modifier_quoted'];
+            case 'replacei':
+                return [$this, 'smarty_modifier_replacei'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1585,6 +1587,25 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $string = "{QUOTE(replyto=>$replyto)}" . $string . '{QUOTE}';
         }
         return $string;
+    }
+
+    /**
+     * Smarty plugin
+     * @package Smarty
+     * @subpackage plugins
+     */
+
+    /**
+     * Smarty replacei modifier plugin
+     *
+     * Type:     modifier<br>
+     * Name:     replacei<br>
+     * Purpose:  Returns a case insensitive replaced string.
+     *           Same arguments as PHP str_ireplace function.
+     */
+    public function smarty_modifier_replacei($string, $find, $replacement)
+    {
+        return str_ireplace($find, $replacement, $string);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
