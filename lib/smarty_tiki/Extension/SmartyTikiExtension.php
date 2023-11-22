@@ -89,6 +89,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_output'];
             case 'packageitemid':
                 return [$this, 'smarty_modifier_packageitemid'];
+            case 'pagname':
+                return [$this, 'smarty_modifier_pagename'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1509,6 +1511,24 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     {
         $api = new \Tiki\Package\Extension\Api();
         return $api->getItemIdFromToken($token);
+    }
+
+    public function smarty_modifier_pagename($source)
+    {
+        global $prefs;
+        if (! empty($prefs['wiki_pagename_strip']) || $prefs['namespace_indicator_in_page_title'] == 'y') {
+            if (! empty($prefs['wiki_pagename_strip'])) {
+                $wiki_strip = '~' . preg_quote($prefs['wiki_pagename_strip']) . '.*$~';
+                $source = preg_replace($wiki_strip, '', $source);
+            }
+            if ($prefs['namespace_indicator_in_page_title'] == 'y') {
+                $wiki_namespace = '~.* / ~';
+                $source = preg_replace($wiki_namespace, '', $source);
+            }
+            return $source;
+        } else {
+            return $source;
+        }
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
