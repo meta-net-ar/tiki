@@ -113,6 +113,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_substring'];
             case 'tasklink':
                 return [$this, 'smarty_modifier_tasklink'];
+            case 'template':
+                return [$this, 'smarty_modifier_template'];
             case 'ternary':
                 return [$this, 'smarty_modifier_ternary'];
             case 'truncate':
@@ -1929,7 +1931,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return str_replace($what, $by, $string);
     }
 
-    function smarty_modifier_tasklink($taskId, $class_name = "link", $offset = "0", $sort_mode = "priority_desc")
+    public function smarty_modifier_tasklink($taskId, $class_name = "link", $offset = "0", $sort_mode = "priority_desc")
     {
         global $tasklib, $user, $prefs, $smarty;
         $tikilib = TikiLib::lib('tiki');
@@ -1993,6 +1995,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         }
         $content .= ">" . htmlspecialchars($info['title']) . "</a>";
         return $content;
+    }
+
+    /**
+     *  Fake modifier for pretty tracker fields. Sets template to use to display
+     */
+    function smarty_modifier_template($string)
+    {
+        return $string;
     }
 
     /*
