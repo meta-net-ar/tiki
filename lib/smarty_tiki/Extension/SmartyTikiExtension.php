@@ -105,6 +105,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_sefurl'];
             case 'slug':
                 return [$this, 'smarty_modifier_slug'];
+            case 'star':
+                return [$this, 'smarty_modifier_star'];
             case 'stringfix':
                 return [$this, 'smarty_modifier_stringfix'];
             case 'ternary':
@@ -1676,6 +1678,17 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $str = urlencode($str);
         }
         return $str;
+    }
+
+    function smarty_modifier_star($score)
+    {
+        global $prefs, $tikilib;
+
+        if ($prefs['feature_score'] != 'y') {
+            return '';
+        }
+
+        return $tikilib->get_star($score);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')

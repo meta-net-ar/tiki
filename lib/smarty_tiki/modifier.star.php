@@ -6,11 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_star($score)
 {
-    global $prefs, $tikilib;
-
-    if ($prefs['feature_score'] != 'y') {
-        return '';
-    }
-
-    return $tikilib->get_star($score);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_star($score);
 }
