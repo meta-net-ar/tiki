@@ -1238,6 +1238,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return empty($langmapping[$lang]) ? $lang : tra($langmapping[$lang][0]);
     }
 
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     lcfirst
+    * Purpose:  lowercase the initial character in a string
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_lcfirst($s)
+    {
+        return strtolower($s[0]) . substr($s, 1);
+    }
+
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
