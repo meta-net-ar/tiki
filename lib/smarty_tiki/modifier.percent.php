@@ -4,12 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/**
- *
- * returns a percentage instead of a fraction
- * @param float $string fraction to format
- */
+
 function smarty_modifier_percent($string)
 {
-    return number_format($string * 100, 1);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_percent($string);
 }

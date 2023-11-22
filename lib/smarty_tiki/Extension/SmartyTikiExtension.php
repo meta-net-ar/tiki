@@ -93,6 +93,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_pagename'];
             case 'parse':
                 return [$this, 'smarty_modifier_parse'];
+            case 'percent':
+                return [$this, 'smarty_modifier_percent'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1543,7 +1545,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      *
      * @return string Parsed string
      */
-    function smarty_modifier_parse($string, $simple = false)
+    public function smarty_modifier_parse($string, $simple = false)
     {
         $parserlib = TikiLib::lib('parser');
         if ($simple) {
@@ -1552,6 +1554,16 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         } else {
             return $parserlib->parse_data($string);
         }
+    }
+
+    /**
+     *
+     * returns a percentage instead of a fraction
+     * @param float $string fraction to format
+     */
+    function smarty_modifier_percent($string)
+    {
+        return number_format($string * 100, 1);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
