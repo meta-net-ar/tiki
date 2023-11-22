@@ -4,15 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-/*
- * Smarty plugin
- * -------------------------------------------------------------
- * Type:     modifier
- * Name:     max_user_inscriptions
- * Purpose:  to use with the tracker field type "User inscription"
- * -------------------------------------------------------------
- */
+
 function smarty_modifier_max_user_inscriptions($text)
 {
-    return substr($text, 0, strpos($text, '#'));
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_max_user_inscriptions($text);
 }

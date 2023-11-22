@@ -1251,6 +1251,18 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return strtolower($s[0]) . substr($s, 1);
     }
 
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     max_user_inscriptions
+    * Purpose:  to use with the tracker field type "User inscription"
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_max_user_inscriptions($text)
+    {
+        return substr($text, 0, strpos($text, '#'));
+    }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
