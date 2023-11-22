@@ -133,6 +133,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_short_datetime'];
             case 'tiki_short_time':
                 return [$this, 'smarty_modifier_tiki_short_time'];
+            case 'times':
+                return [$this, 'smarty_modifier_times'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2152,6 +2154,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         global $prefs;
         $smarty = TikiLib::lib('smarty');
         return smarty_modifier_tiki_date_format($string, $prefs['short_time_format']);
+    }
+
+    public function smarty_modifier_times($n1, $n2)
+    {
+        return $n1 * $n2;
     }
 
     /**
