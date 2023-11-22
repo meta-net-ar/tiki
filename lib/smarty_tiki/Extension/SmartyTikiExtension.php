@@ -123,6 +123,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_long_date'];
             case 'tiki_long_datetime':
                 return [$this, 'smarty_modifier_tiki_long_datetime'];
+            case 'tiki_long_time':
+                return [$this, 'smarty_modifier_tiki_long_time'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2055,6 +2057,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return smarty_modifier_tiki_date_format($string, $prefs['long_date_format'] . ' ' . $prefs['long_time_format']);
     }
 
+    public function smarty_modifier_tiki_long_time($string)
+    {
+        global $prefs;
+        $smarty = TikiLib::lib('smarty');
+        return smarty_modifier_tiki_date_format($string, $prefs['long_time_format']);
+    }
     /**
      * Smarty truncate modifier
      *
