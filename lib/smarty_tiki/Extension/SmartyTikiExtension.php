@@ -151,6 +151,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_utf8unicode'];
             case 'virtual_path':
                 return [$this, 'smarty_modifier_virtual_path'];
+            case 'yesno':
+                return [$this, 'smarty_modifier_yesno'];
             case 'zone_is_empty':
                 return [$this, 'smarty_modifier_zone_is_empty'];
         }
@@ -2384,6 +2386,22 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             return $base_url . 'tiki-webdav.php/Wiki Pages/' . $fileOrPageId;
         } else {
             return $base_url . 'tiki-webdav.php' . ($filegallib->get_full_virtual_path($fileOrPageId, $type));
+        }
+    }
+
+    public function smarty_modifier_yesno($string)
+    {
+        switch ($string) {
+            case 'y':
+                return tra('Yes');
+                break;
+
+            case 'n':
+                return tra('No');
+                break;
+
+            default:
+                return $string;
         }
     }
 

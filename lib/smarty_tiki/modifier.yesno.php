@@ -6,16 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_yesno($string)
 {
-    switch ($string) {
-        case 'y':
-            return tra('Yes');
-                        break;
-
-        case 'n':
-            return tra('No');
-                        break;
-
-        default:
-            return $string;
-    }
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_yesno($string);
 }
