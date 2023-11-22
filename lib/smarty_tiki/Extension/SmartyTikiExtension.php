@@ -125,6 +125,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_long_datetime'];
             case 'tiki_long_time':
                 return [$this, 'smarty_modifier_tiki_long_time'];
+            case 'tiki_remaining_days_from_now':
+                return [$this, 'smarty_modifier_tiki_remaining_days_from_now'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2063,6 +2065,33 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         $smarty = TikiLib::lib('smarty');
         return smarty_modifier_tiki_date_format($string, $prefs['long_time_format']);
     }
+
+    /**
+     * @param int $time future time to calculate number of day to go
+     * @param string $format PHP date format for the displayed date set in $time.
+     *
+     * @return string
+     */
+    public function smarty_modifier_tiki_remaining_days_from_now($time, $format)
+    {
+        global $tikilib;
+
+        $iNbDayBetween = ($time - $tikilib->now) / (60 * 60 * 24);
+
+        if ($iNbDayBetween > 1) {
+            $result = sprintf(
+                ($iNbDayBetween > 1 ? tra('in %s days, the %s') : tra('in %s day, the %s')),
+                '<b>' . round($iNbDayBetween) . '</b>',
+                $tikilib->date_format($format, $time)
+            );
+        } elseif ($iNbDayBetween > 0) {
+            $result = tra('Today');
+        } else {
+            $result = '-';
+        }
+        return $result;
+    }
+
     /**
      * Smarty truncate modifier
      *
