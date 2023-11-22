@@ -83,6 +83,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_nonamspace'];
             case 'nonp':
                 return [$this, 'smarty_modifier_nonp'];
+            case 'number_format':
+                return [$this, 'smarty_modifier_number_format'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1448,6 +1450,47 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_nonp($string)
     {
         return preg_replace('/~[\/]?np~/', '', $string);
+    }
+
+    /**
+     * Smarty substring modifier plugin
+     *
+     * Type:     modifier<br>
+     * Name:     number_format<br>
+     * Purpose:  Format a number. Same arguments as
+     *           PHP number_format function.
+     * @link based on number_format(): http://www.php.net/manual/function.number-format.php
+     * @author   lindon
+     * @param number
+     * @param decimals: sets the number of decimal places (default=0)
+     * @param dec_point: sets the separator for the decimal point
+     * @param thousands: thousands separator
+     * @return number
+     */
+    public function smarty_modifier_number_format($number, $decimals = 2, $dec_point = '.', $thousands = ',')
+    {
+        $dec_point = $this->separator($dec_point);
+        $thousands = $this->separator($thousands);
+        return number_format($number, $decimals, $dec_point, $thousands);
+    }
+
+    private function separator($sep)
+    {
+        switch ($sep) {
+            case 'c':
+            case ',':
+                $sep = ',';
+                break;
+            case 'd':
+            case '.':
+                $sep = '.';
+                break;
+            case 's':
+            case ' ':
+                $sep = ' ';
+                break;
+        }
+        return $sep;
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
