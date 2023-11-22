@@ -129,6 +129,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_remaining_days_from_now'];
             case 'tiki_short_date':
                 return [$this, 'smarty_modifier_tiki_short_date'];
+            case 'tiki_short_datetime':
+                return [$this, 'smarty_modifier_tiki_short_datetime'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2111,6 +2113,35 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             return '<time class="timeago" datetime="' . TikiLib::date_format('c', $string, false, 5, false) . '">' . $date . '</time>';
         } else {
             return $date;
+        }
+    }
+
+    /**
+     * @param string $string
+     * @param string $intro
+     * @param string $same if set to 'n' will bypass timeago preferences. Useful when markup is illegal in date
+     *
+     * @return string
+     */
+    function smarty_modifier_tiki_short_datetime($string, $intro = '', $same = 'y')
+    {
+        global $prefs;
+        $smarty = TikiLib::lib('smarty');
+        $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
+        $time = smarty_modifier_tiki_date_format($string, $prefs['short_time_format']);
+
+        $intro = ! empty($intro) ? tra($intro) . ' ' : '';
+
+        if ($prefs['jquery_timeago'] === 'y' && $same === 'y') {
+            TikiLib::lib('header')->add_jq_onready('$("time.timeago").timeago();');
+            return '<time class="timeago" datetime="' . TikiLib::date_format('c', $string, false, 5, false) . '">' . $date . ' ' . $time . '</time>';
+        } elseif ($same != 'n' && $prefs['tiki_same_day_time_only'] == 'y' && $date == smarty_modifier_tiki_date_format(time(), $prefs['short_date_format'])) {
+            //tra('on') tra('on:') tra('at') tra('at:')
+            return str_replace(['on', 'On'], ['at', 'At'], $intro) . $time;
+        } else {
+            // if you change the separator do not forget to change the translation instruction in lib/prefs/short.php
+            $time = $date . ' ' . $time;
+            return $intro . ' ' . $time;
         }
     }
 
