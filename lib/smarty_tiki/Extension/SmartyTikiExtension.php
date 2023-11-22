@@ -87,6 +87,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_number_format'];
             case 'output':
                 return [$this, 'smarty_modifier_output'];
+            case 'packageitemid':
+                return [$this, 'smarty_modifier_packageitemid'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1498,9 +1500,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     /**
      *  Fake modifier for pretty tracker fields
      */
-    function smarty_modifier_output($string)
+    public function smarty_modifier_output($string)
     {
         return $string;
+    }
+
+    public function smarty_modifier_packageitemid($token)
+    {
+        $api = new \Tiki\Package\Extension\Api();
+        return $api->getItemIdFromToken($token);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
