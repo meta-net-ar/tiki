@@ -6,5 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_nonamespace($pageName)
 {
-    return TikiLib::lib('wiki')->get_without_namespace($pageName);
+    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
+    return $smartyTikiExtension->smarty_modifier_nonamespace($pageName);
 }
