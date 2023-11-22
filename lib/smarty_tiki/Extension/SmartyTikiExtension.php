@@ -813,6 +813,111 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return implode(' ', $result);
     }
 
+    /**
+     * Smarty escape modifier
+     *
+     * Type:     modifier<br>
+     * Name:     escape<br>
+     * Purpose:  Escape the string according to escapement type
+     * @param html|htmlall|url|quotes|hex|hexentity|javascript
+     * @param string $esc_type
+     * @param string $char_set
+     * @param bool $double_encode
+     * @return string
+     */
+    public function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
+    {
+        switch ($esc_type) {
+            case 'html':
+                if (is_array($string)) {
+                    $string = implode(',', $string);
+                }
+                $return = htmlspecialchars($string ?? '', ENT_QUOTES, $char_set, $double_encode);
+
+                // Convert back sanitization tags into real tags to avoid them to be displayed
+                $return = str_replace('&lt;x&gt;', '<x>', $return);
+                // Convert back sanitization tags into real tags for no wrap space
+                $return = str_replace('&amp;nbsp;', '&nbsp;', $return);
+
+                return $return;
+
+            case 'htmlall':
+                $return = htmlentities($string ?? '', ENT_QUOTES, $char_set);
+                if (! strlen($return) && strlen($string)) { // Bug php when there is non utf8 characters in the string(http://bugs.php.net/bug.php?id=43549, http://bugs.php.net/bug.php?id=43294)
+                    $return = htmlentities($string, ENT_QUOTES);
+                }
+
+                // Convert back sanitization tags into real tags to avoid them to be displayed
+                $return = str_replace('&lt;x&gt;', '<x>', $return);
+
+                return $return;
+
+            case 'url':
+                return rawurlencode($string ?? '');
+
+            case 'urlpathinfo':
+                return str_replace('%2F', '/', rawurlencode($string));
+
+            case 'quotes':
+                // escape unescaped single quotes
+                return preg_replace("%(?<!\\\\)'%", "\\'", $string);
+
+            case 'hex':
+                // escape every character into hex
+                $return = '';
+                for ($x = 0, $xstrlen_string = strlen($string); $x < $xstrlen_string; $x++) {
+                    $return .= '%' . bin2hex($string[$x]);
+                }
+                return $return;
+
+            case 'hexentity':
+                $return = '';
+                for ($x = 0, $x_strlen_string = strlen($string); $x < $x_strlen_string; $x++) {
+                    $return .= '&#x' . bin2hex($string[$x]) . ';';
+                }
+                return $return;
+
+            case 'decentity':
+                $return = '';
+                for ($x = 0, $x_strlen_string = strlen($string); $x < $x_strlen_string; $x++) {
+                    $return .= '&#' . ord($string[$x]) . ';';
+                }
+                return $return;
+
+            case 'javascript':
+                // escape quotes and backslashes, newlines, etc.
+                return strtr($string, ['\\' => '\\\\', "'" => "\\'", '"' => '\\"', "\r" => '\\r', "\n" => '\\n', '</' => '<\/']);
+
+            case 'mail':
+                // safe way to display e-mail address on a web page
+                return str_replace(['@', '.'], [' [AT] ', ' [DOT] '], $string);
+
+            case 'nonstd':
+                // escape non-standard chars, such as ms document quotes
+                $_res = '';
+                for ($_i = 0, $_len = strlen($string); $_i < $_len; $_i++) {
+                    $_ord = ord(substr($string, $_i, 1));
+                    // non-standard char, escape it
+                    if ($_ord >= 126) {
+                        $_res .= '&#' . $_ord . ';';
+                    } else {
+                        $_res .= substr($string, $_i, 1);
+                    }
+                }
+                return $_res;
+
+            case 'unescape':
+                return rawurldecode($string);
+
+            case 'attr':
+                $esc = new \Laminas\Escaper\Escaper();
+                return $esc->escapeHtmlAttr((string) $string);
+
+            default:
+                return $string;
+        }
+    }
+
     /*
     * Smarty plugin
     * -------------------------------------------------------------
@@ -869,12 +974,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_groupmembercount($group)
     {
         return TikiLib::lib('user')->nb_users_in_group($group);
-    }
-
-    function smarty_modifier_isodate($string)
-    {
-        global $tikilib;
-        return $tikilib->get_iso8601_datetime($string);
     }
 
     /*
@@ -1087,109 +1186,46 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return TikiLib::lib('user')->user_is_in_group($auser, $group);
     }
 
-    /**
-     * Smarty escape modifier
-     *
-     * Type:     modifier<br>
-     * Name:     escape<br>
-     * Purpose:  Escape the string according to escapement type
-     * @param html|htmlall|url|quotes|hex|hexentity|javascript
-     * @param string $esc_type
-     * @param string $char_set
-     * @param bool $double_encode
-     * @return string
-     */
-    public function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
+    public function smarty_modifier_isodate($string)
     {
-        switch ($esc_type) {
-            case 'html':
-                if (is_array($string)) {
-                    $string = implode(',', $string);
-                }
-                $return = htmlspecialchars($string ?? '', ENT_QUOTES, $char_set, $double_encode);
+        global $tikilib;
+        return $tikilib->get_iso8601_datetime($string);
+    }
 
-                // Convert back sanitization tags into real tags to avoid them to be displayed
-                $return = str_replace('&lt;x&gt;', '<x>', $return);
-                // Convert back sanitization tags into real tags for no wrap space
-                $return = str_replace('&amp;nbsp;', '&nbsp;', $return);
-
-                return $return;
-
-            case 'htmlall':
-                $return = htmlentities($string ?? '', ENT_QUOTES, $char_set);
-                if (! strlen($return) && strlen($string)) { // Bug php when there is non utf8 characters in the string(http://bugs.php.net/bug.php?id=43549, http://bugs.php.net/bug.php?id=43294)
-                    $return = htmlentities($string, ENT_QUOTES);
-                }
-
-                // Convert back sanitization tags into real tags to avoid them to be displayed
-                $return = str_replace('&lt;x&gt;', '<x>', $return);
-
-                return $return;
-
-            case 'url':
-                return rawurlencode($string ?? '');
-
-            case 'urlpathinfo':
-                return str_replace('%2F', '/', rawurlencode($string));
-
-            case 'quotes':
-                // escape unescaped single quotes
-                return preg_replace("%(?<!\\\\)'%", "\\'", $string);
-
-            case 'hex':
-                // escape every character into hex
-                $return = '';
-                for ($x = 0, $xstrlen_string = strlen($string); $x < $xstrlen_string; $x++) {
-                    $return .= '%' . bin2hex($string[$x]);
-                }
-                return $return;
-
-            case 'hexentity':
-                $return = '';
-                for ($x = 0, $x_strlen_string = strlen($string); $x < $x_strlen_string; $x++) {
-                    $return .= '&#x' . bin2hex($string[$x]) . ';';
-                }
-                return $return;
-
-            case 'decentity':
-                $return = '';
-                for ($x = 0, $x_strlen_string = strlen($string); $x < $x_strlen_string; $x++) {
-                    $return .= '&#' . ord($string[$x]) . ';';
-                }
-                return $return;
-
-            case 'javascript':
-                // escape quotes and backslashes, newlines, etc.
-                return strtr($string, ['\\' => '\\\\', "'" => "\\'", '"' => '\\"', "\r" => '\\r', "\n" => '\\n', '</' => '<\/']);
-
-            case 'mail':
-                // safe way to display e-mail address on a web page
-                return str_replace(['@', '.'], [' [AT] ', ' [DOT] '], $string);
-
-            case 'nonstd':
-                // escape non-standard chars, such as ms document quotes
-                $_res = '';
-                for ($_i = 0, $_len = strlen($string); $_i < $_len; $_i++) {
-                    $_ord = ord(substr($string, $_i, 1));
-                    // non-standard char, escape it
-                    if ($_ord >= 126) {
-                        $_res .= '&#' . $_ord . ';';
-                    } else {
-                        $_res .= substr($string, $_i, 1);
-                    }
-                }
-                return $_res;
-
-            case 'unescape':
-                return rawurldecode($string);
-
-            case 'attr':
-                $esc = new \Laminas\Escaper\Escaper();
-                return $esc->escapeHtmlAttr((string) $string);
-
-            default:
-                return $string;
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     kbsize
+    * Purpose:  returns size in Mb, Kb or bytes.
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_kbsize($string, $bytes = false, $nb_decimals = 2, $unit_separator = '&nbsp;')
+    {
+        if ($string == '') {
+            return '';
         }
+
+        if ($string > 1099511627776) { // 1024 x 1024 x 1024 x 1024 = 1099511627776
+            $string = number_format($string / 1099511627776, $nb_decimals);
+            $kb_string = 'T';
+        } elseif ($string > 1073741824) { // 1024 x 1024 x 1024 = 1073741824
+            $string = number_format($string / 1073741824, $nb_decimals);
+            $kb_string = 'G';
+        } elseif ($string > 1048576) { // 1024 x 1024 = 1048576
+            $string = number_format($string / 1048576, $nb_decimals);
+            $kb_string = 'M';
+        } elseif ($string > 1024) {
+            $string = number_format($string / 1024, $nb_decimals);
+            $kb_string = 'K';
+        } else {
+            $string = $string;
+            $kb_string = '';
+        };
+
+        $kb_string = $kb_string . (($bytes) ? 'B' : 'b');
+
+        return $string . $unit_separator . tra($kb_string);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
