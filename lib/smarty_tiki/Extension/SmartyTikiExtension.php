@@ -117,6 +117,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_template'];
             case 'ternary':
                 return [$this, 'smarty_modifier_ternary'];
+            case 'tiki_date_fotmat':
+                return [$this, 'smarty_modifier_tiki_date_format'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2016,6 +2018,22 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_ternary($input, $true = '', $false = '')
     {
         return $input ? $true : $false;
+    }
+
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     tiki_date_format
+    * Purpose:  format a string representing a moment (timezone adjusted to user specified timezone)
+    * Input:    string: string representing a moment
+    *           format: strftime() format for output. For standard formats, see modifiers tiki_{long,short}_{date,datetime,time}.
+    *           _user: if specified, use this user timezone instead of the current user
+    * -------------------------------------------------------------
+    */
+    function smarty_modifier_tiki_date_format($string, $format, $_user = false)
+    {
+        return TikiLib::date_format(tra($format), $string, $_user);
     }
 
     /**
