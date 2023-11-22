@@ -119,6 +119,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_ternary'];
             case 'tiki_date_fotmat':
                 return [$this, 'smarty_modifier_tiki_date_format'];
+            case 'tiki_long_date':
+                return [$this, 'smarty_modifier_tiki_long_date'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2031,11 +2033,17 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     *           _user: if specified, use this user timezone instead of the current user
     * -------------------------------------------------------------
     */
-    function smarty_modifier_tiki_date_format($string, $format, $_user = false)
+    public function smarty_modifier_tiki_date_format($string, $format, $_user = false)
     {
         return TikiLib::date_format(tra($format), $string, $_user);
     }
 
+    function smarty_modifier_tiki_long_date($string)
+    {
+        global $prefs;
+        $smarty = TikiLib::lib('smarty');
+        return smarty_modifier_tiki_date_format($string, $prefs['long_date_format']);
+    }
     /**
      * Smarty truncate modifier
      *
