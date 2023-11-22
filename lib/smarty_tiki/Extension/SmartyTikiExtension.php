@@ -91,6 +91,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_packageitemid'];
             case 'pagname':
                 return [$this, 'smarty_modifier_pagename'];
+            case 'parse':
+                return [$this, 'smarty_modifier_parse'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1528,6 +1530,27 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             return $source;
         } else {
             return $source;
+        }
+    }
+
+    /**
+     * Smarty parse modifier plugin
+     * Type:     modifier
+     * Name:     parse
+     * Purpose:  Parse code in Tiki syntax
+     *
+     * @param boolean $simple true for less parsing, false for normal parsing
+     *
+     * @return string Parsed string
+     */
+    function smarty_modifier_parse($string, $simple = false)
+    {
+        $parserlib = TikiLib::lib('parser');
+        if ($simple) {
+            $string = htmlentities($string, ENT_QUOTES, 'UTF-8'); // Surely this should not be done here, if it is necessary. Chealer 2017-12-29
+            return $parserlib->parse_data_simple($string);
+        } else {
+            return $parserlib->parse_data($string);
         }
     }
 
