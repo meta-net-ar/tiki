@@ -95,6 +95,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_parse'];
             case 'percent':
                 return [$this, 'smarty_modifier_percent'];
+            case 'quoted':
+                return [$this, 'smarty_modifier_quoted'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1561,9 +1563,28 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * returns a percentage instead of a fraction
      * @param float $string fraction to format
      */
-    function smarty_modifier_percent($string)
+    public function smarty_modifier_percent($string)
     {
         return number_format($string * 100, 1);
+    }
+
+    /*
+    * Smarty plugin
+    * -------------------------------------------------------------
+    * Type:     modifier
+    * Name:     quoted
+    * Purpose:  quote text by adding ">" or using {QUOTE()} plugin
+    * -------------------------------------------------------------
+    */
+    public function smarty_modifier_quoted($string, $format = 'simple', $replyto = '')
+    {
+        if ($format == 'simple') {
+            $string = str_replace("\n", "\n>", $string);
+            $string = "\n>" . $string;
+        } elseif ($format == 'fancy') {
+            $string = "{QUOTE(replyto=>$replyto)}" . $string . '{QUOTE}';
+        }
+        return $string;
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
