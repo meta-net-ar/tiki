@@ -127,6 +127,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_tiki_long_time'];
             case 'tiki_remaining_days_from_now':
                 return [$this, 'smarty_modifier_tiki_remaining_days_from_now'];
+            case 'tiki_short_date':
+                return [$this, 'smarty_modifier_tiki_short_date'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'trim':
@@ -2090,6 +2092,26 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $result = '-';
         }
         return $result;
+    }
+
+    /**
+     * @param string  $string
+     * @param string $same   if set to 'n' will bypass timeago preferences. Useful when markup is illegal in date
+     *
+     * @return string
+     */
+
+    public function smarty_modifier_tiki_short_date($string, $same = 'y')
+    {
+        global $prefs;
+        $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
+
+        if ($prefs['jquery_timeago'] === 'y' && $same === 'y') {
+            TikiLib::lib('header')->add_jq_onready('$("time.timeago").timeago();');
+            return '<time class="timeago" datetime="' . TikiLib::date_format('c', $string, false, 5, false) . '">' . $date . '</time>';
+        } else {
+            return $date;
+        }
     }
 
     /**
