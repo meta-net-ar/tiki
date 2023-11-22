@@ -77,6 +77,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_max_max_user_inscriptions'];
             case 'money_format':
                 return [$this, 'smarty_modifier_money_format'];
+            case 'namespace':
+                return [$this, 'smarty_modifier_namspace'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1414,6 +1416,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
            }
        }
        return $format;
+   }
+
+   public function smarty_modifier_namespace($pageName)
+   {
+       return TikiLib::lib('wiki')->get_namespace($pageName);
    }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
