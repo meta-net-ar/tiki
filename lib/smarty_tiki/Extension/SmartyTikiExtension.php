@@ -1228,6 +1228,17 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return $string . $unit_separator . tra($kb_string);
     }
 
+    public function smarty_modifier_langname($lang)
+    {
+        if (empty($lang)) {
+            return '';
+        }
+
+        include('lang/langmapping.php');
+        return empty($langmapping[$lang]) ? $lang : tra($langmapping[$lang][0]);
+    }
+
+
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
         global $prefs;
