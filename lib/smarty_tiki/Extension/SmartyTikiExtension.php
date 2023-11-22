@@ -99,6 +99,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_quoted'];
             case 'replacei':
                 return [$this, 'smarty_modifier_replacei'];
+            case 'reversre_array':
+                return [$this, 'smarty_modifier_reversre_array'];
             case 'sefurl':
                 return [$this, 'smarty_modifier_sefurl'];
             case 'stringfix':
@@ -1606,6 +1608,20 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_replacei($string, $find, $replacement)
     {
         return str_ireplace($find, $replacement, $string);
+    }
+
+    /**
+     * Smarty reverse_array modifier plugin
+     *
+     * Type:     modifier<br>
+     * Name:     reverse_array<br>
+     * Purpose:  reverse arrays
+     * @param array
+     * @return array
+     */
+    public function smarty_modifier_reverse_array($array)
+    {
+        return array_reverse($array);
     }
 
     public function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
