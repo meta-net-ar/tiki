@@ -608,6 +608,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $this->outputFilters[] = new \SmartyTiki\Filter\Output\Highlight();
         }
 
+        $this->outputFilters[] = new \SmartyTiki\Filter\Output\Ticket();
+
         return $this->outputFilters;
     }
 
