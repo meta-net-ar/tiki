@@ -9,6 +9,7 @@ namespace SmartyTiki\Extension;
 
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\FunctionHandler\FunctionHandlerInterface;
+use Smarty\Compile\CompilerInterface;
 use TikiLib;
 
 class SmartyTikiExtension extends \Smarty\Extension\Base
@@ -17,6 +18,22 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     private $functionHandlers = [];
     private $outputFilters = [];
     private $preFilters = [];
+    private $tags = [];
+
+    public function getTagCompiler(string $tag): ?CompilerInterface
+    {
+        if (isset($this->tags[$tag])) {
+            return $this->tags[$tag];
+        }
+        
+        switch ($tag) {
+            case 'assign_content':
+                $this->tags[$tag] = new \SmartyTiki\Compile\Tag\AssignContent();
+                break;
+        }
+
+        return $this->tags[$tag] ?? null;
+    }
 
     public function getModifierCallback(string $modifierName)
     {
