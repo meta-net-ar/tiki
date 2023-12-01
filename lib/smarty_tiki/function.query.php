@@ -7,6 +7,6 @@
 
 function smarty_function_query($params, \Smarty\Template $template)
 {
-    $smartyFunctionQueryHandler = new \smartytiki\FunctionHandler\Query();
+    $smartyFunctionQueryHandler = new \SmartyTiki\FunctionHandler\Query();
     return $smartyFunctionQueryHandler->handle($params, $template);
 }
