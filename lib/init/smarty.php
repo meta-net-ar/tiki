@@ -55,8 +55,8 @@ class Tiki_Security_Policy extends \Smarty\Security
             $this->trusted_uri[] = '#' . preg_quote("http://$url_host", '$#') . '#';
             $this->trusted_uri[] = '#' . preg_quote("https://$url_host", '$#') . '#';
 
-            $functions = array_filter($tikilib->get_preference('smarty_security_functions', [], true));
-            $modifiers = array_filter($tikilib->get_preference('smarty_security_modifiers', [], true));
+            // $functions = array_filter($tikilib->get_preference('smarty_security_functions', [], true));  Momentanly commented, will be removed when ensured there is no regression
+            // $modifiers = array_filter($tikilib->get_preference('smarty_security_modifiers', [], true));
             $dirs = array_filter($tikilib->get_preference('smarty_security_dirs', [], true));
 
             $cdns = preg_split('/\s+/', $tikilib->get_preference('tiki_cdn', ''));
@@ -66,71 +66,12 @@ class Tiki_Security_Policy extends \Smarty\Security
                 $this->trusted_uri[] = '#' . preg_quote($uri) . '$#';
             }
         } else {
-            $functions = [];
-            $modifiers = [];
+            // $functions = [];
+            // $modifiers = [];
             $dirs = [];
         }
 
         // Add defaults
-        $this->php_modifiers = array_merge([
-            'addslashes',
-            'array_filter',
-            'array_reverse',
-            'count',
-            'escape',
-            'explode',
-            'htmlentities',
-            'implode',
-            'is_array',
-            'json_decode',
-            'json_encode',
-            'md5',
-            'nl2br',
-            'preg_split',
-            'strip_tags',
-            'stristr',
-            'strpos',
-            'substr',
-            'tra',
-            'trim',
-            'ucfirst',
-            'ucwords',
-            'urlencode',
-            'var_dump',
-            'strstr',
-        ], $modifiers);
-
-        $this->php_functions = array_merge(['isset',
-            'array',        // not needed? use {$value = []}
-            'array_rand',
-            'array_key_exists',
-            'basename',
-            'count',
-            'empty',
-            'ereg',         // deprecated and removed in php7+ use preg functions instead
-            'in_array',
-            'is_array',
-            'is_numeric',
-            'json_encode',
-            'min',
-            'max',
-            'nl2br',
-            'preg_match',
-            'preg_match_all',
-            'preg_replace',
-            'sizeof',
-            'strlen',
-            'stristr',
-            'strpos',
-            'strstr',
-            'str_replace',
-            'strtolower',
-            'time',
-            'tra',
-            'trim',
-            'zone_is_empty',
-        ], $functions);
-
         $this->secure_dir = array_merge($this->secure_dir, $dirs);
     }
 }
@@ -228,11 +169,6 @@ class Smarty_Tiki extends \Smarty\Smarty
             $this->registerFilter('output', 'filter_out_sefurl');
         }
 
-        // register PHP functions used as smarty modifiers in Tiki templates
-        $builtin = ['addslashes', 'array_reverse', 'count', 'explode', 'implode', 'is_array', 'json_decode', 'json_encode', 'md5', 'stristr', 'strpos', 'trim', 'ucfirst', 'ucwords', 'urlencode', 'var_dump'];
-        foreach ($builtin as $func) {
-            $this->registerPlugin('modifier', $func, $func);
-        }
         include_once(__DIR__ . '/tra.php');
         $this->registerPlugin('modifier', 'tra', 'tra');
     }
