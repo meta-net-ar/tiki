@@ -25,6 +25,7 @@ class Title extends Base
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs, $tiki_p_view_templates, $tiki_p_edit_templates, $tiki_p_admin;
+        $smarty = \TikiLib::lib('smarty');
 
         if ($repeat || empty($content)) {
             return;
@@ -41,7 +42,7 @@ class Title extends Base
         }
 
         // Set the variable for the HTML title tag
-        $template->smarty->assign('headtitle', $content);
+        $smarty->assign('headtitle', $content);
 
         $class = '';
         $current = current_object();
