@@ -786,8 +786,8 @@ class MenuLib extends TikiLib
                     $i++;
                 }
                 $i--;
-                //include_once('lib/smarty_tiki/function.menu.php');
-                usort($section, "compare_menu_options");
+                $functionMenuHandler = new \SmartyTiki\FunctionHandler\Menu();
+                usort($section, [$functionMenuHandler, "compare_menu_options"]);
                 $sorted_channels = array_merge($sorted_channels, $section);
             }
         }

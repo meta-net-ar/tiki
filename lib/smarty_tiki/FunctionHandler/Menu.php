@@ -63,7 +63,7 @@ class Menu extends Base
         }
         $smarty->assign_by_ref('bs_menu_class', $bs_menu_class);
 
-        list($menu_info, $channels) = get_menu_with_selections($params);
+        list($menu_info, $channels) = $this->get_menu_with_selections($params);
         $smarty->assign('menu_channels', $channels['data'] ?? []);
         $smarty->assign('menu_info', $menu_info);
 
@@ -102,7 +102,7 @@ class Menu extends Base
 
             // Unification with structure menus - adds sectionLevel
             if (empty($menu_info['structure']) and !empty($channels['data'])) {
-                $channels['data'] = add_section_levels_to_menu_data($channels['data']);
+                $channels['data'] = $this->add_section_levels_to_menu_data($channels['data']);
             }
 
             if (!empty($channels['data'])) {
@@ -280,113 +280,113 @@ class Menu extends Base
         $data = $smarty->fetch($tpl);
         return \MenuLib::clean_menu_html($data);
     }
-}
 
-/**
- * Helper method to get proper link of a given menu item
- *
- * @param String $url_from_db The current url saved within the database
- *
- * @return String The new parsed link
- */
+    /**
+    * Helper method to get proper link of a given menu item
+    *
+    * @param String $url_from_db The current url saved within the database
+    *
+    * @return String The new parsed link
+    */
+   
+    public static function helper_function_contruct_menu_url_from_db($url_from_db)
+    {
+        if (preg_match('/^\(\(([^()]+)\)\)$/', $url_from_db)) { //as page url are save as ((V-Log)) this should match the regex
+            $match = [];
+            preg_match("/[^()]+/", $url_from_db, $match);
+            $page_name = $match[0];
+            $page_name = str_replace(" ", "-", $page_name);
+            return "tiki-index.php?page=" . $page_name;
+        }
+        return $url_from_db;
+    }
 
- function helper_function_contruct_menu_url_from_db($url_from_db)
- {
-     if (preg_match('/^\(\(([^()]+)\)\)$/', $url_from_db)) { //as page url are save as ((V-Log)) this should match the regex
-         $match = [];
-         preg_match("/[^()]+/", $url_from_db, $match);
-         $page_name = $match[0];
-         $page_name = str_replace(" ", "-", $page_name);
-         return "tiki-index.php?page=" . $page_name;
-     }
-     return $url_from_db;
- }
+    public static function compare_menu_options($a, $b)
+    {
+        return strcmp(tra($a['name']), tra($b['name']));
+    }
 
- function compare_menu_options($a, $b)
-{
-    return strcmp(tra($a['name']), tra($b['name']));
-}
-
-function get_menu_with_selections($params)
-{
-    global $user, $prefs;
-    $tikilib = TikiLib::lib('tiki');
-    $menulib = TikiLib::lib('menu');
-    $cachelib = TikiLib::lib('cache');
-    $cacheName = isset($prefs['mylevel']) ? $prefs['mylevel'] : 0;
-    $cacheName .= '_' . $prefs['language'] . '_' . md5(implode("\n", $tikilib->get_user_groups($user)));
-
-    extract($params, EXTR_SKIP);
-
-    if (isset($structureId)) {
-        $cacheType = 'structure_' . $structureId . '_';
-    } else {
-        if (array_key_exists('id', $params)) {
-            $cacheType = 'menu_' . $id . '_';
+    public static function get_menu_with_selections($params)
+    {
+        global $user, $prefs;
+        $tikilib = TikiLib::lib('tiki');
+        $menulib = TikiLib::lib('menu');
+        $cachelib = TikiLib::lib('cache');
+        $cacheName = isset($prefs['mylevel']) ? $prefs['mylevel'] : 0;
+        $cacheName .= '_' . $prefs['language'] . '_' . md5(implode("\n", $tikilib->get_user_groups($user)));
+    
+        extract($params, EXTR_SKIP);
+    
+        if (isset($structureId)) {
+            $cacheType = 'structure_' . $structureId . '_';
         } else {
-            \Feedback::error('The menu ID is not provided');
-            $id = 0;
-            $cacheType = 'menu_' . $id . '_';
-        }
-    }
-
-    if ($cdata = $cachelib->getSerialized($cacheName, $cacheType)) {
-        list($menu_info, $channels) = $cdata;
-    } elseif (! empty($structureId)) {
-        $structlib = TikiLib::lib('struct');
-
-        if (! is_numeric($structureId)) {
-            $structureId = $structlib->get_struct_ref_id($structureId);
-        }
-
-        $channels = $structlib->build_subtree_toc($structureId);
-        $structure_info = $structlib->s_get_page_info($structureId);
-        $channels = $structlib->to_menu($channels, $structure_info['pageName'], 0, 0, $params);
-        $menu_info = ['type' => 'd', 'menuId' => $structureId, 'structure' => 'y'];
-    } elseif (! empty($id)) {
-        $menu_info = $menulib->get_menu($id);
-        $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', isset($prefs['mylevel']) ? $prefs['mylevel'] : 0);
-        $channels = $menulib->sort_menu_options($channels);
-    } else {
-        return '<span class="alert-warning">menu function: Menu or Structure ID not set</span>';
-    }
-    if (strpos($_SERVER['SCRIPT_NAME'], 'tiki-register') === false) {
-        $cachelib->cacheItem($cacheName, serialize([$menu_info, $channels]), $cacheType);
-    }
-    if (! isset($setSelected) || $setSelected !== 'n') {
-        $channels = $menulib->setSelected($channels, isset($sectionLevel) ? $sectionLevel : '', isset($toLevel) ? $toLevel : '', $params);
-    }
-
-    foreach ($channels['data'] as &$item) {
-        if (! empty($menu_info['parse']) && $menu_info['parse'] === 'y') {
-            //    $item['block'] = TikiLib::lib('parser')->contains_html_block($item['name']); // Only used for CSS menus
-            $item['name'] = preg_replace('/(.*)\n$/', '$1', $item['name']); // parser adds a newline to everything
-        }
-    }
-
-    return [$menu_info, $channels];
-}
-
-function add_section_levels_to_menu_data($data)
-{
-    $sectionLevel = 0;
-    $prev_type = null;
-    $new_data = array_map(function ($menu_item) use (&$sectionLevel, &$prev_type) {
-        if ($menu_item['type'] === 's') {
-            $sectionLevel = 0;
-        } elseif (($prev_type === 's' || is_numeric($prev_type)) && $menu_item['type'] === 'o') {
-            $sectionLevel++;
-        } elseif ($menu_item['type'] === '-') {
-            if ($sectionLevel - 1 >= 0) {
-                $sectionLevel--;
+            if (array_key_exists('id', $params)) {
+                $cacheType = 'menu_' . $id . '_';
+            } else {
+                \Feedback::error('The menu ID is not provided');
+                $id = 0;
+                $cacheType = 'menu_' . $id . '_';
             }
-        } elseif (is_numeric($menu_item['type'])) {
-            $sectionLevel = (int)$menu_item['type'];
         }
-        $prev_type = $menu_item['type'];
-        $menu_item['sectionLevel'] = $sectionLevel;
+    
+        if ($cdata = $cachelib->getSerialized($cacheName, $cacheType)) {
+            list($menu_info, $channels) = $cdata;
+        } elseif (! empty($structureId)) {
+            $structlib = TikiLib::lib('struct');
+    
+            if (! is_numeric($structureId)) {
+                $structureId = $structlib->get_struct_ref_id($structureId);
+            }
+    
+            $channels = $structlib->build_subtree_toc($structureId);
+            $structure_info = $structlib->s_get_page_info($structureId);
+            $channels = $structlib->to_menu($channels, $structure_info['pageName'], 0, 0, $params);
+            $menu_info = ['type' => 'd', 'menuId' => $structureId, 'structure' => 'y'];
+        } elseif (! empty($id)) {
+            $menu_info = $menulib->get_menu($id);
+            $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', isset($prefs['mylevel']) ? $prefs['mylevel'] : 0);
+            $channels = $menulib->sort_menu_options($channels);
+        } else {
+            return '<span class="alert-warning">menu function: Menu or Structure ID not set</span>';
+        }
+        if (strpos($_SERVER['SCRIPT_NAME'], 'tiki-register') === false) {
+            $cachelib->cacheItem($cacheName, serialize([$menu_info, $channels]), $cacheType);
+        }
+        if (! isset($setSelected) || $setSelected !== 'n') {
+            $channels = $menulib->setSelected($channels, isset($sectionLevel) ? $sectionLevel : '', isset($toLevel) ? $toLevel : '', $params);
+        }
+    
+        foreach ($channels['data'] as &$item) {
+            if (! empty($menu_info['parse']) && $menu_info['parse'] === 'y') {
+                //    $item['block'] = TikiLib::lib('parser')->contains_html_block($item['name']); // Only used for CSS menus
+                $item['name'] = preg_replace('/(.*)\n$/', '$1', $item['name']); // parser adds a newline to everything
+            }
+        }
+    
+        return [$menu_info, $channels];
+    }
 
-        return $menu_item;
-    }, $data);
-    return $new_data;
+    public static function add_section_levels_to_menu_data($data)
+    {
+        $sectionLevel = 0;
+        $prev_type = null;
+        $new_data = array_map(function ($menu_item) use (&$sectionLevel, &$prev_type) {
+            if ($menu_item['type'] === 's') {
+                $sectionLevel = 0;
+            } elseif (($prev_type === 's' || is_numeric($prev_type)) && $menu_item['type'] === 'o') {
+                $sectionLevel++;
+            } elseif ($menu_item['type'] === '-') {
+                if ($sectionLevel - 1 >= 0) {
+                    $sectionLevel--;
+                }
+            } elseif (is_numeric($menu_item['type'])) {
+                $sectionLevel = (int)$menu_item['type'];
+            }
+            $prev_type = $menu_item['type'];
+            $menu_item['sectionLevel'] = $sectionLevel;
+    
+            return $menu_item;
+        }, $data);
+        return $new_data;
+    }
 }
