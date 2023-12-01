@@ -1,0 +1,48 @@
+---
+get:
+  description: Retrieve all files of a gallery
+  parameters:
+    - name: galleryId
+      in: path
+      description: Gallery ID
+      required: true
+      schema:
+        type: integer
+    - name: offset
+      in: query
+      description: Start offset for the number of records to return.
+      schema:
+        type: integer
+    - name: maxRecords
+      in: query
+      description: Maximum number of records to return.
+      schema:
+        type: integer
+    - name: sort_mode
+      in: query
+      description: Sort mode.
+      schema:
+        type: string
+    - name: user
+      in: query
+      description: The gallery creator.
+      schema:
+        type: string
+    - name: find
+      in: query
+      description: find.
+      schema:
+        type: string
+  responses:
+    '200':
+      description: files response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-File.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

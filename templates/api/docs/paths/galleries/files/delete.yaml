@@ -1,0 +1,27 @@
+---
+delete:
+  description: Remove a file
+  parameters:
+    - name: fileId
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: remove file response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              message:
+                type: string
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

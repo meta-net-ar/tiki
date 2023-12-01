@@ -1,0 +1,38 @@
+---
+post:
+  description: Duplicate file
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            fileId:
+              type: integer
+            galleryId:
+              type: integer
+              description: the destination gallery of the file copy
+            newName:
+              type: string
+  responses:
+    '200':
+      description: duplicate file response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              message:
+                type: string
+              id:
+                type: integer
+                description: id of the file copy
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

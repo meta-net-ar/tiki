@@ -1,0 +1,37 @@
+---
+post:
+  description: Duplicate gallery
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            galleryId:
+              type: integer
+            name:
+              type: string
+            description:
+              type: string
+  responses:
+    '200':
+      description: duplicate gallery response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              message:
+                type: string
+              id:
+                type: integer
+                description: id of the gallery copy
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

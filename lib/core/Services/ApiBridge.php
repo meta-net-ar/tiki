@@ -175,6 +175,22 @@ class Services_ApiBridge
         $routes->add('wiki-preview', (new Route('wiki/preview', ['controller' => 'wiki', 'action' => 'preview']))->setMethods(['POST']));
         $routes->add('wiki-zip', (new Route('wiki/zip', ['controller' => 'wiki', 'action' => 'zip', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-versions-delete', (new Route('wiki/{page}/delete', ['controller' => 'wiki', 'action' => 'remove_page_versions', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('galleries', (new Route('galleries', ['controller' => 'file', 'action' => 'list_galleries', 'offset' => 0, 'maxRecords' => -1]))->setMethods(['GET']));
+        $routes->add('galleries-create', (new Route('galleries', ['controller' => 'file', 'action' => 'create_update_gallery', 'create' => 1]))->setMethods(['POST']));
+        $routes->add('galleries-update', (new Route('galleries/{galleryId}', ['controller' => 'file', 'action' => 'create_update_gallery', 'update' => 1]))->setMethods(['POST']));
+        $routes->add('galleries-info', (new Route('galleries/{galleryId}', ['controller' => 'file', 'action' => 'info']))->setMethods(['GET']));
+        $routes->add('galleries-move', (new Route('galleries/{galleryId}/move', ['controller' => 'file', 'action' => 'move_file_gallery']))->setMethods(['POST']));
+        $routes->add('galleries-duplicate', (new Route('galleries/{galleryId}/duplicate', ['controller' => 'file', 'action' => 'duplicate_file_gallery']))->setMethods(['POST']));
+        $routes->add('galleries-delete', (new Route('galleries/{id}/delete', ['controller' => 'file', 'action' => 'remove_file_gallery', 'confirmForm' => 'y']))->setMethods(['DELETE']));
+        $routes->add('galleries-upload', (new Route('galleries/upload', ['controller' => 'file', 'action' => 'upload']))->setMethods(['POST']));
+        $routes->add('galleries-download', (new Route('galleries/{fileId}/download', ['controller' => 'file', 'action' => 'download']))->setMethods(['GET']));
+        $routes->add('galleries-files', (new Route('galleries/{galleryId}/list_files', ['controller' => 'file', 'action' => 'list_files', 'offset' => -1, 'maxRecords' => -1]))->setMethods(['GET']));
+        $routes->add('galleries-files-info', (new Route('galleries/files/{fileId}', ['controller' => 'file', 'action' => 'file_view']))->setMethods(['GET']));
+        $routes->add('galleries-files-update', (new Route('galleries/files/{fileId}/update', ['controller' => 'file', 'action' => 'upload']))->setMethods(['POST']));
+        $routes->add('galleries-files-duplicate', (new Route('galleries/files/{fileId}/duplicate', ['controller' => 'file', 'action' => 'duplicate_file']))->setMethods(['POST']));
+        $routes->add('galleries-files-lock', (new Route('galleries/files/lock', ['controller' => 'file', 'action' => 'lock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('galleries-files-unlock', (new Route('galleries/files/unlock', ['controller' => 'file', 'action' => 'unlock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('galleries-files-delete', (new Route('galleries/files/{fileId}/delete', ['controller' => 'file', 'action' => 'remove_file', 'confirmForm' => 'y']))->setMethods(['DELETE']));
         return $routes;
     }
 

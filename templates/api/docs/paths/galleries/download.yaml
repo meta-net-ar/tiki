@@ -1,0 +1,23 @@
+---
+get:
+  description: download file
+  parameters:
+    - name: fileId
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: download response
+      content:
+        application/json:
+          schema:
+            type: object
+            description: the file content 
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

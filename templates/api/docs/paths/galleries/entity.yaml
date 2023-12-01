@@ -1,0 +1,71 @@
+---
+get:
+  description: Retrieve gallery information
+  parameters:
+    - name: galleryId
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: gallery info response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Gallery.yaml 
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml     
+post:
+  description: Update a gallery
+  parameters:
+    - name: galleryId
+      in: path
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          required:
+            - galleryId
+          properties:
+            galleryId:
+              type: integer
+            name:
+              type: string
+            type:
+              type: string
+              enum:
+                - default
+                - podcast
+                - vidcast
+                - direct
+            description:
+              type: string           
+  responses:
+    '200':
+      description: gallery response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Gallery.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+    '404':
+      description: not found
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

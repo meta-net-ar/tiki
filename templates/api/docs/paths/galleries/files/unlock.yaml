@@ -1,0 +1,36 @@
+---
+post:
+  description: Unlock files
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: integer
+                description: file Ids
+  responses:
+    '200':
+      description: unlock files response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              count:
+                type: integer
+              unlocked:
+                type: array
+                description: list of unlocked file Ids
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

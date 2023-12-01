@@ -52,6 +52,34 @@ paths:
     $ref: paths-comments-archive.yaml
   /comments/{threadId}/unarchive:
     $ref: paths-comments-unarchive.yaml
+  /galleries:
+    $ref: paths-galleries-index.yaml
+  /galleries/{galleryId}:
+    $ref: paths-galleries-entity.yaml
+  /galleries/{galleryId}/move:
+    $ref: paths-galleries-move.yaml
+  /galleries/{galleryId}/duplicate:
+    $ref: paths-galleries-duplicate.yaml
+  /galleries/{id}/delete:
+    $ref: paths-galleries-delete.yaml
+  /galleries/upload:
+    $ref: paths-galleries-upload.yaml
+  /galleries/{fileId}/download:
+    $ref: paths-galleries-download.yaml
+  /galleries/{galleryId}/list_files:
+    $ref: paths-galleries-files-index.yaml
+  /galleries/files/{fileId}:
+    $ref: paths-galleries-files-entity.yaml
+  /galleries/files/{fileId}/update:
+    $ref: paths-galleries-files-update.yaml
+  /galleries/files/{fileId}/duplicate:
+    $ref: paths-galleries-files-duplicate.yaml
+  /galleries/files/lock:
+    $ref: paths-galleries-files-lock.yaml
+  /galleries/files/unlock:
+    $ref: paths-galleries-files-unlock.yaml
+  /galleries/files/{fileId}/delete:
+    $ref: paths-galleries-files-delete.yaml
   /groups:
     $ref: paths-groups-index.yaml
   /groups/{olgroup}:

@@ -104,6 +104,12 @@ class Services_File_Controller
         if (empty($asuser)) {
             $asuser = $GLOBALS['user'];
         }
+
+        $perms = Perms::get('file gallery', $gal_info['galleryId']);
+        if (! $perms->upload_files) {
+            throw new Services_Exception_Denied();
+        }
+
         if (! $input->imagesize->word()) {
             $image_x = $input->image_max_size_x->text();
             $image_y = $input->image_max_size_y->text();
@@ -507,6 +513,371 @@ class Services_File_Controller
         unset($info['data']);
 
         return $info;
+    }
+
+    /**
+     * Creates or updates a gallery
+     * @param $input
+     * @return array
+     * @throws Services_Exception
+     */
+    public function action_create_update_gallery($input)
+    {
+        global $user;
+
+        $fileGallery = TikiLib::lib('filegal');
+        $name = $input->name->text();
+        $parentId = $input->parentId->int() ?: -1;
+        $type = $input->type->text() ?: 'default';
+        $description = $input->description->text() ?: '';
+
+        if ($input->create->int()) {
+            if (empty($name)) {
+                throw new Services_Exception(tr('Gallery name is required.'));
+            }
+
+            $perms = Perms::get('file gallery', $parentId);
+            if (! $perms->admin_file_galleries) {
+                throw new Services_Exception_Denied();
+            }
+
+            $info = [
+                'name' => $name,
+                'user' => $user,
+                'type' => $type,
+                'description' => $description,
+                'parentId' => $parentId
+            ];
+        } else {
+            $galleryId = $input->galleryId->int();
+            if (empty($galleryId)) {
+                throw new Services_Exception(tr('Gallery id is required.'));
+            }
+
+            $info = $fileGallery->get_file_gallery_info($galleryId);
+            if (! $info) {
+                throw new Services_Exception_NotFound();
+            }
+
+            $perms = Perms::get('file gallery', $galleryId);
+            if (! $perms->admin_file_galleries) {
+                throw new Services_Exception_Denied();
+            }
+
+            $info = [
+                'name' => $name,
+                'type' => $type,
+                'description' => $description,
+                'galleryId' => $galleryId,
+                'parentId' => $info['parentId']
+            ];
+        }
+
+        $newGalleryId = $fileGallery->replace_file_gallery($info);
+
+        return [
+            'info' => $fileGallery->get_file_gallery_info($newGalleryId)
+        ];
+    }
+
+    /**
+     * @param $input     int "id" ID of gallery to be removed or file in the gallery to be removed
+     * @param $input     int "galleryId" The parent gallery of the gallery to be removed
+     * @param $input     bool "recurse"
+     * @return array
+     * @throws Services_Exception_Denied
+     */
+    public function action_remove_file_gallery($input)
+    {
+        $id = $input->id->int();
+        $galleryId = $input->galleryId->int() ?: 0;
+        $recurse = $input->recurse ?: true;
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->admin_file_galleries) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+        $removed = $fileGallery->remove_file_gallery($id, $galleryId, $recurse);
+        if (! $removed) {
+            $msg = tr('An error occured while deleting the file gallery: %0', $id);
+        } else {
+            $msg = tr('The file gallery %0 has been deleted', $galleryId);
+        }
+
+        return [
+            'title' => tr('Delete File Gallery'),
+            'message' => $msg
+        ];
+    }
+
+    public function action_remove_file($input)
+    {
+        $fileGallery = TikiLib::lib('filegal');
+        $fileId = $input->fileId->int();
+        $fileInfo = $fileGallery->get_file_info($fileId);
+
+        $perms = Perms::get('file gallery', $fileInfo['galleryId']);
+
+        if (! $perms->admin_file_galleries) {
+            throw new Services_Exception_Denied();
+        }
+
+        $removed = $fileGallery->remove_file($fileInfo);
+
+        if (! $removed) {
+            $msg = tr('An error occured while deleting the file : %0', $fileId);
+        } else {
+            $msg = tr('The file %0 has been deleted', $fileId);
+        }
+
+        return [
+            'title' => tr('Delete File'),
+            'message' => $msg
+        ];
+    }
+
+    public function action_info($input)
+    {
+        $galleryId = $input->galleryId->int();
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->view_file_gallery) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+
+        return $fileGallery->get_file_gallery_info($galleryId);
+    }
+
+    public function action_list_files($input)
+    {
+        $galleryId = $input->galleryId->int();
+        $offset = $input->offset->int();
+        $maxRecords = $input->maxRecords->int();
+        $sort_mode = $input->sort_mode->text() ?: 'created_desc';
+        $find = isset($input->find) ? $input->find->text() : null;
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->view_file_gallery) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+
+        $result = $fileGallery->list_files($offset, $maxRecords, $sort_mode, $find, $galleryId);
+
+        return [
+            'title' => tr('List files'),
+            'galleryId' => $galleryId,
+            'offset' => $offset,
+            'maxRecords' => $maxRecords,
+            'count' => $result['cant'],
+            'result' => $result['data'],
+        ];
+    }
+
+    public function action_list_galleries($input)
+    {
+        global $prefs;
+
+        $galleryId = $input->galleryId->int() ?: $prefs['fgal_root_id'];
+        $offset = $input->offset->int();
+        $maxRecords = $input->maxRecords->int();
+        $sort_mode = $input->sort_mode->text() ?: 'created_desc';
+        $user = $input->user->text() ?: '';
+        $find = isset($input->find) ? $input->find->text() : null;
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->view_file_gallery) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+
+        $result = $fileGallery->list_file_galleries($offset, $maxRecords, $sort_mode, $user, $find, $galleryId);
+
+        return [
+            'title' => tr('List Galleries'),
+            'parentId' => $galleryId,
+            'offset' => $offset,
+            'maxRecords' => $maxRecords,
+            'count' => $result['cant'],
+            'result' => $result['data'],
+        ];
+    }
+
+    public function action_file_view($input)
+    {
+        $fileId = $input->fileId->int();
+
+        $perms = Perms::get('file', $fileId);
+
+        if (! $perms->view_file) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+
+        return $fileGallery->get_file_info($fileId);
+    }
+
+    public function action_download($input)
+    {
+        $fileId = $input->fileId->int();
+
+        // Check if the user has permission to download the file
+        $perms = Perms::get('file', $fileId);
+        if (! $perms->download_files) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+        $fileInfo = $fileGallery->get_file_info($fileId);
+
+        $file = new \Tiki\FileGallery\File($fileInfo);
+
+        // Set headers for file download
+        header('Content-Type: ' . $file->filetype);
+        header('Content-Disposition: attachment; filename="' . $file->filename . '"');
+        header('Content-Length: ' . $file->filesize);
+
+        $fileContents = $file->getContents();
+
+        if (empty($fileContents)) {
+            $fileContents = $file->data;
+        }
+
+        echo $fileContents;
+
+        exit; //Make sure nothing else is sent after the file data
+    }
+
+    public function action_move_file_gallery($input)
+    {
+        $galleryId = $input->galleryId->int();
+        $new_parent_id = $input->newParentId->int();
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->admin_file_galleries) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+        $moved = $fileGallery->move_file_gallery($galleryId, $new_parent_id);
+
+        if (! $moved) {
+            $msg = tr('An error occured while moving the file gallery: %0', $galleryId);
+        } else {
+            $msg = tr('The file %0 has been moved', $galleryId);
+        }
+
+        return [
+            'title' => tr('Move File Gallery'),
+            'message' => $msg
+        ];
+    }
+
+    public function action_duplicate_file($input)
+    {
+        $fileId = $input->fileId->int();
+        $galleryId = $input->galleryId->int() ?: null;
+        $newName = $input->newName->text() ?: false;
+
+        $perms = Perms::get('file gallery', $fileId);
+
+        if (! $perms->admin_file_galleries) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+        $newFileId = $fileGallery->duplicate_file($fileId, $galleryId, $newName);
+
+        return [
+            'title' => tr('Duplicate file'),
+            'message' => 'File duplicated successfully',
+            'id' => $newFileId
+        ];
+    }
+
+    public function action_duplicate_file_gallery($input)
+    {
+        $galleryId = $input->galleryId->int();
+        $name = $input->name->text();
+        $description = $input->description->text() ?: '';
+
+        $perms = Perms::get('file gallery', $galleryId);
+
+        if (! $perms->admin_file_galleries) {
+            throw new Services_Exception_Denied();
+        }
+
+        $fileGallery = TikiLib::lib('filegal');
+        $newGalleryId = $fileGallery->duplicate_file_gallery($galleryId, $name, $description);
+
+        return [
+            'title' => tr('Duplicate File Gallery'),
+            'message' => 'File Gallery duplicated successfully',
+            'id' => $newGalleryId
+        ];
+    }
+
+    public function action_lock_files($input)
+    {
+        global $user;
+        $fileIDs = $input->asArray('items');
+
+        $fileGallery = TikiLib::lib('filegal');
+        $result = [];
+
+        foreach ($fileIDs as $id) {
+            $perms = Perms::get('file gallery', $id);
+
+            if ($perms->admin_file_galleries) {
+                $locked = $fileGallery->lock_file($id, $user);
+                if ($locked->numrows) {
+                    $result[] = $id;
+                }
+            }
+        }
+
+        return [
+            'title' => tr('Lock files'),
+            'count' => count($result),
+            'locked' => $result
+        ];
+    }
+
+    public function action_unlock_files($input)
+    {
+        $fileIDs = $input->asArray('fileId');
+
+        $fileGallery = TikiLib::lib('filegal');
+        $result = [];
+
+        foreach ($fileIDs as $id) {
+            $perms = Perms::get('file gallery', $id);
+
+            if ($perms->admin_file_galleries) {
+                $unlocked = $fileGallery->unlock_file($id);
+                if ($unlocked->numrows) {
+                    $result[] = $id;
+                }
+            }
+        }
+
+        return [
+            'title' => tr('Unlock files'),
+            'count' => count($result),
+            'unlocked' => $result
+        ];
     }
 
     private function checkTargetGallery($input)

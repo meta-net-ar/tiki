@@ -1,0 +1,111 @@
+---
+type: object
+properties:
+  galleryId:
+    type: integer
+  name:
+    type: string
+  type:
+    type: string
+  direct:
+    type: string
+  template:
+    type: integer
+  description:
+    type: string
+  created:
+    type: integer
+  visible:
+    type: string
+  lastModif:
+    type: integer
+  user:
+    type: string
+  hits:
+    type: integer
+  votes:
+    type: integer
+  points:
+    type: float
+  maxRows:
+    type: integer
+  public:
+    type: string
+  show_id:
+    type: string
+  show_icon:
+    type: string
+  show_name:
+    type: string
+  show_size:
+    type: string
+  show_description:
+    type: string
+  max_desc:
+    type: integer
+  show_created:
+    type: string
+  show_hits:
+    type: string
+  show_lastDownload:
+    type: string
+  parentId:
+    type: integer
+  lockable:
+    type: string
+  show_lockedby:
+    type: string
+  archives:
+    type: integer
+  sort_mode:
+    type: string
+  show_modified:
+    type: string
+  show_author:
+    type: string
+  show_creator:
+    type: string
+  subgal_conf:
+    type: string
+  show_last_user:
+    type: string
+  show_comment:
+    type: string
+  show_files:
+    type: string
+  show_explorer:
+    type: string
+  show_path:
+    type: string
+  show_slideshow:
+    type: string
+  show_ocr_state:
+    type: string
+  default_view:
+    type: string
+  quota:
+    type: integer
+  size:
+    type: integer
+  wiki_syntax:
+    type: string
+  backlinkPerms:
+    type: string
+  show_backlinks:
+    type: string
+  show_deleteAfter:
+    type: string
+  show_checked:
+    type: string
+  show_share:
+    type: string
+  image_max_size_x:
+    type: integer
+  image_max_size_y:
+    type: integer
+  show_source:
+    type: string
+  icon_fileId:
+    type: integer
+  ocr_lang:
+    type: string

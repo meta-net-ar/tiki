@@ -1,0 +1,39 @@
+---
+delete:
+  description: Remove a gallery
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            galleryId:
+              type: integer
+              description: The parent gallery of the gallery to be removed
+            recurse:
+              type: boolean  
+  responses:
+    '200':
+      description: remove gallery response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              message:
+                type: string
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

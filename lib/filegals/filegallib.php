@@ -1171,7 +1171,7 @@ class FileGalLib extends TikiLib
         $info['user'] = $user;
         $info['galleryId'] = 0;
         $info['description'] = $description;
-        $info['name'] = $name;
+        $info['name'] = ($name ?: $info['name'] . tra(' copy'));
         if (! is_null($parentId)) {
             $info['parentId'] = $parentId;
         }
@@ -2427,10 +2427,15 @@ class FileGalLib extends TikiLib
         return $fgals;
     }
 
-    public function list_files($offset = 0, $maxRecords = -1, $sort_mode = 'created_desc', $find = '')
+    public function list_files($offset = 0, $maxRecords = -1, $sort_mode = 'created_desc', $find = '', $galleryId = null)
     {
         global $prefs;
-        return $this->get_files($offset, $maxRecords, $sort_mode, $find, $prefs['fgal_root_id'], false, false, true, true, false, false, true, true);
+
+        if (empty($galleryId)) {
+            $galleryId = $prefs['fgal_root_id'];
+        }
+
+        return $this->get_files($offset, $maxRecords, $sort_mode, $find, $galleryId, false, false, true, true, false, false, true, true);
     }
 
     public function list_file_galleries($offset = 0, $maxRecords = -1, $sort_mode = 'name_desc', $user = '', $find = '', $parentId = -1, $with_archive = false, $with_subgals = true, $with_subgals_size = false, $with_files = false, $with_files_data = false, $with_parent_name = true, $with_files_count = true, $recursive = true, $skip_direct = false)

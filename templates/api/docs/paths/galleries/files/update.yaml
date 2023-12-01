@@ -1,0 +1,61 @@
+---
+post:
+  description: Update file
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            fileId:
+              type: integer
+            data:
+              type: object
+              description: file to be updated
+            user:
+              type: string
+            title:
+              type: string
+            name:
+              type: string
+            size:
+              type: integer
+            type:
+              type: string
+  responses:
+    '200':
+      description: update file response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              size:
+                type: integer
+              name:
+                type: string
+              title:
+                type: string
+              type:
+                type: string
+              fileId:
+                type: integer
+              galleryId:
+                type: integer
+              md5sum:
+                type: string
+              ticket:
+                type: object
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+    '503':
+      description: unavailable
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

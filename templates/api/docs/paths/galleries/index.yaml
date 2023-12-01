@@ -1,0 +1,144 @@
+---
+get:
+  description: Get all galleries.
+  responses:
+    '200':
+      description: gallery response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              parentId:
+                type: integer
+              offset:
+                type: integer
+              maxRecords:
+                type: integer
+              count:
+                type: integer
+              result:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    isgal:
+                      type: integer
+                    id:
+                      type: integer
+                    parentId:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    size:
+                      type: integer
+                    created:
+                      type: integer
+                    filename:
+                      type: string
+                    type:
+                      type: string
+                    creator:
+                      type: string
+                    author:
+                      type: string
+                    hits:
+                      type: integer
+                    lastDownload:
+                      type: integer
+                    votes:
+                      type: integer
+                    points:
+                      type: float
+                    path:
+                      type: string
+                    reference_url:
+                      type: string
+                    is_reference:
+                      type: string
+                    hash:
+                      type: string
+                    search_data:
+                      type: string
+                    metadata:
+                      type: string
+                    metadata:
+                      type: string
+                    lastModif:
+                      type: integer
+                    last_user:
+                      type: string
+                    lockedby:
+                      type: string
+                    comment:
+                      type: string
+                    deleteAfter:
+                      type: string
+                    maxhits:
+                      type: string
+                    archiveId:
+                      type: integer
+                    ocr_state:
+                      type: string
+                    visible:
+                      type: string
+                    public:
+                      type: string
+                    fileId:
+                      type: integer
+                    galleryId:
+                      type: integer
+                    filesize:
+                      type: integer
+                    filetype:
+                      type: string
+                    user:
+                      type: string
+                    lastModifUser:
+                      type: string
+                    icon_fileId:
+                      type: integer
+                    files:
+                      type: integer
+                    parentName:
+                      type: string
+                    perms:
+                      type: object
+                      example: |
+                        {"tiki_p_admin_file_galleries": "y", "tiki_p_download_files": "y"}
+post:
+  description: Create a new Gallery.
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            user:
+              type: string
+            type:
+              type: string
+            description:
+              type: string
+            parentId:
+              type: integer
+  responses:
+    '200':
+      description: create gallery response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Gallery.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

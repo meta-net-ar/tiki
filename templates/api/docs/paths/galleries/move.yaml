@@ -1,0 +1,33 @@
+---
+post:
+  description: Move gallery
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          type: object
+          properties:
+            galleryId:
+              type: integer
+            newParentId:
+              type: integer
+              description: destination galleryId
+  responses:
+    '200':
+      description: move gallery response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              message:
+                type: string
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

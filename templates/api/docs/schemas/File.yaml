@@ -1,0 +1,102 @@
+---
+type: object
+properties:
+  title:
+    type: string
+  galleryId:
+    type: integer
+  offset:
+    type: integer
+  maxRecords:
+    type: integer
+  count:
+    type: integer
+  result:
+    type: object
+    properties:
+      isgal:
+        type: integer
+      id:
+        type: integer
+      parentId:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+      size:
+        type: integer
+      created:
+        type: integer
+      filename:
+        type: string
+      type:
+        type: string
+      creator:
+        type: string
+      author:
+        type: string
+      hits:
+        type: integer
+      lastDownload:
+        type: integer
+      votes:
+        type: integer
+      points:
+        type: float
+      path:
+        type: string
+      reference_url:
+        type: string
+      is_reference:
+        type: string
+      hash:
+        type: string
+      search_data:
+        type: string
+      metadata:
+        type: string
+      lastModif:
+        type: integer
+      last_user:
+        type: string
+      lockedby:
+        type: string
+      comment:
+        type: string
+      deleteAfter:
+        type: string
+      maxhits:
+        type: string
+      archiveId:
+        type: integer
+      ocr_state:
+        type: string
+      visible:
+        type: string
+      public:
+        type: string
+      fileId:
+        type: integer
+      galleryId:
+        type: integer
+      filesize:
+        type: integer
+      filetype:
+        type: string
+      user:
+        type: string
+      lastModifUser:
+        type: string
+      icon_fileId:
+        type: integer
+      files:
+        type: string
+      parentName:
+        type: string
+      perms:
+        type: object
+        example: |
+          {"tiki_p_admin_file_galleries": "y", "tiki_p_download_files": "y"}
+      wiki_syntax:
+        type: string

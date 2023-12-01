@@ -5189,7 +5189,20 @@
             "Services_File_Controller::action_list_gallery": true,
             "Services_File_Controller::action_remote": true,
             "Services_File_Controller::action_refresh": true,
-            "Services_File_Controller::action_find": true
+            "Services_File_Controller::action_find": true,
+            "Services_File_Controller::action_remove_file_gallery": true,
+            "Services_File_Controller::action_remove_file": true,
+            "Services_File_Controller::action_info": true,
+            "Services_File_Controller::action_list_files": true,
+            "Services_File_Controller::action_list_galleries": true,
+            "Services_File_Controller::action_file_view": true,
+            "Services_File_Controller::action_download": true,
+            "Services_File_Controller::action_move_file_gallery": true,
+            "Services_File_Controller::action_lock_files": true,
+            "Services_File_Controller::action_unlock_files": true,
+            "Services_File_Controller::action_duplicate_file_gallery": true,
+            "Services_File_Controller::action_duplicate_file": true,
+            "Services_File_Controller::action_create_update_gallery": true
         },
         "lib\/core\/Services\/File\/FinderController.php": {
             "Services_File_FinderController::action_finder": true
