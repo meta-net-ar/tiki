@@ -130,6 +130,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_parse'];
             case 'percent':
                 return [$this, 'smarty_modifier_percent'];
+            case 'preg_match':
+                return [$this, 'smarty_modifier_preg_match'];
             case 'quoted':
                 return [$this, 'smarty_modifier_quoted'];
             case 'replacei':
@@ -1855,6 +1857,23 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_percent($string)
     {
         return number_format($string * 100, 1);
+    }
+
+   /**
+    * Smarty modifier preg_match
+    * --------------------------
+    * Purpose: Perform a regular expression match
+    * @param string $pattern     The pattern to search for, as a string.
+    * @param string $subject     The input string.
+    * @param array  $matches 
+    * @param int    $flags
+    * @param int    $offset
+    * @return int|flase
+    * @see https://php.net/manual/en/function.preg-match.php for details about the params description
+    */
+    public function smarty_modifier_preg_match($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
+    {
+        return preg_match($pattern, $subject, $matches, $flags, $offset);;
     }
 
     /*
