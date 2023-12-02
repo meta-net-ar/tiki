@@ -158,7 +158,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_template'];
             case 'ternary':
                 return [$this, 'smarty_modifier_ternary'];
-            case 'tiki_date_fotmat':
+            case 'tiki_date_format':
                 return [$this, 'smarty_modifier_tiki_date_format'];
             case 'tiki_long_date':
                 return [$this, 'smarty_modifier_tiki_long_date'];
