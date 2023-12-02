@@ -178,6 +178,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [$this, 'smarty_modifier_times'];
             case 'trim':
                 return [$this, 'smarty_modifier_trim'];
+            case 'tra':
+                return [$this, 'smarty_modifier_tra'];
             case 'truncate':
                 return [$this, 'smarty_modifier_truncate'];
             case 'truex':
@@ -2520,6 +2522,23 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smarty_modifier_trim($string, $chars = null)
     {
         return empty($chars) ? trim($string) : trim($string, $chars);
+    }
+
+    /**
+     * smarty modifier tra
+     * -------------------
+     * Purpose: Translate an English string
+     * @param string $content English string
+     * @param string $lg      language - if not specify = global current language
+     * @param bool   $unused
+     * @param array  $args
+     *
+     * @return mixed|string
+     */
+    public function smarty_modifier_tra($content, $lg = '', $unused = false, $args = [])
+    {
+        require_once(__DIR__ . '/../init/tra.php');
+        return tra($content, $lg, $unused, $args);
     }
 
      /*
