@@ -142,7 +142,7 @@ class HtmlSelectTime extends Base
                     'selected'      => $selected,
                     'print_result'  => false
                 ],
-                $smarty
+                $template
             );
 
             $html_result .= "</select></div>\n";
@@ -222,7 +222,7 @@ class HtmlSelectTime extends Base
                     'selected'      => $selected,
                     'print_result'  => false
                 ],
-                $smarty
+                $template
             );
             $html_result .= "</select></div>\n";
         }
@@ -274,7 +274,7 @@ class HtmlSelectTime extends Base
                     'selected'      => $selected,
                     'print_result'  => false
                 ],
-                $smarty
+                $template
             );
             $html_result .= "</select></div>\n";
         }
@@ -302,7 +302,7 @@ class HtmlSelectTime extends Base
                     'selected'      => \TikiLib::date_format('%p', $time),
                     'print_result'  => false
                 ],
-                $smarty
+                $template
             );
             $html_result .= "</select></div>\n";
         }
