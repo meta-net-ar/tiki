@@ -7,6 +7,6 @@
 
 function smarty_block_remarksbox($params, $content, \Smarty\Template $template, &$repeat)
 {
-    $smartyBlockRemarksboxHandler = new \Smartytiki\BlockHandler\Remarksbox();
+    $smartyBlockRemarksboxHandler = new \SmartyTiki\BlockHandler\Remarksbox();
     return $smartyBlockRemarksboxHandler->handle($params, $content, $template, $repeat);
 }

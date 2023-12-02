@@ -7,6 +7,6 @@
 
 function smarty_function_button($params, \Smarty\Template $template)
 {
-    $smartyFunctionButtonHandler = new \smartytiki\FunctionHandler\Button();
+    $smartyFunctionButtonHandler = new \SmartyTiki\FunctionHandler\Button();
     return $smartyFunctionButtonHandler->handle($params, $template);
 }

@@ -230,7 +230,7 @@ class PaginationLinks extends Base
                             '_onclick' => $params['_onclick'],
                         ],
                         $url,
-                        $template,
+                        $smarty->getEmptyInternalTemplate(),
                         false
                     );
                 } else {
