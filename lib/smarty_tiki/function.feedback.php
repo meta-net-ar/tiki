@@ -7,6 +7,6 @@
 
 function smarty_function_feedback($params, \Smarty\Template $template)
 {
-    $smartyFunctionFeedbackHandler = new \smartytiki\FunctionHandler\Feedback();
+    $smartyFunctionFeedbackHandler = new \SmartyTiki\FunctionHandler\Feedback();
     return $smartyFunctionFeedbackHandler->handle($params, $template);
 }

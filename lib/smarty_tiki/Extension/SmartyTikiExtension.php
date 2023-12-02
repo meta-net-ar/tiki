@@ -2537,7 +2537,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      */
     public function smarty_modifier_tra($content, $lg = '', $unused = false, $args = [])
     {
-        require_once(__DIR__ . '/../init/tra.php');
+        require_once(__DIR__ . '/../../init/tra.php');
         return tra($content, $lg, $unused, $args);
     }
 
