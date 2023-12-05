@@ -121,7 +121,7 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->customErrorHandler = new SmartyTikiErrorHandler();
         $this->initializePaths();
 
-        // Extensions order must be like this override smarty default extension
+        // Extensions order must be like to this override smarty default extension
         $this->setExtensions([
             new Smarty\Extension\CoreExtension(),
             new SmartyTiki\Extension\SmartyTikiExtension(),
@@ -164,13 +164,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         // Assign the prefs array in smarty, by reference
         $this->assign('prefs', $prefs);
 
-        if (! empty($prefs['feature_sefurl_filter']) && $prefs['feature_sefurl_filter'] === 'y') {
-            require_once('tiki-sefurl.php');
-            $this->registerFilter('output', 'filter_out_sefurl');
-        }
-
-        include_once(__DIR__ . '/tra.php');
-        $this->registerPlugin('modifier', 'tra', 'tra');
     }
 
     /**

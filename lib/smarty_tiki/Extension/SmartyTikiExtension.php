@@ -655,6 +655,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             $this->outputFilters[] = new \SmartyTiki\Filter\Output\Highlight();
         }
 
+        if (! empty($prefs['feature_sefurl_filter']) && $prefs['feature_sefurl_filter'] === 'y') {
+            $this->outputFilters[] = new \SmartyTiki\Filter\Output\Sefurl();
+        }
+
         $this->outputFilters[] = new \SmartyTiki\Filter\Output\Ticket();
 
         return $this->outputFilters;
