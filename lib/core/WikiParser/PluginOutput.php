@@ -63,7 +63,7 @@ class WikiParser_PluginOutput
                             'title' => $label,
                         ],
                 $message,
-                $smarty,
+                $smarty->getEmptyInternalTemplate(),
                 $repeat
             )
         );
