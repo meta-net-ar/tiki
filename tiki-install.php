@@ -28,6 +28,16 @@ error_reporting(-1);
 ini_set('display_errors', 1);
 
 require_once('lib/init/initlib.php');
+
+// Inclusion of all files inside lib/smarty_tiki, so all smarty_* functions are defined
+$smartyTikiDir = __DIR__ . '/lib/smarty_tiki/';
+$smartyTikiFiles = scandir($smartyTikiDir);
+
+foreach ($smartyTikiFiles as $file) {
+    if (is_file($smartyTikiDir . $file) && pathinfo($smartyTikiDir . $file, PATHINFO_EXTENSION) === 'php' && $file !== 'index.php') {
+        require_once($smartyTikiDir . $file);
+    }
+}
 $tikipath = __DIR__ . '/';
 TikiInit::appendIncludePath($tikipath);
 define('TIKI_PATH', $tikipath);
