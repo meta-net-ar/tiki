@@ -42,7 +42,7 @@ class TikiModule extends Base
         if ($repeat) {
             return;
         }
-    
+
         extract($params);
         if (! isset($content)) {
             return "";
@@ -83,7 +83,7 @@ class TikiModule extends Base
         }
 
         $smarty = \TikiLib::lib('smarty');
-    
+
         $smarty->assign('module_error', $error);
         $smarty->assign('module_overflow', $overflow);
         $smarty->assign('module_title', $title);

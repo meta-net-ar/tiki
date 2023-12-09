@@ -23,11 +23,11 @@ class Thumb extends Base
     {
         global $prefs;
 
-        if (!is_array($params) || !isset($params['_id'])) {
+        if (! is_array($params) || ! isset($params['_id'])) {
             return;
         }
 
-        if (!isset($params['_max'])) {
+        if (! isset($params['_max'])) {
             $params['_max'] = $prefs['fgal_thumb_max_size']; // default thumbnail size
         }
 

@@ -17,17 +17,17 @@ class InitialsFilterLinks extends Base
         $html = '';
         $sep = ' . ';
         $default_type = 'absolute_path';
-        if (!isset($params['_initial'])) {
+        if (! isset($params['_initial'])) {
             $params['_initial'] = 'initial';
         }
         $current_initial = isset($_REQUEST[$params['_initial']]) ? $_REQUEST[$params['_initial']] : '';
-        if (!isset($params['_htmlelement'])) {
+        if (! isset($params['_htmlelement'])) {
             $params['_htmlelement'] = 'tiki-center';
         }
-        if (!isset($params['_template'])) {
+        if (! isset($params['_template'])) {
             $params['_template'] = basename($_SERVER['PHP_SELF'], '.php') . '.tpl';
         }
-        if (!isset($params['_class'])) {
+        if (! isset($params['_class'])) {
             $params['_class'] = 'prevnext';
         }
 

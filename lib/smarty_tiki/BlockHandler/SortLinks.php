@@ -34,7 +34,7 @@ class SortLinks extends Base
                     $links2[$splitted[2]] = $value;
                 }
             }
-    
+
             if (isset($params['case']) && $params['case'] == false) {
                 uksort($links2, 'strcasecmp');
             } else {

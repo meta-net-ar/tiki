@@ -29,7 +29,7 @@ class SelectAll extends Base
         global $prefs;
         static $checkbox_count = -1;
 
-        if ($prefs['javascript_enabled'] == 'n' || !is_array($params) || empty($params['checkbox_names'])) {
+        if ($prefs['javascript_enabled'] == 'n' || ! is_array($params) || empty($params['checkbox_names'])) {
             return;
         }
 
@@ -41,7 +41,7 @@ class SelectAll extends Base
         }
         $onclick = '';
         $checkbox_names = $params['checkbox_names'];
-        if (!is_array($checkbox_names)) {
+        if (! is_array($checkbox_names)) {
             $checkbox_names = explode(',', $checkbox_names);
         }
         if (isset($params['hidden_too']) && $params['hidden_too'] === 'y') {
@@ -63,7 +63,7 @@ class SelectAll extends Base
             '<input name="switcher' . $id . '" id="clickall' . $id . '" class="form-check-input position-static" type="checkbox"' . $onclick .
             (empty($params['label']) ? ' title="' . tra('Select All') . '"' : '') .
             '/>' . "\n" .
-            (!empty($params['label']) ? '<label class="form-check-label" for="clickall' . $id . '">' . $params['label'] . "</label>\n" : '') .
+            (! empty($params['label']) ? '<label class="form-check-label" for="clickall' . $id . '">' . $params['label'] . "</label>\n" : '') .
             "</div>\n";
     }
 }

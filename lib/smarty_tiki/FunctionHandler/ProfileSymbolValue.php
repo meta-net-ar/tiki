@@ -50,19 +50,19 @@ class ProfileSymbolValue extends Base
             return '';
         }
 
-        if (!empty($params['ref'])) {
+        if (! empty($params['ref'])) {
             $ref = $params['ref'];
         } else {
             $ref = $params['reference'];
         }
 
-        if (!empty($params['profile'])) {
+        if (! empty($params['profile'])) {
             $profile = $params['profile'];
         } else {
             $profile = '';
         }
 
-        if (!empty($params['domain'])) {
+        if (! empty($params['domain'])) {
             $domain = $params['domain'];
         } else {
             $domain = '';
@@ -70,14 +70,14 @@ class ProfileSymbolValue extends Base
 
         if (
             empty($domain) &&
-            !empty($params['package']) &&
+            ! empty($params['package']) &&
             \Tiki\Package\ExtensionManager::isExtensionEnabled($params['package'])
         ) {
             $extension = \Tiki\Package\ExtensionManager::get($params['package']);
             $domain = 'file://' . $extension->getPath() . '/profiles';
         }
 
-        if (!isset($params['cache']) || $params['cache'] != 'n') {
+        if (! isset($params['cache']) || $params['cache'] != 'n') {
             $cachelib = TikiLib::lib('cache');
             $cacheType = 'profilesymbolval';
             $cacheName = $ref . '-' . $profile . '-' . $domain;
@@ -95,7 +95,7 @@ class ProfileSymbolValue extends Base
         }
 
         if ($result) {
-            if (!isset($params['cache']) || $params['cache'] != 'n') {
+            if (! isset($params['cache']) || $params['cache'] != 'n') {
                 $cachelib->cacheItem($cacheName, $result, $cacheType);
             }
             return $result;

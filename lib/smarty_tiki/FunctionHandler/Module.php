@@ -38,7 +38,7 @@ class Module extends Base
         ];
 
         foreach (['module_style', 'rows'] as $key) {
-            if (!empty($params[$key])) {
+            if (! empty($params[$key])) {
                 $module_reference[$key] = $params[$key];
             }
         }

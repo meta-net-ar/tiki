@@ -30,7 +30,7 @@ class Like extends Base
         global $prefs, $user;
 
         $smarty = \TikiLib::lib('smarty');
-    
+
         // unregistered user, do nothing
         if (empty($user) || $prefs['user_likes'] != 'y') {
             return;
@@ -45,7 +45,7 @@ class Like extends Base
         } else {
             $count_only = $params['count_only'];
         }
-    
+
         $relation = "tiki.user.like";
         $relationlib = \TikiLib::lib("relation");
         //if relation exists
@@ -56,7 +56,7 @@ class Like extends Base
             $smarty->assign('has_relation', false);
         }
         $count = $relationlib->get_relation_count("tiki.user.like", $params['type'], $params['object']);
-    
+
         $smarty->assign('type', $params['type']);
         $smarty->assign('object', $params['object']);
         $smarty->assign('count', $count);

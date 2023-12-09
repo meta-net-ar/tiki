@@ -25,17 +25,17 @@ use Smarty\Compiler\Template;
 
 class AssignContent extends Base
 {
-    public function compile($tag_attrs, Template $compiler, $parameter = array(), $tag = null, $function = null)
+    public function compile($tag_attrs, Template $compiler, $parameter = [], $tag = null, $function = null)
     {
         $_params = $compiler->_parse_attrs($tag_attrs);
 
-        if (!isset($_params['var'])) {
+        if (! isset($_params['var'])) {
             $compiler->trigger_template_error("assign: missing 'var' parameter", E_USER_WARNING);
             return;
         }
 
         $func_name = 'content';
-        if (!isset($_params['id']) && !isset($_params['label'])) {
+        if (! isset($_params['id']) && ! isset($_params['label'])) {
             $_params['id'] = 0;
             $func_name = 'rcontent';
         }

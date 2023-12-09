@@ -21,7 +21,7 @@ class ObjectScore extends Base
         }
         $scorelib = \TikiLib::lib("score");
 
-        if (!empty($ruleId)) {
+        if (! empty($ruleId)) {
             return $scorelib->getPointsBalanceForRuleId($type, $id, $ruleId);
         } elseif ($grouped == 'y') {
             $scoreArr = $scorelib->getGroupedPointsBalance($type, $id);

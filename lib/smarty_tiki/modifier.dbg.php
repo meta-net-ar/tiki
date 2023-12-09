@@ -8,5 +8,5 @@
 function smarty_modifier_dbg($string, $label = '')
 {
     $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_dbg($string,$label);
+    return $smartyTikiExtension->smarty_modifier_dbg($string, $label);
 }

@@ -20,7 +20,7 @@ class NotificationLink extends Base
             return;
         }
 
-        if (!$user) {
+        if (! $user) {
             return '';
         }
 

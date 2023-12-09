@@ -17,22 +17,22 @@ class ActivityFrame extends Base
         if ($repeat) {
             return;
         }
-    
+
         $commentMode = 'default';
         if (isset($params['comment']) && in_array($params['comment'], ['object', 'activity', 'disabled'])) {
             $commentMode = $params['comment'];
         }
-    
+
         $likeMode = 'default';
         if (isset($params['like']) && $params['like'] == 'disabled') {
             $likeMode = 'disabled';
         }
-    
+
         $likes = isset($params['activity']['like_list']) ? $params['activity']['like_list'] : [];
         if (! is_array($likes)) {
             $params['activity']['like_list'] = $likes = [];
         }
-    
+
         if (isset($params['activity']['user_groups']) && is_array($params['activity']['user_groups'])) {
             $userGroups = \TikiLib::lib('user')->get_user_groups($GLOBALS['user']);
             $choiceGroups = \TikiLib::lib('user')->get_groups_userchoice();
@@ -40,7 +40,7 @@ class ActivityFrame extends Base
         } else {
             $sharedGroups = [];
         }
-    
+
         if (isset($params['activity']['object_type'], $params['activity']['object_id'])) {
             // Use the activity
             $object = [
@@ -56,12 +56,12 @@ class ActivityFrame extends Base
         } else {
             $object = [];
         }
-    
+
         /*
         Comment modes.
         By default the activity is picked, with a fallback to the object if not a registered
         activity.
-    
+
         * disabled - completely remove comments
         * activity - prevent fallback to object
         * object - comments use object's comments
@@ -83,7 +83,7 @@ class ActivityFrame extends Base
         } else {
             $comment = $object;
         }
-    
+
         $smarty = \TikiLib::lib('smarty');
         $smarty->assign(
             'activityframe',
@@ -101,7 +101,7 @@ class ActivityFrame extends Base
             ]
         );
         $out = $smarty->fetch('activity/activityframe.tpl');
-    
+
         return $out;
     }
 }

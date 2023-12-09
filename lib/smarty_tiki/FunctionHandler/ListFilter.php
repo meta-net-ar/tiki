@@ -48,13 +48,13 @@ class ListFilter extends Base
 
             $input = ' <div class="form-horizontal my-2"><div class="tiki-form-group form-row"><div class="col"><div class="input-group"><div class="input-group-prepend"><label class="col-form-label input-group-text">';
 
-            if (!isset($prefix)) {
+            if (! isset($prefix)) {
                 $input .= tra("Filter:");
             } else {
                 $input .= tra($prefix);
             }
             $input .= '</label></div><input type="text" class="form-control listfilter"';
-            if (!isset($id)) {
+            if (! isset($id)) {
                 if (isset($listfilter_id)) {
                     $listfilter_id++;
                 } else {
@@ -73,12 +73,12 @@ class ListFilter extends Base
             }
 
             // value from url
-            if (!isset($query)) {
+            if (! isset($query)) {
                 $query = 'textFilter';
             }
-            if (!empty($query) && !empty($_REQUEST[$query])) {
+            if (! empty($query) && !empty($_REQUEST[$query])) {
                 $input .= ' value="' . $_REQUEST[$query] . '"';
-            } elseif (!empty($editorId)) {
+            } elseif (! empty($editorId)) {
                 $parentTabId = (empty($parentTabId) ? "" : $parentTabId);
 
                 $headerlib->add_jq_onready(
@@ -114,7 +114,7 @@ class ListFilter extends Base
                 . tr('Clear filter') . "'>$icon</a>";
             $input .= '</div></div></div></div></div>';
 
-            if (!isset($selectors)) {
+            if (! isset($selectors)) {
                 $selectors = ".$id table tr";
             }
 
@@ -133,7 +133,7 @@ $('#$id').keyup( function() {
         $(this).show();
     } );
 ";
-            if (!empty($parentSelector)) {
+            if (! empty($parentSelector)) {
                 $content .= "
     \$('$parentSelector').show().each( function() {
         if (\$('{$selectors}[data-tt-parent-id=' + \$(this).data('tt-id') + ']:visible:not(\"$exclude\")').length == 0) {    // excluded things don't count
@@ -148,7 +148,7 @@ $('#$id').keyup( function() {
             $content .= '
 } );    // end keyup
 ';
-            if (!empty($query) && !empty($_REQUEST[$query])) {
+            if (! empty($query) && ! empty($_REQUEST[$query])) {
                 $content .= "
 setTimeout(function () {
     if ($('#$id').val() != '') {

@@ -17,14 +17,14 @@ class IfSearchNotExists extends Base
         if (empty($params['type']) || empty($params['id'])) {
             return '';
         }
-    
+
         \TikiLib::lib('access')->check_feature('feature_search');
-    
+
         $query = new \Search_Query();
         $query->addObject($params['type'], $params['id']);
         $index = \TikiLib::lib('unifiedsearch')->getIndex();
         $result = $query->search($index);
-    
+
         if ($result->count() > 0) {
             return '';
         } else {

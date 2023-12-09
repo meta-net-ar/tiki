@@ -25,21 +25,21 @@ class TrackerFields extends Base
 {
     public function handle($params, Template $smartyTemplate)
     {
-        if (!isset($params['fields']) || !is_array($params['fields'])) {
+        if (! isset($params['fields']) || !is_array($params['fields'])) {
             return tr('Invalid fields provided.');
         }
 
-        if (!isset($params['trackerId']) || !$definition = \Tracker_Definition::get($params['trackerId'])) {
+        if (! isset($params['trackerId']) || !$definition = \Tracker_Definition::get($params['trackerId'])) {
             return tr('Missing or invalid tracker reference.');
         }
 
-        if (!isset($params['mode'])) {
+        if (! isset($params['mode'])) {
             $params['mode'] = 'edit';
         }
 
         $sectionFormat = $definition->getConfiguration('sectionFormat', 'flat');
 
-        if (!empty($params['format'])) {
+        if (! empty($params['format'])) {
             $sectionFormat = $params['format'];
         }
 

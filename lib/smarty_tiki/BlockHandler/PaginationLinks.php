@@ -65,25 +65,25 @@ class PaginationLinks extends Base
         $default_type = 'absolute_path';
 
         // Check main params and return no pagination links if there is a mistake
-        if (!isset($params['cant']) || $params['cant'] <= 0) {
+        if (! isset($params['cant']) || $params['cant'] <= 0) {
             return '';
         }
         if (isset($params['step']) && $params['step'] == -1) {
             return ''; // display all
         }
-        if (!isset($params['offset'])) {
+        if (! isset($params['offset'])) {
             $params['offset'] = 0;
         }
-        if (!isset($params['offset_arg'])) {
+        if (! isset($params['offset_arg'])) {
             $params['offset_arg'] = 'offset';
         }
-        if (!isset($params['zero_based_offset'])) {
+        if (! isset($params['zero_based_offset'])) {
             $params['zero_based_offset'] = 'y';
         }
-        if (!isset($params['show_numbers'])) {
+        if (! isset($params['show_numbers'])) {
             $params['show_numbers'] = 'y';
         }
-        if (!isset($params['_onclick'])) {
+        if (! isset($params['_onclick'])) {
             $params['_onclick'] = '';
         }
 
@@ -105,39 +105,39 @@ class PaginationLinks extends Base
             return '';
         }
 
-        if (!isset($params['reloff']) && ($params['offset'] >= $params['cant'] + $zero_based_min || $params['offset'] < $zero_based_min)) {
+        if (! isset($params['reloff']) && ($params['offset'] >= $params['cant'] + $zero_based_min || $params['offset'] < $zero_based_min)) {
             return '';
         }
 
         // Make sure every params are initialized
-        if (!isset($params['itemname'])) {
+        if (! isset($params['itemname'])) {
             $params['itemname'] = 'Page';
         }
-        if (!isset($params['noimg'])) {
+        if (! isset($params['noimg'])) {
             $params['noimg'] = ($prefs['pagination_icons'] == 'n');
         }
-        if (!isset($params['usedots'])) {
+        if (! isset($params['usedots'])) {
             $params['usedots'] = 'y';
         }
-        if (!isset($params['class'])) {
+        if (! isset($params['class'])) {
             $params['class'] = 'mini';
         }
-        if (!isset($params['htmlelement'])) {
+        if (! isset($params['htmlelement'])) {
             $params['htmlelement'] = 'tiki-center';
         }
-        if (!isset($params['template'])) {
+        if (! isset($params['template'])) {
             $params['template'] = basename($_SERVER['PHP_SELF'], '.php') . '.tpl';
             if ($params['template'] == 'tiki-index.tpl') {
                 $params['template'] = 'tiki-show_page.tpl';
             }
         }
 
-        if (!file_exists('templates/' . $params['template']) || $params['template'] == 'noauto') {
+        if (! file_exists('templates/' . $params['template']) || $params['template'] == 'noauto') {
             $params['htmlelement'] = '';
             $params['template'] = '';
         }
 
-        if (!isset($params['step']) || $params['step'] <= 0) {
+        if (! isset($params['step']) || $params['step'] <= 0) {
             $params['step'] = 1;
             $nb_pages = $params['cant'];
         } else {
@@ -153,7 +153,7 @@ class PaginationLinks extends Base
         }
 
         // remove empty url arguments (done by default)
-        if (!isset($params['clean']) || $params['clean'] == 'y') {
+        if (! isset($params['clean']) || $params['clean'] == 'y') {
             $url = preg_replace('/(?<=\?|&amp;)[^=]+=(?=&amp;|$)/U', '', $url);
         }
 
@@ -195,10 +195,10 @@ class PaginationLinks extends Base
             $real_offset = $params['offset'];
         }
 
-        if (!isset($params['next'])) {
+        if (! isset($params['next'])) {
             $params['next'] = ($real_offset < ($nb_pages - $zero_based_maxminus) * $params['step']) ? 'y' : 'n';
         }
-        if (!isset($params['prev'])) {
+        if (! isset($params['prev'])) {
             $params['prev'] = ($real_offset > $zero_based_min) ? 'y' : 'n';
         }
 
@@ -218,7 +218,7 @@ class PaginationLinks extends Base
                 $url = \TikiLib::tikiUrlOpt($url);
                 if ($params['_ajax'] == 'y') {
                     // setting javascript offset variable if requested
-                    if (!empty($params['offset_jsvar'])) {
+                    if (! empty($params['offset_jsvar'])) {
                         $params['_onclick'] = $params['offset_jsvar'] . "=$linkoffset;" . $params['_onclick'];
                     }
 
@@ -299,7 +299,7 @@ class PaginationLinks extends Base
                                 $url_k_val
                             ) . '</li>';
                             $last_dots = false;
-                        } elseif (!$last_dots) {
+                        } elseif (! $last_dots) {
                             $html .= '<li class="page-item disabled"><span class="page-link">…</span>';
                             $last_dots = true;
                         }

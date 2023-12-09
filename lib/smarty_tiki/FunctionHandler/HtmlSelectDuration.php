@@ -52,7 +52,7 @@ class HtmlSelectDuration extends Base
             $prefix = $params['prefix'] . '_unit';
         }
         $html_result .= '<div class="col-sm-7"><select name="' . $prefix . '" class="form-control">';
-    
+
         $html_result .= smarty_function_html_options(
             [
                 'values' => $values,
@@ -61,7 +61,7 @@ class HtmlSelectDuration extends Base
             ],
             $$template
         );
-    
+
         $html_result .= '</select></div></div>';
         return $html_result;
     }

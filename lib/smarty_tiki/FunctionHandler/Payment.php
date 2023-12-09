@@ -110,12 +110,12 @@ class Payment extends Base
 
             $info['fullview'] = $objectperms->payment_view || $theguy;
 
-            if (!empty($smarty->tpl_vars['returnurl']->value)) {
+            if (! empty($smarty->tpl_vars['returnurl']->value)) {
                 $returl = $smarty->tpl_vars['returnurl'];
                 $info['returnurl'] = TikiLib::tikiUrl($returl);
             }
 
-            if (!empty($params['returnurl']) && empty($result)) {
+            if (! empty($params['returnurl']) && empty($result)) {
                 $info['returnurl'] = TikiLib::tikiUrl($params['returnurl']);
                 $info['returnurl'] .= (strstr($params['returnurl'], '?') ? '&' : '?') . "invoice=$invoice";
             }

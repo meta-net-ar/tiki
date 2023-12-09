@@ -89,8 +89,8 @@ class Popup extends Base
                     $options['data-bs-html'] = true;
                     break;
                 case 'background':
-                    if (!empty($params['width'])) {
-                        if (!isset($params["height"])) {
+                    if (! empty($params['width'])) {
+                        if (! isset($params["height"])) {
                             $params["height"] = 300;
                         }
                         $options['data-bs-content'] = "<div style='background-image:url(" . $value . ");background-repeat:no-repeat;width:" . $params["width"] . "px;height:" . $params["height"] . "px;'>" . $options['data-bs-content'] . "</div>";
@@ -116,7 +116,7 @@ class Popup extends Base
         }
 
         //handle delay param here since slashes added by the above break the code
-        if (!empty($params['delay'])) {
+        if (! empty($params['delay'])) {
             $explode = explode('|', $params['delay']);
             if (count($explode) == 1) {
                 $delay = (int) $explode[0];

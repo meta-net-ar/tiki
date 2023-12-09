@@ -34,8 +34,8 @@ class Toolbars extends Base
         $hidden = [];
         $switchableWysiwygSections = ['wiki page', 'blogs', 'newsletters', 'cms', 'webmail'];
         if (
-            (empty($params['switcheditor']) && !in_array($params['section'], $switchableWysiwygSections)) ||
-            (!empty($params['switcheditor']) && $params['switcheditor'] !== 'y')
+            (empty($params['switcheditor']) && ! in_array($params['section'], $switchableWysiwygSections)) ||
+            (! empty($params['switcheditor']) && $params['switcheditor'] !== 'y')
         ) {
             $hidden[] = 'switcheditor';
         }
@@ -44,7 +44,7 @@ class Toolbars extends Base
             $hidden[] = 'admintoolbar';
         }
 
-        if (!isset($params['area_id'])) {
+        if (! isset($params['area_id'])) {
             $params['area_id'] = 'editwiki';
         }
 

@@ -38,7 +38,7 @@ class Autocomplete extends Base
             return '';
         }
 
-        if (!empty($params['options'])) {
+        if (! empty($params['options'])) {
             $options = ',{' . $params['options'] . '}';
         } else {
             $options = '';

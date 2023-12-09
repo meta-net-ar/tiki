@@ -101,12 +101,12 @@ class TreeTable extends Base
             $_checkbox = preg_split('/,/', trim($_checkbox));
         }
 
-        if (!empty($_checkbox) && !is_array($_checkbox)) {
+        if (! empty($_checkbox) && ! is_array($_checkbox)) {
             $_checkbox = [$_checkbox];
             $_checkboxColumnIndex = [$_checkboxColumnIndex];
         }
 
-        if (!empty($_checkboxColumnIndex)) {
+        if (! empty($_checkboxColumnIndex)) {
             if (is_string($_checkboxColumnIndex) && strpos($_checkboxColumnIndex, ',') !== false) {
                 $_checkboxColumnIndex = preg_split('/,/', trim($_checkboxColumnIndex));
             }
@@ -114,7 +114,7 @@ class TreeTable extends Base
                 return 'Number of items in _checkboxColumnIndex doesn not match items in _checkbox';
             }
         }
-        if (!empty($_checkboxTitles)) {
+        if (! empty($_checkboxTitles)) {
             if (is_string($_checkboxTitles)) {
                 if (strpos($_checkboxTitles, ',') !== false) {
                     $_checkboxTitles = preg_split('/,/', trim($_checkboxTitles));
@@ -137,9 +137,9 @@ class TreeTable extends Base
         $_filterMinRows = empty($_filterMinRows) ? 12 : $_filterMinRows;
         $_collapseMaxSections = empty($_collapseMaxSections) ? 4 : $_collapseMaxSections;
 
-        $_rowClasses = !isset($_rowClasses) ? ['odd', 'even'] : (is_array($_rowClasses) ? $_rowClasses : [$_rowClasses]);
+        $_rowClasses = ! isset($_rowClasses) ? ['odd', 'even'] : (is_array($_rowClasses) ? $_rowClasses : [$_rowClasses]);
 
-        if (!empty($_rowClasses)) {
+        if (! empty($_rowClasses)) {
             $oddEvenCounter = 0;
         } else {
             $oddEvenCounter = -1;
@@ -147,7 +147,7 @@ class TreeTable extends Base
 
         // auto-increment val for unique id's etc
         if (empty($id)) {
-            if (!isset($tree_table_id)) {
+            if (! isset($tree_table_id)) {
                 $tree_table_id = 1;
             } else {
                 $tree_table_id++;
@@ -159,7 +159,7 @@ class TreeTable extends Base
             $keys = array_keys($_data[0]);
             $_columns = [];
             foreach ($keys as $key) {
-                if (!is_numeric($key)) {
+                if (! is_numeric($key)) {
                     $_columns[$key] = htmlspecialchars($key);
                 }
             }
@@ -280,7 +280,7 @@ $("#' . $id . '_showSelected").click( function () {
 
         // write the table header
         $html .= '<thead><tr>';
-        if (!empty($_checkbox)) {
+        if (! empty($_checkbox)) {
             for ($i = 0, $icount_checkbox = count($_checkbox); $i < $icount_checkbox; $i++) {
                 $html .= '<th class="checkBoxHeader">';
                 $html .= smarty_function_select_all(
@@ -313,7 +313,7 @@ $("#' . $id . '_showSelected").click( function () {
                 $treeType = htmlspecialchars(trim($row[$_sortColumn]));
                 $childRowClass = '';
 
-                if (!empty($_sortColumnDelimiter)) {   // nested
+                if (! empty($_sortColumnDelimiter)) {   // nested
                     $parts = array_reverse(explode($_sortColumnDelimiter, $treeType));
 
                     for ($i = 0, $icount_parts = count($parts); $i < $icount_parts; $i++) {
@@ -336,11 +336,11 @@ $("#' . $id . '_showSelected").click( function () {
                     $tt_parent_id = $id . '_' . $treeTypeId;
                     $tt_id = 'child_of_' . $id . '_' . $treeTypeId . '_' . $oddEvenCounter;
 
-                    if (!empty($treeType) && !in_array($treeTypeId, $treeSectionsAdded)) {
-                        if (!is_array($_columns) && !is_object($_columns)) {
+                    if (! empty($treeType) && ! in_array($treeTypeId, $treeSectionsAdded)) {
+                        if (! is_array($_columns) && ! is_object($_columns)) {
                             $_columns = [];
                         }
-                        if (!is_array($_checkbox) && !is_object($_checkbox)) {
+                        if (! is_array($_checkbox) && ! is_object($_checkbox)) {
                             $_checkbox = [];
                         }
                         $html .= '<tr data-tt-id="' . $tt_parent_id . '"><td colspan="' . (count($_columns) + count($_checkbox)) . '">';
@@ -356,7 +356,7 @@ $("#' . $id . '_showSelected").click( function () {
 
                         // write a sub-header
                         $html .= '<tr data-tt-id="subHeader_' . $rowCounter . '" data-tt-parent-id="' . $tt_parent_id . '" class="subHeader' . $childRowClass . '">';
-                        if (!empty($_checkbox)) {
+                        if (! empty($_checkbox)) {
                             for ($i = 0, $icount_checkbox = count($_checkbox); $i < $icount_checkbox; $i++) {
                                 $html .= '<td class="checkBoxHeader"><span class="checkBoxLabel tips perms-titles" title=":' . htmlspecialchars(tra($_checkboxTitles[$i])) . '">';
                                 $html .= empty($_checkboxTitles) ? '' : htmlspecialchars(tra($_checkboxTitles[$i]));
@@ -386,10 +386,10 @@ $("#' . $id . '_showSelected").click( function () {
             }
 
             $html .= '<tr data-tt-id="' . $tt_id . '"' .
-                (!empty($tt_parent_id) ? ' data-tt-parent-id="' . $tt_parent_id . '"' : '') .
+                (! empty($tt_parent_id) ? ' data-tt-parent-id="' . $tt_parent_id . '"' : '') .
                 ' class="' . $rowClass . '">';
             // add the checkbox
-            if (!empty($_checkbox)) {
+            if (! empty($_checkbox)) {
                 for ($i = 0, $icount_checkbox = count($_checkbox); $i < $icount_checkbox; $i++) {
                     // get checkbox's "value"
                     $cbxVal = htmlspecialchars($row[$_checkboxColumnIndex[$i]]);

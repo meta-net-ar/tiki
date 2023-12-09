@@ -37,17 +37,17 @@ class Tabset extends Base
         }
         if ($repeat) {
             // opening
-            if (!is_array($smarty_tabset)) {
+            if (! is_array($smarty_tabset)) {
                 $smarty_tabset = [];
             }
             $tabset_index = count($smarty_tabset) + 1;
             $smarty_tabset_name = getTabsetName($params, $tabset_index);
             $smarty_tabset[$tabset_index] = ['name' => $smarty_tabset_name, 'tabs' => []];
-            if (!isset($smarty_tabset_i_tab)) {
+            if (! isset($smarty_tabset_i_tab)) {
                 $smarty_tabset_i_tab = 1;
             }
 
-            if (!isset($cookietab) || $tabset_index > 1) {
+            if (! isset($cookietab) || $tabset_index > 1) {
                 $cookietab = getCookie($smarty_tabset_name, 'tabs', 1);
             }
             // work out cookie value if there
@@ -73,7 +73,7 @@ class Tabset extends Base
                 return '';
             }
 
-            if (!empty($params['skipsingle']) && count($smarty_tabset[$tabset_index]['tabs']) == 1) {
+            if (! empty($params['skipsingle']) && count($smarty_tabset[$tabset_index]['tabs']) == 1) {
                 return $content;
             }
 
@@ -187,4 +187,4 @@ function applyStyles($params, $smarty_tabset_name)
     if ($style /* && ! $headerlib->->outputHeadersHasBegun no access to this here sadly */) {
         $headerlib->add_css($style);
     }
-    }
+}

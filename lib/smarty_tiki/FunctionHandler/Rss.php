@@ -9,7 +9,6 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
-
 use TikiLib;
 
 /* inserts the content of an rss feed into a module */

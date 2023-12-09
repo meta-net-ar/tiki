@@ -32,15 +32,15 @@ class Accordion extends Base
     {
         global $accordion_current_group;
 
-    if ($repeat) {
-        $accordion_current_group = null;
-        return;
-    } else {
-        return <<<CONTENT
+        if ($repeat) {
+            $accordion_current_group = null;
+            return;
+        } else {
+            return <<<CONTENT
 <div class="accordian" id="$accordion_current_group">
 $content
 </div>
 CONTENT;
-    }
+        }
     }
 }

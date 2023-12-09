@@ -19,7 +19,7 @@ class RatingChoice extends Base
         $ratinglib = TikiLib::lib('rating');
         $smarty = TikiLib::lib('smarty');
 
-        if (!isset($params['comment_author'], $params['type'], $params['id'])) {
+        if (! isset($params['comment_author'], $params['type'], $params['id'])) {
             return tra('No object information provided for rating.');
         }
 

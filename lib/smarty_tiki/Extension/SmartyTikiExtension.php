@@ -25,7 +25,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         if (isset($this->tags[$tag])) {
             return $this->tags[$tag];
         }
-        
+
         switch ($tag) {
             case 'assign_content':
                 $this->tags[$tag] = new \SmartyTiki\Compile\Tag\AssignContent();
@@ -708,7 +708,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty modifier addslashes
      * --------------------------
      * Purpose: Quote string with slashes
-     * 
+     *
      * @param string $string   The string to be escaped.
      * @return string          A string with backslashes added before characters that need to be escaped. These characters are: ',",\, NUL (the NUL byte)
      */
@@ -776,13 +776,13 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     */
     public function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
     {
-        if (!$user) {
+        if (! $user) {
             return '';
         }
 
         $avatar = TikiLib::lib('tiki')->get_user_avatar($user, $float);
 
-        if (!$avatar && $default) {
+        if (! $avatar && $default) {
             $smarty = TikiLib::lib('smarty');
             $name = TikiLib::lib('user')->clean_user($user);
             $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
@@ -867,7 +867,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     *     {$smarty.request|d}
     */
 
-    function smarty_modifier_d($var, $modifier = '')
+    public function smarty_modifier_d($var, $modifier = '')
     {
         if (is_callable('Kint::dump')) {
             // add this function as an alias of Kint::dump
@@ -977,7 +977,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     */
     public function smarty_modifier_duration($string, $long = true, $maxLevel = false)
     {
-        if (!is_numeric($string)) {
+        if (! is_numeric($string)) {
             return $string;
         }
         $values = [31536000, 2628000, 604800, 86400, 3600, 60, 1];
@@ -1360,11 +1360,11 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Samrty modifier implode
      * -----------------------
      * Purpose: Joins the elements of an array into a string
-     * 
+     *
      * @param string $separator     Seprator
      * @param array $array          The array of strings to gather.
      * @return string
-     * 
+     *
      * Synthax: {$separator|implode:$array}
      */
     public function smarty_modifier_implode($separator, $array)
@@ -1413,7 +1413,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty modifer json_decode
      * --------------------------
      * Purpose: Decode a JSON string. Get a string JSON encoded and convert it into a PHP value.
-     * 
+     *
      * @param string    $json          The JSON string
      * @param bool      $associative
      * @param int       $depth
@@ -1435,7 +1435,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * @param int   $flags
      * @param int   $depth
      * @return JSON|flase    Returns JSON encoded as a string on success or false on error.
-     * 
+     *
      * @see https://php.net/manual/en/function.json-encode.php for more details about params description
      */
     public function smarty_modifier_json_encode($value, $flags = 0, $depth = 512)
@@ -1519,7 +1519,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty modifier md5
      * -------------------
      * Purpose: Calculate the md5 of a string
-     * 
+     *
      * @param string $string  The string
      * @param bool   $binary  Optional. If set to true, then the md5 is returned in raw binary format with a length of 16.
      * @return string         Returns the md5 of the string, as a 32-character hexadecimal number.
@@ -1549,137 +1549,137 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @oaram all: whether all amounts in list have a currency symbol or on first item
     * @return formatted number
     */
-   public function smarty_modifier_money_format($number, $locale, $currency, $format = '%(#10n', $display = 0)
-   {
-       if (! empty($locale)) {
-           $ret = setlocale(LC_MONETARY, $locale);
-           if ($ret === false) {
-               \Feedback::error(tr('"%0" is not supported by this system.', $locale));
-               return $number;
-           }
-       }
+    public function smarty_modifier_money_format($number, $locale, $currency, $format = '%(#10n', $display = 0)
+    {
+        if (!empty($locale)) {
+            $ret = setlocale(LC_MONETARY, $locale);
+            if ($ret === false) {
+                \Feedback::error(tr('"%0" is not supported by this system.', $locale));
+                return $number;
+            }
+        }
 
-       if (! extension_loaded('intl')) {
-           \Feedback::error(tr('The PHP "intl" extension is required for "money_format".'));
-           return $number;
-       }
+        if (!extension_loaded('intl')) {
+            \Feedback::error(tr('The PHP "intl" extension is required for "money_format".'));
+            return $number;
+        }
 
-       $locale = localeconv();
+        $locale = localeconv();
 
-       if (! empty($currency)) {
-           $locale['int_curr_symbol'] = $currency;
-           $fmt = new \NumberFormatter(locale_get_default() . "@currency=$currency", \NumberFormatter::CURRENCY);
-           $locale['currency_symbol'] = $fmt->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
-       }
+        if (!empty($currency)) {
+            $locale['int_curr_symbol'] = $currency;
+            $fmt = new \NumberFormatter(locale_get_default() . "@currency=$currency", \NumberFormatter::CURRENCY);
+            $locale['currency_symbol'] = $fmt->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+        }
 
-       //regex for format string
-       $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
-                   '(?:#([0-9]+))?(?:\.([0-9]+))?([in%])/';
-       preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
-       foreach ($matches as $fmatch) {
-           $value = (float)$number;
-           $flags = [
-               'fillchar' => preg_match('/\=(.)/', $fmatch[1], $match) ?
-                               $match[1] : ' ',
-               'nogroup' => preg_match('/\^/', $fmatch[1]) > 0,
-               'usesignal' => preg_match('/\+|\(/', $fmatch[1], $match) ?
-                               $match[0] : '+',
-               'nosimbol' => preg_match('/\!/', $fmatch[1]) > 0,
-               'isleft' => preg_match('/\-/', $fmatch[1]) > 0,
-           ];
-           $width = trim($fmatch[2]) ? (int) $fmatch[2] : 0;
-           $left = trim($fmatch[3]) ? (int) $fmatch[3] : 0;
-           $right = trim($fmatch[4]) ? (int) $fmatch[4] : $locale['int_frac_digits'];
-           $conversion = $fmatch[5];
+        //regex for format string
+        $regex = '/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?' .
+        '(?:#([0-9]+))?(?:\.([0-9]+))?([in%])/';
+        preg_match_all($regex, $format, $matches, PREG_SET_ORDER);
+        foreach ($matches as $fmatch) {
+            $value = (float)$number;
+            $flags = [
+                'fillchar' => preg_match('/\=(.)/', $fmatch[1], $match) ?
+                    $match[1] : ' ',
+                'nogroup' => preg_match('/\^/', $fmatch[1]) > 0,
+                'usesignal' => preg_match('/\+|\(/', $fmatch[1], $match) ?
+                    $match[0] : '+',
+                'nosimbol' => preg_match('/\!/', $fmatch[1]) > 0,
+                'isleft' => preg_match('/\-/', $fmatch[1]) > 0,
+            ];
+            $width = trim($fmatch[2]) ? (int) $fmatch[2] : 0;
+            $left = trim($fmatch[3]) ? (int) $fmatch[3] : 0;
+            $right = trim($fmatch[4]) ? (int) $fmatch[4] : $locale['int_frac_digits'];
+            $conversion = $fmatch[5];
 
-           $positive = true;
-           if ($value < 0) {
-               $positive = false;
-               $value *= -1;
-           }
-           $letter = $positive ? 'p' : 'n';
+            $positive = true;
+            if ($value < 0) {
+                $positive = false;
+                $value *= -1;
+            }
+            $letter = $positive ? 'p' : 'n';
 
-           $prefix = $suffix = $cprefix = $csuffix = $signal = '';
-           $signal = $positive ? $locale['positive_sign'] : $locale['negative_sign'];
+            $prefix = $suffix = $cprefix = $csuffix = $signal = '';
+            $signal = $positive ? $locale['positive_sign'] : $locale['negative_sign'];
 
-           switch (true) {
-               case $locale["{$letter}_sign_posn"] == 1 && $flags['usesignal'] == '+':
-                   $prefix = $signal;
-                   break;
-               case $locale["{$letter}_sign_posn"] == 2 && $flags['usesignal'] == '+':
-                   $suffix = $signal;
-                   break;
-               case $locale["{$letter}_sign_posn"] == 3 && $flags['usesignal'] == '+':
-                   $cprefix = $signal;
-                   break;
-               case $locale["{$letter}_sign_posn"] == 4 && $flags['usesignal'] == '+':
-                   $csuffix = $signal;
-                   break;
-               case $flags['usesignal'] == '(':
-               case $locale["{$letter}_sign_posn"] == 0:
-                   if ($positive == false) {
-                       $prefix = '(';
-                       $suffix = ')';
-                   }
-                   break;
-           }
+            switch (true) {
+                case $locale["{$letter}_sign_posn"] == 1 && $flags['usesignal'] == '+':
+                    $prefix = $signal;
+                    break;
+                case $locale["{$letter}_sign_posn"] == 2 && $flags['usesignal'] == '+':
+                    $suffix = $signal;
+                    break;
+                case $locale["{$letter}_sign_posn"] == 3 && $flags['usesignal'] == '+':
+                    $cprefix = $signal;
+                    break;
+                case $locale["{$letter}_sign_posn"] == 4 && $flags['usesignal'] == '+':
+                    $csuffix = $signal;
+                    break;
+                case $flags['usesignal'] == '(':
+                case $locale["{$letter}_sign_posn"] == 0:
+                    if ($positive == false) {
+                        $prefix = '(';
+                        $suffix = ')';
+                    }
+                    break;
+            }
 
-           if (! $flags['nosimbol']) {
-               $currency = $cprefix . ($conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol']) . $csuffix;
-           } else {
-               $currency = '';
-           }
+            if (!$flags['nosimbol']) {
+                $currency = $cprefix . ($conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol']) . $csuffix;
+            } else {
+                $currency = '';
+            }
 
-           if (! empty($currency) && $display == 0) {
-               $currency = '<span style="visibility:hidden">' . $currency . '</span>';
-           }
+            if (!empty($currency) && $display == 0) {
+                $currency = '<span style="visibility:hidden">' . $currency . '</span>';
+            }
 
-           $space = $locale["{$letter}_sep_by_space"] && ! empty($currency) && $display == 1 ? ' ' : '';
+            $space = $locale["{$letter}_sep_by_space"] && !empty($currency) && $display == 1 ? ' ' : '';
 
-           $value = number_format(
-               $value,
-               $right,
-               $locale['mon_decimal_point'],
-               $flags['nogroup'] ? '' : $locale['mon_thousands_sep']
-           );
-           $value = @explode($locale['mon_decimal_point'], $value);
+            $value = number_format(
+                $value,
+                $right,
+                $locale['mon_decimal_point'],
+                $flags['nogroup'] ? '' : $locale['mon_thousands_sep']
+            );
+            $value = @explode($locale['mon_decimal_point'], $value);
 
-           $n = strlen($prefix) + strlen($currency) + strlen($value[0]);
-           if ($left > 0 && $left > $n) {
-               $value[0] = str_repeat($flags['fillchar'], $left - $n) . $value[0];
-           }
-           $value = implode($locale['mon_decimal_point'], $value);
+            $n = strlen($prefix) + strlen($currency) + strlen($value[0]);
+            if ($left > 0 && $left > $n) {
+                $value[0] = str_repeat($flags['fillchar'], $left - $n) . $value[0];
+            }
+            $value = implode($locale['mon_decimal_point'], $value);
 
-           if ($locale["{$letter}_cs_precedes"]) {
-               $value = $prefix . $currency . $space . $value . $suffix;
-               //create right pad for alignment
-               $rightpad = empty($suffix) && $flags['usesignal'] == '(' ? ')' : '';
-           } else {
-               $value = $prefix . $value . $space . $currency . $suffix;
-               //create right pad for alignment
-               $rightpad = $locale['n_sep_by_space'] == true && $locale['n_cs_precedes'] == false && strlen($space) == 0 ? ' ' : '';
-               $currpad = $conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol'];
-               $rightpad .= ($locale['p_cs_precedes'] == false || $locale['n_cs_precedes'] == false) && empty($currency) ? $currpad : '';
-               $rightpad .= empty($suffix) && $flags['usesignal'] == '(' ? ')' : '';
-           }
+            if ($locale["{$letter}_cs_precedes"]) {
+                $value = $prefix . $currency . $space . $value . $suffix;
+                //create right pad for alignment
+                $rightpad = empty($suffix) && $flags['usesignal'] == '(' ? ')' : '';
+            } else {
+                $value = $prefix . $value . $space . $currency . $suffix;
+                //create right pad for alignment
+                $rightpad = $locale['n_sep_by_space'] == true && $locale['n_cs_precedes'] == false && strlen($space) == 0 ? ' ' : '';
+                $currpad = $conversion == 'i' ? $locale['int_curr_symbol'] : $locale['currency_symbol'];
+                $rightpad .= ($locale['p_cs_precedes'] == false || $locale['n_cs_precedes'] == false) && empty($currency) ? $currpad : '';
+                $rightpad .= empty($suffix) && $flags['usesignal'] == '(' ? ')' : '';
+            }
 
-           $format = str_replace($fmatch[0], $value, $format);
-           if (! empty($rightpad) && $display == 0) {
-               $format .= '<span style="visibility:hidden">' . $rightpad . '</span>';
-           }
-       }
-       return $format;
-   }
+            $format = str_replace($fmatch[0], $value, $format);
+            if (!empty($rightpad) && $display == 0) {
+                $format .= '<span style="visibility:hidden">' . $rightpad . '</span>';
+            }
+        }
+        return $format;
+    }
 
-   public function smarty_modifier_namespace($pageName)
-   {
-       return TikiLib::lib('wiki')->get_namespace($pageName);
-   }
+    public function smarty_modifier_namespace($pageName)
+    {
+        return TikiLib::lib('wiki')->get_namespace($pageName);
+    }
 
-   public function smarty_modifier_nonamespace($pageName)
-   {
-       return TikiLib::lib('wiki')->get_without_namespace($pageName);
-   }
+    public function smarty_modifier_nonamespace($pageName)
+    {
+        return TikiLib::lib('wiki')->get_without_namespace($pageName);
+    }
 
    /**
      * Smarty modifier plugin to remove ~np~ tags from smarty variable. For use in templates used by the {list} wiki plugin
@@ -1871,7 +1871,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * Purpose: Perform a regular expression match
     * @param string $pattern     The pattern to search for, as a string.
     * @param string $subject     The input string.
-    * @param array  $matches 
+    * @param array  $matches
     * @param int    $flags
     * @param int    $offset
     * @return int|flase
@@ -1879,7 +1879,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     */
     public function smarty_modifier_preg_match($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match($pattern, $subject, $matches, $flags, $offset);;
+        return preg_match($pattern, $subject, $matches, $flags, $offset);
     }
 
     /*
@@ -2240,7 +2240,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * @param string $needle         The string to look for.
      * @param bool   $before_needle  Optional. If true, stristr() returns the part of haystack before the first occurrence of needle (needle excluded).
      * @return string|false          Returns the matching part of the string. If needle is not found, the function returns false.
-     * 
+     *
      */
     public function smarty_modifier_stristr($haystack, $needle, $before_needle = false)
     {
@@ -2250,15 +2250,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty modifier strpos
      * ----------------------
      * Purpose: Find the position of the first occurrence in a string
-     * 
+     *
      * @param string $haystack     The string in which to search.
      * @param string $needle       The string to search for.
      * @param int<0, max>  $offset       Optional. The position from which to start the search
      * @return int|false
-     * 
+     *
      * Synthax: {$haystack|strpos:$needle:$offset}
      */
-    public function smarty_modifier_strpos($haystack, $needle, $offset= 0)
+    public function smarty_modifier_strpos($haystack, $needle, $offset = 0)
     {
         return strpos($haystack, $needle, $offset);
     }
@@ -2332,7 +2332,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     /**
      *  Fake modifier for pretty tracker fields. Sets template to use to display
      */
-    function smarty_modifier_template($string)
+    public function smarty_modifier_template($string)
     {
         return $string;
     }
@@ -2441,7 +2441,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      *
      * @return string
      */
-    function smarty_modifier_tiki_short_datetime($string, $intro = '', $same = 'y')
+    public function smarty_modifier_tiki_short_datetime($string, $intro = '', $same = 'y')
     {
         global $prefs;
         $smarty = TikiLib::lib('smarty');
@@ -2545,7 +2545,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         return tra($content, $lg, $unused, $args);
     }
 
-     /*
+    /*
     * Smarty plugin
     * -------------------------------------------------------------
     * Type:     modifier
@@ -2555,12 +2555,12 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * -------------------------------------------------------------
     */
     public function smarty_modifier_truex($string)
-   {
-       if ((int) $string == 1) {
-           return('x');
-       }
-       return('-');
-   }
+    {
+        if ((int) $string == 1) {
+            return ('x');
+        }
+        return ('-');
+    }
 
     public function smarty_modifier_tr_if($source)
     {
@@ -2586,7 +2586,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty nodifier ucfirst
      * -----------------------
      * Purpose: Make a string's first character uppercase
-     * 
+     *
      * @param string      $string   The input string.
      * @return string               A string with the first character of string capitalized, if that character is an ASCII character in the range from "a" (0x61) to "z" (0x7a).
      */
@@ -2692,7 +2692,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         }
         return $return;
     }
-    
+
     // convert utf-8 to unicode
     public function smarty_modifier_utf8unicode($utf8_text)
     {
@@ -2745,7 +2745,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Smarty modifier var_dump
      * ------------------------
      * Purpose: Dumps information about a variable
-     * 
+     *
      * @param mixed $value
      * @return void
      */

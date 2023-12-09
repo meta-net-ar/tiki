@@ -8,5 +8,5 @@
 function smarty_modifier_d($var, $modifier = '')
 {
     $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_d($var,$modifier);
+    return $smartyTikiExtension->smarty_modifier_d($var, $modifier);
 }

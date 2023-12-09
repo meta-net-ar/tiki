@@ -37,14 +37,14 @@ class UserRegistration extends Base
         $smarty->assign('allowRegister', 'y');
 
         // NOTE that this is not a standard access check, it checks for the opposite of that, i.e. whether logged in already
-        if (!empty($user)) {
+        if (! empty($user)) {
             TikiLib::lib('access')->redirect($prefs['tikiIndex'], tr('You are logged in'));
             // note that this message might appear also when the user logs in for first time so it has to generic for either case
             return;
         }
         $smarty->assign('showmsg', 'n');
         // ensure ssl
-        if (!$https_mode && $prefs['https_login'] == 'required') {
+        if (! $https_mode && $prefs['https_login'] == 'required') {
             TikiLib::lib('access')->redirect($base_url_https . 'tiki-register.php');
             return;
         }
@@ -67,14 +67,14 @@ class UserRegistration extends Base
             check_ticket('register');
             $cookie_name = $prefs['session_cookie_name'];
 
-            if (ini_get('session.use_cookie') && !isset($_COOKIE[$cookie_name])) {
+            if (ini_get('session.use_cookie') && ! isset($_COOKIE[$cookie_name])) {
                 Feedback::error(tra("Cookies must be enabled to log in to this site"));
                 return '';
             }
 
             if ($registrationlib->merged_prefs['http_referer_registration_check'] === 'y') {
                 global $base_host;
-                if (!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], $base_host) === false) {
+                if (! isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], $base_host) === false) {
                     Feedback::error(tra('Request not from this host.'));
                     return '';
                 }
@@ -97,7 +97,7 @@ class UserRegistration extends Base
                     Feedback::error(['mes' => $result->msg]);
                 } elseif (is_string($result) && $registrationlib->merged_prefs['userTracker'] !== 'y') {    // more to do for usertrackers
                     return $result;
-                } elseif (!empty($result['msg']) && $registrationlib->merged_prefs['userTracker'] !== 'y') {
+                } elseif (! empty($result['msg']) && $registrationlib->merged_prefs['userTracker'] !== 'y') {
                     return $result['msg'];
                 }
             }
@@ -114,7 +114,7 @@ class UserRegistration extends Base
             $chosenGroup = 'Registered';
             if (count($registrationlib->merged_prefs['choosable_groups']) > 0 && isset($_REQUEST['chosenGroup'])) {
                 $chosenGroup = $_REQUEST['chosenGroup'];
-                if (!$userlib->group_exists($chosenGroup) || $userlib->get_registrationChoice($chosenGroup) !== 'y') {
+                if (! $userlib->group_exists($chosenGroup) || $userlib->get_registrationChoice($chosenGroup) !== 'y') {
                     $result = null;                     // invalid group chosen
                     $smarty->assign('msg', '');
                     $smarty->assign('showmsg', 'n');
@@ -122,17 +122,17 @@ class UserRegistration extends Base
                 }
             }
             $re = $userlib->get_group_info($chosenGroup);
-            if (!empty($re['usersTrackerId']) && !empty($re['registrationUsersFieldIds'])) {
+            if (! empty($re['usersTrackerId']) && !empty($re['registrationUsersFieldIds'])) {
                 $needs_validation_js = false;
                 include_once('lib/wiki-plugins/wikiplugin_tracker.php');
                 if (isset($_REQUEST['name'])) {
                     $user = $_REQUEST['name'];  // so that one can set user preferences at registration time
                     $_REQUEST['iTRACKER'] = 1;  // only one tracker plugin on registration
                 }
-                if (!is_array($re['registrationUsersFieldIds'])) {
+                if (! is_array($re['registrationUsersFieldIds'])) {
                     $re['registrationUsersFieldIds'] = explode(':', $re['registrationUsersFieldIds']);
                 }
-                if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && !empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
+                if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
                     if (substr($registrationlib->merged_prefs["user_register_prettytracker_tpl"], -4) == ".tpl") {
                         $userTrackerData = wikiplugin_tracker(
                             '',
@@ -140,7 +140,7 @@ class UserRegistration extends Base
                                 'trackerId' => $re['usersTrackerId'],
                                 'fields' => $re['registrationUsersFieldIds'],
                                 'showdesc' => 'y',
-                                'showmandatory' => (!empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
+                                'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
                                 'embedded' => 'n',
                                 'action' => tra('Register'),
                                 'registration' => 'y',
@@ -159,7 +159,7 @@ class UserRegistration extends Base
                                 'trackerId' => $re['usersTrackerId'],
                                 'fields' => $re['registrationUsersFieldIds'],
                                 'showdesc' => 'y',
-                                'showmandatory' => (!empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
+                                'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
                                 'embedded' => 'n',
                                 'action' => tra('Register'),
                                 'registration' => 'y',
@@ -190,7 +190,7 @@ class UserRegistration extends Base
                     );
                 }
                 $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
-                if (!empty($tr['description'])) {
+                if (! empty($tr['description'])) {
                     $smarty->assign('userTrackerHasDescription', true);
                 }
                 if (isset($_REQUEST['error']) && $_REQUEST['error'] === 'y') {
@@ -212,7 +212,7 @@ class UserRegistration extends Base
                 }
                 $user = ''; // reset $user for security reasons
                 $smarty->assign('userTrackerData', $userTrackerData);
-            } elseif (isset($_REQUEST['name']) && !empty($re['usersTrackerId']) && empty($re['registrationUsersFieldIds'])) {
+            } elseif (isset($_REQUEST['name']) && ! empty($re['usersTrackerId']) && empty($re['registrationUsersFieldIds'])) {
                 // If user has been created in the first round and there is a user tracker specified but fields are not set - proceed anyway
                 $result = $registrationlib->register_new_user($_REQUEST);
                 if (is_array($result)) {

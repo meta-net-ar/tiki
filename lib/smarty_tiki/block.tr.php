@@ -7,6 +7,6 @@
 
 function smarty_block_tr($params, $content, \Smarty\Template $template, &$repeat)
 {
-    $smartyBlockTrHandler =new \SmartyTiki\BlockHandler\Tr();
+    $smartyBlockTrHandler = new \SmartyTiki\BlockHandler\Tr();
     return $smartyBlockTrHandler->handle($params, $content, $template, $repeat);
 }

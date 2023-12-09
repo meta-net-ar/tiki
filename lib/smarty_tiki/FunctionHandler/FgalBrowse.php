@@ -30,7 +30,7 @@ class FgalBrowse extends Base
         $userlib = \TikiLib::lib('user');
         $tikilib = \TikiLib::lib('tiki');
         $smarty = \TikiLib::lib('smarty');
-    
+
         if (! isset($params['nbCols'])) {
             $params['nbCols'] = 0;
         }
@@ -61,7 +61,7 @@ class FgalBrowse extends Base
         if (! isset($params['show_details'])) {
             $params['show_details'] = '';
         }
-    
+
         if (! isset($params['_offset'])) {
             $params['_offset'] = 0;
         }
@@ -74,10 +74,10 @@ class FgalBrowse extends Base
         if (! isset($params['_find'])) {
             $params['_find'] = '';
         }
-    
+
         if ($params['_id'] > 0 && $tiki_p_view_file_gallery == 'y') {
             $filegallib = \TikiLib::lib('filegal');
-    
+
             if ($gal_info = $filegallib->get_file_gallery($params['_id'])) {
                 $tikilib->get_perm_object($params['_id'], 'file gallery', $gal_info);
                 if ($userlib->object_has_one_permission($params['_id'], 'file gallery')) {
@@ -85,18 +85,18 @@ class FgalBrowse extends Base
                 }
                 ///FIXME        $podCastGallery = $filegallib->isPodCastGallery($_REQUEST['galleryId'], $gal_info);
             }
-    
+
             // Get listing display config
             include_once('fgal_listing_conf.php');
-    
+
             $gal_info['show_action'] = 'n';
             $smarty->assign_by_ref('gal_info', $gal_info);
-    
+
             // Get list of files in the gallery
             $files = $filegallib->get_files($params['_offset'], $params['_maxRecords'], $params['_sort_mode'], $params['_find'], $params['_id']);
             $smarty->assign_by_ref('files', $files['data']);
             $smarty->assign('cant', $files['cant']); ///FIXME
-    
+
             foreach ($params as $k => $v) {
                 if ($k[0] == '_') {
                     continue;
@@ -104,7 +104,7 @@ class FgalBrowse extends Base
                 $smarty->assign($k, $v);
             }
         }
-    
+
         return '<div style="padding: 1px; overflow-y: hidden; overflow-x: auto;">' . "\n" . $smarty->fetch('browse_file_gallery.tpl') . "\n</div>";
     }
 }

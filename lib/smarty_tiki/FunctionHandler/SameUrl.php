@@ -24,8 +24,8 @@ class SameUrl extends Base
             if (isset($_REQUEST[$name])) {
                 $_REQUEST[$name] = $val;
             } else {
-                if (in_array($name, $sameurl_elements) && !is_array($name) && !is_array($val)) {
-                    if (!in_array($name, $sets)) {
+                if (in_array($name, $sameurl_elements) && ! is_array($name) && ! is_array($val)) {
+                    if (! in_array($name, $sets)) {
                         if ($first) {
                             $first = false;
                             $sep = '?';
@@ -43,8 +43,8 @@ class SameUrl extends Base
             if (isset($$name)) {
                 $val = $$name;
             }
-            if (in_array($name, $sameurl_elements) && !is_array($name) && !is_array($val)) {
-                if (!in_array($name, $sets)) {
+            if (in_array($name, $sameurl_elements) && ! is_array($name) && ! is_array($val)) {
+                if (! in_array($name, $sets)) {
                     if ($first) {
                         $first = false;
                         $sep = '?';

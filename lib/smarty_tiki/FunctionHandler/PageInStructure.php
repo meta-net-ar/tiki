@@ -28,7 +28,7 @@ class PageInStructure extends Base
         $smarty = TikiLib::lib('smarty');
         extract($params, EXTR_SKIP);
 
-        if (!isset($pagechecked)) {
+        if (! isset($pagechecked)) {
             return ('<b>missing pagechecked parameter for Smarty function testing whether page is in a structure</b><br/>');
         }
 

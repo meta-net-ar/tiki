@@ -163,7 +163,6 @@ class Smarty_Tiki extends \Smarty\Smarty
         global $prefs;
         // Assign the prefs array in smarty, by reference
         $this->assign('prefs', $prefs);
-
     }
 
     /**

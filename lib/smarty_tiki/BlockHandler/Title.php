@@ -31,13 +31,13 @@ class Title extends Base
             return;
         }
 
-        if (!isset($params['help'])) {
+        if (! isset($params['help'])) {
             $params['help'] = '';
         }
-        if (!isset($params['admpage'])) {
+        if (! isset($params['admpage'])) {
             $params['admpage'] = '';
         }
-        if (!isset($params['actions'])) {
+        if (! isset($params['actions'])) {
             $params['actions'] = '';
         }
 
@@ -47,7 +47,7 @@ class Title extends Base
         $class = '';
         $current = current_object();
 
-        if (!isset($params['url'])) {
+        if (! isset($params['url'])) {
             if ($current) {
                 $params['url'] = smarty_modifier_sefurl($current['object'], $current['type']);
             } else {

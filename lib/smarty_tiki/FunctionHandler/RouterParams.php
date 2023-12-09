@@ -26,7 +26,7 @@ class RouterParams extends Base
 
         $className = 'Tiki\\CustomRoute\\Type\\' . $params['name'];
 
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             return;
         }
 
@@ -48,7 +48,7 @@ class RouterParams extends Base
                 case 'select':
                     $input = '<select id="' . $inputKey . '" class="form-control" name="' . $inputKey . '">';
 
-                    if (!empty($param['function'])) {
+                    if (! empty($param['function'])) {
                         $args = [];
                         foreach ($param['args'] as $value) {
                             $args[] = smarty_modifier_escape($routerParams[$value]);
@@ -58,7 +58,7 @@ class RouterParams extends Base
                         $param['options'] = $objects;
                     }
 
-                    if (!empty($param['options'])) {
+                    if (! empty($param['options'])) {
                         foreach ($param['options'] as $optionKey => $optionValue) {
                             $selected = $optionKey == $params['params'][$key] ? 'selected' : '';
                             $input .= '<option value="' . $optionKey . '" ' . $selected . '>' . $optionValue . '</option>';
@@ -69,10 +69,10 @@ class RouterParams extends Base
                     break;
             }
 
-            $required = !empty($param['required']) ? ' *' : '';
+            $required = ! empty($param['required']) ? ' *' : '';
 
             $infoHtml = '';
-            if (!empty($param['description'])) {
+            if (! empty($param['description'])) {
                 $description = smarty_modifier_escape($param['description']);
                 $icon = smarty_function_icon(['name' => 'information'], $template);
 

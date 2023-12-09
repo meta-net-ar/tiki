@@ -89,7 +89,7 @@ class ObjectSelector extends Base
             $arguments['filter'] = $params;
         }
 
-        if ($arguments['simplevalue'] && !$arguments['value'] && isset($arguments['filter']['type'])) {
+        if ($arguments['simplevalue'] && ! $arguments['value'] && isset($arguments['filter']['type'])) {
             $arguments['value'] = "{$arguments['filter']['type']}:{$arguments['simplevalue']}";
             $arguments['simpleclass'] = null;
             $arguments['class'] .= ' d-none';

@@ -99,7 +99,7 @@ class ObjectSelectorMulti extends Base
 
         if ($arguments['relations']) {
             $arguments['current_selection'] = $arguments['relations'];
-        } elseif ($arguments['simplevalue'] && !empty($arguments['filter']['type']) && $arguments['separator']) {
+        } elseif ($arguments['simplevalue'] && ! empty($arguments['filter']['type']) && $arguments['separator']) {
             $arguments['current_selection'] = $selector->readMultipleSimple($arguments['filter']['type'], $arguments['simplevalue'], $arguments['separator'], $arguments['format']);
         } else {
             $arguments['current_selection'] = $selector->readMultiple($arguments['value'], $arguments['format']);

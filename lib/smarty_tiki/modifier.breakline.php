@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 function smarty_modifier_breakline($str_content)
-{  
+{
     $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
     return $smartyTikiExtension->smarty_modifier_breakline($str_content);
 }

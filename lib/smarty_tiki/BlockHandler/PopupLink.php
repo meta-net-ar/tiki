@@ -10,7 +10,8 @@ namespace SmartyTiki\BlockHandler;
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
 
-class PopupLink extends Base{
+class PopupLink extends Base
+{
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs;

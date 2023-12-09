@@ -23,7 +23,7 @@ class ReindexFilePixel extends Base
         if (! is_array($params) || ! isset($params['id']) || ( $id = (int) $params['id'] ) <= 0) {
             return '';
         }
-    
+
         global $tikiroot;
         return '<img src="' . $tikiroot . 'reindex_file.php?id=' . $id . '" width="1" height="1" />';
     }

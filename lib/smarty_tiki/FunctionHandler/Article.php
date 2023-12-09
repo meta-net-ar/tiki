@@ -25,7 +25,7 @@ class Article extends Base
 
         // skip="x,y" will not print Xth and Yth items
         // useful to avoid default first items
-        if (!empty($skip) && preg_match('/^\d+(,\d+)*$/', $skip)) {
+        if (! empty($skip) && preg_match('/^\d+(,\d+)*$/', $skip)) {
             $skipped_items = explode(',', $skip);
             $skip = [];
             foreach ($skipped_items as $i) {

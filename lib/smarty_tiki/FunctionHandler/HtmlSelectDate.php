@@ -143,7 +143,7 @@ class HtmlSelectDate extends Base
                     break;
 
                 default:
-                    if (!is_array($_value)) {
+                    if (! is_array($_value)) {
                         $extra_attrs .= ' ' . $_key . '="' . smarty_function_escape_special_chars($_value) . '"';
                     } else {
                         trigger_error("html_select_date: extra attribute '$_key' cannot be an array", E_USER_NOTICE);
@@ -184,11 +184,11 @@ class HtmlSelectDate extends Base
             }
         }
         if (strlen($time[0]) > 0) {
-            if ($start_year > $time[0] && !isset($params['start_year'])) {
+            if ($start_year > $time[0] && ! isset($params['start_year'])) {
                 // force start year to include given date if not explicitly set
                 $start_year = $time[0];
             }
-            if ($end_year < $time[0] && !isset($params['end_year'])) {
+            if ($end_year < $time[0] && ! isset($params['end_year'])) {
                 // force end year to include given date if not explicitly set
                 $end_year = $time[0];
             }

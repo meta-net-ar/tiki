@@ -21,7 +21,7 @@ class FileGalManagerUrl extends Base
 
         $return = 'tiki-upload_file.php?galleryId=' . $prefs['home_file_gallery'] . '&view=browse';
 
-        if (!empty($params['area_id'])) {
+        if (! empty($params['area_id'])) {
             $return .= '&filegals_manager=' . $params['area_id'];
         }
 

@@ -23,12 +23,12 @@ class JsInsertIcon extends Base
     public function handle($params, Template $template)
     {
         $smarty = \Tikilib::lib("smarty");
-        if (!empty($params['type'])) {
+        if (! empty($params['type'])) {
             //set icon
             $iconmap = [
                 'jscalendar' => 'calendar'
             ];
-            $iconname = !empty($params['iconname']) ? $params['iconname'] : $iconmap[$params['type']];
+            $iconname = ! empty($params['iconname']) ? $params['iconname'] : $iconmap[$params['type']];
             $icon = smarty_function_icon(['name' => $iconname], $smarty->getEmptyInternalTemplate());
             //set js
             switch ($params['type']) {
@@ -37,7 +37,7 @@ class JsInsertIcon extends Base
                     break;
             }
             //load js
-            if (!empty($js)) {
+            if (! empty($js)) {
                 if (isset($params['return']) && $params['return'] === 'y') {
                     return $js;
                 } else {

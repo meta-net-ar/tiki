@@ -77,7 +77,7 @@ class UserSelector extends Base
             $mt = '';
         }
 
-        if (!empty($params['class'])) {
+        if (! empty($params['class'])) {
             $class = ' class="' . $params['class'] . '"';
         } else {
             $class = '';
@@ -90,13 +90,13 @@ class UserSelector extends Base
                     unset($params['groupIds'][$k]);
                 }
             }
-            if (!empty($params['groupIds'])) {
+            if (! empty($params['groupIds'])) {
                 $groupIds = $params['groupIds'];
             }
-        } elseif (!empty($params['groupIds'])) {
+        } elseif (! empty($params['groupIds'])) {
             $groupIds = explode('|', $params['groupIds']);
         }
-        if (!empty($groupIds)) {
+        if (! empty($groupIds)) {
             foreach ($groupIds as $groupId) {
                 $group_info = $userlib->get_groupId_info($groupId);
                 $groupNames[] = $group_info['groupName'];
@@ -105,7 +105,7 @@ class UserSelector extends Base
 
         $users = [];
         $ret = '';
-        if (!empty($groupNames)) {
+        if (! empty($groupNames)) {
             $ucant = $userlib->count_users_consolidated($groupNames);
         } else {
             $ucant = $userlib->count_users('');
@@ -128,7 +128,7 @@ class UserSelector extends Base
             }
 
             // NOTE: if groupIds are present, the list of users is limited to those groups regardless of group == 'all'
-            if (!empty($groupNames)) {
+            if (! empty($groupNames)) {
                 $groupNames = array_unique($groupNames);
                 $usrs = [];
                 foreach ($groupNames as $groupName) {

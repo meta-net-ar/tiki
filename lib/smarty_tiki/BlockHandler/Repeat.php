@@ -18,7 +18,8 @@ use Smarty\Template;
  * Parameters: count [required] - number of times to repeat
  * assign [optional] - variable to collect output
  */
-class Repeat extends Base{
+class Repeat extends Base
+{
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || ! empty($content)) {
@@ -27,10 +28,10 @@ class Repeat extends Base{
                 trigger_error("block: negative 'count' parameter");
                 return;
             }
-    
+
             $strRepeat = str_repeat($content, $intCount);
             if (! empty($params['assign'])) {
-                $smarty =\TikiLib::lib('smarty');
+                $smarty = \TikiLib::lib('smarty');
                 $smarty->assign($params['assign'], $strRepeat);
             } else {
                 return $strRepeat;

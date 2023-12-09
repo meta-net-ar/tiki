@@ -83,7 +83,7 @@ class Lock extends Base
         }
         $perms = \Perms::get(['type' => $type, 'object' => $params['object']]);
 
-        if (!empty($params['object'])) {
+        if (! empty($params['object'])) {
             $value = $attributelib->get_attribute($params['type'], $params['object'], $attribute);
         } else {
             $value = '';

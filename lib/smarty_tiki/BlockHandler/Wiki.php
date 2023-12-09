@@ -24,7 +24,7 @@ class Wiki extends Base
         if ($repeat) {
             return;
         }
-    
+
         if ((isset($params['isHtml'])) and ($params['isHtml'] )) {
             $isHtml = true;
         } else {

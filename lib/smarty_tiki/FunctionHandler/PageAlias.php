@@ -29,11 +29,11 @@ class PageAlias extends Base
         $smarty = TikiLib::lib('smarty');
         extract($params, EXTR_SKIP);
 
-        if (!isset($pagechecked)) {
+        if (! isset($pagechecked)) {
             return ('<b>missing pagechecked parameter for Smarty function to get page alias</b><br/>');
         }
 
-        if (!$structlib->page_is_in_structure($pagechecked)) {
+        if (! $structlib->page_is_in_structure($pagechecked)) {
             return ('<b>pagechecked parameter is not in a structure</b><br/>');
         }
 

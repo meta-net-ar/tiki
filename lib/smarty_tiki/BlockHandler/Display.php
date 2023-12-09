@@ -29,14 +29,14 @@ class Display extends Base
             return;
         }
         $ok = true;
-        if (!empty($params['groups'])) {
+        if (! empty($params['groups'])) {
             $groups = explode(',', $params['groups']);
             $userGroups = $userlib->get_user_groups($user);
         }
 
         $content = explode('///else///', $content);
 
-        if (!empty($params['error'])) {
+        if (! empty($params['error'])) {
             $errmsg = $params['error'];
         } elseif (empty($params['error']) && isset($groups)) {
             $errmsg = '';
@@ -58,7 +58,7 @@ class Display extends Base
                     $ok = false;
                     $anon = false;
                 }
-            } elseif (!in_array($gr, $userGroups) && $anon == false) {
+            } elseif (! in_array($gr, $userGroups) && $anon == false) {
                 $ok = false;
             } else {
                 $ok = true;
@@ -66,7 +66,7 @@ class Display extends Base
         }
 
         /* is it ok ? */
-        if (!$ok) {
+        if (! $ok) {
             if (isset($content[1])) {
                 return $content[1];
             } else {

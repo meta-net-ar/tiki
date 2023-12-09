@@ -58,11 +58,11 @@ class HtmlSelectTime extends Base
         $class = 'form-control date';
 
         extract($params);
-        if (!empty($all_empty)) {
+        if (! empty($all_empty)) {
             $hour_empty = $minute_empty = $second_empty = $all_empty;
         }
 
-        if (!isset($time) or !$time) {
+        if (! isset($time) or !$time) {
             $time = $tikilib->now;
         } elseif (is_string($time) && strpos($time, ':') !== false) {
             $e = explode(':', $time, 3);
@@ -75,7 +75,7 @@ class HtmlSelectTime extends Base
                 $tikilib->date_format('%Y')
             );
         }
-        if (empty($hour_minmax) || !preg_match('/^[0-2]?[0-9]-[0-2]?[0-9]$/', $hour_minmax)) {
+        if (empty($hour_minmax) || ! preg_match('/^[0-2]?[0-9]-[0-2]?[0-9]$/', $hour_minmax)) {
             $hour_minmax = '0-23';
         }
         //only needed for end_ and the static variable in the date_format functions seem to cause problems without the if
@@ -131,7 +131,7 @@ class HtmlSelectTime extends Base
 
             $html_result .= '>' . "\n";
 
-            if (!empty($hour_empty)) {
+            if (! empty($hour_empty)) {
                 $hours = array_merge([$hour_empty == ' ' ? '' : $hour_empty], $hours);
             }
 
@@ -211,7 +211,7 @@ class HtmlSelectTime extends Base
             }
             $html_result .= '>' . "\n";
 
-            if (!empty($minute_empty)) {
+            if (! empty($minute_empty)) {
                 $minutes = array_merge([$minute_empty == ' ' ? '' : $minute_empty], $minutes);
             }
 
@@ -263,7 +263,7 @@ class HtmlSelectTime extends Base
 
             $html_result .= '>' . "\n";
 
-            if (!empty($seconde_empty)) {
+            if (! empty($seconde_empty)) {
                 $secondes = array_merge([$seconde_empty == ' ' ? '' : $seconde_empty], $secondes);
             }
 
@@ -279,7 +279,7 @@ class HtmlSelectTime extends Base
             $html_result .= "</select></div>\n";
         }
 
-        if (!$use_24_hours) {
+        if (! $use_24_hours) {
             $html_result .= '<div class="col-sm-3 ps-0"><select class="' . $class . '" name=';
             if (null !== $field_array) {
                 $html_result .= '"' . $field_array . '[' . $prefix . 'Meridian]"';

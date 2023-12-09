@@ -22,7 +22,7 @@ class WikiStructure extends Base
     {
         include_once('lib/wiki-plugins/wikiplugin_toc.php');
 
-        if (!empty($params['id'])) {
+        if (! empty($params['id'])) {
             $params['structId'] = $params['id'];
         }
         $html = wikiplugin_toc('', $params);

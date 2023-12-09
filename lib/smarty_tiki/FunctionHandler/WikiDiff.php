@@ -13,7 +13,7 @@ use TikiLib;
 
 /**
  * To display with difference between two blocks of text, often wiki syntax or html
- * 
+ *
  *  */
 class WikiDiff extends Base
 {
@@ -31,31 +31,31 @@ class WikiDiff extends Base
 
         $params = array_merge($defaults, $params);
 
-        if (!$params['object_id']) {
+        if (! $params['object_id']) {
             return '<span class="text-danger">' . tra('wikidiff: error - no object_id specified') . '</span>';
         }
 
-        if (!$params['oldver']) {
+        if (! $params['oldver']) {
             return '<span class="text-danger">' . tra('wikidiff: error - no old version specified') . '</span>';
         }
 
         if ($params['object_type'] === 'wiki page') {
             $info = TikiLib::lib('tiki')->get_page_info($params['object_id'], false);
-            if (!$info) {
+            if (! $info) {
                 return '<span class="text-danger">' . tr('wikidiff: error - page "%0" not found', $params['object_id']) . '</span>';
             }
 
             $smarty = TikiLib::lib('smarty');
             $histlib = TikiLib::lib('hist');
 
-            if (!is_numeric($params['oldver'])) {
+            if (! is_numeric($params['oldver'])) {
                 $time = strtotime($params['oldver']);
                 $oldver = $histlib->get_version_by_time($params['object_id'], $time, 'after');
             } else {
                 $oldver = $params['oldver'];
             }
 
-            if (!is_numeric($params['newver']) && !empty($params['newver'])) {
+            if (! is_numeric($params['newver']) && !empty($params['newver'])) {
                 $time = strtotime($params['newver']);
                 $newver = $histlib->get_version_by_time($params['object_id'], $time);
             } else {
@@ -68,7 +68,7 @@ class WikiDiff extends Base
             } else {
                 $curver = 0;
             }
-            $smarty->assign('hide_version_info', !$params['show_version_info']);
+            $smarty->assign('hide_version_info', ! $params['show_version_info']);
             $smarty->assign('hide_example_wikidiff_plugin_syntax', true);
 
             histlib_helper_setup_diff($params['object_id'], $oldver, $newver, $params['diff_style'], $curver);

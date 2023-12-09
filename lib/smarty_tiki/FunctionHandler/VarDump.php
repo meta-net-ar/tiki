@@ -28,7 +28,7 @@ class VarDump extends Base
         require_once('lib/debug/debugger.php');
         $smarty = \TikiLib::lib('smarty');
         $v = $params['var'];
-        if (!empty($v)) {
+        if (! empty($v)) {
             $tmp = $smarty->getTemplateVars();
             if (is_array($tmp) && isset($tmp["$v"])) {
                 if (is_string($tmp[$v])) {

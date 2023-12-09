@@ -31,15 +31,15 @@ class TrackerHeader extends Base
         $params = array_merge($default, $params);
         extract($params, EXTR_SKIP);
 
-        if (!empty($inTable)) {
+        if (! empty($inTable)) {
             $output .= '</table>';
         }
-        while (!empty($last) && $level <= $trackerheaderStack[$last - 1]) { // need to close block
+        while (! empty($last) && $level <= $trackerheaderStack[$last - 1]) { // need to close block
             $output .= "</div>";
             array_pop($trackerheaderStack);
             --$last;
         }
-        if (!empty($title)) { // new header
+        if (! empty($title)) { // new header
             array_push($trackerheaderStack, $level);
             $output .= "<!--PUSH" . count($trackerheaderStack) . " -->";
             $id = "trackerHeader_$iTrackerHeader";
@@ -70,7 +70,7 @@ class TrackerHeader extends Base
             $last = 0;
             $trackerheaderStack = [];
         }
-        if (!empty($inTable)) {
+        if (! empty($inTable)) {
             $output .= "<table class=\"$inTable\">";
         }
         return $output;

@@ -45,14 +45,14 @@ class MultiLike extends Base
             $button['relation'] = $params['relation_prefix'] . "." . $button['id'];
 
             // check if there is an unselected icon else use default thumbs up open
-            if (!empty($config['icon_unselected'][$key])) {
+            if (! empty($config['icon_unselected'][$key])) {
                 $button['icon_unselected'] = $config['icon_unselected'][$key];
             } else {
                 $button['icon_unselected'] = "thumbs-o-up";
             }
 
             // check if there is an selected icon else use default thumbs up
-            if (!empty($config['icon_selected'][$key])) {
+            if (! empty($config['icon_selected'][$key])) {
                 $button['icon_selected'] = $config['icon_selected'][$key];
             } else {
                 $button['icon_selected'] = "thumbs-up";
@@ -76,31 +76,31 @@ class MultiLike extends Base
             $buttons[] = $button;
         }
 
-        if (!empty($params['onlyShowTotalPoints'])) {
+        if (! empty($params['onlyShowTotalPoints'])) {
             return $totalPoints;
         }
 
-        if (!empty($params['onlyShowTotalLikes'])) {
+        if (! empty($params['onlyShowTotalLikes'])) {
             return $totalCount;
         }
 
-        if (!empty($params['showOptionTotals'])) {
+        if (! empty($params['showOptionTotals'])) {
             $smarty->assign("show_option_totals", true);
         }
 
-        if (!empty($params['showInPopup']) && $params['showInPopup'] == 'y') {
+        if (! empty($params['showInPopup']) && $params['showInPopup'] == 'y') {
             $smarty->assign("show_in_popup", true);
         }
         $smarty->assign("popup_placement", "left"); //default
-        if (!empty($params['popupPlacement'])) {
+        if (! empty($params['popupPlacement'])) {
             $smarty->assign("popup_placement", $params['popupPlacement']);
         }
 
-        if (!empty($params['showPoints']) && strtolower($params['showPoints']) != 'n') {
+        if (! empty($params['showPoints']) && strtolower($params['showPoints']) != 'n') {
             $smarty->assign("show_points", true);
         }
 
-        if (!empty($params['showLikes']) && strtolower($params['showLikes']) == 'n') {
+        if (! empty($params['showLikes']) && strtolower($params['showLikes']) == 'n') {
             $smarty->assign("show_likes", false);
         } else {
             $smarty->assign("show_likes", true);
@@ -112,7 +112,7 @@ class MultiLike extends Base
             $smarty->assign("choice_label", "I found this:");
         }
 
-        if (!empty($params['orientation']) && strtolower($params['orientation']) == 'vertical') {
+        if (! empty($params['orientation']) && strtolower($params['orientation']) == 'vertical') {
             $smarty->assign("orientation", 'vertical');
         } else {
             $smarty->assign("orientation", 'horizontal');

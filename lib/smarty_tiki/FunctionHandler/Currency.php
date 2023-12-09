@@ -18,7 +18,7 @@ class Currency extends Base
 
         extract($params);
 
-        if (!isset($amount)) {
+        if (! isset($amount)) {
             return tra('Parameter amount is not specified.');
         }
 
@@ -26,7 +26,7 @@ class Currency extends Base
             return '';
         }
 
-        if (!isset($sourceCurrency)) {
+        if (! isset($sourceCurrency)) {
             return tra('Parameter sourceCurrency is not specified.');
         }
 
@@ -34,7 +34,7 @@ class Currency extends Base
 
         if (is_numeric($params['date'])) {
             $date = date('Y-m-d', $params['date']);
-        } elseif (!empty($params['date'])) {
+        } elseif (! empty($params['date'])) {
             $date = date('Y-m-d', strtotime($params['date']));
         } else {
             $date = date('Y-m-d');
@@ -54,7 +54,7 @@ class Currency extends Base
 
         // convert amount to default currency before converting to other currencies
         $defaultAmount = $amount;
-        if ($sourceCurrency != $defaultCurrency && !empty($rates[$sourceCurrency])) {
+        if ($sourceCurrency != $defaultCurrency && ! empty($rates[$sourceCurrency])) {
             $defaultAmount = (float)$defaultAmount / (float)$rates[$sourceCurrency];
             $conversions[$defaultCurrency] = $defaultAmount;
         }
@@ -77,7 +77,7 @@ class Currency extends Base
         $export = isset($csv) && $csv;
 
         $out = '';
-        if (!$export) {
+        if (! $export) {
             $out = '<div style="display:inline" id="currency_output_' . $id . '" class="currency_output">';
         }
         if ($prepend) {

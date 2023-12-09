@@ -10,4 +10,3 @@ function smarty_function_count($params, \Smarty\Template $template)
     $smartyFunctionCountHandler = new \SmartyTiki\FunctionHandler\Count();
     return $smartyFunctionCountHandler->handle($params, $template);
 }
-

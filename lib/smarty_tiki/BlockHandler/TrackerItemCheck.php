@@ -36,18 +36,18 @@ class TrackerItemCheck extends Base
         if ($repeat) {
             return;
         }
-    
+
         if (empty($params['itemId'])) {
             return tra('itemId required');
         }
         if (empty($params['mode'])) {
             $params['mode'] = '';       // default is to view
         }
-    
+
         $item = \Tracker_Item::fromId($params['itemId']);
-    
+
         $allowed = false;
-    
+
         switch ($params['mode']) {
             case 'edit':
                 $allowed = $item->canModify();
@@ -61,7 +61,7 @@ class TrackerItemCheck extends Base
             default:
                 break;
         }
-    
+
         if ($allowed) {
             return $content;
         } else {

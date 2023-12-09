@@ -19,10 +19,10 @@ class Quotabar extends Base
     public function handle($params, Template $template)
     {
         extract($params, EXTR_SKIP);
-        if (!isset($length)) {
+        if (! isset($length)) {
             $length = 100;
         }
-        if (!isset($value)) {
+        if (! isset($value)) {
             $value = $length;
         }
         if (empty($value)) {

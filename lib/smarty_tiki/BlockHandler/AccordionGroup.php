@@ -33,20 +33,20 @@ class AccordionGroup extends Base
         if ($repeat) {
             return;
         }
-    
+
         global $accordion_current_group, $accordion_position;
-    
+
         if (empty($accordion_current_group)) {
             $accordion_current_group = 'a' . uniqid();
             $accordion_position = 0;
         }
-    
+
         $title = smarty_modifier_escape($params['title']);
         $id = $accordion_current_group . '-' . ++$accordion_position;
-    
+
         $first = ($accordion_position == 1) ? 'show' : '';
         $expanded = ($accordion_position == 1) ? 'true' : 'false';
-    
+
         return <<<CONTENT
     <div class="card card-accordian">
         <div class="card-header">

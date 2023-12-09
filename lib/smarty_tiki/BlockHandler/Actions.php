@@ -63,12 +63,12 @@ class Actions extends Base
             $liend = '';
         }
 
-        if (!$js) {
+        if (! $js) {
             $return .= '<ul class="float-end"><li>';
         }
 
-        $title = !empty($params['title']) ? htmlspecialchars($params['title']) : tra('Actions');
-        $icon = !empty($params['icon']) ? $params['icon'] : 'settings';
+        $title = ! empty($params['title']) ? htmlspecialchars($params['title']) : tra('Actions');
+        $icon = ! empty($params['icon']) ? $params['icon'] : 'settings';
 
         $return .= '<a
             class="float-end p-0 m-0 border border-0"
@@ -83,7 +83,7 @@ class Actions extends Base
         $return .= smarty_function_icon(['name' => $icon, 'iclass' => 'float-end'], $template);
         $return .= '</a>';
 
-        if (!$js) {
+        if (! $js) {
             $return .= '<ul class="dropdown-menu" role="menu">';
             $return .= '<li class="dropdown-title"><li class="dropdown-title">' . $title;
             $return .= '</li><li class="dropdown-divider"></li>';

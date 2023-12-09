@@ -20,7 +20,7 @@ class SchedulerParams extends Base
 
         $className = 'Scheduler_Task_' . $params['name'];
 
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             return;
         }
 
@@ -52,10 +52,10 @@ class SchedulerParams extends Base
                         break;
                 }
 
-                $required = !empty($param['required']) ? ' *' : '';
+                $required = ! empty($param['required']) ? ' *' : '';
 
                 $infoHtml = '';
-                if (!empty($param['description'])) {
+                if (! empty($param['description'])) {
                     $description = smarty_modifier_escape($param['description']);
                     $icon = smarty_function_icon(['name' => 'information'], $template);
 

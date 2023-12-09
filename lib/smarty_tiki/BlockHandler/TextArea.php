@@ -421,7 +421,8 @@ class TextArea extends Base
 
 
             $headerlib->add_js(
-                /** @lang JavaScript */            '
+                /** @lang JavaScript */
+                '
     $("#' . $as_id . '").form().submit(function () {
         addSyntaxPlugin("' . $as_id . '", $(this));
         return true;
@@ -429,5 +430,5 @@ class TextArea extends Base
             );
         }
         return $html;
-        }
+    }
 }

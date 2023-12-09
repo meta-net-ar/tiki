@@ -18,7 +18,7 @@ class CategoryName extends Base
             trigger_error("categoryName: missing 'id' parameter");
             return;
         }
-    
+
         $categlib = \TikiLib::lib('categ');
         return $categlib->get_category_name($params['id']);
     }

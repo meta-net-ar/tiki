@@ -27,9 +27,9 @@ class FileInfo extends Base
         }
         $filegallib = \TikiLib::lib('filegal');
         $params['_id'] = (int) $params['_id'];
-    
+
         $infos = $filegallib->get_file($params['_id']);
-    
+
         if (isset($infos[$params['_field']]) && $infos[$params['_field']] != '') {
             $return = $infos[$params['_field']];
         } elseif ($params['_field'] == 'name') {
@@ -38,7 +38,7 @@ class FileInfo extends Base
         } else {
             $return = '';
         }
-    
+
         if (isset($params['_link'])) {
             global $prefs, $filegals_manager, $url_path;
             $key_type = substr($infos['filetype'], 0, 9);
@@ -49,7 +49,7 @@ class FileInfo extends Base
             $return = $tmp . '>' . $return . '</a>';
             unset($tmp);
         }
-    
+
         return $return;
     }
 }

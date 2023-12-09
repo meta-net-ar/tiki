@@ -23,7 +23,7 @@ class MemUsage extends Base
         } else {
             $memusage = 0;
         }
-    
+
         if ($memusage > 0) {
             $memunit = "B";
             if ($memusage > 1024) {

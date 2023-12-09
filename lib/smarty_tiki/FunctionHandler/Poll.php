@@ -21,12 +21,12 @@ class Poll extends Base
         $smarty = TikiLib::lib('smarty');
         extract($params);
         // Param = zone
-        if (!is_object($polllib)) {
+        if (! is_object($polllib)) {
             include_once('lib/polls/polllib_shared.php');
         }
 
         if (isset($rate)) {
-            if (!TikiLib::lib('tiki')->page_exists($rate)) {
+            if (! TikiLib::lib('tiki')->page_exists($rate)) {
                 return false;
             }
         }

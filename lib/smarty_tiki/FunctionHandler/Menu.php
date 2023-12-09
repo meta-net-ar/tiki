@@ -32,7 +32,7 @@ class Menu extends Base
     {
         global $prefs;
         global $tikilib;
-        
+
         $smarty = TikiLib::lib('smarty');
         $default = ['css' => 'y'];
         if (isset($params['params'])) {
@@ -76,7 +76,7 @@ class Menu extends Base
                         function ($categId) {
                             $categ = \TikiLib::lib('categ')->get_category($categId);
                             $parent = \TikiLib::lib('categ')->get_category($categ["parentId"]);
-                            if (!$parent || $parent["parentId"] != 0 || !$parent["tplGroupContainerId"]) {
+                            if (! $parent || $parent["parentId"] != 0 || ! $parent["tplGroupContainerId"]) {
                                 return null;
                             }
                             $templatedgroupid = \TikiLib::lib('attribute')->get_attribute("category", $categId, "tiki.category.templatedgroupid");
@@ -101,11 +101,11 @@ class Menu extends Base
             $structured = [];
 
             // Unification with structure menus - adds sectionLevel
-            if (empty($menu_info['structure']) and !empty($channels['data'])) {
+            if (empty($menu_info['structure']) and ! empty($channels['data'])) {
                 $channels['data'] = $this->add_section_levels_to_menu_data($channels['data']);
             }
 
-            if (!empty($channels['data'])) {
+            if (! empty($channels['data'])) {
                 // Builds Menus nested tree of options
                 foreach ($channels['data'] as $element) {
                     $attribute = \TikiLib::lib('attribute')->get_attribute('menu', $element["optionId"], 'tiki.menu.templatedgroupid');
@@ -114,7 +114,7 @@ class Menu extends Base
                         $element["url"] = str_replace("--groupname--", $catName, $element["name"]);
                         $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
                         $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
-                    } elseif ($attribute && !$categGroups[$attribute]) {
+                    } elseif ($attribute && ! $categGroups[$attribute]) {
                         continue;
                     }
 
@@ -137,7 +137,7 @@ class Menu extends Base
                         }
 
                         // Pushes the element at the end of selected element children.
-                        if (!empty($branch['children'])) {
+                        if (! empty($branch['children'])) {
                             array_push($branch['children'], $element);
                         } else {
                             $branch['children'] = [$element];
@@ -256,7 +256,7 @@ class Menu extends Base
         }
         if ($params['css'] !== 'n' && $prefs['feature_cssmenus'] == 'y') {
             static $idCssmenu = 0;
-            if (!isset($css_id)) { //adding $css_id parameter to customize menu id and prevent automatic id renaming when a menu is removed
+            if (! isset($css_id)) { //adding $css_id parameter to customize menu id and prevent automatic id renaming when a menu is removed
                 $smarty->assign('idCssmenu', $idCssmenu++);
             } else {
                 $smarty->assign('idCssmenu', $css_id);
@@ -267,7 +267,7 @@ class Menu extends Base
             }
             $smarty->assign('menu_type', $params['type']);
 
-            if (!empty($drilldown) && $drilldown == 'y') {
+            if (! empty($drilldown) && $drilldown == 'y') {
                 $smarty->assign('drilldownmenu', 'y');
             }
 
@@ -288,7 +288,7 @@ class Menu extends Base
     *
     * @return String The new parsed link
     */
-   
+
     public static function helper_function_contruct_menu_url_from_db($url_from_db)
     {
         if (preg_match('/^\(\(([^()]+)\)\)$/', $url_from_db)) { //as page url are save as ((V-Log)) this should match the regex
@@ -314,9 +314,9 @@ class Menu extends Base
         $cachelib = TikiLib::lib('cache');
         $cacheName = isset($prefs['mylevel']) ? $prefs['mylevel'] : 0;
         $cacheName .= '_' . $prefs['language'] . '_' . md5(implode("\n", $tikilib->get_user_groups($user)));
-    
+
         extract($params, EXTR_SKIP);
-    
+
         if (isset($structureId)) {
             $cacheType = 'structure_' . $structureId . '_';
         } else {
@@ -328,16 +328,16 @@ class Menu extends Base
                 $cacheType = 'menu_' . $id . '_';
             }
         }
-    
+
         if ($cdata = $cachelib->getSerialized($cacheName, $cacheType)) {
             list($menu_info, $channels) = $cdata;
         } elseif (! empty($structureId)) {
             $structlib = TikiLib::lib('struct');
-    
+
             if (! is_numeric($structureId)) {
                 $structureId = $structlib->get_struct_ref_id($structureId);
             }
-    
+
             $channels = $structlib->build_subtree_toc($structureId);
             $structure_info = $structlib->s_get_page_info($structureId);
             $channels = $structlib->to_menu($channels, $structure_info['pageName'], 0, 0, $params);
@@ -355,14 +355,14 @@ class Menu extends Base
         if (! isset($setSelected) || $setSelected !== 'n') {
             $channels = $menulib->setSelected($channels, isset($sectionLevel) ? $sectionLevel : '', isset($toLevel) ? $toLevel : '', $params);
         }
-    
+
         foreach ($channels['data'] as &$item) {
             if (! empty($menu_info['parse']) && $menu_info['parse'] === 'y') {
                 //    $item['block'] = TikiLib::lib('parser')->contains_html_block($item['name']); // Only used for CSS menus
                 $item['name'] = preg_replace('/(.*)\n$/', '$1', $item['name']); // parser adds a newline to everything
             }
         }
-    
+
         return [$menu_info, $channels];
     }
 
@@ -384,7 +384,7 @@ class Menu extends Base
             }
             $prev_type = $menu_item['type'];
             $menu_item['sectionLevel'] = $sectionLevel;
-    
+
             return $menu_item;
         }, $data);
         return $new_data;

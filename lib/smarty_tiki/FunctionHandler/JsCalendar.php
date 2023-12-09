@@ -38,7 +38,7 @@ class JsCalendar extends Base
 
         $uiCalendarInstance = uniqid();
 
-        if (!isset($params['id'])) {
+        if (! isset($params['id'])) {
             $params['id'] = 'uiCal_' . $uiCalendarInstance;
         }
         $id = '';
@@ -48,7 +48,7 @@ class JsCalendar extends Base
         } else {
             $name = '';
         }
-        if (!isset($params['date'])) {
+        if (! isset($params['date'])) {
             // if date is provided empty then show a blank date (for filters)
             $params['date'] = $tikilib->now;
         }
@@ -70,12 +70,12 @@ class JsCalendar extends Base
         }';
         }
 
-        if (!empty($params['notAfter'])) {
+        if (! empty($params['notAfter'])) {
             $datepicker_options .= ', onSelect: function (selectedDateTime) {
         $("' . $params['notAfter'] . '").find(".isDatepicker").datetimepicker("option", "minDate", selectedDateTime); }';
         }
 
-        if (!empty($params['notBefore'])) {
+        if (! empty($params['notBefore'])) {
             $datepicker_options .= ', onSelect: function (selectedDateTime) {
         $("' . $params['notBefore'] . '").find(".isDatepicker").datetimepicker("option", "maxDate", selectedDateTime); }';
         }
@@ -86,7 +86,7 @@ class JsCalendar extends Base
             $calendarlib = \TikiLib::lib('calendar');
             $first = $calendarlib->firstDayofWeek();
 
-            if (!is_numeric($first) || !in_array($first, [0, 1, 2, 3, 4, 5, 6])) {
+            if (! is_numeric($first) || !in_array($first, [0, 1, 2, 3, 4, 5, 6])) {
                 $first = 0;
             }
 
@@ -167,13 +167,13 @@ class JsCalendar extends Base
         $html .= '<input type="text" class="form-control isDatepicker" id="' . $params['id'] . '_dptxt" value="">'; // text version of datepicker date
         $headerlib->add_jq_onready('$("#' . $params['id'] . '_dptxt").change(function(e){' .
             'var inst = $.datepicker._getInst(this);' .
-            '$.datepickerAdjustAltField("' . (!isset($params['showtime']) || $params['showtime'] === 'n' ? 'datepicker' : 'datetimepicker') . '", inst);' .
+            '$.datepickerAdjustAltField("' . (! isset($params['showtime']) || $params['showtime'] === 'n' ? 'datepicker' : 'datetimepicker') . '", inst);' .
             '})');
         $headerlib->add_jq_onready('$("#' . $params['id'] . '").change(function(e){' .
             '$("input#' . $params['id'] . '_tzoffset").val((new Date(parseInt($(this).val())*1000)).getTimezoneOffset());' .
             '})');
 
-        $display_tz = !empty($params['timezone']) ? $params['timezone'] : $tikilib->get_display_timezone();
+        $display_tz = ! empty($params['timezone']) ? $params['timezone'] : $tikilib->get_display_timezone();
         if ($display_tz == '') {
             $display_tz = 'UTC';
         }
@@ -186,7 +186,7 @@ class JsCalendar extends Base
         // TODO use a parsed version of $prefs['short_date_format']
         // Note: JS timestamp is in milliseconds - php is seconds
         // Note: adding local browser offset if php date is in UTC, see JsCalendar tracker field
-        if (!isset($params['showtime']) || $params['showtime'] === 'n') {
+        if (! isset($params['showtime']) || $params['showtime'] === 'n') {
             $command = 'datepicker';
             $js_val = empty($params['date']) ? '""' : '$.datepicker.formatDate( "' .
                 $prefs['short_date_format_js'] . '", new Date(' . $params['date'] . '* 1000 + ' . (isset($params['isutc']) && $params['isutc'] && intval($params['date']) > 0 ? 'parseInt($("input#' . $params['id'] . '_tzoffset").val())*60*1000' : '0') . '))';
@@ -226,6 +226,6 @@ var tm = { hour: dt.getHours(), minute: dt.getMinutes(), second: dt.getSeconds()
 }
 
 function smarty_function_jscalendar_tra($str)
-    {
-        return str_replace("'", "\\'", tra($str));
-    }
+{
+    return str_replace("'", "\\'", tra($str));
+}

@@ -19,7 +19,7 @@ class TrackerInput extends Base
         $field = $params['field'];
         if (isset($params['item'])) {
             $item = $params['item'];
-        } elseif (!empty($params['itemId'])) {
+        } elseif (! empty($params['itemId'])) {
             $item = $trklib->get_item_info($params['itemId']);
         } else {
             $item = [];
@@ -33,7 +33,7 @@ class TrackerInput extends Base
             unset($context['field']);
 
             $info = '';
-            if (!empty($field['encryptionKeyId'])) {
+            if (! empty($field['encryptionKeyId'])) {
                 try {
                     $key = new \Tiki\Encryption\Key($field['encryptionKeyId']);
                     $field['value'] = $key->decryptData($handler->getValue());
@@ -59,7 +59,7 @@ class TrackerInput extends Base
                 } else {
                     $desc = htmlspecialchars($desc);
                 }
-                if (!empty($desc)) {
+                if (! empty($desc)) {
                     $desc = '<div class="description form-text">' . $desc . '</div>';
                 }
             }
