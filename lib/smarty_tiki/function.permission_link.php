@@ -7,6 +7,6 @@
 
 function smarty_function_permission_link($params, \Smarty\Template $template)
 {
-    $smartyFunctionPermissionLinkHandler = new \smartytiki\FunctionHandler\PermissionLink();
+    $smartyFunctionPermissionLinkHandler = new \SmartyTiki\FunctionHandler\PermissionLink();
     return $smartyFunctionPermissionLinkHandler->handle($params, $template);
 }
