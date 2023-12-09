@@ -46,7 +46,7 @@ class FunctionToolbarsTest extends TikiTestCase
         ];
         $expectedResults = file_get_contents('lib/test/smarty_tiki/fixtures/FunctionToolbarsDefault.html');
 
-        $result = smarty_function_toolbars($params, $this->smarty);
+        $result = smarty_function_toolbars($params, $this->smarty->getEmptyInternalTemplate());
 
         // It's a real problem that the templated generates a href that both depends on the path AND the filename used to call phpunit.  It makes this test extremely brittle.  I don't know which file actually generates the href and how to inject it. - benoitg
 
@@ -83,7 +83,7 @@ class FunctionToolbarsTest extends TikiTestCase
         // clean out the leftover js additions from previous tests
         $headerlib->__construct();
 
-        $result = smarty_function_toolbars($params, $this->smarty);
+        $result = smarty_function_toolbars($params, $this->smarty->getEmptyInternalTemplate());
 
         // when the full test set is run perms work differently and the Source tool is added
         // can't work out why so ignore that one if it's missing FIXME?
