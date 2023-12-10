@@ -52,6 +52,7 @@ function module_directory_last_sites($mod_reference, $module_params)
     global $prefs;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
+    $module_params['desc'] = isset($module_params['desc']) ? $module_params['desc'] : 'n';
     if (isset($module_params['categoryId'])) {
         global $dirlib;
         include_once('lib/directory/dirlib.php');
