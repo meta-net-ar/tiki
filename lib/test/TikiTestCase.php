@@ -21,6 +21,19 @@ abstract class TikiTestCase extends TestCase
 {
     protected $backupGlobals = false;
 
+    public static function setUpBeforeClass(): void
+    {
+        // Inclusion of all files inside lib/smarty_tiki, so all smarty_* functions are defined
+        $smartyTikiDir = __DIR__ . '/../smarty_tiki/';
+        $smartyTikiFiles = scandir($smartyTikiDir);
+
+        foreach ($smartyTikiFiles as $file) {
+            if (is_file($smartyTikiDir . $file) && pathinfo($smartyTikiDir . $file, PATHINFO_EXTENSION) === 'php' && $file !== 'index.php') {
+                require_once($smartyTikiDir . $file);
+            }
+        }
+    }
+
     protected function ensureDefaultGalleryExists()
     {
         $filegallib = TikiLib::lib('filegal');
