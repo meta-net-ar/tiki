@@ -20,6 +20,7 @@ function module_tracker_input_info()
         'prefs' => ['feature_trackers'],
         'params' => [
             'trackerId' => [
+                'required' => true,
                 'name' => tr('Tracker'),
                 'description' => tr('Tracker ID to render'),
                 'filter' => 'int',
