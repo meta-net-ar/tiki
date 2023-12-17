@@ -88,6 +88,16 @@ if (is_dir(__DIR__ . '/../../vendor_custom')) {
 spl_autoload_register('Tiki\PSR12Migration\Autoload::autoloadAlias');
 spl_autoload_register('Tiki_Autoload::autoload');
 
+// Inclusion of all files inside lib/smarty_tiki, so all smarty_* functions are defined
+$smartyTikiDir = __DIR__ . '/../smarty_tiki/';
+$smartyTikiFiles = scandir($smartyTikiDir);
+
+foreach ($smartyTikiFiles as $file) {
+    if (is_file($smartyTikiDir . $file) && pathinfo($smartyTikiDir . $file, PATHINFO_EXTENSION) === 'php' && $file !== 'index.php') {
+        require_once($smartyTikiDir . $file);
+    }
+}
+
 /**
  * A callback for PHP set_error_handler()
  * Set how Tiki will report Errors
