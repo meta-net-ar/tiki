@@ -50,8 +50,8 @@ if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
         || ! ( // check the existence of critical files denoting a legacy vendor folder
             (file_exists(__DIR__ . '/../../vendor/zendframework/zend-config/src/Config.php') //ZF2
                 || file_exists(__DIR__ . '/../../vendor/bombayworks/zendframework1/library/Zend/Config.php')) //ZF1
-            && (file_exists(__DIR__ . '/../../vendor/smarty/smarty/libs/Smarty.class.php') //Smarty
-                || file_exists(__DIR__ . '/../../vendor/smarty/smarty/distribution/libs/Smarty.class.php')) //Smarty
+            && file_exists(__DIR__ . '/../../vendor/smarty/smarty/src/Smarty.php') //Smarty
+
             && file_exists(__DIR__ . '/../../vendor/adodb/adodb/adodb.inc.php') //Adodb
         )
     ) {
