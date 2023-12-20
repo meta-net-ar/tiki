@@ -218,7 +218,7 @@ function wikiplugin_snarf($data, $params)
 
     if (! $isFresh && empty($params['link'])) {
         include_once('lib/smarty_tiki/block.self_link.php');
-        $icon = '<div style="text-align:right">' . smarty_block_self_link(['_icon' => 'arrow_refresh', 'snarf_refresh' => $params['url']], '', $smarty) . '</div>';
+        $icon = '<div style="text-align:right">' . smarty_block_self_link(['_icon' => 'arrow_refresh', 'snarf_refresh' => $params['url']], '', $smarty->getEmptyInternalTemplate()) . '</div>';
         $ret = $icon . $ret;
     }
 

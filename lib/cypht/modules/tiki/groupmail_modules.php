@@ -589,18 +589,18 @@ if (! hm_exists('sender_callback')) {
                 '_icon_name' => 'user',
                 '_width' => 12,
                 '_height' => 12
-            ], tr('View contact'), $smarty) . ' ';
+            ], tr('View contact'), $smarty->getEmptyInternalTemplate()) . ' ';
             if (! empty($wikiPage)) {
                 $output .= smarty_block_self_link([
                     '_script' => $tikiroot . smarty_modifier_sefurl($wikiPage),
                     '_class' => "mod_webmail_from"
-                ], $from, $smarty);
+                ], $from, $smarty->getEmptyInternalTemplate());
             } else {
                 $output .= smarty_block_self_link([
                 '_script' => $tikiroot . 'tiki-contacts.php',
                 'contactId' => $contactId,
                 '_class' => "mod_webmail_from"
-                ], $from, $smarty);
+                ], $from, $smarty->getEmptyInternalTemplate());
             }
         } else {
             $output = '<span class="mod_webmail_from">' . $from . '</span>';

@@ -564,7 +564,7 @@ if (isset($_REQUEST["returntracker"]) || isset($_REQUEST["save_return"])) {
                 'trackerId' => $trackerId
             ],
             '',
-            $smarty
+            $smarty->getEmptyInternalTemplate()
         )
     );
     die;
