@@ -29,7 +29,7 @@ class PatchCypht
         umask(0);
 
         // setup stock version with missing files
-        copy($cypht . 'hm3.ini', $vendors . $fixDS('jason-munro/cypht/hm3.ini'));
+        copy($cypht . '.env', $vendors . $fixDS('jason-munro/cypht/.env'));
         $tiki_module = $vendors . $fixDS('jason-munro/cypht/modules/tiki');
         if (! is_dir($tiki_module)) {
             mkdir($tiki_module, 0755);
@@ -50,7 +50,8 @@ class PatchCypht
         $cypthFolder = $fixDS('jason-munro/cypht');
         $genScript = $fixDS('scripts/config_gen.php');
         $output = `cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}`;
-        if (! is_string($output) || ! strstr($output, 'hm3.rc file written')) {
+
+        if (! is_string($output)  || ! strstr($output, 'dynamic.php file written')) {
             $io->write('Could not build Cypht package configuration. Check the output below and make sure minimum PHP version is available and executable as CLI.');
             if ($output === false) {
                 $io->write('The pipe cannot be established.');
@@ -61,7 +62,6 @@ class PatchCypht
                 $io->write($output);
             }
         }
-
         // copy site.js and site.css
         copy($vendors . $fixDS('jason-munro/cypht/site/site.js'), $cypht . 'site.js');
         copy($vendors . $fixDS('jason-munro/cypht/site/site.css'), $cypht . 'site.css');

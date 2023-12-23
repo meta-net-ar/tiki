@@ -52,7 +52,7 @@ class SieveFiltersCommand extends Command
         require_once $tikipath . '/lib/cypht/integration/classes.php';
         require_once APP_PATH . 'modules/site/lib.php';
 
-        $site_config = new Tiki_Hm_Site_Config_File(APP_PATH . 'hm3.rc');
+        $site_config = new Tiki_Hm_Site_Config_File();
         $session_config = new Hm_Session_Setup($site_config);
         $cypht_session = $session_config->setup_session();
         $cypht_cache = new Hm_Cache($site_config, $cypht_session);

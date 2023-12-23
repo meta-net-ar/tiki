@@ -60,7 +60,7 @@ if (empty($_SESSION['cypht']['request_key'])) {
 $_SESSION['cypht']['username'] = $user;
 
 /* get configuration */
-$config = new Tiki_Hm_Site_Config_File(APP_PATH . 'hm3.rc');
+$config = new Tiki_Hm_Site_Config_File();
 
 /* process the request */
 $dispatcher = new Hm_Dispatch($config);

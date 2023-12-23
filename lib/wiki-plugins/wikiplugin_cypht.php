@@ -365,7 +365,7 @@ function wikiplugin_cypht($data, $params)
     ");
 
     /* get configuration */
-    $config = new Tiki_Hm_Site_Config_File(APP_PATH . 'hm3.rc', $session_prefix, $settings_per_page);
+    $config = new Tiki_Hm_Site_Config_File([], $session_prefix, $settings_per_page);
 
     // merge existing configuration with plugin params for smtp/imap servers
     if (! empty($params['imap_server']) && ! empty($params['imap_username']) && ! empty($params['imap_password'])) {

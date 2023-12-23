@@ -22,7 +22,7 @@ class Services_Cypht_Controller
         session_write_close();
 
         /* get configuration */
-        $config = new Tiki_Hm_Site_Config_File(APP_PATH . 'hm3.rc', $session_prefix, @$_SESSION[$session_prefix]['settings_per_page']);
+        $config = new Tiki_Hm_Site_Config_File([], $session_prefix, @$_SESSION[$session_prefix]['settings_per_page']);
 
         /* process the request */
         $dispatcher = new Hm_Dispatch($config);
