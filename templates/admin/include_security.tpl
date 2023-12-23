@@ -55,8 +55,10 @@
                 <legend>{tr}Smarty and Features Security{/tr}</legend>
                 {preference name=smarty_security}
                 <div class="adminoptionboxchild" id="smarty_security_childcontainer">
-                    {preference name=smarty_security_functions}
-                    {preference name=smarty_security_modifiers}
+                    {preference name=smarty_security_allowed_tags}
+                    {preference name=smarty_security_disabled_tags}
+                    {preference name=smarty_security_allowed_modifiers}
+                    {preference name=smarty_security_disabled_modifiers}
                     {preference name=smarty_security_dirs}
                 </div>
                 {preference name=feature_purifier}

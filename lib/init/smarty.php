@@ -26,13 +26,55 @@ require_once __DIR__ . '/SmartyTikiErrorHandler.php';
  */
 class Tiki_Security_Policy extends \Smarty\Security
 {
+    /**
+     * is an array of regular expressions matching URIs that are considered trusted.
+     * See https://smarty-php.github.io/smarty/5.x/api/security/ for more details
+     *
+     * @var array
+     */
     public $trusted_uri = [];
 
     /**
-     * needs a proper description
-     * @var array $secure_dir
+     * This is the list of template directories that are considered secure.
+     * $template_dir is in this list implicitly. A directory configured using $smarty->setTemplateDir() is 
+     * considered secure implicitly. The default is an empty array.
+     *
+     * @var array
      */
     public $secure_dir = [];
+
+    /**
+     * This is an array of allowed tags. It's the array of (registered / autoloaded) function-, block and filter plugins
+     * that should be accessible to the template. If empty, no restriction by allowed_tags.
+     *
+     * @var array
+     */
+    public $allowed_tags = [];
+
+    /**
+     * This is an array of disabled tags. It's the array of (registered / autoloaded) function-, block and filter plugins
+     * that may not be accessible to the template. If empty, no restriction by disabled_tags.
+     *
+     * @var array
+     */
+    public $disabled_tags = [];
+
+    /**
+     * This is an array of allowed modifier plugins. It's the array of (registered / autoloaded) modifiers that should be accessible to the template.
+     * If this array is non-empty, only the herein listed modifiers may be used. This is a whitelist.
+     * If empty, no restriction by allowed_modifiers.
+     *
+     * @var array
+     */
+    public $allowed_modifiers = [];
+
+    /**
+     * This is an array of disabled modifier plugins. It's the array of (registered / autoloaded) modifiers that may not be accessible to the template.
+     * If empty, no restriction by disabled_modifiers.
+     *
+     * @var array
+     */
+    public $disabled_modifiers = [];
 
     /**
      * needs a proper description
@@ -55,8 +97,10 @@ class Tiki_Security_Policy extends \Smarty\Security
             $this->trusted_uri[] = '#' . preg_quote("http://$url_host", '$#') . '#';
             $this->trusted_uri[] = '#' . preg_quote("https://$url_host", '$#') . '#';
 
-            // $functions = array_filter($tikilib->get_preference('smarty_security_functions', [], true));  Momentanly commented, will be removed when ensured there is no regression
-            // $modifiers = array_filter($tikilib->get_preference('smarty_security_modifiers', [], true));
+            $allowed_tags = array_filter($tikilib->get_preference('smarty_security_allowed_tags', [], true));
+            $disabled_tags = array_filter($tikilib->get_preference('smarty_security_disabled_tags', [], true));
+            $allowed_modifiers = array_filter($tikilib->get_preference('smarty_security_allowed_modifiers', [], true));
+            $disabled_modifiers = array_filter($tikilib->get_preference('smarty_security_disabled_modifiers', [], true));
             $dirs = array_filter($tikilib->get_preference('smarty_security_dirs', [], true));
 
             $cdns = preg_split('/\s+/', $tikilib->get_preference('tiki_cdn', ''));
@@ -66,12 +110,18 @@ class Tiki_Security_Policy extends \Smarty\Security
                 $this->trusted_uri[] = '#' . preg_quote($uri) . '$#';
             }
         } else {
-            // $functions = [];
-            // $modifiers = [];
+            $allowed_tags = [];
+            $disabled_tags = [];
+            $allowed_modifiers = [];
+            $disabled_modifiers = [];
             $dirs = [];
         }
 
         // Add defaults
+        $this->allowed_tags = $allowed_tags;
+        $this->disabled_tags =  $disabled_tags;
+        $this->allowed_modifiers = $allowed_modifiers;
+        $this->disabled_modifiers = $disabled_modifiers;
         $this->secure_dir = array_merge($this->secure_dir, $dirs);
     }
 }

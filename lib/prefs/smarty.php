@@ -16,16 +16,18 @@ function prefs_smarty_list()
         ],
         'smarty_security' => [
             'name' => tra('Smarty security'),
-            'description' => tra('Do not allow PHP code in Smarty templates.'),
+            'description' => tra('Enable/Disable Smarty security. If checked, you can then define allowed and disabled modifiers and tags(functions, blocks and filters) that should be or not accesible to the template.'),
             'warning' => tra('You should leave this on unless you know what you are doing.'),
             'type' => 'flag',
             'perspective' => false,
             'default' => 'y',
         ],
-        'smarty_security_modifiers' => [
-            'name' => tr('Extra Smarty modifiers'),
-            'description' => tr('Make additional PHP functions available as Smarty modifiers. This may be needed for custom templates.'),
+        'smarty_security_allowed_tags' => [
+            'name' => tr('Allowed Smarty tags'),
+            'description' => tr("This is a list of allowed tags. It's the list of (registered / autoloaded) function-, block and filter plugins that should be accessible to the template.
+                                If empty, no restriction by allowed_tags. This may be needed for custom templates."),
             'warning' => tr('There may be security implications. Make sure you know what you are doing.'),
+            'hint' => tr('Use "," to separate values'),
             'type' => 'text',
             'separator' => ',',
             'perspective' => false,
@@ -34,10 +36,40 @@ function prefs_smarty_list()
                 'smarty_security',
             ],
         ],
-        'smarty_security_functions' => [
-            'name' => tr('Extra Smarty functions'),
-            'description' => tr('Make additional PHP functions available as Smarty functions. This may be needed for custom templates.'),
+        'smarty_security_disabled_tags' => [
+            'name' => tr('Disabled Smarty tags'),
+            'description' => tr("This is a list of disabled tags. It's the list of (registered / autoloaded) function-, block and filter plugins that may not be accessible to the template.
+                                If empty, no restriction by disabled_tags. This may be needed for custom templates."),
             'warning' => tr('There may be security implications. Make sure you know what you are doing.'),
+            'hint' => tr('Use "," to separate values'),
+            'type' => 'text',
+            'separator' => ',',
+            'perspective' => false,
+            'default' => '',
+            'dependencies' => [
+                'smarty_security',
+            ],
+        ],
+        'smarty_security_allowed_modifiers' => [
+            'name' => tr('Allowed Smarty modifiers'),
+            'description' => tr("This is the list of allowed modifier plugins. It's the array of (registered / autoloaded) modifiers that should be accessible to the template.
+                                If this array is non-empty, only the herein listed modifiers may be used. This is a whitelist. If empty, no restriction by allowed_modifiers. This may be needed for custom templates."),
+            'warning' => tr('There may be security implications. Make sure you know what you are doing.'),
+            'hint' => tr('Use "," to separate values'),
+            'type' => 'text',
+            'separator' => ',',
+            'perspective' => false,
+            'default' => '',
+            'dependencies' => [
+                'smarty_security',
+            ],
+        ],
+        'smarty_security_disabled_modifiers' => [
+            'name' => tr('Disabled Smarty modifiers'),
+            'description' => tr("This is a list of disabled modifier plugins. It's the list of (registered / autoloaded) modifiers that may not be accessible to the template.
+                                If empty, no restriction by disabled_modifiers. This may be needed for custom templates."),
+            'warning' => tr('There may be security implications. Make sure you know what you are doing.'),
+            'hint' => tr('Use "," to separate values'),
             'type' => 'text',
             'separator' => ',',
             'perspective' => false,
