@@ -7,6 +7,6 @@
 
 function smarty_modifier_avatarize($user, $float = '', $default = '', $show_tag = 'y')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_avatarize($user, $float, $default, $show_tag);
+    $avatarizeModifier = new \SmartyTiki\Modifier\Avatarize();
+    return $avatarizeModifier->handle($user, $float, $default, $show_tag);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_in_group($group, $auser = '')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_in_group($group, $auser);
+    $inGroupModifier = new \SmartyTiki\Modifier\InGroup();
+    return $inGroupModifier->handle($group, $auser);
 }

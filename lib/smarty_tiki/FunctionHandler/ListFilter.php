@@ -76,7 +76,7 @@ class ListFilter extends Base
             if (! isset($query)) {
                 $query = 'textFilter';
             }
-            if (! empty($query) && !empty($_REQUEST[$query])) {
+            if (! empty($query) && ! empty($_REQUEST[$query])) {
                 $input .= ' value="' . $_REQUEST[$query] . '"';
             } elseif (! empty($editorId)) {
                 $parentTabId = (empty($parentTabId) ? "" : $parentTabId);

@@ -7,6 +7,6 @@
 
 function smarty_modifier_money_format($number, $locale, $currency, $format = '%(#10n', $display = 0)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_money_format($number, $locale, $currency, $format, $display);
+    $moneyFormatModifier = new \SmartyTiki\Modifier\MoneyFormat();
+    return $moneyFormatModifier->handle($number, $locale, $currency, $format, $display);
 }

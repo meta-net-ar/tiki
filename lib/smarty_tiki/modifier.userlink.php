@@ -7,6 +7,6 @@
 
 function smarty_modifier_userlink($other_user, $class = 'userlink', $idletime = 'not_set', $fullname = '', $max_length = 0, $popup = '')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_userlink($other_user, $class, $idletime, $fullname, $popup);
+    $userLinkModifier = new \SmartyTiki\Modifier\UserLink();
+    return $userLinkModifier->handle($other_user, $class, $idletime, $fullname, $popup);
 }

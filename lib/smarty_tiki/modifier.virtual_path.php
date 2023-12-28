@@ -8,6 +8,6 @@
 
 function smarty_modifier_virtual_path($fileOrPageId, $type = 'file')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_virtual_path($fileOrPageId, $type);
+    $virtualPathModifier = new \SmartyTiki\Modifier\VirtualPath();
+    return $virtualPathModifier->handle($fileOrPageId, $type);
 }

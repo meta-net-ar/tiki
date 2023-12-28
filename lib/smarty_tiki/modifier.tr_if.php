@@ -8,6 +8,6 @@
 
 function smarty_modifier_tr_if($source)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tr_if($source);
+    $trIfModifier = new \SmartyTiki\Modifier\TrIf();
+    return $trIfModifier->handle($source);
 }

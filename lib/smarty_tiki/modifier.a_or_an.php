@@ -7,6 +7,6 @@
 
 function smarty_modifier_a_or_an($string, $caps = false)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_a_or_an($string, $caps);
+    $aOrAnModifier = new \SmartyTiki\Modifier\AorAn();
+    return $aOrAnModifier->handle($string, $caps);
 }

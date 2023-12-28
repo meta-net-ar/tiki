@@ -9,6 +9,6 @@
  */
 function smarty_modifier_output($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_output($string);
+    $outputModifier = new \SmartyTiki\Modifier\Output();
+    return $outputModifier->handle($string);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_d($var, $modifier = '')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_d($var, $modifier);
+    $dModifier = new \SmartyTiki\Modifier\D();
+    return $dModifier->handle($var, $modifier);
 }

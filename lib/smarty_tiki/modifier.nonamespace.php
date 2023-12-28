@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_nonamespace($pageName)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_nonamespace($pageName);
+    $noNamespaceModifier = new \SmartyTiki\Modifier\NoNamespace();
+    return $noNamespaceModifier->handle($pageName);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_file_diagram($fileId)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_file_diagram($fileId);
+    $fileDiagramModifier = new \SmartyTiki\Modifier\FileDiagram();
+    return $fileDiagramModifier->handle($fileId);
 }

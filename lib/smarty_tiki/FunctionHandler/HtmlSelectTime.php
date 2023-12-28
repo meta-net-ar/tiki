@@ -62,7 +62,7 @@ class HtmlSelectTime extends Base
             $hour_empty = $minute_empty = $second_empty = $all_empty;
         }
 
-        if (! isset($time) or !$time) {
+        if (! isset($time) or ! $time) {
             $time = $tikilib->now;
         } elseif (is_string($time) && strpos($time, ':') !== false) {
             $e = explode(':', $time, 3);

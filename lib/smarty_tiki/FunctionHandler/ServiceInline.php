@@ -16,10 +16,10 @@ class ServiceInline extends Base
     {
         $servicelib = \TikiLib::lib('service');
 
-        if (!isset($params['controller'])) {
+        if (! isset($params['controller'])) {
             return 'missing-controller';
         }
-        if (!isset($params['action'])) {
+        if (! isset($params['action'])) {
             return 'missing-action';
         }
         $controller = $params['controller'];

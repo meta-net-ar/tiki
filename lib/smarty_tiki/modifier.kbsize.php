@@ -7,6 +7,6 @@
 
 function smarty_modifier_kbsize($string, $bytes = false, $nb_decimals = 2, $unit_separator = '&nbsp;')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_kbsize($string, $bytes, $nb_decimals, $unit_separator);
+    $kbSizeModifier = new \SmartyTiki\Modifier\KbSize();
+    return $kbSizeModifier->handle($string, $bytes, $nb_decimals, $unit_separator);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_tiki_remaining_days_from_now($time, $format)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_remaining_days_from_now($time, $format);
+    $tikiRemainingDaysFromNow = new \SmartyTiki\Modifier\TikiRemainingDaysFromNow();
+    return $tikiRemainingDaysFromNow->handle($time, $format);
 }

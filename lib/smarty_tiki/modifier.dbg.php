@@ -7,6 +7,6 @@
 
 function smarty_modifier_dbg($string, $label = '')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_dbg($string, $label);
+    $dbgModifier = new \SmartyTiki\Modifier\Dbg();
+    return $dbgModifier->handle($string, $label);
 }

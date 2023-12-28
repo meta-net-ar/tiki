@@ -7,6 +7,6 @@
 
 function smarty_modifier_username($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_username($user, $login_fallback, $check_user_show_realnames, $html_encoding);
+    $usernameModifier = new \SmartyTiki\Modifier\Username();
+    return $usernameModifier->handle($user, $login_fallback, $check_user_show_realnames, $html_encoding);
 }

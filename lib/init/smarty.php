@@ -36,7 +36,7 @@ class Tiki_Security_Policy extends \Smarty\Security
 
     /**
      * This is the list of template directories that are considered secure.
-     * $template_dir is in this list implicitly. A directory configured using $smarty->setTemplateDir() is 
+     * $template_dir is in this list implicitly. A directory configured using $smarty->setTemplateDir() is
      * considered secure implicitly. The default is an empty array.
      *
      * @var array
@@ -119,7 +119,7 @@ class Tiki_Security_Policy extends \Smarty\Security
 
         // Add defaults
         $this->allowed_tags = $allowed_tags;
-        $this->disabled_tags =  $disabled_tags;
+        $this->disabled_tags = $disabled_tags;
         $this->allowed_modifiers = $allowed_modifiers;
         $this->disabled_modifiers = $disabled_modifiers;
         $this->secure_dir = array_merge($this->secure_dir, $dirs);

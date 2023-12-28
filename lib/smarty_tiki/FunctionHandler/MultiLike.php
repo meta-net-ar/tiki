@@ -106,7 +106,7 @@ class MultiLike extends Base
             $smarty->assign("show_likes", true);
         }
 
-        if (!empty($params['choiceLabel'])) {
+        if (! empty($params['choiceLabel'])) {
             $smarty->assign("choice_label", $params['choiceLabel']);
         } else {
             $smarty->assign("choice_label", "I found this:");

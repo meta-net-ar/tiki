@@ -2,6 +2,6 @@
 
 function smarty_modifier_forumname($commentid, $retrun_forumid = 'n')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_forumname($commentid, $retrun_forumid);
+    $forumNameModifier = new \SmartyTiki\Modifier\ForumName();
+    return $forumNameModifier->handle($commentid, $retrun_forumid);
 }

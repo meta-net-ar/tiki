@@ -7,6 +7,6 @@
 
 function smarty_modifier_parse($string, $simple = false)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_parse($string, $simple);
+    $parseModifier = new \SmartyTiki\Modifier\Parse();
+    return $parseModifier->handle($string, $simple);
 }

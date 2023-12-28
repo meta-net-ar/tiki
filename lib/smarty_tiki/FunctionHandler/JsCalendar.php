@@ -54,9 +54,9 @@ class JsCalendar extends Base
         }
         $datepicker_options = '{ altField: "#' . $params['id'] . '", onClose: function(dateText, inst) {' .
             '$(inst.settings.altField).removeClass("isDatepicker");' .
-            '$.datepickerAdjustAltField("' . ((!isset($params['showtime']) || $params['showtime'] === 'n') ? 'datepicker' : 'datetimepicker') . '", inst);' .
+            '$.datepickerAdjustAltField("' . ((! isset($params['showtime']) || $params['showtime'] === 'n') ? 'datepicker' : 'datetimepicker') . '", inst);' .
             '}';
-        if (!empty($params['goto'])) {
+        if (! empty($params['goto'])) {
             $datepicker_options .= ', onSelect: function(dateText, inst) {
             var url = "' . $params['goto'] . '".replace("%s",$("#' . $params['id'] . '").val()/1000);
             if (url.indexOf("?") > -1) {
@@ -82,11 +82,11 @@ class JsCalendar extends Base
 
         static $datepicker_options_common;
 
-        if (!$datepicker_options_common) {
+        if (! $datepicker_options_common) {
             $calendarlib = \TikiLib::lib('calendar');
             $first = $calendarlib->firstDayofWeek();
 
-            if (! is_numeric($first) || !in_array($first, [0, 1, 2, 3, 4, 5, 6])) {
+            if (! is_numeric($first) || ! in_array($first, [0, 1, 2, 3, 4, 5, 6])) {
                 $first = 0;
             }
 

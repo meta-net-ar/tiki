@@ -6,6 +6,6 @@
 
 function smarty_modifier_categid($category)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_categid($category);
+    $categIdModifier = new \SmartyTiki\Modifier\CategId();
+    return $categIdModifier->handle($category);
 }

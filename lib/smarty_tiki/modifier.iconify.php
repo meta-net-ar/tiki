@@ -7,6 +7,6 @@
 
 function smarty_modifier_iconify($string, $filetype = null, $fileId = '', $size = 1, $return = 'icon')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_iconify($string, $filetype, $fileId, $size, $return);
+    $iconifyModifier = new \SmartyTiki\Modifier\Iconify();
+    return $iconifyModifier->handle($string, $filetype, $fileId, $size, $return);
 }

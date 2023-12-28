@@ -7,6 +7,6 @@
 
 function smarty_modifier_numStyle($num, $type)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_numStyle($num, $type);
+    $numStyleModifier = new \SmartyTiki\Modifier\NumStyle();
+    return $numStyleModifier->handle($num, $type);
 }

@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_yesno($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_yesno($string);
+    $yesNoModifier = new \SmartyTiki\Modifier\YesNo();
+    return $yesNoModifier->handle($string);
 }

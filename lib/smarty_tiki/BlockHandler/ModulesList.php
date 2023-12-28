@@ -37,7 +37,7 @@ class ModulesList extends Base
         if ($repeat) {
             return;
         }
-    
+
         if (! empty($params["list"]) && count($params["list"]) > 0) {
             if ($params["nonums"] == "y") {
                 $ret = '<ul>' . $content . '</ul>';

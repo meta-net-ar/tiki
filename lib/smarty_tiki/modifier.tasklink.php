@@ -8,6 +8,6 @@
 
 function smarty_modifier_tasklink($taskId, $class_name = "link", $offset = "0", $sort_mode = "priority_desc")
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tasklink($taskId, $class_name, $offset, $sort_mode);
+    $taskLinkModifier = new \SmartyTiki\Modifier\TaskLink();
+    return $taskLinkModifier->handle($taskId, $class_name, $offset, $sort_mode);
 }

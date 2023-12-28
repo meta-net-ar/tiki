@@ -7,6 +7,6 @@
 
 function smarty_modifier_escape($string, $esc_type = 'html', $char_set = 'UTF-8', $double_encode = true)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_escape($string, $esc_type, $char_set, $double_encode);
+    $escapeModifier = new \SmartyTiki\Modifier\Escape();
+    return $escapeModifier->handle($string, $esc_type, $char_set, $double_encode);
 }

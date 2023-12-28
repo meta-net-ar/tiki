@@ -7,6 +7,6 @@
 // this returns the ISO 8601 date for microformats
 function smarty_modifier_isodate($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_isodate($string);
+    $isDateModifier = new \SmartyTiki\Modifier\IsoDate();
+    return $isDateModifier->handle($string);
 }

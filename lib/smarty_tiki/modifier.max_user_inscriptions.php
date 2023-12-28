@@ -7,6 +7,6 @@
 
 function smarty_modifier_max_user_inscriptions($text)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_max_user_inscriptions($text);
+    $maxUserInscriptionsModifier = new \SmartyTiki\Modifier\MaxUserInscrptions();
+    return $maxUserInscriptionsModifier->handle($text);
 }

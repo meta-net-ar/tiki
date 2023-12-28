@@ -7,6 +7,6 @@
 
 function smarty_modifier_truex($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_truex($string);
+    $truexModifier = new \SmartyTiki\Modifier\Truex();
+    return $truexModifier->handle($string);
 }

@@ -55,7 +55,7 @@ class WikiDiff extends Base
                 $oldver = $params['oldver'];
             }
 
-            if (! is_numeric($params['newver']) && !empty($params['newver'])) {
+            if (! is_numeric($params['newver']) && ! empty($params['newver'])) {
                 $time = strtotime($params['newver']);
                 $newver = $histlib->get_version_by_time($params['object_id'], $time);
             } else {

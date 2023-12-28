@@ -2,6 +2,6 @@
 
 function smarty_modifier_forumtopiccount($forumId)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_forumtopiccount($forumId);
+    $forumTopicCountModifier = new \SmartyTiki\Modifier\ForumTopicCount();
+    return $forumTopicCountModifier->handle($forumId);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_percent($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_percent($string);
+    $percentModifier = new \SmartyTiki\Modifier\Percent();
+    return $percentModifier->handle($string);
 }

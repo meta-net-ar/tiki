@@ -7,6 +7,6 @@
 
 function smarty_modifier_template($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_template($string);
+    $templateModifier = new \SmartyTiki\Modifier\Template();
+    return $templateModifier->handle($string);
 }

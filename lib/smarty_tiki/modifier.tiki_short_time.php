@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_tiki_short_time($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_short_time($string);
+    $tikiShortTimeModifier = new \SmartyTiki\Modifier\TikiShortTime();
+    return $tikiShortTimeModifier->handle($string);
 }

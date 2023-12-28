@@ -7,6 +7,6 @@
 
 function smarty_modifier_utf8unicode($utf8_text)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_truex($utf8_text);
+    $utf8UnicodeMdifier = new \SmartyTiki\Modifier\Utf8Unicode();
+    return $utf8UnicodeMdifier->handle($utf8_text);
 }

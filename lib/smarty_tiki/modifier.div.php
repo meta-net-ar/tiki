@@ -7,6 +7,6 @@
 
 function smarty_modifier_div($string, $num, $max = 10)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_div($string, $num, $max);
+    $divModifier = new \SmartyTiki\Modifier\Div();
+    return $divModifier->handle($string, $num, $max);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_file_can_convert_to_pdf($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_file_can_convert_to_pdf($string);
+    $fileCanConvertToPdfModifier = new \SmartyTiki\Modifier\FileCanConvertToPdf();
+    return $fileCanConvertToPdfModifier->handle($string);
 }

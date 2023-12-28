@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_times($n1, $n2)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_times($n1, $n2);
+    $timesModifier = new \SmartyTiki\Modifier\Times();
+    return $timesModifier->handle($n1, $n2);
 }

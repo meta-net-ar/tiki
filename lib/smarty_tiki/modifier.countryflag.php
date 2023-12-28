@@ -7,6 +7,6 @@
 
 function smarty_modifier_countryflag($user)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_countryflag($user);
+    $countryFlagModifier = new \SmartyTiki\Modifier\CountryFlag();
+    return $countryFlagModifier->handle($user);
 }

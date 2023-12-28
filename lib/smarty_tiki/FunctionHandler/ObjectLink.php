@@ -242,7 +242,7 @@ class ObjectLink extends Base
     {
         $cachelib = \TikiLib::lib('cache');
         $tikilib = \TikiLib::lib('tiki');
-    
+
         if (substr($link_orig, 0, 4) === 'www.') {
             $link = 'http://' . $link_orig;
         } else {
@@ -291,7 +291,7 @@ class ObjectLink extends Base
         $relationlib = \TikiLib::lib('relation');
         $attributelib = \TikiLib::lib('attribute');
         $cachelib = \TikiLib::lib('cache');
-    
+
         $cacheKey = "$relationId:$end:$title";
 
         if (! $out = $cachelib->getCached($cacheKey, 'relation_link')) {

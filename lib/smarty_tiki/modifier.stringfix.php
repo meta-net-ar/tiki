@@ -7,6 +7,6 @@
 
 function smarty_modifier_stringfix($string, $what = '_', $by = ' ')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_stringfix($string, $what, $by);
+    $stringFixModifier = new \SmartyTiki\Modifier\StringFix();
+    return $string->handle($string, $what, $by);
 }

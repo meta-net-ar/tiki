@@ -12,6 +12,6 @@ function smarty_modifier_truncate(
     $break_words = false,
     $middle = false
 ) {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_truncate($string, $length, $etc, $break_words, $middle);
+    $truncateModifier = new \SmartyTiki\Modifier\Truncate();
+    return $truncateModifier->handle($string, $length, $etc, $break_words, $middle);
 }

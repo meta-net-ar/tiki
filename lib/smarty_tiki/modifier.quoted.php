@@ -7,6 +7,6 @@
 
 function smarty_modifier_quoted($string, $format = 'simple', $replyto = '')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_quoted($string, $format, $replyto);
+    $quotedModifier = new \SmartyTiki\Modifier\Quoted();
+    return $quotedModifier->handle($string, $format, $replyto);
 }

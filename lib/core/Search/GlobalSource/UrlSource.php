@@ -12,8 +12,7 @@ class Search_GlobalSource_UrlSource implements Search_GlobalSource_Interface
             return false;
         }
 
-        $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-        $url = $smartyTikiExtension->smarty_modifier_sefurl($objectId, $objectType);
+        $url = smarty_modifier_sefurl($objectId, $objectType);
         return [
             'url' => $typeFactory->identifier($url),
         ];

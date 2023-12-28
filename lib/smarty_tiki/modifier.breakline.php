@@ -7,6 +7,6 @@
 
 function smarty_modifier_breakline($str_content)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_breakline($str_content);
+    $breaklineModifier = new \SmartyTiki\Modifier\Breakline();
+    return $breaklineModifier->handle($str_content);
 }

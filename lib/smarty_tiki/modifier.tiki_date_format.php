@@ -7,6 +7,6 @@
 
 function smarty_modifier_tiki_date_format($string, $format, $_user = false)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_date_format($string, $format, $_user);
+    $tikiDateFormatModifier = new \SmartyTiki\Modifier\TikiDateFormat();
+    return $tikiDateFormatModifier->handle($string, $format, $_user);
 }

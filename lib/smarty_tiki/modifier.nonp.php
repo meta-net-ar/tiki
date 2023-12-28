@@ -7,6 +7,6 @@
 
 function smarty_modifier_nonp($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_nonp($string);
+    $nonpModifier = new \SmartyTiki\Modifier\Nonp();
+    return $nonpModifier->handle($string);
 }

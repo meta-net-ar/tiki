@@ -7,6 +7,6 @@
 
 function smarty_modifier_number_format($number, $decimals = 2, $dec_point = '.', $thousands = ',')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_number_format($number, $decimals, $dec_point, $thousands);
+    $numberFormatModifier = new \SmartyTiki\Modifier\NumberFormat();
+    return $numberFormatModifier->handle($number, $decimals, $dec_point, $thousands);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_slug($string, $maxLength = 70, $mixedCase = false, $breakWords = false)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_slug($string, $maxLength, $mixedCase, $breakWords);
+    $slugModifier = new \SmartyTiki\Modifier\Slug();
+    return $slugModifier->handle($string, $maxLength, $mixedCase, $breakWords);
 }

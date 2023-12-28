@@ -8,7 +8,7 @@
 
 function smarty_modifier_sefurl($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
 {
-    $SmartyTikiExtension = new \smartytiki\Extension\SmartyTikiExtension();
+    $sefurlModifier = new \SmartyTiki\Modifier\Sefurl();
 
-    return $SmartyTikiExtension->smarty_modifier_sefurl($source, $type, $with_next, $all_langs, $with_title, $title);
+    return $sefurlModifier->handle($source, $type, $with_next, $all_langs, $with_title, $title);
 }

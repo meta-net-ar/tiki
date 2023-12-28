@@ -7,6 +7,6 @@
 
 function smarty_modifier_tiki_short_datetime($string, $intro = '', $same = 'y')
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_short_datetime($string, $intro, $same);
+    $tikiShortDatetime = new \SmartyTiki\Modifier\TikiShortDateTime();
+    return $tikiShortDatetime->handle($string, $intro, $same);
 }

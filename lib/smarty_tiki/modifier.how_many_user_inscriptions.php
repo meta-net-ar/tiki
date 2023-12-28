@@ -7,6 +7,6 @@
 
 function smarty_modifier_how_many_user_inscriptions($text)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_how_many_user_inscriptions($text);
+    $howManyUserInscriptionModifier = new \SmartyTiki\Modifier\HowManyUserInscriptions();
+    return $howManyUserInscriptionModifier->handle($text);
 }

@@ -7,6 +7,6 @@
 
 function smarty_modifier_tiki_long_datetime($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_long_datetime($string);
+    $tikiLongDateTimeModifier = new \SmartyTiki\Modifier\TikiLongDateTime();
+    return $tikiLongDateTimeModifier->handle($string);
 }

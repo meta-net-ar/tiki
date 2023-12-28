@@ -7,6 +7,6 @@
 
 function smarty_modifier_duration_short($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_duration_short($string);
+    $durationShortModifier = new \SmartyTiki\Modifier\DurationShort();
+    return $durationShortModifier->handle($string);
 }

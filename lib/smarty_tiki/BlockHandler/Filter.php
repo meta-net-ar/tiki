@@ -24,7 +24,7 @@ class Filter extends Base
         $unifiedsearchlib = \TikiLib::lib('unifiedsearch');
         $smarty = \TikiLib::lib('smarty');
 
-        if (!isset($params['action'])) {
+        if (! isset($params['action'])) {
             $params['action'] = '';
         }
 

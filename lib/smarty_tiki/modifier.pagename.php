@@ -8,6 +8,6 @@
 
 function smarty_modifier_pagename($source)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_pagename($source);
+    $pageNameModifier = new \SmartyTiki\Modifier\PageName();
+    return $pageNameModifier->handle($source);
 }

@@ -122,7 +122,7 @@ class UserRegistration extends Base
                 }
             }
             $re = $userlib->get_group_info($chosenGroup);
-            if (! empty($re['usersTrackerId']) && !empty($re['registrationUsersFieldIds'])) {
+            if (! empty($re['usersTrackerId']) && ! empty($re['registrationUsersFieldIds'])) {
                 $needs_validation_js = false;
                 include_once('lib/wiki-plugins/wikiplugin_tracker.php');
                 if (isset($_REQUEST['name'])) {

@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_modifier_tiki_long_date($string)
 {
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_tiki_long_date($string);
+    $tikiLongDateModifier = new \SmartyTiki\Modifier\TikiLongDate();
+    return $tikiLongDateModifier->handle($string);
 }

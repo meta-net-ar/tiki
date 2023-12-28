@@ -13,6 +13,6 @@ function smarty_modifier_adjust(
     $break_words = false
 ) {
 
-    $smartyTikiExtension = new \SmartyTiki\Extension\SmartyTikiExtension();
-    return $smartyTikiExtension->smarty_modifier_adjust($string, $length, $pad, $etc, $break_words);
+    $adjustModifier = new \SmartyTiki\Modifier\Adjust();
+    return $adjustModifier->handle($string, $length, $pad, $etc, $break_words);
 }
