@@ -22,12 +22,12 @@ class Jq implements \Smarty\Filter\FilterInterface
         if (strpos($source, '{jq') === false) {
             return $source;         // quick escape if no jq tags
         }
-        $return = preg_replace_callback('/(?s)(\{jq.*?\})(.+?)\{\/jq\}/', [$this, 'escape_smarty_jq'], $source);
+        $return = preg_replace_callback('/(?s)(\{jq.*?\})(.+?)\{\/jq\}/', [$this, 'escapeSmartyJq'], $source);
 
         return $return;
     }
 
-    private function escape_smarty_jq($key)
+    private function escapeSmartyJq($key)
     {
         $s = $key[2];
         if (preg_match('/\{literal\}/Ums', $s)) {

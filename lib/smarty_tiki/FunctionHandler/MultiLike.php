@@ -19,7 +19,7 @@ class MultiLike extends Base
         $relationlib = \TikiLib::lib("relation");
         $smarty = \TikiLib::lib('smarty');
 
-        $multivalues = $this->get_multivalues_from_pref($params['relation_prefix']);
+        $multivalues = $this->getMultivaluesFromPref($params['relation_prefix']);
 
         $item = [];
         foreach ($multivalues as $mv) {
@@ -144,7 +144,7 @@ class MultiLike extends Base
      * @param $mv
      * @return array
      */
-    private function get_multivalues_from_pref()
+    private function getMultivaluesFromPref()
     {
         global $prefs;
         $data = (explode("\n\n", trim($prefs['user_multilike_config'])));

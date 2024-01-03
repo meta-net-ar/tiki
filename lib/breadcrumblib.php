@@ -246,7 +246,7 @@ function breadcrumb_buildStructureTrail($structure_path, $cnt, $loclass, $showLi
 function breadcrumb_buildMenuCrumbs($crumbs, $menuId, $startLevel = null, $stopLevel = null)
 {
     $functionMenuHandler = new \SmartyTiki\FunctionHandler\Menu();
-    list($menu_info, $menuOptions) = $functionMenuHandler::get_menu_with_selections(['id' => $menuId]);
+    list($menu_info, $menuOptions) = $functionMenuHandler::getMenuWithSelections(['id' => $menuId]);
     $newCrumbs = [];
     if (count($crumbs) > 0) {
         $newCrumbs[] = $crumbs[0];

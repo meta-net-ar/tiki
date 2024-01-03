@@ -42,7 +42,7 @@ class ObjectLink extends Base
             case 'wikipage':
             case 'wiki':
                 $type = 'wiki page';
-                $function = 'smarty_function_object_link_default';
+                $function = 'smartyFunctionObjectLinkDefault';
                 if (! $title) {
                     $title = $object;
                 }
@@ -59,48 +59,48 @@ class ObjectLink extends Base
                 }
                 break;
             case 'user':
-                $function = 'smarty_function_object_link_user';
+                $function = 'smartyFunctionObjectLinkUser';
                 break;
             case 'external':
             case 'external_extended':
-                $function = 'smarty_function_object_link_external';
+                $function = 'smartyFunctionObjectLinkExternal';
                 break;
             case 'relation_source':
-                $function = 'smarty_function_object_link_relation_source';
+                $function = 'smartyFunctionObjectLinkRelationSource';
                 break;
             case 'relation_target':
-                $function = 'smarty_function_object_link_relation_target';
+                $function = 'smartyFunctionObjectLinkRelationTarget';
                 break;
             case 'freetag':
-                $function = 'smarty_function_object_link_freetag';
+                $function = 'smartyFunctionObjectLinkFreetag';
                 break;
             case 'trackeritemfield':
                 $type = 'trackeritem';
                 $object = (int)(explode(':', $object)[0]);
-                $function = 'smarty_function_object_link_trackeritem';
+                $function = 'smartyFunctionObjectLinkTrackerItem';
                 break;
             case 'trackeritem':
-                $function = 'smarty_function_object_link_trackeritem';
+                $function = 'smartyFunctionObjectLinkTrackerItem';
                 break;
             case 'group':
                 // Nowhere to link, at least, yet.
                 return $object;
             case 'forumpost':
             case 'forum post':
-                $function = 'smarty_function_object_link_forumpost';
+                $function = 'smartyFunctionObjectLinkForumPost';
                 break;
             case 'comment':
-                $function = 'smarty_function_object_link_comment';
+                $function = 'smartyFunctionObjectLinkComment';
                 break;
             default:
-                $function = 'smarty_function_object_link_default';
+                $function = 'smartyFunctionObjectLinkDefault';
                 break;
         }
 
         return $this->$function($template, $object, $title, $type, $url, $params);
     }
 
-    public function smarty_function_object_link_default($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
+    public function smartyFunctionObjectLinkDefault($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
     {
         global $base_url;
 
@@ -200,7 +200,7 @@ class ObjectLink extends Base
         return $html;
     }
 
-    public function smarty_function_object_link_comment($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
+    public function smartyFunctionObjectLinkComment($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
     {
         $comments_lib = \TikiLib::lib('comments');
         $comment = $comments_lib->get_comment($object);
@@ -213,7 +213,7 @@ class ObjectLink extends Base
         return '<a href="' . $url . '">' . $title . '</a>';
     }
 
-    public function smarty_function_object_link_trackeritem($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
+    public function smartyFunctionObjectLinkTrackerItem($template, $object, $title = null, $type = 'wiki page', $url = null, $params = [])
     {
         $item = \Tracker_Item::fromId($object);
 
@@ -223,22 +223,22 @@ class ObjectLink extends Base
         }
 
         if ($item && $item->canView()) {
-            return $pre . $this->smarty_function_object_link_default($template, $object, $title, $type, $url, $params);
+            return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $title, $type, $url, $params);
         } else {
             if (empty($title)) {
                 $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
             }
-    
+
             return $pre . smarty_modifier_escape($title);
         }
     }
 
-    public function smarty_function_object_link_user($template, $user, $title = null)
+    public function smartyFunctionObjectLinkUser($template, $user, $title = null)
     {
         return smarty_modifier_userlink($user, 'link', 'not_set', $title ? $title : '');
     }
 
-    public function smarty_function_object_link_external($template, $link_orig, $title = null, $type = null)
+    public function smartyFunctionObjectLinkExternal($template, $link_orig, $title = null, $type = null)
     {
         $cachelib = \TikiLib::lib('cache');
         $tikilib = \TikiLib::lib('tiki');
@@ -276,17 +276,17 @@ class ObjectLink extends Base
         return $data;
     }
 
-    public function smarty_function_object_link_relation_source($template, $relationId, $title = null)
+    public function smartyFunctionObjectLinkRelationSource($template, $relationId, $title = null)
     {
-        return $this->smarty_function_object_link_relation_end($template, 'source', $relationId, $title);
+        return $this->smartyFunctionObjectLinkRelationEnd($template, 'source', $relationId, $title);
     }
 
-    public function smarty_function_object_link_relation_target($template, $relationId, $title = null)
+    public function smartyFunctionObjectLinkRelationTarget($template, $relationId, $title = null)
     {
-        return $this->smarty_function_object_link_relation_end($template, 'target', $relationId, $title);
+        return $this->smartyFunctionObjectLinkRelationEnd($template, 'target', $relationId, $title);
     }
 
-    public function smarty_function_object_link_relation_end($template, $end, $relationId, $title = null)
+    public function smartyFunctionObjectLinkRelationEnd($template, $end, $relationId, $title = null)
     {
         $relationlib = \TikiLib::lib('relation');
         $attributelib = \TikiLib::lib('attribute');
@@ -329,7 +329,7 @@ class ObjectLink extends Base
         return $out;
     }
 
-    public function smarty_function_object_link_freetag($template, $tag, $title = null)
+    public function smartyFunctionObjectLinkFreetag($template, $tag, $title = null)
     {
         global $prefs;
         if ($prefs['feature_freetags'] != 'y') {
@@ -340,10 +340,10 @@ class ObjectLink extends Base
             $tag = \TikiLib::lib('freetag')->get_tag_from_id($tag);
         }
 
-        return $this->smarty_function_object_link_default($template, $tag, $tag, 'freetag');
+        return $this->smartyFunctionObjectLinkDefault($template, $tag, $tag, 'freetag');
     }
 
-    public function smarty_function_object_link_forumpost($template, $object, $title = null, $type = 'forumpost', $url = null)
+    public function smartyFunctionObjectLinkForumPost($template, $object, $title = null, $type = 'forumpost', $url = null)
     {
         $commentslib = \TikiLib::lib('comments');
         $comment = $commentslib->get_comment($object);

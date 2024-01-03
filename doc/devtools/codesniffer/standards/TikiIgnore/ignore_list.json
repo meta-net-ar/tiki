@@ -2786,12 +2786,6 @@
         "lib\/shoutbox\/shoutboxlib.php": {
             "class:ShoutboxLib": true
         },
-        "lib\/smarty_tiki\/modifier.d.php": {
-            "class:SmartyKint": true
-        },
-        "lib\/smarty_tiki\/modifier.numstyle.php": {
-            "class:StyleType": true
-        },
         "lib\/smarty_tiki\/resource.tplwiki.php": {
             "class:Smarty_Resource_Tplwiki": true
         },
@@ -6513,6 +6507,29 @@
             "ShoutboxLib::add_bad_word": true,
             "ShoutboxLib::remove_bad_word": true
         },
+        "lib\/smarty_tiki\/Extension\/SmartyTikiExtension.php": {
+            "SmartyTikiExtension::smarty_modifier_addslashes": true,
+            "SmartyTikiExtension::smarty_modifier_array_reverse": true,
+            "SmartyTikiExtension::smarty_modifier_count": true,
+            "SmartyTikiExtension::smarty_modifier_implode": true,
+            "SmartyTikiExtension::smarty_modifier_is_array": true,
+            "SmartyTikiExtension::smarty_modifier_json_decode": true,
+            "SmartyTikiExtension::smarty_modifier_json_encode": true,
+            "SmartyTikiExtension::smarty_modifier_lcfirst": true,
+            "SmartyTikiExtension::smarty_modifier_md5": true,
+            "SmartyTikiExtension::smarty_modifier_preg_match": true,
+            "SmartyTikiExtension::smarty_modifier_replacei": true,
+            "SmartyTikiExtension::smarty_modifier_reverse_array": true,
+            "SmartyTikiExtension::smarty_modifier_substring": true,
+            "SmartyTikiExtension::smarty_modifier_stristr": true,
+            "SmartyTikiExtension::smarty_modifier_strpos": true,
+            "SmartyTikiExtension::smarty_modifier_trim": true,
+            "SmartyTikiExtension::smarty_modifier_ucfirst": true,
+            "SmartyTikiExtension::smarty_modifier_ucwords": true,
+            "SmartyTikiExtension::smarty_modifier_urlencode": true,
+            "SmartyTikiExtension::smarty_modifier_var_dump": true,
+            "SmartyTikiExtension::smarty_modifier_zone_is_empty": true
+        },
         "lib\/stats\/statslib.php": {
             "StatsLib::is_stats_hit": true,
             "StatsLib::list_orphan_pages": true,
@@ -7819,6 +7836,12 @@
         "lib\/shipping\/shippinglib.php": {
             "class:CustomShippingProvider": true,
             "class:ShippingLib": true
+        },
+        "lib\/smarty_tiki\/Modifier\/D.php": {
+            "class:SmartyKint": true
+        },
+        "lib\/smarty_tiki\/Modifier\/NumStyle.php": {
+            "class:StyleType": true
         },
         "lib\/test\/core\/Search\/FormatterTest.php": {
             "class:Search_FormatterTest_HighlightHelper": true

@@ -63,7 +63,7 @@ class Menu extends Base
         }
         $smarty->assign_by_ref('bs_menu_class', $bs_menu_class);
 
-        list($menu_info, $channels) = $this->get_menu_with_selections($params);
+        list($menu_info, $channels) = $this->getMenuWithSelections($params);
         $smarty->assign('menu_channels', $channels['data'] ?? []);
         $smarty->assign('menu_info', $menu_info);
 
@@ -102,7 +102,7 @@ class Menu extends Base
 
             // Unification with structure menus - adds sectionLevel
             if (empty($menu_info['structure']) and ! empty($channels['data'])) {
-                $channels['data'] = $this->add_section_levels_to_menu_data($channels['data']);
+                $channels['data'] = $this->addSectionLevelsToMenuData($channels['data']);
             }
 
             if (! empty($channels['data'])) {
@@ -289,7 +289,7 @@ class Menu extends Base
     * @return String The new parsed link
     */
 
-    public static function helper_function_contruct_menu_url_from_db($url_from_db)
+    public static function helperFunctionContructMenuUrlFromDb($url_from_db)
     {
         if (preg_match('/^\(\(([^()]+)\)\)$/', $url_from_db)) { //as page url are save as ((V-Log)) this should match the regex
             $match = [];
@@ -301,12 +301,12 @@ class Menu extends Base
         return $url_from_db;
     }
 
-    public static function compare_menu_options($a, $b)
+    public static function compareMenuOptions($a, $b)
     {
         return strcmp(tra($a['name']), tra($b['name']));
     }
 
-    public static function get_menu_with_selections($params)
+    public static function getMenuWithSelections($params)
     {
         global $user, $prefs;
         $tikilib = TikiLib::lib('tiki');
@@ -366,7 +366,7 @@ class Menu extends Base
         return [$menu_info, $channels];
     }
 
-    public static function add_section_levels_to_menu_data($data)
+    public static function addSectionLevelsToMenuData($data)
     {
         $sectionLevel = 0;
         $prev_type = null;

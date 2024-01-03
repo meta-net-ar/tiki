@@ -22,7 +22,7 @@ class InteractiveTranslation extends Base
             return;
         }
 
-        usort($strings, [$this, 'sort_strings_by_length']);
+        usort($strings, [$this, 'sortStringsByLength']);
 
         $strings = json_encode($strings);
 
@@ -47,7 +47,7 @@ JS;
         return $smarty->fetch('interactive_translation_box.tpl');
     }
 
-    private function sort_strings_by_length($a, $b)
+    private function sortStringsByLength($a, $b)
     {
         $a = strlen($a[1]);
         $b = strlen($b[1]);

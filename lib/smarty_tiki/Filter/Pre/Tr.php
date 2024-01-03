@@ -16,11 +16,11 @@ class Tr implements \Smarty\Filter\FilterInterface
     public function filter($source, \Smarty\Template $template)
     {
         // The preg_replace() takes away the Smarty comments ({* *}) in case they have tr tags
-        $return = preg_replace_callback('/(?s)\{tr\}(.+?)\{\/tr\}/', [$this, 'translate_lang'], preg_replace('/(?s)\{\*.*?\*\}/', '', $source));
+        $return = preg_replace_callback('/(?s)\{tr\}(.+?)\{\/tr\}/', [$this, 'translateLang'], preg_replace('/(?s)\{\*.*?\*\}/', '', $source));
         return $return;
     }
 
-    private function translate_lang($matches)
+    private function translateLang($matches)
     {
         include_once(__DIR__ . '/../../../init/tra.php');
         $s = tra($matches[1]);
