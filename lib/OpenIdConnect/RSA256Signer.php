@@ -7,25 +7,43 @@
 namespace Tiki\Lib\OpenIdConnect;
 
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Signer;
 
-class RSA256Signer extends Sha256
+class RSA256Signer implements Signer
 {
+    private $sha256;
+
+    public function __construct()
+    {
+        $this->sha256 = new Sha256();
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function verify($expected, $payload, $key)
+    public function verify($expected, $payload, $key): bool
     {
         if (is_array($key->contents())) {
             return ! empty(
                 array_filter(
                     $key->contents(),
                     function ($content) use ($expected, $payload) {
-                        return parent::verify($expected, $payload, $content);
+                        $this->sha256->verify($expected, $payload, $content);
                     }
                 )
             );
         }
 
-        return parent::verify($expected, $payload, $key);
+        return $this->sha256->verify($expected, $payload, $key);
+    }
+
+    public function algorithmId(): string
+    {
+        return $this->sha256->algorithmId();
+    }
+
+    public function sign($payload, $key): string
+    {
+        return $this->sha256->sign($payload, $key);
     }
 }
