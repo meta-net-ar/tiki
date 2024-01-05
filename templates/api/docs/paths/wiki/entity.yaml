@@ -10,15 +10,82 @@ get:
         type: string
   responses:
     '200':
-      description: page content
+      description: page content response
       content:
         application/json:
           schema:
             type: object
             properties:
+              page_id:
+                type: integer
+              pageName:
+                type: string
+              pageSlug:
+                type: string
+              hits:
+                type: integer
               data:
                 type: string
-                description: Page content
+              description:
+                type: string
+              lastModif:
+                type: integer
+              comment:
+                type: string
+              version:
+                type: integer
+              version_minor:
+                type: integer
+              user:
+                type: string
+              ip:
+                type: string
+              flag:
+                type: string
+              points:
+                type: integer
+              votes:
+                type: integer
+              cache:
+                type: string
+              wiki_cache:
+                type: string
+              cache_timestamp:
+                type: integer
+              pageRank:
+                type: number
+              creator:
+                type: string
+              page_size:
+                type: integer
+              lang:
+                type: string
+              lockedby:
+                type: string
+              is_html:
+                type: integer
+              created:
+                type: integer
+              wysiwyg:
+                type: string
+              wiki_authors_style:
+                type: string
+              comments_enabled:
+                type: string
+              keywords:
+                type: string
+              baseName:
+                type: string
+              prettyName:
+                type: string
+              namespace:
+                type: boolean
+              namespace_parts:
+                type: array
+                items:
+                  type: string
+              outputType:
+                type: string                              
 post:
   description: Update a wiki page
   parameters:

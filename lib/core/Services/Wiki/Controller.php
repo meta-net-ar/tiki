@@ -43,6 +43,11 @@ class Services_Wiki_Controller
      */
     public function action_pages($input)
     {
+        $perms = Perms::get();
+        if (! $perms->view) {
+            throw new Services_Exception_Denied();
+        }
+
         return TikiLib::lib('tiki')->list_pages(
             $input->offset->int(),
             $input->maxRecords->int() ? $input->maxRecords->int() : -1,
@@ -78,7 +83,9 @@ class Services_Wiki_Controller
 
         $canBeRefreshed = false;
         $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed);
-        return ['data' => $data];
+        $result = array_merge($info, ['data' => $data]);
+
+        return $result;
     }
 
     /**
