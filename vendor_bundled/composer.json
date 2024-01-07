@@ -286,6 +286,8 @@
         "symfony/polyfill-mbstring": "^1.27",
         "symfony/polyfill-php80": "^1.27",
         "symfony/polyfill-php81": "^1.27",
+        "symfony/polyfill-php82": "^1.28",
+        "symfony/polyfill-php83": "^1.28",
         "symfony/process": "^5.4.23",
         "symfony/routing": "^4.1",
         "symfony/yaml": "^5.4.23",
