@@ -111,6 +111,24 @@
 
         <!-- https://github.com/symfony/polyfill-php81/tree/main/Resources/stubs -->
         <exclude name="PHPCompatibility.Interfaces.NewInterfaces.returntypewillchangeFound"/>
+
+        <!-- polyfill-php82: https://github.com/symfony/polyfill-php82/tree/main/bootstrap.php and
+             https://github.com/symfony/polyfill-php82/tree/main/Resources/stubs -->
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_is_quotedFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_should_quoteFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_quoteFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ini_parse_quantityFound"/>
+        <exclude name="PHPCompatibility.Classes.NewClasses.random_brokenrandomengineerrorFound"/>
+        <exclude name="PHPCompatibility.Classes.NewClasses.random_randomerrorFound"/>
+        <exclude name="PHPCompatibility.Classes.NewClasses.random_randomexceptionFound"/>
+
+        <!-- polyfill-php83: https://github.com/symfony/polyfill-php83/tree/main/bootstrap.php and
+             https://github.com/symfony/polyfill-php83/tree/main/Resources/stubs -->
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.json_validateFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.mb_str_padFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ldap_exop_syncFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.ldap_connect_walletFound"/>
+        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.stream_context_set_optionsFound"/>
     </rule>
 
     <!--
