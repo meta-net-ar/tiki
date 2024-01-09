@@ -88,30 +88,6 @@
 
     <!-- Skip check compatibility for functions included as polyfill -->
     <rule ref="PHPCompatibility">
-        <!-- https://github.com/symfony/polyfill-php80/blob/main/bootstrap.php -->
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.fdivFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.preg_last_error_msgFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_containsFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.get_resource_idFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_ends_withFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_starts_withFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.get_debug_typeFound"/>
-        <exclude name="PHPCompatibility.Constants.NewConstants.filter_validate_boolFound"/>
-
-        <!-- https://github.com/symfony/polyfill-php80/tree/main/Resources/stubs -->
-        <exclude name="PHPCompatibility.Interfaces.NewInterfaces.stringableFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.phptokenFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.unhandledmatcherrorFound"/>
-        <exclude name="PHPCompatibility.Classes.NewClasses.valueerrorFound"/>
-
-        <!-- https://github.com/symfony/polyfill-php81/blob/main/bootstrap.php -->
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.array_is_listFound"/>
-        <exclude name="PHPCompatibility.FunctionUse.NewFunctions.enum_existsFound"/>
-        <exclude name="PHPCompatibility.Constants.NewConstants.mysqli_refresh_replicaFound"/>
-
-        <!-- https://github.com/symfony/polyfill-php81/tree/main/Resources/stubs -->
-        <exclude name="PHPCompatibility.Interfaces.NewInterfaces.returntypewillchangeFound"/>
-
         <!-- polyfill-php82: https://github.com/symfony/polyfill-php82/tree/main/bootstrap.php and
              https://github.com/symfony/polyfill-php82/tree/main/Resources/stubs -->
         <exclude name="PHPCompatibility.FunctionUse.NewFunctions.odbc_connection_string_is_quotedFound"/>
