@@ -28,7 +28,7 @@ function wikiplugin_userlastlogged_info()
                 'name'        => tra('DateFormat'),
                 'description' => tra('Date format setting. Short_datetime used by default'),
                 'since'       => '16.0',
-                'filter'      => 'dateformat',
+                'filter'      => 'alnumdash',
                 'options'     => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Long date'), 'value' => 'long_date'],
