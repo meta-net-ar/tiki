@@ -91,6 +91,9 @@ function module_last_tracker_items($mod_reference, $module_params)
         $smarty->assign('module_error', tra('You do not have permission to view this tracker.'));
     }
     $smarty->assign('tpl_module_title', tra("Last Items"));
+    if (empty($module_params['sort_mode'])) {
+        $module_params['sort_mode'] = 'created_desc';
+    }
     if (! strcasecmp($module_params['sort_mode'], 'lastModif_desc')) {
         $smarty->assign('tpl_module_title', tra("Last modified Items"));
     }
