@@ -157,7 +157,7 @@ if (isset($_REQUEST['group_select'])) {
     $cookietab = '1';
 }
 
-$group_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_groups'));
+$group_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_groups') ?? "");
 
 // Get a list of groups
 $groups = $userlib->get_groups_for_permissions();
