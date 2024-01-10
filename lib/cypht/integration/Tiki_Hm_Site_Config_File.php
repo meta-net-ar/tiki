@@ -15,9 +15,9 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
     /**
      * Load data based on source
      * Overrides default configuration for Tiki integration
-     * @param string $source source location for site configuration
+     * @param array $source source location for site configuration
      */
-    public function __construct($source, $session_prefix = 'cypht', $settings_per_page = false)
+    public function __construct($source = [], $session_prefix = 'cypht', $settings_per_page = false)
     {
         global $user;
         parent::__construct($source);
