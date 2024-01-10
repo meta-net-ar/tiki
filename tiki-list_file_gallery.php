@@ -239,6 +239,7 @@ if (isset($_REQUEST['fgal_actions'])) {
             }
         }
 
+        $totalGals = $failedGals = 0;
         if (
             isset($_REQUEST['subgal']) && $tiki_p_admin_file_galleries == 'y'
             && $access->checkCsrf(true)
