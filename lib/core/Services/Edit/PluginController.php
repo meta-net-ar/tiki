@@ -358,16 +358,22 @@ class Services_Edit_PluginController
     public function action_render(JitFilter $input): array
     {
         global $jitRequest;
+        $header = TikiLib::lib('header');
+        $header->unsafeClearAllCss();
+        $header->clear_js(true);
 
         $content = $input->markup->wikicontent();
         $plugins = TikiLib::lib('parser')->find_plugins($content);
 
         $pluginOutput = WikiParser_PluginOutput::wiki($content);
         $html = $pluginOutput->toHtml();
+
         return [
             'html' => $html,
             'plugins' => $plugins,
             'pageName' => $jitRequest->page->pagename(),
+            'css' => $header->outputCss() . $header->output_css_files(),
+            'js' => $header->output_js() . $header->output_js_files(),
         ];
     }
 
