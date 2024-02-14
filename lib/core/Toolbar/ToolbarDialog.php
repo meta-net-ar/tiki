@@ -11,6 +11,8 @@ class ToolbarDialog extends ToolbarItem
     protected array $list;
     protected int $index;
     protected string $name;
+    private string $singleSpaAppName;
+    private string $singleSpaDomId;
 
     public static function fromName(string $tagName, bool $is_wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = ''): ?ToolbarItem
     {
@@ -211,7 +213,8 @@ class ToolbarDialog extends ToolbarItem
         global $toolbarDialogIndex;
         ++$toolbarDialogIndex;
         $tag->index = $toolbarDialogIndex;
-
+        $tag->singleSpaAppName = "@vue-mf/toolbar-dialogs-" . \Tiki\Utilities\Identifiers::getHttpRequestId() . '_' . $tag->index;
+        $tag->singleSpaDomId = "single-spa-application:{$tag->singleSpaAppName}";
         $tag->setupJs();
 
         return $tag;
@@ -236,7 +239,6 @@ class ToolbarDialog extends ToolbarItem
     public function setupJs(): void
     {
         global $toolbarDialogIndex;
-
         $data = get_object_vars($this);
         unset($data['list']);
         $data['editor']['isMarkdown'] = $this->isMarkdown;
@@ -251,7 +253,7 @@ class ToolbarDialog extends ToolbarItem
             // language=JavaScript
             TikiLib::lib('header')->add_jq_onready('
     window.registerApplication({
-        name: "@vue-mf/toolbar-dialogs-" + ' . json_encode($this->index) . ',
+        name: "' . $this->singleSpaAppName . '",
         app: () => importShim("@vue-mf/toolbar-dialogs"),
         activeWhen: (location) => {
             let condition = true;
@@ -262,8 +264,8 @@ class ToolbarDialog extends ToolbarItem
             syntax: ""
         },
     })
-    onDOMElementRemoved("single-spa-application:@vue-mf/toolbar-dialogs-" + ' . json_encode($toolbarDialogIndex) . ', function () {
-        window.unregisterApplication("@vue-mf/toolbar-dialogs-" + ' . json_encode($toolbarDialogIndex) . ');
+    onDOMElementRemoved("' . $this->singleSpaDomId . '", function () {
+        window.unregisterApplication("' . $this->singleSpaAppName . '");
     });
     ');
         } else {
@@ -281,7 +283,7 @@ class ToolbarDialog extends ToolbarItem
         );
 
         if ($this->isVueTool()) {
-            return '<span id="single-spa-application:@vue-mf/toolbar-dialogs-' . $this->index . '" class="toolbar-dialogs"></span>';
+            return '<span id="' . $this->singleSpaDomId . '" class="toolbar-dialogs"></span>';
         } else {
             return $this->getSelfLink(
                 $this->getOnClick(),

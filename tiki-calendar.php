@@ -325,9 +325,6 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-calendar.js');
 if ($canEditAnything) {
     $smarty->assign('minHourOfDay', $minHourOfDay . ':00:00');
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');
-    if ($prefs['feature_wysiwyg'] == 'y' && $prefs['wysiwyg_default'] == 'y') {
-        TikiLib::lib('wysiwyg')->setUpEditor(false, 'editwiki');        // init ckeditor if default editor
-    }
 
     TikiLib::lib('header')
         ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
