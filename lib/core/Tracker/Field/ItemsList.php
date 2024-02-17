@@ -24,7 +24,7 @@ class Tracker_Field_ItemsList extends \Tracker\Field\AbstractField implements \T
                 'help' => 'Items-List-and-Item-Link-Tracker-Fields',
                 'prefs' => ['trackerfield_itemslist'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'trackerId' => [
                         'name' => tr('Tracker ID'),

@@ -21,7 +21,7 @@ class Tracker_Field_UserGroups extends \Tracker\Field\AbstractField implements \
                 'help' => 'User-Groups',
                 'prefs' => ['trackerfield_usergroups'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'directOnly' => [
                         'name' => tr('Show direct groups memberships only'),

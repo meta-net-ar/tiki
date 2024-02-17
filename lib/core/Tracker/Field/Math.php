@@ -23,7 +23,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
                 'help' => 'Mathematical-Calculation-Field',
                 'prefs' => ['trackerfield_math'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'calculation' => [
                         'name' => tr('Calculation'),

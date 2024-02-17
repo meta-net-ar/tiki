@@ -39,7 +39,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tr
                 'help' => 'Drop-Down---Radio-Tracker-Field',
                 'prefs' => ['trackerfield_dropdownother'],
                 'tags' => ['basic'],
-                'default' => 'n',
+                'default' => 'y',
                 'supported_changes' => ['d', 'D', 'R', 'M', 'm', 't', 'a', 'L'],
                 'params' => [
                     'options' => [

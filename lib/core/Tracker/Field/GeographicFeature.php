@@ -21,7 +21,7 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractField imple
                 'help' => 'Geographic-Feature-Tracker-Field',
                 'prefs' => ['trackerfield_geographicfeature'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                 ],
             ],
