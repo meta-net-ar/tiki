@@ -11,7 +11,7 @@ function prefs_vuejs_list()
             'name'        => tra('Enable Vue.js'),
             'description' => tra('Loads the vue.js library.'),
             'type'        => 'flag',
-            'default'     => 'n',
+            'default'     => 'y',
             'tags'        => ['experimental'],
             'keywords' => 'vue js vuejs vue_js',
         ],
@@ -36,7 +36,7 @@ function prefs_vuejs_list()
             'name'        => tra('Always Load Vue.js'),
             'description' => tra('Loads the vue.js library for every page.'),
             'type'        => 'flag',
-            'default'     => 'n',
+            'default'     => 'y',
             'tags'        => ['advanced'],
             'dependencies' => [
                 'vuejs_enable',
@@ -47,7 +47,7 @@ function prefs_vuejs_list()
             'name'        => tra('Enable Vue.js Toolbar Dialogs'),
             'description' => tra(''),
             'type'        => 'flag',
-            'default'     => 'n',
+            'default'     => 'y',
             'tags'        => ['experimental'],
             'keywords' => 'vue js vuejs vue_js',
             'dependencies' => [

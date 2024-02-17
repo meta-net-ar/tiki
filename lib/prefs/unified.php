@@ -121,7 +121,7 @@ function prefs_unified_list()
             'description' => tra('Index the names and paths of category field values'),
             'hint' => tra('Requires reindexing'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
                 'feature_trackers',
                 'feature_categories',

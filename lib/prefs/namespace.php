@@ -22,7 +22,7 @@ function prefs_namespace_list()
             'description' => tra('Select the character, symbol, or text to use as the namespace separator.'),
             'size' => 5,
             'type' => 'text',
-            'default' => ':_:',
+            'default' => '__',
             'keywords' => 'Namespaces',
             'perspective' => false,
             'dependencies' => [

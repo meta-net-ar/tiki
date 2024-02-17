@@ -146,7 +146,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('SmartMenus'),
             'description' => tra('Add "SmartMenus" to Bootstrap menus. See smartmenus.org for more.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['advanced'],
             'keywords' => 'smart menu',
         ],

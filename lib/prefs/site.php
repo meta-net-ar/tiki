@@ -233,7 +233,7 @@ function prefs_site_list()
             'name' => tr('Site layout'),
             'description' => tr('Changes the template for the overall site layout'),
             'type' => 'list',
-            'default' => 'basic',
+            'default' => 'social',
             'help' => 'Site-Layout',
             'hint' => tra('Important: when using the Classic Bootstrap (fixed top navbar) layout, be sure to set the fixed-top navbar height, below, to prevent content overlap.'),
             'tags' => ['advanced'],

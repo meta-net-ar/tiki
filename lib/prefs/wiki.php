@@ -192,7 +192,7 @@ function prefs_wiki_list($partial = false)
                 3600 => '1 ' . tra('hour'),
                 7200 => '2 ' . tra('hours'),
             ],
-            'default' => 0,
+            'default' => 7200,
         ],
         'wiki_last_modified_header' => [
             'name' => tra('Last modified header'),
@@ -848,7 +848,7 @@ function prefs_wiki_list($partial = false)
                 'created' => tr('Created'),
                 'lastModif' => tr('Last Modified'),
             ],
-            'default' => 'created',
+            'default' => 'lastModif',
             'dependencies' => [
                 'feature_search',
             ],
