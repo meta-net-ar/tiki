@@ -22,7 +22,7 @@ function prefs_change_list()
             'name' => tra('Users can change theme'),
             'warning' => tra('Users can override the theme with this setting.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
         ],
         'change_password' => [
             'name' => tra('Users can change their password'),

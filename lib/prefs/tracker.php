@@ -17,7 +17,7 @@ function prefs_tracker_list()
             'name' => tr('Refresh item link items when the master is modified'),
             'description' => tr('To be used when item link is used in trackers so that the index remains in good shape when data on the master that is indexed with the detail is modified and used to search on.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
         ],
         'tracker_refresh_itemslist_detail' => [
             'name' => tr('Refresh items list items when related items are created or modified'),
@@ -44,7 +44,7 @@ function prefs_tracker_list()
             'name' => tr('Change field types'),
             'description' => tr('Allow field type to be changed after creation.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'warning' => tra('Use with care!'),
         ],
         'tracker_show_comments_below' => [
@@ -110,7 +110,7 @@ function prefs_tracker_list()
             'name' => tr('Tracker Import-Export'),
             'description' => tr('Allows management of import/export tracker profiles and management of custom list formats.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => ['feature_trackers'],
             'tags' => ['advanced'],
             'help' => 'Tracker-Import-Export',
@@ -119,7 +119,7 @@ function prefs_tracker_list()
             'name' => tr('Always notify watchers'),
             'description' => tr('Send item updated notifications to watchers even if nothing has changed.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => ['feature_trackers'],
         ],
         'tracker_force_fill' => [
@@ -206,7 +206,7 @@ function prefs_tracker_list()
             'name' => tr('Tracker Field Rules'),
             'description' => tr('Conditional rules for tracker fields.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
                 'feature_trackers',
                 'vuejs_enable',

@@ -20,7 +20,7 @@ function prefs_permission_list()
             'description' => tra('If an anonymous visitor attempts to access a page for which permission is not granted, Tiki will automatically display the Log-in module. 
 Alternatively, use the Send to URL field to display a specific page (relative to your Tiki installation) instead.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
         ],
     ];

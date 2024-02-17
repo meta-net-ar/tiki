@@ -164,7 +164,7 @@ function prefs_cookie_list()
             'name' => tr('Refresh the remember-me cookie expiration'),
             'description' => tr('Each time a user is logged in with a cookie set in a previous session, the cookie expiration date is updated.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['advanced'],
             'dependencies' => [
                 'rememberme',
