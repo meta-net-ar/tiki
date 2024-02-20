@@ -22065,7 +22065,7 @@ $lang_current = array(
 "Run Time is required" => "Le temps d'exécution est requis",
 "Run Time format is invalid" => "Le format d'exécution n'est pas valide",
 "Status cannot be empty" => "Le statut ne peut pas être vide",
-"Scheduler %s was updated" => "Le planificateur s% a été mis à jour",
+"Scheduler %s was updated" => "Le planificateur %s a été mis à jour",
 "Scheduler %s was created" => "Le planificateur %s a été créé",
 "Inactive" => "Inactif",
 "unsafe" => "dangereux",
@@ -23036,6 +23036,6 @@ $lang_current = array(
 "Exclude data and changes from email notifications" => "Exclure les données et les modifications des notifications par e-mail",
 "Visible in view mode" => "Visible en mode visualisation",
 "Visible in edit mode" => "Visible en mode édition",
-"Visible in history mode" => "Visible en mode historique"
+"Visible in history mode" => "Visible en mode historique",
 );
 $lang = array_replace($lang, $lang_current);
