@@ -204,9 +204,9 @@ class HeaderLib
     private $rawhtml = '';
 
     /* If set to true, any js added through add_jsfile() that has not rank 'external' will be put to rank 'late'
- * Only set once in tiki-setup.php to separate wiki page specific js from common js.
- * @var boolean
- */
+    * Only set once in tiki-setup.php to separate wiki page specific js from common js.
+    * @var boolean
+    */
     private $forceJsRankLate = false;
 
 
@@ -514,7 +514,7 @@ class HeaderLib
      */
     public function add_jsfile_cdn($url): HeaderLib
     {
-        $this->addJsFile($url, self::GROUP_EXTERNAL_CDN, true);
+        $this->addJsFile($url, self::GROUP_EXTERNAL_CDN, true, false, true);
         return $this;
     }
 
@@ -582,16 +582,21 @@ class HeaderLib
     }
 
 
-    private function addJsFile($file, $group, bool $skipMinify = false, bool $skipCdn = false)
+    private function addJsFile($file, $group, bool $skipMinify = false, bool $skipCdn = false, bool $allowExternalSrc = false)
     {
+        if (!$allowExternalSrc && ! is_file($file)) {
+            throw new Exception("File not found: $file");
+        }
         $this->addLoadableContent([
         'format' => self::FORMAT_JS_FILE,
         'group' => $group,
         'content' => $file,
         'order' => 0,
         'minifyAllowed' => ! $skipMinify,
-        'cdnAllowed' => ! $skipCdn
+        'cdnAllowed' => ! $skipCdn,
+        'externalSrcAllowed' => $allowExternalSrc
         ]);
+        $this->throwIfJSFooterAlreadyOutput();
         return $this;
     }
 
@@ -1007,6 +1012,7 @@ class HeaderLib
             // this is bad practice and that causes issues when putting them all in one file!
             $minified = ';';
             $msg = '';
+
             // if the name contains not  'min' and that file is not blacklisted for minification assume it is minified
             // preferable is to set $skip_minify proper
             if (! preg_match('/\bmin\./', $f)) {
@@ -1022,7 +1028,7 @@ class HeaderLib
                     // filename without extension - makes it easier to identify the compressed files if needed.
                     $prefix = basename($f, '.js');
                     $minifyFile = $tempDir . "min_s_" . $prefix . "_" . $hash . ".js";
-                    if (file_exists($minifyFile)) {
+                    if (is_file($minifyFile)) {
                         $temp = file_get_contents($minifyFile);
                     } else {
                         // if the file does not exist MatthiasMullie\Minify takes the input to be the file content
@@ -1057,6 +1063,7 @@ class HeaderLib
 
             $minifiedAll .= $minified;
         }
+
         $topMsg .= "\n/**** end overview of included js files *****/\n";
         file_put_contents($combinedMinifiedFile, $topMsg . $minifiedAll);
         chmod($combinedMinifiedFile, 0644);
