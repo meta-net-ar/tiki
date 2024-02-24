@@ -192,39 +192,6 @@ class WikiLib extends TikiLib
     }
 
     /**
-     * Clean the page name base on the page regex
-     *
-     * @param string $name
-     * @param string $login
-     * @return string
-     */
-    public function wikiCleanUserPageName($name, $login)
-    {
-        global $page_regex;
-
-        preg_match_all("/$page_regex/", $name, $matches);
-        $good_chars  = implode($matches[0]);
-        if (! empty($good_chars)) {
-            $user_wiki_page_name = $name;
-
-            for ($i = 0; $i < strlen($name); $i++) {
-                if (! is_numeric(strpos($good_chars, $name[$i]))) {
-                    $user_wiki_page_name = str_replace($name[$i], "_", $user_wiki_page_name);
-                }
-            }
-        } else {
-            if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-                $user_wiki_page_name = explode("@", $login)[0];
-            } else {
-                $user_wiki_page_name = $login;
-            }
-        }
-
-        return $user_wiki_page_name;
-    }
-
-
-    /**
      * Duplicate an existing page
      *
      * @param string $name

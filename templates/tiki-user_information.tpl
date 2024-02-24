@@ -110,12 +110,12 @@
                                     <div class="col-sm-4">{tr}Personal Wiki Page:{/tr}</div>
                                     <div class="col-sm-8">
                                         {if $userPage_exists}
-                                            <a class="link" href="tiki-index.php?page={$prefs.feature_wiki_userpage_prefix|escape:'url'}{$user_wiki_page_name|escape:'url'}">
-                                                {$prefs.feature_wiki_userpage_prefix}{$user_wiki_page_name}
+                                            <a class="link" href="tiki-index.php?page={$prefs.feature_wiki_userpage_prefix|escape:'url'}{$userinfo.login|escape:'url'}">
+                                                {$prefs.feature_wiki_userpage_prefix}{$userinfo.login}
                                             </a>
                                         {elseif $user == $userinfo.login}
-                                            {$prefs.feature_wiki_userpage_prefix}{$user_wiki_page_name}
-                                            <a class="link" href="tiki-editpage.php?page={$prefs.feature_wiki_userpage_prefix|escape:'url'}{$user_wiki_page_name|escape:'url'}"
+                                            {$prefs.feature_wiki_userpage_prefix}{$userinfo.login}
+                                            <a class="link" href="tiki-editpage.php?page={$prefs.feature_wiki_userpage_prefix|escape:'url'}{$userinfo.login|escape:'url'}"
                                                     title="{tr}Create Page{/tr}">?</a>
                                         {else}&nbsp;{/if}
                                     </div>

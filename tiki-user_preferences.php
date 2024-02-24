@@ -517,12 +517,6 @@ if (isset($user_preferences[$userwatch]['email is public'])) {
 $tikilib->get_user_preference($userwatch, 'mailCharset', $prefs['default_mail_charset']);
 $tikilib->get_user_preference($userwatch, 'display_12hr_clock', 'n');
 $smarty->assign_by_ref('userinfo', $userinfo);
-
-$realName = $tikilib->get_user_preference($userwatch, 'realName', '');
-
-$user_wiki_page_name = TikiLib::lib('wiki')->wikiCleanUserPageName($realName, $userinfo['login']);
-$smarty->assign_by_ref('user_wiki_page_name', $user_wiki_page_name);
-
 //user theme
 $themelib = TikiLib::lib('theme');
 $available_themesandoptions = $themelib->get_available_themesandoptions();
@@ -591,7 +585,7 @@ if ($prefs['users_prefs_display_timezone'] == 'Site') {
 
 $smarty->assign('userPageExists', 'n');
 if ($prefs['feature_wiki'] == 'y' and $prefs['feature_wiki_userpage'] == 'y') {
-    if ($tikilib->page_exists($prefs['feature_wiki_userpage_prefix'] . $user_wiki_page_name)) {
+    if ($tikilib->page_exists($prefs['feature_wiki_userpage_prefix'] . $user)) {
         $smarty->assign('userPageExists', 'y');
     }
 }

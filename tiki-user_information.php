@@ -134,12 +134,8 @@ if ($email_isPublic != 'n') {
 }
 $userinfo['score'] = TikiLib::lib('score')->get_user_score($userwatch);
 $smarty->assign_by_ref('userinfo', $userinfo);
-
-$user_wiki_page_name = TikiLib::lib('wiki')->wikiCleanUserPageName($realName, $userinfo['login']);
-$smarty->assign_by_ref('user_wiki_page_name', $user_wiki_page_name);
-
 $smarty->assign_by_ref('email_isPublic', $email_isPublic);
-$userPage = $prefs['feature_wiki_userpage_prefix'] . $user_wiki_page_name;
+$userPage = $prefs['feature_wiki_userpage_prefix'] . $userinfo['login'];
 $exist = $tikilib->page_exists($userPage);
 $smarty->assign("userPage_exists", $exist);
 
