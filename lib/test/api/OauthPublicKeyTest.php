@@ -13,7 +13,7 @@ class OauthPublicKeyTest extends TikiTestCase
         $responseData = json_decode($response->getBody(), true);
                 
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $this->assertArrayHasKey('key', $responseData);
         
         $this->assertNotEmpty($responseData['key']);
