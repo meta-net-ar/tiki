@@ -8,6 +8,7 @@
 class CategoriesTest extends TikiTestCase
 {
     protected $categories = [];
+    protected $db;
 
     protected function setUp(): void
     {
@@ -39,13 +40,15 @@ class CategoriesTest extends TikiTestCase
 
     public function testCreateCategory(): void
     {
+        $this->cleanDatabaseTables(['tiki_categories']);
+
         foreach ($this->categories as $index => $category) {
             if ($index > 1) {
                 $category['parentId'] = $this->categories[$index - 1]['categId'];
                 $category['rootId'] = $this->categories[$index - 1]['categId'];
             }
 
-            $response = $this->makeRequest('POST', '/categories', $category);
+            $response = $this->makeHttpRequest('POST', '/categories', 'Admins', $category);
             $this->assertEquals(200, $response->getStatusCode());
 
             $responseData = json_decode($response->getBody(), true);
@@ -78,9 +81,66 @@ class CategoriesTest extends TikiTestCase
         }
     }
 
+    public function testCreateCategoryWithInsufficientPermissions(): void
+    {
+        $category = [
+            'name' => 'Test Category Six',
+            'description' => 'Description Six',
+        ];
+        
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+    
+        $response = $this->makeHttpRequest('POST', '/categories', 'Anonymous', $category);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testGetCategoriesWithInsufficientPermissions(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+    
+        $response = $this->makeHttpRequest('GET', '/categories', 'Anonymous', ['type' => 'all']);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    } 
+    
+
+    /* Fix missing name parameter issue for the endpoint /categories
+    public function testCreateCategoryWithMissingName(): void
+    {
+        $category = [
+            'description' => 'Description Six',
+        ];
+        
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Missing required parameter: name');
+    
+        $response = $this->makeHttpRequest('POST', '/categories', 'Admins', $category);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+    */
+
+    public function testCreateCategoryWithDuplicateName(): void
+    {
+        $duplicateCategory = $this->categories[0];
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A category named '.$duplicateCategory['name'].' already exists in Top.');
+    
+        $response = $this->makeHttpRequest('POST', '/categories', 'Admins', $duplicateCategory);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
     public function testGetAllCategoriesSuccess(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'all']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'all']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
@@ -90,7 +150,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testGetAllCategoriesCount(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'all']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'all']);
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertEquals(count($this->categories), count($responseData));
@@ -98,7 +158,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testGetAllCategoriesAttributes(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'all']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'all']);
         $responseData = json_decode($response->getBody(), true);
 
         $categoriesFixtures = require 'fixtures/categories_fixtures.php';
@@ -123,7 +183,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testGetRootsCategoriesSuccess(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'roots']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
         $this->assertEquals(200, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
@@ -133,7 +193,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testGetRootsCategoriesCount(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'roots']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertEquals(2, count($responseData));
@@ -141,7 +201,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testGetRootsCategoriesAttributes(): void
     {
-        $response = $this->makeRequest('GET', '/categories', ['type' => 'roots']);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
         $responseData = json_decode($response->getBody(), true);
 
         $categoriesFixtures = require 'fixtures/categories_fixtures.php';
@@ -167,53 +227,192 @@ class CategoriesTest extends TikiTestCase
     public function testGetCategoryByParentId(): void
     {
         $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureTwo = $categoriesFixtures[2];
+        $categoryFixtureThree = $categoriesFixtures[3];
 
-        $response = $this->makeRequest('GET', '/categories', ['parentId' => $categoriesFixtures[3]['categId']]);
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['parentId' => $categoryFixtureTwo['categId']]);
         $this->assertEquals(200, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertNotEmpty($responseData);
 
-        $this->assertEquals($categoriesFixture[3]['name'], $responseData['name']);
-        $this->assertEquals($categoriesFixture[3]['description'], $responseData['description']);
-        $this->assertEquals($categoriesFixture[3]['parentId'], $responseData['parentId']);
-        $this->assertEquals($categoriesFixture[3]['rootId'], $responseData['rootId']);
-        $this->assertEquals($categoriesFixture[3]['hits'], $responseData['hits']);
-        $this->assertEquals($categoriesFixture[3]['tplGroupContainerId'], $responseData['tplGroupContainerId']);
-        $this->assertEquals($categoriesFixture[3]['tplGroupPattern'], $responseData['tplGroupPattern']);
-        $this->assertEquals($categoriesFixture[3]['num_roles'], $responseData['num_roles']);
-        $this->assertEquals($categoriesFixture[3]['objects'], $responseData['objects']);
-        $this->assertEquals($categoriesFixture[3]['children'], $responseData['children']);
-        $this->assertEquals($categoriesFixture[3]['descendants'], $responseData['descendants']);
-        $this->assertEquals($categoriesFixture[3]['tepath'], $responseData['tepath']);
-        $this->assertEquals($categoriesFixture[3]['categpath'], $responseData['categpath']);
-        $this->assertEquals($categoriesFixture[3]['relativePathString'], $responseData['relativePathString']);
+        $responseDataCategory = $responseData[3];
+        $this->assertEquals($categoryFixtureThree['name'], $responseDataCategory['name']);
+        $this->assertEquals($categoryFixtureThree['description'], $responseDataCategory['description']);
+        $this->assertEquals($categoryFixtureThree['parentId'], $responseDataCategory['parentId']);
+        $this->assertEquals($categoryFixtureThree['rootId'], $responseDataCategory['rootId']);
+        $this->assertEquals($categoryFixtureThree['hits'], $responseDataCategory['hits']);
+        $this->assertEquals($categoryFixtureThree['tplGroupContainerId'], $responseDataCategory['tplGroupContainerId']);
+        $this->assertEquals($categoryFixtureThree['tplGroupPattern'], $responseDataCategory['tplGroupPattern']);
+        $this->assertEquals($categoryFixtureThree['num_roles'], $responseDataCategory['num_roles']);
+        $this->assertEquals($categoryFixtureThree['objects'], $responseDataCategory['objects']);
+        $this->assertEquals($categoryFixtureThree['children'], $responseDataCategory['children']);
+        $this->assertEquals($categoryFixtureThree['descendants'], $responseDataCategory['descendants']);
+        $this->assertEquals($categoryFixtureThree['tepath'], $responseDataCategory['tepath']);
+        $this->assertEquals($categoryFixtureThree['categpath'], $responseDataCategory['categpath']);
+        $this->assertEquals($responseDataCategory['name'], $responseDataCategory['relativePathString']);
     }
 
     public function testUpdateCategory(): void
     {
-        $response = $this->makeRequest('PUT', '/categories/1', [
-            'name' => 'Test Category Updated',
-            'description' => 'This is a test category updated',
-            'parentId' => 1
-        ]);
+        $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureOne = $categoriesFixtures[1];
+        $categoryFixtureFive = $categoriesFixtures[5];
+        $updateData = [
+            'name' => 'Updated Category Name',
+            'description' => 'Updated Description',
+            'parentId' => $categoryFixtureOne['categId'],
+            'rootId' => $categoryFixtureOne['categId'],
+            'tplGroupContainerId' => 1,
+            'tplGroupPattern' => 'testPattern',
+            'parentPerms' => true
+        ];
+        $tepath = [
+            '1' => $categoryFixtureOne['name'],
+            '5' => 'Updated Category Name',
+        ];
+        $categpath = $relativePathString = $categoryFixtureOne['name'].'::'.$updateData['name'];
+
+        $response = $this->makeHttpRequest('POST', '/categories/' . $categoryFixtureFive['categId'], 'Admins', $updateData, 'application/x-www-form-urlencoded');
+
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertNotEmpty($responseData);
 
-        $this->assertNotEmpty($responseData);
+        $this->assertEquals(5, $responseData['categId']);
+        $this->assertEquals($updateData['name'], $responseData['name']);
+        $this->assertEquals($updateData['description'], $responseData['description']);
+        $this->assertEquals($categoryFixtureOne['categId'], $responseData['parentId']);
+        $this->assertEquals($categoryFixtureOne['categId'], $responseData['rootId']);
+        $this->assertEquals(0, $responseData['hits']);
+        $this->assertEquals($updateData['tplGroupContainerId'], $responseData['tplGroupContainerId']);
+        $this->assertEquals($updateData['tplGroupPattern'], $responseData['tplGroupPattern']);
+        $this->assertEquals(0, $responseData['num_roles']);
+        $this->assertEquals(0, $responseData['objects']);
+        $this->assertEquals([], $responseData['children']);
+        $this->assertEquals([], $responseData['descendants']);
+        $this->assertEquals($tepath, $responseData['tepath']);
+        $this->assertEquals($categpath, $responseData['categpath']);
+        $this->assertEquals($relativePathString, $responseData['relativePathString']);        
+    }
+
+    public function testUpdateCategoryWithInsufficientPermissions(): void
+    {
+        $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureOne = $categoriesFixtures[1];
+        $categoryFixtureFive = $categoriesFixtures[5];
+        $updateData = [
+            'name' => 'Updated Category Name',
+            'description' => 'Updated Description',
+            'parentId' => $categoryFixtureOne['categId'],
+            'rootId' => $categoryFixtureOne['categId'],
+            'tplGroupContainerId' => 1,
+            'tplGroupPattern' => 'testPattern',
+            'parentPerms' => true
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+    
+        $response = $this->makeHttpRequest('POST', '/categories/' . $categoryFixtureFive['categId'], 'Anonymous', $updateData, 'application/x-www-form-urlencoded');
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testUpdateCategoryWithWrongCategId(): void
+    {
+        $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureOne = $categoriesFixtures[1];
+        $updateData = [
+            'name' => 'Updated Category Name',
+            'description' => 'Updated Description',
+            'parentId' => $categoryFixtureOne['categId'],
+            'rootId' => $categoryFixtureOne['categId'],
+            'tplGroupContainerId' => 1,
+            'tplGroupPattern' => 'testPattern',
+            'parentPerms' => true
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not found');
+    
+        $response = $this->makeHttpRequest('POST', '/categories/999', 'Admins', $updateData, 'application/x-www-form-urlencoded');
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testDeleteCategoryWithInsufficientPermissions(): void
+    {
+        $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureFive = $categoriesFixtures[5];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+    
+        $response = $this->makeHttpRequest('DELETE', '/categories/' . $categoryFixtureFive['categId'], 'Anonymous');
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testDeleteCategoryWithWrongCategId(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not found');
+    
+        $response = $this->makeHttpRequest('DELETE', '/categories/999', 'Admins');
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
     }
 
     public function testDeleteCategory(): void
     {
-        $response = $this->makeRequest('DELETE', '/categories/1');
+        $categoriesFixtures = require 'fixtures/categories_fixtures.php';
+        $categoryFixtureFive = $categoriesFixtures[5];
+        $categoryFixtureFive['name'] = 'Updated Category Name';
+        $categoryFixtureFive['description'] = 'Updated Description';
+        $categoryFixtureFive['parentId'] = 1;
+        $categoryFixtureFive['rootId'] = 1;
+        $categoryFixtureFive['tplGroupContainerId'] = 1;
+        $categoryFixtureFive['tplGroupPattern'] = 'testPattern';
+        $categoryFixtureFive['num_roles'] = 0;
+        $categoryFixtureFive['objects'] = 0;
+        $categoryFixtureFive['children'] = [];
+        $categoryFixtureFive['descendants'] = [];
+        $categoryFixtureFive['tepath'] = [
+            '1' => 'Test Category One',
+            '5' => 'Updated Category Name',
+        ];
+        $categoryFixtureFive['categpath'] = 'Test Category One::Updated Category Name';
+        $categoryFixtureFive['relativePathString'] = 'Test Category One::Updated Category Name';
+
+        $response = $this->makeHttpRequest('DELETE', '/categories/' . $categoryFixtureFive['categId'], 'Admins');
         $responseData = json_decode($response->getBody(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertNotEmpty($responseData);
+
+        $this->assertEquals($categoryFixtureFive['categId'], $responseData['categId']);
+        $this->assertEquals($categoryFixtureFive['name'], $responseData['name']);
+        $this->assertEquals($categoryFixtureFive['description'], $responseData['description']);
+        $this->assertEquals($categoryFixtureFive['parentId'], $responseData['parentId']);
+        $this->assertEquals($categoryFixtureFive['rootId'], $responseData['rootId']);
+        $this->assertEquals($categoryFixtureFive['hits'], $responseData['hits']);
+        $this->assertEquals($categoryFixtureFive['tplGroupContainerId'], $responseData['tplGroupContainerId']);
+        $this->assertEquals($categoryFixtureFive['tplGroupPattern'], $responseData['tplGroupPattern']);
+        $this->assertEquals($categoryFixtureFive['num_roles'], $responseData['num_roles']);
+        $this->assertEquals($categoryFixtureFive['objects'], $responseData['objects']);
+        $this->assertEquals($categoryFixtureFive['children'], $responseData['children']);
+        $this->assertEquals($categoryFixtureFive['descendants'], $responseData['descendants']);
+        $this->assertEquals($categoryFixtureFive['tepath'], $responseData['tepath']);
+        $this->assertEquals($categoryFixtureFive['categpath'], $responseData['categpath']);
+        $this->assertEquals($categoryFixtureFive['relativePathString'], $responseData['relativePathString']);
     }
 
     // Helper function to assert category response keys

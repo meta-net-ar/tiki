@@ -16,7 +16,7 @@ class VersionTikiTest extends TikiTestCase
 
     public function testGetVersion()
     {
-        $response = $this->makeRequest('GET', '/version');
+        $response = $this->makeHttpRequest('GET', '/version');
         $responseData = json_decode($response->getBody(), true);
         $version = $this->lib->getVersion();
 
