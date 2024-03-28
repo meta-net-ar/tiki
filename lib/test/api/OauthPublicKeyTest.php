@@ -9,7 +9,7 @@ class OauthPublicKeyTest extends TikiTestCase
 {
     public function testGetPublicKey()
     {        
-        $response = $this->makeRequest('GET', '/oauth/public-key');
+        $response = $this->makeHttpRequest('GET', '/oauth/public-key');
         $responseData = json_decode($response->getBody(), true);
                 
         $this->assertEquals(200, $response->getStatusCode());
