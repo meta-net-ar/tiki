@@ -40,8 +40,7 @@ class CategoriesTest extends TikiTestCase
 
     public function testCreateCategory(): void
     {
-        $this->cleanDatabaseTables(['tiki_categories']);
-
+        $this->cleanDatabaseTables(['tiki_categories', 'tiki_category_objects', 'tiki_categorized_objects']);
         foreach ($this->categories as $index => $category) {
             if ($index > 1) {
                 $category['parentId'] = $this->categories[$index - 1]['categId'];
@@ -52,15 +51,15 @@ class CategoriesTest extends TikiTestCase
             $this->assertEquals(200, $response->getStatusCode());
 
             $responseData = json_decode($response->getBody(), true);
-            $this->assertNotEmpty($responseData);
 
+            $this->assertNotEmpty($responseData);
+            $this->assertCategoryResponseHasKeys([$responseData]);
+            $this->assertCategoryNumericKeys([$responseData]);
             $this->assertEquals($category['name'], $responseData['name']);
             $this->assertEquals($category['description'], $responseData['description']);
             $this->assertIsArray($responseData['children']);
             $this->assertIsArray($responseData['descendants']);
             $this->assertIsArray($responseData['tepath']);
-
-            $this->assertCategoryResponseHasKeys([$responseData]);
 
             $tepath_key = $responseData['categId'];
             $this->assertArrayHasKey($tepath_key, $responseData['tepath']);
@@ -106,10 +105,8 @@ class CategoriesTest extends TikiTestCase
         if ($response->getStatusCode() === 403) {
             throw new \RuntimeException('Failed to make request: ' . $response->getBody());
         }
-    } 
+    }
     
-
-    /* Fix missing name parameter issue for the endpoint /categories
     public function testCreateCategoryWithMissingName(): void
     {
         $category = [
@@ -117,14 +114,13 @@ class CategoriesTest extends TikiTestCase
         ];
         
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Missing required parameter: name');
+        $this->expectExceptionMessage('<!--field[name]-->Field Required');
     
         $response = $this->makeHttpRequest('POST', '/categories', 'Admins', $category);
         if ($response->getStatusCode() === 403) {
             throw new \RuntimeException('Failed to make request: ' . $response->getBody());
         }
     }
-    */
 
     public function testCreateCategoryWithDuplicateName(): void
     {
@@ -156,10 +152,20 @@ class CategoriesTest extends TikiTestCase
         $this->assertEquals(count($this->categories), count($responseData));
     }
 
+    public function testGetAllCategoriesNumericKeys(): void
+    {
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'all']);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertCategoryNumericKeys($responseData);
+    }
+
     public function testGetAllCategoriesAttributes(): void
     {
         $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'all']);
         $responseData = json_decode($response->getBody(), true);
+
+        $this->assertCategoryNumericKeys($responseData);
 
         $categoriesFixtures = require 'fixtures/categories_fixtures.php';
 
@@ -204,9 +210,12 @@ class CategoriesTest extends TikiTestCase
         $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
         $responseData = json_decode($response->getBody(), true);
 
+        $this->assertCategoryNumericKeys($responseData);
+
         $categoriesFixtures = require 'fixtures/categories_fixtures.php';
 
         foreach ($responseData as $index => $category) {
+            
             $this->assertEquals($categoriesFixtures[$index]['name'], $category['name']);
             $this->assertEquals($categoriesFixtures[$index]['description'], $category['description']);
             $this->assertEquals($categoriesFixtures[$index]['parentId'], $category['parentId']);
@@ -235,6 +244,7 @@ class CategoriesTest extends TikiTestCase
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertNotEmpty($responseData);
+        $this->assertCategoryNumericKeys($responseData);
 
         $responseDataCategory = $responseData[3];
         $this->assertEquals($categoryFixtureThree['name'], $responseDataCategory['name']);
@@ -280,6 +290,7 @@ class CategoriesTest extends TikiTestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertNotEmpty($responseData);
+        $this->assertCategoryNumericKeys([$responseData]);
 
         $this->assertEquals(5, $responseData['categId']);
         $this->assertEquals($updateData['name'], $responseData['name']);
@@ -397,6 +408,7 @@ class CategoriesTest extends TikiTestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $this->assertNotEmpty($responseData);
+        $this->assertCategoryNumericKeys([$responseData]);
 
         $this->assertEquals($categoryFixtureFive['categId'], $responseData['categId']);
         $this->assertEquals($categoryFixtureFive['name'], $responseData['name']);
@@ -414,6 +426,193 @@ class CategoriesTest extends TikiTestCase
         $this->assertEquals($categoryFixtureFive['categpath'], $responseData['categpath']);
         $this->assertEquals($categoryFixtureFive['relativePathString'], $responseData['relativePathString']);
     }
+
+    public function testCategorizeWithInsufficientPermissions(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+
+        $response = $this->makeHttpRequest('POST', '/categorize', 'Anonymous', $fileGalleryObject);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testCategorize(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/categorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+        $this->assertIsArray($responseData);
+
+        $objectlib = TikiLib::lib('object');
+        $catObject = $objectlib->get_object('file gallery', 1);
+        $catObjectId = $catObject['objectId'];
+
+        $expectedResponse = [
+            'categId' => 1,
+            'count' => 1,
+            'objects' => [
+                0 => [
+                    'type' => 'file gallery',
+                    'id' => 1,
+                    'catObjectId' => $catObjectId
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedResponse, $responseData);
+    }
+
+    public function testCategorizeObjectAlreadyCategorized(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/categorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+
+        $fileGalleryObject['count'] = 'unchanged';
+        $this->assertEquals($fileGalleryObject, $responseData);
+    }
+
+    public function testGetCategoriesWithCategorizedObjects(): void
+    {
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
+        $responseData = json_decode($response->getBody(), true);
+
+        $categoryOne = $responseData[1];
+        $this->assertEquals(1, $categoryOne['objects']);
+    }
+
+    public function testCategorizeInvalidlyFormattedObject(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => [
+                'type' => 'file gallery',
+                'id' => 1,
+            ],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/categorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+
+        $this->assertEquals($fileGalleryObject, $responseData);
+    }
+
+    public function testUncategorizeWithInsufficientPermissions(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Permission denied');
+
+        $response = $this->makeHttpRequest('POST', '/uncategorize', 'Anonymous', $fileGalleryObject);
+        if ($response->getStatusCode() === 403) {
+            throw new \RuntimeException('Failed to make request: ' . $response->getBody());
+        }
+    }
+
+    public function testUncategorize(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/uncategorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+        $this->assertIsArray($responseData);
+
+        $objectlib = TikiLib::lib('object');
+        $catObject = $objectlib->get_object('file gallery', 1);
+        $catObjectId = $catObject['objectId'];
+
+        $expectedResponse = [
+            'categId' => 1,
+            'count' => 0,
+            'objects' => [
+                0 => [
+                    'type' => 'file gallery',
+                    'id' => 1,
+                    'catObjectId' => $catObjectId
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedResponse, $responseData);
+    }
+
+    public function testUncategorizeObjectNotCategorized(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => ['file gallery:1'],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/uncategorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+
+        $fileGalleryObject['count'] = 'unchanged';
+        $this->assertEquals($fileGalleryObject, $responseData);
+    }
+
+    public function testUncategorizeInvalidlyFormattedObject(): void
+    {
+        $fileGalleryObject = [
+            'categId' => 1,
+            'objects' => [
+                'type' => 'file gallery',
+                'id' => 1,
+            ],
+        ];
+
+        $response = $this->makeHttpRequest('POST', '/uncategorize', 'Admins', $fileGalleryObject);
+        $responseData = json_decode($response->getBody(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotEmpty($responseData);
+
+        $this->assertEquals($fileGalleryObject, $responseData);
+    }
+
+    public function testCheckIsNotCategorized(): void
+    {
+        $response = $this->makeHttpRequest('GET', '/categories', 'Admins', ['type' => 'roots']);
+        $responseData = json_decode($response->getBody(), true);
+
+        $categoryOne = $responseData[1];
+        $this->assertEquals(0, $categoryOne['objects']);
+    }
+
 
     // Helper function to assert category response keys
     private function assertCategoryResponseHasKeys(array $responseData): void
@@ -439,6 +638,26 @@ class CategoriesTest extends TikiTestCase
         foreach ($responseData as $category) {
             foreach ($expectedKeys as $key) {
                 $this->assertArrayHasKey($key, $category, "Key $key not found in response data for category {$category['name']}");
+            }
+        }
+    }
+
+    // Helper function to assert category response numeric datatypes
+    private function assertCategoryNumericKeys(array $responseData): void
+    {
+        $numericKeys = [
+            'categId',
+            'parentId',
+            'rootId',
+            'hits',
+            'tplGroupContainerId',
+            'num_roles',
+            'objects',
+        ];
+
+        foreach ($responseData as $category) {
+            foreach ($numericKeys as $key) {
+                $this->assertIsInt($category[$key], "Key $key is not numeric in response data for category {$category['name']}");
             }
         }
     }
