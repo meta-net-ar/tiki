@@ -8,7 +8,6 @@
 class CategoriesTest extends TikiTestCase
 {
     protected $categories = [];
-    protected $db;
 
     protected function setUp(): void
     {
