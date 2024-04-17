@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Cache;
 
+use Memcached;
+
 /**
  * Class Memcachelib
  *
@@ -20,13 +22,21 @@ class MemcacheLib
     public $options;
     public $key_prefix;
     private $functional = false;
+    private static ?self $instance = null;
+    public static function getInstance()
+    {
+        if (! self::$instance) {
+            self::$instance = new self();
+        }
+        return new self();
+    }
 
     /**
      * Memcachelib constructor.
      * @param bool $memcached_servers
      * @param bool $memcached_options
      */
-    public function __construct(array $memcached_servers = [], array $memcached_options = [])
+    private function __construct(array $memcached_servers = [], array $memcached_options = [])
     {
         global $prefs, $tikidomainslash;
         $enabledInPrefs = self::isEnabled();

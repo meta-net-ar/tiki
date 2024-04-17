@@ -197,7 +197,7 @@ if (isset($prefs['session_storage']) && $prefs['session_storage'] == 'db') {
     if ($db instanceof PdoDb) {
         require_once('lib/tikisession-pdo.php');
     }
-} elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && TikiLib::lib("memcache")->isEnabled()) {
+} elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && \Tiki\Cache\Memcachelib::getInstance()->isEnabled()) {
     require_once('lib/tikisession-memcache.php');
 }
 

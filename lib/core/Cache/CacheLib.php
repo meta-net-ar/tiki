@@ -240,7 +240,7 @@ class CacheLib
     }
 
     /**
-     * Flush memcache if endabled
+     * Flush memcache if enabled
      *
      * @return void
      */
@@ -248,8 +248,8 @@ class CacheLib
     {
         global $prefs;
 
-        if (isset($prefs['memcache_enabled']) && $prefs['memcache_enabled'] === 'y' && ($this->implementation instanceof Memcache)) {
-            $memcachelib = TikiLib::lib("memcache");
+        if (isset($prefs['memcache_enabled']) && $prefs['memcache_enabled'] === 'y' && ($this->implementation instanceof CacheLibMemcache)) {
+            $memcachelib = \Tiki\Cache\Memcachelib::getInstance();
             if ($memcachelib->isFunctional()) {
                 $memcachelib->flush();
             }
@@ -572,5 +572,156 @@ class CacheLib
         }
 
         return ''; // empty string if no failure found
+    }
+}
+
+class CacheLibFileSystem implements Tiki\Cache\KvpCacheInterface
+{
+    public $folder;
+
+    public function __construct()
+    {
+        global $tikidomain;
+        $this->folder = realpath(TEMP_CACHE_PATH);
+        if ($tikidomain) {
+            $this->folder .= "/$tikidomain";
+        }
+        if (! is_dir($this->folder)) {
+            mkdir($this->folder);
+            chmod($this->folder, 0777);
+            $resource = opendir($this->folder);
+            if ($resource === false) {
+                throw new Exception("Unable to create cache directory {$this->folder}");
+            }
+        }
+    }
+
+    public function isFunctional(): bool
+    {
+        return true;
+    }
+
+    public function cacheItem($key, $data, $type = '')
+    {
+        $key = $type . md5($key);
+        @file_put_contents($this->folder . "/$key", $data);
+        return true;
+    }
+
+    public function isCached($key, $type = '')
+    {
+        $key = $type . md5($key);
+        return is_file($this->folder . "/$key");
+    }
+
+    public function getCached($key, $type = '', $lastModif = false)
+    {
+        $key = $type . md5($key);
+        $file = $this->folder . "/$key";
+        if (is_readable($file)) {
+            // If a last date is given for cache validity, make sure the file is younger
+            if ($lastModif !== false && filemtime($file) < $lastModif) {
+                unlink($file);
+                return false;
+            }
+
+            return @file_get_contents($file);
+        } else {
+            return false;
+        }
+    }
+
+    public function invalidate($key, $type = '')
+    {
+        $key = $type . md5($key);
+        if (is_file($this->folder . "/$key")) {
+            unlink($this->folder . "/$key");
+        }
+    }
+
+    public function invalidateAll($type)
+    {
+        $path = $this->folder;
+        $all = opendir($path);
+        if ($all === false) {
+            throw new Exception("Unable to open cache directory {$this->folder}");
+        }
+        while ($file = readdir($all)) {
+            if (strpos($file, $type) === 0) {
+                unlink("$path/$file");
+            }
+        }
+    }
+}
+
+class CacheLibMemcache implements Tiki\Cache\KvpCacheInterface
+{
+    private function getKey($key, $type)
+    {
+        return $type . md5($key);
+    }
+
+    public function isFunctional(): bool
+    {
+        return \Tiki\Cache\Memcachelib::getInstance()->isFunctional();
+    }
+
+    public function cacheItem($key, $data, $type = '')
+    {
+        \Tiki\Cache\Memcachelib::getInstance()->set($this->getKey($key, $type), $data);
+        return true;
+    }
+
+    public function isCached($key, $type = '')
+    {
+        return false;
+    }
+
+    public function getCached($key, $type = '', $lastModif = false)
+    {
+        return \Tiki\Cache\Memcachelib::getInstance()->get($this->getKey($key, $type));
+    }
+
+    public function invalidate($key, $type = '')
+    {
+        return \Tiki\Cache\Memcachelib::getInstance()->delete($this->getKey($key, $type));
+    }
+
+    public function invalidateAll($type)
+    {
+        return \Tiki\Cache\Memcachelib::getInstance()->flush();
+    }
+}
+
+class CacheLibNoCache implements Tiki\Cache\KvpCacheInterface
+{
+    public function isFunctional(): bool
+    {
+        return true;
+    }
+
+    public function cacheItem($key, $data, $type = '')
+    {
+        return false;
+    }
+
+    public function isCached($key, $type = '')
+    {
+        return false;
+    }
+
+    public function getCached($key, $type = '', $lastModif = false)
+    {
+        return false;
+    }
+
+    public function invalidate($key, $type = '')
+    {
+        return false;
+    }
+
+    public function invalidateAll($type)
+    {
+        return false;
     }
 }

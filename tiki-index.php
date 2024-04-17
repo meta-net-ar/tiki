@@ -863,3 +863,5 @@ function make_sure_machine_translation_is_enabled()
         $access->display_error($_REQUEST['page'], 'Cannot machine translate this page', '', true, $error_msg);
     }
 }
+//This is essential for the cache to work
+$pageCache->flush();

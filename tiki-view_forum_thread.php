@@ -458,3 +458,5 @@ if (isset($_REQUEST['display'])) {
     $smarty->assign('mid', 'tiki-view_forum_thread.tpl');
     $smarty->display('tiki.tpl');
 }
+//This is essential for the cache to work
+$pageCache->flush();

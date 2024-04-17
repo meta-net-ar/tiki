@@ -749,6 +749,8 @@ class WikiLib extends TikiLib
         if (! $skipCache && $wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
             $cache_info = $this->get_cache_info($page);
             if (! empty($cache_info['cache_timestamp']) && $cache_info['cache_timestamp'] + $wiki_cache >= $this->now) {
+                //Cache hit
+                //var_dump("wikilib cache hit");
                 $content = $cache_info['cache'];
                 // get any cached JS and add to headerlib JS
                 $jsFiles = $headerlib->getJsFromHTML($content, false, true);
@@ -764,6 +766,8 @@ class WikiLib extends TikiLib
 
                 $canBeRefreshed = true;
             } else {
+                //Cache miss
+                //var_dump("wikilib cache miss");
                 $jsFile1 = $headerlib->getJsFilesWithScriptTags();
                 $js1 = $headerlib->getJs();
                 $info['outputType'] = $tikilib->getOne("SELECT `outputType` FROM `tiki_output` WHERE `entityId` = ? AND `objectType` = ? AND `version` = ?", [$info['pageName'], 'wikiPage', $info['version']]);
@@ -777,11 +781,12 @@ class WikiLib extends TikiLib
                 $js = array_diff($js2, $js1);
 
                 $jsFile = implode("\n", $jsFile);
-                $js = $headerlib->wrap_js(implode("\n", $js));
+                $js = $headerlib->wrapJs(implode("\n", $js));
 
                 $this->update_cache($page, $content . $jsFile . $js);
             }
         } else {
+            //var_dump("wikilib not cacheable");
             $content = (new WikiLibOutput($info, $info['data'], $parse_options, $info['version']))->parsedValue;
         }
 

@@ -179,7 +179,10 @@
         <service id="tiki.lib.mailin" class="MailinLib">
             <file>%kernel.root_dir%/lib/mailin/mailinlib.php</file>
         </service>
+<<<<<<< HEAD
         <service id="tiki.lib.memcache" class="Tiki\Cache\MemcacheLib"/>
+=======
+>>>>>>> 0356ad14ea ([REF,FIX] Refactor and fix caches to stop breaking headerlib abstraction)
         <service id="tiki.lib.message" class="Messu">
             <file>%kernel.root_dir%/lib/messu/messulib.php</file>
         </service>
