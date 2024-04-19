@@ -109,9 +109,21 @@ class Search_Formatter
             $row = array_filter($defaultValues, function ($v) {
                 return ($v !== null);   // allow empty default values like "" or 0 (or even false) but not null
             });
+            // translate the defaults
+            if ($prefs['feature_multilingual'] === 'y') {
+                $row = array_map(function ($value): string {
+                    return tra($value);
+                }, $row);
+            }
             // Clear blank values so the defaults prevail
             foreach ($pre as $k => $value) {
                 if ($value !== '' && $value !== null) {
+                    // process multilingual fields
+                    if ($prefs['feature_multilingual'] === 'y') {
+                        if (isset($pre[$k . '_' . $prefs['language']])) {
+                            $value = $pre[$k . '_' . $prefs['language']];
+                        }
+                    }
                     $row[$k] = $value;
                 }
             }

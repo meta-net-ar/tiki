@@ -281,6 +281,9 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
             $data = [$baseKey => $typeFactory->$fieldType($value)];
             foreach ($decoded as $lang => $content) {
                 $data[$baseKey . '_' . $lang] = $typeFactory->$fieldType($content);
+                if ($this->isMainField()) {
+                    $data['title_' . $lang] = $typeFactory->$fieldType($content);
+                }
             }
 
             return $data;
@@ -307,6 +310,9 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         if ($this->getConfiguration('isMultilingual') == 'y') {
             foreach ($prefs['available_languages'] as $lang) {
                 $data[] = $baseKey . '_' . $lang;
+                if ($this->isMainField()) {
+                    $data[] = ['title_' . $lang];
+                }
             }
         } elseif ($this->getOption('exact') == 'y') {
             $data[] = $baseKey . '_exact';
