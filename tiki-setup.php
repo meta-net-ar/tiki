@@ -862,10 +862,6 @@ if ($prefs['feature_trackers'] == 'y') {
     }
 }
 
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_map();
-}
-
 if ($prefs['xmpp_conversejs_always_load'] === 'y') {
     require_once 'lib/xmpp/ConverseJS.php';
     $xmppclient = new ConverseJS();

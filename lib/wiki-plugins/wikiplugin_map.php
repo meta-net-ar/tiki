@@ -423,3 +423,66 @@ function wp_map_color_filter($color)
         return $color;
     }
 }
+
+/** This used to be in headerlib and called from tiki-setup.php.  Moved here, but untested - benoitg - 2024-04-19 */
+function wp_map_add_map()
+{
+    global $prefs;
+
+    $tikilib = TikiLib::lib('tiki');
+    $headerlib = TikiLib::lib('header');
+    $enabled = $tikilib->get_preference('geo_tilesets', ['openstreetmap'], true);
+
+    $google = array_intersect(['google_street', 'google_physical', 'google_satellite', 'google_hybrid'], $enabled);
+    if (count($google) > 0 || $prefs['geo_google_streetview'] == 'y') {
+        $args = [
+            'v' => '3',
+        ];
+
+        if (! empty($prefs['gmap_key'])) {
+            $args['key'] = $prefs['gmap_key'];
+        }
+
+        $url = $tikilib->httpScheme() . '://maps.googleapis.com/maps/api/js?' . http_build_query($args, '', '&');
+
+        if (TikiLib::lib('access')->is_xml_http_request()) {
+            $headerlib->add_js('function loadScript() {
+var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "' . $url . '";
+    document.body.appendChild(script);
+}
+
+window.onload = loadScript;');
+        } else {
+            $headerlib->add_jsfile_external($url, true);
+        }
+    }
+
+    /* Needs additional testing
+    $visual = array_intersect(array('visualearth_road', 'visualearth_aerial', 'visualearth_hybrid'), $enabled);
+    if (count($visual) > 0) {
+        $headerlib->add_jsfile_cdn('http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1');
+    }
+    */
+
+    if ($prefs['geo_openlayers_version'] === 'ol3') {
+        $headerlib->add_jsfile_external('vendor_bundled/vendor/openlayers/openlayers/ol.js', true)
+            ->add_cssfile('vendor_bundled/vendor/openlayers/openlayers/ol.css')
+            ->add_jsfile_external('vendor_bundled/vendor/walkermatt/ol-layerswitcher/dist/ol-layerswitcher.js')
+            ->add_cssfile('vendor_bundled/vendor/walkermatt/ol-layerswitcher/src/ol-layerswitcher.css')
+            ->add_js(
+                ''
+            );
+    } else {
+        $headerlib->add_jsfile_external('lib/openlayers/OpenLayers.js', true);
+    }
+
+    $headerlib->add_js(
+        '$(".map-container:not(.done)")
+                .addClass("done")
+                .visible(function() {
+                    $(this).createMap();
+            });'
+    );
+}

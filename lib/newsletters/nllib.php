@@ -1487,6 +1487,12 @@ class NlLib extends TikiLib
         return $emails;
     }
 
+    private static function minify_css($file)
+    {
+        $minifier = new MatthiasMullie\Minify\CSS($file);
+        return $minifier->minify();
+    }
+
     private function get_edition_mail($editionId, $target, $is_html = null, $replyTo = null, $sendFrom = null, $unsubscribeLink = null)
     {
         global $prefs, $base_url;
@@ -1622,13 +1628,13 @@ class NlLib extends TikiLib
         $newsCssFileOption = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'newsletter.css');
 
         if (! empty($newsCssFile)) {
-            $newsCss .= $headerlib->minify_css($newsCssFile);
+            $newsCss .= self::minify_css($newsCssFile);
         }
         if (! empty($newsCssFileOption) && $newsCssFileOption !== $newsCssFile) {
-            $newsCss .= $headerlib->minify_css($newsCssFileOption);
+            $newsCss .= self::minify_css($newsCssFileOption);
         }
         if (empty($newsCss)) {
-            $newsCss = $headerlib->minify_css('themes/base_files/css/newsletter.css');
+            $newsCss = self::minify_css('themes/base_files/css/newsletter.css');
         }
         return $newsCss;
     }
