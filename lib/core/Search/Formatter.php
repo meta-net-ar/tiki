@@ -115,16 +115,23 @@ class Search_Formatter
                     return tra($value);
                 }, $row);
             }
-            // Clear blank values so the defaults prevail
-            foreach ($pre as $k => $value) {
-                if ($value !== '' && $value !== null) {
-                    // process multilingual fields
-                    if ($prefs['feature_multilingual'] === 'y') {
-                        if (isset($pre[$k . '_' . $prefs['language']])) {
-                            $value = $pre[$k . '_' . $prefs['language']];
-                        }
+
+            foreach ($pre as $k => $rawValue) {
+                $finalValue = null;
+
+                // process multilingual fields
+                if ($prefs['feature_multilingual'] === 'y') {
+                    $translatedValue = $pre[$k . '_' . $prefs['language']] ?? null;
+                    if ($translatedValue) {
+                        $finalValue = $translatedValue;
                     }
-                    $row[$k] = $value;
+                }
+                if (! $finalValue && $rawValue) {
+                    $finalValue = $rawValue;
+                }
+                if ($finalValue) {
+                    // Only set if not a blank value so the defaults prevail
+                    $row[$k] = $finalValue;
                 }
             }
             if ($enableHighlight) {
