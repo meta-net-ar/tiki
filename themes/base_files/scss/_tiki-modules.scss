@@ -244,24 +244,8 @@ header:not(.fixed-top) a.sitelogo {
 }
 
 // Basic Bootstrap (layout_social)
-.layout_social .fixed-top {
-    .navbar-brand,
-    .sitetitle,
-    .sitesubtitle {
-        display: inline-block;
-        align-self: center !important;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-    .sitesubtitle {
-        font-size: calc( var(--bs-navbar-brand-font-size) * .8 );
-
-    }
-    .sitelogo { // Class name changed from .sitelogo-img
-        margin-top: 0;
-        margin-bottom: 0;
-        padding: 0 !important;
-    }
+.layout_social .fixed-top .sitesubtitle {
+    font-size: calc(var(--bs-navbar-brand-font-size) * .8);
 }
 
 // Remove Bootstrap default top and bottom padding on navbars in modules (nested navbars)
