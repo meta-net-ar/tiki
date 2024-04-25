@@ -26,7 +26,7 @@ class WikiParser_PluginMatcher implements Iterator, Countable
     {
         $matcher = new self();
         $matcher->text = $text;
-        $matcher->findMatches(0, strlen($text));
+        $matcher->findMatches(0, strlen($text ?? ''));
 
         return $matcher;
     }
