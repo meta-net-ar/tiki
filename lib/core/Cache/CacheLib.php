@@ -119,7 +119,7 @@ class CacheLib
         }
         if (in_array('all', $dir_names)) {
             $this->erase_dir_content(SMARTY_COMPILED_TEMPLATES_PATH . "/$tikidomain");
-            $this->erase_dir_content(TEMP_PUBLIC_PATH . "/$tikidomain");
+            $this->erase_dir_content(TEMP_HTTP_PUBLIC_PATH . "/$tikidomain");
             $this->erase_dir_content(TEMP_CACHE_PATH . "/$tikidomain");
 
             $banner = glob(TEMP_PATH . "/banner*.*");
@@ -156,9 +156,9 @@ class CacheLib
             }
         }
         if (in_array('temp_public', $dir_names)) {
-            $this->erase_dir_content(TEMP_PUBLIC_PATH . "/$tikidomain");
+            $this->erase_dir_content(TEMP_HTTP_PUBLIC_PATH . "/$tikidomain");
             if (! $skipLog) {
-                $logslib->add_log($log_section, 'erased ' . TEMP_PUBLIC_PATH . ' content');
+                $logslib->add_log($log_section, 'erased ' . TEMP_HTTP_PUBLIC_PATH . ' content');
             }
         }
         if (in_array('prefs', $dir_names)) {

@@ -323,6 +323,9 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
 // Moved here from tiki-setup.php because smarty use a copy of session
 if (isset($prefs['feature_fullscreen']) && $prefs['feature_fullscreen'] == 'y') {
     require_once('lib/setup/fullscreen.php');
+} else {
+    //Some templates depend on this
+    $_SESSION['fullscreen'] = 'n';
 }
 
 // Retrieve Tiki Extension Packages

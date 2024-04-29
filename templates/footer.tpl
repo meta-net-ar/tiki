@@ -89,8 +89,6 @@
 {interactivetranslation}
 {* Put JS at the end *}
 {if $headerlib}
-    {$headerlib->output_js_config()}
-    {$headerlib->output_js_files()}
     {$headerlib->output_js()}
     {* some js to enabled falsely detected js disabled browsers to be rechecked * disabled when in the installer *}
 

@@ -69,30 +69,30 @@ Some more text
         $prefs['wiki_toc_default'] = 'on';
         $wikilib->set_page_auto_toc($this->pageName, 0);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $expected = 'lib/jquery_tiki/autoToc.js';
         $this->assertStringContainsString($expected, $tags, 'Autotoc on, page set to default');
 
         $headerlib = clone $headerlibVirginCopy;
         $wikilib->set_page_auto_toc($this->pageName, -1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc on, page set to off');
 
         $headerlib = clone $headerlibVirginCopy;
         $wikilib->set_page_auto_toc($this->pageName, 1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringContainsString($expected, $tags, 'Autotoc on, page set to on');
 
         $prefs['wiki_toc_default'] = 'off';
         $headerlib = clone $headerlibVirginCopy;
         $wikilib->set_page_auto_toc($this->pageName, 0);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc off, page set to default');
 
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $wikilib->set_page_auto_toc($this->pageName, -1);
         $wikilib->processPageDisplayOptions($headerlib);
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc off, page set to off');
@@ -100,7 +100,7 @@ Some more text
         $headerlib = clone $headerlibVirginCopy;
         $wikilib->set_page_auto_toc($this->pageName, 1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringContainsString($expected, $tags, 'Autotoc off, page set to on');
     }
 

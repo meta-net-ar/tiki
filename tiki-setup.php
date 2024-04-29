@@ -1112,6 +1112,7 @@ if ($prefs['feature_realtime'] == 'y') {
 }
 
 if ($prefs['feature_calendar'] === 'y') {
+    //These are pretty huge dependencies (depend on  @fullcalendar) that isn't used on every page.  These should probably be imported by the relevent php code somewhere in calendarlib, not from here. benoitg - 2024-05-02
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
     $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
     $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');

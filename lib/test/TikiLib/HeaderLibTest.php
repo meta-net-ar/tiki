@@ -23,17 +23,37 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
     {
         $headerLib = new HeaderLib();
         $headerLib->add_js($this->firstJs)->add_js($this->secondJs);
-        $output = trim($headerLib->output_js(false));
+        $output = trim($headerLib->output_js(true));
         $expected = trim($this->firstJs . "\n" . trim($this->secondJs));
         $this->assertEquals($expected, $output);
     }
 
-    public function testTwoJsCanBeAddedSameAtSameRank(): void
+    public function testTwoJsCanBeAddedAtSameRank(): void
     {
         $headerLib = new HeaderLib();
         $headerLib->add_js($this->firstJs, 10)->add_js($this->secondJs, 10);
-        $output = trim($headerLib->output_js(false));
+        $output = trim($headerLib->output_js(true));
         $expected = trim($this->firstJs . "\n" . trim($this->secondJs));
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testJsCanBeRemoved(): void
+    {
+        $headerLib = new HeaderLib();
+        $headerLib->add_js($this->firstJs, 10)->add_js($this->secondJs, 10);
+        $headerLib->removeJs($this->firstJs);
+        $output = trim($headerLib->output_js(true));
+        $expected = trim($this->secondJs);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testClearJs(): void
+    {
+        $headerLib = new HeaderLib();
+        $headerLib->add_js($this->firstJs, 10)->add_js($this->secondJs, 10);
+        $headerLib->clear_js();
+        $output = trim($headerLib->output_js(true));
+        $expected = '';
         $this->assertEquals($expected, $output);
     }
 
@@ -41,7 +61,7 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
     {
         $headerLib = new HeaderLib();
         $headerLib->add_js($this->firstJs)->add_js($this->firstJs);
-        $output = trim($headerLib->output_js(false));
+        $output = trim($headerLib->output_js(true));
         $expected = trim($this->firstJs);
         $this->assertEquals($expected, $output, "duplicate js should not be duplicated");
     }
@@ -49,15 +69,15 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
     {
         $headerLib = new HeaderLib();
         $headerLib->add_js($this->firstJs, 10)->add_js($this->firstJs, 20);
-        $output = trim($headerLib->output_js(false));
+        $output = trim($headerLib->output_js(true));
         $expected = trim($this->firstJs);
         $this->assertEquals($expected, $output, "duplicate js should should not be duplicated, even if added at different rank");
     }
     public function testAddedAtRightRank(): void
     {
         $headerLib = new HeaderLib();
-        $headerLib->add_js($this->firstJs, 20)->add_js($this->secondJs, 10);
-        $output = trim($headerLib->output_js(false));
+        $headerLib->add_js($this->firstJs, 20)->add_js($this->secondJs, 2);
+        $output = trim($headerLib->output_js(true));
         $expected = trim($this->secondJs) . "\n" . trim($this->firstJs);
         $this->assertEquals($expected, $output, "Javascript should respect rank, even if added out of order");
     }
