@@ -190,7 +190,7 @@ class FakerCommentsCommand extends Command
                     $value = call_user_func_array([$faker, $fakerAction], $fakerArguments);
                 } elseif (! empty($thisFaker)) {
                     $fakerAction = $thisFaker;
-                    $value = $faker->$fakerAction;
+                    $value = $faker->$fakerAction();
                 } else {
                     $value = '';
                 }

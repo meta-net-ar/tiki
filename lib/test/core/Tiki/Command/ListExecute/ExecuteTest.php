@@ -30,7 +30,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
 
     protected function setUp(): void
     {
-        global $testhelpers;
+        $testhelpers = new TestHelpers();
 
         parent::setUp();
 
@@ -52,7 +52,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
 
     protected function tearDown(): void
     {
-        global $testhelpers;
+        $testhelpers = new TestHelpers();
 
         parent::tearDown();
 

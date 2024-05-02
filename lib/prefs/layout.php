@@ -25,14 +25,14 @@ function prefs_layout_list()
             'dependencies' => [
                 'feature_tabs',
             ],
-            'default' => 'y',
+            'default' => 'n',
         ],
         'layout_add_body_group_class' => [
             'name' => tra('Add group CSS info'),
             'hint' => tra('Add CSS classes to the page BODY tag based on the user\'s group membership'),
             'description' => tra('Either grp_Anonymous or grp_Registered and possibly grp_Admins as well'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'keywords' => 'body class html grp',
         ],
     ];

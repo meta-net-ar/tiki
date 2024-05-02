@@ -391,7 +391,7 @@ class CheckAttachmentGalleryTest extends TestCase
      *
      * @return array
      */
-    public function getTypes()
+    public static function getTypes()
     {
         return [
             'forum' => ['f'],

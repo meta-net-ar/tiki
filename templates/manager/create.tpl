@@ -151,7 +151,7 @@
                         </span>
                     </div>
                     <div class="input-group">
-                        <input type="checkbox" name="leavepassword" value="yes" checked>
+                        <input type="checkbox" class="form-check-input" id="leavepassword" name="leavepassword" value="yes" checked>
                         <label for="leavepassword">{tr}Leave default password as is.{/tr}</label>
                     </div>
                 </div>

@@ -84,7 +84,7 @@ function doProcessShout($inFormValues)
             $smarty->assign('shout_error', $captchalib->getErrors());
             $smarty->assign_by_ref('shout_msg', $inFormValues['shout_msg']);
         } else {
-            $shoutboxlib->replace_shoutbox(0, $user, $inFormValues['shout_msg'], ($inFormValues['shout_tweet'] == 1), ($inFormValues['shout_facebook'] == 1));
+            $shoutboxlib->replace_shoutbox(0, $user, $inFormValues['shout_msg'], (($inFormValues['shout_tweet'] ?? 0) == 1), (($inFormValues['shout_facebook'] ?? 0) == 1));
         }
     }
 }

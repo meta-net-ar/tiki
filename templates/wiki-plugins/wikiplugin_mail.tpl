@@ -71,7 +71,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-form-label" for="mail_user{$ipluginmail}">{tr}Send to:{/tr}</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control mb-3" id="mail_user" name="mail_user" value="{$mail_user}">
+                            <input type="text" class="form-control mb-3" id="mail_user{$ipluginmail}" name="mail_user" value="{$mail_user}">
                             {remarksbox type='tip' title="{tr}Tip{/tr}"}{tr}Email address (if more than one, separated by ","){/tr}{/remarksbox}
                         </div>
                     </div>

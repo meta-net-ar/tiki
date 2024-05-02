@@ -15,7 +15,7 @@ class Search_GlobalSource_SocialSource implements Search_GlobalSource_Interface
         $this->userlib = TikiLib::lib('user');
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'user_groups',
@@ -24,7 +24,7 @@ class Search_GlobalSource_SocialSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'user_groups' => 'multivalue',
@@ -33,7 +33,7 @@ class Search_GlobalSource_SocialSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

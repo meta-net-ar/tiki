@@ -1,5 +1,6 @@
 // Tiki overrides, adjustments, etc. for external libs and scripts that are added in vendor, etc. can be added here
 // instead of having to be added to the theme SCSS file.
+// Specifically, this file is imported by _tiki-selectors.scss so the files below should contain variables for themes to declare values for.
 
 @import "tablesorter-custom";
 @import "tablesorter-tiki";
@@ -8,6 +9,7 @@
 @import "conversejs-tiki";
 @import "cypht-tiki";
 @import "select2-tiki";
+@import "select2-tiki_colors";
 @import "toastui-tiki";
 
 @import "../../../vendor_bundled/vendor/npm-asset/sass-svg-uri/_svg-uri.scss";

@@ -7,7 +7,7 @@
 
 class TikiVersionTest extends PHPUnit\Framework\TestCase
 {
-    public function versions()
+    public static function versions()
     {
         return [
             ['9.0', new Tiki_Version_Version(9, 0)],
@@ -191,7 +191,7 @@ O;
         $this->assertEquals($string, $upgrade->getMessage());
     }
 
-    public function upgradeMessages()
+    public static function upgradeMessages()
     {
         return [
             ['Version 8.2 is no longer supported. A minor upgrade to 8.4 is strongly recommended.', new Tiki_Version_Upgrade('8.2', '8.4', true)],

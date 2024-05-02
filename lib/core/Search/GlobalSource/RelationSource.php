@@ -19,7 +19,7 @@ class Search_GlobalSource_RelationSource implements Search_GlobalSource_Interfac
         $this->contentSources = $contentSources;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'relations',
@@ -29,7 +29,7 @@ class Search_GlobalSource_RelationSource implements Search_GlobalSource_Interfac
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'relations' => 'multivalue',
@@ -39,7 +39,7 @@ class Search_GlobalSource_RelationSource implements Search_GlobalSource_Interfac
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

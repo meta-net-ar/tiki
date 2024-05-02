@@ -9,7 +9,7 @@
     <div class="mb-3 row">
         <div class="col-sm-5">
             <label for="categoryId" class="me-2">{tr}Category{/tr}</label>
-            <select name="categoryId" class="form-control form-control-sm me-2">
+            <select name="categoryId" id="categoryId" class="form-control form-control-sm me-2">
                 {foreach from=$categories key=categoryId item=category}
                     <option value="{$categoryId|escape}">
                         {$category.name|escape} (Id:{$categoryId})
@@ -19,7 +19,7 @@
         </div>
         <div class="col-sm-5">
             <label for="theme" class="me-2">{tr}Theme{/tr}</label>
-            <select name="theme" class="form-control form-control-sm me-2">
+            <select name="theme" id="theme" class="form-control form-control-sm me-2">
                 {foreach from=$themes key=theme item=theme_name}
                     <option value="{$theme|escape}">{$theme_name}</option>
                 {/foreach}
@@ -37,11 +37,11 @@
     <div class="table-responsive themecat-table">
         <table class="table">
             <tr>
-                <th>
+                <td> {* th changed to td to prevent ARIA empty header error *}
                     <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
                         {icon name="delete"}
                     </button>
-                </th>
+                </td>
                 <th>
                     <a href="tiki-theme_control.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">
                         {tr}Category{/tr}
@@ -56,9 +56,7 @@
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" name="categoryIds[{$channels[user].categId}]">
-                        </div>
+                        <input type="checkbox" name="categoryIds[{$channels[user].categId}]" class="form-check-input" aria-label="{tr}Select{/tr}">
                     </td>
                     <td class="text">
                         {$channels[user].name|escape} (Id:{$channels[user].categId})

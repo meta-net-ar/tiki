@@ -12,7 +12,7 @@
  */
 class Tracker_Field_WebService extends \Tracker\Field\AbstractField
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'W' => [
@@ -311,13 +311,13 @@ class Tracker_Field_WebService extends \Tracker\Field\AbstractField
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text", "{$baseKey}_json"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [

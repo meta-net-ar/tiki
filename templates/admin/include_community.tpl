@@ -11,7 +11,7 @@
         {tab name="{tr}Community Features{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Community{/tr}{help url="Community"}</legend>
+                <legend class="h3">{tr}Community{/tr}{help url="Community"}</legend>
                 {preference name=feature_community_gender}
                 {preference name=feature_community_mouseover}
                 <div class="adminoptionboxchild" id="feature_community_mouseover_childcontainer">
@@ -26,7 +26,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Additional options{/tr}</legend>
+                <legend class="h3">{tr}Additional options{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=feature_invite}
                     {preference name=auth_token_share}
@@ -46,12 +46,12 @@
         {tab name="{tr}Social Interaction{/tr}"}
             <br>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Friendship and followers{/tr}</legend>
+                <legend class="h3">{tr}Friendship and followers{/tr}</legend>
                 {preference name=feature_friends}
                 <div class="adminoptionboxchild" id="feature_friends_childcontainer">
                     {preference name=social_network_type}
                     <fieldset>
-                        <legend>{tr}Select which items to display when listing users{/tr}</legend>
+                        <legend class="h3">{tr}Select which items to display when listing users{/tr}</legend>
                         {preference name=user_list_order}
                         {preference name=feature_community_list_name}
                         {preference name=feature_community_list_score}
@@ -61,7 +61,7 @@
                 </div>
             </fieldset>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Activity Stream{/tr}</legend>
+                <legend class="h3">{tr}Activity Stream{/tr}</legend>
                 {preference name=activity_basic_events}
                 <div class="adminoptionboxchild" id="activity_basic_events_childcontainer">
                     {preference name=activity_basic_tracker_create}
@@ -89,13 +89,13 @@
                 {preference name=activity_stream_disable_indexing}
             </fieldset>
             <fieldset>
-                <legend>{tr}Goal, recognition and rewards{/tr}</legend>
+                <legend class="h3">{tr}Goal, recognition and rewards{/tr}</legend>
                 {preference name=goal_enabled}
                 {preference name=goal_badge_tracker}
                 {preference name=goal_group_blacklist}
             </fieldset>
             <fieldset>
-                <legend>{tr}Score{/tr}</legend>
+                <legend class="h3">{tr}Score{/tr}</legend>
                 {preference name=feature_score}
             </fieldset>
         {/tab}

@@ -36,7 +36,8 @@ class MLModelTest extends TikiTestCase
 
         // create a tracker and a field
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
-        self::$trklib->replace_tracker_field(
+        self::assertNotEmpty(self::$trackerId, "Check the tracker was created properly");
+        $fieldId = self::$trklib->replace_tracker_field(
             self::$trackerId,
             0,
             'Name',
@@ -61,6 +62,7 @@ class MLModelTest extends TikiTestCase
             '',
             'test_name'
         );
+        self::assertNotEmpty($fieldId, "Check the field was created properly");
 
         $definition = Tracker_Definition::get(self::$trackerId);
         $fields = $definition->getFields();

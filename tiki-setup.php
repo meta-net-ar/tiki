@@ -13,7 +13,7 @@
 // die if called directly.
 use Tiki\Package\VendorHelper;
 
-//Be carefull, composer autoloading isn't available until tiki-setup_base.php is required further down
+//Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
 
 /**
  * @global array $prefs
@@ -442,7 +442,7 @@ $smarty->assign('symbols', TikiLib::symbols());
 
 // Used by TikiAccessLib::redirect()
 if (isset($_GET['msg'])) {
-    Feedback::add(['mes' => htmlspecialchars($_GET['msg']), 'type' => htmlspecialchars($_GET['msgtype'])]);
+    Feedback::add(['mes' => htmlspecialchars($_GET['msg']), 'type' => htmlspecialchars($_GET['msgtype'] ?? '')]);
 } elseif (isset($_SESSION['msg'])) {
     Feedback::add(['mes' => $_SESSION['msg'], 'type' => $_SESSION['msgtype']]);
     unset($_SESSION['msg']);
@@ -951,8 +951,8 @@ if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('vendor_bundled/vendor/mrrio/jspdf/jspdf.min.js', true);
 }
 
-if (file_exists(USER_CUSTOM_SETUP_PHP_FILE)) {
-    include_once(USER_CUSTOM_SETUP_PHP_FILE);
+if (file_exists(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE)) {
+    require_once(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE);
 }
 
 // any furher $headerlib->add_js() call not using rank = 'external' will be put into rank 'late'

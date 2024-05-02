@@ -26,6 +26,7 @@
                     and: "{tr}and{/tr}",
                     all: "{tr}All{/tr}",
                     mine: "{tr}Mine{/tr}",
+                    group: "{tr}Group{/tr}"
                 },
                 c3: {
                     size: {

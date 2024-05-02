@@ -13,8 +13,8 @@
             </div>
             <div class="mb-3 row mx-0">
                 <div class="form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" name="preserve" value="1">
+                    <input class="form-check-input" type="checkbox" name="preserve" id="preserve" value="1">
+                    <label class="form-check-label" for="preserve">
                         {tr}Preserve tracker ID{/tr}
                     </label>
                 </div>

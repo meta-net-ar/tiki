@@ -40,7 +40,7 @@ class AreasMultiDomainBasicTest extends PerspectivesNavigationBaseTestCase
         $this->navigateSteps($steps, $cleanCookies);
     }
 
-    public function navigations()
+    public static function navigations()
     {
         $host = getenv('TIKI_TEST_HOST');
         $site = getenv('TIKI_TEST_HOST_A');

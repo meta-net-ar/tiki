@@ -82,10 +82,9 @@ function prefs_memcache_serialize_servers($data)
     return trim($out);
 }
 
-function prefs_memcache_unserialize_servers($string)
+function prefs_memcache_unserialize_servers(string $string)
 {
     $data = [];
-
     foreach (explode("\n", $string) as $row) {
         if (preg_match("/^\s*([^:]+):(\d+)\s*(\((\d+)\))?\s*$/", $row, $parts)) {
             $data[] = [

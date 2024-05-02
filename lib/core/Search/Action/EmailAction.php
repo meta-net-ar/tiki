@@ -44,9 +44,19 @@ class Search_Action_EmailAction implements Search_Action_Action
             }
 
             foreach ($data->to->text() as $to) {
-                if ($to = $this->dereference($to)) {
-                    foreach ($to as $email) {
-                        $mail->addTo($email);
+                if (is_array($to)) {
+                    foreach ($to as $user_email) {
+                        if ($user_email = $this->dereference($user_email)) {
+                            foreach ($user_email as $email) {
+                                $mail->addTo($email);
+                            }
+                        }
+                    }
+                } else {
+                    if ($to = $this->dereference($to)) {
+                        foreach ($to as $email) {
+                            $mail->addTo($email);
+                        }
                     }
                 }
             }

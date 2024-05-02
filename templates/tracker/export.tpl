@@ -41,26 +41,26 @@
         </div>
 
         <div class="form-check">
-            <label>
-                <input type="checkbox" class="form-check-input" name="dateFormatUnixTimestamp" value="1">
+            <input type="checkbox" class="form-check-input" name="dateFormatUnixTimestamp" id="dateFormatUnixTimestamp" value="1">
+            <label class="form-check-label" for="dateFormatUnixTimestamp">
                 {tr}Export dates as UNIX Timestamps to facilitate importing{/tr}
             </label>
         </div>
         <div class="form-check">
-            <label>
-                <input type="checkbox" class="form-check-input" name="keepItemlinkId" value="1">
+            <input type="checkbox" class="form-check-input" name="keepItemlinkId" id="keepItemlinkId" value="1">
+            <label class="form-check-label" for="keepItemlinkId">
                 {tr}Export ItemLink type fields as the itemId of the linked item (to facilitate importing){/tr}
             </label>
         </div>
         <div class="form-check">
-            <label>
-                <input type="checkbox" class="form-check-input" name="keepCountryId" value="1" >
+            <input type="checkbox" class="form-check-input" name="keepCountryId" id="keepCountryId" value="1" >
+            <label class="form-check-label" for="keepCountryId">
                 {tr}Export country type fields as the system name of the country (to facilitate importing){/tr}
             </label>
         </div>
         <div class="form-check mb-4">
-            <label>
-                <input type="checkbox" class="form-check-input" name="parse" value="1">
+            <input type="checkbox" class="form-check-input" name="parse" id="parse" value="1">
+            <label class="form-check-label" for="parse">
                 {tr}Parse as wiki text{/tr}
             </label>
         </div>
@@ -68,26 +68,27 @@
         <fieldset>
             <legend>{tr}Generic information{/tr}</legend>
             <div class="form-check mt-0">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showItemId" value="1" checked="checked">
+                <input type="checkbox" class="form-check-input" name="showItemId" id="showItemId" value="1" checked="checked">
+                <label class="form-check-label" for="showItemId">
                     {tr}Item ID{/tr}
                 </label>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showStatus" value="1" checked="checked">
+                <input type="checkbox" class="form-check-input" name="showStatus" id="showStatus" value="1" checked="checked">
+                <label class="form-check-label" for="showStatus">
                     {tr}Status{/tr}
                 </label>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showCreated" value="1" checked="checked">
+                <input type="checkbox" class="form-check-input" name="showCreated" id="showCreated" value="1" checked="checked">
+                <label class="form-check-label" for="showCreated">
+
                     {tr}Creation date{/tr}
                 </label>
             </div>
             <div class="form-check mb-4">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showLastModif" value="1" checked="checked">
+                <input type="checkbox" class="form-check-input" name="showLastModif" id="showLastModif" value="1" checked="checked">
+                <label class="form-check-label" for="showLastModif">
                     {tr}Last modification date{/tr}
                 </label>
             </div>
@@ -97,8 +98,8 @@
             <legend>{tr}Fields{/tr}</legend>
             {foreach from=$fields item=field}
                 <div class="form-check mt-0">
-                    <label>
-                        <input type="checkbox" class="form-check-input" name="listfields[]" value="{$field.fieldId|escape}" checked="checked">
+                    <input type="checkbox" class="form-check-input" name="listfields[]" id="listfields[]" value="{$field.fieldId|escape}" checked="checked">
+                    <label class="form-check-label" for="listfields[]">
                         {$field.name|escape}
                     </label>
                 </div>

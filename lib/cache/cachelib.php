@@ -46,7 +46,7 @@ class Cachelib
                     require_once($params['require']);
                 }
                 $implementation = new $params['class']();
-                if ($implementation->isFunctionnal()) {
+                if ($implementation->isFunctional()) {
                     $this->implementation = $implementation;
                     return;
                 }
@@ -243,7 +243,7 @@ class Cachelib
 
         if (isset($prefs['memcache_enabled']) && $prefs['memcache_enabled'] === 'y' && ($this->implementation instanceof CacheLibMemcache)) {
             $memcachelib = TikiLib::lib("memcache");
-            if ($memcachelib->isFunctionnal()) {
+            if ($memcachelib->isFunctional()) {
                 $memcachelib->flush();
             }
         }
@@ -559,7 +559,7 @@ class CacheLibFileSystem implements Tiki\Cache\KvpCacheInterface
         }
     }
 
-    public function isFunctionnal(): bool
+    public function isFunctional(): bool
     {
         return true;
     }
@@ -624,9 +624,9 @@ class CacheLibMemcache implements Tiki\Cache\KvpCacheInterface
         return $type . md5($key);
     }
 
-    public function isFunctionnal(): bool
+    public function isFunctional(): bool
     {
-        return TikiLib::lib("memcache")->isFunctionnal();
+        return TikiLib::lib("memcache")->isFunctional();
     }
 
     public function cacheItem($key, $data, $type = '')
@@ -658,7 +658,7 @@ class CacheLibMemcache implements Tiki\Cache\KvpCacheInterface
 
 class CacheLibNoCache implements Tiki\Cache\KvpCacheInterface
 {
-    public function isFunctionnal(): bool
+    public function isFunctional(): bool
     {
         return true;
     }

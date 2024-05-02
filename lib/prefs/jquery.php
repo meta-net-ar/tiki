@@ -146,7 +146,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('SmartMenus'),
             'description' => tra('Add "SmartMenus" to Bootstrap menus. See smartmenus.org for more.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['advanced'],
             'keywords' => 'smart menu',
         ],
@@ -182,7 +182,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('Draggable Modals'),
             'description' => tra('Modal popups can be moved around.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
                 'feature_jquery_ui',
             ],
@@ -191,7 +191,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('Resizable Modals'),
             'description' => tra('Modal popups can be resized.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
                 'feature_jquery_ui',
             ],

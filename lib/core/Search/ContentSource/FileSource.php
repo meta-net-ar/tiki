@@ -34,7 +34,7 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
         );
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -96,7 +96,7 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -133,7 +133,7 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -170,7 +170,7 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         global $prefs;
 

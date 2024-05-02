@@ -45,7 +45,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
-                            <a href="javascript:toggleBlock('search')" class="link">
+                            <a href="#" onclick="$('#search').toggle()" class="link">
                                 {icon name='add' alt="{tr}more{/tr}"}&nbsp;{tr}More Criteria{/tr}
                             </a>
                         </div>
@@ -55,7 +55,7 @@
                         <div class="mb-3 row">
                             <label class="col-form-label col-sm-5" for="filterGroup">{tr}Group (direct){/tr}</label>
                             <div class="col-sm-7">
-                                <select class="form-select form-control-sm" name="filterGroup" id="filterGroup">
+                                <select class="form-select form-select-sm" name="filterGroup" id="filterGroup">
                                     <option value=""></option>
                                     {section name=ix loop=$all_groups}
                                         {if $all_groups[ix] != 'Registered' && $all_groups[ix] != 'Anonymous'}
@@ -137,11 +137,9 @@
                                     {capture assign=username}{$users[user].user|escape}{/capture}
                                         <tr>
                                             <td class="checkbox-cell">
-                                                <div class="form-check">
-                                                    {if $users[user].user ne 'admin'}
-                                                        <input type="checkbox" name="checked[]" value="{$users[user].user|escape}" {if isset($users[user].checked) && $users[user].checked eq 'y'}checked="checked" {/if}>
-                                                    {/if}
-                                                </div>
+                                                {if $users[user].user ne 'admin'}
+                                                    <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$users[user].user|escape}" {if isset($users[user].checked) && $users[user].checked eq 'y'}checked="checked" {/if}>
+                                                {/if}
                                             </td>
 
                                             <td class="username">

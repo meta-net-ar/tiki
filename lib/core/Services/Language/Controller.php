@@ -159,7 +159,7 @@ class Services_Language_Controller
 
         //get custom php file location
         $custom_php_file = $this->utilities->getLanguageDirectory($language);
-        $custom_php_file .= 'custom.php';
+        $custom_php_file .= LANG_CUSTOM_PHP_BASENAME;
         if (! file_exists($custom_php_file)) {
             $custom_php_file = null;
         }
@@ -234,7 +234,7 @@ class Services_Language_Controller
 
         //add file name
         if ($file_type === 'custom_php') {
-            $file .= 'custom.php';
+            $file .= LANG_CUSTOM_PHP_BASENAME;
         } elseif ($file_type === 'language_php') {
             $file .= 'language.php';
         } elseif ($file_type === 'custom_json') {

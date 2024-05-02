@@ -16,7 +16,7 @@
 
                     <div class="col-sm-7">
                         <select class="form-select" name="wikilinks" id="wikilinks1"
-                                onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                             <option value=",,,">{tr}Choose{/tr} ...</option>
                             <option value="{$prefs.tikiIndex},{tr}Home Page{/tr}">{tr}Home Page{/tr}</option>
                             {if !empty($prefs.home_blog)}
@@ -34,7 +34,7 @@
 
                     <div class="col-sm-7">
                         <select class="form-select" name="wikilinks" id="wikilinks2"
-                                onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                             <option value=",,,">{tr}Choose{/tr} ...</option>
                             {if $prefs.feature_stats eq 'y'}
                                 <option
@@ -54,7 +54,7 @@
 
                         <div class="col-sm-7">
                             <select class="form-select" name="wikilinks" id="wikilinks3"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-index.php,{tr}Wiki Home,{/tr}feature_wiki,tiki_p_view">{tr}Wiki Home{/tr}</option>
                                 <option value="tiki-lastchanges.php,{tr}Latest Changes,{/tr}feature_lastChanges,tiki_p_view">{tr}Latest Changes{/tr}</option>
@@ -72,7 +72,7 @@
 
                         <div class="col-sm-7">
                             <select name="wikilinks" id="wikilinks5" class="form-control"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-view_articles.php,{tr}Articles,{/tr}feature_articles,tiki_p_read_article">{tr}Articles home{/tr}</option>
                                 <option value="tiki-list_articles.php,{tr}All articles,{/tr}feature_articles,tiki_p_read_article">{tr}List articles{/tr}</option>
@@ -90,7 +90,7 @@
 
                         <div class="col-sm-7">
                             <select name="wikilinks" id="wikilinks6" class="form-control"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-list_blogs.php,{tr}List Blogs,{/tr}feature_blogs,tiki_p_read_blog">{tr}List Blogs{/tr}</option>
                                 <option value="tiki-blog_rankings.php,{tr}Rankings,{/tr}feature_blog_rankings,tiki_p_read_blog">{tr}Rankings{/tr}</option>
@@ -107,7 +107,7 @@
 
                         <div class="col-sm-7">
                             <select id="wikilinks7" class="form-control" name="wikilinks"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-list_file_gallery.php,{tr}File Galleries,{/tr}feature_file_galleries,tiki_p_view_file_gallery">{tr}File Galleries{/tr}</option>
                                 <option value="tiki-upload_file.php,{tr}Upload file,{/tr}feature_file_galleries,tiki_p_upload_files">{tr}Upload file{/tr}</option>
@@ -123,7 +123,7 @@
 
                         <div class="col-sm-7">
                             <select name="wikilinks" id="wikilinks8" class="form-control"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-forums.php,{tr}Forums,{/tr}feature_forums,tiki_p_forum_read">{tr}Forums{/tr}</option>
                                 <option value="tiki-view_forum.php?forumId=,{tr}View a forum,{/tr}feature_forums,tiki_p_forum_read">{tr}View a forum{/tr}</option>
@@ -140,7 +140,7 @@
 
                         <div class="col-sm-7">
                             <select name="wikilinks" id="wikilinks9" class="form-control"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-list_faqs.php,{tr}FAQs,{/tr}feature_faqs,tiki_p_view_faqs">{tr}FAQs{/tr}</option>
                                 <option value="tiki-view_faq.php?faqId=,{tr}View a FAQ,{/tr}feature_faqs,tiki_p_view_faqs">{tr}View a FAQ{/tr}</option>
@@ -155,7 +155,7 @@
 
                         <div class="col-sm-7">
                             <select name="wikilinks" id="wikilinks10" class="form-control"
-                                    onchange="setMenuCon(options[selectedIndex].value);return true;">
+                                    onchange="setMenuOptionFields(options[selectedIndex].value);return true;">
                                 <option value=",,,">{tr}Choose{/tr} ...</option>
                                 <option value="tiki-list_quizzes.php,{tr}Quizzes,{/tr}feature_quizzes">{tr}Quizzes{/tr}</option>
                                 <option value="tiki-take_quiz.php?quizId=,{tr}Take a quiz,{/tr}feature_quizzes">{tr}Take a quiz{/tr}</option>

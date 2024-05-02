@@ -39,7 +39,7 @@ class CacheLibRedis implements Tiki\Cache\KvpCacheInterface
      * Return whether this thing is usable.
      * @return boolean
      */
-    public function isFunctionnal(): bool
+    public function isFunctional(): bool
     {
         return isset($this->redis);
     }

@@ -26,18 +26,18 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_articles visible="always"}
             </fieldset>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 {preference name=wikiplugin_articles}
                 {preference name=wikiplugin_article}
             </fieldset>
             {preference name=art_home_title}
             {preference name=maxArticles}
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Features{/tr}{help url="Articles"}
                 </legend>
                 {preference name=feature_submissions}
@@ -69,7 +69,7 @@
                 </div>
                 {preference name=article_feature_copyrights}
             </fieldset>
-            <legend>
+            <legend class="h3">
                 {tr}Custom (Article Own) images setting{/tr}
             </legend>
                 {preference name=article_image_file_size_max}
@@ -79,7 +79,7 @@
                 {preference name=article_default_list_image_size_y}
             </fieldset>
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Sharing on social networks{/tr}{help url="Social+Networks#Using+ShareThis"}
                 </legend>
                 {preference name=feature_cms_sharethis}
@@ -88,7 +88,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Import CSV file{/tr}</legend>
+                <legend class="h3">{tr}Import CSV file{/tr}</legend>
                 <div class="adminoptionbox mb-3 row">
                     <label for="csvlist" class="col-form-label col-sm-4">{tr}Batch upload (CSV file){/tr}</label>
                     <div class="col-sm-8">
@@ -102,7 +102,7 @@
         {tab name="{tr}Articles Listing and View{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}List articles{/tr}</legend>
+                <legend class="h3">{tr}List articles{/tr}</legend>
                 {preference name=art_sort_mode}
                 {preference name=art_list_title}
                 <div class="adminoptionboxchild" id="art_list_title_childcontainer">
@@ -126,7 +126,7 @@
                 {preference name=gmap_article_list}
             </fieldset>
             <fieldset>
-                <legend>{tr}Article view{/tr}</legend>
+                <legend class="h3">{tr}Article view{/tr}</legend>
                 {preference name=art_trailer_pos}
                 {preference name=art_header_text_pos}
             </fieldset>

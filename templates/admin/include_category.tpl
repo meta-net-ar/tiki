@@ -16,19 +16,19 @@
     </div>
 
     <fieldset id="Categories">
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_categories visible="always"}
     </fieldset>
 
     <fieldset class="mb-3 w-100">
-        <legend>{tr}Plugins{/tr} {help url="Plugins"}</legend>
+        <legend class="h3">{tr}Plugins{/tr} {help url="Plugins"}</legend>
         {preference name=wikiplugin_category}
         {preference name=wikiplugin_catpath}
         {preference name=wikiplugin_catorphans}
     </fieldset>
 
     <fieldset class="mb-3 w-100">
-        <legend>{tr}Inline plugins{/tr}</legend>
+        <legend class="h3">{tr}Inline plugins{/tr}</legend>
         {preference name=wikiplugininline_category}
         {preference name=wikiplugininline_categorytransition}
         {preference name=wikiplugininline_catorphans}
@@ -36,7 +36,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>
+        <legend class="h3">
             {tr}Features{/tr}
         </legend>
         {preference name=feature_categorypath}
@@ -47,7 +47,7 @@
 
         {preference name=category_sort_ascii}
         <fieldset>
-            <legend>
+            <legend class="h3">
                 {tr}Category objects{/tr}
             </legend>
             {preference name=feature_categoryobjects}
@@ -107,43 +107,43 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Theme{/tr}</legend>
+        <legend class="h3">{tr}Theme{/tr}</legend>
         {preference name=feature_theme_control_autocategorize}
         {preference name=feature_theme_control_parentcategory}
         {preference name=feature_theme_control_savesession}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Tracker{/tr}</legend>
+        <legend class="h3">{tr}Tracker{/tr}</legend>
         {preference name=trackerfield_category}
         {preference name=unified_trackeritem_category_names}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Forum{/tr}</legend>
+        <legend class="h3">{tr}Forum{/tr}</legend>
         {preference name=forum_category_selector_in_list}
         {preference name=forum_available_categories}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Wiki{/tr}</legend>
+        <legend class="h3">{tr}Wiki{/tr}</legend>
         {preference name=wiki_list_categories}
         {preference name=wiki_list_categories_path}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Performance{/tr}</legend>
+        <legend class="h3">{tr}Performance{/tr}</legend>
         {preference name=category_browse_count_objects}
         {preference name=category_browse_show_categids}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Poll{/tr}</legend>
+        <legend class="h3">{tr}Poll{/tr}</legend>
             {preference name=poll_list_categories}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Structure{/tr}</legend>
+        <legend class="h3">{tr}Structure{/tr}</legend>
             {preference name=feature_wiki_categorize_structure}
     </fieldset>
 

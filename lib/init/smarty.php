@@ -303,11 +303,13 @@ class Smarty_Tiki extends \Smarty\Smarty
      * This is used to assign() values to the templates by reference instead of making a copy.
      * @param $var string
      * @param $value mixed
-     * @return SmartyTiki\ReferenceVariable
+     * @return Smarty\Variable
      */
     public function assign_by_ref($var, &$value)
     {
-        return $this->tpl_vars[$var] = new SmartyTiki\ReferenceVariable($value);
+        $variable = new Smarty\Variable(null);
+        $variable->value = &$value;
+        return $this->tpl_vars[$var] = $variable;
     }
 
     /**
@@ -637,20 +639,50 @@ class Smarty_Tiki extends \Smarty\Smarty
         $this->initializePaths();
     }
 
-    /*
-    Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths
+    /**
+     * Call addTemplateDir on:
+     * - $templatePath/layouts/configured_site_layout_or_site_layout_admin
+     *    - Falls back to $templatePath/layouts/basic/
+     * @param [type] $templatePath
+     * @return void
+     */
+    private function addLayoutTemplatesFromTemplatePath($templatePath): void
+    {
+        global $prefs, $section;
+        if ($section != "admin") {
+            $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? 'basic';
+        } else {
+            $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? 'basic';
+        }
+
+        $layout = TIKI_PATH . "/$templatePath/" . 'layouts/' . $selectedLayout . '/';
+        if (! is_readable($layout)) {
+            $layout = TIKI_PATH . "/$templatePath/" . 'layouts/basic/';
+        }
+        if (is_readable($layout)) {
+            $this->addTemplateDir($layout);
+            //This is just to find layout_plain.tpl
+            $this->addTemplateDir(TIKI_PATH . "/$templatePath/" . 'layouts/');
+        }
+    }
+
+    /**
+    Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths.  It's dependent on
+
+    $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
 
     The load order for main templates is
-    - templates/
     - theme_option path
     - theme path
-    - tikidomain path
     - themes/templates/
+    - tikidomain path
     - tiki extension modules templates/
+    - templates/ (at project root)
 
-    The effective template will be the present in the last directory loaded.
+
+    The effective template will be the one present in the last directory loaded.
     */
-    public function initializePaths()
+    public function initializePaths(): void
     {
         global $prefs, $tikidomainslash, $section;
 
@@ -659,82 +691,61 @@ class Smarty_Tiki extends \Smarty\Smarty
             $this->main_template_dir = TIKI_PATH . '/' . SMARTY_TEMPLATES_PATH . '/';
             $this->setCompileDir(TIKI_PATH . '/' . SMARTY_COMPILED_TEMPLATES_PATH);
         }
-
-        $this->setTemplateDir([]);  //Load main templates/ dir
+        //Initialize smarty template dir system, without adding a template.Keep in mind that smarty will use the first template found.  So generally speaking we add the most specific paths first.
+        $this->setTemplateDir([]);
 
         // when called from release.php TikiLib isn't initialised so we can ignore the themes and addons
         if (class_exists('TikiLib')) {
             // Theme templates
             $themelib = TikiLib::lib('theme');
-            if (! empty($prefs['theme']) && ! in_array($prefs['theme'], ['custom_url'])) {
-                $theme_path = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], '', 'templates'); // path to the theme options
-                $this->addTemplateDir(TIKI_PATH . "/$theme_path/");
-                //if theme_admin is empty, use main theme and site_layout instead of site_layout_admin
-                if ($section != "admin" || empty($prefs['theme_admin'])) {
-                    $layout = TIKI_PATH . "/$theme_path/" . 'layouts/' . $prefs['site_layout'] . '/';
-                    if (! is_readable($layout)) {
-                        $layout = TIKI_PATH . "/$theme_path/" . 'layouts/basic/';
+            $theme = $prefs['theme'] ?? null;
+            $themeOption = $prefs['theme_option'] ?? null;
+            if (! in_array($theme, ['custom_url'])) {
+                //Templates from theme_options of currently active theme
+                if ($themeOption) {
+                    $currentThemeOptionTemplatesPath = $themelib->getThemePath($theme, $themeOption, SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the theme options
+                    if ($currentThemeOptionTemplatesPath) {
+                        $this->addTemplateDir(TIKI_PATH . "/$currentThemeOptionTemplatesPath/");
+                        $this->addLayoutTemplatesFromTemplatePath($currentThemeOptionTemplatesPath);
                     }
-                    $this->addTemplateDir($layout);
-                } else {
-                    $layout = TIKI_PATH . "/$theme_path/" . 'layouts/' . $prefs['site_layout_admin'] . '/';
-                    if (! is_readable($layout)) {
-                        $layout = TIKI_PATH . "/$theme_path/" . 'layouts/basic/';
-                    }
-                    $this->addTemplateDir($layout);
                 }
-                $this->addTemplateDir(TIKI_PATH . "/$theme_path/" . 'layouts/');
 
-                $main_theme_path = $themelib->get_theme_path($prefs['theme'], '', '', 'templates'); // path to the main theme
-                $this->addTemplateDir(TIKI_PATH . "/$main_theme_path/");
-                //if theme_admin is empty, use main theme and site_layout instead of site_layout_admin
-                if ($section != "admin" || empty($prefs['theme_admin'])) {
-                    $layout = TIKI_PATH . "/$main_theme_path/" . 'layouts/' . $prefs['site_layout'] . '/';
-                    if (! is_readable($layout)) {
-                        $layout = TIKI_PATH . "/$main_theme_path/" . 'layouts/basic/';
-                    }
-                    $this->addTemplateDir($layout);
-                } else {
-                    $layout = TIKI_PATH . "/$main_theme_path/" . 'layouts/' . $prefs['site_layout_admin'] . '/';
-                    if (! is_readable($layout)) {
-                        $layout = TIKI_PATH . "/$main_theme_path/" . 'layouts/basic/';
-                    }
-                    $this->addTemplateDir($layout);
+                //Templates from currently active theme
+                //This will fallback to 'default' theme if $theme is empty
+                $currentThemeTemplatesPath = $themelib->getThemePath($theme, '', SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the currently active main theme templates
+                if ($currentThemeTemplatesPath) {
+                    $this->addTemplateDir(TIKI_PATH . "/$currentThemeTemplatesPath/");
+                    $this->addLayoutTemplatesFromTemplatePath($currentThemeTemplatesPath);
                 }
             }
-            // Tikidomain main template folder
+
+
             if (! empty($tikidomainslash)) {
-                $this->addTemplateDir(TIKI_PATH . "/themes/{$tikidomainslash}templates/"); // This dir is for all the themes in the tikidomain
-                $this->addTemplatedir($this->main_template_dir . '/' . $tikidomainslash); // legacy tpls just in case, for example: /templates/mydomain.ltd/
+                // Legacy /themes/mydomain.tld/templates/
+                $this->addTemplateDir(TIKI_PATH . "/themes/{$tikidomainslash}templates/");
+                // Legacy /templates/mydomain.tld/
+                $this->addTemplatedir($this->main_template_dir . '/' . $tikidomainslash);
             }
 
-            $this->addTemplateDir(TIKI_PATH . "/" . THEMES_TEMPLATE_OVERRIDES_PATH . "/"); //This dir stores templates that override templates for any base theme if it has the name of the theme
+            //Shared templates in _custom/shared/templates
+            $this->addTemplateDir(TIKI_PATH . "/" . TIKI_CUSTOMIZATIONS_SHARED_TEMPLATES_PATH . '/');
 
-            //Addon templates
+            //Legacy custom templates for all sites
+            $this->addTemplateDir(TIKI_PATH . '/' . THEMES_LEGACY_ALL_SITES_SHARED_TEMPLATES_PATH . '/');
+
+            //Templates from addon packages
             foreach (\Tiki\Package\ExtensionManager::getPaths() as $path) {
                 $this->addTemplateDir($path . '/templates/');
             }
         }
 
-        //Layout templates
-        if (! empty($prefs['site_layout']) && ($section != "admin" || empty($prefs['theme_admin']))) { //use the admin layout if in the admin section
-            $layout = $this->main_template_dir . '/layouts/' . $prefs['site_layout'] . '/';
-            if (! is_readable($layout)) {
-                $layout = $this->main_template_dir . '/layouts/basic/';
-            }
-            $this->addTemplateDir($layout);
-        } elseif (! empty($prefs['site_layout_admin'])) {
-            $layout = $this->main_template_dir . '/layouts/' . $prefs['site_layout_admin'] . '/';
-            if (! is_readable($layout)) {
-                $layout = $this->main_template_dir . '/layouts/basic/';
-            }
-            $this->addTemplateDir($layout);
-        }
-        $this->addTemplateDir($this->main_template_dir . '/layouts/');
+        //Base tiki templates
+        $this->addLayoutTemplatesFromTemplatePath(SMARTY_TEMPLATES_PATH);
         $this->addTemplateDir($this->main_template_dir);
 
         //Test templates
         $this->addTemplateDir(TIKI_PATH . '/lib/test/core/Search/');
+        //var_dump($this->getTemplateDir());
     }
 
     /**

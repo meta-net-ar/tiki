@@ -283,7 +283,7 @@ class PdfGenerator
         $defaults = new \Mpdf\Config\ConfigVariables();
         $defaultVariables = $defaults->getDefaults();
         $mpdfConfig = [
-            'fontDir' => array_merge([TIKI_PATH . '/lib/pdf/fontdata/fontttf/'], $defaultVariables['fontDir']),
+            'fontDir' => array_merge([TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
             'mode' => 'utf8',
             'format' => $pdfSettings['pagesize'],
             'margin_left' => $pdfSettings['margin_left'],
@@ -308,8 +308,13 @@ class PdfGenerator
         //custom fonts add, currently fontawesome support is added, more fonts can be added in future
         $custom_fontdata = [
          'fontawesome' => [
-            'R' => "fontawesome.ttf",
-            'I' => "fontawesome.ttf",
+            'R' => "fa-regular-400.ttf"
+         ],
+         'fontawesome-solid' => [
+            'R' => 'fa-solid-900.ttf'
+         ],
+         'fontawesome-brands' => [
+            'R' => "fa-brands-400.ttf"
          ]];
 
         //calling function to add custom fonts
@@ -332,7 +337,8 @@ class PdfGenerator
 
         //getting main base css file
         $basecss = file_get_contents('themes/base_files/css/tiki_base.css'); // external css
-
+        //apply available fonts to classes for printing
+        $basecss .= '.far, .fa-regular { font-family: fontawesome; } .fa, .fas, .fa-solid { font-family: fontawesome-solid; } .fab, .fa-brands { font-family: fontawesome-brands; }';
         //getting theme css
         $themeLib = TikiLib::lib('theme');
         $themecss = $themeLib->get_theme_path($prefs['theme'], '', $prefs['theme'] . '.css');
@@ -832,6 +838,7 @@ class PdfGenerator
     public function _getImages(&$html, &$tempImgArr)
     {
         $html = cleanHtml($html, null, 'utf8');
+        $html = str_replace('&amp;#x', '&#x', $html);
         $doc = loadHTMLContent($html);
 
         $tags = $doc->getElementsByTagName('img');
@@ -1051,19 +1058,25 @@ class PdfGenerator
         $fadivs = $xpath->query('//*[contains(@class, "fa")]');
        //loading json file if there is any font-awesome tag in html
         if ($fadivs->length) {
-            $faCodes = file_get_contents('lib/pdf/fontdata/fa-codes.json');
-            $jfo = json_decode($faCodes, true);
-            for ($i = 0; $i < $fadivs->length; $i++) {
-                $fadiv = $fadivs->item($i);
-                $faClass = explode(" ", str_replace(["fa ","-"], "", $fadiv->getAttribute('class')));
-                foreach ($faClass as $class) {
-                    if (! empty($jfo[$class]['codeValue'])) {
-                        $faCode = $doc->createElement('span', " " . $jfo[$class]['codeValue']);
-                        $faCode->setAttribute("style", "font-family: FontAwesome;float:left;padding-left:5px" . $fadiv->getAttribute('style'));
-                        //span with fontawesome code inserted before fa div
-                        $faCode->setAttribute("class", $fadiv->getAttribute('class'));
-                        $fadiv->parentNode->insertBefore($faCode, $fadiv);
-                        $fadiv->parentNode->removeChild($fadiv);
+            //get the file containing the unicode of each fontawesome generated 'php console.php build:generateiconlist'
+            $allFontawesomeIcons = TIKI_PATH . '/' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.json';
+            $faCodes = file_get_contents($allFontawesomeIcons);
+            if ($faCodes !== false) {
+                $jfo = json_decode($faCodes, true);
+                for ($i = 0; $i < $fadivs->length; $i++) {
+                    $fadiv = $fadivs->item($i);
+                    $faClass = explode(" ", str_replace(["fa-", "-"], ["","_"], $fadiv->getAttribute('class')));
+                    foreach ($faClass as $class) {
+                        if (! empty($jfo[$class]['codeValue'])) {
+                            $faCode = $doc->createElement('span', " " . $jfo[$class]['codeValue']);
+                            $faCode->setAttribute("style", "float:left;padding-left:5px;" . $fadiv->getAttribute('style'));
+                            //span with fontawesome code inserted before fa div
+                            $faCode->setAttribute("class", $fadiv->getAttribute('class'));
+                            if ($fadiv->parentNode !== null) {
+                                $fadiv->parentNode->insertBefore($faCode, $fadiv);
+                                $fadiv->parentNode->removeChild($fadiv);
+                            }
+                        }
                     }
                 }
             }
@@ -1313,6 +1326,7 @@ function cleanHtml($html, $config = null, $encoding = 'utf8')
             'coerce-endtags' => true,
             'quote-ampersand' => true,
             'quote-marks' => false,
+            'drop-empty-elements' => false,
         ];
         $config = (is_array($config) == true) ? array_merge($default, $config) : $default;
         $html_ = tidy_parse_string($html, $config, $encoding);

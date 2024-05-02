@@ -1,7 +1,5 @@
-// Vapor 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/vapor/_variables.scss with
+// Vapor 5.3.3 -- This file is to override and add top variables in  node_modules/bootswatch/dist/vapor/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-
-$theme: "vapor" !default;
 
 //
 // Color system
@@ -30,13 +28,15 @@ $green:   #3cf281 !default;
 $teal:    #3f81a2 !default;
 $cyan:    #32fbe2 !default;
 
+$yellow-800: shade-color($yellow, 60%) !default;
+
 $primary:       $purple !default;
-$secondary:     $pink !default;
-$success:       $green !default;
-$info:          $blue !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
-$light:         #44d9e8 !default;
+$secondary:     #D917A2; // $pink !default;
+$success:       #068938; // $green !default;
+$info:         #0879BF; // $blue !default;
+$warning:       #946F00; // $yellow !default;
+$danger:        #E02E3A; // $red !default;
+$light:         #0F6D75; // #11828D; // #44d9e8 !default; Darkened for acceptable contrast behind link color
 $dark:          $gray-900 !default;
 
 $min-contrast-ratio:   1.2 !default;
@@ -51,129 +51,50 @@ $prefix:                      $variable-prefix !default;
 
 // Body
 
-$body-bg:                   #1a0933 !default;
-$body-color:                $cyan !default;
-
 // Links
 
-$link-color:                             $body-color;
-
 // Components
-
-$border-width:                0 !default;
-
-$border-radius:               .15rem !default;
-$border-radius-sm:            .05rem !default;
-
+$component-active-bg:         $pink; // Repeating vapor default $primary !default;
 $component-active-color: $white;
-$component-active-bg:         $pink !default;
 
 // Fonts
 
 // stylelint-disable-next-line value-keyword-case
 $font-family-sans-serif:     system-ui, sans-serif; // Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 
-$text-muted:                  rgba($body-color, .3) !default;
-
-$blockquote-footer-color:     $text-muted !default;
-
+//$mark-color:                  $body-color !default;
+$mark-bg:                     $yellow-800;
 // Tables
 
-$table-color:                 $white !default;
-
-$table-bg-scale:              0% !default;
-
 // Forms
-
-//$input-bg:                              lighten($body-bg, 10%) !default;
-//$input-disabled-bg:                     lighten($body-bg, 5%) !default;
-
-$input-color:                           $white !default;
 $input-bg: #30115e;  // Copied from Bootswatch demo page.
-
-$input-placeholder-color:               rgba($white, .4) !default;
-
-//$input-group-addon-bg:                  $input-disabled-bg !default;
-
-//$form-range-track-bg:             $input-bg !default;
-
-$form-range-thumb-disabled-bg:             $purple !default;
 
 // Navs
 
-$nav-link-disabled-color:           $text-muted !default;
-
-$nav-tabs-link-active-color:        $component-active-bg !default;
-
 // Dropdowns
-$dropdown-link-color:               var(--#{$prefix}body-color) !default;
-$dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-
-$dropdown-link-active-color:        $component-active-color !default;
-$dropdown-link-active-bg:           $component-active-bg !default;
 
 // Pagination
 
-$pagination-bg:                     transparent !default;
-
-$pagination-focus-bg:               transparent !default;
-
-$pagination-hover-bg:               transparent !default;
-
-$pagination-disabled-color:         $text-muted !default;
-$pagination-disabled-bg:            transparent !default;
-
 // Cards
-
-$card-border-width:                 2px !default;
-$card-cap-color:                    $white !default;
-$card-color:                        $white !default;
 
 // Tooltips
 
 $tooltip-bg:                        $dark !default;
-$tooltip-opacity:                   1 !default;
 
 // Popovers
 
-$popover-bg:                        $primary !default;
-
-$popover-header-color:              $white !default;
-
-$popover-body-color:                $white !default;
-
 // Toasts
-
-$toast-color:                       $white !default;
-$toast-background-color:            $primary !default;
-
-$toast-header-color:                $toast-color !default;
-$toast-header-background-color:     $toast-background-color !default;
 
 // Modals
 
-$modal-content-color:               $white !default;
-$modal-content-bg:                  $primary !default;
-
 // Progress bars
-
-//$progress-bg:                       $input-disabled-bg !default;
 
 // List group
 
-$list-group-color:                  $white !default;
-//$list-group-bg:                     $input-disabled-bg !default;
-$list-group-hover-bg:               $pink !default;
-$list-group-disabled-color:         $text-muted !default;
-$list-group-action-color:           $body-color !default;
-$list-group-action-hover-color:     $white !default;
-$list-group-action-active-bg:       $list-group-hover-bg !default;
-
 // Breadcrumbs
 
-$breadcrumb-divider-color:          $text-muted !default;
-$breadcrumb-active-color:           $component-active-bg !default;
+// Code
+$code-color:                        $pink;
 
 //--------------------------- Tiki SCSS variables
 

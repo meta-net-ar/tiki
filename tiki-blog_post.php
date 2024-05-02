@@ -219,7 +219,7 @@ if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
         } else {
             $author = $user;
         }
-        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'], $author, $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
+        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $author, $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
         $smarty->assign('postId', $postId);
     }
 

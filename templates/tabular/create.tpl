@@ -15,9 +15,9 @@
 {block name="content"}
     <form method="post" action="{service controller=tabular action=create}">
         <div class="mb-3 row">
-            <label class="col-form-label col-sm-3">{tr}Name{/tr}</label>
+            <label class="col-form-label col-sm-3" for="name">{tr}Name{/tr}</label>
             <div class="col-sm-9">
-                <input class="form-control" type="text" name="name" required>
+                <input class="form-control" type="text" name="name" id="name" required>
             </div>
         </div>
         <div class="mb-3 row">
@@ -27,19 +27,19 @@
             </div>
         </div>
         <div class="row mb-4">
-            <label class="form-check-label col-sm-3">{tr}Initialize this format with the current tracker fields{/tr}</label>
+            <label class="form-check-label col-sm-3" for="prefill">{tr}Initialize this format with the current tracker fields{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="prefill">
+                    <input class="form-check-input" type="checkbox" name="prefill" id="prefill">
                 </div>
             </div>
         </div>
         {if $has_odbc}
         <div class="row mb-4">
-            <label class="form-check-label col-sm-3">{tr}External ODBC source?{/tr}</label>
+            <label class="form-check-label col-sm-3" for="use_odbc">{tr}External ODBC source?{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input class="form-check-input use-odbc" type="checkbox" name="use_odbc" value="1">
+                    <input class="form-check-input use-odbc" type="checkbox" name="use_odbc" id="use_odbc" value="1">
                 </div>
             </div>
         </div>
@@ -69,19 +69,19 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-form-label col-sm-2 offset-sm-1">{tr}Sync deletes{/tr}</label>
+                <label class="col-form-label col-sm-2 offset-sm-1" for="odbc[sync_deletes]">{tr}Sync deletes{/tr}</label>
                 <div class="col-sm-9">
-                    <input class="form-check-input" type="checkbox" name="odbc[sync_deletes]" value="1">
+                    <input class="form-check-input" type="checkbox" name="odbc[sync_deletes]" id="odbc[sync_deletes]" value="1">
                     <a class="tikihelp text-info" title="{tr}Synchronization:{/tr} {tr}Deleting a tracker item or clearing the local tracker will also erase items remotely. Use with care!{/tr}">
                         {icon name=warning}
                     </a>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="form-check-label col-sm-2 offset-sm-1">{tr}Initialize with remote schema fields{/tr}</label>
+                <label class="form-check-label col-sm-2 offset-sm-1" for="prefill_odbc">{tr}Initialize with remote schema fields{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="prefill_odbc" value="1">
+                        <input class="form-check-input" type="checkbox" name="prefill_odbc" id="prefill_odbc" value="1">
                         <a class="tikihelp text-info" title="{tr}Remote initialization:{/tr} {tr}Create missing fields in related tracker and in this import-export format from remote schema.{/tr}">
                             {icon name=information}
                         </a>

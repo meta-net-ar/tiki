@@ -15,17 +15,17 @@ class Search_GlobalSource_ArticleAttachmentSource implements Search_GlobalSource
         $this->source = $source;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['article_contents'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return ['article_contents' => 'plaintext'];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'article_contents' => false,

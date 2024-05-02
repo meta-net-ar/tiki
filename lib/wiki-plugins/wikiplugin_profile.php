@@ -58,7 +58,7 @@ function wikiplugin_profile($data, $params)
 
         try {
             if ($installer->isInstalled($profile)) {
-                if ($_POST['reinstall'] == "{$params['domain']}/{$params['name']}") {
+                if (isset($_POST['reinstall']) && $_POST['reinstall'] == "{$params['domain']}/{$params['name']}") {
                     $installer->forget($profile);
                     $installer->install($profile);
 
@@ -66,7 +66,7 @@ function wikiplugin_profile($data, $params)
                     exit;
                 }
             } else {
-                if ($_POST['install'] == "{$params['domain']}/{$params['name']}") {
+                if (isset($_POST['install']) && ($_POST['install'] == "{$params['domain']}/{$params['name']}")) {
                     $installer->install($profile);
 
                     header('Location: ' . $_SERVER['REQUEST_URI']);

@@ -3,17 +3,12 @@
 
 {if count($plugins) ne 0}
 
-    <h3>{tr}Plugins{/tr}</h3>
+    <h5>{tr}Plugins{/tr}</h5>
     <div class="help_section">
-        <p>
-            {tr}Note that plugin arguments can be enclosed with double quotes (&quot;); this allows them to contain , or = or &gt;{/tr}.
-            <br>
-            {if $prefs.feature_help eq 'y'}{tr}More help here{/tr}
-                <a href="{$prefs.helpurl}Plugins" target="tikihelp" class="tikihelp" title="{tr}Plugins:{/tr}{tr}Wiki plugins extend the function of wiki syntax with more specialized commands.{/tr}">
-                    {icon name='help' style="vertical-align:middle"}
-                </a>
-            {/if}
-        </p>
+        {remarksbox type="info"}
+        {tr}Note: plugin arguments can be enclosed with double quotes (<code>&quot;</code>). This allows them to contain <code>,</code> or <code>=</code> or <code>&gt;</code>.{/tr} {if $prefs.feature_help eq 'y'}{tr}More information:{/tr} <a href="{$prefs.helpurl}Plugins" target="tikihelp" class="tikihelp alert-link" title="{tr}Plugins:{/tr}{tr}Wiki plugins extend the function of wiki syntax with more specialized commands.{/tr}">
+                    Plugins {icon name="link-external" istyle="font-size: 70%"}</a>.{/if}
+        {/remarksbox}
 
         {if $tiki_p_admin eq 'y'}
             <a href="tiki-admin.php?page=textarea&amp;cookietab=2" target="tikihelp" class="tikihelp">
@@ -26,7 +21,7 @@
         {else}
             {listfilter selectors='#plugins_help_table tr' parentTabId="plugin_help"}
         {/if}
-        <table id="plugins_help_table" width="95%" class="formcolor">
+        <table id="plugins_help_table"  class="table table-condensed table-hover">
             <tr><th>{tr}Description{/tr}</th></tr>
 
             {section name=i loop=$plugins}

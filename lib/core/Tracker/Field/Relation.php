@@ -42,7 +42,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
 
     public static $refreshedTargets = [];
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'REL' => [
@@ -50,7 +50,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
                 'description' => tr('Allow arbitrary relations to be created between the trackers and other objects in the system.'),
                 'prefs' => ['trackerfield_relation'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'help' => 'Relations-Tracker-Field',
                 'params' => [
                     'relation' => [
@@ -628,7 +628,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
         ], $meta);
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         $data = $this->getFieldData();
@@ -643,7 +643,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
         ], $meta);
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         $data = $this->getFieldData();
@@ -658,7 +658,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
         ], $meta);
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return ["{$baseKey}_plain" => true];    // index contents with the object titles

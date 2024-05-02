@@ -1,5 +1,5 @@
-{foreach from=$data item=$diagram name=diagrams}
-    <div id="graph-container{if isset($index)}-{$index}{/if}-{$smarty.foreach.diagrams.iteration|escape}" class="diagram text-{{$alignment}}" page="{$page_name}"></div>
+{foreach $data as $diagrams => $diagram}
+    <div id="graph-container{if isset($index)}-{$index}{/if}-{$diagram@iteration|escape}" class="diagram text-{{$alignment}}" page="{$page_name}"></div>
 {/foreach}
 {block name="diagram_extra"}{/block}
 

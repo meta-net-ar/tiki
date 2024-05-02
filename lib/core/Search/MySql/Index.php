@@ -165,7 +165,7 @@ class Search_MySql_Index implements Search_Index_Interface
                 Feedback::error($e->getMessage());
             }
             $resultSet = new Search_ResultSet([], 0, $resultStart, $resultCount);
-            $resultSet->errorInQuery = true;
+            $resultSet->errorInQuery = $e->getMessage();
             return $resultSet;
         }
     }

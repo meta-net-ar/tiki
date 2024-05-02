@@ -594,6 +594,7 @@ class RegistrationLib extends TikiLib
             $js = '
             $("form[name=RegForm]").validate({
                 rules: {
+                    // tiki-register.php calls the username field "name".
                     name: {
                         required: true,';
             if ($prefs['login_is_email'] === 'y') {
@@ -610,6 +611,23 @@ class RegistrationLib extends TikiLib
                             }
                         }
                     },
+                    // tiki-adminusers.php calls the username field "login".
+                    login: {
+                        required: true,';
+            if ($prefs['login_is_email'] === 'y') {
+                $js .= '
+                        email: true,';
+            }
+            $js .= '
+                        remote: {
+                            url: "validate-ajax.php",
+                            type: "post",
+                            data: {
+                                validator: "username",
+                                input: function() { return $("#login").val(); }
+                            }
+                        }
+                    },
                     email: {';
             if ($prefs['user_unique_email'] == 'y') {
                 $js .= '
@@ -618,7 +636,7 @@ class RegistrationLib extends TikiLib
                             type: "post",
                             data: {
                                 validator: "uniqueemail",
-                                input: function() { return $("#email").val(); }
+                                input: function() { return $("input#email").val(); }
                             }
                         },';
             }

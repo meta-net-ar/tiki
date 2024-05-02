@@ -203,7 +203,7 @@ class VCSUpdateCommand extends Command
      * @param int $before A timestamp value
      * @return String
      */
-    protected function getGitRevision(string $branch = null, int $before = 0)
+    protected function getGitRevision(string|null $branch = null, int $before = 0)
     {
         $command = 'git log -n 1 --pretty=format:"%H"';
 

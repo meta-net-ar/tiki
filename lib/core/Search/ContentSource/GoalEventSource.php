@@ -18,7 +18,7 @@ class Search_ContentSource_GoalEventSource implements Search_ContentSource_Inter
         return $this->table->fetchColumn('eventId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -44,12 +44,12 @@ class Search_ContentSource_GoalEventSource implements Search_ContentSource_Inter
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['event_type', 'modification_date', 'user', 'goal_groups', 'target', 'date'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'event_type' => 'identifier',
@@ -61,7 +61,7 @@ class Search_ContentSource_GoalEventSource implements Search_ContentSource_Inter
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'date' => true,

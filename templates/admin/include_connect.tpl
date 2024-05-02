@@ -5,12 +5,12 @@
     {tab name="{tr}Tiki Connect{/tr}"}
         <br>
         <fieldset>
-            <legend><strong>{tr}Join the community!{/tr}</strong></legend>
+            <legend class="h3">{tr}Join the community!{/tr}</legend>
             <p>{tr}Tiki Wiki CMS Groupware is Free and Open Source Software (FOSS). It is a community-driven project which exists and improves thanks to the participation of people just like YOU.{/tr}</p>
             <p>{button href="https://tiki.org/Join" _text="{tr}Join the Community{/tr}"}</p>
         </fieldset>
         <fieldset>
-            <legend><strong>{tr}Tiki news{/tr}</strong></legend>
+            <legend class="h3">{tr}Tiki news{/tr}</legend>
             <p>
                 {tr}Embedded RSS feed from info.tiki.org TODO, meanwhile{/tr}
                 {button href="https://tiki.org/tiki-articles_rss.php?ver=2" _text="{tr}Add RSS{/tr}"}
@@ -20,27 +20,27 @@
             </p>
         </fieldset>
         <fieldset>
-            <legend><strong>{tr}Promote your site{/tr}</strong></legend>
+            <legend class="h3">{tr}Promote your site{/tr}</legend>
             <p>
                 {tr}Add your site to the Tiki directory.{/tr}
                 {button href="tiki-register_site.php" _text="{tr}Submit your site{/tr}"}
             </p>
         </fieldset>
         <fieldset>
-            <legend><strong>{tr}Spread the word{/tr}</strong></legend>
+            <legend class="h3">{tr}Spread the word{/tr}</legend>
             <p>
                 {tr}Add the "Powered by" module to your site. {/tr}
                 {button href="tiki-admin_modules.php?textFilter=powered&cookietab=3" _text="{tr}Manage Modules{/tr}"}
             </p>
         </fieldset>
         <fieldset>
-            <legend><strong>{tr}Help improve Tiki{/tr}</strong></legend>
+            <legend class="h3">{tr}Help improve Tiki{/tr}</legend>
             <p>
                 {tr}Submit a feature request or bug report.{/tr} {button _text="{tr}Visit Tiki development site{/tr}" href="https://dev.tiki.org/Make+a+wish"}
             </p>
         </fieldset>
         <fieldset>
-            <legend><strong>{tr}Make a financial contribution to the Tiki Association{/tr}</strong></legend>
+            <legend class="h3">{tr}Make a financial contribution to the Tiki Association{/tr}</legend>
             <p>
                 <a href="https://tiki.org/Donation">
                     <img src="img/tiki/Tiki_Contribute_Button.png" alt="{tr}Contribute to Tiki{/tr}">
@@ -55,7 +55,7 @@
             {ticket}
             {include file='admin/include_apply_top.tpl'}
             <fieldset>
-                <legend>{tr}Tiki connect{/tr}{help url="Connect"}</legend>
+                <legend class="h3">{tr}Tiki connect{/tr}{help url="Connect"}</legend>
                 {remarksbox type="info" title="{tr}New Feature{/tr}" icon="bricks"}
                     <p><em>{tr}Please note: Experimental - work in progress{/tr}</em></p>
                     <p>{tr}Tiki Connect is a way to let the Tiki project know how it is being used, and which parts people like or would like fixing (or explaining).{/tr}<br>
@@ -162,7 +162,7 @@
             {ticket}
             {include file='admin/include_apply_top.tpl'}
             <fieldset>
-                <legend>{tr}Jitsi{/tr}{help url="Jitsi"}</legend>
+                <legend class="h3">{tr}Jitsi{/tr}{help url="Jitsi"}</legend>
 
                 <div class="mb-3 row">
                     <label class="col-form-label col-sm-4" for="jitsi-url">

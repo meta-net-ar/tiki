@@ -11,13 +11,13 @@ class OrderClause
 {
     private $parts;
 
-    public function __construct(Order $order = null)
+    public function __construct(Order|null $order = null)
     {
         $this->parts = [];
         $this->add($order);
     }
 
-    public function add(Order $order = null)
+    public function add(Order|null $order = null)
     {
         if ($order) {
             $this->parts[] = $order;

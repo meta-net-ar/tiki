@@ -28,7 +28,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         return $this->db->table('users_users')->fetchColumn('login', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -135,7 +135,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         static $data;
 
@@ -174,7 +174,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         return array_unique($data);
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         static $data;
 
@@ -212,7 +212,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         static $data;
 
@@ -237,8 +237,8 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
 
     private function getAllIndexableHandlers()
     {
-        $result = $this->db->fetchAll("SELECT DISTINCT usersTrackerId FROM users_groups WHERE usersTrackerId IS NOT NULL");
-
+        //We have horrible data validation so usersTrackerId could be both null or 0 - benoitg - 2024-03-11
+        $result = $this->db->fetchAll("SELECT DISTINCT usersTrackerId FROM users_groups WHERE usersTrackerId IS NOT NULL AND usersTrackerId != 0");
         $handlers = [];
         foreach ($result as $row) {
             if ($definition = Tracker_Definition::get($row['usersTrackerId'])) {

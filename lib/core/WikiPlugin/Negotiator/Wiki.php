@@ -29,7 +29,6 @@ class WikiPlugin_Negotiator_Wiki
     private $page;
     private $prefs;
 
-    public static $standardRelativePath = 'lib/wiki-plugins/wikiplugin_';
     public static $zendRelativePath = 'vendor_bundled/vendor/zendframework/zendframework1/library/';
     public static $checkZendPaths = true;
     public static $pluginIndexes = [];
@@ -92,7 +91,7 @@ class WikiPlugin_Negotiator_Wiki
         $this->closing = $pluginDetails['closing'];
         $this->ignored = false;
 
-        $this->exists = $this->exists(true);
+        $this->exists = self::loadPluginFromName($this->name, false);
         $this->info = $this->info();
         $this->fingerprint = $this->fingerprint();
         $this->index = $this->incrementIndex();
@@ -216,17 +215,67 @@ class WikiPlugin_Negotiator_Wiki
         }
     }
 
-    private function exists($include = false)
+    /**
+     * get's the directories where the code should look for wikiplugins
+     *
+     * @return array
+     */
+    private static function getWikipluginLookupPaths(): array
     {
-        $phpName = self::$standardRelativePath . strtolower($this->name) . '.php';
+        $paths = [
+            TIKI_CUSTOMIZATIONS_SHARED_WIKIPLUGINS_PATH,
+            WIKIPLUGINS_SRC_PATH
+        ];
+        $path = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_WIKIPLUGINS_PATH_FRAGMENT);
+        if ($path) {
+            $paths[] = $path;
+        }
+        return $paths;
+    }
 
-        $exists = file_exists($phpName);
+    public static function getWikipluginFromFiles(): array
+    {
+        $pluginsMap = [];
+        foreach (self::getWikipluginLookupPaths() as $baseDir) {
+            foreach (glob($baseDir . '/wikiplugin_*.php') as $file) {
+                $base = basename($file);
+                $pluginName = substr($base, 11, -4);
+                if (! isset($pluginsMap[$pluginName])) {
+                    $pluginsMap[$pluginName] = $file;
+                }
+            }
+        }
+        return $pluginsMap;
+    }
 
-        if ($include && $exists) {
-            include_once $phpName;
+    private static function lookupPluginFileFromName(string $name): ?string
+    {
+        $exists = false;
+        foreach (self::getWikipluginLookupPaths() as $dirPath) {
+            $pluginPhpFilePath = $dirPath . '/wikiplugin_' . mb_strtolower($name, 'UTF-8') . '.php';
+            $exists = file_exists($pluginPhpFilePath);
+            if ($exists) {
+                break;
+            }
+        }
+        //var_dump($pluginPhpFilePath, $exists);
+        return $exists ? $pluginPhpFilePath : null;
+    }
+
+    /**
+     * This is where wikiplugin_*.php code is actually required_once (optionally).
+     *
+     * @param boolean $checkOnly if true, only check that the plugin file exists
+     * @return boolean
+     */
+    public static function loadPluginFromName(string $name, bool $checkOnly = false): bool
+    {
+        $pluginPhpFilePath = self::lookupPluginFileFromName($name);
+        if (! $checkOnly && $pluginPhpFilePath) {
+            require_once $pluginPhpFilePath;
         }
 
-        if ($exists) {
+        if ($pluginPhpFilePath) {
             return true;
         }
 
@@ -402,14 +451,7 @@ class WikiPlugin_Negotiator_Wiki
 
     public static function getList($includeReal = true, $includeAlias = true)
     {
-        $real = [];
-
-        foreach (glob('lib/wiki-plugins/wikiplugin_*.php') as $file) {
-            $base = basename($file);
-            $plugin = substr($base, 11, -4);
-
-            $real[] = $plugin;
-        }
+        $real = array_keys(self::getWikipluginFromFiles());
 
         if ($includeReal && $includeAlias) {
             $plugins = array_merge($real, WikiPlugin_Negotiator_Wiki_Alias::getList());

@@ -14,7 +14,7 @@ class Tracker_Field_ItemsList extends \Tracker\Field\AbstractField implements \T
 {
     private static $itemValuesLocalCache = [];
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'l' => [
@@ -24,7 +24,7 @@ class Tracker_Field_ItemsList extends \Tracker\Field\AbstractField implements \T
                 'help' => 'Items-List-and-Item-Link-Tracker-Fields',
                 'prefs' => ['trackerfield_itemslist'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'trackerId' => [
                         'name' => tr('Tracker ID'),
@@ -349,7 +349,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -358,7 +358,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -367,7 +367,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }
@@ -664,11 +664,29 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         $trklib = TikiLib::lib('trk');
         $trackerId = (int) $this->getOption('trackerId');
 
+        if (! $trackerId) {
+            Feedback::error(
+                tr(
+                    'No tracker "%0" found for ItemsList fieldId %1',
+                    $this->getOption('trackerId'),
+                    $this->getFieldId()
+                )
+            );
+            return [];
+        }
         $filterFieldIdHere = (int) $this->getOption('fieldIdHere');
         $filterFieldIdThere = (int) $this->getOption('fieldIdThere');
 
-        $filterFieldHere = $this->getTrackerDefinition()->getField($filterFieldIdHere);
-        $filterFieldThere = $trklib->get_tracker_field($filterFieldIdThere);
+        if ($filterFieldIdHere) {
+            $filterFieldHere = $this->getTrackerDefinition()->getField($filterFieldIdHere);
+        } else {
+            $filterFieldHere = null;
+        }
+        if ($filterFieldIdThere) {
+            $filterFieldThere = $trklib->get_tracker_field($filterFieldIdThere);
+        } else {
+            Feedback::error(tr('No linked field set for ItemsList fieldId %0', $this->getFieldId()));
+        }
 
         $sortFieldIds = $this->getOption('sortField');
         if (is_array($sortFieldIds)) {
@@ -785,6 +803,16 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
     {
         $displayFields = $this->getOption('displayFieldIdThere');
         $trackerId = (int) $this->getOption('trackerId');
+        if (! $trackerId) {
+            Feedback::error(
+                tr(
+                    'No tracker "%0" found for ItemsList fieldId %1',
+                    $this->getOption('trackerId'),
+                    $this->getFieldId()
+                )
+            );
+            return [];
+        }
         $status = $this->getOption('status', 'opc');
 
         $definition = Tracker_Definition::get($trackerId);
@@ -830,6 +858,9 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         $displayFields = $this->getOption('displayFieldIdThere');
         $trackerId = (int) $this->getOption('trackerId');
 
+        if (! $trackerId) {
+            return [];
+        }
         $definition = Tracker_Definition::get($trackerId);
         if (! $definition) {
             return [];
@@ -843,8 +874,13 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
             $itemValues = [];
             if ($displayFields) {
                 foreach ($displayFields as $fieldId) {
-                    $field = $definition->getField($fieldId);
-                    if (empty($field)) {
+                    try {
+                        $field = $definition->getField($fieldId);
+                        if (empty($field)) {
+                            throw new Exception(tr('ItemsList::getItemValues display field not found: %0', $fieldId));
+                        }
+                    } catch (Exception $e) {
+                        trigger_error($e->getMessage());
                         continue;
                     }
                     if ($field['type'] == 'l') {

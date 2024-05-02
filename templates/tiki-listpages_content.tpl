@@ -39,9 +39,9 @@
         <thead>
             <tr>
                 {if isset($checkboxes_on) and $checkboxes_on eq 'y'}
-                    <th id="checkbox">
+                    <dh id="checkbox">
                         {select_all checkbox_names='checked[]' tablesorter="{$ts.enabled}"}
-                    </th>
+                    </dh>
                     {assign var='cntcol' value='1'}
                 {else}
                     {assign var='cntcol' value='0'}
@@ -171,7 +171,7 @@
 
                 {if $show_actions eq 'y'}
                     {assign var='cntcol' value=$cntcol+1}
-                    <th id="actions"></th>
+                    <td id="actions"></td>
                 {/if}
             </tr>
         </thead>
@@ -192,9 +192,7 @@
 
                     {if $checkboxes_on eq 'y'}
                         <td class="checkbox-cell">
-                            <div class="form-check">
-                                <input type="checkbox" name="checked[]" value="{$listpages[changes].pageName|escape}">
-                            </div>
+                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$listpages[changes].pageName|escape}">
                         </td>
                     {/if}
 
@@ -430,7 +428,7 @@
             $('input[data-column=' + pageNameColumn + ']').val(myfilter);
 
             var currentFilter = [];
-            for(i = 0; i < $('#listpages1 th:last').data('column'); i++) {
+            for(i = 0; i < $('#listpages1 th').last().data('column'); i++) {
                 var value = i == pageNameColumn ? myfilter : '';
                 currentFilter.push(value);
             }

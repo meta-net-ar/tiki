@@ -8,12 +8,12 @@
     </div>
 
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_share visible="always"}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Site-wide features{/tr}</legend>
+        <legend class="h3">{tr}Site-wide features{/tr}</legend>
 
         <div class="admin featurelist">
             {preference name=share_display_links}

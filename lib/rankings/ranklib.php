@@ -198,10 +198,10 @@ class RankLib extends TikiLib
         }
 /*if ($last_replied == false)
 {   */
-        $query = "select * from
-            `tiki_comments` a,`tiki_forums` tf where
-            `objectType` = 'forum' and
-            `parentId`=0 $mid order by `commentDate` desc";
+        $query = "select c.*, f.name, f.parentId from `tiki_comments` c
+			inner join `tiki_forums` f on c.threadId = f.forumId
+			where c.objectType = 'forum' 
+			order by c.commentDate desc";
 /*} else {
 $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
 `tiki_comments` a left join `tiki_comments` b on b.`parentId`=a.`threadId` right join `tiki_forums` tf on "

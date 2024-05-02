@@ -25,7 +25,7 @@
 {/if}
     {* ..than on hover first show the list of translations including the current language highlighted *}
     {if empty($trads[0].lang)}
-        <div class="dropdown-menu dropdown-menu-end" role="menu">
+        <div class="dropdown-menu dropdown-menu-end">
             <h6 class="dropdown-header">
                 {tr}Translations{/tr}
             </h6>
@@ -46,7 +46,7 @@
             {/if}
         </div>
     {else}
-        <div class="dropdown-menu dropdown-menu-end" role="menu">
+        <div class="dropdown-menu dropdown-menu-end">
             <h6 class="dropdown-header">
                 {tr}Translations{/tr}
             </h6>

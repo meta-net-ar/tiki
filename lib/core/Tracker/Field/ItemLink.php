@@ -17,7 +17,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
     private const CASCADE_STATUS = 2;
     private const CASCADE_DELETE = 4;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'r' => [
@@ -643,7 +643,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         $fields = [$baseKey, "{$baseKey}_text"];
@@ -658,7 +658,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
         return $fields;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         $fields = [
@@ -676,7 +676,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
         return $fields;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         $fields = ["{$baseKey}_text" => true];
@@ -1050,14 +1050,20 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
             $option = [$option];
         }
         // filter by user-visible fields
-        $trackerId = (int) $this->getOption('trackerId');
-        $definition = Tracker_Definition::get($trackerId);
+        $remoteTrackerId = (int) $this->getOption('trackerId');
+        $definition = Tracker_Definition::get($remoteTrackerId);
         if ($definition) {
             foreach (array_filter($option) as $fieldId) {
-                $field = $definition->getField($fieldId);
-                if (! $field) {
+                if (! $definition->hasFieldId($fieldId)) {
                     Feedback::error(tr('ItemLink field "%0": displayFieldsList field ID #%1 not found', $this->getConfiguration('permName'), $fieldId));
-                } elseif (
+                    $trackerId = $this->getConfiguration('trackerId');
+                    $remoteTrackerId = $this->getOption('trackerId');
+                    $itemId = $this->getItemId();
+                    trigger_error("ItemLink data integrity error: tracker item {$itemId} in tracker {$trackerId} has an ItemLink pointing to non-existent fieldId {$fieldId} in remote tracker {$remoteTrackerId}");
+                    continue;
+                }
+                $field = $definition->getFieldInfoFromFieldId($fieldId);
+                if (
                     $field['isPublic'] == 'y' && ($field['isHidden'] == 'n' || $field['isHidden'] == 'c' || $field['isHidden'] == 'p' || $field['isHidden'] == 'a' || $tiki_p_admin_trackers == 'y')
                     && $field['type'] != 'x' && $field['type'] != 'h' && ($field['type'] != 'p' || $field['options_array'][0] != 'password')
                     && (empty($field['visibleBy']) or array_intersect(TikiLib::lib('tiki')->get_user_groups($user), $field['visibleBy']) || $tiki_p_admin_trackers == 'y')
@@ -1066,7 +1072,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
                 }
             }
         } else {
-            Feedback::error(tr('ItemLink field "%0": Tracker ID #%1 not found', $this->getConfiguration('permName'), $trackerId));
+            Feedback::error(tr('ItemLink field "%0": Tracker ID #%1 not found', $this->getConfiguration('permName'), $remoteTrackerId));
         }
         return $fields;
     }

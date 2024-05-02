@@ -8,7 +8,7 @@
     </div>
 
     <fieldset>
-        <legend>{tr}Settings{/tr}</legend>
+        <legend class="h3">{tr}Settings{/tr}</legend>
 
         {preference name=geo_enabled visible="always"}
         {preference name=mapzone}
@@ -44,7 +44,7 @@
     </fieldset>
 
     <fieldset class="admin">
-        <legend>{tr}Defaults{/tr}</legend>
+        <legend class="h3">{tr}Defaults{/tr}</legend>
         {preference name=gmap_defaultx}
         {preference name=gmap_defaulty}
         {preference name=gmap_defaultz}

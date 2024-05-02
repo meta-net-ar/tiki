@@ -606,39 +606,43 @@ if ($prefs['feature_wiki_attachments'] == 'y' && $prefs['feature_use_fgal_for_wi
     if (isset($_REQUEST['attach']) && ( $objectperms->wiki_admin_attachments || $objectperms->wiki_attach_files )) {
         $access->checkCsrf();
         // Process an attachment here
-        if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $ret = $tikilib->attach_file(
-                $_FILES['userfile1']['name'],
-                $_FILES['userfile1']['tmp_name'],
-                $prefs['w_use_db'] == 'y' ? 'db' : 'dir'
-            );
-            if ($ret['ok']) {
-                // Set "data" field only if we're using db
-                if ($prefs['w_use_db'] == 'y') {
-                    $wikilib->wiki_attach_file(
-                        $page,
-                        $_FILES['userfile1']['name'],
-                        $_FILES['userfile1']['type'],
-                        $_FILES['userfile1']['size'],
-                        $ret['data'],
-                        $_REQUEST['attach_comment'],
-                        $user,
-                        $ret['fhash']
-                    );
+        if (isset($_FILES['userfile1'])) {
+            if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+                $ret = $tikilib->attach_file(
+                    $_FILES['userfile1']['name'],
+                    $_FILES['userfile1']['tmp_name'],
+                    $prefs['w_use_db'] == 'y' ? 'db' : 'dir'
+                );
+                if ($ret['ok']) {
+                    // Set "data" field only if we're using db
+                    if ($prefs['w_use_db'] == 'y') {
+                        $wikilib->wiki_attach_file(
+                            $page,
+                            $_FILES['userfile1']['name'],
+                            $_FILES['userfile1']['type'],
+                            $_FILES['userfile1']['size'],
+                            $ret['data'],
+                            $_REQUEST['attach_comment'],
+                            $user,
+                            $ret['fhash']
+                        );
+                    } else {
+                        $wikilib->wiki_attach_file(
+                            $page,
+                            $_FILES['userfile1']['name'],
+                            $_FILES['userfile1']['type'],
+                            $_FILES['userfile1']['size'],
+                            '',
+                            $_REQUEST['attach_comment'],
+                            $user,
+                            $ret['fhash']
+                        );
+                    }
                 } else {
-                    $wikilib->wiki_attach_file(
-                        $page,
-                        $_FILES['userfile1']['name'],
-                        $_FILES['userfile1']['type'],
-                        $_FILES['userfile1']['size'],
-                        '',
-                        $_REQUEST['attach_comment'],
-                        $user,
-                        $ret['fhash']
-                    );
+                    $access->display_error('', $ret['error']);
                 }
             } else {
-                $access->display_error('', $ret['error']);
+                Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
             }
         }
     }

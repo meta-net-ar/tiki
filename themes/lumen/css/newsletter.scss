@@ -3,7 +3,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400
 @import url($web-font-path);
 
 @import "../../base_files/css/newsletter.scss";
-@import "../../../vendor_bundled/vendor/thomaspark/bootswatch/dist/lumen/variables";
+@import "../../../node_modules/bootswatch/dist/lumen/variables";
 
 $font-family-sans-serif:  "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $font-family-base:        $font-family-sans-serif;

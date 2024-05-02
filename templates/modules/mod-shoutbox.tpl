@@ -12,10 +12,18 @@
                     {/if}
                     {if $prefs.feature_socialnetworks eq 'y' && $user neq ''}
                         {if $prefs.socialnetworks_twitter_consumer_key neq '' && $tweet}
-                            <div class="form-check"><input type="hidden" name="tweet" value="-1" /><input type="checkbox" class="form-check-input" name="shout_tweet" value='1' /> {tr}Tweet with Twitter{/tr}</div>
+                            <div class="form-check">
+                                <input type="hidden" name="tweet" value="-1" />
+                                <input type="checkbox" class="form-check-input" id="shout_tweet" name="shout_tweet" value='1' />
+                                <label class="form-check-label" for="shout_tweet">{tr}Tweet with Twitter{/tr}</label>
+                            </div>
                         {/if}
                         {if $prefs.socialnetworks_facebook_application_id neq '' && $facebook}
-                            <div class="form-check"><input type="hidden" name="facebook" value="-1" /><input type="checkbox" class="form-check-input" name="shout_facebook" value='1' /> {tr}Post on my Facebook wall{/tr}</div>
+                            <div class="form-check">
+                                <input type="hidden" name="facebook" value="-1" />
+                                <input type="checkbox" class="form-check-input" name="shout_facebook" id="shout_facebook" value='1' />
+                                <label class="form-check-label" for="shout_facebook">{tr}Post on my Facebook wall{/tr}</label>
+                            </div>
                         {/if}
                     {/if}
                     <input type="submit" class="btn btn-primary btn-sm" id="shout_send" name="shout_send" value="{$buttontext}" />

@@ -14,7 +14,7 @@ class Directives
     protected $path;
     protected $filter;
 
-    public function __construct(FilterInterface $filter = null, $path = null)
+    public function __construct(?FilterInterface $filter = null, $path = null)
     {
         if (is_null($path)) {
             $this->path = TIKI_PATH;

@@ -249,15 +249,10 @@
         {if $prefs.feature_webdav eq 'y'}
             {assign var=virtual_path value=$file.fileId|virtual_path}
 
-            {if $prefs.feature_file_galleries_save_draft eq 'y'}
-                {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _script="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
-                    {tr}Open your draft in WebDAV{/tr}
-                {/self_link}
-            {else}
-                {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _script="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
-                    {tr}Open in WebDAV{/tr}
-                {/self_link}
-            {/if}
+            {assign var=link_label value=($prefs.feature_file_galleries_save_draft eq 'y') ? "Open your draft in WebDAV" : "Open in WebDAV"}
+            {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _onclick="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
+                {tr}{$link_label}{/tr}
+            {/self_link}
         {/if}
 
         {if $prefs.feature_share eq 'y' and $tiki_p_share eq 'y'}

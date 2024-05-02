@@ -9,6 +9,8 @@ namespace Tiki\Composer;
 use Composer\Script\Event;
 use Composer\Util\FileSystem;
 
+// TODO : Refactor the way paths are being handled here, see https://gitlab.com/tikiwiki/tiki/-/merge_requests/4565#note_1794038774
+
 class PatchCypht
 {
     public static function setup(Event $event)
@@ -22,7 +24,11 @@ class PatchCypht
         $io = $event->getIO();
 
         if (substr($vendors, -1, 1) !== DIRECTORY_SEPARATOR) {
-            $vendors .= DIRECTORY_SEPARATOR;
+            if (DIRECTORY_SEPARATOR == "/") {
+                $vendors .= DIRECTORY_SEPARATOR;
+            } else {
+                $vendors .= "\\\\\\";
+            }
         }
 
         $fs = new FileSystem();
@@ -68,6 +74,11 @@ class PatchCypht
         // copy site.js and site.css
         copy($vendors . $fixDS('jason-munro/cypht/site/site.js'), $cypht . 'site.js');
         copy($vendors . $fixDS('jason-munro/cypht/site/site.css'), $cypht . 'site.css');
+
+        // css custom pacthes
+        $css = file_get_contents($cypht . 'site.css');
+        $css = str_replace('url("./fonts/bootstrap-icons', 'url("/' . NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/fonts/bootstrap-icons', $css);
+        file_put_contents($cypht . 'site.css', $css);
 
         // js custom pacthes
         $js = file_get_contents($cypht . 'site.js');

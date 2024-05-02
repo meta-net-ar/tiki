@@ -8,7 +8,7 @@ class Tracker_Field_Articles extends \Tracker\Field\AbstractField
 {
     private $articleSource;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         $db = TikiDb::get();
         $topics = $db->table('tiki_topics')->fetchMap('topicId', 'name', [], -1, -1, 'name_asc');
@@ -180,7 +180,7 @@ class Tracker_Field_Articles extends \Tracker\Field\AbstractField
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
 
@@ -198,7 +198,7 @@ class Tracker_Field_Articles extends \Tracker\Field\AbstractField
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
 
@@ -216,7 +216,7 @@ class Tracker_Field_Articles extends \Tracker\Field\AbstractField
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => true];

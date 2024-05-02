@@ -12,7 +12,7 @@
     {tabset name="admin_look"}
         {tab name="{tr}Theme{/tr}"}
             <br>
-            <legend>{tr}Main theme{/tr}</legend>
+            <legend class="h3">{tr}Main theme{/tr}</legend>
             <div class="row">
                 <div class="col-md-8 adminoptionbox">
                     {preference name=theme}
@@ -80,7 +80,7 @@
 
             <hr>
 
-            <legend>{tr}Admin theme{/tr}</legend>
+            <legend class="h3">{tr}Admin theme{/tr}</legend>
             <div class="adminoptionbox">
                 {preference name=theme_unified_admin_backend}
                 {preference name=theme_admin}
@@ -90,7 +90,7 @@
             </div>
             <hr>
 
-            <legend>{tr}Other{/tr}</legend>
+            <legend class="h3">{tr}Other{/tr}</legend>
             {preference name=theme_iconset}
             {if $prefs.javascript_enabled eq 'n' or $prefs.feature_jquery eq 'n'}
                 {* TODO I don't see where this is used in in admin/include_look.php *}
@@ -108,11 +108,11 @@
                 {preference name=feature_theme_control_autocategorize}
             </div>
             <hr>
-            <legend>{tr}Theme Preferences{/tr}</legend>
+            <legend class="h3">{tr}Theme Preferences{/tr}</legend>
             <div class="adminoptionboxchild">
                 {foreach key=theme item=preferences from=$themePrefs}
                     <fieldset>
-                        <legend>{tr}{{$theme|escape|ucfirst}}{/tr}</legend>
+                        <legend class="h3">{tr}{{$theme|escape|ucfirst}}{/tr}</legend>
                         {foreach $preferences as $pref}
                             {preference name="{$pref|escape}"}
                         {/foreach}
@@ -125,7 +125,7 @@
         {/tab}
         {tab name="{tr}Layout{/tr}"}
             <br>
-            <legend>{tr}General layout{/tr}</legend>
+            <legend class="h3">{tr}General layout{/tr}</legend>
             {preference name=feature_fixed_width}
             <div class="adminoptionboxchild" id="feature_fixed_width_childcontainer">
                 {preference name=layout_fixed_width}
@@ -135,24 +135,24 @@
             {preference name=theme_navbar_fixed_topbar_offset}
             {preference name=theme_header_and_address_bar_color}
 
-            <legend>{tr}Admin pages layout{/tr} (<small>{tr}Admin theme must be selected first{/tr}</small>)</legend>
+            <legend class="h3">{tr}Admin pages layout{/tr} (<small>{tr}Admin theme must be selected first{/tr}</small>)</legend>
             {preference name=site_layout_admin}
 
-            {* <legend>{tr}Fixed vs full width layout{/tr}</legend> *}
+            {* <legend class="h3">{tr}Fixed vs full width layout{/tr}</legend> *}
             <hr>
 
-            <legend>{tr}Logo and Title{/tr}</legend>
+            <legend class="h3">{tr}Logo and Title{/tr}</legend>
             {preference name=feature_sitelogo}
             <div class="adminoptionboxchild" id="feature_sitelogo_childcontainer">
                 <fieldset>
-                    <legend>{tr}Logo{/tr}</legend>
+                    <legend class="h3">{tr}Logo{/tr}</legend>
                     {preference name=sitelogo_src}
                     {preference name=sitelogo_title}
                     {preference name=sitelogo_alt}
                     {preference name=sitelogo_upload_icon}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Title{/tr}</legend>
+                    <legend class="h3">{tr}Title{/tr}</legend>
                     {preference name=sitetitle}
                     {preference name=sitesubtitle}
                 </fieldset>
@@ -161,7 +161,7 @@
 
             <div class="adminoptionbox">
                 <fieldset>
-                    <legend>{tr}Module zone visibility{/tr}</legend>
+                    <legend class="h3">{tr}Module zone visibility{/tr}</legend>
                     {preference name=module_zones_top}
                     {preference name=module_zones_topbar}
                     {preference name=module_zones_pagetop}
@@ -178,7 +178,7 @@
 
             <div class="adminoptionbox">
                 <fieldset>
-                    <legend>{tr}Site report bar{/tr}</legend>
+                    <legend class="h3">{tr}Site report bar{/tr}</legend>
                     {preference name=feature_site_report}
                     {preference name=feature_site_report_email}
                 </fieldset>
@@ -188,7 +188,7 @@
         {if $prefs.site_layout eq 'classic'}
             {tab name="{tr}Shadow layer{/tr}"}
                 <br>
-                <legend>{tr}Shadow layer{/tr}</legend>
+                <legend class="h3">{tr}Shadow layer{/tr}</legend>
                 {preference name=feature_layoutshadows}
                 <div class="adminoptionboxchild" id="feature_layoutshadows_childcontainer">
                     {preference name=main_shadow_start}
@@ -209,7 +209,7 @@
         {/if}
         {tab name="{tr}Pagination{/tr}"}
             <br>
-            <legend>{tr}Pagination{/tr}</legend>
+            <legend class="h3">{tr}Pagination{/tr}</legend>
             {preference name=nextprev_pagination}
             {preference name=direct_pagination}
             <div class="adminoptionboxchild" id="direct_pagination_childcontainer">
@@ -221,7 +221,7 @@
             {preference name=pagination_hide_if_one_page}
             {preference name=pagination_icons}
 
-            <legend>{tr}Limits{/tr}</legend>
+            <legend class="h3">{tr}Limits{/tr}</legend>
             {preference name=user_selector_threshold}
             {preference name=maxRecords}
             {preference name=tiki_object_selector_threshold}
@@ -233,7 +233,7 @@
             <br>
             <div class="adminoptionbox">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Standard UI effects{/tr}</legend>
+                    <legend class="h3">{tr}Standard UI effects{/tr}</legend>
                     {preference name=jquery_effect}
                     {preference name=jquery_effect_speed}
                     {preference name=jquery_effect_direction}
@@ -241,7 +241,7 @@
             </div>
             <div class="adminoptionbox">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Tab UI effects{/tr}</legend>
+                    <legend class="h3">{tr}Tab UI effects{/tr}</legend>
                     {preference name=jquery_effect_tabs}
                     {preference name=jquery_effect_tabs_speed}
                     {preference name=jquery_effect_tabs_direction}
@@ -250,7 +250,7 @@
             <hr>
 
             <fieldset>
-                <legend>{tr}Other{/tr}</legend>
+                <legend class="h3">{tr}Other{/tr}</legend>
                 <div class="admin featurelist">
                     {preference name=feature_shadowbox}
                     {preference name=allowImageLazyLoad}
@@ -330,21 +330,23 @@
                         <input type="hidden" name="operation" value="create"/>
                         <input type="hidden" name="id" value=""/>
                         <div class="mb-3">
-                            <label class="form-label">Color mode name</label>
+                            <label class="form-label" for="color-mode">Color mode name</label>
                             <input
                                 type="text"
                                 value=""
                                 name="mode"
+                                id="color-mode"
                                 class="form-control"
                                 placeholder="dark blue"
                                 />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Mode icon name</label>
+                            <label class="form-label" for="mode-icon">Mode icon name</label>
                             <input
                                 type="text"
                                 value=""
                                 name="icon"
+                                id="mode-icon"
                                 class="form-control"
                                 placeholder="icon name"
                                 />
@@ -462,7 +464,7 @@
                 </div>
                 {* end off-canvas *}
                 <fieldset>
-                    <legend>{tr}Color mode settings{/tr}</legend>
+                    <legend class="h3">{tr}Color mode settings{/tr}</legend>
                     {*
                     <p>
                         {tr}Default modes{/tr}
@@ -491,11 +493,12 @@
                             </div>
                         {/foreach}
                     </div>
-                    <button onclick="return  add_custom_mode(this)" class="btn btn-info mb-5">{tr}Set up a new color mode{/tr}</button>
+                    <button onclick="return  add_custom_mode(this)" class="btn btn-info mb-3">{tr}Set up a new color mode{/tr}</button>
                 </fieldset>
             {/if}
+            <hr>
             <fieldset>
-                <legend>{tr}Custom code{/tr}</legend>
+                <legend class="h3">{tr}Custom code{/tr}</legend>
                 {preference name="header_custom_css" syntax="css"}
                 {preference name=feature_custom_html_head_content syntax="htmlmixed"}
                 {preference name=feature_endbody_code syntax="tiki"}
@@ -506,7 +509,7 @@
             </fieldset>
             <hr>
             <fieldset>
-                <legend>{tr}Editing{/tr}</legend>
+                <legend class="h3">{tr}Editing{/tr}</legend>
                 {preference name=theme_customizer}
                 {preference name=feature_editcss}
                 {preference name=feature_view_tpl}
@@ -528,7 +531,7 @@
         {tab name="{tr}Miscellaneous{/tr}"}
             <br>
             <fieldset class="adminoptionbox">
-                <legend>{tr}Tabs{/tr}</legend>
+                <legend class="h3">{tr}Tabs{/tr}</legend>
                 {preference name=feature_tabs}
                 <div class="adminoptionboxchild" id="feature_tabs_childcontainer">
                     {preference name=layout_tabs_optional}
@@ -537,20 +540,20 @@
             <hr>
 
             <fieldset class="adminoptionbox">
-                <legend>{tr}Favicons{/tr}</legend>
+                <legend class="h3">{tr}Favicons{/tr}</legend>
                 {preference name=site_favicon_enable}
             </fieldset>
             <hr>
 
             <fieldset class="adminoptionbox">
-                <legend>{tr}Responsive images{/tr}</legend>
+                <legend class="h3">{tr}Responsive images{/tr}</legend>
                 {preference name=image_responsive_class}
             </fieldset>
             <hr>
 
             <div class="adminoptionbox">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Context menus{/tr} (<small>{tr}currently used in file galleries only{/tr}</small>)</legend>
+                    <legend class="h3">{tr}Context menus{/tr} (<small>{tr}currently used in file galleries only{/tr}</small>)</legend>
                     {preference name=use_context_menu_icon}
                     {preference name=use_context_menu_text}
                 </fieldset>
@@ -558,13 +561,13 @@
             <hr>
 
             <fieldset>
-                <legend>{tr}Separators{/tr}</legend>
+                <legend class="h3">{tr}Separators{/tr}</legend>
                 {preference name=site_crumb_seper}
                 {preference name=site_nav_seper}
             </fieldset>
             <hr>
 
-            <legend>{tr}Smarty templates (TPL files){/tr}</legend>
+            <legend class="h3">{tr}Smarty templates (TPL files){/tr}</legend>
             {preference name=log_tpl}
             {preference name=smarty_compilation}
             {preference name=smarty_cache_perms}

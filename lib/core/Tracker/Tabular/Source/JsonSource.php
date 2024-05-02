@@ -15,7 +15,7 @@ class JsonSource implements SourceInterface
     private string $encoding;
     private string $format;
 
-    public function __construct(Schema $schema, string $fileName, string $encoding = null)
+    public function __construct(Schema $schema, string $fileName, ?string $encoding = null)
     {
         $this->schema = $schema->getPlainOutputSchema();
         $this->file = new \SplFileObject($fileName, 'r');

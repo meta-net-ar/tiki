@@ -23,26 +23,26 @@ export default createStore({
         // Sample normaliazed data (Github: https://github.com/paularmstrong/normalizr)
         boards: {
             byId: {
-                1: { id: 1, title: "Agile Board", rows: [1, 2, 3], imageUrl: null }
+                1: { id: 1, title: "Agile Board", rows: [1, 2, 3], imageUrl: null },
             },
-            allIds: [1]
+            allIds: [1],
         },
         rows: {
             byId: {
                 1: { id: 1, title: "UX", cells: [1, 2, 3, 4] },
                 2: { id: 2, title: "Google Code-in Tasks", cells: [5, 6, 7, 8] },
-                3: { id: 3, title: "Design", cells: [9, 10, 11, 12] }
+                3: { id: 3, title: "Design", cells: [9, 10, 11, 12] },
             },
-            allIds: [1, 2, 3]
+            allIds: [1, 2, 3],
         },
         cols: {
             byId: {
                 1: { id: 1, title: "To Do", wip: 15 },
                 2: { id: 2, title: "In progress", wip: 10 },
                 3: { id: 3, title: "Test", wip: 100 },
-                4: { id: 4, title: "Done", wip: 100 }
+                4: { id: 4, title: "Done", wip: 100 },
             },
-            allIds: [1, 2, 3, 4]
+            allIds: [1, 2, 3, 4],
         },
         cells: {
             byId: {
@@ -51,9 +51,9 @@ export default createStore({
                 3: { id: 3, title: "Done", cards: [] },
                 4: { id: 4, title: "To do", cards: [] },
                 5: { id: 5, title: "In progress", cards: [] },
-                6: { id: 6, title: "Done", cards: [] }
+                6: { id: 6, title: "Done", cards: [] },
             },
-            allIds: [1, 2, 3, 4, 5, 6]
+            allIds: [1, 2, 3, 4, 5, 6],
         },
         cards: {
             byId: {
@@ -68,11 +68,11 @@ export default createStore({
                     row: 2,
                     sortOrder: 2,
                     title: "Agora-web Display election detail during voting",
-                    description: "Some card description"
-                }
+                    description: "Some card description",
+                },
             },
-            allIds: [1, 2, 3, 4, 5, 6]
-        }
+            allIds: [1, 2, 3, 4, 5, 6],
+        },
     },
     getters: {
         getUser(state) {
@@ -139,7 +139,7 @@ export default createStore({
         },
         getCard(state) {
             return (id) => state.cards.byId[id];
-        }
+        },
     },
     actions: {
         initBoard({ commit }, data) {
@@ -198,7 +198,7 @@ export default createStore({
         },
         editCardField({ commit }, { id, field, data }) {
             commit("editCardField", { id, field, data });
-        }
+        },
     },
     mutations: {
         setUser(state, data) {
@@ -307,8 +307,8 @@ export default createStore({
         },
         editCardField(state, { id, field, data }) {
             state.cards.byId[id][field] = data;
-        }
-    }
+        },
+    },
 });
 
 function makeKanbanData(data) {
@@ -318,7 +318,7 @@ function makeKanbanData(data) {
         id: data.trackerId,
         title: `Board ${data.trackerId}`,
         imageUrl: null,
-        rows: []
+        rows: [],
     };
 
     if (!data.rows || data.rows.length === 0) data.rows = [{ id: 0 }]; // when no data.rows or empty array
@@ -372,24 +372,24 @@ function makeKanbanData(data) {
     return {
         boards: {
             byId: boardsById,
-            allIds: boardsAllIds
+            allIds: boardsAllIds,
         },
         rows: {
             byId: rowsById,
-            allIds: rowsAllIds
+            allIds: rowsAllIds,
         },
         cols: {
             byId: colsById,
-            allIds: colsAllIds
+            allIds: colsAllIds,
         },
         cells: {
             byId: cellsById,
-            allIds: cellsAllIds
+            allIds: cellsAllIds,
         },
         cards: {
             byId: cardsById,
-            allIds: cardsAllIds
-        }
+            allIds: cardsAllIds,
+        },
     };
 }
 

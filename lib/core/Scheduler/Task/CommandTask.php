@@ -18,7 +18,7 @@ abstract class Scheduler_Task_CommandTask
     /** @var OutputInterface */
     protected $output;
 
-    public function __construct(LoggerInterface $logger, OutputInterface $output = null)
+    public function __construct(LoggerInterface $logger, OutputInterface|null $output = null)
     {
         $this->logger = $logger;
         $this->output = $output ?? new NullOutput();

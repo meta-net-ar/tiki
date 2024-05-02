@@ -21,17 +21,17 @@
             {tab name="{tr}Polls{/tr}"}
                 <br>
                 <fieldset id="Polls">
-                    <legend>{tr}Activate the feature{/tr}</legend>
+                    <legend class="h3">{tr}Activate the feature{/tr}</legend>
                     {preference name=feature_polls visible="always"}
                 </fieldset>
 
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Plugins{/tr}</legend>
+                    <legend class="h3">{tr}Plugins{/tr}</legend>
                     {preference name=wikiplugin_poll}
                 </fieldset>
 
                 <fieldset>
-                    <legend>{tr}Settings{/tr}{help url="Polls"}</legend>
+                    <legend class="h3">{tr}Settings{/tr}{help url="Polls"}</legend>
                     <input type="hidden" name="pollprefs" />
                     {preference name=feature_poll_anonymous}
                     {preference name=feature_poll_revote}
@@ -51,7 +51,7 @@
             {tab name="{tr}Surveys{/tr}"}
                 <br>
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Activate the feature{/tr}</legend>
+                    <legend class="h3">{tr}Activate the feature{/tr}</legend>
                     {preference name=feature_surveys visible="always"}
                 </fieldset>
                 <fieldset>

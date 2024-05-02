@@ -15,7 +15,7 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Features{/tr}{help url="Text+Area"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="Text+Area"}</legend>
                 {preference name=feature_fullscreen}
                 {preference name=feature_filegals_manager}
                 {preference name=feature_dynamic_content}
@@ -31,7 +31,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Wiki syntax{/tr}{help url="Wiki-syntax"}</legend>
+                <legend class="h3">{tr}Wiki syntax{/tr}{help url="Wiki-syntax"}</legend>
                 {preference name=feature_smileys}
                 {preference name=feature_wiki_paragraph_formatting}
                 <div class="adminoptionboxchild" id="feature_wiki_paragraph_formatting_childcontainer">
@@ -48,7 +48,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Markdown{/tr}{help url="Markdown"}</legend>
+                <legend class="h3">{tr}Markdown{/tr}{help url="Markdown"}</legend>
                 {preference name=markdown_enabled}
                 <div class="adminoptionboxchild" id="markdown_enabled_childcontainer">
                     {preference name=markdown_gfm}
@@ -57,7 +57,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Typography{/tr}</legend>
+                <legend class="h3">{tr}Typography{/tr}</legend>
                 {preference name=feature_typo_enable}
                 <div class="adminoptionboxchild" id="feature_typo_enable_childcontainer">
                     {preference name=feature_typo_quotes}
@@ -68,7 +68,7 @@
             </fieldset>
 
             <fieldset class="mb-4 featurelist">
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 {preference name=wikiplugin_showreference}
                 {preference name=wikiplugin_addreference}
                 {preference name=wikiplugin_alink}
@@ -110,7 +110,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Miscellaneous{/tr}</legend>
+                <legend class="h3">{tr}Miscellaneous{/tr}</legend>
                 {preference name=feature_purifier}
                 {preference name=feature_autolinks}
                 {preference name=feature_hotwords}
@@ -125,7 +125,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Default size{/tr}</legend>
+                <legend class="h3">{tr}Default size{/tr}</legend>
                 {preference name=default_rows_textarea_wiki}
                 {preference name=default_rows_textarea_comment}
                 {preference name=default_rows_textarea_forum}
@@ -133,7 +133,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}External links and images{/tr}</legend>
+                <legend class="h3">{tr}External links and images{/tr}</legend>
                 {preference name=cachepages}
                 {preference name=cacheimages}
                 {preference name=feature_wiki_ext_icon}
@@ -170,7 +170,7 @@
             {/if}
 
             <fieldset class="mb-5">
-                <legend>{tr}Plugin preferences{/tr}</legend>
+                <legend class="h3">{tr}Plugin preferences{/tr}</legend>
                 {preference name=profile_autoapprove_wikiplugins}
                 {preference name=wikipluginprefs_pending_notification}
                 {preference name=image_responsive_class}
@@ -178,7 +178,7 @@
             </fieldset>
 
             <fieldset class="mb-5">
-                <legend>{tr}Edit plugin icons{/tr}</legend>
+                <legend class="h3">{tr}Edit plugin icons{/tr}</legend>
                 {preference name=wiki_edit_plugin}
                 <div class="adminoptionboxchild" id="wiki_edit_plugin_childcontainer">
                     {preference name=wiki_edit_icons_toggle}
@@ -188,7 +188,7 @@
             </fieldset>
 
             <fieldset class="mb-5" id="plugins">
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 <fieldset class="mb-5 donthide">
                     {preference name='unified_search_textarea_admin'}
                     {if $prefs.unified_search_textarea_admin eq 'y'}
@@ -211,7 +211,7 @@
                 {if $prefs.unified_search_textarea_admin eq 'y'}<noscript>{/if}
                     {foreach from=$plugins key=plugin item=info}
                         <fieldset class="mb-5">
-                            <legend>
+                            <legend class="h3">
                                 {if !empty($info.iconname)}{icon name=$info.iconname}{else}{icon name='plugin'}{/if} {$info.name|escape}
                             </legend>
                             <div class="adminoptionbox">
@@ -246,7 +246,7 @@
             {tabset name='plugin_alias'}
                 {tab name='{tr}Available alias{/tr}'}
                     <fieldset id="pluginalias_available">
-                        <legend>
+                        <legend class="h3">
                             <strong>{tr}Available alias{/tr}</strong>
                         </legend>
                         <div class="input_submit_container table-responsive">
@@ -313,7 +313,7 @@
                 {/if}
                 {tab name=$tabname}
                     <fieldset id="pluginalias_general">
-                        <legend>
+                        <legend class="h3">
                             {tr}General information{/tr}
                         </legend>
 
@@ -410,7 +410,7 @@
                     </fieldset><br>
 
                     <fieldset id="pluginalias_simple_args">
-                        <legend>
+                        <legend class="h3">
                             {tr}Simple plugin arguments{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add parameter{/tr}'}
                         </legend>
                         <div class="mb-3 row">
@@ -453,7 +453,7 @@
                     </fieldset>
 
                     <fieldset id="pluginalias_doc">
-                        <legend>
+                        <legend class="h3">
                             {tr}Plugin parameter documentation{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add parameter documentation{/tr}'}
                         </legend>
 
@@ -519,7 +519,7 @@
 
                     <div id="pluginalias_body">
                         <fieldset>
-                            <legend>
+                            <legend class="h3">
                                 {tr}Plugin body{/tr}
                             </legend>
 
@@ -540,7 +540,7 @@
                                 </div>
                             </div>
                             <fieldset>
-                                <legend>
+                                <legend class="h3">
                                     {tr}Body Parameters{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add body parameter{/tr}'}
                                 </legend>
                                 {foreach $plugin_admin.body.params as $token => $detail}
@@ -594,7 +594,7 @@
                     </div><br><br>
 
                     <fieldset id="pluginalias_composed_args">
-                        <legend>
+                        <legend class="h3">
                             {tr}Composed plugin arguments{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add composed parameter{/tr}'}
                         </legend>
 

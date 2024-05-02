@@ -149,6 +149,7 @@ function s_f_attachments_actionshandler($params)
             case 'upload':
                 if (isset($objectperms) && ( $objectperms->wiki_admin_attachments || $objectperms->wiki_attach_files )) {
                     $galleryId = $filegallib->get_attachment_gallery($params['page'], 'wiki page', true);
+                    $smarty = \TikiLib::lib('smarty');
                     if ($access->checkCsrf()) {
                         $result = $filegallib->actionHandler(
                             'uploadFile',
@@ -163,7 +164,7 @@ function s_f_attachments_actionshandler($params)
                                         's_f_attachments-comment' => 'NULL',
                                         'ticket' => 'NULL',
                                     ],
-                                    $smarty
+                                    $smarty->getEmptyInternalTemplate()
                                 ),
                             ]
                         );

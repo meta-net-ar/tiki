@@ -16,9 +16,15 @@ $auto_query_args = [
 ];
 $access->check_feature('feature_sheet');
 
+if (! isset($_REQUEST['sheetId'])) {
+    $smarty->assign('msg', tra('Missing parameter "sheetId"'));
+    $smarty->display('error.tpl');
+    die;
+}
+
 $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
 if (empty($info)) {
-    $smarty->assign('Incorrect parameter');
+    $smarty->assign('msg', tr('Unable to retrieve sheet id %0', $_REQUEST['sheetId']));
     $smarty->display('error.tpl');
     die;
 }

@@ -15,6 +15,13 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 
 function iconset_default()
 {
+    $file = __DIR__ . '/../../../' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.php';
+    global $prefs;
+    $fa_generated_icons = [];
+    if (is_readable($file)) {
+        include_once $file;
+        $fa_generated_icons = $prefs['fa_generated_icons'] ?? [];
+    }
     return [
         'name' => tr('Default (Font-awesome)'), // Mandatory, will be displayed as Icon set option in the Look&Feel admin UI
         'description' => tr('The default system icon set using Font-awesome fonts'), // TODO display as Icon set description in the Look&Feel admin UI
@@ -2829,7 +2836,7 @@ function iconset_default()
                 'prepend' => 'fas fa-'
             ]
 
-        ],
+        ] + $fa_generated_icons,
         /*
          * All the available icons in this set based on https://fontawesome.com/v5/cheatsheet/free
          *

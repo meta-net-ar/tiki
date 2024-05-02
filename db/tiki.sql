@@ -423,13 +423,15 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `monthly` tinyint(1) default '0',
   `months` int default NULL,
   `dayOfMonth` varchar(100) default NULL,
-  `monthlyType` enum('date','weekday') NULL default NULL,
+  `monthlyType` enum('date','weekday','firstlastweekday') NULL default NULL,
   `monthlyWeekdayValue` varchar(4) NULL default NULL COMMENT 'Format => (-) + 1digit + 2 letters for weekday (1MO for every 1st Monday or -1TH for last Thursday of each month )',
+  `monthlyFirstlastWeekdayValue` int default NULL,
   `yearly` tinyint(1) default '0',
   `years` int default NULL,
-  `yearlyType` enum('date','weekday') NULL default NULL,
+  `yearlyType` enum('date','weekday','firstlastweekday') NULL default NULL,
   `dateOfYear` int(4),
   `yearlyWeekdayValue` varchar(4) NULL default NULL COMMENT 'Format => (-) + 1digit + 2 letters for weekday (1MO for every 1st Monday or -1TH for last Thursday of each month)',
+  `yearlyFirstlastWeekdayValue` int default NULL,
   `yearlyWeekMonth` int default NULL,
   `nbRecurrences` int(8),
   `startPeriod` int(14),
@@ -3223,6 +3225,7 @@ INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES 
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Removed', 'calendar event', 'n');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Sync', 'file gallery', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('CRSF Error', 'system', 'y');
+INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('api', 'system', 'y');
 
 DROP TABLE IF EXISTS `tiki_freetags`;
 CREATE TABLE `tiki_freetags` (
@@ -3352,7 +3355,7 @@ CREATE TABLE `tiki_feature` (
 DROP TABLE IF EXISTS `tiki_schema`;
 CREATE TABLE `tiki_schema` (
   `patch_name` VARCHAR(100) PRIMARY KEY,
-  `install_date` TIMESTAMP
+  `install_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_semantic_tokens`;
@@ -3622,7 +3625,7 @@ DROP TABLE IF EXISTS `tiki_payment_received`;
 CREATE TABLE `tiki_payment_received` (
     `paymentReceivedId` INT NOT NULL AUTO_INCREMENT,
     `paymentRequestId` INT NOT NULL,
-    `payment_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `payment_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `amount` DECIMAL(7,2),
     `type` VARCHAR(15),
     `status` VARCHAR(15) NOT NULL DEFAULT 'paid',
@@ -3631,6 +3634,7 @@ CREATE TABLE `tiki_payment_received` (
     PRIMARY KEY(`paymentReceivedId`),
     KEY `payment_request_ix` (`paymentRequestId`)
 ) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_discount`;
 CREATE TABLE `tiki_discount` (
     `id` INT NOT NULL AUTO_INCREMENT,
@@ -4016,7 +4020,7 @@ CREATE TABLE `tiki_page_references` (
   `location` VARCHAR(255)  DEFAULT NULL,
   `style` VARCHAR(30) DEFAULT NULL,
   `template` varchar(255) DEFAULT NULL,
-  `last_modified` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`ref_id`),
   KEY `PageId` (`page_id`)
 ) ENGINE=MyISAM;

@@ -178,7 +178,11 @@ function wikiplugin_snarf($data, $params)
             $cachetime = $prefs['wikiplugin_snarf_cache'];
         }
         $info = $tikilib->get_cached_url($params['url'], $isFresh, $cachetime);
-        $snarf = $info['data'];
+        if (isset($info['data'])) {
+            $snarf = $info['data'];
+        } else {
+            $snarf = "";
+        }
         $url = $params['url'];
     }
 

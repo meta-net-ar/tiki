@@ -95,14 +95,8 @@ function prefs_wikiplugin_list($partial = false)
 
     if ($partial) {
         $out = [];
-        $list = [];
+        $list = array_keys(WikiPlugin_Negotiator_Wiki::getWikipluginFromFiles());
         $alias = [];
-        foreach (glob('lib/wiki-plugins/wikiplugin_*.php') as $file) {
-            $base = basename($file);
-            $plugin = substr($base, 11, -4);
-
-            $list[] = $plugin;
-        }
 
         global $prefs;
         if (isset($prefs['pluginaliaslist'])) {
@@ -167,7 +161,7 @@ function prefs_wikiplugin_list($partial = false)
         'name' => tr('GUI for the list plugin'),
         'description' => tr('Experimental GUI for the list plugin in popup plugin edit forms.') . (' ') . tr('(listgui)'),
         'tags' => ['experimental'],
-        'default' => 'n',
+        'default' => 'y',
         'dependencies' => ['wikiplugin_list'],
         'filter' => 'alpha',
         'type' => 'flag'

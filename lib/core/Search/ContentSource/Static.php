@@ -20,7 +20,7 @@ class Search_ContentSource_Static implements Search_ContentSource_Interface
         return array_keys($this->data);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         if (! isset($this->data[$objectId])) {
             return false;
@@ -51,12 +51,12 @@ class Search_ContentSource_Static implements Search_ContentSource_Interface
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return array_keys($this->typeMap);
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $out = [];
 
@@ -67,7 +67,7 @@ class Search_ContentSource_Static implements Search_ContentSource_Interface
         return $out;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return array_fill_keys(array_keys($this->typeMap), true);
     }

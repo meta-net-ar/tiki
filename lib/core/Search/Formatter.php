@@ -98,10 +98,29 @@ class Search_Formatter
             $row = array_filter($defaultValues, function ($v) {
                 return ($v !== null);   // allow empty default values like "" or 0 (or even false) but not null
             });
-            // Clear blank values so the defaults prevail
-            foreach ($pre as $k => $value) {
-                if ($value !== '' && $value !== null) {
-                    $row[$k] = $value;
+            // translate the defaults
+            if ($prefs['feature_multilingual'] === 'y') {
+                $row = array_map(function ($value): string {
+                    return tra($value);
+                }, $row);
+            }
+
+            foreach ($pre as $k => $rawValue) {
+                $finalValue = null;
+
+                // process multilingual fields
+                if ($prefs['feature_multilingual'] === 'y') {
+                    $translatedValue = $pre[$k . '_' . $prefs['language']] ?? null;
+                    if ($translatedValue) {
+                        $finalValue = $translatedValue;
+                    }
+                }
+                if (! $finalValue && $rawValue) {
+                    $finalValue = $rawValue;
+                }
+                if ($finalValue) {
+                    // Only set if not a blank value so the defaults prevail
+                    $row[$k] = $finalValue;
                 }
             }
             if ($enableHighlight) {

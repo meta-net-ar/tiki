@@ -100,7 +100,7 @@ class GetStringsCommand extends Command
         $options['lang'] = $input->getOption('lang') ?: null;
         $options['outputFiles'] = $input->getOption('outputfiles') ?: null;
         $excludeDirs = [
-            DEPRECATED_CUSTOM_PATH, EXPORT_DUMP_PATH, STATIC_IMG_PATH, LANG_PATH, BIN_PATH,
+            TIKI_CUSTOMIZATIONS_SRC_PATH, EXPORT_DUMP_PATH, STATIC_IMG_PATH, LANG_SRC_PATH, BIN_PATH,
             TIKI_UPGRADE_SQL_SCHEMA_PATH, TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH, TIKI_VENDOR_NONBUNDLED_PATH,
             TIKI_VENDOR_CUSTOM_PATH, 'lib/test', TEMP_PATH, PERMISSIONCHECK_PATH,
             DEPRECATED_STORAGE_PATH, TIKI_TESTS_PATH, DEPRECATED_DEVTOOLS_PATH, TIKI_CONFIG_PATH, 'lib/openlayers', TESTS_PATH
@@ -108,7 +108,7 @@ class GetStringsCommand extends Command
         $excludeDirs = array_filter($excludeDirs, 'is_dir'); // only keep in the exclude list if the dir exists
 
         // Files are processed after the base directory, so adding a file here allows to scan it even if its directory was excluded.
-        $includeFiles = ['./' . LANG_PATH . '/langmapping.php', './' . IMG_FLAGNAMES_FILE];
+        $includeFiles = ['./' . LANG_PATH_FRAGMENT . '/langmapping.php', './' . IMG_FLAGNAMES_FILE];
 
         if ($input->getOption('basedir')) {
             $options['baseDir'] = $input->getOption('basedir');

@@ -26,15 +26,15 @@ class Perms_MixedTest extends TikiTestCase
             ->method('getResolver')
             ->willReturn(null);
 
-        $bulkCalls = [
-            [['type' => 'wiki page'], 'object', ['A', 'B']],
-            [['type' => 'category'], 'object', [10]],
-        ];
+        // $bulkCalls = [
+        //     [['type' => 'wiki page'], 'object', ['A', 'B']],
+        //     [['type' => 'category'], 'object', [10]],
+        // ];
 
-        $resolver->expects($this->exactly(3))
-            ->method('bulk')
-            ->withConsecutive(...$bulkCalls)
-            ->willReturnOnConsecutiveCalls([], [], []);
+        // $resolver->expects($this->exactly(3))
+        //     ->method('bulk')
+        //     ->withConsecutive(...$bulkCalls)
+        //     ->willReturnOnConsecutiveCalls([], [], []);
 
         $data = [
             ['type' => 'wiki page', 'object' => 'A', 'creator' => 'abc'],

@@ -1,4 +1,4 @@
-<div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}">
+<div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}" data-namefilter="{$field.namefilter|escape}" data-namefilter-error="{$field.namefilterError|escape}">
     {if !empty($field.canUpload)}
         {if !empty($field.limit)}
             {if $field.limit == 1}
@@ -31,12 +31,12 @@
                     {/if}
                     <div class="file-actions d-inline-block">
                         <div class="d-inline-block">
-                            <a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy">
+                            <a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">
                                 {icon name='copy'}
                             </a>
                         </div>
                         <div class="d-inline-block">
-                            <a href="#" class="file-move-to-tracker-icon text-danger" data-action="move">
+                            <a href="#" class="file-move-to-tracker-icon text-danger" data-action="move" title="{tr}Move to another tracker{/tr}">
                                 {icon name='move'}
                             </a>
                         </div>
@@ -74,6 +74,7 @@
         {/if}
         {if $prefs.fgal_upload_from_source eq 'y' and $field.canUpload}
             <fieldset>
+                <legend class="visually-hidden">{tr}Upload File(s){/tr}</legend>
                 {if $prefs.vimeo_upload eq 'y' and $field.options_map.displayMode eq 'vimeo'}
                     <label for="vimeourl_{$field.ins_id|escape}" class="small">
                         {tr}Link to existing Vimeo URL{/tr}
@@ -129,7 +130,7 @@
                 $field.input_csv('add', ',', fileId);
 
                 li.prepend($.fileTypeIcon(fileId, { type: type, name: name }));
-                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger">{{icon name='trash'}}</a><a class="file-delete-icon text-danger">{{icon name='delete'}}</a></div>'));
+                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger">{{icon name='trash'}}</a><a class="file-delete-icon text-danger">{{icon name='delete'}}</a></div>'));
 
                 if (replaceFile && $self.data('firstfile') > 0) {
                     li.prev('li').remove();
@@ -144,11 +145,41 @@
                 toggleWarning();
             }
 
+            function checkFile(fileName, $form) {
+                if (! $self.data('namefilter')) {
+                    return true;
+                }
+                if (! fileName.match(new RegExp($self.data('namefilter')))) {
+                    feedback(tr($self.data('namefilter-error') || 'The uploaded file name doesn\'t match desired pattern.'), 'error');
+                    $(this).val("");
+                    $("input[type=file]", $form).val("");
+                    $(".custom-file-label", $form).text(tr("Choose file"));
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function attachFileCheckingOnElement(el) {
+                $("input[type=file]", el).change(function () {
+                    return checkFile($(this).val(), $(this).closest("form"));
+                });
+                $(el).on('drop', '.file-uploader', function (e) {
+                    const files = e.originalEvent.dataTransfer.files;
+                    let badFile =  Array.from(files).find(function (file) {
+                        return ! checkFile(file.name, $(this));
+                    });
+                    if (badFile) {
+                        e.stopPropagation();
+                        return false;
+                    }
+                });
+            }
+
             $field.hide();
             toggleWarning();
 
             $self.find('.btn.upload-files').clickModal({
-
                 success: function (data) {
                     var $ff = $(this).parents(".files-field");
                     $field = $(".input", $ff);
@@ -161,6 +192,15 @@
                     $.closeModal();
                 }
             });
+
+            attachFileCheckingOnElement($self.find('.upload-files-inline-form'));
+
+            $("a.upload-files").click(function () {
+                $(document).one('tiki.modal.redraw', '.modal.fade', function () {
+                    attachFileCheckingOnElement(this);
+                });
+            });
+
             $self.find('.btn.browse-files').on('click', function () {
                 if (! $(this).data('initial-href')) {
                     $(this).data('initial-href', $(this).attr('href'));

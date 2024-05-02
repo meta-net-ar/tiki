@@ -146,8 +146,10 @@ function tiki_mail_setup()
     } elseif ($prefs['zend_mail_handler'] === 'file') {
         $mail_debug_path = TIKI_PATH . '/temp/mail_debug';
         if (! file_exists($mail_debug_path)) {
+            // is the parent temp dir group writable?
+            $group_write = fileperms(TIKI_PATH . '/temp') & 0x0010;
             mkdir($mail_debug_path);
-            chmod($mail_debug_path, 0751); // no public read perm
+            chmod($mail_debug_path, $group_write ? 0771 : 0751); // no public read perm
         }
         $transport = new Laminas\Mail\Transport\File();
         $transportOptions = new Laminas\Mail\Transport\FileOptions(

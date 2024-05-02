@@ -365,7 +365,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
         }
         if (is_dir($entry)) {
             // do not descend and no CVS/Subversion files
-            if ($e != '..' && $e != '.' && $e != 'CVS' && $e != '.git' && $e != '.gitignore' && $e != '.svn' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . DEPRECATED_CUSTOM_PATH) {
+            if ($e != '..' && $e != '.' && $e != 'CVS' && $e != '.git' && $e != '.gitignore' && $e != '.svn' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
                 build_secdb_queries($entry, $version, $queries, $excludes);
             }
         } else {
@@ -672,9 +672,9 @@ function build_packages($releaseVersion)
     removeFiles($sourceDir, ['.gitignore']);
 
     echo "Removing language file comments\n";
-    foreach (scandir($sourceDir . '/' . LANG_PATH) as $strip) {
-        if (is_file($sourceDir . '/' . LANG_PATH . '/' . $strip . '/language.php')) {
-            $shellout = shell_exec('php ' . escapeshellarg(__DIR__ . '/stripcomments.php') . ' ' . escapeshellarg($sourceDir . '/' . LANG_PATH . '/' . $strip . '/language.php') . ' 2>&1');
+    foreach (scandir($sourceDir . '/' . LANG_SRC_PATH) as $strip) {
+        if (is_file($sourceDir . '/' . LANG_SRC_PATH . '/' . $strip . '/language.php')) {
+            $shellout = shell_exec('php ' . escapeshellarg(__DIR__ . '/stripcomments.php') . ' ' . escapeshellarg($sourceDir . '/' . LANG_SRC_PATH . '/' . $strip . '/language.php') . ' 2>&1');
         }
         if ($shellout) {
             die($shellout . "\n");
@@ -792,9 +792,8 @@ function check_smarty_syntax(&$error_msg)
     $prefs['log_tpl'] = 'y';
     $prefs['feature_sefurl_filter'] = 'y';
     $prefs['site_layout'] = 'basic';
-    require_once 'vendor_bundled/vendor/smarty/smarty/src/Smarty.php';
-    require_once 'lib/init/smarty.php';
     require_once 'lib/init/initlib.php';
+    require_once 'lib/init/smarty.php';
     // needed in Smarty_Tiki
     define('TIKI_PATH', getcwd());
     require_once 'lib/smarty_tiki/prefilter.tr.php';

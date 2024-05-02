@@ -14,7 +14,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
 {
     private static $runner;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'math' => [
@@ -23,7 +23,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
                 'help' => 'Mathematical-Calculation-Field',
                 'prefs' => ['trackerfield_math'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'calculation' => [
                         'name' => tr('Calculation'),
@@ -135,7 +135,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $handler = $this->getMirroredHandler();
         if ($handler && $handler instanceof \Tracker\Field\IndexableInterface) {
@@ -146,7 +146,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
         }
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $handler = $this->getMirroredHandler();
         if ($handler && $handler instanceof \Tracker\Field\IndexableInterface) {
@@ -157,7 +157,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractField implements \Tracke
         }
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

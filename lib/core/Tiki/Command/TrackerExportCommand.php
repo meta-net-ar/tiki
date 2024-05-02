@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
@@ -29,7 +30,13 @@ class TrackerExportCommand extends Command
             ->addArgument(
                 'filename',
                 InputArgument::OPTIONAL,
-                'Location (full path) and/or a CSV file name to export'
+                'Location (full path) and/or a file name to export - depending on the import-export format, this could be csv, json, ndjson or ical format.'
+            )
+            ->addOption(
+                'filter',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Query string formatted name=value key pairs of filters applied to the corresponding import-export format. Inspect the web UI partial export of this format in order to get the available filter names and possible values.'
             );
     }
 
@@ -65,11 +72,27 @@ class TrackerExportCommand extends Command
             throw new \Exception(tr('Primary Key required'));
         }
 
-        // this will throw exceptions and not return if there's a problem
-        $source = new \Tracker\Tabular\Source\TrackerSource($schema, $tracker);
+        if ($filter = $input->getOption('filter')) {
+            $qs = implode('&', $filter);
+            parse_str($qs, $data);
+            $inp = new \JitFilter($data);
+            $collection = $schema->getFilterCollection();
+            $collection->applyInput($inp);
+            $search = \TikiLib::lib('unifiedsearch');
+            $query = $search->buildQuery([
+                'type' => 'trackeritem',
+                'tracker_id' => $info['trackerId'],
+            ]);
+            $collection->applyConditions($query);
+            $source = new \Tracker\Tabular\Source\QuerySource($schema, $query);
+        } else {
+            // this will throw exceptions and not return if there's a problem
+            $source = new \Tracker\Tabular\Source\TrackerSource($schema, $tracker);
+        }
 
         if (! empty($fileName)) {
-            $writer = new \Tracker\Tabular\Writer\CsvWriter($fileName);
+            $name = '';
+            $writer = $schema->getWriter($name, '', $fileName);
         } elseif (! empty($info['odbc_config'])) {
             $writer = new \Tracker\Tabular\Writer\ODBCWriter($info['odbc_config']);
         } elseif (! empty($info['api_config'])) {

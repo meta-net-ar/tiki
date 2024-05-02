@@ -40,7 +40,7 @@
             {/remarksbox}
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}List of pages and content of the title tag{/tr}</legend>
+                    <legend class="h3">{tr}List of pages and content of the title tag{/tr}</legend>
                     <div class="table-responsive">
                         <table class="table" >
                             <tr>

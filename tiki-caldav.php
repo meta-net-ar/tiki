@@ -16,7 +16,6 @@ define('TIKI_CALDAV', true);
 
 require_once 'tiki-setup.php';
 $access->check_feature('feature_calendar');
-
 $authBackend = new BasicAuth();
-$server = Utilities::buildCaldavServer($authBackend);
+$server = Utilities::buildSabreDavServer($authBackend, 'caldav');
 $server->start();

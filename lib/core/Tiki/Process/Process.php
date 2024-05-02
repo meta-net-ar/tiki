@@ -13,7 +13,7 @@ class Process extends SymfonyProcess
     /**
      * @inheritdoc
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    public function __construct($commandline, $cwd = null, array|null $env = null, $input = null, $timeout = 60)
     {
         $env = $this->setEnvDefaults($env);
         parent::__construct($commandline, $cwd, $env, $input, $timeout);

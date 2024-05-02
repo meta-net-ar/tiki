@@ -56,7 +56,7 @@
                         </li>
                         <li>
                             <label>
-                                <input class="autojoin" type="checkbox" name="groups~{$key|escape}~autojoin" value="1" {if !empty($group.autojoin)}checked="checked"{/if} />
+                                <input class="autojoin form-check-input" type="checkbox" name="groups~{$key|escape}~autojoin" value="1" {if !empty($group.autojoin)}checked="checked"{/if} />
                                 {tr}Workspace creator joins this group{/tr}
                             </label>
                         </li>

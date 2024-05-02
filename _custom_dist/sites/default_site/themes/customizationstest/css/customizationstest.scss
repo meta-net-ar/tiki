@@ -1,0 +1,13 @@
+/* A sample to show how customizations work */
+
+//To convert base themes, replace  ../../base_files by  themes/base_files.  Tiki root is now in the scss load path.
+
+@import "themes/base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
+@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
+@import "themes/base_files/scss/_tiki-variables.scss"; // 4. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
+@import "themes/base_files/scss/_tiki-bootstrap_layout_and_components"; // 5. Remainder of required Bootstrap parts.
+@import "../scss/css-variables"; // 6. Imported after default CSS variables to override them.
+@import "themes/base_files/scss/_tiki-selectors.scss"; // 7. Tiki CSS selectors used globally.
+@import "themes/base_files/scss/_tiki-pagetop_colors.scss"; // 8. Optionally imported to group (separately) the top and topbar zone components for styling.
+@import "../scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.

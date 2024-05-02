@@ -28,8 +28,8 @@ $success: #A5E4A0;
 $info: #D5CDEA;
 $warning: #E4D081;
 $danger: #EEC9AF;
-$dark: #ad1d28;
-$light: #5AE3ED;
+$dark: #FDF7F9; // #ad1d28;
+$light: #0F7D85; // #5AE3ED;
 
 $theme-colors: (
     "primary":           #F5CDC2, // #f5af9f, //#F3C9C9, // #ad1d28,
@@ -38,9 +38,11 @@ $theme-colors: (
     "info":              #D5CDEA, // #907bc7, // #4d3a7d,
     "warning":           #E4D081, // #e0c96b,
     "danger":            #EEC9AF, // #d98c56,
-    "light":             #5AE3ED, // #18cbd8,
-    "dark":              #ad1d28, // $black,
+    "light":             #0F7D85, // #5AE3ED, // #18cbd8,
+    "dark":              #FDF7F9, //  #ad1d28, // $black,
 );
+
+
 
 // Options
 // Prefix for :root CSS variables
@@ -50,12 +52,21 @@ $prefix:                      $variable-prefix !default;
 // Gradient
 // Spacing
 // Body
-$body-bg: #0c6369; // #108a93; WAI
+$body-bg: #0b646b; // #108a93; WAI
 $body-color: #fff;
+$body-tertiary-bg: #16838c;
+$body-secondary-color:      rgba($body-color, .75);
+
+$body-secondary-bg:         $light; // $gray-200 !default;
+
+$body-tertiary-color:       rgba($body-color, .5) !default;
+$body-tertiary-bg:          $gray-100 !default;
+
+$body-emphasis-color:       $black !default;
 
 // Utility maps
 // Links
-$link-color: lighten(#E4D081FF, 15%); //lighten($warning, 15%);
+$link-color: #FCF6E8; // lighten(#E4D081FF, 15%); //lighten($warning, 15%);
 $link-shade-percentage:                   20% !default; // BS53
 $link-hover-color: lighten($warning, 10%);
 $link-hover-decoration: underline;
@@ -69,6 +80,9 @@ $link-hover-decoration: underline;
 $padding-base-vertical: .5rem;
 $padding-large-vertical: .9rem;
 
+$component-active-color:       #ddb9af;; // $white !default;
+$component-active-bg:         #981919; // $primary !default;
+
 // Typography
 //Fonts
 $font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;   //"Cabin", Arial, sans-serif;
@@ -76,16 +90,21 @@ $headings-font-family: Superclarendon, 'Bookman Old Style', 'URW Bookman', 'URW 
 $headings-font-style: italic;
 $blockquote-footer-color: #E6E8EA;
 $text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0
+$mark-bg: $light;
 
 // Tables
+$table-color:                 var(--#{$prefix}body-color);
+$table-striped-color:         $table-color;
 $table-bg: transparent;
 $table-head-bg: #108a93;
 $table-head-color: #fff;
 
 // Forms
-$input-bg: var(--#{$prefix}body-bg) !default; // $gray-100;
-$input-color: var(--#{$prefix}body-color) !default; // $gray-800;
-$input-placeholder-color: var(--#{$prefix}secondary-color) !default; // #585E65;
+$form-text-color:                       var(--#{$prefix}body-color);
+$input-bg: var(--#{$prefix}body-bg); // $gray-100;
+$input-color: var(--#{$prefix}body-color); // $gray-800;
+$input-placeholder-color: var(--#{$prefix}secondary-color); // #585E65;
+$input-group-addon-bg: var(--#{$prefix}tertiary-bg);
 
 // Form validation
 // Z-index master list
@@ -145,8 +164,8 @@ $pagination-focus-color: darken($link-color,8%);
 $pagination-focus-bg: darken($pagination-bg,8%);
 $pagination-hover-color: $link-color;
 $pagination-hover-bg: lighten($pagination-bg,10%);
-$pagination-active-color: #fff;
-$pagination-active-bg: $dark;
+$pagination-active-color:           $component-active-color !default;
+$pagination-active-bg:              $component-active-bg !default;
 $pagination-disabled-color: $pagination-focus-color;
 $pagination-disabled-bg: #094344;
 
@@ -176,9 +195,9 @@ $accordion-border-color:                  var(--#{$prefix}border-color) !default
 //$accordion-button-padding-y:              $accordion-padding-y !default;
 //$accordion-button-padding-x:              $accordion-padding-x !default;
 $accordion-button-color:                  $accordion-color !default;
-$accordion-button-bg:                     $dark; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
+$accordion-button-bg:                     #6e0d0d; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
 //$accordion-transition:                    $btn-transition, border-radius .15s ease !default;
-$accordion-button-active-bg:              #6e0d0d; // tint-color($component-active-bg, 90%) !default;
+$accordion-button-active-bg:              #981919; // tint-color($component-active-bg, 90%) !default;
 $accordion-button-active-color:           #ddb9af; //shade-color($primary, 10%) !default;
 
 //$accordion-button-focus-border-color:     $input-focus-border-color !default;

@@ -74,7 +74,7 @@ class SlugManagerTest extends TestCase
         $this->assertEquals('Hello_World_2', $slug2);
     }
 
-    public function generatorCases()
+    public static function generatorCases()
     {
         return [
             [new UrlencodeGenerator(), 'Hello', 'Hello', null],

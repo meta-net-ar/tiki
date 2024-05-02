@@ -349,15 +349,15 @@ class HtmlSelectDate extends Base
             $c = substr($field_order, $i, 1);
             switch ($c) {
                 case 'D':
-                    $html_result .= "<div class='col-sm-4'>$day_result</div>";
+                    $html_result .= "<div class='col-auto'>$day_result</div>";
                     break;
 
                 case 'M':
-                    $html_result .= "<div class='col-sm-4'>$month_result</div>";
+                    $html_result .= "<div class='col-auto'>$month_result</div>";
                     break;
 
                 case 'Y':
-                    $html_result .= "<div class='col-sm-4'>$year_result</div>";
+                    $html_result .= "<div class='col-auto'>$year_result</div>";
                     break;
             }
             // Add the field seperator
@@ -366,6 +366,6 @@ class HtmlSelectDate extends Base
             }
         }
 
-        return "<div class='row html-select-date'>$html_result</div>";
+        return "<div class='row gy-2 gx-3 align-items-center mb-3'>$html_result</div>";
     }
 }

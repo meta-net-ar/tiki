@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\ExportableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         global $prefs;
         if (isset($prefs['tracker_wikirelation_synctitle'])) {
@@ -386,7 +386,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
 
@@ -402,7 +402,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
 
@@ -418,7 +418,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
 

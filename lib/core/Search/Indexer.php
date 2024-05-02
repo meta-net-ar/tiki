@@ -9,6 +9,10 @@ use Tiki\Package\Extension\Api\Search as PackageApiSearch;
 class Search_Indexer
 {
     private $searchIndex;
+    /**
+     *
+     * @var array of Search_ContentSource_Interface
+     */
     private $contentSources = [];
     private $globalSources = [];
     private $packageSources = [];
@@ -88,9 +92,14 @@ class Search_Indexer
         $this->packageSources = $api->getSources();
     }
 
-    public function addContentSource($objectType, Search_ContentSource_Interface $contentSource)
+    public function addContentSource(string $objectType, Search_ContentSource_Interface $contentSource)
     {
         $this->contentSources[$objectType] = $contentSource;
+    }
+
+    private function getContentSource(string $objectType): Search_ContentSource_Interface
+    {
+        return $this->contentSources[$objectType];
     }
 
     public function addGlobalSource(Search_GlobalSource_Interface $globalSource)
@@ -296,7 +305,15 @@ class Search_Indexer
         return $output;
     }
 
-    public function getDocuments($objectType, $objectId)
+    /**
+     * Final array of keys representing the information to be indexed for a single tiki object.
+     * Don't know why this is getDocuments and not getDocument.
+     *
+     * @param string $objectType the object type of the object id to find the content source as added in addContentSource
+     * @param [type] $objectId The object we want information for
+     * @return array of keys representing the
+     */
+    public function getDocuments(string $objectType, $objectId): array
     {
         $out = [];
 
@@ -305,7 +322,7 @@ class Search_Indexer
         if (isset($this->contentSources[$objectType])) {
             $globalFields = $this->getGlobalFields($objectType);
 
-            $contentSource = $this->contentSources[$objectType];
+            $contentSource = $this->getContentSource($objectType);
 
             if (method_exists($contentSource, 'setIndexer')) {
                 $contentSource->setIndexer($this);
@@ -320,6 +337,7 @@ class Search_Indexer
                     ));
                     $data = [];
                 }
+                // Why do we need to do this?  benoitg - 2024-03-09
                 if (! is_int(key($data))) {
                     $data = [$data];
                 }
@@ -332,7 +350,9 @@ class Search_Indexer
 
         return $out;
     }
-
+/**
+ * Called once for each document.  Each globalSource can filter out, modify or add keys base of the global sources
+ */
     private function augmentDocument($objectType, $objectId, $data, $typeFactory, $globalFields)
     {
         $initialData = $data;
@@ -359,7 +379,7 @@ class Search_Indexer
             'object_id' => $typeFactory->identifier($objectId),
             'contents' => $typeFactory->plainmediumtext($this->getGlobalContent($data, $globalFields)),
         ];
-
+        //var_dump($globalFields);
         $data = array_merge(array_filter($data), $base);
         $data = $this->applyFilters($data);
 
@@ -402,7 +422,13 @@ class Search_Indexer
         return $data;
     }
 
-    public static function getGlobalContent(array &$data, $globalFields)
+    /** This generates the 'contents' key in the final search.  That key has slightly conlicting requirements:
+     * 1- Server as teh objects textual, human readable summary
+     * 2- Be fuzzy-searchable from PluginList as the main content of the object
+     *
+     * So, fields should not repeat, and title must be present, but ideally at the end (since it will already be displayed in list right above or besided the summary)
+     */
+    public static function getGlobalContent(array &$data, $globalFields): string
     {
         $content = '';
 

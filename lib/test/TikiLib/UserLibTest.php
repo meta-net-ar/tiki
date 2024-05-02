@@ -68,7 +68,7 @@ class UserLibTest extends TikiTestCase
         $userLib->ldap_sync_user_data($user, $ldapAttributes);
     }
 
-    public function dataForLdapSyncUserDataUserWithoutPreferences(): array
+    public static function dataForLdapSyncUserDataUserWithoutPreferences(): array
     {
         return [
             [ // empty values

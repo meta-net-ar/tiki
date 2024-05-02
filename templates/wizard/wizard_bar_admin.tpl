@@ -5,7 +5,7 @@
         <div class="form-check">
             {capture name=likeicon}{icon name="thumbs-up"}{/capture}
             <label>
-                <input type="checkbox" class="form-check-input" id="connect_feedback_cbx" {if !empty($connect_feedback_showing)}checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" id="connect_feedback_cbx" {if !empty($connect_feedback_showing)}checked="checked"{/if}>
                 {tr}Provide Feedback{/tr}
                 <a href="http://doc.tiki.org/Connect" target="tikihelp" class="tikihelp" title="{tr}Provide Feedback:{/tr}
                     {tr}Once selected, some icon/s will be shown next to all features so that you can provide some on-site feedback about them.{/tr}
@@ -43,7 +43,7 @@
         {if !isset($showOnLoginDisplayed) or $showOnLoginDisplayed neq 'y'}
         <div class="form-check  form-switch mb-2 d-flex justify-content-between">
             <label class="form-check-label" for="showOnLogin">{tr}Show on admin log-in{/tr}</label>
-            <input type="checkbox" class="form-check-input mt-2" id="showOnLogin" name="showOnLogin" {if isset($showOnLogin) AND $showOnLogin eq true}checked="checked"{/if} />
+            <input type="checkbox" aria-label="{tr}Select{/tr}" class="form-check-input mt-2" id="showOnLogin" name="showOnLogin" {if isset($showOnLogin) AND $showOnLogin eq true}checked="checked"{/if}>
             {assign var="showOnLoginDisplayed" value="y" scope="root"}
         </div>
         {/if}

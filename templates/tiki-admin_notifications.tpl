@@ -101,7 +101,7 @@
                 <tr>
                     <td class="checkbox-cell">
                         <div class="form-check">
-                            <input type="checkbox" name="checked[]" value="{$channels[user].watchtype}{$channels[user].watchId|escape}" {if $smarty.request.checked and in_array($channels[user].watchId,$smarty.request.checked)}checked="checked"{/if}>
+                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$channels[user].watchtype}{$channels[user].watchId|escape}" {if $smarty.request.checked and in_array($channels[user].watchId,$smarty.request.checked)}checked="checked"{/if}>
                         </div>
                     </td>
                     <td class="text">{$channels[user].event}</td>

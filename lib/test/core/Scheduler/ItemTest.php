@@ -272,7 +272,7 @@ class ItemTest extends TestCase
      * Returns DateTime for multiple minutes in the same hour
      * @return array
      */
-    public function dateTimeGenerator()
+    public static function dateTimeGenerator()
     {
         $minutes = [0, 10, 15, 30, 45, 50, 59];
 

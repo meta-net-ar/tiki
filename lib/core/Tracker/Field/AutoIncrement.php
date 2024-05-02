@@ -12,7 +12,7 @@
  */
 class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'q' => [
@@ -208,13 +208,13 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractField implement
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [

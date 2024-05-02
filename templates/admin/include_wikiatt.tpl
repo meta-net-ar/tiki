@@ -4,7 +4,7 @@
 {/remarksbox}
 {/if}
 <fieldset class="mb-3 w-100">
-    <legend>{tr}Wiki attachments{/tr}</legend>
+    <legend class="h3">{tr}Wiki attachments{/tr}</legend>
     <form action="tiki-admin.php?page=wikiatt" method="post">
         {ticket}
         <input type="text" name="find" value="{$find|escape}">

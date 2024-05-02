@@ -161,9 +161,7 @@
                 {section name=user loop=$channels}
                     <tr>
                         <td class="checkbox-cell">
-                            <div class="form-check">
-                                <input type="checkbox" name="checked[]" value="{$channels[user].code}" {if $smarty.request.checked and in_array($channels[user].code, $smarty.request.checked)}checked="checked"{/if}>
-                            </div>
+                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$channels[user].code}" {if $smarty.request.checked and in_array($channels[user].code, $smarty.request.checked)}checked="checked"{/if}>
                         </td>
                         <td class="username">
                             {if $channels[user].isUser == "y"}

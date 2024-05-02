@@ -266,7 +266,7 @@ function tiki_route_single($index, $name)
  */
 function tiki_route_attempt_custom_route_redirect()
 {
-    global $path, $inclusion, $prefs, $tikiroot, $tikipath, $base, $full;
+    global $path, $inclusion, $prefs, $user_preferences, $tikiroot, $tikipath, $base, $full;
 
     if ($inclusion || empty($path)) {
         return;

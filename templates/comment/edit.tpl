@@ -11,6 +11,7 @@
                 {tr}Edit Comment{/tr}
             </div>
             <fieldset>
+                <legend class="visually-hidden">{tr}Edit Comment{/tr}</legend>
                 <input type="hidden" name="edit" value="1"/>
                 <div class="card-body">
                 {if $prefs.comments_notitle neq 'y'}

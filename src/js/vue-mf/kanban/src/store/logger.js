@@ -29,5 +29,5 @@ export default createLogger({
     },
     logActions: true, // Log Actions
     logMutations: true, // Log mutations
-    logger: console // implementation of the `console` API, default `console`
+    logger: console, // implementation of the `console` API, default `console`
 });

@@ -8,16 +8,16 @@
         {tab name="{tr}Intertiki Client{/tr}"}
             <em>{tr}Set up this Tiki site as the Intertiki client{/tr}</em><br><br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_intertiki}
             </fieldset>
             <fieldset>
-                <legend>{tr}Client server settings{/tr}</legend>
+                <legend class="h3">{tr}Client server settings{/tr}</legend>
                 {preference name=tiki_key}
                 {preference name=feature_intertiki_sharedcookie}
             </fieldset>
             <fieldset>
-                <legend>{tr}Currently linked master server{/tr}</legend>
+                <legend class="h3">{tr}Currently linked master server{/tr}</legend>
                 {preference name=feature_intertiki_mymaster mode=notempty}
                 <div class="adminoptionboxchild feature_intertiki_mymaster_childcontainer">
                     {preference name=feature_intertiki_import_preferences}
@@ -26,7 +26,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Add an available master server{/tr}{help desc='{tr}The InterTiki Server fields are for defining for every master server you want to have access to from this client{/tr}'}</legend>
+                <legend class="h3">{tr}Add an available master server{/tr}{help desc='{tr}The InterTiki Server fields are for defining for every master server you want to have access to from this client{/tr}'}</legend>
                     <div class="tiki-form-group row">
                         <label class="col-sm-4 col-form-label">{tr}Server name{/tr}{help desc='{tr}Set the name of your target server as defined in the server name field of the master. Use a distinct, but easily understood value.{/tr}'}</label>
                         <div class="col-sm-8">
@@ -60,7 +60,7 @@
             </fieldset>
             {if !empty($prefs.interlist)}
                 <fieldset>
-                    <legend>{tr}Available master Tiki servers{/tr}</legend>
+                    <legend class="h3">{tr}Available master Tiki servers{/tr}</legend>
                     <div class="mb-3 row">
                         <div class="col-sm-12">
                             <div class="table-responsive">
@@ -109,16 +109,16 @@
             {tab name="{tr}Intertiki Master Server{/tr}"}
                 <em>{tr}Set up this Tiki site as the InterTiki master server{/tr}</em><br><br>
                 <fieldset>
-                    <legend>{tr}Activate the feature{/tr}</legend>
+                    <legend class="h3">{tr}Activate the feature{/tr}</legend>
                     {preference name=feature_intertiki_server}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Master server settings{/tr}</legend>
+                    <legend class="h3">{tr}Master server settings{/tr}</legend>
                     {preference name=intertiki_logfile}
                     {preference name=intertiki_errfile}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Allowed client servers{/tr}</legend>
+                    <legend class="h3">{tr}Allowed client servers{/tr}</legend>
                     <div class="mb-3 row">
                         <div class="col-sm-12">
                             <div class="table-responsive">

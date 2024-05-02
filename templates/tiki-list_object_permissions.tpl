@@ -67,7 +67,7 @@
 
                                         {foreach from=$content.default item=default}
                                             <tr>
-                                                <td class="checkbox-cell"><input type="checkbox" name="groupPerm[]" value='{$default|json_encode|escape}'></td>
+                                                <td class="checkbox-cell"><input type="checkbox" name="groupPerm[]" value='{$default|json_encode|escape}' class="form-check-input" aria-label="{tr}Select{/tr}"></td>
                                                 <td class="text">{$default.group|escape}</td>
                                                 <td class="text">{$default.perm|escape}</td>
                                             </tr>
@@ -123,7 +123,7 @@
                                         {if !empty($object.special)}
                                             {foreach from=$object.special item=special}
                                                 <tr>
-                                                    <td class="checkbox-cell"><input type="checkbox" name="objectPerm[]" value='{$special|json_encode|escape}'></td>
+                                                    <td class="checkbox-cell"><input type="checkbox" name="objectPerm[]" value='{$special|json_encode|escape}' class="form-check-input" aria-label="{tr}Select{/tr}"></td>
                                                     <td class="text">{object_link type=$special.objectType id=$special.objectId title=$special.objectName}</td>
                                                     <td class="text">{$special.group|escape}</td>
                                                     <td class="text">{$special.perm|escape}</td>

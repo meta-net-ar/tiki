@@ -37,7 +37,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
                 $label = tra('Page Break');
                 $iconname = 'page-break';
                 $wysiwyg = 'PageBreak';
-                $syntax = '...page...';
+                $syntax = $prefs['wiki_page_separator'];
                 break;
             case 'box':
                 $label = tra('Box');
@@ -107,7 +107,9 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
      */
     public function getOnClick(): string
     {
-        if ($this->syntax == '...page...') {
+        global $prefs;
+
+        if ($this->syntax == $prefs['wiki_page_separator']) {
             // this breaks the toolbar when inside nested plugins if wiki_pagination is enabled becasue
             // \WikiLib::get_number_of_pages doesn't check where the ...page... string occurs in the data
             // so we get javascript to reassemble the "...page..." syntax client-side

@@ -53,25 +53,25 @@
             <input type="hidden" name="siteId" value="{$siteId|escape}">
 
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Name{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="name">{tr}Name{/tr}</label>
                 <div class="col-sm-7">
                     <input type="text" id="name" name="name" value="{$info.name|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Description{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="description">{tr}Description{/tr}</label>
                 <div class="col-sm-7">
                     <textarea rows="5" cols="60" id="description" name="description" class="form-control">{$info.description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}URL{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="url">{tr}URL{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" size="60" id="url" name="url" value="{if $info.url ne ""}{$info.url|escape}{else}http://{/if}" class="form-control">
+                    <input type="text" size="60" id="url" name="url" id="url" value="{if $info.url ne ""}{$info.url|escape}{else}https://{/if}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Directory Categories{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="siteCats">{tr}Directory Categories{/tr}</label>
                 <div class="col-sm-7">
                     <select id="siteCats" name="siteCats[]" multiple="multiple" size="4" class="form-control">
                         {section name=ix loop=$categs}
@@ -88,7 +88,7 @@
             </div>
             {if $prefs.directory_country_flag eq 'y'}
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Country{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="country">{tr}Country{/tr}</label>
                 <div class="col-sm-7">
                     <select id="country" name="country" class="form-control">
                         {section name=ux loop=$countries}
@@ -109,8 +109,7 @@
                 {include file='antibot.tpl' td_style="formcolor"}
             {/if}
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label"></label>
-                <div class="col-sm-7">
+                <div class="col-sm-7 offset-sm-3">
                     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
                 </div>
             </div>

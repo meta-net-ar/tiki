@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tracker_Field_Language extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'LANG' => [
@@ -139,13 +139,13 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractField implements \Tr
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, 'language'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -154,7 +154,7 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractField implements \Tr
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

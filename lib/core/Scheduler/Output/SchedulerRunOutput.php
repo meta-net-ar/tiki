@@ -26,7 +26,7 @@ class SchedulerRunOutput extends BufferedOutput
      * @param bool                          $decorated
      * @param OutputFormatterInterface|null $formatter
      */
-    public function __construct($itemId, $verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface $formatter = null)
+    public function __construct($itemId, $verbosity = self::VERBOSITY_NORMAL, $decorated = false, OutputFormatterInterface|null $formatter = null)
     {
         parent::__construct($verbosity, $decorated, $formatter);
         $this->itemId = $itemId;

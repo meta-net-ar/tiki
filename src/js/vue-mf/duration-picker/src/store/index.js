@@ -11,11 +11,11 @@ export default () =>
             chronometer: 0, // 0 or 1
             initialDuration: {
                 value: moment.duration(0), // Duration object
-                units: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"]
+                units: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"],
             },
             duration: {
                 value: moment.duration(0), // Duration object
-                units: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"]
+                units: ["years", "months", "weeks", "days", "hours", "minutes", "seconds", "milliseconds"],
             },
             token: null,
             inputName: "",
@@ -25,14 +25,14 @@ export default () =>
                     id: 0,
                     spentTime: moment.duration(0),
                     startTime: null,
-                    stopTime: null
-                }
+                    stopTime: null,
+                },
             ],
             activeTimestamp: 0, // Array index
             activeUnit: "hours",
             playing: false,
             view: "editor", // 'editor' or 'chronometer',
-            draft: false
+            draft: false,
         },
         setView(name) {
             this.state.view = name;
@@ -65,7 +65,7 @@ export default () =>
             this.state.duration.value = moment.duration(amounts);
             this.deleteAllTimestamp();
             this.createTimestamp({
-                spentTime: moment.duration(amounts)
+                spentTime: moment.duration(amounts),
             });
         },
         resetIntitialDuration() {
@@ -73,7 +73,7 @@ export default () =>
             this.deleteAllTimestamp();
             this.state.duration.value = moment.duration(this.state.initialDuration.value);
             this.createTimestamp({
-                spentTime: moment.duration(this.state.initialDuration.value)
+                spentTime: moment.duration(this.state.initialDuration.value),
             });
         },
         setDuration(value) {
@@ -157,7 +157,7 @@ export default () =>
                 days: "d",
                 weeks: "w",
                 months: "M",
-                years: "y"
+                years: "y",
             };
             const formatedUnits = units.map((unit) => `"[${unit}]": ${durationLabels[unit]}`);
             const token = "{" + formatedUnits.join(",") + "}";
@@ -169,7 +169,7 @@ export default () =>
                 groupingSeparator: "",
                 usePlural: false,
                 trim: false,
-                trunc: true
+                trunc: true,
             });
             return JSON.parse(amounts);
         },
@@ -184,8 +184,8 @@ export default () =>
                 url: this.getDraftUrl("drafts"),
                 dataType: "json",
                 data: {
-                    id: id
-                }
+                    id: id,
+                },
             });
         },
         saveDurationDraft: function (id, field) {
@@ -197,8 +197,8 @@ export default () =>
                 dataType: "json",
                 data: {
                     id: id,
-                    field: field
-                }
+                    field: field,
+                },
             });
         },
         removeDurationDraft: function (id) {
@@ -208,8 +208,8 @@ export default () =>
                 url: this.getDraftUrl("delete_draft"),
                 dataType: "json",
                 data: {
-                    id: id
-                }
+                    id: id,
+                },
             });
-        }
+        },
     });

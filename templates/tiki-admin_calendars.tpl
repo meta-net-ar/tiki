@@ -259,8 +259,8 @@
                     <input type="text" class="form-control" name="name" id="calendarName" value="{$name|escape}">
                 </div>
                 <div class="checkbox col-sm-3">
+                    <input type="checkbox" name="show[calname]" id="showCalnamePopup" class="form-check-input" value="on"{if $show_calname eq 'y'} checked="checked"{/if}>
                     <label for="showCalnamePopup">
-                        <input type="checkbox" name="show[calname]" id="showCalnamePopup" value="on"{if $show_calname eq 'y'} checked="checked"{/if}>
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
@@ -273,13 +273,13 @@
                     <textarea name="description" rows="5" wrap="virtual" class="form-control" id="calendarDescription">{$description|escape}</textarea>
                 </div>
                 <div class="checkbox col-sm-3">
-                    <label for="showCalDescriptionPopup" class="col-form-label">
-                        <input type="checkbox" id="showCalDescriptionPopup" name="show[description]" value="on"{if $show_description eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" id="showCalDescriptionPopup" class="form-check-input" name="show[description]" value="on"{if $show_description eq 'y'} checked="checked"{/if}>
+                    <label for="showCalDescriptionPopup" class="form-check-label">
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-4 col-form-label" for="customlocations">
                     {tr}Custom location{/tr}
                 </label>
@@ -290,13 +290,13 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
+                    <input type="checkbox" name="show[location]" id="showCustomLocationsPopup" class="form-check-input" value="on"{if $show_location eq 'y'} checked="checked"{/if}>
                     <label>
-                        <input type="checkbox" name="show[location]" id="showCustomLocationsPopup" value="on"{if $show_location eq 'y'} checked="checked"{/if}>
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-4 col-form-label" for="customparticipants">
                     {tr}Custom participants{/tr}
                 </label>
@@ -307,13 +307,13 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
+                    <input type="checkbox" class="form-check-input" name="show[participants]" value="on"{if $show_participants eq 'y'} checked="checked"{/if}>
                     <label>
-                        <input type="checkbox" name="show[participants]" value="on"{if $show_participants eq 'y'} checked="checked"{/if}>
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-4 col-form-label" for="customcategories">
                     {tr}Custom classification{/tr}
                 </label>
@@ -324,13 +324,13 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
+                    <input type="checkbox" class="form-check-input" name="show[category]" value="on"{if $show_category eq 'y'} checked="checked"{/if}>
                     <label>
-                        <input type="checkbox" name="show[category]" value="on"{if $show_category eq 'y'} checked="checked"{/if}>
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-4 col-form-label" for="customlanguages">
                     {tr}Custom language{/tr}
                 </label>
@@ -341,13 +341,13 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
+                    <input type="checkbox" class="form-check-input" name="show[language]" id="showlanguagepopup" value="on"{if $show_language eq 'y'} checked="checked"{/if}>
                     <label for="showlanguagepopup">
-                        <input type="checkbox" name="show[language]" id="showlanguagepopup" value="on"{if $show_language eq 'y'} checked="checked"{/if}>
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
             </div>
-            <div class="mb-3 row">
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-4 col-form-label" for="customurl">
                     {tr}Custom URL{/tr}
                 </label>
@@ -358,8 +358,8 @@
                     </select>
                 </div>
                 <div class="checkbox col-sm-3">
-                    <label for="showurlpopup" class="col-form-label">
-                        <input type="checkbox" id="showurlpopup" name="show[url]" value="on"{if $show_url eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" id="showurlpopup" name="show[url]" value="on"{if $show_url eq 'y'} checked="checked"{/if}>
+                    <label for="showurlpopup" class="form-check-label">
                         {tr}Show in popup box{/tr}
                     </label>
                 </div>
@@ -418,7 +418,7 @@
                 <label class="col-sm-4 col-form-label" for="customcategories">
                     {tr}Start of day{/tr}
                 </label>
-                <div class="col-sm-2">
+                <div class="col">
                     {html_select_time prefix="startday_" time=$info.startday display_minutes=false display_seconds=false use_24_hours=$use_24hr_clock}
                 </div>
             </div>
@@ -426,7 +426,7 @@
                 <label class="col-sm-4 col-form-label" for="customcategories">
                     {tr}End of day{/tr}
                 </label>
-                <div class="col-sm-2">
+                <div class="col">
                     {html_select_time prefix="endday_" time=$info.endday display_minutes=false display_seconds=false use_24_hours=$use_24hr_clock}
                 </div>
             </div>
@@ -436,18 +436,19 @@
             </label>
             <div class="col-sm-8">
                 <div>
-                    <label class="col-form-label">
-                        <input type="checkbox" id="select-all-days">
+                    <input type="checkbox" class="form-check-input" id="select-all-days">
+                    <label class="form-check-label me-3" for="select-all-days">
                         Select all
                     </label>
-                    <label class="col-form-label">
-                        <input type="checkbox" id="select-working-days">
+                    <input type="checkbox" id="select-working-days" class="form-check-input">
+                    <label class="form-check-label" for="select-working-days">
                         Select working days
                     </label>
                 </div>
                 {section name="viewdays" start=0 loop=7}
-                <div>
-                    <label class="col-form-label"><input type="checkbox" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
+                    <label class="form-check-label">
                         {$days_names[$smarty.section.viewdays.index]}
                     </label>
                 </div>
@@ -507,16 +508,16 @@
             </div>
             <div class="mb-3 row">
                 <div class="checkbox col-sm-4 offset-sm-4">
-                    <label class="col-form-label">
-                        <input type="checkbox" name="show[status]" value="on"{if $info.show_status eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="show[status]" value="on"{if $info.show_status eq 'y'} checked="checked"{/if}>
+                    <label class="form-check-label">
                         {tr}Show in popup view{/tr}
                     </label>
                 </div>
             </div>
             <div class="mb-3 row">
                 <div class="checkbox col-sm-4 offset-sm-4">
-                    <label class="col-form-label">
-                        <input type="checkbox" name="show[status_calview]" value="on"{if $info.show_status_calview ne 'n'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="show[status_calview]" value="on"{if $info.show_status_calview ne 'n'} checked="checked"{/if}>
+                    <label class="form-check-label">
                         {tr}Show in calendar view{/tr}
                     </label>
                 </div>
@@ -536,28 +537,28 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label class="col-sm-4 col-form-label" for="showeachuser">
+                    <label class="col-sm-4 form-check-label" for="showeachuser">
                         {tr}Allows each user to be selected for small groups{/tr}
                     </label>
                     <div class="col-sm-2">
-                        <input type="checkbox" name="showeachuser" id="showeachuser" {if $showeachuser eq 'y'}checked="checked"{/if}>
+                        <input type="checkbox" class="form-check-input" name="showeachuser" id="showeachuser" {if $showeachuser eq 'y'}checked="checked"{/if}>
                     </div>
                 </div>
             {/if}
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="allday">
+                <label class="col-sm-4 form-check-label" for="allday">
                     {tr}Default length of events is all day{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" id="allday" name="allday"{if $info.allday eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" id="allday" name="allday"{if $info.allday eq 'y'} checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="nameoneachday">
+                <label class="col-sm-4 form-check-label" for="nameoneachday">
                     {tr}Event name on each day in calendar view{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" name="nameoneachday"{if $info.nameoneachday eq 'y'} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="nameoneachday"{if $info.nameoneachday eq 'y'} checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 text-center">
@@ -651,27 +652,27 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="stripTodos">
+                <label class="col-sm-4 form-check-label" for="stripTodos">
                     {tr}Ignore Todos{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" name="subscription[strip_todos]" id="stripTodos" value="1"{if $subscription.strip_todos} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="subscription[strip_todos]" id="stripTodos" value="1"{if $subscription.strip_todos} checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="stripAlarms">
+                <label class="col-sm-4 form-check-label" for="stripAlarms">
                     {tr}Ignore Alarms{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" name="subscription[strip_alarms]" id="stripAlarms" value="1"{if $subscription.strip_alarms} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="subscription[strip_alarms]" id="stripAlarms" value="1"{if $subscription.strip_alarms} checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label" for="stripAttachments">
+                <label class="col-sm-4 form-check-label" for="stripAttachments">
                     {tr}Ignore Attachments{/tr}
                 </label>
                 <div class="col-sm-8">
-                    <input type="checkbox" name="subscription[strip_attachments]" id="stripAttachments" value="1"{if $subscription.strip_attachments} checked="checked"{/if}>
+                    <input type="checkbox" class="form-check-input" name="subscription[strip_attachments]" id="stripAttachments" value="1"{if $subscription.strip_attachments} checked="checked"{/if}>
                 </div>
             </div>
             <div class="mb-3 text-center">

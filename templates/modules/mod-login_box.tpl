@@ -220,7 +220,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
                     <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if}/>
-                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].trigger("focus");} }{/jq}
+                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
             {/if}
@@ -246,8 +246,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 <input type="hidden" name="rme" id="login-remember-module-input_{$module_logo_instance}" value="on" />
             {else}
                 <div class="form-check">
-                    <div class="checkbox rme">
-                        <label for="login-remember-module_{$module_logo_instance}"><input type="checkbox" class="form-check-input" name="rme" id="login-remember-module_{$module_logo_instance}" value="on" />
+                {*    <div class="checkbox rme"> *}
+                        <input type="checkbox" class="form-check-input" name="rme" id="login-remember-module_{$module_logo_instance}" value="on" />
+                        <label for="login-remember-module_{$module_logo_instance}">
                             {tr}Remember me{/tr}
                             ({tr}for{/tr}
                             {if $prefs.remembertime eq 300}
@@ -274,7 +275,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                                 1 {tr}year{/tr})
                             {/if}
                         </label>
-                    </div>
+                 {*   </div> *}
                 </div>
             {/if}
         {/if}

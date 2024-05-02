@@ -64,7 +64,7 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}</th>
                 <th class="text-end">{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Items{/tr}{/self_link}</th>
-                <th></th>
+                <td></td> {* Changed from th to td to prevent ARIA empty header error *}
             </tr>
 
             {foreach from=$trackers item=tracker}

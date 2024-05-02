@@ -138,6 +138,19 @@ function wikiplugin_memberlist_info()
                     ['text' => tra('No'), 'value' => 'n']
                 ],
             ],
+            'showgroupname' => [
+                'required' => false,
+                'name' => tra('Group name'),
+                'description' => tra('Display or hide group name'),
+                'since' => '27.0',
+                'default' => 'y',
+                'filter' => 'groupname',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
         ],
     ];
 }
@@ -275,12 +288,20 @@ function wikiplugin_memberlist($data, $params)
         }
     }
 
+    $showgroupname = "";
+    if ($params['showgroupname'] === "y") {
+        $showgroupname = true;
+    } else {
+        $showgroupname = false;
+    }
+
     $smarty = TikiLib::lib('smarty');
     $smarty->assign('execution_key', $exec_key);
     $smarty->assign('can_apply', $canApply);
     $smarty->assign('defaultGroup', $params['defaultGroup']);
     $smarty->assign('memberlist_groups', $validGroups);
     $smarty->assign('displayMode', $params['displayMode']);
+    $smarty->assign('showgroupname', $showgroupname);
 
     // seems conditionally adding tabs in the tpl doesn't work (unclosed {tabset} errors etc) - a Smarty 3 change?
     if (empty($params['displayMode']) && $prefs['feature_tabs'] === 'y') {

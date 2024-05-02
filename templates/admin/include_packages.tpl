@@ -479,7 +479,7 @@
                 {ticket}
                 <input type="hidden" name="redirect" value="0">
                 <fieldset>
-                    <legend>{tr}Activate Extension Package{/tr}</legend>
+                    <legend class="h3">{tr}Activate Extension Package{/tr}</legend>
                     {foreach $packageprefs as $package}
                         {preference name="{$package|escape}"}
                     {/foreach}

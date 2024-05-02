@@ -41,33 +41,35 @@ if (isset($_REQUEST["removeall"]) && $access->checkCsrf(true)) {
     }
 }
 if (isset($_REQUEST["upload"]) && $access->checkCsrf()) {
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $fp = fopen($_FILES['userfile1']['tmp_name'], "r");
-        $result = false;
-        $resultCount = 0;
-        while (! feof($fp)) {
-            $data = fgets($fp, 65535);
-            if (! empty($data)) {
-                $data = str_replace("\n", "", $data);
-                $result = $taglinelib->replace_cookie(0, $data);
-                if ($result && $result->numRows()) {
-                    $resultCount = $resultCount + $result->numRows();
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $fp = fopen($_FILES['userfile1']['tmp_name'], "r");
+            $result = false;
+            $resultCount = 0;
+            while (! feof($fp)) {
+                $data = fgets($fp, 65535);
+                if (! empty($data)) {
+                    $data = str_replace("\n", "", $data);
+                    $result = $taglinelib->replace_cookie(0, $data);
+                    if ($result && $result->numRows()) {
+                        $resultCount = $resultCount + $result->numRows();
+                    }
                 }
             }
-        }
-        fclose($fp);
-        $size = $_FILES['userfile1']['size'];
-        $name = $_FILES['userfile1']['name'];
-        $type = $_FILES['userfile1']['type'];
-        if ($resultCount) {
-            $msg = $resultCount === 1 ? tr('File uploaded and one cookie created or replaced')
-                : tr('File uploaded and %0 cookies created or replaced', $resultCount);
-            Feedback::success($msg);
+            fclose($fp);
+            $size = $_FILES['userfile1']['size'];
+            $name = $_FILES['userfile1']['name'];
+            $type = $_FILES['userfile1']['type'];
+            if ($resultCount) {
+                $msg = $resultCount === 1 ? tr('File uploaded and one cookie created or replaced')
+                    : tr('File uploaded and %0 cookies created or replaced', $resultCount);
+                Feedback::success($msg);
+            } else {
+                Feedback::error(tr('Upload failed - no cookies created'));
+            }
         } else {
-            Feedback::error(tr('Upload failed - no cookies created'));
+            Feedback::error($taglinelib->uploaded_file_error($_FILES['userfile1']['error']));
         }
-    } else {
-        Feedback::error(tr('Upload failed'));
     }
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {

@@ -8,7 +8,10 @@
                 <ul data-for="#{$facet.name}" data-join="{$facet.operator|escape}">
                     {foreach from=$facet.options key=value item=label}
                         <li>
-                            <label> <input type="checkbox" value="{$value|escape}"> {$label|escape}</label>
+                            <div class="form-check">
+                                <input type="checkbox" value="{$value|escape}" class="form-check-input" id="id_{$value|escape}">
+                                <label class="form-check-label" for="id_{$value|escape}">{$label|escape}</label>
+                            </div>
                         </li>
                     {/foreach}
                 </ul>

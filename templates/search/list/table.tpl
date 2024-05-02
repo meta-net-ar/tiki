@@ -59,7 +59,7 @@
                                 {foreach from=$facet.options key=value item=label}
                                     <li>
                                         <label>
-                                            {if not empty($adddata)}<input type="checkbox" value="{$value|escape}">{/if}
+                                            {if not empty($adddata)}<input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" value="{$value|escape}">{/if}
                                             {$label|escape}
                                         </label>
                                     </li>
@@ -133,7 +133,7 @@
                 {if $actions}
                     {$fieldcount = 1}
                     <th>
-                        <input type="checkbox" class="form-check-input listexecute-select-all" name="selectall" value="">
+                        <input type="checkbox" class="form-check-input listexecute-select-all" aria-label="{tr}Select{/tr}" name="selectall" value="">
                         <input type="hidden" name="objects{$iListExecute}[]" value="" class="listexecute-all">
                     </th>
                 {/if}
@@ -186,7 +186,7 @@
             <tr>
                 {if $actions}
                     <td>
-                        <input type="checkbox" name="objects{$iListExecute}[]" class="checkbox_objects form-check-input" value="{$row.object_type|escape}:{$row.object_id|escape}">
+                        <input type="checkbox" name="objects{$iListExecute}[]" class="checkbox_objects form-check-input" aria-label="{tr}Select{/tr}" value="{$row.object_type|escape}:{$row.object_id|escape}">
                         {if $row.report_status eq 'success'}
                             {icon name='ok'}
                         {elseif $row.report_status eq 'error'}

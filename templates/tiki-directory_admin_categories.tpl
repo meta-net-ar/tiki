@@ -10,11 +10,11 @@
     {ticket}
     <br>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">
+        <label class="col-sm-4 col-form-label" for="parent">
             {tr}Parent directory category{/tr}
         </label>
         <div class="col-sm-7">
-            <select name="parent" onchange="javascript:path.submit();" class="form-control">
+            <select name="parent" id="parent" onchange="javascript:path.submit();" class="form-control">
                 <option value="0">{tr}Top{/tr}</option>
                 {section name=ix loop=$categs}
                     <option value="{$categs[ix].categId|escape}" {if $parent eq $categs[ix].categId}selected="selected"{/if}>{$categs[ix].path|escape}</option>
@@ -40,21 +40,21 @@
     <input type="hidden" name="categId" value="{$categId|escape}">
 
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Name{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="name">{tr}Name{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="name" value="{$info.name|escape}" class="form-control">
+            <input type="text" name="name" id="name" value="{$info.name|escape}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Description{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="description">{tr}Description{/tr}</label>
         <div class="col-sm-7">
-            <textarea rows="5" cols="60" name="description" class="form-control">{$info.description|escape}</textarea>
+            <textarea rows="5" cols="60" name="description" id="description" class="form-control">{$info.description|escape}</textarea>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Child type{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="childrenType">{tr}Child type{/tr}</label>
         <div class="col-sm-7">
-            <select name="childrenType" class="form-control">
+            <select name="childrenType" id="childrenType" class="form-control">
                 <option value='c' {if $info.childrenType eq 'c'}selected="selected"{/if}>{tr}Most visited directory sub-categories{/tr}</option>
                 <option value='d' {if $info.childrenType eq 'd'}selected="selected"{/if}>{tr}Directory category description{/tr}</option>
                 <option value='r' {if $info.childrenType eq 'r'}selected="selected"{/if}>{tr}Random directory sub-categories{/tr}</option>
@@ -62,9 +62,9 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Maximum number of child directory categories to show{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="viewableChildren">{tr}Maximum number of child directory categories to show{/tr}</label>
         <div class="col-sm-7">
-            <select name="viewableChildren" class="form-control">
+            <select name="viewableChildren" id="viewableChildren" class="form-control">
                 <option value="0" {if $info.viewableChildren eq 0}selected="selected"{/if}>{tr}none{/tr}</option>
                 <option value="1" {if $info.viewableChildren eq 1}selected="selected"{/if}>1</option>
                 <option value="2" {if $info.viewableChildren eq 2}selected="selected"{/if}>2</option>
@@ -75,21 +75,21 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Allow sites in this directory category{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="allowSites">{tr}Allow sites in this directory category{/tr}</label>
         <div class="col-sm-7">
-            <input name="allowSites" type="checkbox" {if $info.allowSites eq 'y'}checked="checked"{/if} >
+            <input name="allowSites" id="allowSites" type="checkbox" {if $info.allowSites eq 'y'}checked="checked"{/if} >
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Show number of sites in this directory category{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="showCount">{tr}Show number of sites in this directory category{/tr}</label>
         <div class="col-sm-7">
-            <input name="showCount" type="checkbox" {if $info.showCount eq 'y'}checked="checked"{/if}>
+            <input name="showCount" id="showCount" type="checkbox" {if $info.showCount eq 'y'}checked="checked"{/if}>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label">{tr}Editor group{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="editorGroup">{tr}Editor group{/tr}</label>
         <div class="col-sm-7">
-            <select name="editorGroup" class="form-control">
+            <select name="editorGroup" id="editorGroup" class="form-control">
                 <option value="">{tr}None{/tr}</option>
                 {section name=ux loop=$groups}
                     <option value="{$groups[ux]|escape}" {if $editorGroup eq $groups[ux]}selected="selected"{/if}>{$groups[ux]}</option>
@@ -118,7 +118,7 @@
             <th><a href="tiki-directory_admin_categories.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'allowSites_desc'}allowSites_asc{else}allowSites_desc{/if}">{tr}allow{/tr}</a></th>
             <th><a href="tiki-directory_admin_categories.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'showCount_desc'}showCount_asc{else}showCount_desc{/if}">{tr}count{/tr}</a></th>
             <th><a href="tiki-directory_admin_categories.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'editorGroup_desc'}editorGroup_asc{else}editorGroup_desc{/if}">{tr}editor{/tr}</a></th>
-            <th></th>
+            <td></td> {* Changed from th to avoid ARIA empty header error *}
         </tr>
 
         {section name=user loop=$items}

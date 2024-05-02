@@ -53,7 +53,7 @@ class DirectivesTest extends TestCase
         $this->assertEquals(json_encode($yamlResult), json_encode($yaml));
     }
 
-    public function includeDataProvider()
+    public static function includeDataProvider()
     {
         return [
             ['include_replace_key.yml', 'include_replace_key_result.yml'],

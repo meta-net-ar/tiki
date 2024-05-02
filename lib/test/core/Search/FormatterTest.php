@@ -326,12 +326,12 @@ OUT;
                 [
                     'object_type' => 'wiki page',
                     'object_id' => 'HomePage',
-                    'content' => 'Hello World'
+                    'contents' => 'Hello World'
                 ],
                 [
                     'object_type' => 'wiki page',
                     'object_id' => 'SomePage',
-                    'content' => 'Test'
+                    'contents' => 'Test'
                 ],
             ],
             22,

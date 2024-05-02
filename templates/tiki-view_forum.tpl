@@ -43,9 +43,9 @@
                                 <input type="hidden" name="watch_action" value="add">
                                 <input type="hidden" name="watch_object" value={$forumId}>
                                 <input type="hidden" name="watch_event" value="forum_post_topic">
-                                <button type="submit" name="forumId" value={$forumId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                                <a type="submit" name="forumId" value={$forumId} class="dropdown-item tips">
                                     {icon name="watch"} {tr}Monitor topics{/tr}
-                                </button>
+                                </a>
                             </form>
                         {else}
                             <a class="dropdown-item" href="tiki-view_forum.php?forumId={$forumId}&amp;watch_event=forum_post_topic&amp;watch_object={$forumId}&amp;watch_action=remove">
@@ -56,9 +56,9 @@
                                 <input type="hidden" name="watch_action" value="remove">
                                 <input type="hidden" name="watch_object" value={$forumId}>
                                 <input type="hidden" name="watch_event" value="forum_post_topic">
-                                <button type="submit" name="forumId" value={$forumId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                                <a type="submit" name="forumId" value={$forumId} class="dropdown-item tips">
                                     {icon name="stop-watching"} {tr}Stop monitoring topics{/tr}
-                                </button>
+                                </a>
                             </form>
                         {/if}
                 {/if}
@@ -69,9 +69,9 @@
                                 <input type="hidden" name="watch_action" value="add">
                                 <input type="hidden" name="watch_object" value={$forumId}>
                                 <input type="hidden" name="watch_event" value="forum_post_topic_and_thread">
-                                <button type="submit" name="forumId" value={$forumId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                                <a type="submit" name="forumId" value={$forumId} class="dropdown-item tips">
                                     {icon name="watch"} {tr}Monitor topics and threads{/tr}
-                                </button>
+                                </a>
                             </form>
                         {else}
                             <a class="float-sm-end tips" href="tiki-view_forum.php?forumId={$forumId}&amp;watch_event=forum_post_topic_and_thread&amp;watch_object={$forumId}&amp;watch_action=remove">
@@ -82,9 +82,9 @@
                                 <input type="hidden" name="watch_action" value="remove">
                                 <input type="hidden" name="watch_object" value={$forumId}>
                                 <input type="hidden" name="watch_event" value="forum_post_topic_and_thread">
-                                <button type="submit" name="forumId" value={$forumId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                                <a type="submit" name="forumId" value={$forumId} class="dropdown-item tips">
                                     {icon name="stop-watching"} {tr}Stop monitoring topics and threads{/tr}
-                                </button>
+                                </a>
                             </form>
                         {/if}
                 {/if}
@@ -202,7 +202,7 @@
                     {/if}
                     {if $tiki_p_admin_forum eq 'y'}
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label" for="comments_topictype">{tr}Type{/tr}</label>
+                            <label class="col-sm-2 col-form-label" for="comment_topictype">{tr}Type{/tr}</label>
                             <div class="col-sm-10">
                                 <select name="comment_topictype" id="comment_topictype" class="form-select comment_topictype">
                                     <option value="n" {if $comment_topictype eq 'n'}selected="selected"{/if}>{tr}Normal{/tr}</option>
@@ -216,9 +216,9 @@
                     {/if}
                     {if $forum_info.topic_smileys eq 'y'}
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label" for="comments_topictype">{tr}Smiley{/tr}</label>
+                            <label class="col-sm-2 col-form-label" for="comment_topicsmiley">{tr}Smiley{/tr}</label>
                             <div class="col-sm-10">
-                                <select name="comment_topicsmiley" class="form-select comment_topicsmiley">
+                                <select name="comment_topicsmiley" id="comment_topicsmiley" class="form-select comment_topicsmiley">
                                     <option value="" {if $comment_topicsmiley eq ''}selected="selected"{/if}>{tr}no feeling{/tr}</option>
                                     <option value="icon_frown.gif" {if $comment_topicsmiley eq 'icon_frown.gif'}selected="selected"{/if}>{tr}frown{/tr}</option>
                                     <option value="icon_exclaim.gif" {if $comment_topicsmiley eq 'icon_exclaim.gif'}selected="selected"{/if}>{tr}exclaim{/tr}</option>
@@ -348,7 +348,7 @@
                         });
                     {/jq}
                     <div class="mb-3 forum_deliberation" style="display: none;">
-                        <label class="col-sm-2 col-form-label">{tr}Deliberation{/tr}</label>
+                        <div class="col-sm-2 col-form-label">{tr}Deliberation{/tr}</div>
                         <div class="col-sm-10 forum_deliberation_items">
                             <div class="forum_deliberation_items_toolbar">
                                 {button href="#" _class="forum_deliberation_add_item" _text="{tr}Add Deliberation Item{/tr}"}
@@ -366,7 +366,7 @@
 
                     {if $user and $prefs.feature_user_watches eq 'y' and (!isset($comments_threadId) or $comments_threadId eq 0)}
                         <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label">{tr}Watch for replies{/tr}</label>
+                            <div class="col-sm-2 col-form-label">{tr}Watch for replies{/tr}</div>
                             <div class="col-sm-10">
                                 <input type="radio" name="set_thread_watch" value="y" id="thread_watch_yes" checked="checked">
                                 <label for="thread_watch_yes">{tr}Send me an email when someone replies to my topic{/tr}</label>
@@ -420,7 +420,7 @@
                         <span class="input-group-text">
                             {icon name="search"}
                         </span>
-                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Find{/tr}...">
+                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Find{/tr}..." aria-label={tr}Find{/tr}>
                         <input type="hidden" name="where" value="forums">
                         <input type="hidden" name="forumId" value="{$forum_info.forumId}">
                         <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Find{/tr}">
@@ -586,6 +586,7 @@
                             formaction="{bootstrap_modal controller=forum action=merge_topic}"
                             title=":{tr}Merge{/tr}"
                             class="btn btn-primary btn-sm tips"
+                            aria-label="{tr}merge{/tr}"
                             onclick="confirmPopup()"
                         >
                             {icon name="merge"}
@@ -598,6 +599,7 @@
                             formaction="{bootstrap_modal controller=forum action=move_topic}"
                             title=":{tr}Move{/tr}"
                             class="btn btn-primary btn-sm tips"
+                            aria-label="{tr}Move{/tr}"
                             onclick="confirmPopup()"
                         >
                             {icon name="move"}
@@ -610,6 +612,7 @@
                             formaction="{bootstrap_modal controller=forum action=lock_topic}"
                             title=":{tr}Lock{/tr}"
                             class="btn btn-primary btn-sm tips"
+                            aria-label="{tr}Lock{/tr}"
                             onclick="confirmPopup()"
                         >
                             {icon name="lock"}
@@ -620,6 +623,7 @@
                             formaction="{bootstrap_modal controller=forum action=unlock_topic}" 
                             title=":{tr}Unlock{/tr}"
                             class="btn btn-primary btn-sm tips"
+                            aria-label="{tr}Unlock{/tr}"
                             onclick="confirmPopup()"
                         >
                             {icon name="unlock"}
@@ -630,6 +634,7 @@
                             formaction="{bootstrap_modal controller=forum action=delete_topic}"
                             title=":{tr}Delete{/tr}"
                             class="btn btn-primary btn-sm tips"
+                            aria-label="{tr}Delete{/tr}"
                             onclick="confirmPopup()"
                         >
                             {icon name="remove"}
@@ -732,9 +737,7 @@
                     <tr>
                         {if $tiki_p_admin_forum eq 'y'}
                             <td class="checkbox-cell">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" name="forumtopic[]" value="{$comments_coms[ix].threadId|escape}" {if isset($smarty.request.forumtopic) and in_array($comments_coms[ix].threadId,$smarty.request.forumtopic)}checked="checked"{/if}>
-                                </div>
+                                <input type="checkbox" class="form-check-input" name="forumtopic[]" aria-label="{tr}Select{/tr}" value="{$comments_coms[ix].threadId|escape}" {if isset($smarty.request.forumtopic) and in_array($comments_coms[ix].threadId,$smarty.request.forumtopic)}checked="checked"{/if}>
                             </td>
                         {/if}
                         <td class="icon">
@@ -956,7 +959,7 @@
                             <input type="hidden" name="thread_sort_mode" value="{$thread_sort_mode|escape}">
                             <input type="hidden" name="forumId" value="{$forumId|escape}">
                             <div class="mb-3 row mx-0">
-                                <label class="col-md-4 col-form-label form-control-sm" for="filter_time">{tr}Last post date{/tr}</label>
+                                <label class="col-md-4 col-form-label col-form-label-sm" for="filter_time">{tr}Last post date{/tr}</label>
                                 <div class="col-md-8">
                                     <select id="filter_time" name="time_control" class="form-control form-control-sm">
                                         <option value="" {if $smarty.request.time_control eq ''}selected="selected"{/if}>{tr}All posts{/tr}</option>
@@ -968,7 +971,7 @@
                             </div>
                             {if $prefs.feature_forum_topics_archiving eq 'y'}
                                 <div class="mb-3 row mx-0">
-                                    <label class="col-md-4 col-form-label form-control-sm" for="show_archived">{tr}Show archived posts{/tr}</label>
+                                    <label class="col-md-4 col-form-label col-form-label-sm" for="show_archived">{tr}Show archived posts{/tr}</label>
                                     <div class="col-md-8">
                                         <input type="checkbox" class="form-check-input" id="show_archived" name="show_archived" {if $show_archived eq 'y'}checked="checked"{/if}>
                                     </div>
@@ -976,7 +979,7 @@
                             {/if}
                             {if $user}
                                 <div class="mb-3 row mx-0">
-                                    <label class="col-md-4 col-form-label form-control-sm" for="filter_poster">{tr}Containing posts by{/tr}</label>
+                                    <label class="col-md-4  col-form-label col-form-label-sm" for="filter_poster">{tr}Containing posts by{/tr}</label>
                                     <div class="col-md-8">
                                         <select id="filter_poster" class="form-control form-control-sm" name="poster">
                                             <option value=""{if empty($smarty.request.poster)} selected="selected"{/if}>
@@ -990,7 +993,7 @@
                                 </div>
                             {/if}
                             <div class="mb-3 row mx-0">
-                                <label class="col-md-4 col-form-label form-control-sm" for="filter_type">{tr}Type{/tr}</label>
+                                <label class="col-md-4  col-form-label col-form-label-sm" for="filter_type">{tr}Type{/tr}</label>
                                 <div class="col-md-8">
                                     <select id="filter_type" name="filter_type" class="form-control form-control-sm">
                                         <option value=""{if empty($smarty.request.filter_type)}selected="selected"{/if}>
@@ -1012,7 +1015,7 @@
                                 </div>
                             </div>
                             <div class="mb-3 row mx-0">
-                                <label class="col-md-4 col-form-label form-control-sm" for="filter_replies">{tr}Replies{/tr}</label>
+                                <label class="col-md-4 col-form-label col-form-label-sm" for="filter_replies">{tr}Replies{/tr}</label>
                                 <div class="col-md-8">
                                     <select id="filter_replies" name="reply_state" class="form-control form-control-sm">
                                         <option value=""{if empty($smarty.request.reply_state)} selected="selected"{/if}>

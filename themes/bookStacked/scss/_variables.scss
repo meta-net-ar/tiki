@@ -74,8 +74,8 @@ $green-300: tint-color($green, 40%) !default;
 $primary: #206ea7;
 $secondary:     $gray-600 !default;
 $success:       $green !default;
-$info: $primary;
-$warning:       $yellow !default;
+$info:          #087E96; // $primary;
+$warning:       #946F00; // $yellow !default;
 $danger:        $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-900 !default;
@@ -213,6 +213,7 @@ $input-color:                           var(--#{$prefix}body-color) !default;
 $input-border-color:                    var(--#{$prefix}border-color) !default;
 
 // Form validation
+
 // Z-index master list
 // Navs (four below added for Bootstrap 53)
 $nav-link-color:                    var(--#{$prefix}link-color);

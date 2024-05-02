@@ -19,7 +19,7 @@ class Services_ApiBridge
     protected $routes;
     protected $context;
 
-    public function __construct(JitFilter $jitRequest = null)
+    public function __construct(JitFilter|null $jitRequest = null)
     {
         $this->jitRequest = $jitRequest;
         $this->routes = $this->prepareRoutes();

@@ -8,7 +8,7 @@
         </div>
     </div>
     <fieldset id="Comments">
-        <legend>{tr}Site-wide features{/tr}</legend>
+        <legend class="h3">{tr}Site-wide features{/tr}</legend>
         <div class="admin featurelist">
             {preference name=feature_comments_moderation}
             {preference name=feature_comments_locking}
@@ -29,7 +29,7 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{tr}Display options{/tr}</legend>
+        <legend class="h3">{tr}Display options{/tr}</legend>
         <div class="admin featurelist">
             {preference name=comments_per_page}
             {preference name=comments_sort_mode}
@@ -43,7 +43,7 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{tr}Annotations{/tr}</legend>
+        <legend class="h3">{tr}Annotations{/tr}</legend>
         {preference name=feature_inline_comments}
         <div class="adminoptionboxchild" id="feature_inline_comments_childcontainer">
             {preference name=comments_inline_annotator}
@@ -53,7 +53,7 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{tr}Using comments in various features{/tr}</legend>
+        <legend class="h3">{tr}Using comments in various features{/tr}</legend>
         {preference name=feature_article_comments}
         {preference name=feature_wiki_comments}
         <div class="adminoptionboxchild" id="feature_wiki_comments_childcontainer">

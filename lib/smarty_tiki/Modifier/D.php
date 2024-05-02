@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use Kint\Kint;
+use Kint\Parser\Parser;
+
 /**
  * If installed, this modifier will use Kint (from https://github.com/kint-php/kint/)
  *
@@ -23,28 +26,28 @@ class D
     {
         if (is_callable('Kint::dump')) {
             // add this function as an alias of Kint::dump
-            \Kint::$aliases[] = 'smarty_modifier_d';
+            Kint::$aliases[] = 'smarty_modifier_d';
             // So far SmartyKin just replaces the ugly
-            \Kint::$plugins[] = new SmartyKint();
+            Kint::$plugins[] = new SmartyKint();
 
             switch ($modifier) {
                 case '!':                   // Expand all data in this dump automatically
-                    ! \Kint::dump($var);
+                    ! Kint::dump($var);
                     break;
                 case '+':                   // Disable the depth limit in this dump
-                    +\Kint::dump($var);
+                    +Kint::dump($var);
                     break;
                 case '-':                   // Clear buffered output and flush after dump
-                    -\Kint::dump($var);
+                    -Kint::dump($var);
                     break;
                 case '@':                   // Return the output of this dump instead of echoing it
-                    @\Kint::dump($var);
+                    @Kint::dump($var);
                     break;
                 case '~':                   // Use the text renderer for this dump
-                    ~\Kint::dump($var);
+                    ~Kint::dump($var);
                     break;
                 default:
-                    \Kint::dump($var);
+                    Kint::dump($var);
             }
         } else {
             var_dump($var);
@@ -53,21 +56,28 @@ class D
 }
 
 if (class_exists('Kint')) {
-    class SmartyKint extends \Kint\Parser\Plugin
+    class SmartyKint implements \Kint\Parser\PluginInterface
     {
-        public function getTypes()
+        protected $parser;
+
+        public function setParser(Parser $p): void
+        {
+            $this->parser = $p;
+        }
+
+        public function getTypes(): array
         {
             return ['integer', 'string', 'array', 'object'];
         }
 
-        public function getTriggers()
+        public function getTriggers(): int
         {
-            return \Kint\Parser\Parser::TRIGGER_BEGIN;
+            return Parser::TRIGGER_BEGIN;
         }
 
-        public function parse(&$var, \Kint\Zval\Value &$o, $trigger)
+        public function parse(&$var, \Kint\Zval\Value &$o, $trigger): void
         {
-            if ($trigger === \Kint\Parser\Parser::TRIGGER_BEGIN) {
+            if ($trigger === Parser::TRIGGER_BEGIN) {
                 // we begin the Kint dump
                 $replace = preg_replace('/.*\[\'(.*)\']->value/', '$$1', $o->access_path);
                 // if the path of the var is $_smarty_tpl->tpl_vars[...]->value then just use the smarty var name for the title

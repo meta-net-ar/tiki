@@ -24,8 +24,12 @@ if (
     $cookietab = 2;
 } elseif (isset($_REQUEST['route']) && $_REQUEST['route'] && empty($_POST['load_options'])) {
     $item = Tiki\CustomRoute\Item::load($_REQUEST['route']);
-    $route = $item->toArray();
-    $cookietab = '2';
+    if (! empty($item)) {
+        $route = $item->toArray();
+        $cookietab = '2';
+    } else {
+        $access->display_error(null, tra("Custom route cannot be found"), '404');
+    }
 } else {
     $item = $controller->populateFromRequest($_POST);
     $route = $item->toArray();

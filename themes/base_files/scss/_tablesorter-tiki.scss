@@ -198,7 +198,7 @@ div.ts-wrapperdiv {
     }
     select, input {
         font-size: smaller;
-        border: none;
+        border: var(--bs-border-width) solid var(--bs-border-color);
     }
     div.ts-pager {
         margin-top: 3px;

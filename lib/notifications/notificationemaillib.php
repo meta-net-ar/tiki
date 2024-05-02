@@ -186,7 +186,9 @@ function sendForumEmailNotification(
         $smarty->assign('forumId', $forum_info["forumId"]);
         if ($event == "forum_post_topic") {
             $smarty->assign('new_topic', 'y');
+            $smarty->assign('threadId', $threadId);
         } else {
+            $smarty->assign('new_topic', 'n');
             $smarty->assign('threadId', $threadId);
         }
         if ($parentId) {
@@ -445,7 +447,7 @@ function sendEmailNotification($watches, $dummy, $subjectTpl, $subjectParam, $tx
             $mail->setHeader($headerName, $headerValue);
         }
 
-        $smarty->assign('watchId', $watch['watchId']);
+        $smarty->assign('watchId', $watch['watchId'] ?? null);
         if ($watch['user']) {
             $mail->setUser($watch['user']);
         }

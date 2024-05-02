@@ -280,8 +280,8 @@ $logslib = TikiLib::lib('logs');
 $client_charset = '';
 
 // next block checks if there is a local.php and if we can connect through this.
-// sets $dbcon to false if there is no valid local.php
-$dbcon = (bool) TikiDb::get();
+// sets $dbconn to false if there is no valid local.php
+$dbconn = (TikiDb::isAvailable()) ? TikiDb::get() : false;
 $installer = null;
 if (file_exists($local)) {
     // include the file to get the variables
@@ -310,9 +310,9 @@ if (file_exists($local)) {
         $dbversion_tiki = '2.0';
     }
 
-    $dbcon = false;
+    $dbconn = false;
     $smarty->assign('resetdb', 'n');
-    if ($dbcon = initTikiDB($api_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
+    if ($dbconn = initTikiDB($api_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
         $smarty->assign('resetdb', isset($_POST['reset']) ? 'y' : 'n');
         $installer = Installer::getInstance();
         if (! $client_charset_forced) {
@@ -321,7 +321,7 @@ if (file_exists($local)) {
                 . '; dbname=' . $dbs_tiki . '; dbuser=' . $user_tiki);
         }
     }
-} elseif ($dbcon) {
+} elseif ($dbconn) {
     $installer = Installer::getInstance();
     TikiDb::get()->setErrorHandler(new \Tiki\Installer\InstallerDatabaseErrorHandler());
 } else {
@@ -343,7 +343,7 @@ if (file_exists($local)) {
     }
 }
 
-if ($dbcon) {
+if ($dbconn) {
     $admin_acc = has_admin($api_tiki);
 }
 
@@ -359,7 +359,7 @@ if ($admin_acc == 'n') {
 // and the admin is not logged
 if (
     (
-        ! $dbcon
+        ! $dbconn
         || (
             isset($_POST['resetdb'])
             && $_POST['resetdb'] == 'y'
@@ -372,10 +372,10 @@ if (
     ) && isset($_POST['dbinfo'])
 ) {
     if (! empty($_POST['user']) && strlen($_POST['user']) > 80) {
-        $dbcon = false;
+        $dbconn = false;
         Feedback::error(tra('Invalid database user.'));
     } elseif (empty($_POST['name'])) {
-        $dbcon = false;
+        $dbconn = false;
         Feedback::error(tra('No database name specified'));
     } else {
         if (isset($_POST['force_utf8'])) {
@@ -389,7 +389,7 @@ if (
             && ! empty($_POST['root_user'])
             && ! empty($_POST['root_pass'])
         ) {
-            $dbcon = initTikiDB(
+            $dbconn = initTikiDB(
                 $api_tiki,
                 $_POST['host'],
                 $_POST['root_user'],
@@ -399,7 +399,7 @@ if (
                 $dbTiki
             );
         } else {
-            $dbcon = initTikiDB(
+            $dbconn = initTikiDB(
                 $api_tiki,
                 $_POST['host'],
                 $_POST['user'],
@@ -410,7 +410,7 @@ if (
             );
         }
 
-        if ($dbcon) {
+        if ($dbconn) {
             if (
                 ! empty($_POST['create_new_user'])
                 && ! empty($_POST['root_user'])
@@ -442,7 +442,7 @@ if (isset($_POST['useInnoDB'])) {
     }
 }
 
-if ($dbcon) {
+if ($dbconn) {
     $smarty->assign('dbcon', 'y');
     $smarty->assign('dbname', isset($dbs_tiki) ? $dbs_tiki : null);
 } else {
@@ -453,7 +453,7 @@ if ($dbcon) {
 $smarty->assign('tikidb_created', false);
 $smarty->assign('tikidb_is20', false);
 
-if ($dbcon) {
+if ($dbconn) {
     $has_tiki_db = has_tiki_db();
     $smarty->assign('tikidb_created', $has_tiki_db);
     $oldPerms = $installer->getOne('SELECT COUNT(*) FROM `users_permissions` WHERE `permDesc` = \'Can view categorized items\'');
@@ -489,7 +489,7 @@ $smarty->assign('logged', $logged);
 $smarty->assign('installer', $installer);
 // Installation steps
 if (
-    $dbcon
+    $dbconn
     && isset($_SESSION["install-logged-$multi"])
     && $_SESSION["install-logged-$multi"] == 'y'
 ) {
@@ -830,7 +830,7 @@ if ($install_step == '4') {
     }
 
     $value = '';
-    if (($db = TikiDb::get()) && ($result = $db->fetchAll('show variables like "character_set_database"'))) {
+    if (TikiDb::isAvailable() && ($db = TikiDb::get()) && ($result = $db->fetchAll('show variables like "character_set_database"'))) {
         $res = reset($result);
         $variable = array_shift($res);
         $value = array_shift($res);

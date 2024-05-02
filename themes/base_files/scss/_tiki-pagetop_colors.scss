@@ -138,7 +138,7 @@
     }
 }
 
-.layout_social/*:not(.tiki-admin)*/ {
+.layout_social:not(.tiki-admin) {
     header .top_modules,
     header .top_modules .navbar,
     .topbar,

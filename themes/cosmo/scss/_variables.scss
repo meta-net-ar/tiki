@@ -1,7 +1,5 @@
-// Cosmo 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/cosmo/_variables.scss with
+// Cosmo 5.3.3 -- This overrides and adds to node_modules/bootswatch/dist/cosmo/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-
-$theme: "cosmo" !default;
 
 //
 // Color system
@@ -30,11 +28,11 @@ $green:   #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guide
 $teal:    #20c997 !default;
 $cyan:    #9954bb !default;
 
-$primary:       $blue !default;
+$primary:       #207CA7; // $blue !default;
 $secondary:     $gray-800 !default;
-$success:       $green !default;
+$success:       #558000; // $green !default;
 $info:          $cyan !default;
-$warning:       $yellow !default;
+$warning:       #B35F00; // $yellow !default;
 $danger:        $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
@@ -42,29 +40,23 @@ $dark:          $gray-800 !default;
 $green-300: tint-color($green, 40%) !default; // Bootstrap 53
 $red-300: tint-color($red, 40%) !default; // Bootstrap 53
 
-$min-contrast-ratio:   2.6 !default;
-
 // Options
 $prefix: bs-;
-$enable-rounded: false !default;
 
 // Body
 
-$body-color:    $gray-800 !default;
-
 // Links
+$link-color: #2DA1D7;
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
 
 // Components
 $border-color: $gray-400;
 
 // Typography
+
 $font-family-sans-serif:        Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
 $font-size-base:                1.1rem;
 
-// stylelint-disable-next-line value-keyword-case
-$font-family-sans-serif:    "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$headings-font-weight:      400 !default;
 
 $text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 --$gray-800; // Updated for Tiki (all of the following were changed from $gray-600)
 $blockquote-footer-color:     var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 --$gray-800; // Updated for Tiki
@@ -75,10 +67,12 @@ $list-group-disabled-color:   var(--#{$prefix}secondary-color) !default; // Depr
 $nav-link-disabled-color:     var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- $gray-800; // Updated for Tiki
 $pagination-disabled-color:   var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- $gray-800; // Updated for Tiki
 
+// Form validation
+$form-valid-color: #70A800;
+$form-invalid-color: #F50000;
+
 // Navbar
 
-$navbar-dark-hover-color:       rgba($white, 1) !default;
-$navbar-light-hover-color:      rgba($black, .9) !default;
 
 // Accordion (added for TIki)
 $accordion-button-active-bg:             $blue;
@@ -86,13 +80,10 @@ $accordion-button-active-color:          #fff;
 
 // Alerts
 
-$alert-border-width:            0 !default;
-
 // Progress bars
-$progress-height:               .5rem !default;
 
 // Code
-$code-color:                        $body-color; // $pink !default; // Bootstrap 5.3
+$code-color:                        #adafea; // $body-color; // $pink !default; // Bootstrap 5.3
 
 //--------------------------- Tiki SCSS variables
 

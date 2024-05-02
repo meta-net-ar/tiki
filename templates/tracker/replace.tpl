@@ -18,8 +18,8 @@
                 <textarea class="form-control" name="description" id="description" cols="40">{$info.description|escape}</textarea>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">
+                <input type="checkbox" class="form-check-input" name="descriptionIsParsed" id="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">
+                <label class="form-check-label" for="descriptionIsParsed">
                     {tr}Description is wiki-parsed{/tr}
                 </label>
             </div>
@@ -46,9 +46,9 @@
         {/accordion_group}
         {accordion_group title="{tr}Features{/tr}"}
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="useRatings" value="1"
+                <input type="checkbox" class="form-check-input" name="useRatings" id="useRatings" value="1"
                         {if $info.useRatings eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="useRatings">
                     {tr}Allow ratings (deprecated, use rating field){/tr}
                 </label>
             </div>
@@ -57,51 +57,52 @@
                 <input class="form-controls" type="text" name="ratingOptions" id="ratingOptions" value="{$info.ratingOptions|default:'-2,-1,0,1,2'|escape}">
             </div>
             <div class="form-check depends" data-on="useRatings">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showRatings" value="1"
+                <input type="checkbox" class="form-check-input" name="showRatings" id="showRatings" value="1"
                         {if $info.showRatings eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" id="showRatings">
                     {tr}Show ratings in listing{/tr}
                 </label>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="useComments" value="1"
+                <input type="checkbox" class="form-check-input" name="useComments" id="useComments" value="1"
                         {if $info.useComments eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="useComments">
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showComments" value="1"
+            <div class="form-check depends" data-on="useComments"
+                <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="showComments">
                     {tr}Show comments in listing{/tr}
                 </label>
             </div>
             <div class="form-check depends" data-on="useComments">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showLastComment" value="1"
+                <input type="checkbox" class="form-check-input" name="showLastComment" id="showLastComment" value="1"
                         {if $info.showLastComment eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="showLastComment">
                     {tr}Display last comment author and date{/tr}
                 </label>
             </div>
             <div class="form-check depends" data-on="useComments">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="saveAndComment" value="1"
-                            {if $info.saveAndComment eq 'y'} checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" name="saveAndComment" id="saveAndComment" value="1"
+                        {if $info.saveAndComment eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="saveAndComment">
+
                     {tr}Save and Comment{/tr}
                 </label>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="useAttachments" value="1"
+                <input type="checkbox" class="form-check-input" name="useAttachments" id="useAttachments" value="1"
                         {if $info.useAttachments eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="useAttachments">
                     {tr}Allow attachments (deprecated, use files field){/tr}
                 </label>
             </div>
             <div class="form-check depends" data-on="useAttachments">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showAttachments" value="1"
+                <input type="checkbox" class="form-check-input" name="showAttachments" id="showAttachments" value="1"
                         {if $info.showAttachments eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="showAttachments">
                     {tr}Display attachments in listing{/tr}
                 </label>
             </div>
@@ -109,8 +110,8 @@
                 <legend>{tr}Attachment attributes (sortable){/tr}</legend>
                 {foreach from=$attachmentAttributes key=name item=att}
                     <div class="form-check">
-                        <label>
-                            <input type="checkbox" class="form-check-input" name="orderAttachments[]" value="{$name|escape}" {if !empty($att.selected)} checked="checked"{/if}>
+                        <input type="checkbox" class="form-check-input" name="orderAttachments[]" id="orderAttachments[]" value="{$name|escape}" {if !empty($att.selected)} checked="checked"{/if}>
+                        <label class="form-check-label" for="orderAttachments[]">
                             {$att.label|escape}
                         </label>
                     </div>
@@ -126,16 +127,16 @@
                 </div>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showStatus" value="1"
+                <input type="checkbox" class="form-check-input" name="showStatus" id="showStatus" value="1"
                         {if $info.showStatus eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="showStatus">
                     {tr}Show status{/tr}
                 </label>
             </div>
             <div class="form-check depends" data-on="showStatus">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="showStatusAdminOnly" value="1"
+                <input type="checkbox" class="form-check-input" name="showStatusAdminOnly" id="showStatusAdminOnly" value="1"
                         {if $info.showStatusAdminOnly eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="showStatusAdminOnly">
                     {tr}Show status to tracker administrator only{/tr}
                 </label>
             </div>
@@ -276,6 +277,20 @@
                 </select>
             </div>
             <div class="mb-3 row mx-0">
+                <div class="mb-3">
+                    <label for="altOpenStatus">{tr}Open alternative label{/tr}</label>
+                    <input class="form-control" type="text" name="altOpenStatus" id="altOpenStatus" value="{$info.altOpenStatus|escape}">
+                </div>
+                <div class="mb-3">
+                    <label for="altPendingStatus">{tr}Pending alternative label{/tr}</label>
+                    <input class="form-control" type="text" name="altPendingStatus" id="altPendingStatus" value="{$info.altPendingStatus|escape}">
+                </div>
+                <div>
+                    <label for="altClosedStatus">{tr}Closed alternative label{/tr}</label>
+                    <input class="form-control" type="text" name="altClosedStatus" id="altClosedStatus" value="{$info.altClosedStatus|escape}">
+                </div>
+            </div>
+            <div class="mb-3 row mx-0">
                 <label for="modItemStatus">{tr}Modified item status{/tr}</label>
                 <select name="modItemStatus" id="modItemStatus" class="form-control">
                     <option value="">{tr}No change{/tr}</option>
@@ -363,9 +378,9 @@
         {/accordion_group}
         {accordion_group title="{tr}Permissions{/tr}"}
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="userCanSeeOwn" value="1"
-                        {if $info.userCanSeeOwn eq 'y'}checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" name="userCanSeeOwn" id="userCanSeeOwn" value="1"
+                                           {if $info.userCanSeeOwn eq 'y'}checked="checked"{/if}>
+                <label class="form-check-label" for="userCanSeeOwn">
                     {tr}User can see his own items{/tr}
                 </label>
                 <div class="description form-text mb-4">
@@ -374,9 +389,9 @@
                 </div>
             </div>
             <div class="form-check">
-                <label>
-                    <input type="checkbox" class="form-check-input" name="groupCanSeeOwn" value="1"
-                        {if $info.groupCanSeeOwn eq 'y'}checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" name="groupCanSeeOwn" id="groupCanSeeOwn" value="1"
+                                           {if $info.groupCanSeeOwn eq 'y'}checked="checked"{/if}>
+                <label class="form-check-label" for="groupCanSeeOwn">
                     {tr}Group can see their own items{/tr}
                 </label>
                 <div class="description form-text mb-4">

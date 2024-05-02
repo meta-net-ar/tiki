@@ -1,6 +1,8 @@
 //Custom styles for the FiveAlive Kiwi option theme.
 $tiki-top-bg: linear-gradient(to right, #bebc24 0%, #ded319 53%, #e7d915 100%);
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
+
+@import "../../../scss/variables";
 // Color system
 
 // scss-docs-start gray-color-variables
@@ -287,11 +289,12 @@ $bg-dark-info: #00DAE6;
 }
 
 header.navbar.fixed-top {
-    --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-right-width: 0px;
-    --tiki-fixed-top-border-bottom-width: 5px;
-    --tiki-fixed-top-border-left-width: 0px;
-    --tiki-topbar-light-border-color: #000;
+//    --tiki-fixed-top-border-top-width: 0px;
+//    --tiki-fixed-top-border-right-width: 0px;
+//    --tiki-fixed-top-border-bottom-width: 5px;
+//    --tiki-fixed-top-border-left-width: 0px;
+//    --tiki-topbar-light-border-color: #000;
+    --tiki-top-border-width: 0 0 5px 0;
 }
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //

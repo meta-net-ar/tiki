@@ -135,12 +135,18 @@ class ObjectsExportCommand extends Command
                 'license' => null
                 ];
                 $outputArray['url'] = $objectRow['href'];
-                $outputArray['title'] = $objectRow['name'];
                 $data = $source->getDocument($id, $factory);
+                $outputArray['title'] = $data['title']->getValue();//Should correspond to $objectRow['name'];, but objectRow may be out of date
                 //$output->writeln(print_r($data, true));
                 //$output->writeln(print_r($data['wiki_content'], true));
                 $globalFields = $source->getGlobalFields();
-                $content = \Search_Indexer::getGlobalContent($data, $globalFields);
+
+                $globalContent = \Search_Indexer::getGlobalContent($data, $globalFields);
+                // A bit of a hack.  We add the title fiels at the end so it's available to indexing systems.
+                // But textualization uses both title and text during chunting (prepends the title).  So we remove the title we know the universal index addad at the end of content.
+                $content =
+                str_replace($data['title']->getValue(), '', $globalContent);
+
                 $outputArray['text'] = $content;
                 $outputJson = json_encode($outputArray);
                 //$output->writeln(print_r($data, true));

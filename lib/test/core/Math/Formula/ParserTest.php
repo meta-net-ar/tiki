@@ -128,7 +128,7 @@ DOC;
         );
     }
 
-    public function badStrings()
+    public static function badStrings()
     {
         return [
             'noOpening' => ['test'],

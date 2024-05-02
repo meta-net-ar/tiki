@@ -203,26 +203,25 @@ function wikiplugin_ajaxload($data, $params)
     });';
             }
         }
-
-        TikiLib::lib('header')->add_jsfile("vendor_bundled/vendor/npm-asset/dompurify/dist/purify.min.js");
-        TikiLib::lib('header')->add_jq_onready('
-(function ($) {
-    var $el = $("' . $id . '");
-    $el.tikiModal(tr("Loading..."));
-    $.ajax({
-        url: "' . $params['url'] . '",
-        dataType: "html",
-        method: "GET"
-    }).done(function(data) {
-        data = DOMPurify.sanitize(data);
-      ' . $js . '
-      ' . $data . '
-      $el.html(data);
-    }).fail(function() {
-    }).always(function () {
-        $el.tikiModal();
-    });
-})(jQuery);');
+        TikiLib::lib('header')->add_js_module('
+        import DOMPurify from "dompurify";
+        (function ($) {
+            var $el = $("' . $id . '");
+            $el.tikiModal(tr("Loading..."));
+            $.ajax({
+                url: "' . $params['url'] . '",
+                dataType: "html",
+                method: "GET"
+            }).done(function(data) {
+                data = DOMPurify.sanitize(data);
+            ' . $js . '
+            ' . $data . '
+            $el.html(data);
+            }).fail(function() {
+            }).always(function () {
+                $el.tikiModal();
+            });
+        })(jQuery);');
     } else {
         $params['src'] = $params['url'];
         unset($params['url'], $params['mode'], $params['selector'], $params['target'], $params['absolutelinks']);

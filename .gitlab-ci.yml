@@ -20,9 +20,12 @@ variables:
   #The schemas dumped for prior tikis on https://gitlab.com/tikiwiki/tikiwiki-ci-databases have explicit COLLATION() statements for each table column.  Later versions of mysql (8.0.11+, but not sure) will not dump the same whits explicit collations.
   #Running php doc/devtools/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into doc/devtool/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
 
-  MARIADB_10_IMAGE: mariadb:10.3.0
-  MYSQL_8_IMAGE: mysql:8.0.29
-  MYSQL_5_IMAGE: mysql:5.6
+  MARIADB_IMAGE_NEWEST_SUPPORTED: mariadb:10.11.7
+  MARIADB_IMAGE_OLDEST_SUPPORTED: mariadb:10.5.11
+  MYSQL_IMAGE_NEWEST_SUPPORTED: mysql:8.0.36
+  MYSQL_IMAGE_OLDEST_SUPPORTED: mysql:8.0.29
+  #Only for older version upgrade tests these days
+  MYSQL_5_IMAGE: mysql:5.7.44
   NODE_IMAGE: node:18
   MANTICORE_DSN: http://manticore
   # You can set USE_GITLAB_PROXY to "true" in your project configuration to use the gitlab dependency proxy. (default not using as it may cause issues for some accounts)
@@ -210,6 +213,20 @@ phplint82:
     paths:
       - phplint.cache
 
+phplint83:
+  stage: lint
+  image: ${DEPENDENCY_PROXY_PREFIX}rjsmelo/ubuntu-php:8.3-qa
+  script:
+    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint -n --configuration=doc/devtools/phplint.yml
+  dependencies:
+    - composer
+  needs:
+    - composer
+  cache:
+    key: phplint83
+    paths:
+      - phplint.cache
+
 smarty-lint:
   stage: lint
   needs:
@@ -390,7 +407,7 @@ composer-could-update-lock:
   <<: *template-tiki-schema-upgrade
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      command: [ "--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+      command: [ "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
       alias: mysql
 
 db-upgrade-22-mariadb:
@@ -398,55 +415,31 @@ db-upgrade-22-mariadb:
   variables:
     DBFILE: ci_22.sql
     DBVER: 22
-    IMAGE: ${MARIADB_10_IMAGE}
+    IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
 
-db-upgrade-22-mysql8:
+db-upgrade-22-mysql:
   <<: *template-tiki-schema-upgrade-mysql8
   variables:
     DBFILE: ci_22.sql
     DBVER: 22
-    IMAGE: ${MYSQL_8_IMAGE}
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
 
-db-upgrade-22:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_22.sql
-    DBVER: 22
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-21-mysql8:
+db-upgrade-21-mysql:
   <<: *template-tiki-schema-upgrade-mysql8
   variables:
     DBFILE: ci_21.sql
     DBVER: 21
-    IMAGE: ${MYSQL_8_IMAGE}
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
 
-db-upgrade-21:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_21.sql
-    DBVER: 21
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-20-mysql8:
+db-upgrade-20-mysql:
   <<: *template-tiki-schema-upgrade-mysql8
   variables:
     DBFILE: ci_20.sql
     DBVER: 20
-    IMAGE: ${MYSQL_8_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-20:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_20.sql
-    DBVER: 20
-    IMAGE: ${MYSQL_5_IMAGE}
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
 
 db-upgrade-19:
@@ -470,7 +463,7 @@ db-upgrade-18-lts-myisam:
   variables:
     DBFILE: ci_18.sql
     DBVER: 18
-    IMAGE: mysql:5.5
+    IMAGE: ${MYSQL_5_IMAGE}
     ENGINE: MyISAM
 
 sql-engine-conversion:
@@ -480,7 +473,7 @@ sql-engine-conversion:
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_5_IMAGE}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
       alias: mysql
   script:
     - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
@@ -518,7 +511,7 @@ console-php-works:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${IMAGE}
   services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_5_IMAGE}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_NEWEST_SUPPORTED}
       alias: mysql
     - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
       alias: elasticsearch
@@ -533,7 +526,7 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $dbversion_tiki = "21.0"; $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d --bootstrap vendor_bundled/vendor/autoload.php display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always
     paths:
@@ -542,10 +535,10 @@ console-php-works:
       junit: report.xml
     expire_in: 2 days
 
-.template-unit-tests-mysql8: &template-unit-tests-mysql8
+.template-unit-tests-mysql-oldest-supported: &template-unit-tests-mysql-oldest-supported
   <<: *template-unit-tests
   services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_8_IMAGE}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_OLDEST_SUPPORTED}
       command: [ "--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off" ]
       alias: mysql
     - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
@@ -553,10 +546,21 @@ console-php-works:
     - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:dev
       alias: manticore
 
-.template-unit-tests-mariadb: &template-unit-tests-mariadb
+.template-unit-tests-mysql-newest-supported: &template-unit-tests-mysql-newest-supported
   <<: *template-unit-tests
   services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_10_IMAGE}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
+      command: [ "--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off" ]
+      alias: mysql
+    - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
+      alias: elasticsearch
+    - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:dev
+      alias: manticore
+
+.template-unit-tests-mariadb-oldest-supported: &template-unit-tests-mariadb-oldest-supported
+  <<: *template-unit-tests
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_OLDEST_SUPPORTED}
       #command: [ "--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off" ]
       alias: mysql
     - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
@@ -564,31 +568,41 @@ console-php-works:
     - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:dev
       alias: manticore
 
-# Run unit tests once for each php version supported
-
-unit-tests-81:
+.template-unit-tests-mariadb-newest-supported: &template-unit-tests-mariadb-newest-supported
   <<: *template-unit-tests
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      #command: [ "--default-authentication-plugin=mysql_native_password", "--explicit-defaults-for-timestamp=off" ]
+      alias: mysql
+    - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
+      alias: elasticsearch
+    - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:dev
+      alias: manticore
+
+# Run unit tests once, must cover at least min and max php version supported, and min and max myslq/mariadb version supported
+
+unit-tests-phpmin-mysqlmin:
+  <<: *template-unit-tests-mysql-oldest-supported
   variables:
     IMAGE: rjsmelo/ubuntu-php:8.1-qa
   allow_failure: false
 
-unit-tests-82:
-  <<: *template-unit-tests
+unit-tests-php82-mysqlmax:
+  <<: *template-unit-tests-mysql-newest-supported
   variables:
     IMAGE: rjsmelo/ubuntu-php:8.2-qa
   allow_failure: false
 
-# Run unit tests at least once for any mysql/mariadb version supported
-unit-tests-81-mysql8:
-  <<: *template-unit-tests-mysql8
+unit-tests-phpmin-mariadbmin:
+  <<: *template-unit-tests-mariadb-oldest-supported
   variables:
     IMAGE: rjsmelo/ubuntu-php:8.1-qa
   allow_failure: false
 
-unit-tests-81-mariadb:
-  <<: *template-unit-tests-mariadb
+unit-tests-phpmax-mariadbmax:
+  <<: *template-unit-tests-mariadb-newest-supported
   variables:
-    IMAGE: rjsmelo/ubuntu-php:8.2-qa
+    IMAGE: rjsmelo/ubuntu-php:8.3-qa
   allow_failure: false
 
 #

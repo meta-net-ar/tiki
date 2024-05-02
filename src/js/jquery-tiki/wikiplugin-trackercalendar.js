@@ -7,8 +7,7 @@ import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import moment from "moment";
 
-$.fn.setupFullCalendar = function(tcPluginParams)
-{
+$.fn.setupFullCalendar = function (tcPluginParams) {
     this.each(function () {
         let cal = this;
         $(cal).tikiModal(tr("Loading..."));
@@ -27,23 +26,23 @@ $.fn.setupFullCalendar = function(tcPluginParams)
                 end = start;
             }
 
-            request['fields~' + tcPluginParams.begin] = moment(start).unix() + (start.getTimezoneOffset() * 60);
-            request['fields~' + tcPluginParams.end] = moment(end).unix() + (end.getTimezoneOffset() * 60);
+            request["fields~" + tcPluginParams.begin] = moment(start).unix() + start.getTimezoneOffset() * 60;
+            request["fields~" + tcPluginParams.end] = moment(end).unix() + end.getTimezoneOffset() * 60;
 
             let resource = event.getResources();
             if (resource.length) {
                 resource = resource[0];
             }
-            request['fields~' + tcPluginParams.resource] = resource.title;
+            request["fields~" + tcPluginParams.resource] = resource.title;
 
-            $.post($.service('tracker', 'update_item'), request, null, 'json');
+            $.post($.service("tracker", "update_item"), request, null, "json");
         };
 
         let slotLabelTimeFormat = {
-            hour: 'numeric',
-            minute: '2-digit',
+            hour: "numeric",
+            minute: "2-digit",
             meridiem: tcPluginParams.timeFormat,
-            hour12: tcPluginParams.timeFormat
+            hour12: tcPluginParams.timeFormat,
         };
         var calendar = new Calendar(cal, {
             plugins: [resourceTimelinePlugin, resourceTimeGridPlugin],
@@ -105,7 +104,7 @@ $.fn.setupFullCalendar = function(tcPluginParams)
                     coloringField: tcPluginParams.coloring,
                     filters: tcPluginParams.body,
                     maxRecords: tcPluginParams.maxEvents,
-                }),
+                })
             ),
             buttonText: {
                 resourceTimelineDay: tcPluginParams.labelResDay,
@@ -193,11 +192,12 @@ $.fn.setupFullCalendar = function(tcPluginParams)
                             open: function () {
                                 $("form:not(.no-ajax)", this)
                                     .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                    .on("submit",
+                                    .on(
+                                        "submit",
                                         ajaxSubmitEventHandler(function (data) {
                                             $(this).parents(".modal").modal("hide");
                                             calendar.refetchEvents();
-                                        }),
+                                        })
                                     );
                             },
                         });
@@ -238,11 +238,12 @@ $.fn.setupFullCalendar = function(tcPluginParams)
                             open: function () {
                                 $("form:not(.no-ajax)", this)
                                     .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                    .on("submit",
+                                    .on(
+                                        "submit",
                                         ajaxSubmitEventHandler(function (data) {
                                             $(this).parents(".modal").modal("hide");
                                             calendar.refetchEvents();
-                                        }),
+                                        })
                                     );
                             },
                         });
@@ -260,7 +261,7 @@ $.fn.setupFullCalendar = function(tcPluginParams)
 
         if (jqueryTiki.print_pdf_from_url !== "none") {
             $(function () {
-                $("#" + tcPluginParams.id).addFullCalendarPrint('#calendar-pdf-btn', calendar);
+                $("#" + tcPluginParams.id).addFullCalendarPrint("#calendar-pdf-btn", calendar);
             });
         }
     });

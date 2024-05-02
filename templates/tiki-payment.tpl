@@ -1,4 +1,4 @@
-{title help="Payment" admpage="payment"}{tr}Payment{/tr}{/title}
+{title help="Payments" admpage="payments"}{tr}Payments{/tr}{/title}
 
 {if isset($invoice)}
     <div class="mb-4">
@@ -50,45 +50,49 @@
                         <label class="col-sm-3 col-form-label text-end" for="description">
                             {tr}Description{/tr}
                         </label>
-                        <div class="col-sm-8 input-group">
+                        <div class="col-sm-8">
                             <input class="form-control" type="text" id="description" name="description">
                         </div>
                     </div>
                     <div class="tiki-form-group row">
-                        <label class="col-sm-3 col-form-label text-end" for="detail">
-                            {tr}Detail{/tr}
+                        <label class="col-sm-3 col-form-label text-end" for="details">
+                            {tr}Details{/tr}
                         </label>
-                        <div class="col-sm-8 input-group">
-                            <textarea class="form-control" id="detail" name="detail" style="width: 100%;" rows="6"></textarea>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" id="details" name="details" style="width: 100%;" rows="6"></textarea>
                         </div>
                     </div>
                     <div class="tiki-form-group row">
                         <label class="col-sm-3 col-form-label text-end" for="amount">
                             {tr}Amount{/tr}
                         </label>
-                        <div class="col-sm-8 input-group">
-                            <input type="text" id="amount" name="amount" class="form-control text-end">
-                            <span class="input-group-text">
-                                {$prefs.payment_currency|escape}
-                            </span>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input type="text" id="amount" name="amount" class="form-control text-end">
+                                <span class="input-group-text">
+                                    {$prefs.payment_currency|escape}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="tiki-form-group row">
                         <label class="col-sm-3 col-form-label text-end" for="payable">
                             {tr}Payable within{/tr}
                         </label>
-                    </div>
-                    <div class="col-sm-8 mb-3 input-group">
-                        <input type="text" id="payable" class="text-end form-control" name="payable" value="{$prefs.payment_default_delay|escape}">
-                        <span class="input-group-text">
-                            {tr}days{/tr}
-                        </span>
+                        <div class="col-sm-8 mb-3">
+                            <div class="input-group">
+                                <input type="text" id="payable" class="text-end form-control" name="payable" value="{$prefs.payment_default_delay|escape}">
+                                <span class="input-group-text">
+                                    {tr}days{/tr}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     {if $prefs.feature_categories eq 'y'}
                         {include file="categorize.tpl" labelcol=3 labelclass='text-end' inputcol=8 inputgroup=y}
                     {/if}
                     <div class="mb-3 row">
-                        <div class="col-sm-8 offset-sm-3 input-group">
+                        <div class="col-sm-8 offset-sm-3">
                             <input type="submit" class="btn btn-secondary" name="request" value="{tr}Request{/tr}">
                         </div>
                     </div>

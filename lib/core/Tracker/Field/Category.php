@@ -13,7 +13,7 @@
  */
 class Tracker_Field_Category extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, \Tracker\Field\IndexableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'e' => [
@@ -704,7 +704,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractField implements \Tr
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         global $prefs;
         $baseKey = $this->getBaseKey();
@@ -716,7 +716,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractField implements \Tr
         return $out;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         global $prefs;
 

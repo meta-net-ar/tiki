@@ -66,18 +66,17 @@
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
-.tiki .tiki-admin-top-nav-light,
-.tiki .tiki-admin-aside-nav-light {
+@mixin admin-nav-light {
     --tiki-admin-top-nav-color: #6E6E6E;
     --tiki-admin-top-nav-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-admin-top-nav-hover-bg: none;
     --tiki-admin-aside-nav-bg: rgba(246, 246, 246, 1);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    //--tiki-admin-dropdown-bg: var(--tiki-admin-top-nav-bg);
+    --tiki-admin-dropdown-bg: var(--tiki-admin-top-nav-bg);
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
-    //--tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     .accordion-item {
         border-color: transparent;
     }
@@ -99,8 +98,7 @@
 }
 
 // Dark navbar minus top nav
-.tiki .tiki-admin-top-nav-dark,
-.tiki .tiki-admin-aside-nav-dark {
+@mixin admin-nav-dark {
     --tiki-admin-top-nav-color: rgba(255, 255, 255, 1);
     --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.7);;
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
@@ -123,6 +121,20 @@
     }
 }
 
+// Color mode preference trumps L&F admin light navbar option
+[data-bs-theme=dark] {                              // dark color mode
+    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+        @include admin-nav-dark;                      // dark values
+    }
+}
+// Color mode preference trumps L&F admin dark navbar option
+[data-bs-theme=light] {                              // light color mode
+    .tiki .tiki-admin-top-nav-dark,
+    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
+        @include admin-nav-dark;                      // light values
+    }
+}
 
 // Dark top nav
 .tiki.tiki-admin .top_modules.navbar-dark-parent {

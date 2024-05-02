@@ -9,7 +9,7 @@ use Tiki\Package\ComposerManager;
 
 class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         global $prefs;
 
@@ -43,6 +43,19 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                         'description' => tr('Mask for accepted MIME types in the field'),
                         'filter' => 'text',
                         'legacy_index' => 1,
+                    ],
+                    'namefilter' => [
+                        'name' => tr('File Name Filter'),
+                        'description' => tr('Regular expression that uploaded file name should match in order to be accepted for upload.'),
+                        'filter' => 'text',
+                    ],
+                    'namefilterError' => [
+                        'name' => tr('File Name Filter Error Message'),
+                        'description' => tr('Text of the error message when file name filter doesn\'t match.'),
+                        'filter' => 'text',
+                        'depends' => [
+                            'field' => 'namefilter'
+                        ],
                     ],
                     'count' => [
                         'name' => tr('File Count'),
@@ -309,6 +322,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
             'firstfile' => $firstfile,
             'value' => $value,
             'filter' => $this->getOption('filter'),
+            'namefilter' => $this->getOption('namefilter'),
+            'namefilterError' => $this->getOption('namefilterError'),
             'image_x' => $image_x,
             'image_y' => $image_y,
             'gallerySearch' => $gallery_list,
@@ -424,7 +439,17 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                 }
                 $params['fromFieldId'] = $this->getConfiguration('fieldId');
                 $params['fromItemId'] = $this->getItemId();
-                $item = Tracker_Item::fromInfo($this->getItemData());
+                $itemData = $this->getItemData() ?? [];
+
+                if (! isset($itemData['trackerId'], $itemData['itemId'])) {
+                    $definition = $this->getFieldDefinition();
+
+                    if (isset($definition['trackerId'])) {
+                        $itemData['trackerId'] = $definition['trackerId'];
+                    }
+                }
+
+                $item = Tracker_Item::fromInfo($itemData);
                 $params['checkItemPerms'] = $item->canModify() ? 'n' : 'y';
 
                 if ($this->getOption('displayMode') == 'img') { // img
@@ -934,7 +959,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         if ($this->getOption('indexGeometry') && $this->getValue()) {
@@ -951,7 +976,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         }
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         if ($this->getOption('indexGeometry') && $this->getValue()) {
@@ -973,7 +998,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         }
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         if ($this->getOption('indexGeometry') && $this->getValue()) {
             return [];

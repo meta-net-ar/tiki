@@ -28,8 +28,8 @@
         <input type="hidden" name="totalSubmissions" value="1">
         <input type="hidden" name="galleryId" value="{$gal_info.galleryId}">
         <input type="hidden" name="returnUrl" value="{$smarty.server.REQUEST_URI|escape}">
-        <label>{tr}Title:{/tr} <input type="text" name="name[]" maxlength="250"></label>
-        <label>{tr}Description:{/tr} <input type="text" name="description[]" maxlength="250"></label>
+        <label for="name">{tr}Title:{/tr}</label> <input type="text" name="name[]" id="name" maxlength="250">
+        <label for="description">{tr}Description:{/tr}</label> <input type="text" name="description[]" id="description" maxlength="250">
         <br>
         <input size="16" name="userfile[]" type="file">
         <input type="submit" class="btn btn-primary btn-sm" name="upload" value="{tr}Upload{/tr}">

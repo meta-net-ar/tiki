@@ -414,7 +414,7 @@ $("#' . $id . '_showSelected").on("click", function () {
                     }
 
                     $html .= '<td class="checkBoxCell" style="white-space: nowrap;">';
-                    $html .= '<input type="checkbox" name="' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '"' .
+                    $html .= '<input type="checkbox" class="form-check-input" name="' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '"' .
                         ($cbxVal == 'y' ? ' checked="checked"' : '') . ' title="' . $cbxTit . '" />';
                     if ($cbxVal == 'y') {
                         $html .= '<input type="hidden" name="old_' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '" />';

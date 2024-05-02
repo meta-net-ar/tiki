@@ -54,6 +54,7 @@
                 data-vote="{$field.rating_options[i]}"
                 onclick="sendVote(this,{$item.itemId},{$field.fieldId},{$field.rating_options[i]});return false;"
                 class="tips" title=":{$smarty.capture.thisvote}"
+                id="star"
                 >{/if}
                     {icon name='star-selected' istyle="{$starselected}"}
                     {icon name='star' istyle="{$star}"}
@@ -65,7 +66,7 @@
         {/section}
         </span>
         {if !empty($item.itemId)}
-            <small class="tips" title=":{tr}Votes{/tr}">
+            <small class="tips" title=":{tr}Votes{/tr}" id="num-votes">
                 ({$field.numvotes})
             </small>
             {icon name='help' iclass='tips' ititle=":{$smarty.capture.stat}"}
@@ -74,6 +75,7 @@
             <a
                 href="{$smarty.server.REQUEST_URI}"
                 data-vote="0" onclick="sendVote(this,{$item.itemId},{$field.fieldId},'NULL');return false;"
+                id="unvote"
                 {if $field.my_rate === false or not in_array($field.my_rate, $field.rating_options)} style="display:none;"{/if}
             >{icon name='delete' iclass='tips unvote' ititle=":{tr}Remove your rating{/tr}"}</a>
         {/if}

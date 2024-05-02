@@ -174,6 +174,9 @@ class OAuthServerLib extends \TikiLib
             $request = $server->validateAuthenticatedRequest($request);
             return $request->getAttribute('oauth_access_token_id');
         } catch (OAuthServerException $e) {
+            if (TIKI_API) {
+                TikiLib::lib('logs')->api_add_action($e->getMessage(), $e->getCode());
+            }
             TikiLib::lib('access')->display_error(null, $e->getMessage() . ' ' . $e->getHint(), 403);
         }
     }

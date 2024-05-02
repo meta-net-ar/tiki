@@ -46,11 +46,12 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
             unset($output_modules[$page]['header_end']);
             unset($output_modules[$page]['content_start']);
             unset($output_modules[$page]['content_end']);
+            if (isset($output_modules[$page]['save_reminder'])) {
+                unset($output_modules[$page]['save_reminder']);
+            }
             if (isset($output_modules[$page]['header_css'])) {
                 unset($output_modules[$page]['header_css']);
-                $headerlib->add_cssfile(TIKI_VENDOR_BUNDLED_PATH . '/twbs/bootstrap-icons/font/bootstrap-icons.css');
                 $headerlib->add_cssfile('lib/cypht/site.css');
-                $headerlib->add_cssfile('lib/cypht/modules/tiki/site.css');
             }
             if (isset($output_modules[$page]['page_js'])) {
                 unset($output_modules[$page]['page_js']);

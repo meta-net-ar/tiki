@@ -171,10 +171,8 @@ class TikiDb_Table
      * Retrieve all fields from a single row
      * @param array $conditions
      * @param null  $orderClause
-     *
-     * @return mixed
      */
-    public function fetchFullRow(array $conditions, $orderClause = null)
+    public function fetchFullRow(array $conditions, $orderClause = null): array|false
     {
         return $this->fetchRow($this->all(), $conditions, $orderClause);
     }
@@ -223,10 +221,10 @@ class TikiDb_Table
     }
 
     /**
-     * Retrieves the two values from the table and generates a map from the key and the value
+     * In a single SQL request, retrieves an array of key/value pairs from the table and generates a map from the key and the value
      * @param       $keyField
      * @param       $valueField
-     * @param array $conditions
+     * @param array $conditions See buildConditions()
      * @param int   $numrows
      * @param int   $offset
      * @param null  $order
@@ -274,10 +272,8 @@ class TikiDb_Table
      * @param int   $numrows
      * @param int   $offset
      * @param null  $orderClause
-     *
-     * @return array|bool
      */
-    public function fetchAll(array $fields = [], array $conditions = [], $numrows = -1, $offset = -1, $orderClause = null)
+    public function fetchAll(array $fields = [], array $conditions = [], $numrows = -1, $offset = -1, $orderClause = null): array|false
     {
         $bindvars = [];
 

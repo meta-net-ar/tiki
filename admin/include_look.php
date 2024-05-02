@@ -11,7 +11,6 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 }
 global $prefs;
 $themelib = TikiLib::lib('theme');
-$csslib = TikiLib::lib('css');
 
 //handle case when changing the themes in the Look and Feel settings panel
 $a_theme = $prefs['theme'];
@@ -84,11 +83,11 @@ if ($prefs['feature_jquery'] == 'y') {
     //Setup theme layouts array matching themes and theme:options with their respective layouts
     $js .= 'var theme_layouts = ';
     foreach ($themes as $theme => $value) {
-        $theme_layouts[$theme] = $csslib->list_user_selectable_layouts($theme);
+        $theme_layouts[$theme] = ThemeLib::listUserSelectableLayouts($theme);
         $options = $themelib->list_theme_options($theme);
         if ($options) {
             foreach ($options as $option) {
-                $theme_layouts[$theme . ':' . $option] = $csslib->list_user_selectable_layouts($theme, $option);
+                $theme_layouts[$theme . ':' . $option] = ThemeLib::listUserSelectableLayouts($theme, $option);
             }
         }
     }

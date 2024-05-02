@@ -14,7 +14,7 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  * @package   Tiki
  * @subpackage    Language
  *
- * Generic methods for managing languages in Tiki
+ * Generic methods for managing languages in Tiki.  The concept of a language, lists of languages, etc.
  */
 class Language extends TikiDb_Bridge
 {
@@ -322,30 +322,6 @@ class Language extends TikiDb_Bridge
         }
 
         return $language;
-    }
-
-    /**
-     * Load additional language files that are located in theme folder
-     *
-     * @param $lang
-     * @param $themeName
-     * @throws Exception
-     */
-    public function loadThemeOverrides($lang, $themeName)
-    {
-        $langKey = "lang_$lang";
-
-        $themeLib = TikiLib::lib('theme');
-        $themePath = rtrim($themeLib->get_theme_path($themeName), '/');
-        $themeLangPath = implode('/', [$themePath, 'lang', $lang, 'language.php']);
-
-        if (file_exists($themeLangPath)) {
-            require $themeLangPath;
-
-            if (isset($language) && is_array($language)) {
-                $GLOBALS[$langKey] = array_merge($GLOBALS[$langKey] ?? [], $language);
-            }
-        }
     }
 
     /**

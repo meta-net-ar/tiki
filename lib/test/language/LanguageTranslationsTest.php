@@ -50,10 +50,11 @@ class LanguageTranslationsTest extends TikiTestCase
 
         copy(__DIR__ . '/fixtures/language_orig.php', $this->langDir . '/language.php');
 
+        /* Should no longer be needed - benoitg
         if (! isset($GLOBALS[$langKey])) {
             require_once('lib/init/tra.php');
             init_language($this->lang);
-        }
+        }*/
     }
 
     protected function tearDown(): void
@@ -62,8 +63,8 @@ class LanguageTranslationsTest extends TikiTestCase
             unlink($this->langDir . '/language.php');
         }
 
-        if (file_exists($this->langDir . '/custom.php')) {
-            unlink($this->langDir . '/custom.php');
+        if (file_exists($this->langDir . '/' . LANG_CUSTOM_PHP_BASENAME)) {
+            unlink($this->langDir . '/' . LANG_CUSTOM_PHP_BASENAME);
         }
 
         rmdir($this->langDir);
@@ -113,7 +114,8 @@ class LanguageTranslationsTest extends TikiTestCase
     public function testUpdateTransShouldNotInsertStringsThatWereNotChanged(): void
     {
         $this->obj->updateTrans('last modification time', 'data da última modificação');
-        $this->assertFalse(TikiDb::get()->getOne('SELECT `tran` FROM `tiki_language` WHERE `lang` = ? AND `source` = ?', [$this->lang, 'last modification time']));
+        $res = TikiDb::get()->getOne('SELECT `tran` FROM `tiki_language` WHERE `lang` = ? AND `source` = ?', [$this->lang, 'last modification time']);
+        $this->assertFalse($res);
     }
 
     public function testUpdateTransShouldMarkTranslationAsChanged(): void
@@ -255,7 +257,7 @@ class LanguageTranslationsTest extends TikiTestCase
         $this->assertEquals($expectedResult, $this->obj->getFileUntranslated());
     }
 
-    public function getAllTranslationsDataProvider(): array
+    public static function getAllTranslationsDataProvider(): array
     {
         $fileTranslations = [
                 "categorize" => ["source" => "categorize", "tran" => "categorizar"],
@@ -380,7 +382,7 @@ class LanguageTranslationsTest extends TikiTestCase
 
     public function testGetFileTranslations(): void
     {
-        copy(__DIR__ . '/fixtures/custom.php', $this->langDir . '/custom.php');
+        copy(__DIR__ . '/fixtures/custom.php', $this->langDir . '/' . LANG_CUSTOM_PHP_BASENAME);
         $this->assertCount(27, $this->obj->getFileTranslations());
     }
 
@@ -479,7 +481,7 @@ class LanguageTranslationsTest extends TikiTestCase
         $this->assertEquals($expectedResult, $this->obj->getDbUntranslated(-1, 0, 'string 3'));
     }
 
-    public function getAllUntranslatedDataProvider(): array
+    public static function getAllUntranslatedDataProvider(): array
     {
         $dbUntranslated = [
                 'Untranslated string 1' => ['source' => 'Untranslated string 1', 'tran' => null],

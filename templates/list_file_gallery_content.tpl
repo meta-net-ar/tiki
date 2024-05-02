@@ -10,11 +10,9 @@
                 {else}
                     {assign var=nbCols value=1}
                 {/if}
-                <th class="checkbox-cell">
-                    <div class="form-check">
-                        {select_all checkbox_names='file[],subgal[]'}
-                    </div>
-                </th>
+                <td class="checkbox-cell"> {* th changed to td to avoid ARIA empty header error  *}
+                    {select_all checkbox_names='file[],subgal[]'}
+                </td>
             {/if}
 
             {if ( $prefs.use_context_menu_icon eq 'y' or $prefs.use_context_menu_text eq 'y' )
@@ -24,9 +22,9 @@
                 {else}
                     {assign var=nbCols value=1}
                 {/if}
-                <th style="width: 1em">&nbsp;
+                <td style="width: 1em">&nbsp; {* th changed to td to avoid ARIA empty header error  *}
 
-                </th>
+                </td>
             {/if}
 
             {if isset($gal_info.show_parentName) && $gal_info.show_parentName eq 'y'}
@@ -288,16 +286,14 @@
 
                 {if $gal_info.show_checked ne 'n' and ($tiki_p_admin_file_galleries eq 'y' or $tiki_p_upload_files eq 'y')}
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            {if $files[changes].isgal eq 1}
-                                {assign var='checkname' value='subgal'}
-                            {else}
-                                {assign var='checkname' value='file'}
-                            {/if}
-                            <input type="checkbox" class="form-check-input" name="{$checkname}[]" value="{$files[changes].id|escape}"
-                            {if isset($smarty.request.$checkname) and $smarty.request.$checkname
-                                and in_array($files[changes].id,$smarty.request.$checkname)}checked="checked"{/if}>
-                        </div>
+                        {if $files[changes].isgal eq 1}
+                            {assign var='checkname' value='subgal'}
+                        {else}
+                            {assign var='checkname' value='file'}
+                        {/if}
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="{$checkname}[]" value="{$files[changes].id|escape}"
+                        {if isset($smarty.request.$checkname) and $smarty.request.$checkname
+                            and in_array($files[changes].id,$smarty.request.$checkname)}checked="checked"{/if}>
                     </td>
                 {/if}
 

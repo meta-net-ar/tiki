@@ -24,14 +24,16 @@
         </div>
         {if $prefs.feature_categories eq 'y'}
             <div class="form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" type="checkbox" name="dupCateg" value="1">{tr}Duplicate categories{/tr}
+                <input class="form-check-input" type="checkbox" name="dupCateg" id="dupCateg" value="1">
+                <label class="form-check-label"for="dupCateg">
+                    {tr}Duplicate categories{/tr}
                 </label>
             </div>
         {/if}
         <div class="form-check">
-            <label class="form-check-label">
-                <input class="form-check-input" type="checkbox" name="dupPerms" value="1">{tr}Duplicate permissions{/tr}
+            <input class="form-check-input" type="checkbox" name="dupPerms" id="dupPerms" value="1">
+            <label class="form-check-label" for="dupPerms">
+                {tr}Duplicate permissions{/tr}
             </label>
         </div>
         <div class="submit text-center">

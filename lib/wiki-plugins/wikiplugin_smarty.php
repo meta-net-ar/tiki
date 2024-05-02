@@ -52,7 +52,7 @@ function wikiplugin_smarty($data, $params)
         }
         include_once($path);
         $func = 'smarty_function_' . $params['name'];
-        $content = $func($params, $smarty);
+        $content = $func($params, $smarty->getEmptyInternalTemplate());
     }
     return $content;
 }

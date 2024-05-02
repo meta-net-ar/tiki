@@ -6,10 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Field;
 
+use Tracker_Definition;
+
 /**
- * Foundation of all trackerfields. Each trackerfield defines its own class that derives from this one and also
- * has to implement Tracker\Field\FieldInterface, Tracker\Field\IndexableInterface.
+ * Foundation of all trackerfields.
  *
+ * A concrete instance of this class represents a specific tracker field
+ * configured in a specific tracker instance.
+ * It is stored as a row in tiki_tracker_fields.
  */
 abstract class AbstractField implements FieldInterface, IndexableInterface
 {
@@ -19,9 +23,9 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
     private $baseKeyPrefix = '';
 
     /**
-     * @var array - the field definition
+     * An internal structure, that is very close, but not the same as the raw row.  It augmented with a key options_array  (built with Tracker_Options:: buildOptionsArray())
      */
-    private $definition;
+    private array $definition;
 
     /**
      * @var handle ??? -
@@ -34,21 +38,19 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
      */
     private $itemData;
 
-    /**
-     * @var array - trackerdefinition
-     *
-     */
-    private $trackerDefinition;
+    private Tracker_Definition $trackerDefinition;
 
 
     /**
      * Initialize the instance with field- and trackerdefinition and item value(s)
      * @param array $fieldInfo - the field definition
-     * @param array $itemData - itemId/value pair(s)
+     * @param ?array $itemData - itemId/value pair(s).  If empty you can only manipulate informations related to the field.  This seems to be legacy support, only used to getOption().  The problem is that we don't have a TrackerField class representing the tracker field associated to the tracker (not the Tracker item).  This is an easy refactoring, but I have to stop somewhere for now - benoitg - 2024-03-12.
+     * This is called with an empty $itemData from TrackerLib::get_field_handler() through Tracker_Field_Factory::getHandler())
+     * In practice,
      * @param array $trackerDefinition - the tracker definition.
      *
      */
-    public function __construct($fieldInfo, $itemData, $trackerDefinition)
+    public function __construct(array $fieldInfo, ?array $itemData, Tracker_Definition $trackerDefinition)
     {
         $this->options = \Tracker_Options::fromSerialized($fieldInfo['options'], $fieldInfo);
 
@@ -61,6 +63,7 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
         $this->trackerDefinition = $trackerDefinition;
     }
 
+    /** @deprecated This is only used by the FieldController.php, and TrackerItemSource.php, and should be refactored.  The structure it exposes is very close, but not the same as the raw database row */
     public function getFieldDefinition()
     {
         return $this->definition;
@@ -68,7 +71,7 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
 
 
     /**
-     * Not implemented here. Its upto to the extending class.
+     * Not implemented here. Its up to to the extending class.
      * @param array $context - ???
      * @return string $renderedContent depending on the $context
      */
@@ -81,7 +84,7 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
     /**
      * Render output for this field.
      * IMPORTANT: This method uses the following $_GET args directly: 'page'
-     * @TODO fixit so it does not directly access the $_GET array. Better pass it as a param.
+     * @TODO fix it so it does not directly access the $_GET array. Better pass it as a param.
      * @param array $context -keys:
      * <pre>
      * $context = array(
@@ -321,15 +324,18 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
         if (empty($itemId)) {
             return false;
         }
-        $itemObject = \Tracker_Item::fromInfo($this->itemData);
 
-        $status = $this->getData('status');
-
-        if (
-            $this->getConfiguration('isMain', 'n') == 'y'
-            && ($itemObject->canView()  || $itemObject->getPerm('comment_tracker_items'))
-        ) {
-            return (bool) $this->getItemId();
+        try {
+            $itemObject = \Tracker_Item::fromInfo($this->itemData);
+            if (
+                $this->getConfiguration('isMain', 'n') == 'y'
+                && ($itemObject->canView()  || $itemObject->getPerm('comment_tracker_items'))
+            ) {
+                return (bool) $this->getItemId();
+            }
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage());
+            return false;
         }
 
         return false;
@@ -512,7 +518,7 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
 
     /**
      * Return option from the options array.
-     * For the list of options for a particular field check its getTypes() method.
+     * For the list of options for a particular field check its getManagedTypesInfo() method.
      * Note: This function should be public, as long as certain low-level trackerlib functions need to be accessed directly.
      * Otherwise one would be forced to get the options from fields like this: $myField['options_array'][0] ...
      * @param int $number | string $key.  depending on type: based on the numeric array position, or by name.
@@ -530,10 +536,8 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
 
     /**
      * Get the tracker definition object
-     *
-     * @return \Tracker_Definition
      */
-    protected function getTrackerDefinition()
+    protected function getTrackerDefinition(): Tracker_Definition
     {
         return $this->trackerDefinition;
     }
@@ -546,6 +550,13 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
     protected function getItemData()
     {
         return $this->itemData;
+    }
+
+    public function isMainField(): bool
+    {
+        //We use this instead of 'isMain' because there is no constraint enforced that there is only one field per tracker set 'isMain'.
+        $mainFieldId = $this->trackerDefinition->getMainFieldId();
+        return ($this->definition['fieldId'] == $mainFieldId) ? true : false;
     }
 
     protected function renderTemplate($file, $context = [], $data = [])
@@ -573,19 +584,19 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => 'sortable'];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => true];

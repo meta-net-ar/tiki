@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class PaginationTest extends \Search_Index_PaginationTest
+class PaginationTest extends \SearchIndexPagination
 {
     use IndexBuilder;
 

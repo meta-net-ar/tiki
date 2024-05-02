@@ -13,12 +13,12 @@ class Search_GlobalSource_PermissionSource implements Search_GlobalSource_Interf
         $this->perms = $perms;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['allowed_groups', 'allowed_users'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'allowed_groups' => 'multivalue',
@@ -26,7 +26,7 @@ class Search_GlobalSource_PermissionSource implements Search_GlobalSource_Interf
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

@@ -214,7 +214,7 @@ if (isset($_REQUEST['send'])) {
             }
 
             $share_access_rights = isset($_POST['share_access']);
-            if ($_REQUEST['share_token_notification'] == 'y') {
+            if (isset($_REQUEST['share_token_notification']) && $_REQUEST['share_token_notification'] == 'y') {
                 // list all users to give an unique token for notification
                 $tokenlib = AuthTokens::build($prefs);
 

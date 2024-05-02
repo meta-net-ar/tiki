@@ -7,7 +7,7 @@
     </div>
 
     <fieldset>
-        <legend>{tr}Global configuration{/tr}</legend>
+        <legend class="h3">{tr}Global configuration{/tr}</legend>
         {preference name=rating_recalculation}
         <div class="rating_recalculation_childcontainer randomvote randomload">
             {preference name=rating_recalculation_odd}
@@ -18,7 +18,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Wiki{/tr}</legend>
+        <legend class="h3">{tr}Wiki{/tr}</legend>
         {preference name=feature_wiki_ratings}
         {preference name=wiki_simple_ratings}
         <div class="adminoptionboxchild" id="wiki_simple_ratings_childcontainer">
@@ -27,7 +27,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Articles{/tr}</legend>
+        <legend class="h3">{tr}Articles{/tr}</legend>
         {preference name=article_user_rating}
         <div class="adminoptionboxchild" id="article_user_rating_childcontainer">
             {preference name=article_user_rating_options}
@@ -35,7 +35,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Comments{/tr}</legend>
+        <legend class="h3">{tr}Comments{/tr}</legend>
         {preference name=comments_vote}
         {preference name=wiki_comments_simple_ratings}
         <div class="adminoptionboxchild" id="wiki_comments_simple_ratings_childcontainer">
@@ -45,7 +45,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Forums{/tr}</legend>
+        <legend class="h3">{tr}Forums{/tr}</legend>
         {remarksbox title="{tr}Enabling ratings for forums{/tr}"}
             {tr}You need to:{/tr}
             <ul>
@@ -58,17 +58,17 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Trackers{/tr}</legend>
+        <legend class="h3">{tr}Trackers{/tr}</legend>
         {preference name=trackerfield_rating}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Default Options{/tr}</legend>
+        <legend class="h3">{tr}Default Options{/tr}</legend>
         {preference name=rating_default_options}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}User Interface{/tr}</legend>
+        <legend class="h3">{tr}User Interface{/tr}</legend>
         {preference name=rating_results_detailed}
         <div class="adminoptionboxchild" id="rating_results_detailed_childcontainer">
             {preference name=rating_results_detailed_percent}
@@ -78,7 +78,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Advanced{/tr}</legend>
+        <legend class="h3">{tr}Advanced{/tr}</legend>
         {preference name=rating_advanced}
     </fieldset>
     {include file='admin/include_apply_bottom.tpl'}
@@ -89,7 +89,7 @@
         <form class="config" method="post" action="">
             {ticket}
             <fieldset>
-                <legend>{$config.name|escape} <small>(ID: {$config.ratingConfigId|escape}, {tr}Search Field:{/tr} <em>adv_rating_{$config.ratingConfigId|escape}</em>)</small></legend>
+                <legend class="h3">{$config.name|escape} <small>(ID: {$config.ratingConfigId|escape}, {tr}Search Field:{/tr} <em>adv_rating_{$config.ratingConfigId|escape}</em>)</small></legend>
                 <input type="hidden" name="config" value="{$config.ratingConfigId|escape}">
                 <div class="mb-3 row">
                     <label class="col-form-label col-sm-4" for="rating_name_{$config.ratingConfigId|escape}">
@@ -131,7 +131,7 @@
     <form method="post" action="">
         {ticket}
         <fieldset>
-            <legend>{tr}Create new{/tr}</legend>
+            <legend class="h3">{tr}Create new{/tr}</legend>
             <label class="col-form-label col-sm-4" for="rating_config_new">
                 {tr}Name{/tr}
             </label>

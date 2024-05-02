@@ -19,7 +19,7 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($expectedOutput, wikiplugin_youtube($data, $params));
     }
 
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['', '{BOX(class="text-bg-light")}Plugin YouTube error: the movie parameter is empty.{BOX}'],

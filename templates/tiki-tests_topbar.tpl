@@ -30,9 +30,9 @@
         createCookie("tikitest_record",""+state);
         if (state == '2') {
             hide("tikitest_pause");
-            toggleSpan("tikitest_play");
+            $("#tikitest_play").toggle();
         } else if (state == '1') {
-            toggleSpan("tikitest_pause");
+            $("#tikitest_pause").toggle();
             hide("tikitest_play");
         } else if (state == '3') {
             location.href="tiki_tests/tiki-tests_edit.php?filename={{$tikitest_filename}}.xml";

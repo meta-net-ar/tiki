@@ -13,17 +13,17 @@ class Search_GlobalSource_VisitsSource implements Search_GlobalSource_Interface
         $this->statslib = TikiLib::lib('stats');
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['visits'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return ['visits' => 'sortable'];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

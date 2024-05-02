@@ -1,0 +1,162 @@
+// Business theme for Tiki Bootstrap 5
+// This file is for additional SCSS rules beyond what are in variables.scss.
+// Image path example:
+$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+$tiki-topmodules-row-sidemargins: 0;
+$tiki-topbar-row-sidemargins: -15px;
+
+.navbar-dark-parent {
+    .sitetitles a {
+        color: #ffffff;
+    }
+    .sitesubtitle {
+        color: #91bef5;
+    }
+}
+
+.sitetitles {
+  font-weight: 700
+}
+
+h1.sitetitle {
+  font-size: 24px;
+}
+
+h2.sitesubtitle {
+  font-size: 13px;
+  font-style: italic;
+}
+
+//.page-header,
+//.header_outer.bg-dark-parent,
+.bg-dark//,
+//.topbar.bg-dark > li,
+//.navbar-dark
+    {
+  background: #1f5daa !important; /* Old browsers */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1f5daa), color-stop(2%, #3977c4), color-stop(3%, #3b7ac7), color-stop(5%, #3877c6), color-stop(7%, #3a7cca), color-stop(9%, #3778c8), color-stop(19%, #3674c7), color-stop(43%, #2c6abf), color-stop(69%, #1c5cb3), color-stop(93%, #1454ac), color-stop(97%, #1455a9), color-stop(98%, #1a57a8), color-stop(100%, #346dba)) !important; /* Chrome,Safari4+ */
+  background: linear-gradient(to bottom, #1f5daa 0%, #3977c4 2%, #3b7ac7 3%, #3877c6 5%, #3a7cca 7%, #3778c8 9%, #3674c7 19%, #2c6abf 43%, #1c5cb3 69%, #1454ac 93%, #1455a9 97%, #1a57a8 98%, #346dba 100%) !important; /* W3C */
+   border-left: 1px solid #3676C4;
+  border-right: 1px solid #1957AA;
+}
+
+
+.topbar .navbar-dark .navbar-nav > li > a {
+  //  color: #ffffff;
+  text-transform: uppercase;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+#col1, #col2, #col3 {
+  padding-top: 1em;
+}
+
+#footer .container,
+footer.main-footer .container {
+  min-height: 60px;
+  background: url('#{$imagePath}footer.gif') repeat-x;
+}
+
+.card-header,
+.modal-header {
+  //  background: #3475c6 url('#{$imagePath}title_bg.png') no-repeat 0 0;
+  background: #386dbb; /* Old browsers */
+  background: -webkit-linear-gradient(top, #386dbb 0%, #3a6fbb 7%, #457bc3 25%, #4c82ca 54%, #2f6dc0 57%, #3371c4 82%, #3574c4 86%, #3574c4 100%); /* Chrome10+,Safari5.1+ */
+  background: linear-gradient(to bottom, #386dbb 0%, #3a6fbb 7%, #457bc3 25%, #4c82ca 54%, #2f6dc0 57%, #3371c4 82%, #3574c4 86%, #3574c4 100%); /* W3C */
+  text-transform: uppercase;
+  color: #fff;
+
+  & a:not(.dropdown-item) {
+    color: #fff;
+  }
+
+  .dropdown-item .tips {
+    color: $body-color;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+h3.card-title {
+  font-size: 90%;
+  font-weight: 700;
+}
+
+// Dropdowns
+.dropdown-menu.dropdown-menu-dark .dropdown-item {
+    color: $gray-300 !important;
+}
+
+.adminanchors.card { background: transparent; }
+
+.modal-header {
+  color: $gray-300;
+}
+
+// Class no longer supported by Bootstrap
+.well {
+  background: url('#{$imagePath}market.jpg') 0 100% no-repeat;
+  background-size: 100% 100%;
+  color: $gray-500;
+}
+
+.magnifying_glass {
+  background: url('#{$imagePath}magnifyT.png') no-repeat;
+  height: 59px;
+  width: 59px;
+  position: absolute;
+  top: -3px;
+  left: -45px;
+  z-index: 2;
+}
+
+// Update for Smartmenus
+.navbar .navbar-nav.sm-vertical {
+    .dropdown { border: none;
+ //    a { color: #005999; }
+    }
+}
+
+// overriding some cypht stuff
+.tiki-webmail, .tiki-cypht, .mobile.tiki-cypht, .inline-cypht {
+    .moduletitle { color: $card-text !important; }
+}
+
+// Buttons
+.btn-outline-warning {
+    color: #975D0C;
+}
+
+.btn-outline-danger {
+    color: #B82D28;
+}
+
+.btn-outline-info,
+.spinner-border.text-info {
+    color: #1F7C98;
+}
+
+.btn-outline-light {
+    color: #fff;
+    border-color: #fff;
+}
+
+// Badges
+.badge.bg-warning.text-dark, // Need to be specified because Bootstrap isn't sorting it out
+.progress-bar.bg-warning.text-dark {
+    color: #fff !important;
+}
+
+// Spinners
+.spinner-border.text-light {
+    color: $text-muted;
+}

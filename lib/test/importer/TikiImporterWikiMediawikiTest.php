@@ -11,7 +11,7 @@ require_once(__DIR__ . '/../../tikilib.php');
 /**
  * @group importer
  */
-class TikiImporter_Wiki_Mediawiki_Test extends TikiImporter_TestCase
+class TikiImporterWikiMediawikiTest extends TikiImporter_TestCase
 {
     public $obj;
     protected function setUp(): void

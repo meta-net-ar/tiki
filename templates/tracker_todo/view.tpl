@@ -48,7 +48,7 @@
     <h4>{tr}New event{/tr}</h4>
     <div class="mb-3 row">
         <label for="from">{tr}From{/tr}</label>
-        <select name="from" class="form-control">
+        <select name="from" class="form-control" id="from">
             {foreach key=st item=stdata from=$statusTypes}
                 <option value="{$st|escape}">{$stdata.label|escape}</option>
             {/foreach}
@@ -56,7 +56,7 @@
     </div>
     <div class="mb-3 row">
         <label for="to">{tr}To{/tr}</label>
-        <select name="to" class="form-control">
+        <select name="to" class="form-control" id="to">
             {foreach key=st item=stdata from=$statusTypes}
                 <option value="{$st|escape}">{$stdata.label|escape}</option>
             {/foreach}
@@ -85,11 +85,11 @@
         </div>
         <div class="mb-3 row">
             <label for="subject">{tr}Mail subject text{/tr}</label>
-            <input type="text" name="subject" class="form-control">
+            <input type="text" name="subject" id="subject" class="form-control">
         </div>
         <div class="mb-3 row">
             <label for="body">{tr}Mail body ressource{/tr}</label>
-            <input type="text" name="body" class="form-control">
+            <input type="text" name="body" id="body" class="form-control">
             <div class="form-text">
                 {tr}wiki:pageName for a wiki page or tplName.tpl for a template{/tr}
             </div>

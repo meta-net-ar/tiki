@@ -7,18 +7,18 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
     <fieldset id="Calendar">
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_calendar visible="always"}
     </fieldset>
     <fieldset>
-        <legend>{tr}Plugins{/tr}</legend>
+        <legend class="h3">{tr}Plugins{/tr}</legend>
         {preference name=wikiplugin_calendar}
         {preference name=wikiplugin_events}
         {preference name=wikiplugin_mcalendar}
         {preference name=wikiplugin_addtogooglecal}
     </fieldset>
     <fieldset>
-        <legend>{tr}General settings{/tr}{help url="Calendar+Admin"}</legend>
+        <legend class="h3">{tr}General settings{/tr}{help url="Calendar+Admin"}</legend>
         {preference name=feature_default_calendars}
         <div class="adminoptionboxchild" id="feature_default_calendars_childcontainer">
             {preference name=default_calendars}

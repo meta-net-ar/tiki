@@ -29,7 +29,7 @@
                 <button id="generate-custom-css" class="btn btn-primary generate-custom-css">
                     {tr}Generate custom CSS{/tr}
                 </button>
-                <label><input class="keep-changes" type="checkbox"><span>{tr}Keep changes after refresh{/tr}</span></label>
+                <label><input class="keep-changes form-check-input" type="checkbox"><span>{tr}Keep changes after refresh{/tr}</span></label>
             </div>
 
             <div class="btn-group dropup">

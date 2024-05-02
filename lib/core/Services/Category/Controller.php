@@ -31,6 +31,16 @@ class Services_Category_Controller
         $parentId = $input->parentId->int();
         $descends = $input->descends->int();
         $type = $input->type->text();
+
+        if ($parentId) {
+            $perms = Perms::get('category', $parentId);
+        } else {
+            $perms = Perms::get();
+        }
+        if (! $perms->tiki_p_view_category) {
+            throw new Services_Exception_Denied();
+        }
+
         if ($type != 'roots' && $type != 'all') {
             $type = $descends ? 'descendants' : 'children';
             if (! $parentId) {
@@ -45,6 +55,7 @@ class Services_Category_Controller
     public function action_create($input)
     {
         $parentId = $input->parentId->int();
+        $name = $input->name->text();
         if ($parentId) {
             $perms = Perms::get('category', $parentId);
         } else {
@@ -53,11 +64,15 @@ class Services_Category_Controller
         if (! $perms->admin_categories) {
             throw new Services_Exception_Denied();
         }
+        if (empty($name)) {
+            throw new Services_Exception_MissingValue('name');
+        }
+
         $categlib = TikiLib::lib('categ');
         try {
             $newcategId = $categlib->add_category(
                 $parentId,
-                $input->name->text(),
+                $name,
                 $input->description->text(),
                 $input->tplGroupContainerId->int(),
                 $input->tplGroupPattern->text()

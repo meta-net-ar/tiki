@@ -37,8 +37,8 @@ if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_l
 }
 
 // for item id when switching from one lang to other
-$item_url = parse_url($_SERVER['HTTP_REFERER']);
-$item_query = $item_url['query'];
+$item_url = parse_url($_SERVER['HTTP_REFERER'] ?? "");
+$item_query = $item_url['query'] ?? null;
 // Also, if we are at the homepage and tikiIndex is set, the URL we need to take as reference is the tikiIndex
 $item_path = $item_url['path'];
 if ($item_path == '/') {

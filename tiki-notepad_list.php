@@ -12,32 +12,36 @@ $access->check_feature('feature_notepad');
 $access->check_user($user);
 $access->check_permission('tiki_p_notepad');
 // Process upload here
-if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-    $access->checkCsrf();
-    $filegallib = TikiLib::lib('filegal');
-    try {
-        $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-    } catch (Exception $e) {
-        $smarty->assign('errortype', 403);
-        $smarty->assign('msg', $e->getMessage());
-        $smarty->display("error.tpl");
-        die;
+if (isset($_FILES['userfile1'])) {
+    if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+        $access->checkCsrf();
+        $filegallib = TikiLib::lib('filegal');
+        try {
+            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+        } catch (Exception $e) {
+            $smarty->assign('errortype', 403);
+            $smarty->assign('msg', $e->getMessage());
+            $smarty->display("error.tpl");
+            die;
+        }
+        $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+        $data = '';
+        while (! feof($fp)) {
+            $data .= fread($fp, 8192 * 16);
+        }
+        fclose($fp);
+        if (strlen($data) > 1000000) {
+            $smarty->assign('msg', tra("The file is too large"));
+            $smarty->display("error.tpl");
+            die;
+        }
+        $size = $_FILES['userfile1']['size'];
+        $name = $_FILES['userfile1']['name'];
+        $type = $_FILES['userfile1']['type'];
+        $notepadlib->replace_note($user, 0, $name, $data);
+    } else {
+        Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
     }
-    $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-    $data = '';
-    while (! feof($fp)) {
-        $data .= fread($fp, 8192 * 16);
-    }
-    fclose($fp);
-    if (strlen($data) > 1000000) {
-        $smarty->assign('msg', tra("The file is too large"));
-        $smarty->display("error.tpl");
-        die;
-    }
-    $size = $_FILES['userfile1']['size'];
-    $name = $_FILES['userfile1']['name'];
-    $type = $_FILES['userfile1']['type'];
-    $notepadlib->replace_note($user, 0, $name, $data);
 }
 if (isset($_REQUEST["merge"])) {
     $access->checkCsrf();

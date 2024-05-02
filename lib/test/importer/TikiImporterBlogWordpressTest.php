@@ -12,9 +12,10 @@ require_once(__DIR__ . '/../../importer/tikiimporter_blog_wordpress.php');
 /**
  * @group importer
  */
-class TikiImporter_Blog_Wordpress_Test extends TikiImporter_TestCase
+class TikiImporterBlogWordpressTest extends TikiImporter_TestCase
 {
     public $obj;
+
     protected function setUp(): void
     {
         date_default_timezone_set('UTC');

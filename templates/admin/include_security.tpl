@@ -52,7 +52,7 @@
                 {/remarksbox}
             </fieldset>
             <fieldset>
-                <legend>{tr}Smarty and Features Security{/tr}</legend>
+                <legend class="h3">{tr}Smarty and Features Security{/tr}</legend>
                 {preference name=smarty_security}
                 <div class="adminoptionboxchild" id="smarty_security_childcontainer">
                     {preference name=smarty_security_allowed_tags}
@@ -85,7 +85,7 @@
                 {preference name=feature_editcss}
             </fieldset>
             <fieldset>
-                <legend>{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
+                <legend class="h3">{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
                 {preference name=feature_user_encryption}
                 <div class="adminoptionboxchild" id="feature_user_encryption_childcontainer">
                     {if $sodium_available}
@@ -114,7 +114,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}CSRF security{/tr}{help url="Security"}</legend>
+                <legend class="h3">{tr}CSRF security{/tr}{help url="Security"}</legend>
                 <div class="adminoptionbox">
                     {tr}Use these options to protect against cross-site request forgeries (CSRF){/tr}.
                 </div>
@@ -125,7 +125,7 @@
                 {preference name=feature_ticketlib}
             </fieldset>
             <fieldset>
-                <legend>{tr}HTTP Headers{/tr}{help url="Security"}</legend>
+                <legend class="h3">{tr}HTTP Headers{/tr}{help url="Security"}</legend>
                 <div class="adminoptionbox">
                     {tr}Use these options to add options related with security to the HTTP Headers{/tr}.
                 </div>
@@ -164,7 +164,7 @@
                 {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
-                <legend>{tr}CAPTCHA{/tr}</legend>
+                <legend class="h3">{tr}CAPTCHA{/tr}</legend>
                 {preference name=feature_antibot}
                 <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
                     {preference name=captcha_wordLen}
@@ -257,7 +257,7 @@
 
         {tab name="{tr}OpenPGP{/tr}"}
             <fieldset>
-                <legend>{tr}OpenPGP functionality for PGP/MIME encrypted email messaging{/tr}</legend>
+                <legend class="h3">{tr}OpenPGP functionality for PGP/MIME encrypted email messaging{/tr}</legend>
                 {remarksbox type="tip" title="{tr}Note{/tr}"}
                     {tr}Experimental OpenPGP fuctionality for PGP/MIME encrypted email messaging.{/tr}<br><br>
                     {tr}All email-messaging/notifications/newsletters are sent as PGP/MIME-encrypted messages, signed with the signer-key, and are completely 100% opaque to outsiders. All user accounts need to be properly configured into gnupg keyring with public-keys related to their tiki-account-related email-addresses.{/tr}
@@ -388,7 +388,7 @@
                         {/remarksbox}
                     {/if}
                     <fieldset id="encryption_general">
-                        <legend>
+                        <legend class="h3">
                             {tr}General information{/tr}
                         </legend>
                         <div class="mb-3 row">

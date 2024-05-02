@@ -5,10 +5,10 @@
 
 import moment from "moment";
 
-$.fn.addFullCalendarPrint = function (buttonId, calendar){
+$.fn.addFullCalendarPrint = function (buttonId, calendar) {
     let viewContainer = $(this);
     var calendarId = "#" + $(this).attr("id");
-    if(!viewContainer){
+    if (!viewContainer) {
         console.warn(calendarId + " not found");
         return;
     }
@@ -20,29 +20,29 @@ $.fn.addFullCalendarPrint = function (buttonId, calendar){
         event.preventDefault();
         var elementToPrint = $(calendarId + " .fc-view");
         $("html, body").animate({ scrollTop: 0 }, 0);
-        setTimeout(function() {
+        setTimeout(function () {
             html2canvas(elementToPrint[0], {
-                "scrollY": 0,
-                "scrollX": 0
-            }).then(function(canvas) {
+                scrollY: 0,
+                scrollX: 0,
+            }).then(function (canvas) {
                 var date = moment(calendar.getDate());
                 var monthName = date.format("MMMM");
                 var year = date.format("YYYY");
                 var imgData = canvas.toDataURL("image/jpeg", 1.0);
                 var imgWidth = 180;
                 var pageHeight = 250;
-                var imgHeight = canvas.height * imgWidth / canvas.width;
+                var imgHeight = (canvas.height * imgWidth) / canvas.width;
                 var heightLeft = imgHeight;
                 var doc = new jsPDF("p", "mm");
                 doc.setFontSize(14);
-                doc.text((210-imgWidth)/2, 20, monthName + " " + year);
+                doc.text((210 - imgWidth) / 2, 20, monthName + " " + year);
 
-                if(imgHeight > pageHeight){
+                if (imgHeight > pageHeight) {
                     imgHeight = pageHeight;
-                    imgWidth = canvas.width * imgHeight/canvas.height;
+                    imgWidth = (canvas.width * imgHeight) / canvas.height;
                 }
 
-                doc.addImage(imgData, "JPEG", (210-imgWidth)/2, 30, imgWidth, (heightLeft > pageHeight)?pageHeight:heightLeft);
+                doc.addImage(imgData, "JPEG", (210 - imgWidth) / 2, 30, imgWidth, heightLeft > pageHeight ? pageHeight : heightLeft);
 
                 doc.save(monthName + year + ".pdf");
             });

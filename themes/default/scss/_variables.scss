@@ -5,7 +5,9 @@ $enable-important-utilities: false;
 
 @import "../../../node_modules/bootstrap/scss/variables";
 
-$border-color:                $gray-400;
+$border-color:                $gray-500;
+
+//$input-border-color:                    var(--#{$prefix}border-color) !default; //         $gray-500; //           var(--#{$prefix}border-color) !default;
 $code-color: $body-color;
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //

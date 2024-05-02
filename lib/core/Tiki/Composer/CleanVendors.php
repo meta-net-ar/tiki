@@ -124,13 +124,6 @@ class CleanVendors
         }
 
         self::remove(
-            $vendors . 'afarkas/html5shiv',
-            [
-                'src',
-                'dist/html5shiv-printshiv.js',
-            ]
-        );
-        self::remove(
             $vendors . 'codemirror/codemirror',
             [
                 'mode/tiki',
@@ -373,15 +366,6 @@ class CleanVendors
             ]
         );
         self::remove(
-            $vendors . 'npm-asset/converse.js/',
-            [
-                'docs',
-                'src',
-                'CHANGES.md',
-                'README.md'
-            ]
-        );
-        self::remove(
             $vendors . 'plotly/plotly.js/',
             [
                 'test',
@@ -392,13 +376,6 @@ class CleanVendors
                 'dist/topojson',
                 'CHANGELOG.md',
                 'CONTRIBUTING.md',
-                'README.md'
-            ]
-        );
-        self::remove(
-            $vendors . 'thomaspark/bootswatch/',
-            [
-                'docs',
                 'README.md'
             ]
         );
@@ -456,8 +433,6 @@ class CleanVendors
         $fs->remove($vendors . 'components/tablesorter');
         // duplicate with rmm5t/jquery-timeago
         $fs->remove($vendors . 'components/jquery-timeago');
-        // duplicate with afarkas/html5shiv
-        $fs->remove($vendors . 'components/html5shiv');
         // duplicate with moment/moment
         $fs->remove($vendors . 'components/moment');
         // duplicate with drmonty/smartmenus
@@ -476,7 +451,8 @@ class CleanVendors
     private static function addIndexFiles(string $path): void
     {
         $excludeDirs = [
-            'rector/rector'  //It breaks rector, and it's a devtool, so won't be bundled anyway.
+            'rector/rector',  //It breaks rector, and it's a devtool, so won't be bundled anyway.
+            'phpseclib/phpseclib/phpseclib/Crypt', //it breaks phpseclib as it thinks there are classes called index due to the index files
         ];
         // add index file if needed
         $index = glob($path . '[iI][nN][dD][eE][xX].[pP][hH][pP]'); // index.php case-insensitive

@@ -39,7 +39,7 @@
     </form>
     {if $results}
         <br/>
-        {foreach from=$results key=$itemId item=row}
+        {foreach $results as $itemId => $row}
             <p>
                 {if !empty($row.proba)}
                     {$row.proba}%:

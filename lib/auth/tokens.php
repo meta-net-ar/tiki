@@ -25,7 +25,7 @@ class AuthTokens
         );
     }
 
-    public function __construct($db, $options = [], DateTime $dt = null)
+    public function __construct($db, $options = [], DateTime|null $dt = null)
     {
         $this->db = $db;
         $this->table = $this->db->table('tiki_auth_tokens');

@@ -73,7 +73,7 @@ class Tracker_Field_Factory
                 $reflected = new ReflectionClass($class);
 
                 if ($reflected->isInstantiable() && $reflected->implementsInterface('\Tracker\Field\FieldInterface')) {
-                    $providedFields = call_user_func([$class, 'getTypes']);
+                    $providedFields = call_user_func([$class, 'getManagedTypesInfo']);
                     foreach ($providedFields as $key => $info) {
                         $this->typeMap[$key] = $class;
                         $this->infoMap[$key] = $info;
@@ -119,18 +119,24 @@ class Tracker_Field_Factory
      * @Example 'q' => 'Tracker_Field_AutoIncrement', ...
      * @return array letterType => classname
      */
-    public function getTypeMap()
+    public function getTypeMap(): array
     {
         return $this->typeMap;
     }
 
-    public function getHandler($field_info, $itemData = [])
+    /**
+     * Return a concrete class instance to manipulate this field
+     *
+     * @param array $fieldInfo
+     * @param array $itemData
+     * @return \Tracker\Field\AbstractField or null if the field type isn't enabled in prefs
+     */
+    public function getHandler(array $fieldInfo, ?array $itemData = null): \Tracker\Field\AbstractField|null
     {
-        if (! isset($field_info['type'])) {
-            // When does a field have no type? Should this not throw an exception? Chealer 2017-05-23
-            return null;
+        if (! isset($fieldInfo['type'])) {
+            throw new InvalidArgumentException("fieldInfo parameter is missing 'type' key");
         }
-        $type = $field_info['type'];
+        $type = $fieldInfo['type'];
 
         if (isset($this->typeMap[$type])) {
             $info = $this->infoMap[$type];
@@ -148,13 +154,16 @@ class Tracker_Field_Factory
                 }
             }
 
-            $field_info = array_merge($info, $field_info);
+            $fieldInfo = array_merge($info, $fieldInfo);
 
             if (class_exists($class) && is_callable([$class, 'build'])) {
-                return call_user_func([$class, 'build'], $type, $this->trackerDefinition, $field_info, $itemData);
+                //I couldn't find a case where this code path is followed.  benoitg - 2024-03-12
+                return call_user_func([$class, 'build'], $type, $this->trackerDefinition, $fieldInfo, $itemData);
             } else {
-                return new $class($field_info, $itemData, $this->trackerDefinition);
+                return new $class($fieldInfo, $itemData, $this->trackerDefinition);
             }
+        } else {
+            throw new Exception("type {$type} is missing in typeMap");
         }
     }
 }

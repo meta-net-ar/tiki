@@ -105,6 +105,7 @@
             {tabset}
                 {tab name="{tr}Tiki Statistics{/tr}"}
                     <fieldset>
+                        <legend class="visually-hidden">{tr}Tiki Statistics{/tr}</legend>
                         {preference name=feature_stats}
                         {preference name=feature_referer_stats}
                         {preference name=count_admin_pvs}
@@ -113,6 +114,7 @@
 
                 {tab name="{tr}Google Analytics{/tr}"}
                     <fieldset>
+                        <legend class="visually-hidden">{tr}Google Analytics{/tr}</legend>
                         {preference name=site_google_analytics_account}
                         {preference name=site_google_credentials}
                     </fieldset>
@@ -120,6 +122,7 @@
 
                 {tab name="{tr}Piwik Analytics{/tr}"}
                     <fieldset>
+                        <legend class="visually-hidden">{tr}Piwik Analytics{/tr}</legend>
                         {preference name=site_piwik_analytics_server_url}
                         {preference name=site_piwik_site_id}
                     </fieldset>

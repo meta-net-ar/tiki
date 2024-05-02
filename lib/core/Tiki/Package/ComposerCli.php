@@ -62,7 +62,7 @@ class ComposerCli
      * @param PhpExecutableFinder|null $phpExecutableFinder
      * @param PackageInformationCache|null $cache
      */
-    public function __construct(string $basePath, ?string $workingPath = null, PhpExecutableFinder $phpExecutableFinder = null, ?PackageInformationCache $cache = null)
+    public function __construct(string $basePath, ?string $workingPath = null, ?PhpExecutableFinder $phpExecutableFinder = null, ?PackageInformationCache $cache = null)
     {
         $basePath = rtrim($basePath, '/');
         if ($basePath) {

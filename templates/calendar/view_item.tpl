@@ -37,6 +37,14 @@
                 {tr}Every{/tr} {$recurrence.months} {tr}month(s){/tr}<br>
                 {if $recurrence.monthlyType eq 'date'}
                     {tr}Each{/tr} {$recurrence.dayOfMonth|join:', '} {tr}of the month{/tr}
+                {elseif $recurrence.monthlyType eq 'firstlastweekday'}
+                    {tr}Every{/tr}
+                    {if $recurrence.monthlyFirstlastWeekdayValue[0] eq '1'}
+                        {tr}First Weekday{/tr}
+                    {else}
+                        {tr}Last Weekday{/tr}
+                    {/if}
+                    {tr}of the month{/tr}
                 {else}
                     {tr}Every{/tr}
                     {if $recurrence.monthlyWeekdayValue[0] eq '1'}
@@ -96,6 +104,39 @@
                     {elseif $recurrence.yearlyMonth eq '11'}
                         {tr}November{/tr}
                     {elseif $recurrence.yearlyMonth eq '12'}
+                        {tr}December{/tr}
+                    {/if}
+                {elseif $recurrence.yearlyType eq 'firstlastweekday'}
+                    {tr}Every{/tr}
+                    {if $recurrence.yearlyFirstlastWeekdayValue eq '1'}
+                        {tr}First Weekday{/tr}
+                    {else}
+                        {tr}Last Weekday{/tr}
+                    {/if}
+                        {tr}of{/tr}
+                    {if $recurrence.yearlyWeekMonth eq '1'}
+                        {tr}January{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '2'}
+                        {tr}February{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '3'}
+                        {tr}March{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '4'}
+                        {tr}April{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '5'}
+                        {tr}May{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '6'}
+                        {tr}June{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '7'}
+                        {tr}July{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '8'}
+                        {tr}August{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '9'}
+                        {tr}September{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '10'}
+                        {tr}October{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '11'}
+                        {tr}November{/tr}
+                    {elseif $recurrence.yearlyWeekMonth eq '12'}
                         {tr}December{/tr}
                     {/if}
                 {else}

@@ -76,6 +76,10 @@ li.archivedate {
 
 // /***** Boxes *****/
 // ** Modules **/
+// When the module title is a link, make it the card-title color.
+.card.module .card-title a {
+    color: var(--bs-card-title-color);
+}
 
 .minichatdiv {
     font-size: .9em;
@@ -240,24 +244,8 @@ header:not(.fixed-top) a.sitelogo {
 }
 
 // Basic Bootstrap (layout_social)
-.layout_social .fixed-top {
-    .navbar-brand,
-    .sitetitle,
-    .sitesubtitle {
-        display: inline-block;
-        align-self: center !important;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-    .sitesubtitle {
-        font-size: calc( var(--bs-navbar-brand-font-size) * .8 );
-
-    }
-    .sitelogo { // Class name changed from .sitelogo-img
-        margin-top: 0;
-        margin-bottom: 0;
-        padding: 0 !important;
-    }
+.layout_social .fixed-top .sitesubtitle {
+    font-size: calc(var(--bs-navbar-brand-font-size) * .8);
 }
 
 // Remove Bootstrap default top and bottom padding on navbars in modules (nested navbars)
@@ -463,29 +451,29 @@ header.fixed-top {
     padding-right: 0;
 }
 
-@include media-breakpoint-up(sm) {
-    .layout_social_modules .navbar-header {
-        margin-top: -34px;
-    }
-}
+//@include media-breakpoint-up(sm) {
+//   .layout_social_modules .navbar-header {
+//        margin-top: -34px;
+//    }
+//}
 
-@include media-breakpoint-down(xs) {
-    .box-search {
-        .form-inline .input-group {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            .form-control { width: auto; }
-            .input-group-append { float: left; width: auto; }
-        }
-
-        .panel-body .form-inline .input-group {
-            width: 100%;
-            .input-group-addon, .input-group-append, .form-control {
-                width: 100%;
-            }
-        }
-    }
-}
+//@include media-breakpoint-down(xs) {
+//    .box-search {
+//        .form-inline .input-group {
+//            margin-left: 0 !important;
+//            margin-right: 0 !important;
+//            .form-control { width: auto; }
+//            .input-group-append { float: left; width: auto; }
+//        }
+//
+//        .panel-body .form-inline .input-group {
+//            width: 100%;
+//            .input-group-addon, .input-group-append, .form-control {
+//                width: 100%;
+//            }
+//        }
+//    }
+//}
 
 @media (max-width: breakpoint-max(sm)) {
     .tiki-admin_modules {

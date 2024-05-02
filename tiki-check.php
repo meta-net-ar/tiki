@@ -63,11 +63,27 @@ function getTikiRequirements()
 {
     return array(
         array(
+            'name'    => 'Tiki 27.x',
+            'version' => 27,
+            'php'     => array(
+                'min' => '8.1.0', // For the latest version, this should match TIKI_MIN_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+                'max' => '8.4.99', // For the latest version, this should match TIKI_MAX_SUPPORTED_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+            ),
+            'mariadb' => array(
+                'min' => '10.5',
+                'max' => null
+            ),
+            'mysql'   => array(
+                'min' => '8.0',
+                'max' => null
+            ),
+        ),
+        array(
             'name'    => 'Tiki 26.x',
             'version' => 26,
             'php'     => array(
                 'min' => '8.1',
-                'max' => '8.2',
+                'max' => '8.2.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -83,7 +99,7 @@ function getTikiRequirements()
             'version' => 25,
             'php'     => array(
                 'min' => '7.4',
-                'max' => '7.4',
+                'max' => '7.4.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -99,7 +115,7 @@ function getTikiRequirements()
             'version' => 24,
             'php'     => array(
                 'min' => '7.4',
-                'max' => '7.4',
+                'max' => '7.4.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -115,7 +131,7 @@ function getTikiRequirements()
             'version' => 23,
             'php'     => array(
                 'min' => '7.4',
-                'max' => '7.4',
+                'max' => '7.4.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -131,7 +147,7 @@ function getTikiRequirements()
             'version' => 22,
             'php'     => array(
                 'min' => '7.4',
-                'max' => '7.4',
+                'max' => '7.4.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -147,7 +163,7 @@ function getTikiRequirements()
             'version' => 21,
             'php'     => array(
                 'min' => '7.2',
-                'max' => '7.3',
+                'max' => '7.3.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
@@ -163,15 +179,15 @@ function getTikiRequirements()
             'version' => 20,
             'php'     => array(
                 'min' => '7.1',
-                'max' => '7.2',
+                'max' => '7.2.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
-                'max' => '10.4',
+                'max' => '10.4.99',
             ),
             'mysql'   => array(
                 'min' => '5.5.3',
-                'max' => '5.7',
+                'max' => '5.7.99',
             ),
         ),
         array(
@@ -179,15 +195,15 @@ function getTikiRequirements()
             'version' => 19,
             'php'     => array(
                 'min' => '7.1',
-                'max' => '7.2',
+                'max' => '7.2.99',
             ),
             'mariadb' => array(
                 'min' => '5.5',
-                'max' => '10.4',
+                'max' => '10.4.99',
             ),
             'mysql'   => array(
                 'min' => '5.5.3',
-                'max' => '5.7',
+                'max' => '5.7.99',
             ),
         ),
         array(
@@ -195,15 +211,15 @@ function getTikiRequirements()
             'version' => 18,
             'php'     => array(
                 'min' => '5.6',
-                'max' => '7.2',
+                'max' => '7.2.99',
             ),
             'mariadb' => array(
                 'min' => '5.1',
-                'max' => '10.4',
+                'max' => '10.4.99',
             ),
             'mysql'   => array(
                 'min' => '5.0',
-                'max' => '5.7',
+                'max' => '5.7.99',
             ),
         )
     );
@@ -221,16 +237,16 @@ function checkServerRequirements($phpVersion, $dbEngine, $dbVersion)
     $phpValid = false;
     $dbValid = false;
 
-    foreach ($tikiRequirements as $tikiVersion) {
-        if (version_compare($phpVersion, $tikiVersion['php']['min'], '<')) {
+    foreach ($tikiRequirements as $requirement) {
+        if (version_compare($phpVersion, $requirement['php']['min'], '<')) {
             continue;
         }
         if (
             isset($requirement['php']['max'])
-            && $requirement['php']['max'] !== $requirement['php']['min']
-            && version_compare(PHP_VERSION, $requirement['php']['max'], '>')
+            && version_compare($phpVersion, $requirement['php']['max'], '>')
         ) {
             continue;
+        } else {
         }
         $phpValid = true;
         break;
@@ -315,7 +331,6 @@ function getCompatibleVersions($dbEngine = '', $dbVersion = '')
             }
             if (
                 isset($requirement[$dbEngine]['max'])
-                && $requirement[$dbEngine]['max'] !== $requirement[$dbEngine]['min']
                 && version_compare($dbVersion, $requirement[$dbEngine]['max'], '>')
             ) {
                 continue;
@@ -779,65 +794,22 @@ function isVersionInRange($version, $min, $max)
     return version_compare($version, $min, '>=')
         && version_compare($version, $max, '<');
 }
+$tikiRequirements = getTikiRequirements();
 
-// PHP Version
-if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '12.0', '16.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 12.x LTS - Tiki 15.x LTS will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} elseif (version_compare(PHP_VERSION, '7.0.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '12.0', '19.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 12.x LTS - TIki 18.x LTS will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} elseif (version_compare(PHP_VERSION, '7.1.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '18.0', '19.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 18.x LTS will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} elseif (version_compare(PHP_VERSION, '7.2.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '18.0', '21.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 18.x - Tiki 20.x will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} elseif (version_compare(PHP_VERSION, '7.3.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '18.0', '22.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 18.x - Tiki 21.x will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} elseif (version_compare(PHP_VERSION, '7.4.0', '<')) {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (isVersionInRange($tikiWikiVersion, '21.0', '22.0') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 21.x LTS will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
-} else {
-    $php_properties['PHP version'] = array(
-        'fitness' => $standalone ?
-            tra('unsure') :
-            (version_compare($tikiBaseVersion, '22.0', '>=') ? tra('good') : tra('unsure')),
-        'setting' => PHP_VERSION,
-        'message' => 'Tiki 22.x and newer will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details.'
-    );
+$minCompatibleTikiVersion = null;
+$maxCompatibleTikiVersion = null;
+foreach ($tikiRequirements as $requirement) {
+    if (isVersionInRange(PHP_VERSION, $requirement['php']['min'], $requirement['php']['max'])) {
+        //Remember the list is sorted from most recent to oldest
+        $minCompatibleTikiVersion = $requirement['version'] ?: $minCompatibleTikiVersion;
+        $maxCompatibleTikiVersion = $maxCompatibleTikiVersion ?: $requirement['version'];
+    }
 }
+$php_properties['PHP version'] = array(
+    'fitness' => ($minCompatibleTikiVersion && $maxCompatibleTikiVersion) ? tra('good') : tra('bad'),
+    'setting' => PHP_VERSION,
+    'message' => "Tiki $minCompatibleTikiVersion.x to Tiki $maxCompatibleTikiVersion.x will work fine on this version of PHP. Please see http://doc.tiki.org/Requirements for details."
+);
 
 // Check PHP command line version
 if (function_exists('exec')) {

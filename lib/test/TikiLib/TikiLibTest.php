@@ -16,14 +16,14 @@ class TikiLibTest extends TikiTestCase
 
     protected function setUp(): void
     {
-        global $testhelpers;
+        $testhelpers = new TestHelpers();
 
         $testhelpers->simulateTikiScriptContext();
     }
 
     protected function tearDown(): void
     {
-        global $testhelpers;
+        $testhelpers = new TestHelpers();
 
         $testhelpers->removeAllVersions($this->some_page_name1);
         $testhelpers->removeAllVersions($this->some_page_name2);
@@ -37,7 +37,7 @@ class TikiLibTest extends TikiTestCase
 
     public function testRemoveAllVersionsRemovesAllRelationsAlso(): void
     {
-        global $testhelpers;
+        $testhelpers = new TestHelpers();
         $relationlib = TikiLib::lib('relation');
         $tikilib = TikiLib::lib('tiki');
 

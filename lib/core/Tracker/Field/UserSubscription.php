@@ -12,7 +12,7 @@
  */
 class Tracker_Field_UserSubscription extends \Tracker\Field\AbstractField
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'U' => [

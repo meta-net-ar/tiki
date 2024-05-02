@@ -60,7 +60,7 @@
                 </div>
                 {if !empty($object_selector.current_selection)}
                     <div class="form-check">
-                        <input type="radio" checked="checked" value="{$object_selector.current_selection|escape}" name="{$object_selector.id|escape}_sel" name="{$object_selector.id|escape}_sel_selected">
+                        <input type="radio" checked="checked" value="{$object_selector.current_selection|escape}" name="{$object_selector.id|escape}_sel" id="{$object_selector.id|escape}_sel_selected">
                         <label class="form-check-label" for="{$object_selector.id|escape}_sel_selected">
                             {$object_selector.current_selection.title|escape}
                             {if !empty($object_selector.current_selection.metadata)}

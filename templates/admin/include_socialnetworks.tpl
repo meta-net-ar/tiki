@@ -9,7 +9,7 @@
 
     {tabset}
         {tab name="{tr}General{/tr}"}
-            <legend>{tr}Social network integration{/tr}</legend>
+            <legend class="h3">{tr}Social network integration{/tr}</legend>
             {preference name=feature_socialnetworks visible="always"}
 
             <ol>
@@ -127,7 +127,7 @@
 
             {************************************}
             <fieldset class="mt-5">
-                <legend>{tr}Debug and Logs{/tr}</legend>
+                <legend class="h3">{tr}Debug and Logs{/tr}</legend>
                 <div class="adminoptionbox">
                     {$prefname = "`$socPrefix`socLoginBaseUrl"}
     {*                {$prefs[$prefname]}*}
@@ -171,7 +171,7 @@
 
                     </p>
                 {/remarksbox}
-                <legend>{tr}Twitter{/tr}</legend>
+                <legend class="h3">{tr}Twitter{/tr}</legend>
                 <br>
                 <div class="adminoptionbox">
                     {preference name=socialnetworks_twitter_site_name}
@@ -191,7 +191,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Facebook{/tr}</legend>
+                <legend class="h3">{tr}Facebook{/tr}</legend>
                 <br>
                 <div class="adminoptionbox">
                     {preference name=socialnetworks_facebook_site_name}
@@ -226,7 +226,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}LinkedIn{/tr}</legend>
+                <legend class="h3">{tr}LinkedIn{/tr}</legend>
                 <br>
                 {remarksbox type="note" title="{tr}Note{/tr}"}
                 <p>

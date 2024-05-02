@@ -40,9 +40,7 @@
         {section name=ix loop=$items}
             <tr>
                 <td class="checkbox-cell">
-                    <div class="form-check">
-                        <input type="checkbox" name="msg[{$items[ix].threadId}]">
-                    </div>
+                    <input type="checkbox" name="msg[{$items[ix].threadId}]" class="form-check-input" aria-label="{tr}Select{/tr}">
                 </td>
                 <td class="text">
                     {object_link id=$items[ix].threadId type=forumpost} (thread {$items[ix].threadId})

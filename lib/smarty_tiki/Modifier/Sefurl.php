@@ -178,7 +178,11 @@ class Sefurl
             case 'survey':
                 $href = "tiki-take_survey.php?surveyId=" . urlencode($source);
                 break;
-
+            case 'faq':
+            case 'faqs':
+                $type = 'faq';
+                $href = 'tiki-list_faqs.php?galleryId=' . $source;
+                break;
             default:
                 $href = $source;
                 break;

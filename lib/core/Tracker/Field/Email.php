@@ -13,7 +13,7 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
 {
     private $type;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'm' => [
@@ -116,13 +116,13 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -131,7 +131,7 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractField implements \Track
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => true, "{$baseKey}_text" => true];

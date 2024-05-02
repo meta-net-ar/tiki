@@ -56,6 +56,24 @@ legend + * {
     background: inherit;
 }
 
+// To override The dropdown menu text-align: left that (wrongly) ensures proper alignment if parent has it changed (e.g., modal footer)
+.dropdown-menu {
+    text-align: start !important;
+}
+
+// Smarty {button} maeks .btn-default but sometimes .btn-link is added by hand. Actually Smarty {button} probably should make just .btn.
+.btn-primary.btn-link,
+.btn-primary.btn-link:hover {
+    background: transparent;
+    border: none;
+}
+
+.tiki .wiki.external + .icon-link-external, // wikitext
+.tiki .wiki.external .icon-link-external,
+.editable-inline .icon { // Tracker inline editing
+    color: var(--bs-link-color);
+}
+
 //body.tiki.navbar-padding {
 //    padding-top: $tiki-navbar-fixed-height;
 //}
@@ -64,6 +82,13 @@ legend + * {
 //    padding-top: $tiki-navbar-fixed-height + 2rem;
 //    padding-bottom: 0;
 //}
+
+// Cancelling the hardcoded direction of the padding in the navbar set at node_modules/bootstrap/scss/_navbar.scss line:71
+// Padding (any) is not needed in LTR and padding-left is not wanted in RTL languages
+
+.navbar-nav {
+    padding: 0;
+}
 
 body.fullscreen.tiki.navbar-padding {
     padding-top: 0;

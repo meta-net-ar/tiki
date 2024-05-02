@@ -67,6 +67,10 @@ class Search_Formatter_ValueFormatter_Categorylist extends Search_Formatter_Valu
                     break;
                 }
 
+                if (! isset($myArr[$ar])) {
+                    continue;
+                }
+
                 $p_info = $myArr[$ar];
 
                 $showCat = $this->shouldShow($p_info['tepath']);
@@ -89,7 +93,11 @@ class Search_Formatter_ValueFormatter_Categorylist extends Search_Formatter_Valu
                             }
                         }
                     } else {
-                        $printedPath = $p_info['name'];
+                        if (! empty($p_info) && isset($p_info['name'])) {
+                            $printedPath = $p_info['name'];
+                        } else {
+                            $printedPath = '';
+                        }
                     }
 
                     if (! empty($this->separator)) {

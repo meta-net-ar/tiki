@@ -1,4 +1,4 @@
-// Lumen 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/lumen/_variables.scss with
+// Lumen 5.2.0 -- This is a copy of node_modules/bootswatch/dist/lumen/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "lumen" !default;
@@ -30,16 +30,14 @@ $green:   #1D8621; // #28b62c !default; WCAG
 $teal:    #20c997 !default;
 $cyan:    #187DA5; // #75caeb !default; WCAG
 
-$primary:       $blue !default;
-$secondary:     $gray-200 !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
+$primary:       #137FAA; //$blue !default;
+$secondary:     $gray-300; // $gray-200 !default;
+$success:       #1D8720; // $green !default;
+$info:          #177DA6; // $cyan !default;
+$warning:       #BD5800; //$yellow !default;
+$danger:        #EB0C00; // $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-700 !default;
-
-$min-contrast-ratio:   1.75 !default;
 
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
@@ -72,8 +70,6 @@ $blockquote-footer-color:     #707070 !important; // added for Tiki
 
 // Tables
 
-$table-bg-scale:              0% !default;
-
 // Form validation (added for Tiki)
 
 // scss-docs-start form-feedback-variables
@@ -81,8 +77,6 @@ $form-feedback-valid-color:         #1d8720;
 $form-feedback-invalid-color:       #C20A00;
 
 // Buttons
-
-$btn-font-weight:             700 !default;
 
 // Dropdowns
 
@@ -124,13 +118,8 @@ $nav-link-disabled-color: var(--#{$prefix}secondary-color) !default; // #696969;
 
 // Pagination
 
-$pagination-color:                  $gray-700 !default;
 $pagination-bg:                     $gray-200 !default;
-$pagination-hover-color:            $pagination-color !default;
-$pagination-hover-bg:               $pagination-bg !default;
-$pagination-active-border-color:    darken($primary, 5%) !default;
 $pagination-disabled-color:         #696969; // Changed for Tiki - WCAG
-$pagination-disabled-bg:            $pagination-bg !default;
 
 // Accordion (added for Tiki)
 $accordion-button-color: #106E93;
@@ -140,21 +129,11 @@ $figure-caption-color:              #707070 !important;
 
 // Breadcrumbs
 
-$breadcrumb-padding-y:              .375rem !default;
-$breadcrumb-padding-x:              .75rem !default;
-$breadcrumb-bg:                     $pagination-bg !default;
-$breadcrumb-border-radius:          .25rem !default;
 $breadcrumb-active-color: #696969; // Added for Tiki (WCAG)
 
 // Modals
 
-$modal-content-border-color:        rgba($black, .1) !default;
-
 // Close
-
-$btn-close-color:            $white !default;
-$btn-close-opacity:          .4 !default;
-$btn-close-hover-opacity:    1 !default;
 
 // Code
 $code-color:                     $body-color; //    $pink !default; // Bootstrap 5.3

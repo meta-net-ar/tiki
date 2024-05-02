@@ -36,7 +36,7 @@
             {preference name=auth_method}
             {preference name=feature_intertiki}
             <fieldset>
-                <legend>{tr}Registration{/tr} &amp; {tr}Log in{/tr}</legend>
+                <legend class="h3">{tr}Registration{/tr} &amp; {tr}Log in{/tr}</legend>
                 {preference name=allowRegister}
                 <div class="adminoptionboxchild" id="allowRegister_childcontainer">
                     {preference name=validateUsers}
@@ -65,7 +65,7 @@
                     {preference name=http_referer_registration_check}
                     {preference name=email_detect_disposable}
                     <fieldset>
-                        <legend>{tr}CAPTCHA{/tr}</legend>
+                        <legend class="h3">{tr}CAPTCHA{/tr}</legend>
                         {preference name=feature_antibot}
                         <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
                             {preference name=captcha_wordLen}
@@ -83,7 +83,7 @@
                                 {preference name=captcha_questions}
                             </div>
                     </fieldset>
-                    <legend>{tr}Group and tracker login settings{/tr}</legend>
+                    <legend class="h3">{tr}Group and tracker login settings{/tr}</legend>
                     <div class="adminoptionbox mb-3 row">
                         <label for="registration_choices" class="col-sm-4 col-form-label">{tr}Users can select a group to join at registration:{/tr}</label>
                         <div class="col-sm-8 adminoptionlabel">
@@ -143,7 +143,7 @@
                     {preference name=tracker_force_tracker_fields}
                 </div>
                 {preference name=groupTracker}
-                <legend>{tr}Other login settings{/tr}</legend>
+                <legend class="h3">{tr}Other login settings{/tr}</legend>
                 {preference name=email_due}
                 {preference name=unsuccessful_logins}
                 {preference name=unsuccessful_logins_invalid}
@@ -167,7 +167,7 @@
                     {preference name=https_external_links_for_users}
                 </div>
                 <fieldset>
-                    <legend>{tr}Cookies{/tr}</legend>
+                    <legend class="h3">{tr}Cookies{/tr}</legend>
                     {preference name=rememberme}
                     <div class="adminoptionboxchild rememberme_childcontainer all always">
                         {preference name=remembertime}
@@ -177,7 +177,7 @@
                     {preference name=cookie_domain}
                     {preference name=cookie_path}
                     <hr>
-                    <legend>{tr}Cookie consent{/tr}</legend>
+                    <legend class="h3">{tr}Cookie consent{/tr}</legend>
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
                         {preference name=cookie_consent_name}
@@ -200,7 +200,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Username{/tr}</legend>
+                <legend class="h3">{tr}Username{/tr}</legend>
                 {preference name=login_is_email mode=invert}
                 {preference name=login_is_email_obscure}
                 {preference name=user_unique_email}
@@ -217,7 +217,7 @@
                 {preference name=login_autogenerate}
             </fieldset>
             <fieldset>
-                <legend>{tr}Password{/tr}</legend>
+                <legend class="h3">{tr}Password{/tr}</legend>
                 {preference name=forgotPass}
                 {preference name=twoFactorAuth}
                 {preference name=change_password}
@@ -263,7 +263,7 @@
         {tab name="{tr}LDAP{/tr}"}
             <br>
             <fieldset>
-                <legend>LDAP {help url="Login+Authentication+Methods"}</legend>
+                <legend class="h3">LDAP {help url="Login+Authentication+Methods"}</legend>
                 {if ! $ldap_extension_loaded}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must install PHP extension LDAP{/tr}
@@ -281,7 +281,7 @@
                 {preference name=auth_ldap_permit_tiki_users}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
                 {preference name=auth_ldap_host}
                 {preference name=auth_ldap_port}
                 {preference name=auth_ldap_debug}
@@ -292,7 +292,7 @@
                 {preference name=auth_ldap_basedn}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP user{/tr}</legend>
+                <legend class="h3">{tr}LDAP user{/tr}</legend>
                 {preference name=auth_ldap_userdn}
                 {preference name=auth_ldap_userattr}
                 {preference name=auth_ldap_useroc}
@@ -301,7 +301,7 @@
                 {preference name=auth_ldap_emailattr}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP admin{/tr}</legend>
+                <legend class="h3">{tr}LDAP admin{/tr}</legend>
                 {preference name=auth_ldap_adminuser}
                 {preference name=auth_ldap_adminpass}
             </fieldset>
@@ -310,11 +310,11 @@
         {tab name="{tr}LDAP external groups{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}LDAP external groups{/tr}</legend>
+                <legend class="h3">{tr}LDAP external groups{/tr}</legend>
                 {preference name=auth_ldap_group_external}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
                 {preference name=auth_ldap_group_host}
                 {preference name=auth_ldap_group_port}
                 {preference name=auth_ldap_group_debug}
@@ -325,7 +325,7 @@
                 {preference name=auth_ldap_group_basedn}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP user{/tr}</legend>
+                <legend class="h3">{tr}LDAP user{/tr}</legend>
                 {preference name=auth_ldap_group_userdn}
                 {preference name=auth_ldap_group_userattr}
                 {preference name=auth_ldap_group_corr_userattr}
@@ -333,7 +333,7 @@
                 {preference name=syncGroupsWithDirectory}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP group{/tr}</legend>
+                <legend class="h3">{tr}LDAP group{/tr}</legend>
                 {preference name=auth_ldap_groupdn}
                 {preference name=auth_ldap_groupattr}
                 {preference name=auth_ldap_groupdescattr}
@@ -341,17 +341,17 @@
                 {preference name=syncUsersWithDirectory}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP group member - if group membership can be found in group attributes{/tr}</legend>
+                <legend class="h3">{tr}LDAP group member - if group membership can be found in group attributes{/tr}</legend>
                 {preference name=auth_ldap_memberattr}
                 {preference name=auth_ldap_memberisdn}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP user group - if group membership can be found in user attributes{/tr}</legend>
+                <legend class="h3">{tr}LDAP user group - if group membership can be found in user attributes{/tr}</legend>
                 {preference name=auth_ldap_usergroupattr}
                 {preference name=auth_ldap_groupgroupattr}
             </fieldset>
             <fieldset>
-                <legend>{tr}LDAP admin{/tr}</legend>
+                <legend class="h3">{tr}LDAP admin{/tr}</legend>
                 {preference name=auth_ldap_group_adminuser}
                 {preference name=auth_ldap_group_adminpass}
             </fieldset>
@@ -360,7 +360,7 @@
         {tab name="{tr}PAM{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}PAM{/tr} {help url="AuthPAM" desc="{tr}PAM{/tr}"}</legend>
+                <legend class="h3">{tr}PAM{/tr} {help url="AuthPAM" desc="{tr}PAM{/tr}"}</legend>
                 {if $prefs.auth_method ne 'pam'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to PAM for these changes to take effect{/tr}
@@ -374,7 +374,7 @@
         {tab name="{tr}Shibboleth{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Shibboleth{/tr}{help url="AuthShib" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Shibboleth{/tr}{help url="AuthShib" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'shib'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Shibboleth for these changes to take effect{/tr}
@@ -392,7 +392,7 @@
 
         {tab name="{tr}SAML2{/tr}"}
             <fieldset>
-                <legend>{tr}SAML2{/tr}{help url="SAML" desc="{tr}based on Onelogin's php-saml {/tr}"}</legend>
+                <legend class="h3">{tr}SAML2{/tr}{help url="SAML" desc="{tr}based on Onelogin's php-saml {/tr}"}</legend>
                 {if $prefs.auth_method ne 'saml' && $prefs.saml_auth_enabled eq 'y'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to SAML for these changes to take effect{/tr}
@@ -402,14 +402,14 @@
                 {preference name=saml_auth_enabled}
 
                 <fieldset>
-                    <legend>{tr}Identity provider settings{/tr}</legend>
+                    <legend class="h3">{tr}Identity provider settings{/tr}</legend>
                     {preference name=saml_idp_entityid}
                     {preference name=saml_idp_sso}
                     {preference name=saml_idp_slo}
                     {preference name=saml_idp_x509cert}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Options{/tr}</legend>
+                    <legend class="h3">{tr}Options{/tr}</legend>
                         {preference name=saml_options_autocreate}
                         {preference name=saml_options_sync_group}
                         {preference name=saml_options_slo}
@@ -419,18 +419,18 @@
                         {preference name=saml_option_login_link_text}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Attribute mapping{/tr}</legend>
+                    <legend class="h3">{tr}Attribute mapping{/tr}</legend>
                         {preference name=saml_attrmap_username}
                         {preference name=saml_attrmap_mail}
                         {preference name=saml_attrmap_group}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Group mapping{/tr}</legend>
+                    <legend class="h3">{tr}Group mapping{/tr}</legend>
                         {preference name=saml_groupmap_admins}
                         {preference name=saml_groupmap_registered}
                 </fieldset>
                 <fieldset>
-                    <legend>{tr}Advanced settings{/tr}</legend>
+                    <legend class="h3">{tr}Advanced settings{/tr}</legend>
                         {preference name=saml_advanced_debug}
                         {preference name=saml_advanced_strict}
                         {preference name=saml_advanced_sp_entity_id}
@@ -456,7 +456,7 @@
         {tab name="{tr}CAS{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}CAS (central authentication service){/tr}{help url="CAS+Authentication"}</legend>
+                <legend class="h3">{tr}CAS (central authentication service){/tr}{help url="CAS+Authentication"}</legend>
                 {if $prefs.auth_method ne 'cas'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to CAS for these changes to take effect{/tr}
@@ -469,7 +469,7 @@
                 {preference name='cas_force_logout'}
                 {preference name='cas_version'}
                 <fieldset>
-                    <legend>{tr}CAS server{/tr}</legend>
+                    <legend class="h3">{tr}CAS server{/tr}</legend>
                     {preference name='cas_hostname' label="{tr}CAS Server Name{/tr}"}
                     {preference name='cas_port' label="{tr}CAS Server Port{/tr}"}
                     {preference name='cas_path' label="{tr}CAS Server Path{/tr}"}
@@ -482,7 +482,7 @@
         {tab name="{tr}phpBB{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}phpBB{/tr}{help url="phpBB+Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}phpBB{/tr}{help url="phpBB+Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'phpbb'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to phpBB for these changes to take effect{/tr}
@@ -511,7 +511,7 @@
         {tab name="{tr}Web Server{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Web server{/tr}{help url="External+Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Web server{/tr}{help url="External+Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'ws'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Web Server for these changes to take effect{/tr}
@@ -525,11 +525,11 @@
         {tab name="{tr}Password Blacklist{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Password{/tr}</legend>
+                <legend class="h3">{tr}Password{/tr}</legend>
 
                 {preference name=pass_blacklist_file}
 
-                <legend>{tr}Password blacklist tools{/tr}</legend>
+                <legend class="h3">{tr}Password blacklist tools{/tr}</legend>
 
                 <div class="mb-3 row">
                     <h3>{tr}Upload Word List for Processing{/tr}</h3>

@@ -1,4 +1,4 @@
-// United 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/united/_variables.scss with
+// United 5.2.0 -- This is a copy of node_modules/bootswatch/dist/united/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "united" !default;
@@ -33,16 +33,14 @@ $cyan:    #17a2b8 !default;
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
-$primary:       $orange !default;
-$secondary:     $gray-500 !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
+$primary:       #D14715; // $orange !default;
+$secondary:     #7F736C; // $gray-500 !default;
+$success:       #298537; // $green !default;
+$info:          #128091; // $cyan !default;
+$warning:       #996C0B; // $yellow !default;
+$danger:        #DF3226; // $red !default;
 $light:         $gray-200 !default;
 $dark:          $purple !default;
-
-$min-contrast-ratio:   1.8 !default;
 
 // Options
 $enable-dark-mode:            true !default;
@@ -66,9 +64,6 @@ $font-family-sans-serif:      system-ui, sans-serif; // Ubuntu, -apple-system, B
 $input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;
 
 // Tables
-
-$table-dark-bg:               $dark !default;
-$table-dark-border-color:     darken($dark, 5%) !default;
 
 // Code
 $code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3

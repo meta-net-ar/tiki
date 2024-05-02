@@ -114,7 +114,7 @@
     {if !isset($first) or $first neq 'y'}
     <div>
         {if $tiki_p_admin_forum eq 'y' and isset($comment.threadId) and $comment.threadId > 0}
-        <input type="checkbox" name="forumtopic[]" value="{$comment.threadId|escape}" {if $smarty.request.forumthread and in_array($comment.threadId,$smarty.request.forumthread)}checked="checked"{/if}>
+        <input type="checkbox" name="forumtopic[]" value="{$comment.threadId|escape}" {if $smarty.request.forumthread and in_array($comment.threadId,$smarty.request.forumthread)}checked="checked"{/if} aria-label="{tr}Select{/tr}">
         {/if}
     </div>
     {/if}
@@ -125,9 +125,9 @@
     <h2 class=" card-title">
         <span>{$comment.title|escape}</span>
         {if ($prefs.feature_sefurl eq 'y') }
-        <a class="heading-link" href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}">{icon name="link"}</a>
+        <a class="heading-link" href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}" aria-label="{tr}Heading link{/tr}">{icon name="link"}</a>
         {else}
-        <a class="heading-link" href="?tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}">{icon name="link"}</a>
+        <a class="heading-link" href="?tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}" aria-label="{tr}Heading link{/tr}>{icon name="link"}</a>
         {/if}
     </h2>
     {/if}

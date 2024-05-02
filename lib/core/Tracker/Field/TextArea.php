@@ -12,7 +12,7 @@
  */
 class Tracker_Field_TextArea extends Tracker_Field_Text
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'a' => [
@@ -229,7 +229,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         global $prefs;
         $baseKey = $this->getBaseKey();
@@ -246,7 +246,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         global $prefs;
 
@@ -268,7 +268,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         global $prefs;
         $baseKey = $this->getBaseKey();

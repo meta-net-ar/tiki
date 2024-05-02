@@ -28,8 +28,8 @@
         <form method="post"{if ! $isAjax}class="no-ajax"{/if} action="{service controller=search action=rebuild}" onsubmit="$(this).parent().tikiModal('{tr}Rebuilding index...{/tr}')">
             <div class="mb-3 row mx-2">
                 <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" name="loggit" value="1">
+                    <input type="checkbox" class="form-check-input" name="loggit" id="loggit" value="1">
+                    <label class="form-check-label" for="loggit">
                         {tr}Enable logging{/tr}
                     </label>
                     <div class="form-text">{tr _0=$log_file_browser}Log file is saved as %0{/tr}</div>

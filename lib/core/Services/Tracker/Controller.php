@@ -338,7 +338,7 @@ class Services_Tracker_Controller
         $encryption_keys = TikiLib::lib('encryption')->get_keys();
 
         $permName = $input->permName->word();
-        if ($field['permName'] != $permName) {
+        if ($permName && $field['permName'] != $permName) {
             if ($definition->getFieldFromPermName($permName)) {
                 throw new Services_Exception_DuplicateValue('permName', tr('This permanent name %0 is already used', $permName));
             }
@@ -923,7 +923,9 @@ class Services_Tracker_Controller
                 $permName = $f['permName'];
                 $fieldValue = $f['value'] ?? '';
                 if ($f['type'] === 'a') {
-                    $fieldValue = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($fieldValue);
+                    foreach ((array) $fieldValue as & $value) {
+                        $value = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($value);
+                    }
                 }
                 $fields[$permName] = $fieldValue;
 
@@ -1275,7 +1277,9 @@ class Services_Tracker_Controller
                 $permName = $f['permName'];
                 $fieldValue = $f['value'] ?? '';
                 if ($f['type'] === 'a') {
-                    $fieldValue = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($fieldValue);
+                    foreach ((array) $fieldValue as & $value) {
+                        $value = TikiLib::lib('tiki')->convertAbsoluteLinksToRelative($value);
+                    }
                 }
                 $fields[$permName] = $fieldValue;
             }
@@ -1371,7 +1375,7 @@ class Services_Tracker_Controller
                     ];
                 }
                 //return to page
-                if (! $redirect) {
+                if ($skipRedirect === 1 || ! $redirect) {
                     $referer = Services_Utilities::noJsPath();
 
                     // Return item data and refresh info
@@ -1391,7 +1395,7 @@ class Services_Tracker_Controller
                     return $return;
                 } elseif ($access->is_xml_http_request()) {
                     return Services_Utilities::redirect($redirect);
-                } elseif ($skipRedirect !== 1) {
+                } else {
                     $access->redirect($redirect);
                 }
             }
@@ -1494,15 +1498,20 @@ class Services_Tracker_Controller
     {
         global $prefs;
 
-        $input = $input->fields;
-        $trackerId = $input->trackerId->int();
+        if (! empty($input->fields->getValue())) {
+            $input_bis = $input->fields;
+        } else {
+            $input_bis = $input;
+        }
+
+        $trackerId = $input_bis->trackerId->int();
         $definition = Tracker_Definition::get($trackerId);
 
         if (! $definition) {
             throw new Services_Exception_NotFound();
         }
 
-        $itemId = $input->itemId->int();
+        $itemId = $input_bis->itemId->int();
 
         if ($itemId) {
             $itemInfo = TikiLib::lib('trk')->get_tracker_item($itemId);
@@ -1517,7 +1526,7 @@ class Services_Tracker_Controller
         $smarty = TikiLib::lib('smarty');
 
         $itemObject = Tracker_Item::fromInfo($itemInfo);
-        $processedFields = $itemObject->prepareInput($input);
+        $processedFields = $itemObject->prepareInput($input_bis);
         $fieldsProcessed = [];
         foreach ($processedFields as $k => $f) {
             $permName = $f['permName'];
@@ -1563,8 +1572,7 @@ class Services_Tracker_Controller
 
         include_once('tiki-sefurl.php');
 
-        $statusTypes = $trklib->status_types();
-        $smarty->assign('status_types', $statusTypes);
+        $smarty->assign('status_types', $definition->getStatusTypes());
         $fields = [];
         $ins_fields = [];
         $itemUsers = $trklib->get_item_creators($trackerId, $itemId);
@@ -1661,32 +1669,6 @@ class Services_Tracker_Controller
             $comCount = $trklib->get_item_nb_comments($itemId);
             $smarty->assign("comCount", $comCount);
             $smarty->assign("canViewCommentsAsItemOwner", $itemObject->canViewComments());
-        }
-
-        if ($trackerInfo["useAttachments"] == 'y') {
-            if ($input->removeattach->int()) {
-                $_REQUEST["show"] = "att";
-            }
-            if ($input->editattach->int()) {
-                $att = $trklib->get_item_attachment($input->editattach->int());
-                $smarty->assign("attach_comment", $att['comment']);
-                $smarty->assign("attach_version", $att['version']);
-                $smarty->assign("attach_longdesc", $att['longdesc']);
-                $smarty->assign("attach_file", $att["filename"]);
-                $smarty->assign("attId", $att["attId"]);
-                $_REQUEST["show"] = "att";
-            }
-            // If anything below here is changed, please change lib/wiki-plugins/wikiplugin_attach.php as well.
-            $attextra = 'n';
-            if (isset($trackerInfo['orderAttachments']) && strstr($trackerInfo["orderAttachments"], '|')) {
-                $attextra = 'y';
-            }
-            $attfields = explode(',', strtok($trackerInfo["orderAttachments"] ?? '', '|'));
-            $atts = $trklib->list_item_attachments($itemId, 0, -1, 'comment_asc', '');
-            $smarty->assign('atts', $atts["data"]);
-            $smarty->assign('attCount', $atts["cant"]);
-            $smarty->assign('attfields', $attfields);
-            $smarty->assign('attextra', $attextra);
         }
 
         $smarty->assign('canView', $itemObject->canView());
@@ -2122,8 +2104,6 @@ class Services_Tracker_Controller
             if (! $definition) {
                 throw new Services_Exception_NotFound();
             }
-        } else {
-            $definition = Tracker_Definition::getDefault();
         }
 
         $cat_type = 'tracker';
@@ -2180,15 +2160,15 @@ class Services_Tracker_Controller
         return [
             'title' => $trackerId ? tr('Edit') . " " . tr('%0', $definition->getConfiguration('name')) : tr('Create Tracker'),
             'trackerId' => $trackerId,
-            'info' => $definition->getInformation(),
-            'statusTypes' => TikiLib::lib('trk')->status_types(),
-            'statusList' => preg_split('//', $definition->getConfiguration('defaultStatus', 'o'), -1, PREG_SPLIT_NO_EMPTY),
-            'sortFields' => $this->getSortFields($definition),
-            'attachmentAttributes' => $this->getAttachmentAttributes($definition->getConfiguration('orderAttachments', 'created,filesize,hits')),
-            'startDate' => $this->format($definition->getConfiguration('start'), '%Y-%m-%d'),
-            'startTime' => $this->format($definition->getConfiguration('start'), '%H:%M'),
-            'endDate' => $this->format($definition->getConfiguration('end'), '%Y-%m-%d'),
-            'endTime' => $this->format($definition->getConfiguration('end'), '%H:%M'),
+            'info' => $trackerId ? $definition->getInformation() : [],
+            'statusTypes' => $trackerId ? $definition->getStatusTypes() : $trklib->status_types(),
+            'statusList' => $trackerId ? preg_split('//', $definition->getConfiguration('defaultStatus', 'o'), -1, PREG_SPLIT_NO_EMPTY) : null,
+            'sortFields' => $this->getSortFields($definition ?? null),
+            'attachmentAttributes' => $trackerId ? $this->getAttachmentAttributes($definition->getConfiguration('orderAttachments', 'created,filesize,hits')) : [],
+            'startDate' => $trackerId ? $this->format($definition->getConfiguration('start'), '%Y-%m-%d') : '',
+            'startTime' => $trackerId ? $this->format($definition->getConfiguration('start'), '%H:%M') : '',
+            'endDate' => $trackerId ? $this->format($definition->getConfiguration('end'), '%Y-%m-%d') : '',
+            'endTime' => $trackerId ? $this->format($definition->getConfiguration('end'), '%H:%M') : '',
             'groupList' => $this->getGroupList(),
             'groupforAlert' => $groupforAlert,
             'showeachuser' => $groupalertlib->GetShowEachUser('tracker', 'trackerId', $groupforAlert),
@@ -2654,8 +2634,10 @@ class Services_Tracker_Controller
     {
         $sorts = [];
 
-        foreach ($definition->getFields() as $field) {
-            $sorts[$field['fieldId']] = $field['name'];
+        if ($definition) {
+            foreach ($definition->getFields() as $field) {
+                $sorts[$field['fieldId']] = $field['name'];
+            }
         }
 
         $sorts[-1] = tr('Last Modification');

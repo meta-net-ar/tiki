@@ -17,7 +17,7 @@
     </div>
 
     <fieldset id="Modules">
-        <legend>{tr}{$crumbs[$crumb]->description}{/tr}{help crumb=$crumbs[$crumb]}</legend>
+        <legend class="h3">{tr}{$crumbs[$crumb]->description}{/tr}{help crumb=$crumbs[$crumb]}</legend>
 
         {preference name=feature_modulecontrols}
         {preference name=user_assigned_modules}
@@ -28,7 +28,7 @@
 
         <div class="adminoptionbox">
             <fieldset>
-                <legend>{tr}Module zone visibility{/tr}</legend>
+                <legend class="h3">{tr}Module zone visibility{/tr}</legend>
                 {preference name=module_zones_top}
                 {preference name=module_zones_topbar}
                 {preference name=module_zones_pagetop}

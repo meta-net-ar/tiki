@@ -19,26 +19,28 @@ interface Search_ContentSource_Interface
     /**
      * Provides the basic data for the specified object ID.
      *
-     * @return array
+     * @return array An array of keys, some standard (ex: title), some specific to the document type (ex: tracker_status).  False if the document isn't found in the source
      */
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory);
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false;
 
     /**
      * Returns an array containing the list of field names that can be provided
      * by the content source.
+     *
+     * benoitg- 2023-03-04:  This list seems to be quite incomplete in the case of some object types (namely TrackerItemSource).
      */
-    public function getProvidedFields();
+    public function getProvidedFields(): array;
 
     /**
      * Returns an array containing the list of field names that can be provided
      * by the content source and their respective search types.
      */
-    public function getProvidedFieldTypes();
+    public function getProvidedFieldTypes(): array;
 
 
     /**
      * Returns an array containing the list of field names that must be included
-     * in the global content.
+     * in the "contents" key contents if indexable.
      */
-    public function getGlobalFields();
+    public function getGlobalFields(): array;
 }

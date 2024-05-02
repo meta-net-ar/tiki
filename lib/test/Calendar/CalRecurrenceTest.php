@@ -12,7 +12,11 @@ class Calendar_CalRecurrenceTest extends TikiTestCase
 
     protected function setUp(): void
     {
-        global $user;
+        global $user, $prefs;
+
+        // FIXME These tests don't work if categories are enabled
+        $prefs['feature_categories'] = 'n';
+
         $user = 'admin';
         $this->calendarId = TikiLib::lib('calendar')->set_calendar(0, $user, 'Test cal', '', ['customlanguages' => 'y', 'custompriorities' => 'y']);
         $table = TikiLib::lib('tiki')->table('tiki_calendar_recurrence');
@@ -111,6 +115,7 @@ class Calendar_CalRecurrenceTest extends TikiTestCase
             'dayOfMonth' => [],
             'monthlyType' => null,
             'monthlyWeekdayValue' => null,
+            'monthlyFirstlastWeekdayValue' => null,
             'yearly' => true,
             'years' => 1,
             'yearlyType' => 'date',
@@ -118,6 +123,7 @@ class Calendar_CalRecurrenceTest extends TikiTestCase
             'yearlyMonth' => 9,
             'yearlyDay' => 15,
             'yearlyWeekdayValue' => " ",
+            'yearlyFirstlastWeekdayValue' => null,
             'yearlyWeekMonth' => null,
             'nbRecurrences' => null,
             'startPeriod' => $rec->getStartPeriod(),

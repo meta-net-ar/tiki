@@ -206,11 +206,13 @@ function wikiplugin_list($data, $params)
     if ($params['cache'] == 'y') {
         // Clean rules setting
         $rules = [];
-        foreach ($params['cachepurgerules'] as $r) {
-            $parts = explode(':', $r, 2);
-            $cleanrule['type'] = trim($parts[0]);
-            $cleanrule['object'] = trim($parts[1]);
-            $rules[] = $cleanrule;
+        if (isset($params['cachepurgerules'])) {
+            foreach ($params['cachepurgerules'] as $r) {
+                $parts = explode(':', $r, 2);
+                $cleanrule['type'] = trim($parts[0]);
+                $cleanrule['object'] = trim($parts[1]);
+                $rules[] = $cleanrule;
+            }
         }
         // Need to check if existing rules have been changed and therefore have to be deleted first
         $oldrules = $cachelib->get_purge_rules_for_cache($cacheType, $cacheName);
@@ -322,7 +324,7 @@ function wikiplugin_list($data, $params)
 
     $result->setTsSettings($builder->getTsSettings());
 
-    $formatter = $builder->getFormatter(isset($result->errorInQuery) && ! empty($result->errorInQuery));
+    $formatter = $builder->getFormatter($result->errorInQuery ?? '');
 
     $result->setTsOn($tsret['tsOn']);
 

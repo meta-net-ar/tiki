@@ -42,11 +42,9 @@
         <table class="table">
             <tr>
                 {if $listpages and $tiki_p_remove_article eq 'y'}
-                    <th class="auto">
-                        <div class="form-check">
-                            {select_all checkbox_names='checked[]'}
-                        </div>
-                    </th>
+                    <td class="auto">  {* Changed from th to prevent ARIA empty header error *}
+                        {select_all checkbox_names='checked[]'}
+                    </td>
                 {/if}
                 {if $prefs.art_list_title eq 'y'}
                     {assign var=numbercol value=$numbercol+1}
@@ -119,7 +117,7 @@
                 {/if}
                 {if $tiki_p_edit_article eq 'y' or $tiki_p_remove_article eq 'y' or isset($oneEditPage) or $tiki_p_read_article}
                     {assign var=numbercol value=$numbercol+1}
-                    <th></th>
+                    <td></td> {* Changed from th to prevent ARIA empty header error *}
                 {/if}
             </tr>
 
@@ -132,9 +130,7 @@
                 <tr>
                     {if $listpages[changes].perms.tiki_p_remove_article eq 'y'}
                         <td class="checkbox-cell">
-                            <div class="form-check">
-                                <input class="checkboxes" type="checkbox" name="checked[]" value="{$listpages[changes].articleId|escape}" {if $listpages[changes].checked eq 'y'}checked="checked" {/if} required>
-                            </div>
+                            <input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$listpages[changes].articleId|escape}" {if $listpages[changes].checked eq 'y'}checked="checked" {/if} required>
                         </td>
                     {/if}
                     {if $prefs.art_list_title eq 'y'}
@@ -156,10 +152,10 @@
                         <td class="text">{$listpages[changes].topicName|escape}</td>
                     {/if}
                     {if $prefs.art_list_date eq 'y'}
-                        <td class="date" title="{$listpages[changes].publishDate|tiki_short_datetime:'':'n'}">{$listpages[changes].publishDate|tiki_short_date}</td>
+                        <td class="date">{$listpages[changes].publishDate|tiki_short_date}</td>
                     {/if}
                     {if $prefs.art_list_expire eq 'y'}
-                        <td class="date" title="{$listpages[changes].expireDate|tiki_short_datetime:'':'n'}">{$listpages[changes].expireDate|tiki_short_date}</td>
+                        <td class="date">{$listpages[changes].expireDate|tiki_short_date}</td>
                     {/if}
                     {if $prefs.art_list_visible eq 'y'}
                         <td class="text">{tr}{$listpages[changes].disp_article}{/tr}</td>
@@ -231,12 +227,17 @@
             {sectionelse}
                 {norecords _colspan=$numbercol}
             {/section}
+            {if $listpages and $tiki_p_remove_article eq 'y'}
+                <tr>
+                    <td colspan="{$numbercol+1}">
+                        {button _text="{tr}Select Duplicates{/tr}" _onclick="checkDuplicateRows(this, [2, 7]); return false;"}
+                    </td>
+                </tr>
+            {/if}
         </table>
     </div>
     {if $listpages and $tiki_p_remove_article eq 'y'}
         <div>
-            {button _text="{tr}Select Duplicates{/tr}" _onclick="checkDuplicateRows(this,'td:not(:eq(2))'); return false;"}
-            <br><br>
             <div class="col-lg-9 input-group">
                 <select name="submit_mult" class="form-select">
                     <option value="">{tr}Select action to perform with checked...{/tr}</option>

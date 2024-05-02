@@ -25,7 +25,7 @@ class CaldavClient
     public function __construct()
     {
         $this->authBackend = new InternalAuth();
-        $this->server = Utilities::buildCaldavServer($this->authBackend);
+        $this->server = Utilities::buildSabreDavServer($this->authBackend);
     }
 
     public function saveCalendarObject($calitem)
@@ -76,7 +76,7 @@ class CaldavClient
         $this->invokeBackendMethod($r);
     }
 
-    public function deleteCalendarObject($calitem_or_rec)
+    public function deleteCalendarObject($calitem_or_rec, $recurring_all = true)
     {
         global $url_path;
         if (is_array($calitem_or_rec)) {
@@ -93,6 +93,7 @@ class CaldavClient
         $r = Sapi::createFromServerArray($_SERVER);
         $r->setMethod('DELETE');
         $r->setUrl($url_path . 'tiki-caldav.php/calendars/' . $user . '/' . Utilities::getCalendarUri($calendarId) . '/' . Utilities::getCalendarObjectUri($calitem_or_rec));
+        $r->setHeader('X-Tiki-Delete-All-Recurring', $recurring_all ? 1 : 0);
         $this->invokeBackendMethod($r);
     }
 

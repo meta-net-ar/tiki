@@ -12,7 +12,7 @@
  */
 class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, Search_FacetProvider_Interface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, \Tracker\Field\EnumerableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'd' => [
@@ -39,7 +39,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tr
                 'help' => 'Drop-Down---Radio-Tracker-Field',
                 'prefs' => ['trackerfield_dropdownother'],
                 'tags' => ['basic'],
-                'default' => 'n',
+                'default' => 'y',
                 'supported_changes' => ['d', 'D', 'R', 'M', 'm', 't', 'a', 'L'],
                 'params' => [
                     'options' => [
@@ -279,7 +279,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         $data = [$baseKey, $baseKey . '_text'];
@@ -291,7 +291,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         $data = [
@@ -306,7 +306,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return ["{$baseKey}_text" => true];

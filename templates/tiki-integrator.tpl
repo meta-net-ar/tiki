@@ -6,7 +6,7 @@
 <div class="t_navbar">
     {assign var=thisrepID value=$repID|escape}
     {if $cached eq 'y'}
-        {if strlen($file) gt 0}
+        {if $file neq null and strlen($file) gt 0}
             {button href="tiki-integrator.php?repID=$thisrepID&amp;file=$file&amp;clear_cache" class="btn btn-primary" _title="{tr}Clear cached version and refresh cache{/tr}" _text="{tr}Refresh{/tr}"}
         {else}
             {button href="tiki-integrator.php?repID=$thisrepID&amp;clear_cache" class="btn btn-primary" _title="{tr}Clear cached version and refresh cache{/tr}" _text="{tr}Refresh{/tr}"}

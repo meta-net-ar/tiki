@@ -10,13 +10,13 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_forums visible="always"}
                 {preference name=home_forum}
                 {preference name=forum_image_file_gallery}
             </fieldset>
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Features{/tr}
                 </legend>
                 {preference name=feature_forum_rankings}
@@ -55,7 +55,7 @@
                 {preference name=forum_moderator_email_approve}
             </fieldset>
             <fieldset>
-                <legend>{tr}Threads{/tr}</legend>
+                <legend class="h3">{tr}Threads{/tr}</legend>
                 {preference name=forum_thread_defaults_by_forum}
                 {preference name=forum_thread_user_settings}
                 <div class="adminoptionboxchild" id="forum_thread_user_settings_childcontainer">
@@ -69,7 +69,7 @@
                 {preference name=forum_notifications_use_new_threads}
             </fieldset>
             <fieldset>
-                <legend>{tr}Searches{/tr}</legend>
+                <legend class="h3">{tr}Searches{/tr}</legend>
                 {preference name=feature_forums_name_search}
                 {preference name=feature_forums_search}
                 {preference name=feature_forum_content_search}

@@ -16,7 +16,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
     private $id;
     private $tsOn;
     private $tsettings;
-    public $errorInQuery = false;
+    public $errorInQuery = '';
 
     public static function create($list)
     {
@@ -131,35 +131,43 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
 
     public function highlight($content)
     {
-        if ($this->highlightHelper) {
-            // Build the content string based on heuristics
-            $text = '';
-            foreach ($content as $key => $value) {
-                if (
-                    $key != 'object_type' // Skip internal values
-                    && $key != 'object_id'
-                    && $key != 'parent_object_type'
-                    && $key != 'parent_object_id'
-                    && $key != 'relevance'
-                    && $key != 'score'
-                    && $key != 'url'
-                    && $key != 'title'
-                    && $key != 'title_initial'
-                    && $key != 'title_firstword'
-                    && $key != 'description'
-                    && ! empty($value) // Skip empty
-                    && ! is_array($value) // Skip arrays, multivalues fields are not human readable
-                    && ! preg_match('/token[a-z]{8,}/', $value) // tokens
-                    && ! preg_match('/^\s*\d{4}-\d{2}-\d{2} \d{2}\:\d{2}\:\d{2}\s*$/', $value)  // dates
-                    && ! preg_match('/^[\w-]+$/', $value)
-                ) { // Skip anything that looks like a single token
-                    $text .= "\n$value";
-                }
-            }
+        /* These heuristics seem to date from a long time ago, and did not work properly with most trackers at all - benoitg - 2024-03-11
 
-            if (! empty($text)) {
-                return $this->highlightHelper->filter($text);
+        if ($this->highlightHelper) {
+        // Build the content string based on heuristics
+        $text = '';
+        foreach ($content as $key => $value) {
+            if (
+                $key != 'object_type' // Skip internal values
+                && $key != 'object_id'
+                && $key != 'parent_object_type'
+                && $key != 'parent_object_id'
+                && $key != 'relevance'
+                && $key != 'score'
+                && $key != 'url'
+                && $key != 'title'
+                && $key != 'title_initial'
+                && $key != 'title_firstword'
+                && $key != 'description'
+                && ! empty($value) // Skip empty
+                && ! is_array($value) // Skip arrays, multivalues fields are not human readable
+                && ! preg_match('/token[a-z]{8,}/', $value) // tokens
+                && ! preg_match('/^\s*\d{4}-\d{2}-\d{2} \d{2}\:\d{2}\:\d{2}\s*$/', $value)  // dates
+                && ! preg_match('/^[\w-]+$/', $value)
+            ) { // Skip anything that looks like a single token
+                $text .= "\n$value";
             }
+        }
+
+        if (! empty($text)) {
+            var_dump($content);
+            die;
+            return $this->highlightHelper->filter($text);
+        }
+        }*/
+
+        if (! empty($content['contents'])) {
+            return $this->highlightHelper->filter($content['contents']);
         }
     }
 

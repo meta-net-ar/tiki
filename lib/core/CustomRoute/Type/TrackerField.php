@@ -33,6 +33,12 @@ class TrackerField extends Type
                 'function' => 'getTrackerFields',
                 'args' => ['tracker'],
             ],
+            'wiki_page' => [
+                'name' => tr('Wiki page'),
+                'type' => 'select',
+                'required' => false,
+                'function' => 'getWikiPageNames'
+            ],
         ];
     }
 
@@ -67,6 +73,24 @@ class TrackerField extends Type
             $fieldName = $trkField['name'];
 
             $list[$fieldId] = $fieldName;
+        }
+
+        return $list;
+    }
+
+    /**
+     * Get the list of wiki pages available to add a route
+     *
+     * @return array
+     */
+    public static function getWikiPageNames()
+    {
+        $tikilib = TikiLib::lib('tiki');
+
+        $list = ['' => ''];
+        $pages = $tikilib->list_pages(0, -1, 'pageName_asc');
+        foreach ($pages['data'] as $page) {
+            $list[$page['page_id']] = $page['pageName'];
         }
 
         return $list;

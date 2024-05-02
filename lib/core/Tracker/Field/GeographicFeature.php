@@ -12,7 +12,7 @@
  */
 class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\IndexableInterface, \Tracker\Field\ExportableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'GF' => [
@@ -21,7 +21,7 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractField imple
                 'help' => 'Geographic-Feature-Tracker-Field',
                 'prefs' => ['trackerfield_geographicfeature'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                 ],
             ],
@@ -79,13 +79,13 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractField imple
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return ['geo_located', 'geo_feature', 'geo_feature_field', $baseKey];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -96,7 +96,7 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractField imple
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

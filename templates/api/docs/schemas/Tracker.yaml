@@ -45,6 +45,12 @@ properties:
     type: array
   newItemStatus:
     type: string
+  altOpenStatus:
+    type: string
+  altPendingStatus:
+    type: string
+  altClosedStatus:
+    type: string
   modItemStatus:
     type: string
   outboundEmail:

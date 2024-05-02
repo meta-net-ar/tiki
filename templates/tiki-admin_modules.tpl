@@ -39,7 +39,7 @@
     </ul>
     <p>
         <strong>{tr}Note:{/tr}</strong> {tr}Links and buttons in modules, apart from the Application Menu, have been deliberately disabled on this page to make drag and drop more reliable. Click here to return <a href="./" class="alert-link">HOME</a>{/tr}<br>
-        <strong><em>{tr}More info here{/tr}</em></strong> {icon name="help" href="http://dev.tiki.org/Modules+Revamp" class="alert-link"}
+        <strong><em>{tr}More info here{/tr}</em></strong> {icon name="help" href="http://dev.tiki.org/Modules+Revamp" class="alert-link" _aria-label="{tr}More info here{/tr}"}
     </p>
 
 {/remarksbox}
@@ -78,7 +78,7 @@
                                         <th>{tr}Rows{/tr}</th>
                                         <th>{tr}Parameters{/tr}</th>
                                         <th>{tr}Groups{/tr}</th>
-                                        <th></th>
+                                        <td></td>
                                     </tr>
 
                                     {foreach $assigned_modules[$zone_initial] as $module}
@@ -204,7 +204,7 @@
                 <tr>
                     <th>{tr}Name{/tr}</th>
                     <th>{tr}Title{/tr}</th>
-                    <th></th>
+                    <td></td>
                 </tr>
 
                 {section name=user loop=$user_modules}
@@ -264,19 +264,19 @@
             {ticket}
             <input type="hidden" name="um_tgt_module" value="{$um_tgt_module|escape}" hidden="hidden" />
             <div class="tiki-form-group row">
-                <label class="col-sm-2 col-form-label">{tr}Name{/tr}</label>
+                <label class="col-sm-2 col-form-label" for="um_name">{tr}Name{/tr}</label>
                 <div class="col-sm-10">
                     <input type="text" id="um_name" name="um_name" value="{$um_name|escape}" class="form-control">
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-2 col-form-label">{tr}Title{/tr}</label>
+                <label class="col-sm-2 col-form-label" for="um_title">{tr}Title{/tr}</label>
                 <div class="col-sm-10">
                     <input type="text" id="um_title" name="um_title" value="{$um_title|escape}" class="form-control">
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-2 col-form-label">{tr}Parse using{/tr}</label>
+                <label class="col-sm-2 col-form-label" for="um_parse">{tr}Parse using{/tr}</label>
                 <div class="col-sm-10">
                     <select name="um_parse" id="um_parse" class="form-control mb-3">
                         <option value=""{if $um_parse eq ""} selected="selected"{/if}>{tr}None{/tr}</option>
@@ -288,7 +288,7 @@
             {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
             {if $prefs.feature_polls eq "y"}
                 <div class="tiki-form-group row">
-                    <label class="col-sm-2 col-form-label">{tr}Polls{/tr}</label>
+                    <label class="col-sm-2 col-form-label" for='list_polls'>{tr}Polls{/tr}</label>
                     <div class="col-sm-9">
                         <select name="polls" id='list_polls' class="form-control">
                             <option value="{literal}{{/literal}poll{literal}}{/literal}">--{tr}Random active poll{/tr}--</option>
@@ -299,14 +299,14 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_polls', 'um_data');" title=":{tr}Use poll{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
-                        <a title="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_polls', 'um_data');" aria-label="{tr}Use poll{/tr}" title=":{tr}Use poll{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
+                        <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>
             {/if}
             {if $contents}
                 <div class="tiki-form-group row">
-                    <label class="col-sm-2 col-form-label">{tr}Dynamic content blocks{/tr}</label>
+                    <label class="col-sm-2 col-form-label"  for='list_contents'>{tr}Dynamic content blocks{/tr}</label>
                     <div class="col-sm-9">
                         <select name="contents" id='list_contents' class="form-control">
                             {section name=ix loop=$contents}
@@ -315,14 +315,14 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_contents', 'um_data');" title=":{tr}Use dynamic content{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>>
-                        <a title="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_contents', 'um_data');" aria-label="{tr}Use dynamic content{/tr}" title=":{tr}Use dynamic content{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>>
+                        <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>
             {/if}
             {if $rsss}
                 <div class="tiki-form-group row">
-                    <label class="col-sm-2 col-form-label">{tr}Feeds{/tr}</label>
+                    <label class="col-sm-2 col-form-label" for='list_rsss'>{tr}Feeds{/tr}</label>
                     <div class="col-sm-9">
                         <select name="rsss" id='list_rsss' class="form-control">
                             {section name=ix loop=$rsss}
@@ -331,14 +331,14 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_rsss', 'um_data');" title=":{tr}Use RSS module{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
-                        <a title="{tr}Help{/tr}" {popup text="Params: id= max= skip=x,y " width=100 center=true}>{icon name='help'}</a>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_rsss', 'um_data');" aria-label="{tr}Use RSS module{/tr}" title=":{tr}Use RSS module{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
+                        <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: id= max= skip=x,y " width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>
             {/if}
             {if $banners}
                 <div class="tiki-form-group row">
-                    <label class="col-sm-2 col-form-label">{tr}Banners{/tr}</label>
+                    <label class="col-sm-2 col-form-label" for='list_banners'>{tr}Banners{/tr}</label>
                     <div class="col-sm-9">
                         <select name="banners" id='list_banners' class="form-control">
                             {section name=ix loop=$banners}
@@ -347,14 +347,14 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_banners', 'um_data');" title=":{tr}Use banner zone{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
-                        <a title="{tr}Help{/tr}" {popup text="Params: zone= target=_blank|_self|" width=100 center=true}>{icon name='help'}</a>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_banners', 'um_data');" aria-label="{tr}Use banner zone{/tr}" title=":{tr}Use banner zone{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
+                        <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: zone= target=_blank|_self|" width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>
             {/if}
             {if $wikistructures}
                 <div class="tiki-form-group row">
-                    <label class="col-sm-2 col-form-label">{tr}Structures{/tr}</label>
+                    <label class="col-sm-2 col-form-label" for='list_wikistructures'>{tr}Structures{/tr}</label>
                     <div class="col-sm-9">
                         <select name="structures" id='list_wikistructures' class="form-control">
                             {section name=ix loop=$wikistructures}
@@ -363,21 +363,20 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_wikistructures', 'um_data');" title=":{tr}Use wiki structure{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
-                        <a title="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_wikistructures', 'um_data');" aria-label="{tr}Use wiki structure{/tr}" title=":{tr}Use wiki structure{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
+                        <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>
             {/if}
             <div class="tiki-form-group row">
-                <label class="col-sm-2 col-form-label">{tr}Contents{/tr}</label>
+                <label class="col-sm-2 col-form-label" for='um_data'>{tr}Contents{/tr}</label>
                 <div class="col-sm-10">
                     <a id="editcreate"></a>
                     {textarea name='um_data' id='um_data' _class='form-control' _toolbars='y' _previewConfirmExit='n' _simple="y" syntax='smarty'}{$um_data}{/textarea}
                 </div>
             </div>
             <div class="tiki-form-group row">
-                <label class="col-sm-2 col-form-label"></label>
-                <div class="col-sm-10">
+                <div class="col-sm-10 offset-sm-2">
                     <input type="submit" class="btn btn-primary" name="um_update" value="{if empty($um_name)}{tr}Create{/tr}{else}{tr}Save{/tr}{/if}" onclick="$(window).off('beforeunload');return true;">
                 </div>
             </div>
@@ -392,7 +391,7 @@
                     {listfilter selectors='#module_list li'}
                     <div class="form-check mb-3">
                         <input type="checkbox" class="form-check-input" name="module_list_show_all" id="module_list_show_all"{if $module_list_show_all} checked="checked"{/if}>
-                        <label for="module_list_show_all" class="form-check-lable">{tr}Show all modules{/tr}</label>
+                        <label for="module_list_show_all" class="form-check-label">{tr}Show all modules{/tr}</label>
                     </div>
                 </div>
                 <ul id="module_list">

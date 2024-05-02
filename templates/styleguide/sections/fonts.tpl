@@ -31,15 +31,15 @@
                     <input id="tc-font-size" class="nocolor" data-selector="p" data-element="font-size" type="text">
                 </p>
                 <p>
-                    <input id="tc-font-bold" class="nocolor check" data-selector="p" data-element="font-weight" type="checkbox" data-check="600" data-default="normal">
+                    <input id="tc-font-bold" class="nocolor check form-check-input" data-selector="p" data-element="font-weight" type="checkbox" data-check="600" data-default="normal">
                     {tr}Bold{/tr}
                 </p>
                 <p>
-                    <input id="tc-font-italic" class="nocolor check" data-selector="p" data-element="font-style" type="checkbox" data-check="italic" data-default="normal">
+                    <input id="tc-font-italic" class="nocolor check form-check-input" data-selector="p" data-element="font-style" type="checkbox" data-check="italic" data-default="normal">
                     {tr}Italic{/tr}
                 </p>
                 <p>
-                    <input id="tc-font-upper" class="nocolor check" data-selector="p" data-element="text-transform" type="checkbox" data-check="uppercase" data-default="none">
+                    <input id="tc-font-upper" class="nocolor check form-check-input" data-selector="p" data-element="text-transform" type="checkbox" data-check="uppercase" data-default="none">
                     {tr}Uppercase{/tr}
                 </p>
             </div>

@@ -1,4 +1,4 @@
-// Yeti 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/yeti/_variables.scss with
+// Yeti 5.2.0 -- This is a copy of node_modules/bootswatch/dist/yeti/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "yeti" !default;
@@ -19,20 +19,6 @@ $gray-800: #333 !default;
 $gray-900: #222 !default;
 $black:    #000 !default;
 
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-) !default;
-// scss-docs-end gray-colors-map
-
 $blue:    #008cba !default;
 $indigo:  #6610f2 !default;
 $purple:  #6f42c1 !default;
@@ -44,49 +30,18 @@ $green:   #43ac6a !default;
 $teal:    #20c997 !default;
 $cyan:    #5bc0de !default;
 
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-) !default;
-// scss-docs-end colors-map
 
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
-$primary:       $blue !default;
+$primary:       #007EA8; // $blue !default;
 $secondary:     $gray-200 !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
+$success:       #338451; //$green !default;
+$info:          #20809D; //$cyan !default;
+$warning:       #A76702; //$yellow !default;
+$danger:        #E02F10; // $red !default;
 $light:         $gray-200 !default;
 $dark:          $gray-900 !default;
-
-// scss-docs-start theme-colors-map
-$theme-colors: (
-    "primary":    $primary,
-    "secondary":  $secondary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger,
-    "light":      $light,
-    "dark":       $dark
-) !default;
-// scss-docs-end theme-colors-map
 
 // Prefix for :root CSS variables
 $prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
@@ -104,9 +59,6 @@ $link-shade-percentage:                   20% !default; // Bootstrap 5.3
 $component-active-color:      $white !default;
 $component-active-bg:         $primary !default;
 
-$border-radius:               0 !default;
-$border-radius-lg:            0 !default;
-$border-radius-sm:            0 !default;
 $border-color: $gray-400;
 
 // Fonts
@@ -114,12 +66,7 @@ $border-color: $gray-400;
 // stylelint-disable-next-line value-keyword-case
 $font-family-sans-serif:      ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, Manjari, 'Arial Rounded MT', 'Arial Rounded MT Bold', Calibri, source-sans-pro, sans-serif; // "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 
-
-$headings-font-weight:        300 !default;
-
 // Tables
-
-$table-bg-scale:              0% !default;
 
 // Buttons
 // Forms
@@ -145,20 +92,10 @@ $navbar-dark-hover-color:           rgba($white, .75) !default;
 $navbar-dark-active-color:          $white !default;
 $navbar-dark-disabled-color:        rgba($white, .25) !default;
 
-$input-btn-padding-x:         .5rem !default;
-$btn-font-weight:             300 !default;
-
 // Dropdowns
 
 $dropdown-border-color:             rgba($black, .1) !default;
 $dropdown-divider-bg:               rgba($black, .1) !default;
-// Dropdowns
-$dropdown-link-color:               var(--#{$prefix}body-color) !default;
-$dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-
-$dropdown-link-active-color:        $component-active-color !default;
-$dropdown-link-active-bg:           $component-active-bg !default;
 
 // Navs
 
@@ -169,33 +106,17 @@ $nav-tabs-link-active-border-color: $nav-tabs-border-color !default;
 
 // Navbar
 
-$navbar-dark-color:                 rgba($white, .7) !default;
-$navbar-dark-hover-color:           $white !default;
-
 // Pagination
-
-$pagination-color:                  $gray-600 !default;
 $pagination-border-color:           $nav-tabs-border-color !default;
-$pagination-active-border-color:    darken($primary, 5%) !default;
 $pagination-disabled-color:         $gray-200 !default;
 
 // Cards
 
-$card-inner-border-radius:          0 !default;
-
 // Badges
-
-$badge-font-weight:                 300 !default;
-$badge-padding-x:                   1rem !default;
 
 // Alerts
 
-$alert-link-font-weight:            400 !default;
-
-$alert-bg-scale:                    0 !default;
-
 // Progress bars
-
 $progress-bg:                       $gray-400 !default;
 $progress-bar-color:                $white !default;
 
@@ -205,15 +126,7 @@ $list-group-disabled-bg:            $gray-200 !default;
 
 // Breadcrumbs
 
-$breadcrumb-padding-y:              .375rem !default;
-$breadcrumb-padding-x:              .75rem !default;
-$breadcrumb-border-radius:          3px !default;
-
 // Close
-
-$btn-close-color:            $gray-600 !default;
-$btn-close-opacity:          .6 !default;
-$btn-close-hover-opacity:    1 !default;
 
 // Code
 $code-color:                     $body-color; //    $pink !default; // Bootstrap 5.3

@@ -14,7 +14,7 @@
     {tabset name="admin_metatags"}
         {tab name="{tr}Meta tags{/tr}"}
             <fieldset>
-                <legend>{tr}General{/tr}</legend>
+                <legend class="h3">{tr}General{/tr}</legend>
                     <div class="adminoptionbox">
                         {preference name=metatag_keywords}
                         {preference name=metatag_freetags}
@@ -27,7 +27,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Twitter{/tr}</legend>
+                <legend class="h3">{tr}Twitter{/tr}</legend>
                 <br>
                 <div class="adminoptionbox">
                     {preference name=socialnetworks_twitter_site_name}
@@ -35,7 +35,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Facebook{/tr}</legend>
+                <legend class="h3">{tr}Facebook{/tr}</legend>
                 <br>
                 <div class="adminoptionbox">
                     {preference name=socialnetworks_facebook_site_name}

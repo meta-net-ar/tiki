@@ -11,12 +11,14 @@
             <textarea class="form-control" name="raw" rows="20"></textarea>
         </div>
         <div class="form-check">
-            <label>
-                <input type="checkbox" class="form-check-input" name="preserve_ids" value="1">
+            <input type="checkbox" class="form-check-input" name="preserve_ids" id="preserve_ids" value="1">
+            <label class="form-check-label" for="preserve_ids">
                 {tr}Preserve Field IDs{/tr}
             </label>
-            <label>
-                <input type="checkbox" class="form-check-input" name="last_position" checked="checked" value="1">
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="last_position" id="last_position" checked="checked" value="1">
+            <label class="form-check-label" for="last_position">
                 {tr}Imported fields at the bottom of the list{/tr}
             </label>
         </div>

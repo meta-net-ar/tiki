@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\Field\ExportableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         global $prefs;
 
@@ -352,7 +352,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         $fields = [
@@ -365,7 +365,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         return $fields;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         $fields = [
@@ -378,7 +378,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         return $fields;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => true];

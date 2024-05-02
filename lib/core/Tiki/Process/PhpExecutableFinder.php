@@ -220,7 +220,7 @@ class PhpExecutableFinder
      *
      * @return array
      */
-    public function generatePossiblePhpCliNames(array $include = ['virtualmin', 'base', 'versions'], array $versionsToSearch = null): array
+    public function generatePossiblePhpCliNames(array $include = ['virtualmin', 'base', 'versions'], array|null $versionsToSearch = null): array
     {
         if (is_null($versionsToSearch)) {
             $versionsToSearch = self::PHP_VERSIONS_TO_SEARCH;

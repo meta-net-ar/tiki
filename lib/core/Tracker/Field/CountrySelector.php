@@ -12,7 +12,7 @@
  */
 class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'y' => [
@@ -134,13 +134,13 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractField impleme
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, $baseKey . '_text'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -149,7 +149,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractField impleme
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return ["{$baseKey}_text" => true];

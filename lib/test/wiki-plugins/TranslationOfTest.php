@@ -53,7 +53,7 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
         $this->assertEquals($expectedOutput, wikiplugin_translationof($data, $params), $message);
     }
 
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['', '<a href="tiki-index.php?page=SomePage"  data-bs-toggle="popover" data-bs-container="body" data-bs-trigger="click" data-bs-content="&lt;a&#x20;href&#x3D;&quot;tiki-edit_translation.php&#x3F;page&#x3D;SomePage&amp;target_lang&#x3D;fr&#x23;new_translation&quot;&gt;Translate&#x20;this&#x20;link&lt;&#x2F;a&gt;"  data-bs-delay=\'{"show":500,"hide":250}\'>SomePage</a>',

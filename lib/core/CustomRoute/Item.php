@@ -143,23 +143,30 @@ class Item
                 if (! isset($matches[1])) {
                     return false;
                 }
-
-                if ($redirectDetails['tracker_field'] == 'itemId') {
+                //If Wiki page option is selected, then redirect to wiki page
+                if (! empty($redirectDetails['wiki_page'])) {
+                    $wikiPageId = $redirectDetails['wiki_page'];
+                    $objectType = 'wiki page';
+                    $objectId = $wikiPageId;
                     $itemId = $matches[1];
                 } else {
-                    $itemId = TikiLib::lib('trk')->get_item_id(
-                        $redirectDetails['tracker'],
-                        $redirectDetails['tracker_field'],
-                        $matches[1]
-                    );
-                }
+                    if ($redirectDetails['tracker_field'] == 'itemId') {
+                        $itemId = $matches[1];
+                    } else {
+                        $itemId = TikiLib::lib('trk')->get_item_id(
+                            $redirectDetails['tracker'],
+                            $redirectDetails['tracker_field'],
+                            $matches[1]
+                        );
+                    }
 
-                if (empty($itemId)) {
-                    $itemId = '0';
-                }
+                    if (empty($itemId)) {
+                        $itemId = '0';
+                    }
 
-                $objectType = 'tracker item';
-                $objectId = $itemId;
+                    $objectType = 'tracker item';
+                    $objectId = $itemId;
+                }
 
                 break;
 
@@ -199,7 +206,14 @@ class Item
                 }
 
                 $file = 'tiki-index.php';
-                $params = ['page' => $pageSlug];
+                $params = [];
+
+                //Check if itemId exists and add it to the wiki page parameters
+                if (! empty($itemId)) {
+                    $params['itemId'] = $itemId;
+                }
+
+                $params['page'] = $pageSlug;
 
                 break;
 

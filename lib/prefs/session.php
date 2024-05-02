@@ -17,7 +17,7 @@ function prefs_session_list()
                 'db' => tra('Database'),
                 'memcache' => tra('Memcache'),
             ],
-            'default' => 'default',
+            'default' => 'db',
         ],
         'session_lifetime' => [
             'name' => tra('Session lifetime'),

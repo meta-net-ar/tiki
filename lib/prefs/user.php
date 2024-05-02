@@ -16,7 +16,7 @@ function prefs_user_list($partial = false)
             'description' => tra('Show the user\'s real name instead of username (log-in name), when possible.'),
             'help' => 'User-Preferences',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
         ],
         'user_unique_email' => [
@@ -74,7 +74,7 @@ function prefs_user_list($partial = false)
             'help' => 'User-Preferences',
             'keywords' => 'avatar',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => ['user_picture_gallery_id',],
         ],
         'user_small_avatar_size' => [
@@ -99,7 +99,7 @@ function prefs_user_list($partial = false)
             'type' => 'text',
             'filter' => 'digits',
             'size' => '3',
-            'default' => 0,
+            'default' => 1,
             'profile_reference' => 'file_gallery',
             'dependencies' => ['feature_file_galleries',],
         ],

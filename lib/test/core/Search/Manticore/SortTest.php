@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class SortTest extends \Search_Index_SortTest
+class SortTest extends \SearchIndexSort
 {
     use IndexBuilder;
 

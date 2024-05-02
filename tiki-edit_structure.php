@@ -20,6 +20,11 @@ if (! isset($_REQUEST["page_ref_id"])) {
 }
 
 $page_info = $structlib->s_get_page_info($_REQUEST["page_ref_id"]);
+if (! isset($page_info)) {
+    $smarty->assign('msg', tra("Invalid page_ref_id"));
+    $smarty->display("error.tpl");
+    die;
+}
 
 $access->check_permission('tiki_p_view', tra('View this wiki page'), 'wiki page', $page_info['pageName']);
 
@@ -29,6 +34,11 @@ if (isset($_REQUEST['move_to'])) {
 }
 
 $structure_info = $structlib->s_get_structure_info($_REQUEST["page_ref_id"]);
+if (! isset($structure_info)) {
+    $smarty->assign('msg', tra("Invalid page_ref_id"));
+    $smarty->display("error.tpl");
+    die;
+}
 
 $smarty->assign('page_ref_id', $_REQUEST["page_ref_id"]);
 $smarty->assign('structure_id', $structure_info["page_ref_id"]);

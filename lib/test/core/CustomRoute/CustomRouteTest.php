@@ -142,7 +142,7 @@ class CustomRouteTest extends TestCase
         $this->assertEquals($expectError, ! empty($errors));
     }
 
-    public function getDirectRouteData()
+    public static function getDirectRouteData()
     {
         return [
             [
@@ -207,7 +207,7 @@ class CustomRouteTest extends TestCase
         $this->assertEquals($expectError, ! empty($errors));
     }
 
-    public function getTikiObjectRouteData()
+    public static function getTikiObjectRouteData()
     {
         return [
             [
@@ -292,7 +292,7 @@ class CustomRouteTest extends TestCase
         $this->assertEquals($expectError, ! empty($errors));
     }
 
-    public function getTrackerFieldRouteData()
+    public static function getTrackerFieldRouteData()
     {
         return [
             [

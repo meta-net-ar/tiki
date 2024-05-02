@@ -8,8 +8,8 @@ function prefs_site_list()
 {
     global $prefs;
 
-    $available_layouts = TikiLib::lib('css')->list_user_selectable_layouts(isset($prefs['site_theme']) ? $prefs['site_theme'] : '', isset($prefs['theme_option']) ? $prefs['theme_option'] : '');
-    $available_admin_layouts = TikiLib::lib('css')->list_user_selectable_layouts(isset($prefs['site_theme_admin']) ? $prefs['site_theme_admin'] : '', isset($prefs['theme_option_admin']) ? $prefs['theme_option_admin'] : '');
+    $available_layouts = TikiLib::lib('theme')::listUserSelectableLayouts(isset($prefs['site_theme']) ? $prefs['site_theme'] : '', isset($prefs['theme_option']) ? $prefs['theme_option'] : '');
+    $available_admin_layouts = TikiLib::lib('theme')::listUserSelectableLayouts(isset($prefs['theme_admin']) ? $prefs['theme_admin'] : '', isset($prefs['theme_option_admin']) ? $prefs['theme_option_admin'] : '');
     $listGroups = TikiLib::lib('user')->get_groups();
     $groups[''] = tr('All');
     foreach ($listGroups['data'] as $group) {
@@ -233,7 +233,7 @@ function prefs_site_list()
             'name' => tr('Site layout'),
             'description' => tr('Changes the template for the overall site layout'),
             'type' => 'list',
-            'default' => 'basic',
+            'default' => 'social',
             'help' => 'Site-Layout',
             'hint' => tra('Important: when using the Classic Bootstrap (fixed top navbar) layout, be sure to set the fixed-top navbar height, below, to prevent content overlap.'),
             'tags' => ['advanced'],

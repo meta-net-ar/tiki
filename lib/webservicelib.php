@@ -71,10 +71,7 @@ class Tiki_Webservice
         }
     }
 
-    /**
-     * @return array
-     */
-    public static function getTypes()
+    public static function getTypes(): array
     {
         return ['REST', 'SOAP'];
     }

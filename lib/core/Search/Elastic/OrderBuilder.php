@@ -12,7 +12,7 @@ class Search_Elastic_OrderBuilder
 {
     private $index;
 
-    public function __construct(Search_Elastic_Index $index = null)
+    public function __construct(Search_Elastic_Index|null $index = null)
     {
         $this->index = $index;
     }

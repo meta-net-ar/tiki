@@ -18,9 +18,9 @@
     <table class="table">
         <tr>
             {if $posts and $tiki_p_blog_admin eq 'y'}
-                <th>
+                <td>  {* Changed from th to prevent ARIA empty header error *}
                     {select_all checkbox_names='checked[]'}
-                </th>
+                </td>
             {/if}
             <th>
                 <a href="tiki-list_posts.php?{if isset($blogId)}blogId={$blogId}&amp;{/if}offset={$offset}&amp;sort_mode={if $sort_mode eq 'title_asc'}title_desc{else}title_asc{/if}">
@@ -37,13 +37,13 @@
             <th>
                 <a href="tiki-list_posts.php?{if isset($blogId)}blogId={$blogId}&amp;{/if}offset={$offset}&amp;sort_mode={if $sort_mode eq 'user_desc'}user_asc{else}user_desc{/if}">{tr}Author{/tr}</a>
             </th>
-            <th></th>
+            <td></td>  {* Changed from th to prevent ARIA empty header error *}
         </tr>
 
 
         {section name=changes loop=$posts}{assign var=id value=$posts[changes].postId}
             <tr>
-                <td class="checkbox-cell"><div class="form-check"><input type="checkbox" name="checked[]" value="{$id}"></div></td>
+                <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$id}"></td>
                 <td class="text">{object_link type="blog post" id=$posts[changes].postId title=$posts[changes].title}</td>
                 {if !isset($blogId)}
                     <td class="text">

@@ -17,7 +17,8 @@ class InteractiveTranslation extends Base
         $headerlib = \TikiLib::lib('header');
         $smarty = \TikiLib::lib('smarty');
 
-        $strings = get_collected_strings();
+        $translator = \I18N\LanguageTranslator::getInstance(\I18N\LanguageTranslator::getLanguageFromPrefs());
+        $strings = $translator->getInteractiveCollectedStrings();
         if (count($strings) == 0) {
             return;
         }

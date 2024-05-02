@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_TypeAnalyzerTest extends PHPUnit\Framework\TestCase
 {
-    public function mappingProvider()
+    public static function mappingProvider()
     {
         return [
             'empty' => ['plaintext', 'test', ''],

@@ -6,17 +6,17 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_GlobalSource_SearchableSource implements Search_GlobalSource_Interface
 {
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['searchable'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return ['searchable' => 'identifier'];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

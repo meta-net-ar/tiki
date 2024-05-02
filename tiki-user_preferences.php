@@ -120,7 +120,7 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     // setting preferences
     if ($prefs['change_theme'] == 'y' && empty($group_theme)) {
         if (isset($_POST['mytheme'])) {
-            $themeandoption = $themelib->extract_theme_and_option($_POST['mytheme']);
+            $themeandoption = ThemeLib::extractThemeAndOptionFromString($_POST['mytheme']);
             $theme = $themeandoption[0];
             $themeOption = $themeandoption[1];
             $tikilib->set_user_preference($userwatch, 'theme', $theme);

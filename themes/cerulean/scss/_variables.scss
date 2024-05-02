@@ -1,4 +1,4 @@
-// Cerulean 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/cerulean/_variables.scss with
+// Cerulean 5.2.0 -- This is a copy of node_modules/bootswatch/dist/cerulean/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "cerulean";
@@ -31,10 +31,10 @@ $teal:    #20c997;
 $cyan:    #157BB7; //#2fa4e7; Updated for Tiki
 
 $primary:       $cyan;
-$secondary:     $gray-200;
-$success:       $green;
-$info:          $blue;
-$warning:       $yellow;
+$secondary:     #A0A5AC; // $gray-200;
+$success:       #58812C; // $green;
+$info:          #077F97; // $blue;
+$warning:       #946F00; // $yellow;
 $danger:        $red;
 $light:         $gray-100;
 $dark:          $gray-800;
@@ -67,6 +67,9 @@ $headings-color:         $cyan;
 $component-active-color:      $white !default;
 $component-active-bg:         $primary !default;
 $border-color:                $gray-400;
+
+// Form validation
+$form-valid-color: #58812C;
 
 // Dropdowns
 $dropdown-link-color:               var(--#{$prefix}body-color) !default;

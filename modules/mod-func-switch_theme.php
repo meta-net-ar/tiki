@@ -39,7 +39,7 @@ function module_switch_theme($mod_reference, &$module_params)
 
     //check if CSS Editor's try theme is on
     if (! empty($_SESSION['try_theme'])) {
-        list($css_theme, $css_theme_option) = $themelib->extract_theme_and_option($_SESSION['try_theme']);
+        list($css_theme, $css_theme_option) = ThemeLib::extractThemeAndOptionFromString($_SESSION['try_theme']);
     } else {
         $css_theme = '';
     }

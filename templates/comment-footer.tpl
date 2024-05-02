@@ -33,7 +33,7 @@
         </span>
     {else}
         <span class="back_to_top">
-            <a href="#top" class="tips" title=":{tr}top of page{/tr}">
+            <a href="#top" class="tips" title=":{tr}top of page{/tr}" aria-label="{tr}top of page{/tr}">
                 {icon name='arrow-up'}
             </a>
         </span>
@@ -44,9 +44,9 @@
     {if $thread_style != 'commentStyle_headers' and isset($comment.approved) and $comment.approved eq 'y'}
     <div class="actions">
         {if ($prefs.feature_sefurl eq 'y') }
-            <a href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}">{tr}Link{/tr}</a>
+            <a href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}" class="btn btn-outline-primary me-2" title="{tr}Link to this comment{/tr}" aria-label="{tr}Link to this comment{/tr}" style="font-size: 1rem">{icon name="link"}</a>
         {else}
-            <a href="tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}">{tr}Link{/tr}</a>
+            <a href="tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}">{tr}Link to this comment{/tr}</a>
         {/if}
 
         {if ( $prefs.feature_comments_locking neq 'y' or $thread_is_locked neq 'y' ) and

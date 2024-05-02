@@ -11,7 +11,7 @@
 
     {if $prefs.payment_feature neq "y"}
         <fieldset class="mb-3 w-100">
-            <legend>{tr}Activate the feature{/tr}</legend>
+            <legend class="h3">{tr}Activate the feature{/tr}</legend>
             {preference name=payment_feature visible="always"}
         </fieldset>
     {/if}
@@ -99,7 +99,7 @@
             </fieldset>
 {*
             <fieldset>
-                <legend>{tr}Advanced cart tracker names setup{/tr}</legend>
+                <legend class="h3">{tr}Advanced cart tracker names setup{/tr}</legend>
                 {preference name=payment_cart_product_tracker_name}
                 {preference name=payment_cart_orders_tracker_name}
                 {preference name=payment_cart_orderitems_tracker_name}
@@ -107,7 +107,7 @@
             </fieldset>
 *}
             <fieldset>
-                <legend>{tr}Products tracker setup{/tr}</legend>
+                <legend class="h3">{tr}Products tracker setup{/tr}</legend>
 {*
                 {remarksbox title="{tr}Choose payment system{/tr}"}
                     {tr}Depending on which feature you are using, you may need some or all of the following fields to be setup{/tr}
@@ -123,7 +123,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Features{/tr}</legend>
+                <legend class="h3">{tr}Features{/tr}</legend>
                 {preference name=payment_cart_inventory}
                 <div class="adminoptionboxchild" id="payment_cart_inventory_childcontainer">
                     {preference name=payment_cart_inventory_type_field}
@@ -178,7 +178,7 @@
             <br>
 
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 {preference name=wikiplugin_addtocart}
                 {preference name=wikiplugin_adjustinventory}
                 {preference name=wikiplugin_extendcarthold}

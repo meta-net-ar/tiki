@@ -1,12 +1,9 @@
-// Materia 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/materia/_variables.scss with
+// Materia 5.3,3 -- This overrids and adds to node_modules/bootswatch/dist/materia/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
-
-$theme: "materia" !default;
 
 //
 // Color system
 //
-
 $white:    #fff !default;
 $gray-100: #f8f9fa !default;
 $gray-200: #eee !default;
@@ -30,28 +27,21 @@ $green:   #4caf50 !default;
 $teal:    #20c997 !default;
 $cyan:    #9c27b0 !default;
 
-$primary:       $blue !default;
-$secondary:     $white !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
-$light:         $gray-100 !default;
-$dark:          $gray-800 !default;
-
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
-$min-contrast-ratio:   2.15 !default;
+$primary:       #0B78D0; // $blue !default;
+$secondary: #567476;
+$success: #4caf50;
+$info: #9c27b0;
+$warning: #ff9800;
+$danger: #e51c23;
 
 // Options
 // Prefix
 $prefix: bs-;
 
-$enable-gradients: true !default;
-
 // Body
-
 $body-color:    $gray-700 !default;
 
 // Typography
@@ -60,68 +50,34 @@ $link-shade-percentage:                   20% !default; // Bootstrap 5.3
 // stylelint-disable-next-line value-keyword-case
 $font-family-sans-serif:    Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif !default;
 $font-size-base:            1.05rem; // 1rem !default;
-$font-weight-base:          400 !default;
 
 $headings-font-weight:      600; //  500 !default;
 
 // Buttons
 
-$input-btn-padding-y:       .8rem !default;
-$input-btn-padding-x:       1rem !default;
-
 // Forms
 
-$input-padding-y:                1rem !default;
-$input-padding-x:                0 !default;
-$input-padding-y-sm:             0 !default;
-$input-padding-x-sm:             0 !default;
-$input-padding-y-lg:             ($font-size-base * 1.25) !default;
-$input-padding-x-lg:             0 !default;
 $input-bg:                       var(--#{$prefix}body-bg) !default; // transparent !default;
-$input-disabled-bg:              transparent !default;
 $input-color:                    var(--#{$prefix}body-color) !default; // $gray-600 !default;
-$input-border-color:             transparent !default;
-$input-border-width:             0 !default;
-$input-border-radius:            0 !default;
-$input-border-radius-lg:         0 !default;
-$input-border-radius-sm:         0 !default;
 $input-placeholder-color:        var(--#{$prefix}secondary-color) !default; // rgba(0, 0, 0, .4) !default;
-$input-group-addon-bg:           transparent !default;
 
+// Form validation
+$form-valid-color: #3A833C;
 // Navs
 
 $nav-link-disabled-color:       var(--#{$prefix}secondary-color) !default; // $gray-500 !default;
-$nav-tabs-border-color:         transparent !default;
 
 // Navbar
 
-$navbar-padding-y:                  1rem !default;
-$navbar-dark-color:                 rgba($white, .75) !default;
-$navbar-dark-hover-color:           $white !default;
-
 // Cards
-
-$card-border-width:                 0 !default;
-$card-border-color:                 transparent !default;
 
 // Tooltips
 
-$tooltip-bg:                        $gray-700 !default;
-
 // Modals
-
-$modal-content-border-color:        transparent !default;
 
 // Progress bars
 
-$progress-height:               .375rem !default;
-$progress-border-radius:        0 !default;
-
 // Close
-
-$btn-close-color:            $white !default;
-$btn-close-opacity:          .6 !default;
-$btn-close-hover-opacity:    1 !default;
 
 // Code
 $code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3

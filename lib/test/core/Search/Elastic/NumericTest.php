@@ -1,6 +1,6 @@
 <?php
 
-class Search_Elastic_NumericTest extends Search_Index_NumericTest
+class Search_Elastic_NumericTest extends SearchIndexNumeric
 {
     protected function setUp(): void
     {

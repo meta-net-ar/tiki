@@ -83,6 +83,7 @@ class ConsoleApplicationBuilder
                 new VCSUpdateCommand(),
                 new FixBOMandUnixCommand(),
                 new GetStringsCommand(),
+                new BuildIconsListCommand(),
                 ],
             ],[
             'condition' => 'checkIsDevMode',

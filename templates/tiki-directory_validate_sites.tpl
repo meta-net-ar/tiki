@@ -30,7 +30,7 @@ var CHECKBOX_LIST = [{{section name=user loop=$items}'sites[{$items[user].siteId
 
             {section name=user loop=$items}
                 <tr class="{cycle advance=false}">
-                    <td class="checkbox-cell"><div class="form-check"><input class="checkboxes" type="checkbox" name="sites[{$items[user].siteId}]" required></div></td>
+                    <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="sites[{$items[user].siteId}]" required></td>
                     <td class="text">{$items[user].name}</td>
                     <td class="text"><a href="{$items[user].url}" target="_blank">{$items[user].url}</a></td>
                     {if $prefs.directory_country_flag eq 'y'}

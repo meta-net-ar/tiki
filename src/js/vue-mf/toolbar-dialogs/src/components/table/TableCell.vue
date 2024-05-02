@@ -59,7 +59,7 @@ function getAlign() {
     @change="update"
     @blur="update"
     @vnode-mounted="({ el }) => el.focus()"
-    class="form-control"
+    class="form-control form-control-sm"
     :title="myCol + ':' + myRow"
     ref="myInput"
   >

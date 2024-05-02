@@ -143,9 +143,9 @@ reg
     .on('continueToPurchase', function() {
         pay.find('input[name="wp_member_users"]').val($('#memberRegister$i #name').val());
         pay.find('input[name="wp_member_periods"]').val($('#memberDuration$i').val());
-        pay.find('input:last').trigger("click");
+        pay.find('input').last().trigger("click");
     })
-    .find('input:last').on("click", function() {
+    .find('input').last().on("click", function() {
         var frmData = reg.find('form').serialize(),
             invokeRegistration = function() {
                 if (frmData) {

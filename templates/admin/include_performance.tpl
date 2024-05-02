@@ -42,7 +42,7 @@
             {preference name=allowImageLazyLoad }
 
             <fieldset>
-                <legend>{tr}PHP settings{/tr}</legend>
+                <legend class="h3">{tr}PHP settings{/tr}</legend>
                 <p>{tr}Some PHP.INI settings that can increase performance{/tr}</p>
                 <div class="adminoptionboxchild">
                     <p>

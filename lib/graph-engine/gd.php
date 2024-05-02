@@ -286,7 +286,9 @@ class GD_GRenderer extends GRenderer // {{{1
 
     public function _drawLeftText($string, $left, $height, $style) // {{{2
     {
-        imagestring($this->gd, $style['font'], $left, $height, is_array($string) ? $string['value'] : $string, $this->_getColor('Black'));
+        if ($string !== null) {
+            imagestring($this->gd, $style['font'], $left, $height, is_array($string) ? $string['value'] : $string, $this->_getColor('Black'));
+        }
     }
 
     public function _drawCenterText($string, $left, $right, $height, $style) // {{{2
@@ -294,7 +296,7 @@ class GD_GRenderer extends GRenderer // {{{1
         $width = imagefontwidth($style['font']) * strlen($string);
         $x = ( $right - $left ) / 2 + $left - $width / 2;
 
-        imagestring($this->gd, $style['font'], $x, $height, $string, $this->_getColor('Black'));
+        imagestring($this->gd, $style['font'], round($x), $height, $string, $this->_getColor('Black'));
     }
 
     public function _drawRightText($string, $right, $height, $style) // {{{2

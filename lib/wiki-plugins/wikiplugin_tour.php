@@ -9,7 +9,7 @@ function wikiplugin_tour_info()
     return [
         'name' => tra('Tour'),
         'documentation' => 'PluginTour',
-        'description' => tra('Quick and easy way to build your product tours with Bootstrap popovers'),
+        'description' => tra('Quick and easy way to build your product tours with Driver.js'),
         'prefs' => [ 'wikiplugin_tour' ],
         'iconname' => 'information',
         'introduced' => 15,
@@ -26,32 +26,8 @@ function wikiplugin_tour_info()
             ],
             'title' => [
                 'name' => tra('Title'),
-                'required' => false,
+                'required' => true,
                 'description' => tra('Title of the step'),
-                'since' => '15.0',
-                'filter' => 'text',
-                'default' => '',
-            ],
-            'next' => [
-                'name' => tra('Next'),
-                'required' => false,
-                'description' => tra('Index of the step to show after this one, starting from 0, -1 for the last one'),
-                'since' => '15.0',
-                'filter' => 'int',
-                'default' => '',
-            ],
-            'prev' => [
-                'name' => tra('Previous'),
-                'required' => false,
-                'description' => tra('Index of the step to show before this one, starting from 0, -1 not to show'),
-                'since' => '15.0',
-                'filter' => 'int',
-                'default' => '',
-            ],
-            'path' => [
-                'name' => tra('Path'),
-                'required' => false,
-                'description' => tra('Path to the page on which the step should be shown'),
                 'since' => '15.0',
                 'filter' => 'text',
                 'default' => '',
@@ -59,53 +35,11 @@ function wikiplugin_tour_info()
             'start' => [
                 'name' => tra('Start'),
                 'required' => false,
-                'description' => tra('Start the tour on page load? If "No", then a start button can be made with "Restart Button", below.'),
+                'description' => tra('Start the tour on page load? If "No", then a start button can be made with "Restart Button", below. (Set only in the first step.)'),
                 'since' => '15.0',
                 'filter' => 'alpha',
                 'default' => 'y',
                 'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n'],
-                ],
-            ],
-            'placement' => [
-                'name' => tra('Placement'),
-                'required' => false,
-                'description' => tra('The placement of the popup'),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'default' => 'right',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Top'), 'value' => 'top'],
-                    ['text' => tra('Right'), 'value' => 'right'],
-                    ['text' => tra('Bottom'), 'value' => 'bottom'],
-                    ['text' => tra('Left'), 'value' => 'left'],
-                ],
-            ],
-            'orphan' => [
-                'name' => tra('Orphan'),
-                'required' => false,
-                'description' => tra('Setting to true removes the pointer on the popup and centers it on the page'),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'default' => 'n',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n'],
-                ],
-            ],
-            'backdrop' => [
-                'name' => tra('Backdrop'),
-                'required' => false,
-                'description' => tra('Show a dark backdrop behind the popover and its element, highlighting the current step.'),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'default' => 'n',
-                'options' => [
-                    ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
                     ['text' => tra('No'), 'value' => 'n'],
                 ],
@@ -113,23 +47,10 @@ function wikiplugin_tour_info()
             'show_once' => [
                 'name' => tra('Only Show Once'),
                 'required' => false,
-                'description' => tra('Show automatically only once. tour_id should also be set if there are multiple tours.'),
+                'description' => tra('Show automatically only once. tour_id should also be set if there are multiple tours. (Set only in the first step.)'),
                 'since' => '15.0',
                 'filter' => 'alpha',
                 'default' => 'n',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n'],
-                ],
-            ],
-            'show_until_dismiss' => [
-                'name' => tra('Show Until Dismissed'),
-                'required' => false,
-                'description' => tra('Show automatically only until dismissed. tour_id should also be set if there are multiple tours.'),
-                'since' => '16.0',
-                'filter' => 'alpha',
-                'default' => 'y',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -139,7 +60,7 @@ function wikiplugin_tour_info()
             'tour_id' => [
                 'name' => tra('Tour ID'),
                 'required' => false,
-                'description' => tra('Set a tour ID to be able to only show the tour once.'),
+                'description' => tra('Set a tour ID to be able to only show the tour once. (Set only in the first step.)'),
                 'since' => '15.0',
                 'filter' => 'text',
                 'default' => 'default',
@@ -147,10 +68,125 @@ function wikiplugin_tour_info()
             'show_restart_button' => [
                 'name' => tra('Restart Button'),
                 'required' => false,
-                'description' => tra('Display a button to restart the tour. Enter the text to appear on the button.'),
+                'description' => tra('Display a button to restart the tour. Enter the text to appear on the button. (Set only in the first step.)'),
                 'since' => '15.0',
                 'filter' => 'text',
                 'default' => '',
+            ],
+            'overlay_color' => [
+                'name' => tra('Overlay Color'),
+                'required' => false,
+                'description' => tra('Set an overlay color to be shown behind the popover and its element, highlighting the current step. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'text',
+                'default' => 'transparent',
+            ],
+            'overlay_opacity' => [
+                'name' => tra('Overlay Opacity'),
+                'required' => false,
+                'description' => tra('Set the opacity of the overlay. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'int',
+                'default' => '0.5',
+            ],
+            'allow_close' => [
+                'name' => tra('allow_close'),
+                'required' => false,
+                'description' => tra('Allow closing the popover by clicking on the backdrop. (Set only in the first step.)'),
+                'since' => '16.0',
+                'filter' => 'alpha',
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
+            'side' => [
+                'name' => tra('Side'),
+                'required' => false,
+                'description' => tra('The side of the popup. (Set only in the first step.)'),
+                'since' => '15.0',
+                'filter' => 'alpha',
+                'default' => 'right',
+                'options' => [
+                    ['text' => tra('Right'), 'value' => 'right'],
+                    ['text' => tra('Top'), 'value' => 'top'],
+                    ['text' => tra('Bottom'), 'value' => 'bottom'],
+                    ['text' => tra('Left'), 'value' => 'left'],
+                ],
+            ],
+            'align' => [
+                'name' => tra('Align'),
+                'required' => false,
+                'description' => tra('The alignment of the popup. (Set only in the first step.)'),
+                'since' => '15.0',
+                'filter' => 'alpha',
+                'default' => 'end',
+                'options' => [
+                    ['text' => tra('End'), 'value' => 'end'],
+                    ['text' => tra('Start'), 'value' => 'start'],
+                    ['text' => tra('Center'), 'value' => 'center'],
+                ],
+            ],
+            'number_of_steps' => [
+                'name' => tra('Number of Steps'),
+                'required' => false,
+                'description' => tra('Number of steps in the tour. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'int',
+                'default' => '',
+            ],
+            'animate' => [
+                'name' => tra('Animate'),
+                'required' => false,
+                'description' => tra('Animate the popup. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'alpha',
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
+            'next_button_text' => [
+                'name' => tra('Next Button Text'),
+                'required' => false,
+                'description' => tra('Text to show on the Next button. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'text',
+                'default' => 'Next',
+            ],
+            'prev_button_text' => [
+                'name' => tra('Prev Button Text'),
+                'required' => false,
+                'description' => tra('Text to show on the Prev button. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'text',
+                'default' => 'Previous',
+            ],
+            'show_progress' => [
+                'name' => tra('Show Progress'),
+                'required' => false,
+                'description' => tra('Show the progress text in popover. (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'alpha',
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
+            'progress_text' => [
+                'name' => tra('Progress Text'),
+                'required' => false,
+                'description' => tra('Template for the progress text. You can use the following placeholders in the template:
+                    //  - {{current}}: The current step number.
+                    //  - {{total}}: Total number of steps.
+                    Example: Step {{current}} of {{total}}.
+                    (Set only in the first step.)'),
+                'since' => '27.0',
+                'filter' => 'text',
+                'default' => '{{current}} of {{total}}',
             ],
         ],
     ];
@@ -158,6 +194,12 @@ function wikiplugin_tour_info()
 
 function wikiplugin_tour($data, $params)
 {
+    if (! session_id()) {
+        session_start();
+    }
+
+    $_SESSION['id'] = ($_SESSION['id'] ?? 0) + 1;
+
     $defaults = [];
     $plugininfo = wikiplugin_tour_info();
     foreach ($plugininfo['params'] as $key => $param) {
@@ -177,79 +219,109 @@ function wikiplugin_tour($data, $params)
         }
     }
 
-    static $id = 0;
-    $unique = 'wptour_' . ++$id;
-    static $wp_tour = ['steps' => []];
-
     if (! isset($wp_tour['start'])) {
         $wp_tour['start'] = $params['start'];
     }
 
-    $headerlib = TikiLib::lib('header');
-    $headerlib->add_jsfile(BOOTSTRAP_TOUR_DIST_PATH . '/js/bootstrap-tour.js')
-            ->add_cssfile(BOOTSTRAP_TOUR_DIST_PATH . '/css/bootstrap-tour.css');
+    // tour constants (change across multiple tours)
+    $TOUR_STEPS = "tour_steps_{$params['tour_id']}";
+    $TOUR_NUMBER_OF_STEPS = "number_of_steps_{$params['tour_id']}";
 
-    // non changing init js in ransk 11 and 13 (the tour definition goes in 12)
-    $headerlib->add_jq_onready('var tour;
-', 11);
+    $step = array_filter($params);
+    $content = TikiLib::lib('parser')->parse_data($data);
+    $step['content'] = $content;
+    $_SESSION[$TOUR_STEPS] = array_merge($_SESSION[$TOUR_STEPS] ?? [], [$step]);
 
-    if ($params['show_until_dismiss'] != 'n') {
-        $headerlib->add_jq_onready('
-$(".tour-tour button[data-role=\'end\']").on("click",function() {
-    setCookieBrowser("' . $cookie_id . '", "y", "tours", new Date(' . $cookie_expiry . '000));
-});
-        ', 12);
+    // first step
+    if ($params['number_of_steps']) {
+        $_SESSION[$TOUR_NUMBER_OF_STEPS] = $params['number_of_steps'];
+        $unique = 'wptour_' . $_SESSION['id'];
+        $_SESSION['startButtonId'] = $unique . '_restart';
     }
-
-    if ($wp_tour['start'] === 'y' && ! $dontStart) {
-        $headerlib->add_jq_onready('
-if (tour) {
-    // Start the tour
-    tour.restart();
-} else {
-    console.log("Warning: Tour not initialized, the last step needs to have parameter next set to -1");
-}
-', 13);
-    }
-    unset($params['start']);
-    unset($params['tour_id']);
 
     $html = '';
 
-    $params['orphan']   = ($params['orphan'] === 'y');
-    $params['backdrop'] = ($params['backdrop'] === 'y');
+    if ($_SESSION[$TOUR_NUMBER_OF_STEPS] === count($_SESSION[$TOUR_STEPS])) {
+        $jsSteps = "";
+        foreach ($_SESSION[$TOUR_STEPS] as $step) {
+            $jsSteps .= "{element: '$step[element]', popover: {title: \"$step[title]\", description: \"$step[content]\", align: '$step[align]', side: '$step[side]'}},";
+        }
 
-    if (empty($params['element']) && ! $params['orphan']) {
-        $params['element'] = "#$unique";
-        $html = '<span id="' . $unique . '"></span>';
-        if (! empty($params['show_restart_button'])) {
+        $first_step = $_SESSION[$TOUR_STEPS][0];
+
+        // Avoid undefined array key warning
+        $getParam = function ($name) use ($first_step) {
+            return isset($first_step[$name]) ? $first_step[$name] : '';
+        };
+
+        $overlayColor = $getParam('overlay_color');
+        $animate = $getParam('animate') === 'y' ? 'true' : 'false';
+        $allowClose = $getParam('allow_close') === 'y' ? 'true' : 'false';
+        $smoothScroll = $getParam('smooth_scroll') === 'y' ? 'true' : 'false';
+        $nextBtnText = $getParam('next_button_text');
+        $prevBtnText = $getParam('prev_button_text');
+        $doneBtnText = $getParam('done_button_text');
+        $overlayOpacity = $getParam('overlay_opacity');
+        $showProgress = $getParam('show_progress') === 'y' ? 'true' : 'false';
+        $progressText = $getParam('progress_text');
+
+        $startButtonId = $_SESSION['startButtonId'];
+
+        // Show the restart button
+        if (! empty($first_step['show_restart_button'])) {
             $smarty = TikiLib::lib('smarty');
             $html .= smarty_function_button([
-                    '_text' => tra($params['show_restart_button']),
-                    '_id' => $unique . '_restart',
+                    '_text' => tra($first_step['show_restart_button']),
+                    '_id' => $startButtonId,
                     'href' => '#',
                 ], $smarty->getEmptyInternalTemplate());
-            $headerlib->add_jq_onready('$("#' . $unique . '_restart").on("click", function() {
-    tour.goTo(0);
-    tour.restart();
-    return false;
-});', 13);
         }
-    }
-    $params['content'] = TikiLib::lib('parser')->parse_data($data);
 
-    $wp_tour['steps'][] = array_filter($params);
+        // Make sure variables names are unique, otherwise it will break if there are multiple tours on the same page
+        $driver_var = 'driver' . $_SESSION['id'];
+        $startButton_var = 'startButton' . $_SESSION['id'];
+        $js = "
+        const $driver_var = () => {
+            window.driver({
+                overlayColor: '$overlayColor',
+                overlayOpacity: $overlayOpacity,
+                animate: Boolean($animate),
+                allowClose: Boolean($allowClose),
+                smoothScroll: Boolean($smoothScroll),
+                nextBtnText: '$nextBtnText',
+                prevBtnText: '$prevBtnText',
+                doneBtnText: '$doneBtnText',
+                showProgress: Boolean($showProgress),
+                progressText: '$progressText',
+                steps: [$jsSteps]
+            }).drive();
+        };
 
-    $template = TikiLib::lib('smarty')->fetch('wiki-plugins/wikiplugin_tour_template.tpl');
-    $wp_tour['template'] = preg_replace('/<\!\-\-.*?\-\->/', '', $template);        // remove html comments
+        const $startButton_var = document.getElementById('$startButtonId');
+        if ($startButton_var) {
+            $startButton_var.addEventListener('click', () => {
+                $driver_var();
+            });
+        }
+        ";
 
-    if ($params['next'] == -1 || $params['path']) {
-        $js = '
-        $.fn.tooltip.Constructor.Default.whiteList.button.push("data-role");
-        // Instance the tour
-tour = new Tour(' . json_encode($wp_tour) . ');
-';
+        if ($first_step['start'] === 'y' && ! $dontStart) {
+            $js .= "
+            $driver_var();
+            ";
+        }
+
+        $headerlib = TikiLib::lib('header');
+        $headerlib->add_js_module("
+        import { driver } from 'driver.js';
+        window.driver = driver;
+        ")
+        ->add_cssfile(NODE_PUBLIC_DIST_PATH . '/driver.js/dist/driver.css');
         $headerlib->add_jq_onready($js, 12);
+
+        // Start a new tour
+        $_SESSION[$TOUR_STEPS] = [];
+        $_SESSION[$TOUR_NUMBER_OF_STEPS] = null;
     }
 
     return $html;

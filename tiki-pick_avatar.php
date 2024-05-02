@@ -35,30 +35,34 @@ if (isset($_REQUEST["view_user"])) {
 }
 $smarty->assign('userwatch', $userwatch);
 // Upload avatar is processed here
-if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-    $access->checkCsrf();
-    $name = $_FILES['userfile1']['name'];
+if (isset($_FILES['userfile1'])) {
+    if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+        $access->checkCsrf();
+        $name = $_FILES['userfile1']['name'];
 
-    $filegallib = TikiLib::lib('filegal');
-    try {
-        $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-    } catch (Exception $e) {
-        $smarty->assign('errortype', 403);
-        $smarty->assign('msg', $e->getMessage());
-        $smarty->display("error.tpl");
-        die;
-    }
+        $filegallib = TikiLib::lib('filegal');
+        try {
+            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+        } catch (Exception $e) {
+            $smarty->assign('errortype', 403);
+            $smarty->assign('msg', $e->getMessage());
+            $smarty->display("error.tpl");
+            die;
+        }
 
-    $avatarlib = TikiLib::lib('avatar');
-    $avatarlib->set_avatar_from_url($_FILES['userfile1']['tmp_name'], $userwatch, $name);
+        $avatarlib = TikiLib::lib('avatar');
+        $avatarlib->set_avatar_from_url($_FILES['userfile1']['tmp_name'], $userwatch, $name);
 
-    /* redirect to prevent re-submit on page reload */
-    if ($tiki_p_admin == 'y' && $user !== $userwatch) {
-        header('Location: tiki-pick_avatar.php?view_user=' . $userwatch);
+        /* redirect to prevent re-submit on page reload */
+        if ($tiki_p_admin == 'y' && $user !== $userwatch) {
+            header('Location: tiki-pick_avatar.php?view_user=' . $userwatch);
+        } else {
+            header('Location: tiki-pick_avatar.php');
+        }
+        exit;
     } else {
-        header('Location: tiki-pick_avatar.php');
+        Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
     }
-    exit;
 }
 
 if (isset($_REQUEST["uselib"])) {

@@ -2,15 +2,15 @@
  * included by tiki-show_help.tpl via smarty_block_add_help()
  * TODO: Add links to add samples to edit form *}
 
-<h3>{tr}Wiki Syntax{/tr}</h3>
+<h5>{tr}Wiki Syntax{/tr}</h5>
 {if $prefs.feature_help eq 'y'}
-    {remarksbox type="info" title="{tr}More information{/tr}"}
-        <a href="{$prefs.helpurl}Wiki-Page-Editor" target="tikihelp" class="tikihelp alert-link" title="{tr}Wiki Page Editor:{/tr} {tr}More help on editing wiki pages{/tr}">
-            {tr}Wiki Page Editor{/tr}
+    {remarksbox type="info"}
+    {tr}More information:{/tr} <a href="{$prefs.helpurl}Wiki-Page-Editor" target="tikihelp" class="tikihelp alert-link" title="{tr}Wiki Page Editor:{/tr} {tr}More help on editing wiki pages{/tr}">
+        {tr}Wiki Page Editor{/tr} {icon name="link-external" istyle="font-size: 70%"}
         </a>
         {tr}and{/tr}
         <a href="{$prefs.helpurl}Wiki-syntax" target="tikihelp" class="tikihelp alert-link" title="{tr}Wiki Syntax:{/tr} {tr}The syntax system used for creating pages in Tiki{/tr}">
-            {tr}Wiki Syntax{/tr}
+            {tr}Wiki Syntax{/tr} {icon name="link-external" istyle="font-size: 70%"}.
         </a>
     {/remarksbox}
 {/if}

@@ -13,9 +13,9 @@ interface Search_PackageSource_Interface
 
     public function getData($objectType, $objectId, Search_Type_Factory_Interface $typeFactory, array $data = []);
 
-    public function getProvidedFields();
+    public function getProvidedFields(): array;
 
-    public function getProvidedFieldTypes();
+    public function getProvidedFieldTypes(): array;
 
-    public function getGlobalFields();
+    public function getGlobalFields(): array;
 }

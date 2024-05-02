@@ -15,6 +15,7 @@ $gray-300: #495057;
 $gray-200: #343a40;
 $gray-100: #212529;
 $white: #fff;
+$dark: #474747;
 
 $red:     #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
 $green:   #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guidelines
@@ -34,7 +35,7 @@ $theme-colors: (
         "warning": #f0ad4e,
         "danger": #d9534f,
         "light": #fff,
-        "dark": #000
+        "dark": #474747
 );
 
 $green-300: tint-color($green, 40%) !default; // Bootstrap 53
@@ -130,11 +131,14 @@ $table-color:                 $white; // var(--#{$prefix}emphasis-color) !defaul
 //$table-bg:                    var(--#{$prefix}body-bg) !default;
 //$table-accent-bg:             transparent !default;
 $table-bg: #4e4e4e;
-$table-accent-bg: darken(#474747,5%);
+//$table-accent-bg: darken(#474747,5%);
 $table-hover-bg: #555555;
 $table-active-bg: $table-hover-bg;
 $table-head-bg: #292929;
 $table-border-color: #292929;
+
+$table-bg-scale:       0%; //        -80% !default;
+// scss-docs-end table-variables
 
 // Buttons
 //$btn-primary-color: #d8d8d8;
@@ -166,7 +170,8 @@ $btn-danger-bg: $danger;
 $btn-link-disabled-color: $gray-800;
 
 // Forms
-$input-bg: #242424;
+//$input-bg: #242424;
+$input-bg:                              var(--#{$prefix}body-bg) !default;
 $input-bg-disabled: $gray-800;
 $input-color: #cfcfcf;
 $input-border-color: #4c4c4c;
@@ -178,11 +183,12 @@ $input-group-addon-bg: #4F4F4F;
 $input-group-addon-border-color: $input-border-color;
 
 // Form validation
-$form-feedback-valid-color:         #6ABE6A;
-$form-feedback-invalid-color:       #E89492;
+$form-valid-color:         #24C67B;
+$form-invalid-color:       #ED919C;
 
 // Navs
 $nav-link-color: #BDBDBD;
+
 // Navbar
 
 $navbar-light-color: #fff;

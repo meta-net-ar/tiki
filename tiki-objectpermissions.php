@@ -239,7 +239,7 @@ if (isset($_REQUEST['assign']) && ! isset($_REQUEST['quick_perms']) && $access->
         $isParentGroup = false;
         foreach ($groupInheritance as $index => $gi) {
             if (is_array($gi) && in_array($groupName, $gi)) {
-                $delPerms = $changed['deleted'][$groupList[$index]];
+                $delPerms = $changed['deleted'][$groupList[$index]] ?? [];
                 $changed['deleted'][$groupList[$index]] = array_diff($delPerms, $addPerms);
                 $isParentGroup = true;
             }
@@ -592,10 +592,14 @@ foreach ($groupNames as $groupName) {
 }   // end of for $groupNames loop
 
     // add cell colouring helpers
-    $js .= '
-$("table.objectperms input[type=checkbox]").on("change", function () {
-    var $this = $(this);
-    var $parent = $this.parent();
+    $js .= /** @lang JavaScript */
+        '
+const $objectPermTables = $("table.objectperms tbody");
+
+$("input[type=checkbox]", $objectPermTables).on("change", function () {
+    const $this = $(this);
+    const $parent = $this.parent();
+    $this.data("checked", $this.is(":checked"));
     if ($this.is(":checked")) {
         if ($parent.hasClass("removed")) {
             $parent.removeClass("removed");
@@ -610,6 +614,34 @@ $("table.objectperms input[type=checkbox]").on("change", function () {
         }
     }
 });
+
+/*** reduce the number of inputs by removing unchanged ones ***/
+
+const $objectPermsForm = $objectPermTables.parents("form");
+const $submitButtons = $("input[type=submit]", $objectPermsForm);
+
+const removeUnchangedCheckboxes = function () {
+    // this needs to remove the inputs from the confirm popup form as it runs before
+    $("input[name^=\'perm[\']", "form#confirm-popup").each(function() {
+        const $this = $(this),
+            $oldPermInput = $this.parent()
+                .find("input[name=\'old_" + $this.attr("name") + "\'][value=\'" + $this.val() + "\']");
+        
+        // old_perm[blah] is there when a perm is checked, so the back end can tell its been unchecked
+        // so if theyre both there then its still checked
+        if ($oldPermInput.length) {
+            $oldPermInput.remove();
+            $this.remove();
+        }
+    });
+
+};
+
+$submitButtons.on("click", function() {
+  removeUnchangedCheckboxes();
+  return true;
+});
+
 ';
 
 $headerlib->add_jq_onready($js);

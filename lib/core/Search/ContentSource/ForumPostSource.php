@@ -31,7 +31,7 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
         return $this->db->table('tiki_comments')->fetchColumn('threadId', $filters);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -145,7 +145,7 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -184,7 +184,7 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -223,7 +223,7 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

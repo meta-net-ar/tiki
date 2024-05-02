@@ -100,7 +100,7 @@ function prefs_feature_list($partial = false)
             'help' => 'Trackers',
             'type' => 'flag',
             'keywords' => 'CRUD',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
             'admin' => 'trackers',
             'view' => 'tiki-list_trackers.php',
@@ -231,7 +231,7 @@ function prefs_feature_list($partial = false)
             'description' => tra('Site-wide content category system. Items of different types (wiki pages, articles, tracker items, etc.) can be categorized. Categories can have permissions to control content access'),
             'help' => 'Category',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'admin' => 'category',
             'module' => 'categ', // intentional use of categ so it catches category and categories
             'view' => 'tiki-browse_categories.php',
@@ -520,7 +520,7 @@ function prefs_feature_list($partial = false)
             'name' => tra('Display page name as page title'),
             'description' => tra('Display the page name at the top of each page as page title. If not enabled, the page content should contain an h1 heading to function as the page title, or the page description can be used as the title.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'tags' => ['basic'],
         ],
         'feature_wiki_pageid' => [
@@ -533,7 +533,7 @@ function prefs_feature_list($partial = false)
             'name' => tra('Individual wiki cache'),
             'description' => tra('Allow users to change the duration of the cache on a per-page basis.'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
         ],
         'feature_jscalendar' => [
             'name' => tra('Date picker for date selection'),
@@ -573,7 +573,7 @@ function prefs_feature_list($partial = false)
             'description' => tra('Quickperms are an interface in addition to the normal edit-permissions page, for quick assignment of permissions for a page or other object.'),
             'help' => 'Quickperms',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['experimental'],
         ],
         'feature_user_encryption' => [
@@ -690,7 +690,7 @@ function prefs_feature_list($partial = false)
             'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://ckeditor.com">CKEditor</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
                 'feature_ajax',
                 'ajax_autosave',
@@ -814,7 +814,7 @@ function prefs_feature_list($partial = false)
             'description' => tra('Display "My Account" in the application menu'),
             'help' => 'My Account',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
         ],
         'feature_minical' => [
@@ -830,7 +830,7 @@ function prefs_feature_list($partial = false)
             'name' => tra('User preferences screen'),
             'help' => 'User-Preferences',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
         ],
         'feature_notepad' => [
@@ -1064,7 +1064,7 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'tags' => ['basic'],
             'perspective' => false,
-            'default' => 'n',
+            'default' => 'y',
         ],
         'feature_help' => [
             'name' => tra('Help system'),
@@ -1343,7 +1343,7 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'perspective' => false,
             'dependencies' => ['feature_sefurl'],
-            'default' => 'n',
+            'default' => 'y',
         ],
         'feature_sefurl_title_max_size' => [
             'name' => tra('Max size of title in the search engine friendly URL (Tracker Items and Forum Threads)'),
@@ -1386,7 +1386,7 @@ function prefs_feature_list($partial = false)
                 'feature_html_head_base_tag',
             ],
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'view' => 'tiki-admin_routes.php',
         ],
         'feature_modulecontrols' => [
@@ -2388,7 +2388,7 @@ function prefs_feature_list($partial = false)
         'feature_show_stay_in_ssl_mode' => [
             'name' => tra('Users can choose to stay in SSL mode after an HTTPS login'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
         ],
         'feature_switch_ssl_mode' => [
             'name' => tra('Users can switch between secured or standard mode at login'),
@@ -2941,7 +2941,7 @@ function prefs_feature_list($partial = false)
             'name' => tra('Convert from absolute to relative link'),
             'description' => tra('Process wiki text and convert internal links from absolute to relative links'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['experimental'],
         ],
         'feature_system_suggestions' => [

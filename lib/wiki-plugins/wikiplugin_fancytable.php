@@ -125,79 +125,74 @@ function wikiplugin_fancytable_info()
 function wikiplugin_fancytable($data, $params)
 {
     global $prefs;
+
+    // Initialize variables
     $tagremove = [];
     $pluginremove = [];
     static $iFancytable = 0;
     ++$iFancytable;
     extract($params, EXTR_SKIP);
-    if (empty($sortable)) {
-        $sortable = 'n';
-    }
     $msg = '';
 
-    if ((isset($sortable) && $sortable != 'n')) {
-        if (Table_Check::isEnabled()) {
-            $ts = new Table_Plugin();
-            $ts->setSettings(
-                'wpfancytable' . $iFancytable,
-                'n',
-                $sortable,
-                isset($sortList) ? $sortList : null,
-                isset($tsortcolumns) ? $tsortcolumns : null,
-                isset($tsfilters) ? $tsfilters : null,
-                isset($tsfilteroptions) ? $tsfilteroptions : null,
-                isset($tspaginate) ? $tspaginate : null,
-                isset($tscolselect) ? $tscolselect : null,
-                null,
-                null,
-                isset($tstotals) ? $tstotals : null,
-                isset($tstotalformat) ? $tstotalformat : null,
-                isset($tstotaloptions) ? $tstotaloptions : null
-            );
-            if (is_array($ts->settings)) {
-                $ts->settings['resizable'] = true;
-                Table_Factory::build('plugin', $ts->settings);
-                $sort = true;
-            } else {
-                $sort = false;
-            }
+    // Check for sortable
+    $sort = isset($sortable) && $sortable != 'n';
+
+    if ($sort && Table_Check::isEnabled()) {
+        // If sortable and table plugin is enabled
+        $ts = new Table_Plugin();
+        $ts->setSettings(
+            'wpfancytable' . $iFancytable,
+            'n',
+            $sortable,
+            $sortList ?? null,
+            $tsortcolumns ?? null,
+            $tsfilters ?? null,
+            $tsfilteroptions ?? null,
+            $tspaginate ?? null,
+            $tscolselect ?? null,
+            null,
+            null,
+            $tstotals ?? null,
+            $tstotalformat ?? null,
+            $tstotaloptions ?? null
+        );
+
+        // Build table plugin
+        if (is_array($ts->settings)) {
+            $ts->settings['resizable'] = true;
+            Table_Factory::build('plugin', $ts->settings);
         } else {
             $sort = false;
-        }
-
-        if ($sort === false) {
-            if ($prefs['feature_jquery_tablesorter'] === 'n') {
-                $msg = '<em>' . tra('The jQuery Sortable Tables feature must be activated for the sort feature to work.')
-                    . '</em>';
-            } elseif ($prefs['javascript_enabled'] !== 'y') {
-                $msg = '<em>' . tra('JavaScript must be enabled for the sort feature to work.') . '</em>';
-            } else {
-                $msg = '<em>' . tra('Unable to load the jQuery Sortable Tables feature.') . '</em>';
-            }
         }
     } else {
         $sort = false;
     }
-
-    //Start the table
-    $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y' ? true : false;
-    $style = $sort === true ? ' style="visibility:hidden"' : '';
-    $wret = '<div id="wpfancytable' . $iFancytable . '-div"' . $style
-        . ' class="table-responsive ts-wrapperdiv ' . ($sticky ? 'table-sticky' : '') . '">' . "\r\t";
-    if (! empty($colwidths)) {  // if colwidths have been set then don't let the .table class set the width to 100%
-        $wret .= '<table class="table table-striped table-hover normal" id="wpfancytable' . $iFancytable . '">' . "\r\t";
-    } else {
-        $wret .= '<table class="table table-striped table-hover normal" id="wpfancytable' . $iFancytable . '">' . "\r\t";
+    // Check if sort is disabled or failed to build
+    if (! $sort) {
+        if ($prefs['feature_jquery_tablesorter'] === 'n') {
+            $msg = '<em>' . tra('The jQuery Sortable Tables feature must be activated for the sort feature to work.')
+                . '</em>';
+        } elseif ($prefs['javascript_enabled'] !== 'y') {
+            $msg = '<em>' . tra('JavaScript must be enabled for the sort feature to work.') . '</em>';
+        } else {
+            $msg = '<em>' . tra('Unable to load the jQuery Sortable Tables feature.') . '</em>';
+        }
     }
 
-    //Header
+    // Prepare table attributes
+    $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y';
+    $style = $sort ? ' style="visibility:hidden"' : '';
+    $wret = '<div id="wpfancytable' . $iFancytable . '-div"' . $style
+        . ' class="table-responsive ts-wrapperdiv ' . ($sticky ? 'table-sticky' : '') . '">' . "\r\t";
+    $tableClass = 'table table-striped table-hover normal';
+    if (! empty($colwidths)) {
+        $tableClass .= ' fixed-layout';
+    }
+    $wret .= '<table class="' . $tableClass . '" id="wpfancytable' . $iFancytable . '">' . "\r\t";
+
+    // Process header
     if (isset($head)) {
-        //set header class
-        if (! empty($headclass)) {
-            $tdhdr = "\r\t\t\t" . '<th class="' . $headclass . '"';
-        } else {
-            $tdhdr = "\r\t\t\t<th";
-        }
+        $tdhdr = ! empty($headclass) ? "\r\t\t\t" . '<th class="' . $headclass . '"' : "\r\t\t\t<th";
         //replace tiki tags, plugins and other enclosing characters with hash strings before creating table so that any
         //pipes (| or ~|~) inside aren't mistaken for cell dividers
         if (TikiLib::lib('parser')->option['is_markdown']) {
@@ -206,11 +201,7 @@ function wikiplugin_fancytable($data, $params)
         }
         preprocess_section($head, $tagremove, $pluginremove);
 
-        if ($sort) {
-            $type = 'hs';
-        } else {
-            $type = 'h';
-        }
+        $type = $sort ? 'hs' : 'h';
         //now create header table rows
         $headrows = process_section(
             $head,
@@ -218,28 +209,24 @@ function wikiplugin_fancytable($data, $params)
             '>>',
             $tdhdr,
             '</th>',
-            isset($colwidths) ? $colwidths : '',
-            isset($headaligns) ? $headaligns : '',
-            isset($headvaligns) ? $headvaligns : ''
+            $colwidths ?? '',
+            $headaligns ?? '',
+            $headvaligns ?? ''
         );
 
         //restore original tags and plugin syntax
         $headhtml = $headrows['html'];
         postprocess_section($headhtml, $tagremove, $pluginremove);
-
         $wret .= '<thead class="' . ($sticky ? 'bg-light' : '') . '">' . $headhtml . "\r\t" . '</thead>' . "\r\t";
     }
 
-    //Body
+    // Process body
     //replace tiki tags, plugins and other enclosing characters with hash strings before creating table so that any
     //pipes (| or ~|~) inside aren't mistaken for cell dividers
     preprocess_section($data, $tagremove, $pluginremove);
-
-    if ($sort) {
-        $type = 'bs';   //sortable body rows - do not assign odd/even class to these since jquery will do it
-    } else {
-        $type = 'b';    //plain body rows
-    }
+    //bs : sortable body rows - do not assign odd/even class to these since jquery will do it
+    //b : plain body rows
+    $type = $sort ? 'bs' : 'b';
     //now create table body rows
     $bodyrows = process_section(
         $data,
@@ -247,24 +234,23 @@ function wikiplugin_fancytable($data, $params)
         "\n",
         "\r\t\t\t" . '<td',
         '</td>',
-        isset($colwidths) ? $colwidths : '',
-        isset($colaligns) ? $colaligns : '',
-        isset($colvaligns) ? $colvaligns : ''
+        $colwidths ?? '',
+        $colaligns ?? '',
+        $colvaligns ?? ''
     );
-
     //restore original tags and plugin syntax
     $bodyhtml = $bodyrows['html'];
     postprocess_section($bodyhtml, $tagremove, $pluginremove);
-
     //end the tbody
     $wret .= '<tbody>' . $bodyhtml . "\r\t" . '</tbody>';
-
+    // Add footer if available
     if (isset($ts->settings)) {
         $footer = Table_Totals::getTotalsHtml($ts->settings, $bodyrows['cols']);
         if ($footer) {
             $wret .= $footer;
         }
     }
+    // Finalize table output
     $wret .= "\r" . '</table></div>' . "\r" . $msg;
     return $wret;
 }
@@ -280,91 +266,44 @@ function wikiplugin_fancytable($data, $params)
 function preprocess_section(&$data, &$tagremove, &$pluginremove)
 {
     $parserlib = TikiLib::lib('parser');
-    //first replace plugins with hash strings since they may contain pipe characters
+    // First replace plugins with hash strings since they may contain pipe characters
     $parserlib->plugins_remove($data, $pluginremove);
-
-    //then replace tags or other enclosing charcters that could enclose a pipe (| or ~|~) character with a hash string
+    // Then replace tags or other enclosing characters that could enclose a pipe (| or ~|~) character with a hash string
     $tikilib = TikiLib::lib('tiki');
     $tags = [
-        [
-            'start' => '\(\(',      // (( ))
-            'end'   => '\)\)',
-        ],
-        [
-            'start' => '\[',        // [ ]
-            'end'   => '\]',
-        ],
-        [
-            'start' => '~np~',      // ~np~ ~/np~
-            'end'   => '~\/np~',
-        ],
-        [
-            'start' => '~tc~',      // ~tc~ ~/tc~
-            'end'   => '~\/tc~',
-        ],
-        [
-            'start' => '~hc~',      // ~hc~ ~/hc~
-            'end'   => '~\/hc~',
-        ],
-        [
-            'start' => '\^',        // ^ ^
-            'end'   => '\^',
-        ],
-        [
-            'start' => '__',        // __ __
-            'end'   => '__',
-        ],
-        [
-            'start' => '\:\:',      // :: ::
-            'end'   => '\:\:',
-        ],
-        [
-            'start' => '\:\:\:',        // ::: :::
-            'end'   => '\:\:\:',
-        ],
-        [
-            'start' => '\'\'',      // '' ''
-            'end'   => '\'\'',
-        ],
-        [
-            'start' => '-\+',       // -+ +-
-            'end'   => '\+-',
-        ],
-        [
-            'start' => '-=',        // -= =-
-            'end'   => '=-',
-        ],
-        [
-            'start' => '===',       // === ===
-            'end'   => '===',
-        ],
-        [
-            'start' => '--',        // -- --
-            'end'   => '--',
-        ],
-        [
-            'start' => '\(',        // ( )
-            'end'   => '\)',
-        ],
-        [
-        'start' => '\"',        // " "
-        'end'   => '\"',
-        ],
+        '\(\(', '\)\)',       // (( ))
+        '\[', '\]',           // [ ]
+        '~np~', '~\/np~',     // ~np~ ~/np~
+        '~tc~', '~\/tc~',     // ~tc~ ~/tc~
+        '~hc~', '~\/hc~',     // ~hc~ ~/hc~
+        '\^', '\^',           // ^ ^
+        '__', '__',           // __ __
+        '\:\:', '\:\:',       // :: ::
+        '\:\:\:', '\:\:\:',   // ::: :::
+        '\'\'', '\'\'',       // '' ''
+        '-\+', '\+-',         // -+ +-
+        '-=', '=-',           // -= =-
+        '===', '===',         // === ===
+        '--', '--',           // -- --
+        '\(', '\)',           // ( )
+        '\"', '\"',           // " "
     ];
-    $count = count($tags) - 1;
-    $pattern = '/(';
-    foreach ($tags as $key => $tag) {
-        $pattern .= $tag['start'] . '(?:(?!' . $tag['end'] . ').)*' . $tag['end'];
-        if ($key < $count) {
-            $pattern .= '|';
-        }
-    }
-    $pattern .= ')/';
+    //Creates a string `pattern` containing all the tags patterns joined by `|`
+    //And wrapped the output of the implode with forward slashes / to form a regular expression pattern with delimiters
+    $pattern = '/' . implode('|', $tags) . '/';
     preg_match_all($pattern, $data, $matches);
-    foreach ($matches[0] as $match) {
-        $tagremove['key'][] = '§' . md5($tikilib->genPass()) . '§';
-        $tagremove['data'][] = $match;
-        $data = isset($tagremove['data']) ? str_replace($tagremove['data'], $tagremove['key'], $data) : $data;
+    if (! empty($matches[0])) {
+        //if there are any matches found
+        //iterate over each match in $matches[0] and generate a replacement key for each match
+        $tagremove['key'] = array_map(function () use ($tikilib) {
+            return '§' . md5($tikilib->genPass()) . '§';
+        }, $matches[0]);
+        // stores the matches found
+        $tagremove['data'] = $matches[0];
+        // check if datas are not null before proceeding with replacement operation
+        if ($data !== null && $tagremove['data'] !== null && $tagremove['key'] !== null) {
+            $data = str_replace($tagremove['data'], $tagremove['key'], $data);
+        }
     }
 }
 

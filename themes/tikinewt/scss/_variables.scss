@@ -29,7 +29,7 @@ $cyan:    #3399f3 !default;
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
-$primary:         #6c839b;
+$primary:         #61778F; // #6c839b;
 $secondary: $primary;
 $success: $primary;
 $info: $primary;
@@ -71,6 +71,7 @@ $border-color: #8cacbb;
 $border-radius:               .1rem; // Not being implemented - why?
 $border-radius-lg:            .2rem;
 $border-radius-sm:            0rem;
+$border-color-translucent:    rgba($black, .175) !default;
 
 // Fonts
 $font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;  // Cabin, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -109,6 +110,24 @@ $navbar-light-hover-color:          rgba($black, .7) !default;
 //$navbar-light-disabled-color:       rgba($black, .3) !default;
 //$navbar-light-toggler-icon-bg:      str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
 //$navbar-light-toggler-border-color: rgba($black, .1) !default;
+
+// Dropdowns
+$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
+$dropdown-divider-bg:               $dropdown-border-color !default;
+$dropdown-link-active-color:        $component-active-color !default;
+$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
+$dropdown-dark-color:               $gray-300 !default;
+$dropdown-dark-bg:                  $gray-800 !default;
+$dropdown-dark-border-color:        $dropdown-border-color !default;
+$dropdown-dark-divider-bg:          $dropdown-divider-bg !default;
+$dropdown-dark-box-shadow:          null !default;
+$dropdown-dark-link-color:          $dropdown-dark-color !default;
+$dropdown-dark-link-hover-color:    $white !default;
+$dropdown-dark-link-hover-bg:       rgba($white, .15) !default;
+$dropdown-dark-link-active-color:   $dropdown-link-active-color !default;
+$dropdown-dark-link-active-bg:      $dropdown-link-active-bg !default;
 
 // Pagination
 // Jumbotron

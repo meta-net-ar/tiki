@@ -156,7 +156,7 @@ class JsCalendar extends Base
 
         $datepicker_options .= $datepicker_options_common;
 
-        $html = '<input type="hidden" id="' . $params['id'] . '"' . $name . ' value="' . $params['date'] . '" class="isDatepicker">';
+        $html = '<input type="hidden" id="' . $params['id'] . '"' . $name . ' value="' . $params['date'] . '" class="isDatepicker" . aria-label="date picker">';
         $html .= '<input type="hidden" id="' . $params['id'] . '_tzoffset" name="tzoffset" value="">';
         $html .= '<input type="hidden" id="' . $params['id'] . '_tzname" name="tzname" value="">';
         $headerlib->add_jq_onready('$("input#' . $params['id'] . '_tzoffset").val((new Date(' . (int)$params['date'] . '*1000)).getTimezoneOffset());');
@@ -164,7 +164,7 @@ class JsCalendar extends Base
         if (isset($params['isutc']) && $params['isutc'] && intval($params['date']) > 0) {
             $headerlib->add_jq_onready('$("#' . $params['id'] . '").val(' . (int)$params['date'] . ' + parseInt($("input#' . $params['id'] . '_tzoffset").val())*60);');
         }
-        $html .= '<input type="text" class="form-control isDatepicker" id="' . $params['id'] . '_dptxt" value="">'; // text version of datepicker date
+        $html .= '<input type="text" class="form-control isDatepicker" id="' . $params['id'] . '_dptxt" value="" . aria-label="date picker">'; // text version of datepicker date
         $headerlib->add_jq_onready('$("#' . $params['id'] . '_dptxt").on("change", function(e){' .
             'var inst = $.datepicker._getInst(this);' .
             '$.datepickerAdjustAltField("' . (! isset($params['showtime']) || $params['showtime'] === 'n' ? 'datepicker' : 'datetimepicker') . '", inst);' .

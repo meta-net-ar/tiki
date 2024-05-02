@@ -59,36 +59,41 @@ function module_last_tracker_items($mod_reference, $module_params)
     $trklib = TikiLib::lib('trk');
     $smarty = TikiLib::lib('smarty');
     $smarty->assign('module_error', '');
-    if ($tikilib->user_has_perm_on_object($user, $module_params['trackerId'], 'tracker', 'tiki_p_view_trackers')) {
-        if (isset($module_params['name'])) {
-            $module_params['fieldId'] = $trklib->get_field_id($module_params['trackerId'], $module_params['name']);
-        }
-        if (empty($module_params['fieldId']) && isset($module_params['trackerId'])) {
-            $module_params['fieldId'] = $trklib->get_main_field($module_params['trackerId']);
-        }
-        if (empty($module_params['fieldId'])) {
-            $smarty->assign('module_error', tra('Unable to determine which field to show. Tracker identifier may be invalid, or the tracker has no main field and neither Field identifier nor Field name were set.'));
-        } else {
-            $field_info = $trklib->get_tracker_field($module_params['fieldId']);
-            if (! isset($module_params['status'])) {
-                $module_params['status'] = '';
+    if (isset($module_params['trackerId'])) {
+        if ($tikilib->user_has_perm_on_object($user, $module_params['trackerId'], 'tracker', 'tiki_p_view_trackers')) {
+            if (isset($module_params['name'])) {
+                $module_params['fieldId'] = $trklib->get_field_id($module_params['trackerId'], $module_params['name']);
             }
-            if (empty($module_params['sort_mode'])) {
-                $module_params['sort_mode'] = 'created_desc';
+            if (empty($module_params['fieldId']) && isset($module_params['trackerId'])) {
+                $definition = Tracker_Definition::get($module_params['trackerId']);
+                $module_params['fieldId'] = $definition->getMainFieldId();
             }
-            $modLastItems = [];
-            //list_items filters the fieldId if hidden...
-            $tmp = $trklib->list_items($module_params['trackerId'], 0, $mod_reference["rows"], $module_params['sort_mode'], [$module_params['fieldId'] => $field_info], '', '', $module_params['status']);
-            foreach ($tmp['data'] as $data) {
-                if (! empty($data['field_values'][0]['value'])) {
-                    $data['subject'] = $data['field_values'][0]['value'];
-                    $modLastItems[] = $data;
+            if (empty($module_params['fieldId'])) {
+                $smarty->assign('module_error', tra('Unable to determine which field to show. Tracker identifier may be invalid, or the tracker has no main field and neither Field identifier nor Field name were set.'));
+            } else {
+                $field_info = $trklib->get_tracker_field($module_params['fieldId']);
+                if (! isset($module_params['status'])) {
+                    $module_params['status'] = '';
                 }
+                if (empty($module_params['sort_mode'])) {
+                    $module_params['sort_mode'] = 'created_desc';
+                }
+                $modLastItems = [];
+                //list_items filters the fieldId if hidden...
+                $tmp = $trklib->list_items($module_params['trackerId'], 0, $mod_reference["rows"], $module_params['sort_mode'], [$module_params['fieldId'] => $field_info], '', '', $module_params['status']);
+                foreach ($tmp['data'] as $data) {
+                    if (! empty($data['field_values'][0]['value'])) {
+                        $data['subject'] = $data['field_values'][0]['value'];
+                        $modLastItems[] = $data;
+                    }
+                }
+                $smarty->assign_by_ref('modLastItems', $modLastItems);
             }
-            $smarty->assign_by_ref('modLastItems', $modLastItems);
+        } else {
+            $smarty->assign('module_error', tra('You do not have permission to view this tracker.'));
         }
     } else {
-        $smarty->assign('module_error', tra('You do not have permission to view this tracker.'));
+        $smarty->assign('module_error', tra('Unable to determine which field to show. Tracker identifier may be invalid, or the tracker has no main field and neither Field identifier nor Field name were set.'));
     }
     $smarty->assign('tpl_module_title', tra("Last Items"));
     if (empty($module_params['sort_mode'])) {

@@ -96,7 +96,7 @@ class StatsLib extends TikiLib
     public function file_gal_stats()
     {
         $stats = [];
-        $stats["galleries"] = $this->getOne("select count(*) from `tiki_file_galleries`", []);
+        $stats["galleries"] = $this->getOne("select count(*) from `tiki_file_galleries` where type !='system'", []);
         $stats["files"] = $this->getOne("select count(*) from `tiki_files`", []);
         $stats["fpg"] = ($stats["galleries"] ? $stats["files"] / $stats["galleries"] : 0);
         $stats["size"] = $this->getOne("select sum(`filesize`) from `tiki_files`", []);

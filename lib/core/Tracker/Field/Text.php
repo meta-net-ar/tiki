@@ -12,7 +12,7 @@
  */
 class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             't' => [
@@ -160,7 +160,11 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         if (! isset($requestData[$id_string])) {
             $value = $this->getValue();
             if ($multilingual) {
-                $newValue = @json_decode($value, true);
+                if (! is_array($value)) {
+                    $newValue = json_decode($value, true);
+                } else {
+                    $newValue = false;
+                }
 
                 if ($newValue !== false && ! is_null($newValue)) {
                     $value = $newValue;
@@ -172,7 +176,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         }
 
         if (is_array($value)) {
-            $thisVal = $value[$language];
+            $thisVal = $value[$language] ?? '';
         } else {
             $thisVal = $value;
         }
@@ -280,6 +284,9 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
             $data = [$baseKey => $typeFactory->$fieldType($value)];
             foreach ($decoded as $lang => $content) {
                 $data[$baseKey . '_' . $lang] = $typeFactory->$fieldType($content);
+                if ($this->isMainField()) {
+                    $data['title_' . $lang] = $typeFactory->$fieldType($content);
+                }
             }
 
             return $data;
@@ -296,7 +303,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         global $prefs;
         $baseKey = $this->getBaseKey();
@@ -306,6 +313,9 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         if ($this->getConfiguration('isMultilingual') == 'y') {
             foreach ($prefs['available_languages'] as $lang) {
                 $data[] = $baseKey . '_' . $lang;
+                if ($this->isMainField()) {
+                    $data[] = ['title_' . $lang];
+                }
             }
         } elseif ($this->getOption('exact') == 'y') {
             $data[] = $baseKey . '_exact';
@@ -314,7 +324,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         global $prefs;
 
@@ -334,7 +344,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractField implements \Tracke
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         global $prefs;
         $baseKey = $this->getBaseKey();

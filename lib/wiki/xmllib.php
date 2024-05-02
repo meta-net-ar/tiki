@@ -113,7 +113,7 @@ class XmlLib extends TikiLib
                 }
                 $this->xml .= "<structure>\n";
                 $stack[] = $page['page_ref_id'];
-                if (! $this->export_page($page['pageName'])) {
+                if (! empty($page['pageName']) && ! $this->export_page($page['pageName'])) {
                     return false;
                 }
             }

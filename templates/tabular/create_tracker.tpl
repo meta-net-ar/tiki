@@ -16,19 +16,19 @@
 
     <form class="edit-tabular" method="post" action="{service controller=tabular action=create_tracker}" enctype="multipart/form-data">
         <div class="tiki-form-group row">
-            <label class="col-form-label col-sm-3">{tr}Name{/tr}</label>
+            <label class="col-form-label col-sm-3" for="name">{tr}Name{/tr}</label>
             <div class="col-sm-9">
-                <input class="form-control" type="text" name="name" maxlength="255" required>
+                <input class="form-control" type="text" name="name" id="name" maxlength="255" required>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="col-form-label col-sm-3">{tr}Tracker Name{/tr}</label>
+            <label class="col-form-label col-sm-3" for="tracker_name">{tr}Tracker Name{/tr}</label>
             <div class="col-sm-9">
-                <input class="form-control" type="text" name="tracker_name" maxlength="255" required>
+                <input class="form-control" type="text" name="tracker_name" id="tracker_name" maxlength="255" required>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="col-form-label col-sm-3">{tr}File Delimiter{/tr}</label>
+            <label class="col-form-label col-sm-3" for="delimiter">{tr}File Delimiter{/tr}</label>
             <div class="col-sm-9">
                 <select class="form-select file-delimiter">
                     <option value="comma" selected>{tr}Comma (,){/tr}</option>
@@ -38,9 +38,9 @@
             </div>
         </div>
         <div class="tiki-form-group row file-container">
-            <label class="col-form-label col-sm-3">{tr}File{/tr}</label>
+            <label class="col-form-label col-sm-3" for="file">{tr}File{/tr}</label>
             <div class="col-sm-9">
-                <input type="file" name="file" accept="text/csv" class="form-control" required>
+                <input type="file" name="file" id="file" accept="text/csv" class="form-control" required>
                 <div id="file-size-error" class="alert alert-danger mt-3" style="display:none">
                     {tr _0=$config.upload_max_filesize}<strong>Error:</strong> Selected file has <span id="file-size"></span> bytes. The max file size upload is %0 bytes.{/tr}
                 </div>
@@ -58,7 +58,7 @@
                             <th><abbr title="{tr}Unique Key{/tr}">{tr}UK{/tr}</abbr></th>
                             <th><abbr title="{tr}Read-Only{/tr}">{tr}RO{/tr}</abbr></th>
                             <th><abbr title="{tr}Export-Only{/tr}">{tr}EO{/tr}</abbr></th>
-                            <th></th>
+                            <td></td>
                         </tr>
                         </thead>
                         <tbody>
@@ -91,17 +91,17 @@
                                 {*</ul>*}
 
                             </td>
-                            <td><input class="primary" type="radio" name="pk" required /></td>
-                            <td><input class="unique-key" type="checkbox" /></td>
-                            <td><input class="read-only" type="checkbox" /></td>
-                            <td><input class="export-only" type="checkbox" /></td>
-                            <td class="text-end"><button class="remove">{icon name=remove}</button></td>
+                            <td><input class="primary" type="radio" name="pk" required aria-label="{tr}Primary Key:{/tr}" /></td>
+                            <td><input class="unique-key form-check-input" type="checkbox" aria-label="{tr}Unique Key:{/tr}" /></td>
+                            <td><input class="read-only form-check-input" type="checkbox" aria-label="{tr}Read-only:{/tr}" /></td>
+                            <td><input class="export-only form-check-input" type="checkbox" aria-label="{tr}Export-Only{/tr}" /></td>
+                            <td class="text-end"><button class="remove" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                         </tr>
                         </tbody>
                         <tfoot>
                         <tr>
                             <td colspan="5">
-                                <textarea name="fields" class="d-none"></textarea>
+                                <textarea name="fields" class="d-none" aria-label="{tr}Fields{/tr}"></textarea>
                             </td>
                         </tr>
                         </tfoot>
@@ -116,58 +116,63 @@
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="form-check-label col-sm-3">{tr}Simple headers{/tr}</label>
+            <label class="form-check-label col-sm-3" for="config-simple_headers">{tr}Simple headers{/tr} <a class="tikihelp" title="{tr}Simple headers:{/tr} {tr}Allow using field labels only as a header row when importing rather than the full &quot;Field [permName:type]&quot; format.{/tr}">
+                    {icon name=information}
+                </a>
+            </label>
             <div class="col-sm-9">
                 <div class="form-check">
                     <input type="hidden" name="config[simple_headers]" value="1">
-                    <input type="checkbox" class="form-check-input" value="1" checked disabled>
-                    <a class="tikihelp" title="{tr}Simple headers:{/tr} {tr}Allow using field labels only as a header row when importing rather than the full &quot;Field [permName:type]&quot; format.{/tr}">
-                        {icon name=information}
-                    </a>
+                    <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" id="config-simple_headers" value="1" checked disabled>
+
                 </div>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="form-check-label col-sm-3">{tr}Import updates{/tr}</label>
+            <label class="form-check-label col-sm-3" for="config-import_update">{tr}Import updates{/tr} <a class="tikihelp" title="{tr}Import update:{/tr} {tr}Allow updating existing entries matched by PK when importing. If this is disabled, only new items will be imported.{/tr}">
+                    {icon name=information}
+                </a>
+            </label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="config[import_update]" value="1" {if $config['import_update']} checked {/if}>
-                    <a class="tikihelp" title="{tr}Import update:{/tr} {tr}Allow updating existing entries matched by PK when importing. If this is disabled, only new items will be imported.{/tr}">
-                        {icon name=information}
-                    </a>
+                    <input type="checkbox" class="form-check-input" name="config[import_update]" id="config-import_update" value="1" {if $config['import_update']} checked {/if}>
+
                 </div>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="form-check-label col-sm-3">{tr}Ignore blanks{/tr}</label>
+            <label class="form-check-label col-sm-3" for="config-ignore_blanks">{tr}Ignore blanks{/tr} <a class="tikihelp" title="{tr}Ignore blanks:{/tr} {tr}Ignore blank values when import is updating existing items. Only non-blank values will be updated this way.{/tr}">
+                    {icon name=information}
+                </a>
+            </label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="config[ignore_blanks]" value="1" {if $config['ignore_blanks']} checked {/if}>
-                    <a class="tikihelp" title="{tr}Ignore blanks:{/tr} {tr}Ignore blank values when import is updating existing items. Only non-blank values will be updated this way.{/tr}">
-                        {icon name=information}
-                    </a>
+                    <input type="checkbox" class="form-check-input" name="config[ignore_blanks]" id="config-ignore_blanks" value="1" {if $config['ignore_blanks']} checked {/if}>
+
                 </div>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="form-check-label col-sm-3">{tr}Transactional import{/tr}</label>
+            <label class="form-check-label col-sm-3" for="config-import_transaction">{tr}Transactional import{/tr} <a class="tikihelp" title="{tr}Import transaction:{/tr} {tr}Import in a single transaction. If any of the items fails validation, the whole import is rejected and nothing is saved.{/tr}">
+                    {icon name=information}
+                </a>
+            </label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="config[import_transaction]" value="1" {if $config['import_transaction']} checked {/if}>
-                    <a class="tikihelp" title="{tr}Import transaction:{/tr} {tr}Import in a single transaction. If any of the items fails validation, the whole import is rejected and nothing is saved.{/tr}">
-                        {icon name=information}
-                    </a>
+                    <input type="checkbox" class="form-check-input" name="config[import_transaction]" id="config-import_transaction" value="1" {if $config['import_transaction']} checked {/if}>
+
                 </div>
             </div>
         </div>
         <div class="tiki-form-group row">
-            <label class="form-check-label col-sm-3">{tr}Bulk import{/tr}</label>
+            <label class="form-check-label col-sm-3" for="config-bulk_import">{tr}Bulk import{/tr} <a class="tikihelp" title="{tr}Bulk Import:{/tr} {tr}Import in 'bulk' mode so the search index is not updated for each item and no notifications should be sent.{/tr}">
+                    {icon name=information}
+                </a>
+            </label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="config[bulk_import]" value="1" {if $config['bulk_import']} checked {/if}>
-                    <a class="tikihelp" title="{tr}Bulk Import:{/tr} {tr}Import in 'bulk' mode so the search index is not updated for each item and no notifications should be sent.{/tr}">
-                        {icon name=information}
-                    </a>
+                    <input type="checkbox" class="form-check-input" name="config[bulk_import]" id="config-bulk_import" value="1" {if $config['bulk_import']} checked {/if}>
+
                 </div>
             </div>
         </div>

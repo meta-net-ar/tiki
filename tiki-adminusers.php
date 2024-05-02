@@ -32,6 +32,10 @@ require_once('tiki-setup.php');
 $access = TikiLib::lib('access');
 $access->check_permission(['tiki_p_admin_users']);
 
+// client side user validation
+$registrationlib = TikiLib::lib('registration');
+$registrationlib->addRegistrationFormValidationJs();
+
 if ($tiki_p_admin != 'y') {
     $userGroups = $userlib->get_user_groups_inclusion($user);
     $smarty->assign_by_ref('userGroups', $userGroups);

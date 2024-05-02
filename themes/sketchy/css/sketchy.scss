@@ -1,6 +1,6 @@
 /* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
 /* Original Bootswatch information:
- * bootswatch v5.2.0
+ * bootswatch v5.3.3
  * Homepage: http://bootswatch.com
  * Copyright 2012-2022 Thomas Park
  * Licensed under MIT
@@ -9,23 +9,22 @@
  * Adapted by the Tiki Community for Tiki Wiki CMS Groupware
 */
 
-@import "../../base_files/scss/_tiki-bootstrap_functions";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
-@import "../scss/variables";
-@import "../scss/variables-dark";
-@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
-@import "../../base_files/scss/_tiki-variables.scss"; // Values/definitions for Tiki variables (outside of Bootstrap variables) such as _tiki-selectors.scss.
-@import "../../default/scss/variables"; // Bootstrap default variables, with a few Tiki overrides
-@import "../../default/scss/variables-dark"; // Bootstrap dark mode default variables
+@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
+@import "../../../node_modules/bootswatch/dist/sketchy/variables"; // 4. Default Bootswatch theme variables.
+@import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
+@import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
+@import "../scss/css-variables"; // 7. Imported after default CSS variables to override them.
+@import "../../base_files/scss/_tiki-variables.scss"; // 8. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
 
-@import "../../../vendor_bundled/vendor/thomaspark/bootswatch/dist/sketchy/bootswatch";
-//@import "../../base_files/scss/_tiki-bootstrap_layout_and_components";
-@import "../scss/css-variables"; // Needs to be loaded after default variables to override them
+@import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 9. Remainder of required Bootstrap parts.
+@import "../../../node_modules/bootswatch/dist/sketchy/bootswatch"; // 10. Bootswatch theme selectors
+@import "../../base_files/scss/_tiki-selectors.scss"; // 11. Tiki CSS selectors used globally.
+@import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 12. Optionally imported to group (separately) the top and topbar zone components for styling.
+//@import "../scss/_tiki-selectors.scss"; // 11. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
-@import "../../base_files/scss/_tiki-selectors.scss";
-@import "../../base_files/scss/_tiki-pagetop_colors.scss"; // Import if needed to specify top and topbar zone colors in more detail
-@import "../../base_files/scss/_external-scripts.scss";
-@import "../../base_files/scss/_select2-tiki_colors.scss";
 
 // fix position and appearance of outline of checkbox/radio buttons
 [type="checkbox"], [type="radio"] {

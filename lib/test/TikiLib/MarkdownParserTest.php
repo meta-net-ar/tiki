@@ -14,10 +14,10 @@ class TikiLib_MarkdownParserTest extends TikiTestCase
     protected $oldprefs;
     protected $olduser;
 
-    public function __construct()
+    public function __construct($name = null)
     {
         $this->setPageRegex();
-        parent::__construct();
+        parent::__construct($name);
     }
 
     protected function setUp(): void

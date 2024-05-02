@@ -22,9 +22,9 @@
             {trackerfields trackerId=$trackerId fields=$fields status=$status format=$format editItemPretty=$editItemPretty}
             {if ! $modal}
                 <div class="form-check">
-                    <label>
-                        <input type="hidden" name="next" value="{$next}">
-                        <input type="checkbox" class="form-check-input" name="next" value="{service controller=tracker action=insert_item trackerId=$trackerId next=$next}">
+                    <input type="hidden" name="next" value="{$next}">
+                    <input type="checkbox" class="form-check-input" name="next" id="next" value="{service controller=tracker action=insert_item trackerId=$trackerId next=$next}">
+                    <label class="form-check-label" for="next">
                         {tr}Create another{/tr}
                     </label>
                 </div>

@@ -429,7 +429,8 @@ if ($(this).val() != '') {
                                 <option value="{$item|escape}" {if $sortorder == $item} selected="selected"{/if}>{$key}</option>
                             {/foreach}
                         </select>
-                        <span class="form-text">
+                        <fieldset class="form-text">
+                            <legend class="visually-hidden">{tr}Default sort order{/tr}</legend>
                             <label  for="fgal_sortdirection1">
                                 <input type="radio" id="fgal_sortdirection1" name="sortdirection" value="desc" {if $sortdirection == 'desc'}checked="checked"{/if} />
                                 &nbsp;{tr}Descending{/tr}&nbsp;
@@ -438,14 +439,13 @@ if ($(this).val() != '') {
                                 <input type="radio" id="fgal_sortdirection2" name="sortdirection" value="asc" {if $sortdirection == 'asc'}checked="checked"{/if} />
                                 &nbsp;{tr}Ascending{/tr}&nbsp;
                             </label>
-                        </span>
+                        </fieldset>
                     </div>
                 </div>
-                <hr>
-                <div class="">
-                    <label for="" class="col-form-label">{tr}Select which items to display when listing galleries{/tr}</label>
+                <fieldset>
+                    <legend>{tr}Items to display when listing galleries{/tr}</legend>
                     {include file='fgal_listing_conf.tpl'}
-                </div>
+                </fieldset>
                 <hr>
                 <div class="tiki-form-group row">
                     <label for="max_desc" class="col-sm-4 col-form-label">{tr}Max description display size{/tr}</label>

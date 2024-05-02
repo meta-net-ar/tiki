@@ -28,6 +28,7 @@
     {if $prefs.feature_ajax eq 'y'}
         {include file='tiki-ajax_header.tpl'}
     {/if}
+    <a class="btn btn-info btn-lg skipnav" href="#col1">{tr}Skip to main content{/tr}</a>
     <div class="middle_outer" id="middle_outer">
         {if $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}

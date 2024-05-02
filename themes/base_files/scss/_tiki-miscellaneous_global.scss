@@ -281,7 +281,10 @@ body.fullscreen {
     font-size: .9em;
 }
 
-/* Icons */
+// /* Icons */
+div #metadata fieldset.tabcontent, div #metadata div.tabs {
+    background-color: transparent;
+}
 a.icon,
 img.icon {
     border: none;
@@ -318,6 +321,7 @@ span.btn-link {
 
 // So form submit buttons with icons and text used in popover actions can look just like links
 // .dropdown-item, Sorry but this is affecting *all* dropdown-items; scope should be narrowed. - G_C-L
+.popover .iconmenu,
 .popover button.btn-link {
     font-size: $popover-font-size;
 }
@@ -474,7 +478,7 @@ div[style*="text-align: center"] .img-fluid {margin: auto}
     width: 250px;
 }
 .btn.btn-social {
-    margin-bottom: $padding-y;
+//    margin-bottom: $padding-y;
     display: block;
 }
 
@@ -545,11 +549,7 @@ textarea.wikiedit {
     font-size: 80%; margin-left: 0.2rem;
 }
 
-.side-col-toggle { z-index: 2; }
-.tiki .side-col-toggle + #col1 {
-    margin-top: $tiki-top-margin-compensation-for-side-col-toggle;
-    padding-top: $line-height-base;
-}
+
 
 div.categbar {
     text-align: right;
@@ -593,6 +593,14 @@ blockquote {
 .breadcrumb-item { padding-right: 0.5rem;}
 .breadcrumb .tips { padding-right: 0.5rem;}
 
+// Enable Smartmenus dropdown-menu to display above fixed-top header
+ul.sm-vertical,
+ul.sm-horizontal {
+    .dropdown-menu {
+        z-index: 1040;
+    }
+}
+
 // Vertical Smartmenus hack, until a proper solution is committed
 // For a vertical menu, assign a bootstrap menu, type "horiz", and add "smartmenu_vert" as containing class.
 .smartmenu_vert .navbar-nav { flex-direction: column; }
@@ -609,4 +617,179 @@ blockquote {
 }
 .tiki-form-group {
     margin-bottom: 1rem;
+}
+
+// Accessibility link to main content (skip navigation links)
+.skipnav {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    -webkit-transition: top .5s ease-out;
+    transition: top .5s ease-out;
+    z-index: 1040;
+}
+
+.skipnav:focus {
+    position:absolute;
+    left:0;
+    top:0;
+    -webkit-transition: top .05s ease-in;
+    transition: top .05s ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skipnav {
+        transition-duration: 0.001ms !important;
+    }
+}
+
+// edit menu contextual icons -- Moved from tiki-selectors April 21 2024
+.edit-menu {
+    position: absolute;
+    top: 6px;
+    right: 2px;
+}
+
+//@include media-breakpoint-up(md) {
+//    .edit-menu { display: none; }
+//    .navbar-default:hover .edit-menu { display: block; }
+//}
+
+//@include media-breakpoint-down(xs) {
+//    .navbar-default .edit-menu { top: 48px; }
+//}
+
+.codelisting_container {
+    max-width: 990px;
+    z-index: 1;
+    position: relative;
+}
+.code {
+    margin-top: 20px;
+    padding-left: 20px;
+}
+.icon_copy_code {
+    position: relative;
+    display: inline-block;
+    color: #87898a;
+    float: right;
+    right: 20px;
+    top: 10px;
+    font-size: 80%;
+}
+.icon_copy_code:hover {
+    color: black;
+    cursor: pointer;
+}
+.icon_copy_code .copy_code_tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -60px;
+    font-family : none;
+}
+.copy_code_tooltiptext {
+    font-size: 14px;
+}
+.icon_copy_code .copy_code_tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+.icon_copy_code:hover .copy_code_tooltiptext {
+    visibility: visible;
+}
+
+// Following 78 lines moved from tiki-selectors as they contain no variables
+.permission_table {
+    .form-row {
+        margin-left: 0; margin-right: 0;
+        > .col { padding-left: 15px; padding-right: 15px; }
+    }
+}
+
+.tiki-admin_modules {
+    .t_navbar .btn {
+        margin-right: 5px;
+    }
+}
+
+@media (max-width: breakpoint-max(sm)) {
+    .navbar-nav {
+        padding: 0 15px;
+        margin: 15px 0;
+    }
+
+    .tiki-view_tracker, .tiki-admin_tracker_fields, .tiki-lastchanges,
+    .tiki-admin_survey_questions, .tiki-assignuser, .tiki_user_messages,
+    .tiki-view_banner {
+        .t_navbar {
+            .btn-group > .btn:not(.dropdown-toggle),
+            &.btn-group > .btn:not(.dropdown-toggle) {
+                margin-right: 5px;
+                margin-bottom: 5px;
+                border-radius: 0.25rem;
+            }
+        }
+    }
+
+    #pagehistory .multi {
+        .input-group-append {
+            display: block;
+            margin: 0 !important;
+            .btn {
+                width: 100%;
+                margin-top: 5px;
+                border-radius: 0.25rem;
+            }
+        }
+    }
+
+    .t_navbar {
+        .btn-group { display: inline-block; }
+    }
+
+    .tiki-admin_menu_options {
+        #preview_code { white-space: normal; }
+    }
+
+    .tiki-wizard_admin {
+        #wizardBody {
+            margin-top: 2em;
+            .media { display: block; margin-top: 1.5rem; }
+        }
+    }
+
+    .tiki-page_contribution {
+        .wikitext { word-break: break-word; }
+    }
+
+    .nav-breadcrumb {
+        display: block;
+        .breadcrumb {
+            width: 100%;
+            & + form { display: block !important; }
+        }
+    }
+
+    .tiki-edit_translation, .tiki-edit_structure {
+        .ui-dialog { width: 100% !important; }
+    }
+
+    #page-data.col-sm-9 { padding-left: 0; padding-right: 0; }
+    .syslog-table textarea { min-height: 5.5em; }
+    .tiki .ui-dialog { width: 80vw !important; }
 }

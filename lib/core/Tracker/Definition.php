@@ -4,17 +4,39 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+/**
+ * Represents a specific tracker; a row in tiki_trackers
+ */
 class Tracker_Definition
 {
-    public static $definitions = [];
+    /**
+     * This is a cache of tracker definitions
+     */
+    private static array $definitions = [];
 
-    private $trackerInfo;
+    /** This is the raw row from  tiki_trackers, with columns
+     * trackerId: int, Primary key
+     * name: varchar(255)
+     * description: text
+     * descriptionIsParsed: 'y' or 'n'
+     * created: bigint relative to unix epoch
+     * lastModif: bigint relative to unix epoch
+     * items: int A cache of the number of items currently stored in the tracker
+    */
+    private array $trackerInfo;
     private $factory;
-    private $fields;
+    /**
+     * This is the direct return of the the 'data' key of the very messy legacy TrackerLib::list_tracker_fields, may as well read the code directly if you want to know what's in there...
+     */
+    private ?array $fields = null;
 
-    public static function get($trackerId, $useCache = true)
+    public static function get($trackerId, $useCache = true): Tracker_Definition|false
     {
         $trackerId = (int) $trackerId;
+
+        if (! $trackerId) {
+            throw new InvalidArgumentException("trackerId parameter must be present");
+        }
 
         if ($useCache && isset(self::$definitions[$trackerId])) {
             return self::$definitions[$trackerId];
@@ -48,15 +70,12 @@ class Tracker_Definition
         return $def;
     }
 
-    public static function getDefault()
+    public static function clearCache(int $trackerId): void
     {
-        $def = new self([]);
-        $def->fields = [];
-
-        return $def;
+        unset(self::$definitions[$trackerId]);
     }
 
-    private function __construct($trackerInfo)
+    private function __construct(array $trackerInfo)
     {
         $this->trackerInfo = $trackerInfo;
     }
@@ -66,7 +85,7 @@ class Tracker_Definition
         return $this->trackerInfo;
     }
 
-    public function getFieldFactory()
+    public function getFieldFactory(): Tracker_Field_Factory
     {
         if ($this->factory) {
             return $this->factory;
@@ -102,16 +121,17 @@ class Tracker_Definition
         return $fields;
     }
 
-    public function getFields()
+    public function getFields(): array
     {
-        if ($this->fields) {
+        if ($this->fields !== null) {
             return $this->fields;
         }
 
         $trklib = TikiLib::lib('trk');
-        $trackerId = $this->trackerInfo['trackerId'] ?? 0;
+        $trackerId = $this->trackerInfo['trackerId'];
 
         if ($trackerId) {
+            /** This is inefficient and goes back and forth between the new and old objects to build an undocumented fields structure - benoitg - 2024-03-03 */
             $fields = $trklib->list_tracker_fields($trackerId, 0, -1, 'position_asc', '', false /* Translation must be done from the views to avoid translating the sources on edit. */);
 
             return $this->fields = $fields['data'];
@@ -120,44 +140,89 @@ class Tracker_Definition
         }
     }
 
-    public function setFields($fields)
-    {
-        $this->fields = $fields;
-    }
-
-    public function getField($id)
+    /**
+     * Get the field info
+     *
+     * @param [type] $id The fieldId or permName.  Searches the fieldId if is_numeric, otherwise searches the permName.
+     * @return array|null
+     */
+    public function getField($id): array|null
     {
         if (is_numeric($id)) {
-            foreach ($this->getFields() as $f) {
-                if ($f['fieldId'] == $id) {
-                    return $f;
-                }
-            }
+            return $this->getFieldInfoFromFieldId((int) $id);
         } else {
             return $this->getFieldFromPermName($id);
         }
     }
 
-    public function getFieldFromName($name)
+    public function hasFieldId(int $id): bool
     {
+        if (! $id) {
+            throw new InvalidArgumentException("id parameter must be provided");
+        }
+        foreach ($this->getFields() as $f) {
+            if ($f['fieldId'] == $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getFieldInfoFromFieldId(int $id): array
+    {
+        if (! $id) {
+            throw new InvalidArgumentException("id parameter must be provided");
+        }
+        foreach ($this->getFields() as $f) {
+            if ($f['fieldId'] == $id) {
+                return $f;
+            }
+        }
+        throw new RuntimeException("Field with fieldId: {$id} not found in definition of {$this->trackerInfo['trackerId']}");
+    }
+
+    public function getFieldFromName($name): ?array
+    {
+        if (empty($name)) {
+            throw new InvalidArgumentException("name parameter must be provided");
+        }
         foreach ($this->getFields() as $f) {
             if ($f['name'] == $name) {
                 return $f;
             }
         }
+        return null;
     }
 
-    public function getFieldFromPermName($name)
+    public function getFieldFromPermName($permName): ?array
     {
-        if (empty($name)) {
-            return null;
+        if (empty($permName)) {
+            throw new InvalidArgumentException("permName parameter must be provided");
         }
 
         foreach ($this->getFields() as $f) {
-            if ($f['permName'] == $name) {
+            if ($f['permName'] == $permName) {
                 return $f;
             }
         }
+        return null;
+    }
+
+    /**
+     * Get the tracker's configured "Main" or "Title" field's id.
+     * There may not be one that is configured, in withc case it returns null
+     * There may be more than one configured (the interface doesn't currenty prevent it - benoitg- 2024-03-08), in which case it returns the first one.
+     *
+     * @return int|null
+     */
+    public function getMainFieldId(): int|null
+    {
+        foreach ($this->getFields() as $field) {
+            if ($field['isMain'] == 'y') {
+                return $field['fieldId'];
+            }
+        }
+        return null;
     }
 
     public function getFieldFromNameMaj($name)
@@ -412,5 +477,28 @@ class Tracker_Definition
         }
 
         return true;
+    }
+
+    /**
+     * Get the status types using the alternate status labels if they are set.
+     * @param string $lg The language key to translate the status labels, if different than preferences.
+     * @return array
+     */
+    public function getStatusTypes($lg = '')
+    {
+        $status = TikiLib::lib('trk')->status_types($lg);
+        $trackerInfo = $this->trackerInfo;
+
+        if (isset($trackerInfo['altOpenStatus']) && ! empty($trackerInfo['altOpenStatus'])) {
+            $status['o']['label'] = $trackerInfo['altOpenStatus'];
+        }
+        if (isset($trackerInfo['altPendingStatus']) && ! empty($trackerInfo['altPendingStatus'])) {
+            $status['p']['label'] = $trackerInfo['altPendingStatus'];
+        }
+        if (isset($trackerInfo['altClosedStatus']) && ! empty($trackerInfo['altClosedStatus'])) {
+            $status['c']['label'] = $trackerInfo['altClosedStatus'];
+        }
+
+        return $status;
     }
 }

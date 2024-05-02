@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class BaseTest extends \Search_Index_BaseTest
+class BaseTest extends \SearchIndexBase
 {
     use IndexBuilder;
 

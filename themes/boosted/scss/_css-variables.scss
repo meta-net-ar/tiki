@@ -22,7 +22,7 @@
 
 @mixin top-nav-light {
     --tiki-top-bg: #fff;
-    --tiki-top-color: #ff7900;
+    --tiki-top-color: var(--tiki-top-color); //#ff7900;
     --tiki-top-hover-color: #000;
     --tiki-top-active-color: #000;
     //    --tiki-top-hover-bg:;
@@ -36,7 +36,7 @@
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: #fff;
-    --tiki-topbar-color: #ff7900;
+    --tiki-topbar-color: var(--tiki-top-color); // #ff7900;
     --tiki-topbar-hover-color: #000;
     --tiki-topbar-active-color: #000;
     //    --tiki-topbar-hover-bg:;

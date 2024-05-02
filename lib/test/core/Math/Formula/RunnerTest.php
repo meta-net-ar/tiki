@@ -344,7 +344,7 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $this->assertEquals($out, $this->runner->evaluate());
     }
 
-    public function stringConcats()
+    public static function stringConcats()
     {
         return [
             ['(str a b)', 'a b'],

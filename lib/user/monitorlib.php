@@ -455,7 +455,7 @@ class MonitorLib
             'target' => $realTarget,
             'hash' => md5($eventName . $realTarget),
             'type' => $objectInfo['type'],
-            'object' => $objectInfo['object'],
+            'object' => $objectInfo['object'] ?? '',
             'description' => $objectInfo['isContainer']
                 ? tr('%0 in %1', $label, $objectInfo['title'])
                 : tr('%0 for %1', $label, $objectInfo['title']),

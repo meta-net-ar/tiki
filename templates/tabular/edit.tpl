@@ -286,9 +286,9 @@
                                         </td>
                                     {/if}
                                     <td><input class="primary" type="radio" name="pk"></td>
-                                    <td><input class="unique-key" type="checkbox"></td>
-                                    <td><input class="read-only" type="checkbox"></td>
-                                    <td><input class="export-only" type="checkbox"></td>
+                                    <td><input class="unique-key form-check-input" type="checkbox"></td>
+                                    <td><input class="read-only form-check-input" type="checkbox"></td>
+                                    <td><input class="export-only form-check-input" type="checkbox"></td>
                                     <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
                                 </tr>
                                 {foreach $schema->getColumns() as $column}
@@ -328,9 +328,9 @@
                                             </td>
                                         {/if}
                                         <td><input class="primary" type="radio" name="pk" {if $column->isPrimaryKey()} checked {/if}></td>
-                                        <td><input class="unique-key" type="checkbox" {if $column->isUniqueKey()} checked {/if}></td>
-                                        <td><input class="read-only" type="checkbox" {if $column->isReadOnly()} checked {/if}></td>
-                                        <td><input class="export-only" type="checkbox" {if $column->isExportOnly()} checked {/if}></td>
+                                        <td><input class="unique-key form-check-input" type="checkbox" {if $column->isUniqueKey()} checked {/if}></td>
+                                        <td><input class="read-only form-check-input" type="checkbox" {if $column->isReadOnly()} checked {/if}></td>
+                                        <td><input class="export-only form-check-input" type="checkbox" {if $column->isExportOnly()} checked {/if}></td>
                                         <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
                                     </tr>
                                 {/foreach}
@@ -461,26 +461,26 @@
                     <input type="submit" class="btn btn-primary" value="{tr}Update{/tr}" onclick="$(window).off('beforeunload');return true;">
                 </div>
             </div>
-            <div class="row mb-3">
-                <label class="col-form-label col-sm-2">{tr}Options{/tr}</label>
+            <fieldset class="row mb-3">
+                <legend class="col-form-label col-sm-2 pt-0">{tr}Options{/tr}</legend>
                 <div class="col-sm-5">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[simple_headers]" value="1" {if $config['simple_headers']} checked {/if}>
-                        <label class="form-check-label">{tr}Simple headers{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[simple_headers]" id="config-simple_headers" value="1" {if $config['simple_headers']} checked {/if}>
+                        <label class="form-check-label" for="config-simple_headers">{tr}Simple headers{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Simple headers:{/tr} {tr}Allow using field labels only as a header row when importing rather than the full &quot;Field [permName:type]&quot; format.{/tr}">
                             {icon name=information}
                         </a>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[import_update]" value="1" {if $config['import_update']} checked {/if}>
-                        <label class="form-check-label">{tr}Import updates{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[import_update]" id="config-import_update" value="1" {if $config['import_update']} checked {/if}>
+                        <label class="form-check-label" for="config-import_update">{tr}Import updates{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Import update:{/tr} {tr}Allow updating existing entries matched by either PK or full record when importing. If this is disabled, only new items will be imported.{/tr}">
                             {icon name=information}
                         </a>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[ignore_blanks]" value="1" {if $config['ignore_blanks']} checked {/if}>
-                        <label class="form-check-label">{tr}Ignore blanks{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[ignore_blanks]" id="config-ignore_blanks" value="1" {if $config['ignore_blanks']} checked {/if}>
+                        <label class="form-check-label" for="config-ignore_blanks">{tr}Ignore blanks{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Ignore blanks:{/tr} {tr}Ignore blank values when import is updating existing items. Only non-blank values will be updated this way.{/tr}">
                             {icon name=information}
                         </a>
@@ -488,25 +488,25 @@
                 </div>
                 <div class="col-sm-5">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[import_transaction]" value="1" {if $config['import_transaction']} checked {/if}>
-                        <label class="form-check-label">{tr}Transactional import{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[import_transaction]" id="config-import_transaction" value="1" {if $config['import_transaction']} checked {/if}>
+                        <label class="form-check-label" for="config-import_transaction">{tr}Transactional import{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Import transaction:{/tr} {tr}Import in a single transaction. If any of the items fails validation, the whole import is rejected and nothing is saved.{/tr}">
                             {icon name=information}
                         </a>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[bulk_import]" value="1" {if $config['bulk_import']} checked {/if}>
-                        <label class="form-check-label">{tr}Bulk import{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[bulk_import]" id="config-bulk_import" value="1" {if $config['bulk_import']} checked {/if}>
+                        <label class="form-check-label" for="config-bulk_import">{tr}Bulk import{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Bulk Import:{/tr} {tr}Import in 'bulk' mode so the search index is not updated for each item and no notifications should be sent.{/tr}">
                             {icon name=information}
                         </a>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="config[skip_unmodified]" value="1" {if $config['skip_unmodified']} checked {/if}>
-                        <label class="form-check-label">{tr}Skip Unmodified{/tr}</label>
+                        <input type="checkbox" class="form-check-input" name="config[skip_unmodified]" id="config-skip_unmodified" value="1" {if $config['skip_unmodified']} checked {/if}>
+                        <label class="form-check-label" for="config-skip_unmodified">{tr}Skip Unmodified{/tr}</label>
                     </div>
                 </div>
-            </div>
+            </fieldset>
             <div class="row mb-3">
                 <label class="col-form-label col-sm-2">
                     {tr}CSV/JSON Encoding{/tr}

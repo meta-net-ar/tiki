@@ -54,9 +54,9 @@
 
         {if $field.type eq 'D'}
             <div class="offset-md-1">
-                <label{if !isset($field.possibilities[$field.value]) && $field.value} style="display:inherit;"{else} style="display:none;"{/if}>
+                <label for="other_{$field.ins_id}" {if !isset($field.possibilities[$field.value]) && $field.value} style="display:inherit;"{else} style="display:none;"{/if}>
                     {tr}Other:{/tr}
-                    <input type="text" class="group_{$field.ins_id|escape} form-control" name="other_{$field.ins_id}" value="{if !isset($field.possibilities[$field.value])}{$field.value|escape}{/if}">
+                    <input type="text" class="group_{$field.ins_id|escape} form-control" name="other_{$field.ins_id}" id="other_{$field.ins_id}" value="{if !isset($field.possibilities[$field.value])}{$field.value|escape}{/if}">
                 </label>
             </div>
             {jq}

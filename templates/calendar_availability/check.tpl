@@ -15,10 +15,10 @@
             {/foreach}
         </tr>
     </thead>
-    {foreach from=$availability key=$user item=list}
+    {foreach $availability as $user => $list}
     <tr>
         <td>{$user|escape}</td>
-        {foreach from=$list key=$time item=$busy}
+        {foreach $list as $time => $busy}
             <td {if $busy}style="background-color: #ccc"{/if}>
                 {if $busy}
                     {tr}{$busy}{/tr}

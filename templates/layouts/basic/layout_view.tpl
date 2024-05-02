@@ -12,6 +12,7 @@
 {if $prefs.feature_ajax eq 'y'}
     {include file='tiki-ajax_header.tpl'}
 {/if}
+<a class="btn btn-info btn-lg skipnav" href="#col1">{tr}Skip to main content{/tr}</a>
 <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         <div class="row">

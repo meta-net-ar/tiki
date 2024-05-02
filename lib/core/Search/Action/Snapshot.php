@@ -133,7 +133,7 @@ class Search_Action_Snapshot implements Search_Action_Action
      *
      * @throws Exception
      */
-    private function saveSnapshot(string $snapshot, string $page, bool $onlyIfChanged, string $templatePage = null)
+    private function saveSnapshot(string $snapshot, string $page, bool $onlyIfChanged, ?string $templatePage = null)
     {
         global $user;
 

@@ -7,7 +7,7 @@
 use Tiki\Installer\Installer;
 
 /**
- * Class TikiDb
+ * Class TikiDb, a singleton representing the entire Tiki database,
  * Implemented by TikiDb_Pdo and TikiDb_Adodb
  */
 abstract class TikiDb
@@ -16,7 +16,7 @@ abstract class TikiDb
     public const ERR_NONE = false;
     public const ERR_EXCEPTION = 'exception';
 
-    private static $instance;
+    private static ?TikiDb $instance = null;
 
     private $errorHandler;
     private $errorMessage;
@@ -29,9 +29,15 @@ abstract class TikiDb
     private $usersTablePrefix;
 
     /**
+     * Return the TikiDb global instance, if one has been set
+     *
+     * There is still a lot of magic in tiki-db.php
+     * The instance is actually set from the outside.
+     * But you can trust this to return a valid instance, or error out.
+     *
      * @return TikiDb
      */
-    public static function get()
+    public static function get(): TikiDb
     {
         if (empty(self::$instance) && (! defined('DB_TIKI_SETUP') || DB_TIKI_SETUP) && ! defined('TIKI_IN_INSTALLER')) {
             // if we are in the console and database setup has completed then this error needs to be ignored.
@@ -56,6 +62,12 @@ abstract class TikiDb
     public static function set(TikiDb $instance)
     {
         return self::$instance = $instance;
+    }
+
+    /** For exceptional cases, check if the database has been initialised yet */
+    public static function isAvailable(): bool
+    {
+        return self::$instance !== null;
     }
 
     public function startTimer()

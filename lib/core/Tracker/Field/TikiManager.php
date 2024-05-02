@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tracker_Field_TikiManager extends \Tracker\Field\AbstractField
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         $utilities = new \Services_Manager_Utilities();
         $options = $utilities::getAvailableActions();

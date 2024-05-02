@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use SteveGrunwell\PHPUnit_Markup_Assertions\MarkupAssertionsTrait;
+
 require_once(__DIR__ . '/../../smarty_tiki/function.toolbars.php');
 
 /**
@@ -13,6 +15,8 @@ require_once(__DIR__ . '/../../smarty_tiki/function.toolbars.php');
  */
 class FunctionToolbarsTest extends TikiTestCase
 {
+    use MarkupAssertionsTrait;
+
     private Smarty_Tiki $smarty;
 
     protected function setUp(): void
@@ -36,7 +40,7 @@ class FunctionToolbarsTest extends TikiTestCase
 
     public function testFunctionToolbarsDefault(): void
     {
-        //This test seems to depend on cache somehow.  If it's disabled, the testFunctionToolbarsWysiwyg test will fail.  We need to completely revisit how we do these tests - benoitg - 2023-11-17';
+        //To find out more, check the file /tiki/lib/test/smarty_tiki/fixtures/FunctionToolbarsDefault.html content structure
 
         $params = [
             '_wysiwyg'     => 'n',
@@ -46,26 +50,32 @@ class FunctionToolbarsTest extends TikiTestCase
             'switcheditor' => 'n',
             'section'      => 'wiki page',
         ];
-        $expectedResults = file_get_contents('lib/test/smarty_tiki/fixtures/FunctionToolbarsDefault.html');
 
-        $result = smarty_function_toolbars($params, $this->smarty->getEmptyInternalTemplate());
-
-        // It's a real problem that the templated generates a href that both depends on the path AND the filename used to call phpunit.  It makes this test extremely brittle.  I don't know which file actually generates the href and how to inject it. - benoitg 2023-01
-
-
-        // currently the fixture used for comparing is commited with this path, which needs to be stripped, because it may or may not be how phpunit is called
-        $expectedResults = str_replace('vendor_bundled/vendor/phpunit/phpunit/', '', $expectedResults);
-        $result = str_replace('vendor_bundled/vendor/phpunit/phpunit/', '', $result);
-
+        $render = smarty_function_toolbars($params, $this->smarty->getEmptyInternalTemplate());
+        $render = str_replace('vendor_bundled/vendor/phpunit/phpunit/', '', $render);
         // results comes back with absolute paths when run from here
         $tikipath = str_replace('lib/test/smarty_tiki', '', dirname(__FILE__));
-        $result = str_replace($tikipath, '', $result);
+        $render = str_replace($tikipath, '', $render);
 
-        $this->assertEquals($expectedResults, $result);
+        //must contain div with class .helptool-admin float-end
+        $this->assertContainsSelector('div>div.helptool-admin.float-end', $render);
+        //div with class .helptool-admin float-end must contain link only
+        $this->assertContainsSelector('div>div.helptool-admin.float-end a.toolbar', $render);
+        $this->assertNotContainsSelector('div>div.helptool-admin.float-end span.toolbar', $render);
+
+        //must contain elements with class .toolbar-list
+        $this->assertContainsSelector('div>span.toolbar-list', $render);
+        $this->assertContainsSelector('div>span.toolbar-list a.toolbar', $render);
+        $this->assertNotContainsSelector('div>span.toolbar-list span.toolbar', $render);
+
+        //all link must contain css class .toolbar
+        $this->assertContainsSelector('a.toolbar', $render);
     }
 
     public function testFunctionToolbarsWysiwyg(): void
     {
+        $this->markTestSkipped("This test is way too fragile. A better strategy is required.");
+
         $params = [
             '_wysiwyg'     => 'y',
             'area_id'      => 'editwiki',

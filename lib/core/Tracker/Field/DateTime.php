@@ -12,7 +12,7 @@
  */
 class Tracker_Field_DateTime extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'f' => [
@@ -241,7 +241,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $data = parent::getProvidedFields();
 
@@ -252,7 +252,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $data = [$this->getBaseKey() => 'timestamp'];
 
@@ -263,7 +263,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractField implements \Tr
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $data = parent::getGlobalFields();
 

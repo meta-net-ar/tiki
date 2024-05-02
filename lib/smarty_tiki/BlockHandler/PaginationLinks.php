@@ -164,6 +164,7 @@ class PaginationLinks extends Base
         $url = preg_replace('/(?:(\?|&amp;)(&amp;)+|(\?|&amp;))$/', '\\1', $url);
 
         $url_args_pos = strpos($url, '?');
+        $next_offset_val = 0;
         if ($url_args_pos === false) {
             $url .= '?';
         } elseif ($url_args_pos < strlen($url) - 1) {
@@ -261,6 +262,7 @@ class PaginationLinks extends Base
 
                 if ($params['show_numbers'] == 'y') {
                     $last_dots = false;
+                    $url_k_val = 0;
                     $page_num = floor($real_offset / $params['step']);
                     foreach (range(0, $nb_pages - 1) as $k) {
                         if ($k + $zero_based_min == $page_num) {

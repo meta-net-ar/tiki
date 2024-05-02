@@ -18,7 +18,7 @@ class Search_Type_WikiTextTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($expectedPlaintext, $plaintext);
     }
 
-    public function mapping()
+    public static function mapping()
     {
         return [
             'Check ^plain text is not somehow mangled' => ['firstword secondword', 'firstword secondword'],

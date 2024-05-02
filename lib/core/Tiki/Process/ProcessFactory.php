@@ -31,7 +31,7 @@ class ProcessFactory
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function create($commandline, string $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = null): Process
+    public function create($commandline, string|null $cwd = null, array|null $env = null, $input = null, $timeout = 60, array|null $options = null): Process
     {
         return new Process($commandline, $cwd, $env, $input, $timeout, $options);
     }

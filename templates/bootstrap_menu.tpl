@@ -1,6 +1,6 @@
 {if $prefs.jquery_smartmenus_enable eq 'y'}
     {* Smartmenu megamenu navigation *}
-    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}sm-vertical flex-column{/if}">
+    <ul class="{if $bs_menu_class}{$bs_menu_class}{else} navbar-nav me-auto nav{/if} {if $module_params.type|default:null eq 'vert'}sm-vertical flex-column{else}sm-horizontal{/if}">
         {foreach from=$list item=item}
             {include file='bootstrap_smartmenu.tpl' item=$item}
         {/foreach}

@@ -396,9 +396,7 @@ if (isset($_REQUEST['print'])) {
     $access->check_permission('tiki_p_export_pdf', '', 'trackeritem', $itemId);
 }
 
-
-$status_types = $trklib->status_types();
-$smarty->assign('status_types', $status_types);
+$smarty->assign('status_types', $definition->getStatusTypes());
 $fields = [];
 $ins_fields = [];
 $usecategs = false;

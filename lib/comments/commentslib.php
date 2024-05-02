@@ -1908,19 +1908,17 @@ class Comments extends TikiLib
         } else {
             $res = $comments->fetchFullRow(['threadId' => $id]);
         }
-
-        if ($res) { //if there is a comment with that id
+        if ($res && is_array($res)) { //if there is a comment with that id
             $this->add_comments_extras($res, $forum_info);
-
             if (! empty($res['objectType']) && $res['objectType'] == 'forum') {
                 $res['deliberations'] = $this->get_forum_deliberations($res['threadId']);
             }
-
             if (! empty($res['objectType']) && $res['objectType'] == 'trackeritem') {
                 $res['version'] = TikiLib::lib('attribute')->get_attribute('comment', $res['threadId'], 'tiki.comment.version');
             }
+        } else {
+            $res = null;
         }
-
         return $res;
     }
 

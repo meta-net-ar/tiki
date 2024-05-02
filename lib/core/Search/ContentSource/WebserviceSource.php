@@ -89,7 +89,7 @@ class Search_ContentSource_WebserviceSource implements Search_ContentSource_Inte
      * @param Search_Type_Factory_Interface $typeFactory
      * @return array|bool
      */
-    public function getDocument($templateName, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($templateName, Search_Type_Factory_Interface $typeFactory): array|false
     {
         if (strpos($templateName, ':') !== false) { // multi-index template from getDocuments
             list ($templateName, $index) = explode(':', $templateName);
@@ -237,7 +237,7 @@ class Search_ContentSource_WebserviceSource implements Search_ContentSource_Inte
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -250,7 +250,7 @@ class Search_ContentSource_WebserviceSource implements Search_ContentSource_Inte
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -263,7 +263,7 @@ class Search_ContentSource_WebserviceSource implements Search_ContentSource_Inte
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

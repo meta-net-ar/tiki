@@ -7366,7 +7366,7 @@ class UsersLib extends TikiLib
 
         $site_hash = $tikilib->get_site_hash();
 
-        $random_value = \phpseclib\Crypt\Random::string(40);
+        $random_value = \phpseclib3\Crypt\Random::string(40);
         return base64_encode(sha1($random_value . $site_hash, true));
     }
 

@@ -320,45 +320,49 @@ if (isset($_REQUEST['preview']) || ! empty($errors)) {
     $data = urldecode($_REQUEST['image_data']);
 
     // Parse the information of an uploaded file and use it for the preview
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
-        }
-        $file_name = $_FILES['userfile1']['name'];
-        // Simple check if it's an image file
-        if (preg_match('/\.(gif|png|jpe?g)$/i', $file_name)) {
-            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-            $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-            fclose($fp);
-
-            $imgtype = $_FILES['userfile1']['type'];
-            $imgsize = $_FILES['userfile1']['size'];
-            $imgname = $_FILES['userfile1']['name'];
-            $smarty->assign('image_data', urlencode($data));
-            $smarty->assign('image_name', $imgname);
-            $smarty->assign('image_type', $imgtype);
-            $smarty->assign('image_size', $imgsize);
-            $hasImage = 'y';
-            $smarty->assign('hasImage', 'y');
-
-            // Create preview cache image, for display afterwards
-            $cachefile = $prefs['tmpDir'];
-
-            if ($tikidomain) {
-                $cachefile .= "/$tikidomain";
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
             }
+            $file_name = $_FILES['userfile1']['name'];
+            // Simple check if it's an image file
+            if (preg_match('/\.(gif|png|jpe?g)$/i', $file_name)) {
+                $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+                $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+                fclose($fp);
 
-            $cachefile .= '/article_preview.' . $previewId;
+                $imgtype = $_FILES['userfile1']['type'];
+                $imgsize = $_FILES['userfile1']['size'];
+                $imgname = $_FILES['userfile1']['name'];
+                $smarty->assign('image_data', urlencode($data));
+                $smarty->assign('image_name', $imgname);
+                $smarty->assign('image_type', $imgtype);
+                $smarty->assign('image_size', $imgsize);
+                $hasImage = 'y';
+                $smarty->assign('hasImage', 'y');
 
-            if (move_uploaded_file($_FILES['userfile1']['tmp_name'], $cachefile)) {
-                $smarty->assign('imageIsChanged', 'y');
+                // Create preview cache image, for display afterwards
+                $cachefile = $prefs['tmpDir'];
+
+                if ($tikidomain) {
+                    $cachefile .= "/$tikidomain";
+                }
+
+                $cachefile .= '/article_preview.' . $previewId;
+
+                if (move_uploaded_file($_FILES['userfile1']['tmp_name'], $cachefile)) {
+                    $smarty->assign('imageIsChanged', 'y');
+                }
             }
+        } else {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
         }
     }
 
@@ -452,23 +456,27 @@ if ((isset($_REQUEST['save']) || isset($_REQUEST['submitarticle'])) && empty($er
     $imgtype = $_REQUEST['image_type'];
     $imgsize = $_REQUEST['image_size'];
 
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
-        }
-        $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
 
-        $imgdata = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-        fclose($fp);
-        $imgtype = $_FILES['userfile1']['type'];
-        $imgsize = $_FILES['userfile1']['size'];
-        $imgname = $_FILES['userfile1']['name'];
+            $imgdata = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+            fclose($fp);
+            $imgtype = $_FILES['userfile1']['type'];
+            $imgsize = $_FILES['userfile1']['size'];
+            $imgname = $_FILES['userfile1']['name'];
+        } else {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
     }
 
     // TODO ImageGalleryRemoval23.x replace with a file gallery version
@@ -628,6 +636,7 @@ if ($prefs['feature_freetags'] == 'y') {
 $smarty->assign('publishDate', $publishDate);
 $smarty->assign('expireDate', $expireDate);
 $smarty->assign('siteTimeZone', $prefs['display_timezone']);
+$smarty->assign('wikiPageSeparator', $prefs['wiki_page_separator']);
 
 $wikilib = TikiLib::lib('wiki');
 $plugins = $wikilib->list_plugins(true, 'body');

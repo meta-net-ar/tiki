@@ -100,7 +100,7 @@ function wikiplugin_archivebuilder($data, $params)
             $path = 'tiki-view_tracker_item.php';
         }
         $archiveParams[$archive] = $label;
-        $archiveParamStr = http_build_query($archiveParams, null, '&');
+        $archiveParamStr = http_build_query($archiveParams, '', '&');
 
         $downloadLink = '<a href=' . $path . '?' . $archiveParamStr . ' class="btn btn-primary btn-sm">' . $label . '</a>';
         return $downloadLink;

@@ -9,7 +9,7 @@ use phpseclib3\Net\SSH2;
 
 class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractField
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'STO' => [
@@ -39,7 +39,7 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractField
                         'legacy_index' => 1,
                     ],
                     'publicKey'       => [
-                        'name'         => tr('Public key file path'),
+                        'name'         => tr('Public key file path (deprecated, not needed anymore)'),
                         'description'  => tr('System path to public key on local server. Only RSA keys are supported.'),
                         'filter'       => 'text',
                         'legacy_index' => 2,
@@ -136,19 +136,18 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractField
         $conn = new SSH2($this->getOption('domain'));
 
         try {
-            if (! is_readable(file_get_contents($this->getOption('privateKey'))) || ! is_readable(file_get_contents($this->getOption('publicKey')))) {
-                Feedback::error(tra("Unable to read ssh file. Run the copysshkey script: `php tiki-manager.php instance:copysshkey`"));
+            if (! is_readable($this->getOption('privateKey'))) {
+                Feedback::error(tra("Unable to read the ssh private key file, in the ShowTikiOrg tracker field"));
                 $ret['status'] = 'INVKEYS';
                 return $ret;
             }
-            $publicKeyLoaded = RSA::loadPublicKey(file_get_contents($this->getOption('publicKey')));
             $privateKeyLoaded = RSA::loadPrivateKey(file_get_contents($this->getOption('privateKey')));
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $ret['status'] = 'INVKEYS';
             return $ret;
         }
 
-        if (! $publicKeyLoaded || ! $privateKeyLoaded) {
+        if (! $privateKeyLoaded) {
             $ret['status'] = 'INVKEYS';
             return $ret;
         }

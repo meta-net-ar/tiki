@@ -11,7 +11,7 @@ require_once(__DIR__ . '/../../importer/tikiimporter_wiki_mediawiki.php');
 /**
  * @group importer
  */
-class TikiImporter_Wiki_Test extends TikiImporter_TestCase
+class TikiImporterWikiTest extends TikiImporter_TestCase
 {
     public function testImportShouldCallMethodsToStartImportProcess(): void
     {

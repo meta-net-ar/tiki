@@ -286,7 +286,7 @@ class WikiRenderer
         if (count($slides) > 1) {
             $this->smartyassign('show_slideshow', 'y');
         } else {
-            $slides = explode('...page...', $this->info['data']);
+            $slides = explode($prefs['wiki_page_separator'], $this->info['data']);
 
             $this->smartyassign('show_slideshow', ( count($slides) > 1 ) ? 'y' : 'n');
         }
@@ -391,8 +391,8 @@ class WikiRenderer
         }
 
         if ($prefs['wiki_pagination'] == 'y') {
-            $pages = $wikilib->get_number_of_pages($pdata);
-            $pdata = $wikilib->get_page($pdata, $this->pageNumber);
+            $pages = WikiPaginationUtils::getNumberOfPages($pdata);
+            $pdata = WikiPaginationUtils::getPage($pdata, $this->pageNumber);
             $this->smartyassign('pages', $pages);
 
             if ($pages > $this->pageNumber) {

@@ -50,7 +50,7 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '27.0vcs';
+        $this->version  = '28.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
 
@@ -394,6 +394,7 @@ class TWVersion
                 '26.0',
                 '26.1',
                 '26.2',
+                '27.0alpha',
             ];
     }
 

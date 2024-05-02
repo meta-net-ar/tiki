@@ -6,66 +6,27 @@
 // This implementation is a work in progress and not all details are integrated at this time.
 // Original source: https://boosted.orange.com/
 
-@import "../../base_files/scss/_tiki-bootstrap_functions";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
 .accordion-button {
     --bs-accordion-btn-icon-width: 0;
 }
 
-@import "../scss/variables"; // Imported here to prevent compile error in boosted/mixins/forms.
-@import "../scss/variables-dark";
-@import "../../base_files/scss/_tiki-variables.scss"; // Values/definitions for Tiki variables (outside of Bootstrap variables) such as _tiki-selectors.scss.
-@import "../../default/scss/variables"; // Bootstrap default variables, with a few Tiki overrides
-@import "../../default/scss/variables-dark"; // Bootstrap dark mode default variables
+@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+@import "../../default/scss/variables"; // 3. Adds default variables for any not declared by the theme variables file.
+@import "../scss/variables-dark"; // 4. Values of dark variables if color modes are enabled.
+@import "../../default/scss/variables-dark"; // 5. Adds default dark variables for any not declared by the theme dark variables file.
+@import "../scss/css-variables"; // 6. Imported after default CSS variables to override them.
+@import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
 
-@import "../scss/variables"; // Theme overrides of Bootstrap defaults plus any additional variables
-@import "../scss/variables-dark"; // Bootstrap 5.3
-
-@import "../../base_files/scss/_tiki-bootstrap_layout_and_components";
-@import "../scss/css-variables"; // Needs to be loaded after default variables to override them
-
-@import "../../base_files/scss/_tiki-selectors.scss";
-@import "../../base_files/scss/tiki-pagetop_colors"; // Import for unified styling of top and topzone navbars, etc. using CSS variables
+@import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 8. Remainder of required Bootstrap parts.
+@import "../../base_files/scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors used globally.
+@import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 10. Optionally imported to group (separately) the top and topbar zone components for styling.
 @import "../scss/mixins"; // original source: Orange-Boosted-Bootstrap-5.2.0/scss/mixins
 @import "../scss/forms"; // original source: Orange-Boosted-Bootstrap-5.2.0/scss/forms (imported to get the checkbox slide and range styling)
 @import "../scss/accordion"; // original source: Orange-Boosted-Bootstrap-5.2.0/scss/_accordion.scss
 @import "../scss/nav";
-@import "../scss/_tiki-selectors.scss";
-@import "../../base_files/scss/_external-scripts.scss";
-@import "../../base_files/scss/_select2-tiki_colors.scss"; // This can be commented out if the theme uses default standard dark-on-light colors
-
-
-//@font-face{
-//    font-family: HelveticaNeueW20-55Roman;
-//    font-style: normal;
-//    font-weight: 400;
-//    font-display:fallback;
-//    src:url(../fonts/HelveticaNeueW20-55Roman.woff2) format("woff2");
-//}
-//
-//@font-face{
-//    font-family: HelveticaNeueW20-55Roman;
-//    font-style: normal;
-//    font-weight: 400;
-//    font-display: fallback;
-//    src: url(../fonts/HelveticaNeueW20-75Bold.woff2) format("woff2");
-//}
-//
-//@font-face{
-//    font-family: HelvNeue55_W1G;
-//    font-style: normal;
-//    font-weight: 400;
-//    font-display: fallback;
-//    src: url(../fonts/HelvNeue55_W1G.woff2) format("woff2");
-//}
-//
-//@font-face{
-//    font-family: HelvNeue75_W1G;
-//    font-style: normal;
-//    font-weight: 400;
-//    font-display: fallback;
-//    src: url(../fonts/HelvNeue75_W1G.woff2) format("woff2");
-//}
+@import "../scss/_tiki-selectors.scss"; // 11. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 .form-switch .form-check-input {
     width: 3.75rem;

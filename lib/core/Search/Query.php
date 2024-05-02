@@ -370,7 +370,7 @@ class Search_Query implements Search_Query_Interface
                 trigger_error($e->getMessage(), E_USER_WARNING);
             }
             $resultSet = Search_ResultSet::create([]);
-            $resultSet->errorInQuery = true;
+            $resultSet->errorInQuery = $e->getMessage();
             return $resultSet;
         }
 

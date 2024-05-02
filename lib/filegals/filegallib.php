@@ -904,11 +904,16 @@ class FileGalLib extends TikiLib
                 };
             case 'application/pdf':
                 return function (FileWrapper $wrapper) {
-                    include_once TIKI_VENDOR_NONBUNDLED_PATH . "/christian-vigh-phpclasses/PdfToText/PdfToText.phpclass";
-                    ob_start();
-                    $pdf = new PdfToText($wrapper->getReadableFile());
-                    ob_end_clean();
-                    return $pdf->Text;
+                    $getTextFromPdf = function () use ($wrapper) {
+                        require_once TIKI_VENDOR_BUNDLED_PATH . "/christian-vigh-phpclasses/PdfToText/PdfToText.phpclass";
+                        ob_start();
+                        $pdf = new \PdfToText($wrapper->getReadableFile());
+                        ob_end_clean();
+                        return $pdf->Text;
+                    };
+
+                    // Call the closure to get text from PDF
+                    return $getTextFromPdf();
                 };
         }
     }
@@ -2914,6 +2919,11 @@ class FileGalLib extends TikiLib
     public function get_file_additional($fileId)
     {
         $file = $this->get_file_info($fileId);
+
+        if (! is_array($file)) {//when fileId is empty
+            throw new Exception('File not found');
+        }
+
         $files = $this->get_files(-1, -1, false, null, $file['galleryId'])['data'];
         $files = array_filter($files, function ($file) use ($fileId) {
             return $file['fileId'] == $fileId;

@@ -177,7 +177,7 @@ class PhpExecutableFinderTest extends TestCase
         $this->assertEquals($expectedVersion, $version);
     }
 
-    public function dataForGetPhpVersion(): array
+    public static function dataForGetPhpVersion(): array
     {
         return [
             [ // multiline input
@@ -227,7 +227,7 @@ class PhpExecutableFinderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function dataForGeneratePossiblePhpCliNames(): array
+    public static function dataForGeneratePossiblePhpCliNames(): array
     {
         return [
             [ // empty inputs, empty output

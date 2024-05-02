@@ -9,7 +9,7 @@ namespace Tiki\Cache;
 interface KvpCacheInterface
 {
     /** Is this cache system enabled and functional */
-    public function isFunctionnal(): bool;
+    public function isFunctional(): bool;
 
     public function cacheItem($key, $data, string $type = '');
 

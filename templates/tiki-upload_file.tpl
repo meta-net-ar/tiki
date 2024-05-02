@@ -139,7 +139,7 @@
         <input type="hidden" id="max_file_uploads" value="{$max_file_uploads}">
         {remarksbox type="note" title="{tr}Information{/tr}"}
             {tr}Maximum file size is around:{/tr}
-            {if $tiki_p_admin eq 'y'}<a title="|{$max_upload_size_comment}" class="btn btn-link tips">{/if}
+            {if $tiki_p_admin eq 'y'}<a title="|{$max_upload_size_comment}" class="alert-link tips">{/if}
                 {$max_upload_size|kbsize:true:0}
             {if $tiki_p_admin eq 'y'}</a>
                 {if $is_iis}<br>{tr}Note: You are running IIS{/tr}. {tr}maxAllowedContentLength also limits upload size{/tr}. {tr}Please check web.config in the Tiki root folder{/tr}{/if}
@@ -512,7 +512,7 @@
 {/if}
 {if not $editFileId and $prefs.fgal_upload_from_source eq 'y' and $tiki_p_upload_files eq 'y'}
     <form class="remote-upload" method="post" action="{service controller=file action=remote}">
-        <h3>{tr}Upload from URL{/tr}</h3>
+        <span class="h3">{tr}Upload from URL{/tr}</span>
         <div class="mb-3 row">
             <input type="hidden" name="galleryId" value="{$galleryId|escape}">
             <label class="col-md-4 col-form-label">{tr}URL:{/tr}</label>

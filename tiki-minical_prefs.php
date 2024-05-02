@@ -61,43 +61,53 @@ if (isset($_REQUEST['removetopic'])) {
 }
 if (isset($_REQUEST['import'])) {
     $access->checkCsrf();
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-        $heading = fgetcsv($fp, 1000, ",");
-        while ($data = fgetcsv($fp, 1000, ",")) {
-            $subject = $data[array_search('Subject', $heading) ];
-            $description = $data[array_search('Description', $heading) ];
-            $start = strtotime($data[array_search('Start Date', $heading) ]);
-            $start = strtotime($data[array_search('Start Time', $heading) ], $start);
-            $end = strtotime($data[array_search('End Date', $heading) ]);
-            $end = strtotime($data[array_search('End Time', $heading) ], $start);
-            $minicallib->minical_replace_event($user, 0, $subject, $description, $start, $end - $start, 0);
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+            $heading = fgetcsv($fp, 1000, ",");
+            while ($data = fgetcsv($fp, 1000, ",")) {
+                $subject = $data[array_search('Subject', $heading) ];
+                $description = $data[array_search('Description', $heading) ];
+                $start = strtotime($data[array_search('Start Date', $heading) ]);
+                $start = strtotime($data[array_search('Start Time', $heading) ], $start);
+                $end = strtotime($data[array_search('End Date', $heading) ]);
+                $end = strtotime($data[array_search('End Time', $heading) ], $start);
+                $minicallib->minical_replace_event($user, 0, $subject, $description, $start, $end - $start, 0);
+            }
+        } else {
+            Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
         }
     }
 }
 // Process upload here
 if (isset($_REQUEST['addtopic'])) {
     $access->checkCsrf();
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+            $data = '';
+            while (! feof($fp)) {
+                $data .= fread($fp, 8192 * 16);
+            }
+            fclose($fp);
+            $size = $_FILES['userfile1']['size'];
+            $name = $_FILES['userfile1']['name'];
+            $type = $_FILES['userfile1']['type'];
+        } else {
+            Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
         }
-        $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-        $data = '';
-        while (! feof($fp)) {
-            $data .= fread($fp, 8192 * 16);
-        }
-        fclose($fp);
-        $size = $_FILES['userfile1']['size'];
-        $name = $_FILES['userfile1']['name'];
-        $type = $_FILES['userfile1']['type'];
-    } else {
+    }
+
+    if (! isset($data)) {
         $size = 0;
         $name = '';
         $type = '';

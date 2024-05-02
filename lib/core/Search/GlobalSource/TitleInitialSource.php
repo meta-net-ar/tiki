@@ -30,12 +30,12 @@ class Search_GlobalSource_TitleInitialSource implements Search_GlobalSource_Inte
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['title_initial', 'title_firstword'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title_initial' => 'identifier',
@@ -43,7 +43,7 @@ class Search_GlobalSource_TitleInitialSource implements Search_GlobalSource_Inte
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

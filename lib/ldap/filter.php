@@ -29,7 +29,7 @@ class LDAPFilter
     * @return LDAPFilter|Exception
     * @static
     */
-    public function &combine($log_op, $filters)
+    public static function &combine($log_op, $filters)
     {
         // substitude named operators to logical operators
         if ($log_op == 'and') {
@@ -90,7 +90,7 @@ class LDAPFilter
     * @access static
     * @return LDAPFilter|Net_LDAP_Error
     */
-    public function parse($FILTER)
+    public static function parse($FILTER)
     {
         if (preg_match('/^\((.+?)\)$/', $FILTER, $matches)) {
             if (in_array(substr($matches[1], 0, 1), ['!', '|', '&'])) {

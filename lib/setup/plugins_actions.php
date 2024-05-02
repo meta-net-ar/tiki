@@ -32,8 +32,8 @@ foreach ($plugins_actions as $plugin_type => $v) {
     foreach ($v as $plugin_name => $params) {
         switch ($plugin_type) {
             case 's_f_': // Smarty Function
-                @include_once('lib/smarty_tiki/function.' . $plugin_name . '.php');
-                $func = 's_f_' . $plugin_name . '_actionshandler';
+                @include_once('lib/smarty_tiki/FunctionHandler/' . ucfirst($plugin_name) . '.php');
+                $func = '\\SmartyTiki\\FunctionHandler\\s_f_' . $plugin_name . '_actionshandler';
                 if (! function_exists($func) || ! call_user_func($func, $params)) {
                     TikiLib::lib('access')->display_error('', sprintf(tra('Handling actions of plugin "%s" failed.'), $plugin_name));
                 }

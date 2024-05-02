@@ -1000,7 +1000,7 @@ if (! isset($_REQUEST['find'])) {
 $smarty->assign_by_ref('find', $_REQUEST['find']);
 
 if (isset($_REQUEST['fileId'])) {
-    if (! is_numeric($_REQUEST['fileId'])) {
+    if (! is_numeric($_REQUEST['fileId']) && ! empty($_REQUEST['fileId'])) {
         Feedback::error(tr('Invalid %0 parameter', 'fileId'));
     } else {
         $fileId = (int)$_REQUEST['fileId'];

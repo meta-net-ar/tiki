@@ -11,12 +11,12 @@
         {remarksbox type="warning" title="{tr}Page links{/tr}"}{tr}Note that if the SEFURL feature is on, page links created using wysiwyg might not be automatically updated when pages are renamed. This is addressed through the "Use Wiki syntax in WYSIWYG" feature.{/tr}{/remarksbox}
     {/if}
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_wysiwyg visible="always"}
         {preference name=wikiplugin_wysiwyg}
     </fieldset>
     <fieldset>
-        <legend>{tr}WYSIWYG editor features{/tr}</legend>
+        <legend class="h3">{tr}WYSIWYG editor features{/tr}</legend>
         {preference name=wysiwyg_optional}
         <div class="adminoptionboxchild" id="wysiwyg_optional_childcontainer">
             {preference name=wysiwyg_default}
@@ -24,14 +24,14 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{tr}Markdown Toast UI WySIWYG{/tr}</legend>
+        <legend class="h3">{tr}Markdown Toast UI WySIWYG{/tr}</legend>
         {preference name=markdown_wysiwyg_height}
         {preference name=markdown_wysiwyg_preview_style}
         {preference name=markdown_wysiwyg_intitial_edit_type}
         {preference name=markdown_wysiwyg_usage_statistics}
     </fieldset>
     <fieldset>
-        <legend>{tr}Legacy CKEditor WYSIWYG{/tr}</legend>
+        <legend class="h3">{tr}Legacy CKEditor WYSIWYG{/tr}</legend>
         {preference name=wysiwyg_htmltowiki}
         {preference name=wysiwyg_inline_editing}
         {preference name=wysiwyg_toolbar_skin}

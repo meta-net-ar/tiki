@@ -11,12 +11,12 @@
 
 
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_directory visible="always"}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Directory{/tr}</legend>
+        <legend class="h3">{tr}Directory{/tr}</legend>
         {preference name=directory_columns}
         {preference name=directory_links_per_page}
         {preference name=directory_validate_urls}

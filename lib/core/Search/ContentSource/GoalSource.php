@@ -24,7 +24,7 @@ class GoalSource implements Search_ContentSource_Interface
         return $this->table->fetchColumn('goalId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -51,12 +51,12 @@ class GoalSource implements Search_ContentSource_Interface
         }
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['title', 'description', 'goal_type', 'enabled', 'day_span', 'span_from', 'span_to', 'eligible', 'conditions', 'rewards'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -72,7 +72,7 @@ class GoalSource implements Search_ContentSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

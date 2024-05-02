@@ -116,6 +116,9 @@ class TikiDb_Pdo extends TikiDb
                 if (! is_array($values)) {
                     $values = [$values];
                 }
+                if (! array_filter(array_keys($values), 'is_string')) {
+                    $values = array_values($values);
+                }
                 $result = $pq->execute($values);
                 $this->rowCount = $pq->rowCount();
             }

@@ -8,7 +8,7 @@
 
 class Tracker_Field_Action implements \Tracker\Field\FieldInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'x' => [

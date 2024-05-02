@@ -5,12 +5,12 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_copyright visible="always"}
     </fieldset>
     <div class="adminoptionboxchild" id="feature_copyright_childcontainer">
         <fieldset>
-            <legend>{tr}Features{/tr}</legend>
+            <legend class="h4">{tr}Features{/tr}</legend>
             {preference name=wikiLicensePage}
             {preference name=wikiSubmitNotice}
             {preference name=wiki_feature_copyrights}

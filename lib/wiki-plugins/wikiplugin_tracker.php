@@ -716,6 +716,11 @@ function wikiplugin_tracker_info()
                 'default' => 'n',
                 'advanced' => true,
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
             ],
             'rulesparent' => [
                 'required' => false,
@@ -1807,14 +1812,14 @@ function wikiplugin_tracker($data, $params)
             if (count($field_errors['err_mandatory']) > 0) {
                 $msg = tra('The following mandatory fields are missing');
                 foreach ($field_errors['err_mandatory'] as $err) {
-                    $msg .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . $err['name'];
+                    $msg .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . (empty($err['name']) ? $err['fieldId'] : $err['name']);
                 }
                 Feedback::error($msg);
             }
             if (count($field_errors['err_value']) > 0) {
                 $msg = tra('Following fields are incorrect');
                 foreach ($field_errors['err_value'] as $err) {
-                    $msg .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . $err['name'];
+                    $msg .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;' . (empty($err['name']) ? $err['fieldId'] : $err['name']);
                     if (! empty($err['errorMsg'])) {
                         $msg .= ' (' . $err['errorMsg'] . ')';
                     }
@@ -2049,7 +2054,7 @@ function wikiplugin_tracker($data, $params)
             }
         }
         if (! empty($showstatus) && $showstatus == 'y') {
-            $status_types = $trklib->status_types();
+            $status_types = $definition->getStatusTypes();
             $smarty->assign_by_ref('status_types', $status_types);
             $smarty->assign('form_status', 'status');
             $smarty->assign_by_ref('tracker', $tracker);

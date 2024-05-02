@@ -148,7 +148,7 @@
         <form action="tiki-admin.php?page=profiles" method="post" role="form">
             <input type="hidden" name="redirect" value=0>
             <fieldset id="export_to_yaml">
-                <legend>{tr}Export YAML{/tr}</legend>
+                <legend class="h3">{tr}Export YAML{/tr}</legend>
                 {if !empty(exported_content)}
                     {foreach $exported_content as $export}
                         <div class="wikitext">{$export}</div>
@@ -176,7 +176,7 @@
                     </div>
                 </div>
                 <fieldset>
-                    <legend>{tr}Export modified preferences as YAML{/tr}</legend>
+                    <legend class="h3">{tr}Export modified preferences as YAML{/tr}</legend>
                     <div class="t_navbar">
                         {listfilter selectors=".profile_export_list > li"}
                         <label for="select_all_prefs_to_export">{tr}Toggle Visible{/tr}</label>
@@ -189,7 +189,6 @@
                             {foreach from=$modified_list key="name" item="data"}
                                 <li class="form-check">
                                     {if is_array($data.current.expanded)}
-                                        {assign var=current value=$data.current.expanded|join:', '}
                                         {assign var=current value="[$current]"}
                                     {else}
                                         {assign var=current value=$data.current.expanded}
@@ -310,7 +309,7 @@
                 </div>
             </form>
         </fieldset>
-        <fieldset><legend>{tr}Profile tester{/tr}</legend>
+        <fieldset><legend class="h3">{tr}Profile tester{/tr}</legend>
             <form action="tiki-admin.php?page=profiles" method="post">
                 {ticket}
                 <input type="hidden" name="redirect" value=0>

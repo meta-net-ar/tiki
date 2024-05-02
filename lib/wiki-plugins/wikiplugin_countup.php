@@ -336,7 +336,9 @@ function wikiplugin_countup_info()
 
 function wikiplugin_countup($data, $params)
 {
-    TikiLib::lib('header')->add_jsfile("vendor_bundled/vendor/npm-asset/animejs/lib/anime.min.js", true);
+    TikiLib::lib('header')->add_js_module(
+        'import anime from "animejs";'
+    );
 
     $smarty = TikiLib::lib('smarty');
     $pluginInfos = $params;
@@ -418,7 +420,7 @@ function wikiplugin_countup($data, $params)
     $smarty->assign('descriptionStyle', $descriptionStyle);
     $smarty->assign('numberStyle', $numberStyle);
 
-    TikiLib::lib('header')->add_jq_onready($js);
+    TikiLib::lib('header')->add_js_module($js);
 
     return $smarty->fetch('wiki-plugins/wikiplugin_countup.tpl');
 }

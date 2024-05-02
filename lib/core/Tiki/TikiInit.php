@@ -62,7 +62,7 @@ class TikiInit
                     $container->hasParameter('tiki.version') &&                    // no version before 15.0
                     $container->getParameter('tiki.version') === $version
                 ) {
-                    if (TikiDb::get()) {
+                    if (TikiDb::isAvailable()) {
                         $container->set('tiki.lib.db', TikiDb::get());
                     }
 
@@ -74,7 +74,6 @@ class TikiInit
             }
         }
 
-        $path = TIKI_PATH . '/' . TIKI_CONFIG_PATH . '/config';
         $container = new ContainerBuilder();
         $container->addCompilerPass(new \Tiki\MailIn\Provider\CompilerPass());
         $container->addCompilerPass(new \Tiki\Recommendation\Engine\CompilerPass());
@@ -84,8 +83,9 @@ class TikiInit
 
         $container->setParameter('kernel.root_dir', TIKI_PATH);
         $container->setParameter('tiki.version', $version);
-
-        $loader = new XmlFileLoader($container, new FileLocator($path));
+        $loadPaths = [TIKI_PATH . '/' . TIKI_MAIN_CLASS_LOADER_XML_PATH,
+        TIKI_PATH . '/' . TIKI_CUSTOMIZATIONS_CLASS_LOADER_XML_PATH];
+        $loader = new XmlFileLoader($container, new FileLocator($loadPaths));
 
         $tempDir = sys_get_temp_dir();
         $tmpfile = tempnam($tempDir, 'symfony');
@@ -101,7 +101,7 @@ class TikiInit
         try {
             $loader->load('custom.xml');
         } catch (FileLocatorFileNotFoundException $e) {
-            // Do nothing, absence of custom.xml file is expected
+            // Do nothing, the absence of custom.xml file is expected
         }
 
         $extensionPackagesDefinition = PackageExtensionManager::getEnabledPackageExtensions(false);

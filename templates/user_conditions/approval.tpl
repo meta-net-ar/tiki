@@ -14,8 +14,8 @@
     </div>
     <form method="post" action="{service controller=user_conditions action=approval}">
         <div class="form-check">
-            <label class="form-label">
-                <input name="approve" type="checkbox" value="{$hash|escape}">
+            <input name="approve" id="approve" type="checkbox" class="form-check-input" value="{$hash|escape}">
+            <label for="approve" class="form-label">
                 {tr}I approve the above terms and conditions{/tr}
             </label>
         </div>

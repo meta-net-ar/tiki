@@ -20,7 +20,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
         ]);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -67,7 +67,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -82,7 +82,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -97,7 +97,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

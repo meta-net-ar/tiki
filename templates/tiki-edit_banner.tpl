@@ -10,66 +10,66 @@
     <div class="card mb-2">
         <div class="card-body">
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}URL to link the banner{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="url">{tr}URL to link the banner{/tr}</label>
                 <div class="col-sm-7 mb-3">
-                    <input type="text" name="url" value="{$url|escape}" class="form-control">
+                    <input type="text" name="url" id="url" value="{$url|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Client{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="client">{tr}Client{/tr}</label>
                 <div class="col-sm-7 mb-3">
-                    {user_selector user=$client name='client'}
+                    {user_selector user=$client name='client' id='client'}
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Maximum impressions{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="maxImpressions">{tr}Maximum impressions{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="text" name="maxImpressions" id="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Maximum number of impressions for a user{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="maxUserImpressions">{tr}Maximum number of impressions for a user{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="text" name="maxUserImpressions" id="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Maximum clicks{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="maxClicks">{tr}Maximum clicks{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
+                    <input type="text" name="maxClicks" id="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}URIs where the banner appears only{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="onlyInURIs">{tr}URIs where the banner appears only{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="onlyInURIs" value="{$onlyInURIs|escape}" class="form-control">
+                    <input type="text" name="onlyInURIs" id="onlyInURIs" value="{$onlyInURIs|escape}" class="form-control">
                     <div class="form-text">
                         {tr}Type each URI enclosed with the # character. Exemple:#/this_page#/tiki-index.php?page=this_page#{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}URIs where the banner will not appear{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="exceptInURIs">{tr}URIs where the banner will not appear{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="exceptInURIs" value="{$exceptInURIs|escape}" class="form-control">
+                    <input type="text" name="exceptInURIs" id="exceptInURIs" value="{$exceptInURIs|escape}" class="form-control">
                     <div class="form-text">
                         {tr}Type each URI enclosed with the # character. Exemple:#/this_page#/tiki-index.php?page=this_page#{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Zone{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="zone">{tr}Zone{/tr}</label>
                 <div class="col-sm-7">
-                    <select name="zone"{if !$zones} disabled="disabled"{/if} class="form-control">
+                    <select id="zone" name="zone"{if !$zones} disabled="disabled"{/if} class="form-control">
                         {section name=ix loop=$zones}
                             <option value="{$zones[ix].zone|escape}" {if $zone eq $zones[ix].zone}selected="selected"{/if}>{$zones[ix].zone|escape}</option>
                         {sectionelse}
@@ -80,9 +80,9 @@
                         {tr}Or, create a new zone{/tr}
                     </div>
                 </div>
-                <label class="col-sm-4 col-form-label">{tr}New Zone{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="zoneName">{tr}New Zone{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="zoneName" maxlength="10" class="form-control">
+                    <input type="text" id="zoneName" name="zoneName" maxlength="10" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
@@ -96,23 +96,24 @@
 
     <div class="card mb-2">
         <div class="card-body">
-            <h4>{tr}Show the banner only between these dates:{/tr}</h4>
+            <h2 class="h4">{tr}Show the banner only between these dates:{/tr}</h2> {* Here and below, use semantically correct heading size, but display smaller visually *}
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}From date:{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="fromDate">{tr}From date:{/tr}</label>
                 <div class="col-sm-7 short">
-                    {html_select_date time=$fromDate prefix="fromDate_" end_year="+2" field_order=$prefs.display_field_order}
+                    {html_select_date id="fromDate" time=$fromDate prefix="fromDate_" end_year="+2" field_order=$prefs.display_field_order}
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}To date:{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="toDate">{tr}To date:{/tr}</label>
                 <div class="col-sm-7 short">
-                    {html_select_date time=$toDate prefix="toDate_" start_year="+0" end_year=$prefs.calendar_end_year field_order=$prefs.display_field_order}
+                    {html_select_date id="toDate" time=$toDate prefix="toDate_" start_year="+0" end_year=$prefs.calendar_end_year field_order=$prefs.display_field_order}
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}Use dates:{/tr}</label>
+                <div class="col-sm-4 col-form-label">{tr}Use dates:{/tr}</div>
                 <div class="col-sm-7">
-                    <label><input type="checkbox" name="useDates" {if $useDates eq 'y'}checked='checked'{/if}> {tr}Yes{/tr}</label>
+                    <input class="form-check-input" type="checkbox" id="useDates" name="useDates" {if $useDates eq 'y'}checked='checked'{/if}>
+                    <label class="form-check-label" for="useDates"> {tr}Yes{/tr}</label>
                 </div>
             </div>
         </div>
@@ -120,17 +121,17 @@
 
     <div class="card mb-2">
         <div class="card-body">
-            <h4>{tr}Show the banner only in these hours:{/tr}</h4>
+            <h2 class="h4">{tr}Show the banner only in these hours:{/tr}</h2>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}from{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="fromTime">{tr}from{/tr}</label>
                 <div class="col-sm-7 short">
-                    {html_select_time time=$fromTime display_seconds=false prefix='fromTime' use_24_hours=$use_24hr_clock}
+                    {html_select_time id="fromTime" time=$fromTime display_seconds=false prefix='fromTime' use_24_hours=$use_24hr_clock}
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label">{tr}to{/tr}</label>
+                <label class="col-sm-4 col-form-label" for="toTime">{tr}to{/tr}</label>
                 <div class="col-sm-7 short">
-                    {html_select_time time=$toTime display_seconds=false prefix='toTime' use_24_hours=$use_24hr_clock}
+                    {html_select_time id="toTime" time=$toTime display_seconds=false prefix='toTime' use_24_hours=$use_24hr_clock}
                 </div>
             </div>
         </div>
@@ -138,16 +139,37 @@
 
     <div class="card mb-2">
         <div class="card-body">
-            <h4>{tr}Show the banner only on:{/tr}</h4>
+            <h2 class="h4">{tr}Show the banner only on:{/tr}</h2>
             <div class="col-sm-12">
-                <div class="mb-3 row flex-column">
-                    <label><input type="checkbox" name="Dmon" {if $Dmon eq 'y'}checked="checked"{/if}> {tr}Mon{/tr}</label>
-                    <label><input type="checkbox" name="Dtue" {if $Dtue eq 'y'}checked="checked"{/if}> {tr}Tue{/tr}</label>
-                    <label><input type="checkbox" name="Dwed" {if $Dwed eq 'y'}checked="checked"{/if}> {tr}Wed{/tr}</label>
-                    <label><input type="checkbox" name="Dthu" {if $Dthu eq 'y'}checked="checked"{/if}> {tr}Thu{/tr}</label>
-                    <label><input type="checkbox" name="Dfri" {if $Dfri eq 'y'}checked="checked"{/if}> {tr}Fri{/tr}</label>
-                    <label><input type="checkbox" name="Dsat" {if $Dsat eq 'y'}checked="checked"{/if}> {tr}Sat{/tr}</label>
-                    <label><input type="checkbox" name="Dsun" {if $Dsun eq 'y'}checked="checked"{/if}> {tr}Sun{/tr}</label>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dmon" id="Dmon" {if $Dmon eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dmon"> {tr}Monday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dtue" id="Dtue" {if $Dtue eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dtue"> {tr}Tuesday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dwed" id="Dwed" {if $Dwed eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dwed"> {tr}Wednesday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dthu" id="Dthu" {if $Dthu eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dthu"> {tr}Thursday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dfri" id="Dfri" {if $Dfri eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dfri"> {tr}Friday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dsat" id="Dsat" {if $Dsat eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dsat"> {tr}Saturday{/tr}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="Dsun" id="Dsun" {if $Dsun eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="Dsun"> {tr}Sunday{/tr}</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,29 +177,39 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <h4>{tr}Select ONE method for the banner:{/tr}</h4>
+            <h2 class="h4">{tr}Select ONE method for the banner:{/tr}</h2>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><label><input type="radio" name="use" value="useHTML" {if $use eq 'useHTML'}checked="checked"{/if}> {tr}Use HTML{/tr}</label></label>
+                <div class="col-sm-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="use" id="useHTML" value="useHTML" {if $use eq 'useHTML'}checked="checked"{/if}>
+                        <label class="form-check-label" for="useHTML"> {tr}Use HTML{/tr}</label>
+                    </div>
+                </div>
                 <div class="col-sm-7">
-                    <textarea class="form-control" rows="5" name="HTMLData">{$HTMLData|escape}</textarea>
-                    <div class="form-text">
+                    <textarea class="form-control" rows="5" name="HTMLData" aria-labelledby="HTMLcode">{$HTMLData|escape}</textarea>
+                    <div class="form-text" id="HTMLcode">
                         {tr}HTML code{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><label><input type="radio" name="use" value="useImage" {if $use eq 'useImage'}checked="checked"{/if}> {tr}Use Image{/tr}</label></label>
+                <div class="col-sm-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="use" id="useImage" value="useImage" {if $use eq 'useImage'}checked="checked"{/if}>
+                        <label class="form-check-label" for="useImage"> {tr}Use Image{/tr}</label>
+                    </div>
+                </div>
                 <div class="col-sm-7">
                     <input type="hidden" name="imageData" value="{$imageData|escape}">
                     <input type="hidden" name="imageName" value="{$imageName|escape}">
                     <input type="hidden" name="imageType" value="{$imageType|escape}">
                     <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-                    <input name="userfile1" type="file" class="form-control">
+                    <input name="userfile1" type="file" class="form-control" aria-label="Browse">
                 </div>
             </div>
             <div class="mb-3 row">
                 {if $hasImage eq 'y'}
-                <label class="col-sm-4 col-form-label">{tr}Current Image{/tr}</label>
+                <div class="col-sm-4">{tr}Current Image{/tr}</div>
                 <div class="col-sm-7">
                     {$imageName}: <img class="img-fluid" src="banner_image.php?id={$bannerId}" alt="{tr}Current Image{/tr}">
                 </div>
@@ -206,7 +238,7 @@
 {if $zones}
     <div align="left" class="card">
         <div class="card-body">
-            <h2>{tr}Remove zones (info entered for any banner in the zones will be lost){/tr}</h2>
+            <h2 class="h4">{tr}Remove zones (info entered for any banner in the zones will be lost){/tr}</h2>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <tr>

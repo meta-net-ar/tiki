@@ -12,11 +12,11 @@
         {tab name="{tr}Workspaces{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=workspace_ui visible="always"}
             </fieldset>
             <fieldset>
-                <legend>{tr}Dependencies{/tr}</legend>
+                <legend class="h3">{tr}Dependencies{/tr}</legend>
                 {preference name=namespace_enabled}
                 {preference name=namespace_separator}
                 {preference name=namespace_force_links}
@@ -25,7 +25,7 @@
                 {preference name=feature_wiki}
             </fieldset>
             <fieldset>
-                <legend>{tr}Advanced{/tr}</legend>
+                <legend class="h3">{tr}Advanced{/tr}</legend>
                 {preference name=workspace_root_category}
             </fieldset>
             {jq}
@@ -47,11 +47,11 @@
         {tab name="{tr}Areas{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_areas}
             </fieldset>
             <fieldset>
-                <legend>{tr}Areas{/tr}</legend>
+                <legend class="h3">{tr}Areas{/tr}</legend>
                 <div class="table-responsive">
                     <table class="table">
                         <tr>

@@ -12,7 +12,7 @@
                                 <label class="col-form-label" for="filterType">
                                     {tr}in{/tr}&nbsp;
                                 </label>
-                                <div class="col-auto">
+                                <div class="col-auto mb-3">
                                     {if $smod_params.search_action eq 'tiki-searchindex.php'}
                                         <select id="filterType" name="filter~type" class="form-select my-1" {*style="width:{$smod_params.select_size}em;"*}>
                                             <option value="">{tr}Entire Site{/tr}</option>

@@ -132,12 +132,10 @@ $tiki-blockquote-left-border-color: var(--#{$prefix}secondary-color); // #e5e5e5
     --tiki-static-top-light-border: none;
 }
 
+// These are redundant re: --tiki-top-border-width, but need to be explicit for calculation of fixed-top navbar height in templates/modules/mod-logo.tpl. A unit is required.
 header.navbar.fixed-top {
     --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-right-width: 0px;
     --tiki-fixed-top-border-bottom-width: 0px;
-    --tiki-fixed-top-border-left-width: 0px;
-//    --tiki-topbar-light-border-color: #000;
 }
 
 :root {
@@ -145,4 +143,10 @@ header.navbar.fixed-top {
     --tiki-tooltip-link-hover-color: #{$tooltip-color};
     --tiki-code-color: var(--bs-body-color);
     --tiki-code-bg: var(--bs-secondary-bg);
+}
+
+[data-bs-theme=dark] {
+    .bg-light {
+        background-color: var(--bs-tertiary-bg);
+    }
 }

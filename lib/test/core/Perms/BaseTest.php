@@ -84,7 +84,7 @@ class Perms_BaseTest extends TikiTestCase
         $this->assertSame($$expectedResolver, Perms::get($context)->getResolver());
     }
 
-    public function resolverMatches()
+    public static function resolverMatches()
     {
         return [
             'testObjectA' => [['object' => 'a'], 'rA'],

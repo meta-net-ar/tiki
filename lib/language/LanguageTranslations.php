@@ -27,6 +27,8 @@ class LanguageTranslations extends TikiDb_Bridge
      */
     public $lang;
 
+    private I18N\LanguageTranslator $translator;
+
     /**
      * @var string path to language.php file
      */
@@ -55,15 +57,13 @@ class LanguageTranslations extends TikiDb_Bridge
 
         if (! is_null($lang)) {
             $this->lang = $lang;
-        } elseif (isset($user) && isset($user_preferences[$user]['language'])) {
-            $this->lang = $user_preferences[$user]['language'];
         } else {
-            global $prefs;
-            $this->lang = $prefs['language'];
+            $this->lang = \I18N\LanguageTranslator::getLanguageFromPrefs();
         }
 
         $this->filePath = "lang/{$this->lang}/language.php";
-        $this->customFilePath = "lang/{$this->lang}/custom.php";
+        $this->customFilePath = "lang/{$this->lang}/" . LANG_CUSTOM_PHP_BASENAME;
+        $this->translator = \I18N\LanguageTranslator::getInstance($this->lang);
     }
 
     /**
@@ -82,8 +82,6 @@ class LanguageTranslations extends TikiDb_Bridge
     {
         global $user, $tikilib;
 
-        $langKey = "lang_$this->lang";
-
         $general = null; // default value
         foreach ($optionalParameters as $name => $value) {
             switch ($name) {
@@ -95,7 +93,7 @@ class LanguageTranslations extends TikiDb_Bridge
                     $generalDefinedByCaller = true;
                     break;
                 default:
-                    throw UnexpectedValueException;
+                    throw new UnexpectedValueException();
             }
         }
         /** @var boolean $generalDefinedByCaller true if the $general variable's value was defined by the caller, to distinguish the caller passing null from the caller not passing anything */
@@ -103,11 +101,6 @@ class LanguageTranslations extends TikiDb_Bridge
 
         // only the user name is globally available? not the user_id?
         $userId = $tikilib->get_user_id($user);
-
-        // initialize language (used when this function is called by tiki-interactive_translation.php)
-        if (! isset($GLOBALS[$langKey])) {
-            init_language($this->lang);
-        }
 
         // don't change anything if $originalStr and $translatedStr are equal
         if ($originalStr == $translatedStr) {
@@ -120,11 +113,11 @@ class LanguageTranslations extends TikiDb_Bridge
         }
 
         // If the translation is not in the database and the new translation is the same as the translation defined by the filesystem, ignore it (do not insert in the database)
-        if (isset($GLOBALS[$langKey][$originalStr]) && $GLOBALS[$langKey][$originalStr] == $translatedStr) {
-            {
-                static $initialDatabaseTranslations = [];
+        $noDbTranslator = \I18N\LanguageTranslator::getInstance($this->lang, ['skipDb' => true]);
+        if ($noDbTranslator->translate($originalStr) == $translatedStr) {
+            static $initialDatabaseTranslations = [];
 
-                // Build $initialDatabaseTranslations for the given language
+            // Build $initialDatabaseTranslations for the given language
             if (! isset($initialDatabaseTranslations[$this->lang])) {
                 $initialDatabaseTranslationsForThisLanguage = [];
                 $resultSet = $this->query('SELECT `source`, `tran` FROM `tiki_language` WHERE lang=?', [$this->lang]);
@@ -132,7 +125,6 @@ class LanguageTranslations extends TikiDb_Bridge
                     $initialDatabaseTranslationsForThisLanguage[$row['source']] = $row['tran'];
                 }
                 $initialDatabaseTranslations[$this->lang] = $initialDatabaseTranslationsForThisLanguage;
-            }
             }
 
             if (! isset($initialDatabaseTranslations[$this->lang][$originalStr])) {
@@ -696,8 +688,8 @@ class LanguageTranslations extends TikiDb_Bridge
         }
 
         global $tikidomain;
-        if (! empty($tikidomain) && is_file("lang/$this->lang/$tikidomain/custom.php")) {
-            require("lang/$this->lang/$tikidomain/custom.php");
+        if (! empty($tikidomain) && is_file("lang/$this->lang/$tikidomain/" . LANG_CUSTOM_PHP_BASENAME)) {
+            require("lang/$this->lang/$tikidomain/" . LANG_CUSTOM_PHP_BASENAME);
         }
 
         // remove last entry from language.php used only for get_strings.php
@@ -782,7 +774,7 @@ class LanguageTranslations extends TikiDb_Bridge
      * array) to the format used on tiki-edit_languages.php (a two dimensional array with
      * more information for database translations)
      *
-     * @param array $translations in the format used all over Tiki and created by init_language()
+     * @param array $translations in the format used all over Tiki and created by LanguageTranslator::initLanguage()
      * @return array $newFormat translations in the new format used by tiki-edit_language.php
      */
     protected function _convertTranslationsArray($translations)

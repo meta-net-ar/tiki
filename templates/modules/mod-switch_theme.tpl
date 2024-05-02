@@ -8,6 +8,7 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="switch_theme" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
     <form method="get" action="tiki-switch_theme.php">
         <fieldset>
+            <legend class="visually-hidden">{tr}Switch Theme{/tr}</legend>
             <div class="mb-3 row mx-0">
                 <select name="theme" onchange="this.form.submit();" class="form-select" {if not $switchtheme_enabled}disabled{/if}>
                     <option value="" class="text-muted bg-info">{tr}Site theme{/tr} ({$prefs.site_theme}{if !empty($prefs.site_theme_option)}/{$prefs.site_theme_option}{/if})</option>

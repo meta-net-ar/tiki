@@ -41,9 +41,6 @@ class WikiPluginPluginManager extends PluginsLib
         global $helpurl;
         $wikilib = TikiLib::lib('wiki');
         $tikilib = TikiLib::lib('tiki');
-        if (! is_dir(PLUGINS_DIR)) {
-            return $this->error('No plugin directory defined');
-        }
         if (empty($helpurl)) {
             $helpurl = 'http://doc.tiki.org/';
         }
@@ -532,7 +529,7 @@ function get_plugin_info($sPluginFile)
     preg_match("/wikiplugin_(.*)\.php/i", $sPluginFile, $match);
     global $sPlugin, $numparams;
     $sPlugin = $match[1];
-    include_once(PLUGINS_DIR . '/' . $sPluginFile);
+    WikiPlugin_Negotiator_Wiki::loadPluginFromName($sPlugin);
     global $tikilib;
     $parserlib = TikiLib::lib('parser');
 

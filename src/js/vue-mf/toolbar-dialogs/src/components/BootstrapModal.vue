@@ -8,7 +8,7 @@ import {Modal} from "bootstrap";
 import {reactive, onMounted, ref} from "vue";
 
 const state = reactive({
-    modal_demo: null,
+    theModal: null,
 });
 
 defineProps({
@@ -24,7 +24,9 @@ defineProps({
 let modalElement = ref(null);
 
 onMounted(() => {
-    state.modal_demo = new Modal(modalElement.value, {})
+    // initialise the bootstrap modal with focus disabled otherwise
+    // the modal close button gets the focus after each dialog's "exec"
+    state.theModal = new Modal(modalElement.value, { focus: false })
 });
 
 function _shown(e) {
@@ -32,11 +34,11 @@ function _shown(e) {
 }
 
 function _show() {
-    state.modal_demo.show();
+    state.theModal.show();
 }
 
 function _close() {
-    state.modal_demo.hide();
+    state.theModal.hide();
 }
 
 defineExpose({ show: _show, shown: _shown, close: _close });

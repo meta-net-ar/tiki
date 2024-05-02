@@ -11,12 +11,12 @@
     </div>
 
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_webservices visible="always"}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Options{/tr}</legend>
+        <legend class="h3">{tr}Options{/tr}</legend>
         {preference name=webservice_consume_defaultcache}
     </fieldset>
     {include file='admin/include_apply_bottom.tpl'}

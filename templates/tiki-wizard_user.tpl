@@ -7,21 +7,26 @@
 
 {block name="content"}
 <form action="tiki-wizard_user.php" method="post">
-{include file="wizard/wizard_bar_user.tpl"}
+    <div class="col-sm-12">
+        {include file="wizard/wizard_bar_user.tpl"}
+    </div>
+    <hr>
 <div id="wizardBody">
-<table class="adminWizardTable">
-    <tr>
-    {if !empty($wizard_toc)}
-        <td class="adminWizardTOC">
-            <span class="adminWizardTOCTitle">{tr}Wizard Steps{/tr}</span><br>
-            {$wizard_toc}
-        </td>
-    {/if}
-        <td class="adminWizardBody">
+    <div class="row">
+        {if !empty($wizard_toc)}
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-header font-weight-bold adminWizardTOCTitle">
+                        {tr}Wizard Steps{/tr}
+                    </div>
+                    {$wizard_toc}
+                </div>
+            </div>
+        {/if}
+        <div class="{if !empty($wizard_toc)}col-sm-8{else}col-sm-12{/if}">
             {$wizardBody}
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
 </div>
 {include file="wizard/wizard_bar_user.tpl"}
 </form>

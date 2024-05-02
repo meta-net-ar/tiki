@@ -1,6 +1,6 @@
 <div class="adminoptionbox preference clearfix {$p.tagstring|escape}{if isset($smarty.request.highlight) and $smarty.request.highlight eq $p.preference} highlight{/if}">
     <div class="adminoption mb-3 row d-flex">
-        <label class="col-sm-3">
+        <label class="col-sm-3" for="{$p.id|escape}">
             {$p.name|escape}
             {include file="prefs/shared-help-icon.tpl"}
         </label>

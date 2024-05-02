@@ -27,7 +27,7 @@ class TikiFilter
      * Provides an object implementing Laminas\Filter\FilterInterface based on the input
      *
      * @param FilterInterface|string $filter        A filter shortcut name, or the filter itself.
-     * @return TikiFilter_Alnum|TikiFilter_Alpha|TikiFilter_AttributeType|TikiFilter_HtmlPurifier|TikiFilter_IsoDate|TikiFilter_Lang|TikiFilter_None|TikiFilter_PregFilter|TikiFilter_PreventXss|TikiFilter_RawUnsafe|TikiFilter_RelativeURL|TikiFilter_WikiContent|Boolean|Digits|FilterInterface|PregReplace|StripTags|ToInt|TikiFilter_Array
+     * @return TikiFilter_Alnum|TikiFilter_Alpha|TikiFilter_AttributeType|TikiFilter_HtmlPurifier|TikiFilter_IsoDate|TikiFilter_Lang|TikiFilter_None|TikiFilter_PregFilter|TikiFilter_PreventXss|TikiFilter_RawUnsafe|TikiFilter_Raw|TikiFilter_RelativeURL|TikiFilter_WikiContent|Boolean|Digits|FilterInterface|PregReplace|StripTags|ToInt|TikiFilter_Array
      *
      * @link https://dev.tiki.org/Filtering+Best+Practices
      * @link https://zendframework.github.io/zend-filter/
@@ -200,6 +200,10 @@ class TikiFilter
                 // Test Return " :/g.,:|4h&#Δ δ_🍘コン onclick<b><script> "
                 // Exotic filter which will remove the '<x>', for values previously "neutered" by the PreventXss filter
                 return new TikiFilter_RawUnsafe();
+            case 'raw':
+                // Test Return " :/g.,:|4h&#Δ δ_🍘コン onclick<b><script> "
+                // Raw data, no filtering
+                return new TikiFilter_Raw();
 
             default:
                 trigger_error('Filter not found: ' . $filter, E_USER_WARNING);

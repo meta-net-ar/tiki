@@ -540,9 +540,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
      * Use this if the default for a preference changes to preserve the old default behaviour on upgrades
      *
      * @param string $prefName
-     * @param string $oldDefault
+     * @param mixed $oldDefault
      */
-    public function preservePreferenceDefault($prefName, $oldDefault)
+    public function preservePreferenceDefault(string $prefName, mixed $oldDefault): void
     {
 
         if ($this->tableExists('tiki_preferences')) {

@@ -6,9 +6,9 @@
             <input type="hidden" name="{$name|escape}" value="{$label}">
         {else}
             <div class="mb-3 row">
-                <label class="col-md-3 col-form-label">{$label|escape}:</label>
+                <label class="col-md-3 col-form-label" for="{$name|escape}">{$label|escape}:</label>
                 <div class="col-md-9">
-                    <input type="text" name="{$name|escape}" class="form-control">
+                    <input type="text" name="{$name|escape}"  id="{$name|escape}" class="form-control">
                 </div>
             </div>
         {/if}

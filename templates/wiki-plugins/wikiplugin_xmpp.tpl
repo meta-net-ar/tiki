@@ -19,8 +19,8 @@
 <script type="text/template" id="wikiplugin_xmpp_tplitem">
     {* the form items *}
     <div class="col-md-6">
-        <label for="input_{{ name }}">
-            <input type="checkbox" name="item[][jid]" id="input_{{ name }}" value="{{ jid }}"/>
+        <input type="checkbox" class="form-check-input" name="item[][jid]" id="input_{{ name }}" value="{{ jid }}"/>
+        <label class="form-check-label" for="input_{{ name }}">
             <span>{{ fullname }}</span>
         </label>
     </div></script>

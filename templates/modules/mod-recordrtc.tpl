@@ -23,7 +23,7 @@
                 <input id="record-rtc-ticket" type="hidden" value="{ticket mode=get}">
             </div>
             <div class="mb-3">
-                <input id="record-rtc-auto-upload" type="checkbox" name="auto-upload"> {tr}Auto-upload{/tr}
+                <input id="record-rtc-auto-upload" type="checkbox" class="form-check-input" aria-label="{tr}Auto-upload{/tr}" name="auto-upload"> {tr}Auto-upload{/tr}
             </div>
             <div class="mb-3 row">
                 <span id="upload-feedback" style="width: 100%"></span>

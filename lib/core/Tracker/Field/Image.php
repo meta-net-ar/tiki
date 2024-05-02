@@ -15,7 +15,7 @@ class Tracker_Field_Image extends Tracker_Field_File
     private $imgMimeTypes;
     private $imgMaxSize;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'i' => [

@@ -743,14 +743,15 @@ class CalendarLib extends TikiLib
                 $data['categoryId'] = 0;
             }
             if (trim($data["newcat"])) {
-                $bindvars = [(int)$data["calendarId"],trim($data["newcat"])];
-                $data["categoryId"] = $this->getOne("select `calcatId` from `tiki_calendar_categories` where `calendarId`=? and `name`=?", $bindvars);
+                $calendarId = (int)$data["calendarId"];
+                $newcatname = trim($data["newcat"]);
+                $newcatbgcolor = trim($data["newcatbgcolor"]);
+
+                $data["categoryId"] = $this->getOne("select `calcatId` from `tiki_calendar_categories` where `calendarId`=? and `name`=?", [$calendarId, $newcatname]);
                 if (empty($data["categoryId"])) {
                     $query = "insert into `tiki_calendar_categories` (`calendarId`,`name`,`backgroundColor`) values (?,?,?)";
-                    $bindvars[] = trim($data["newcatbgcolor"]);
-                    $this->query($query, $bindvars);
-                    array_pop($bindvars);
-                    $data["categoryId"] = $this->getOne("select `calcatId` from `tiki_calendar_categories` where `calendarId`=? and `name`=?", $bindvars);
+                    $this->query($query, [$calendarId, $newcatname, $newcatbgcolor]);
+                    $data["categoryId"] = $this->getOne("select `calcatId` from `tiki_calendar_categories` where `calendarId`=? and `name`=?", [$calendarId, $newcatname]);
                 }
             }
         } else {
@@ -874,8 +875,6 @@ class CalendarLib extends TikiLib
                 $z[] = '?';
                 if ($k == 'priority') {
                     $v = (string)$v;
-                } elseif ($k == 'allday') {
-                    $v = ($v == 'true') ? 1 : 0;
                 }
                 $r[] = $v;
             }
@@ -898,7 +897,9 @@ class CalendarLib extends TikiLib
         }
 
         if ($prefs['feature_categories'] == 'y') {
-            $this->update_item_categories($calitemId, $_REQUEST['cat_managed'], $_REQUEST['cat_categories'], $data['name'], $data['description']);
+            $catCategories = isset($_REQUEST['cat_categories']) ? $_REQUEST['cat_categories'] : [];
+            $catCatManaged = isset($_REQUEST['cat_managed']) ? $_REQUEST['cat_managed'] : [];
+            $this->update_item_categories($calitemId, $catCatManaged, $catCategories, $data['name'], $data['description']);
         }
 
         if ($roles !== null) {

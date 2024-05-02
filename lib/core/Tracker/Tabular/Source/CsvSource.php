@@ -14,7 +14,7 @@ class CsvSource implements SourceInterface
     private \SplFileObject $file;
     private string $encoding;
 
-    public function __construct(Schema $schema, string $fileName, string $delimiter = ',', string $encoding = null)
+    public function __construct(Schema $schema, string $fileName, string $delimiter = ',', ?string $encoding = null)
     {
         $this->schema = $schema->getPlainOutputSchema();
         $this->file = new \SplFileObject($fileName, 'r');

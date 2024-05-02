@@ -11,7 +11,7 @@
  */
 class Tracker_Field_Ip extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'I' => [

@@ -138,9 +138,6 @@
                 {$smarty.capture.thumbactions}
             </div> {* thumbnail *}
         </div> {* thumbnailcontener *}
-        {jq}
-            adjustThumbnails()
-        {/jq}
 
     {foreachelse}
         <div>

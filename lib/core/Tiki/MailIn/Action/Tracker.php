@@ -195,7 +195,7 @@ class Tracker implements ActionInterface
                 $permNames[] = 'f_' . $fieldId;
             }
 
-            $definition = $this->getDefinition($trackerId);
+            $definition = Tracker_Definition::get($trackerId);
 
             // upload attachments
             $itemFiles = $this->uploadAttachments($account, $message);
@@ -273,17 +273,6 @@ class Tracker implements ActionInterface
         $filegallib = TikiLib::lib('filegal');
         $result = $filegallib->upload_single_file($gal_info, $att['name'], $att['size'], $att['type'], $att['data'], $user, null, null, null);
         return $result;
-    }
-
-    private function getDefinition($trackerId)
-    {
-        $trklib = TikiLib::lib('trk');
-        $fields = $trklib->list_tracker_fields($trackerId, 0, -1, 'position_asc', '', false /* Translation must be done from the views to avoid translating the sources on edit. */);
-
-        $definition = Tracker_Definition::get($trackerId);
-
-        $definition->setFields($fields['data']);
-        return $definition;
     }
 
     // upload incoming mail files

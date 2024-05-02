@@ -55,7 +55,7 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
             $smarty = TikiLib::lib('smarty');
             return smarty_function_icon(['name' => 'status-' . $status, 'iclass' => 'tips', 'ititle' => ':'
                 . $istatus ], $smarty->getEmptyInternalTemplate());
-        } elseif (substr($name, 0, 14) !== 'tracker_field_') {
+        } elseif (substr($name, 0, 14) !== 'tracker_field_' && $name !== 'title') {
             return $value;
         }
 
@@ -63,7 +63,17 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
         if (! is_object($tracker)) {
             return $value;
         }
-        $field = $tracker->getField(substr($name, 14));
+        if ($name === 'title') {
+            // function getField works with either id of permName
+            $nameOrId = $tracker->getMainFieldId($entry['tracker_id']);
+        } else {
+            $nameOrId = substr($name, 14);
+        }
+        $field = $tracker->getField($nameOrId);
+
+        if ($name === 'title') {
+            $name = 'tracker_field_' . $field['permName'];
+        }
 
         if (! $field) {
             if (Perms::get()->tracker_admin) {

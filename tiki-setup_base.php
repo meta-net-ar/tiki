@@ -531,6 +531,7 @@ if (TIKI_API) {
         if ($token && ! empty($token['user'])) {
             $user = $token['user'];
             TikiLib::lib('api_token')->hit($token);
+            TikiLib::lib('user')->update_lastlogin($user);
         } else {
             $user = null;
         }

@@ -1,4 +1,4 @@
-// Quartz 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/quartz/_variables.scss with
+// Quartz 5.3.3 -- This file contains variables that override or supplement those in node_modules/bootswatch/dist/quartz/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "quartz";
@@ -30,12 +30,12 @@ $green:   #41d7a7;
 $teal:    #528fb3;
 $cyan:    #39cbfb;
 
-$primary:       $pink;
+$primary:       #E11973; // $pink;
 $secondary:     rgba($white, .4);
-$success:       $green;
-$info:          $cyan;
-$warning:       $yellow;
-$danger:        $orange;
+$success:       #1C8262; // $green;
+$info:          #037DA6; // $cyan;
+$warning:       #946F00; // $yellow;
+$danger:        #C05702; // $orange;
 $light:         $gray-200;
 $dark:          $gray-900;
 
@@ -64,39 +64,22 @@ $spacers: (
 
 // Body
 
-$body-bg:                   $purple;
-$body-color:                $white;
+$body-bg:                   $purple !default;
+$body-color:                $white !default;
 
 // Links
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
-$link-color:                              $white !default;
 
 // Components
-
-$border-color:                rgba($white, .2);
-
-$border-radius:               .5rem;
-$border-radius-sm:            .6rem;
-$border-radius-lg:            .7rem;
-$border-radius-pill:          50rem;
-
-$box-shadow:                  1px 3px 24px -1px rgba($black, .15);
-$box-shadow-sm:               0 1px 1px rgba($black, .1);
 
 // Fonts
 
 $headings-font-weight:        700;
-
 $text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- rgba($white, .7);
-
 $blockquote-footer-color:     $text-muted;
 
 // Tables
 $table-color:                 var(--#{$prefix}body-color);
-$table-dark-bg:               $dark;
-$table-dark-border-color:     darken($dark, 5%);
-
-$table-bg-scale:              0%;
 $table-hover-color:           $table-color;
 
 // Buttons + Forms
@@ -106,51 +89,17 @@ $input-btn-padding-x:         .75rem !default;
 
 // Buttons
 
-$btn-box-shadow:              $box-shadow;
-
 // Forms
 
 $input-bg:                           var(--#{$prefix}body-bg) !default; // transparent;
 $input-color:                           var(--#{$prefix}body-color) !default;
 $input-disabled-bg:                     var(--#{$prefix}secondary-bg) !default; // rgba($white, .1);
-
-$input-border-color:                    rgba($white, .4);
-$input-border-width:                    1px;
-
-$input-focus-border-color:              $input-border-color;
-$input-focus-box-shadow:                none;
-
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default; // $text-muted;
-
-$form-switch-color:               $white;
-
-$form-switch-focus-color:         $form-switch-color;
-
-$input-group-addon-bg:                  transparent;
-
-$form-check-input-bg:                     rgba($white, .3);
-$form-check-input-border:                 1px solid $border-color;
-
-$form-select-indicator-color:       $white;
-$form-select-focus-box-shadow:    none;
-
-$form-range-track-bg:             var(--#{$prefix}tertiary-bg) !default; // rgba($black, .2);
-
 $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !default; // $gray-500;
 
 // Navs
 
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // $text-muted;
-
-$nav-tabs-border-width:             0;
-$nav-tabs-border-radius:            0;
-$nav-tabs-link-active-color:        $gray-800;
-$nav-tabs-link-active-bg:           $white;
-$nav-tabs-link-active-border-color: $gray-300 $gray-300 $nav-tabs-link-active-bg;
-
-$nav-pills-border-radius:           $border-radius-pill;
-$nav-pills-link-active-color:       $white;
-$nav-pills-link-active-bg:          $primary;
 
 // Navbars
 
@@ -164,90 +113,36 @@ $navbar-light-disabled-color:       rgba($gray-800, .3);
 
 // Dropdowns
 
-$dropdown-border-color:             $border-color;
-$dropdown-link-hover-color:         $white;
-$dropdown-link-hover-bg:            rgba($white, .4);
-
 // Pagination
-
-$pagination-bg:                     rgba($white, .3);
-$pagination-border-width:           0;
-
-$pagination-focus-color:            $white;
-$pagination-focus-bg:               $dropdown-link-hover-bg;
-$pagination-focus-box-shadow:       none;
-
-$pagination-hover-color:            $white;
-$pagination-hover-bg:               $dropdown-link-hover-bg;
-
-$pagination-disabled-color:         $text-muted;
-$pagination-disabled-bg:            $pagination-bg;
 
 // Cards
 
 $card-spacer-y:                     $spacer; // 1.75rem;
 $card-spacer-x:                     $spacer; // 2rem;
-$card-border-color:                 $border-color;
-$card-cap-bg:                       transparent;
-$card-cap-color:                    $white;
-$card-color:                        $white;
-$card-bg:                           transparent;
 
 // Accordion
-
-$accordion-button-bg:                     $secondary;
-$accordion-button-active-bg:              $primary;
-$accordion-button-active-color:           $white;
 
 // Tooltips
 
 $tooltip-opacity:                   .7;
 $tooltip-color: $white;
 
-    // Popovers
+// Popovers
 
-$popover-header-bg:                 $card-cap-bg;
-
-$popover-body-color:                $card-color;
-$popover-body-padding-y:            $spacer * .5;
-
-$popover-arrow-color:               $border-color;
-
-$popover-arrow-outer-color:         transparent;
 
 // Toasts
 
-$toast-header-color:                $card-color;
-$toast-header-background-color:     $card-cap-bg;
-$toast-header-border-color:         $border-color;
-
 // Progress bars
-
-$progress-bg:                       rgba($black, .2);
 
 // List group
 
-$list-group-color:                  $white;
-$list-group-bg:                     transparent;
-$list-group-border-color:           $border-color;
-$list-group-border-width:           0;
-
-$list-group-hover-bg:               $dropdown-link-hover-bg;
-
-$list-group-disabled-color:         $text-muted;
-
-$list-group-action-color:           $white;
-$list-group-action-hover-color:     $white;
-
 // Breadcrumbs
 
-$breadcrumb-divider-color:          $white;
-$breadcrumb-active-color:           $white;
-
 // Close
-$btn-close-color:            $white !default;
 
 // Code
 $code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
 
 //--------------------------- Tiki SCSS variables
+
+$body-bg-image: linear-gradient(90deg, #33b7e2, #5e62b0, #dc307c);

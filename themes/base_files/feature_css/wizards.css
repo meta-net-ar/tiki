@@ -6,17 +6,6 @@
 .adminWizardPageTitle {
     text-align:center;
 }
-.adminWizardTable {
-    width:100%;
-}
-.adminWizardTOCItem {
-    padding-left:5px;
-}
-.adminWizardTOC {
-    vertical-align: top;
-    width:27%;
-    padding-left:15px;
-}
 .disabledTOCSelection {
     opacity: 0.5;
 }
@@ -47,11 +36,6 @@
 .adminWizardIconright {
     float: right;
     margin-left: 10px;
-}
-
-.adminWizardtable {
-    border: 0px;
-    padding-left: 20px;
 }
 
 .adminWizardlookandfell {

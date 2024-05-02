@@ -301,7 +301,7 @@ check_hosting_platform() {
     # check if looks like a virtualmin, where sites are hosted within the home folder
     if [ -f /usr/sbin/virtualmin ]; then
         # shellcheck disable=SC3028,SC3054
-        CURRENT_SCRIPT=${BASH_SOURCE[0]}
+        CURRENT_SCRIPT=$(readlink -f "$0")
         DIR_PATH=$(cd "$(dirname "$CURRENT_SCRIPT")" && pwd)
         CURRENT_SCRIPT_PATH="$DIR_PATH/$(basename "$CURRENT_SCRIPT")"
 
@@ -327,9 +327,9 @@ fi
 # part 3 - default and writable subdirs
 # -------------------------------------
 # shellcheck disable=SC2153
-DIR_LIST_DEFAULT="${ADMIN_PATH} ${TIKI_CONFIG_PATH} ${DOC_PATH} ${DEPRECATED_FILES_PATH} ${STATIC_IMG_PATH} ${INSTALLER_PATH} ${LANG_PATH} ${LIB_PATH} ${MODULES_PATH} ${PERMISSIONCHECK_PATH} ${DEPRECATED_STORAGE_PATH} ${TEMP_PATH} ${SMARTY_TEMPLATES_PATH} ${TESTS_PATH} ${THEMES_SRC_PATH} ${TIKI_TESTS_PATH} ${TIKI_VENDOR_NONBUNDLED_PATH} ${WHELP_PATH}"
+DIR_LIST_DEFAULT="${ADMIN_PATH} ${TIKI_CONFIG_PATH} ${DOC_PATH} ${DEPRECATED_FILES_PATH} ${STATIC_IMG_PATH} ${INSTALLER_PATH} ${LANG_SRC_PATH} ${LIB_PATH} ${MODULES_PATH} ${PERMISSIONCHECK_PATH} ${DEPRECATED_STORAGE_PATH} ${TEMP_PATH} ${SMARTY_TEMPLATES_PATH} ${TESTS_PATH} ${BASE_THEMES_SRC_PATH} ${TIKI_TESTS_PATH} ${TIKI_VENDOR_NONBUNDLED_PATH} ${WHELP_PATH}"
 
-DIR_LIST_WRITABLE="${TIKI_CONFIG_PATH} ${DEPRECATED_IMG_WIKI_PATH} ${DEPRECATED_IMG_WIKI_UP_PATH} ${TRACKER_FIELD_IMAGE_STORAGE_PATH} ${DEPRECATED_STORAGE_PATH} ${STORAGE_PUBLIC_PATH} ${DEPRECATED_STORAGE_PUBLIC_H5P_PATH} ${FILE_GALLERY_DEFAULT_STORAGE_PATH} ${TEMP_PATH} ${TEMP_CACHE_PATH} ${TEMP_HTTP_PUBLIC_PATH} ${SMARTY_COMPILED_TEMPLATES_PATH} ${SMARTY_TEMPLATES_PATH} ${THEMES_SRC_PATH} ${WHELP_PATH} ${DEPRECATED_MODS_PATH} ${DEPRECATED_FILES_PATH} ${TIKI_TESTS_PATH} ${UNIFIED_INDEX_TEMP_PATH} ${TIKI_VENDOR_NONBUNDLED_PATH} ${TIKI_VENDOR_CUSTOM_PATH}"
+DIR_LIST_WRITABLE="${TIKI_CONFIG_PATH} ${DEPRECATED_IMG_WIKI_PATH} ${DEPRECATED_IMG_WIKI_UP_PATH} ${TRACKER_FIELD_IMAGE_STORAGE_PATH} ${DEPRECATED_STORAGE_PATH} ${STORAGE_PUBLIC_PATH} ${DEPRECATED_STORAGE_PUBLIC_H5P_PATH} ${FILE_GALLERY_DEFAULT_STORAGE_PATH} ${TEMP_PATH} ${TEMP_CACHE_PATH} ${TEMP_HTTP_PUBLIC_PATH} ${SMARTY_COMPILED_TEMPLATES_PATH} ${SMARTY_TEMPLATES_PATH} ${BASE_THEMES_SRC_PATH} ${WHELP_PATH} ${DEPRECATED_MODS_PATH} ${DEPRECATED_FILES_PATH} ${TIKI_TESTS_PATH} ${UNIFIED_INDEX_TEMP_PATH} ${TIKI_VENDOR_NONBUNDLED_PATH} ${TIKI_VENDOR_CUSTOM_PATH}"
 
 DIRS=${DIR_LIST_WRITABLE}
 
@@ -738,6 +738,12 @@ npm_setup() {
         fi
     } >/dev/null 2>&1
     npm run build
+    {
+        exitCode=$?
+        if [ $exitCode -ne 0 ]; then
+            exit 1
+        fi
+    } >/dev/null 2>&1
     set +x
 }
 
@@ -887,11 +893,15 @@ what to answer, just press enter to each question (to use default value)"
 
     printf "Fix special dirs ..."
     if [ "$USER" = 'root' ] || [ "$USERINAGROUP" = "yes" ]; then
-        ${CHMOD} -R g+w "$DIRS"
+        for dir in $DIRS; do
+            ${CHMOD} -R g+w "$dir"
+        done
         ${CHMOD} g+w composer.json
         ${CHMOD} g+w composer.lock
     else
-        ${CHMOD} -fR go+w "$DIRS"
+        for dir in $DIRS; do
+            ${CHMOD} -fR go+w "$dir"
+        done
         ${CHMOD} go+w composer.json
         ${CHMOD} go+w composer.lock
     fi

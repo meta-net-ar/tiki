@@ -1,12 +1,16 @@
 {
   "name": "scss-tiki",
   "version": "1.0.0",
-  "description": "Sass (scss) build system for themes",
+  "description": "Sass (scss) build system for themes.  Note that for themes in _custom to actually work, you also need the main vite js build to run to copy the assets (images, fonts, etc.)",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "sass --update ../../themes ",
-        "watch": "sass --watch ../../themes "
+    "prebuild": "node scripts/check_custom.js",
+    "prewatch": "node scripts/check_custom.js",
+    "build": "sass --update --load-path=../../ ../../themes ../../_custom:../../public/generated/_custom",
+    "watch": "sass --watch --load-path=../../ ../../themes ../../_custom:../../public/generated/_custom",
+    "clean": "git clean -f -x \"../../themes/**/*.css\" \"../../themes/**/*.css.map\" \"../../public/generated/_custom/**/*.css\" \"../../public/generated/_custom/**/*.css.map\""
+
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +19,7 @@
     "sass": "Changelog: https://github.com/sass/dart-sass/blob/main/CHANGELOG.md"
   },
   "devDependencies": {
-    "sass": "^1.71.1"
+    "bootswatch": "^5.3.3",
+    "sass": "^1.75.0"
   }
 }

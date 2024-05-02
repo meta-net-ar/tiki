@@ -146,9 +146,7 @@
             {section name=ix loop=$items}
                 <tr>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" name="msg[{$items[ix].qId}]">
-                        </div>
+                        <input type="checkbox" name="msg[{$items[ix].qId}]" class="form-check-input" aria-label="{tr}Select{/tr}">
                     </td>
 
                     <td class="text">

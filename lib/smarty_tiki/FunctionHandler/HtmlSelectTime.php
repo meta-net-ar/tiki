@@ -113,7 +113,7 @@ class HtmlSelectTime extends Base
                 $selected = $time == '--' ? $hour_empty : \TikiLib::date_format($hour_fmt, $time);
             }
 
-            $html_result .= '<div class="col-sm-3 ps-0"><select class="' . $class . '" name=';
+            $html_result .= '<div class="col-auto"><select class="' . $class . '" name=';
 
             if (null !== $field_array) {
                 $html_result .= '"' . $field_array . '[' . $prefix . 'Hour]"';
@@ -197,7 +197,7 @@ class HtmlSelectTime extends Base
                 $selected = '0' . $selected;
             }
 
-            $html_result .= '<div class="col-sm-3 pe-0"><select class="' . $class . '" name=';
+            $html_result .= '<div class="col-auto"><select class="' . $class . '" name=';
             if (null !== $field_array) {
                 $html_result .= '"' . $field_array . '[' . $prefix . 'Minute]"';
             } else {
@@ -245,7 +245,7 @@ class HtmlSelectTime extends Base
                 $selected = $time == '--' ? $second_empty : (int)(floor($tikidate->format('%S', true) / $second_interval) * $second_interval);
             }
 
-            $html_result .= '<div class="col"><select class="' . $class . '" name=';
+            $html_result .= '<div class="col-auto"><select class="' . $class . '" name=';
 
             if (null !== $field_array) {
                 $html_result .= '"' . $field_array . '[' . $prefix . 'Second]"';
@@ -280,7 +280,7 @@ class HtmlSelectTime extends Base
         }
 
         if (! $use_24_hours) {
-            $html_result .= '<div class="col-sm-3 ps-0"><select class="' . $class . '" name=';
+            $html_result .= '<div class="col-auto"><select class="' . $class . '" name=';
             if (null !== $field_array) {
                 $html_result .= '"' . $field_array . '[' . $prefix . 'Meridian]"';
             } else {
@@ -306,7 +306,7 @@ class HtmlSelectTime extends Base
             );
             $html_result .= "</select></div>\n";
         }
-        $html_result = "<div class='row html-select-time'>$html_result</div>";
+        $html_result = "<div class='row gy-2 gx-3 align-items-center mb-3 html-select-time'>$html_result</div>";
 
         $html_result = '<span dir="ltr">' . $html_result . '</span>';
         return $html_result;

@@ -33,7 +33,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
 
         // create tracker and couple of fields
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
-
+        self::assertNotEmpty(self::$trackerId);
         $fields = [[
             'name' => 'Date (legacy)',
             'type' => 'f',
@@ -64,7 +64,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
             'options' => json_encode(['datetime' => 'dt']),
         ]];
         foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
+            $fieldId = self::$trklib->replace_tracker_field(
                 self::$trackerId,
                 0,
                 $field['name'],
@@ -89,6 +89,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
                 '',
                 $field['permName']
             );
+            self::assertNotEmpty($fieldId);
         }
 
         TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_admin_trackers', '')");
@@ -569,7 +570,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         ]);
         $result = $query->search(self::$unifiedlib->getIndex());
         $resultArray = $result->getArrayCopy();
-
+        $this->assertNotEmpty($resultArray);
         foreach (['test_date_legacy', 'test_datetime_legacy', 'test_date', 'test_datetime'] as $field) {
             if (is_array($index[$field])) {
                 $this->assertContains($resultArray[0]['tracker_field_' . $field], $index[$field], "Field: $field");

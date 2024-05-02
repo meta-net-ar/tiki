@@ -95,7 +95,7 @@ class UserWizardPreferencesParams extends Wizard
         $userinfo = $userlib->get_user_info($userwatch);
         $smarty->assign_by_ref('userinfo', $userinfo);
         $llist = [];
-        $llist = $tikilib->list_styles();
+        $llist = $tikilib->list_themes();
         $smarty->assign_by_ref('styles', $llist);
         $languages = [];
         $langLib = TikiLib::lib('language');

@@ -19,27 +19,27 @@
             </div>
 
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_kaltura visible="always"}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Plugin to embed in pages{/tr}</legend>
+                <legend class="h3">{tr}Plugin to embed in pages{/tr}</legend>
                 {preference name=wikiplugin_kaltura}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Enable related tracker field types{/tr}</legend>
+                <legend class="h3">{tr}Enable related tracker field types{/tr}</legend>
                 {preference name=trackerfield_kaltura}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Kaltura / Tiki config{/tr}</legend>
+                <legend class="h3">{tr}Kaltura / Tiki config{/tr}</legend>
                 {preference name=kaltura_kServiceUrl}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Kaltura partner settings{/tr}</legend>
+                <legend class="h3">{tr}Kaltura partner settings{/tr}</legend>
                 {preference name=kaltura_partnerId}
                 {preference name=kaltura_adminSecret}
                 {preference name=kaltura_secret}
@@ -48,7 +48,7 @@
             <br>
 
             <fieldset>
-                <legend>{tr}Kaltura dynamic player{/tr}</legend>
+                <legend class="h3">{tr}Kaltura dynamic player{/tr}</legend>
                 {preference name=kaltura_kdpUIConf}
                 {preference name=kaltura_kdpEditUIConf}
                 {$kplayerlist}
@@ -57,7 +57,7 @@
             <br>
 
             <fieldset>
-                <legend>{tr}Legacy support{/tr}</legend>
+                <legend class="h3">{tr}Legacy support{/tr}</legend>
                 {preference name=kaltura_legacyremix}
             </fieldset>
 

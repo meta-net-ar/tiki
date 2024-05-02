@@ -7,11 +7,11 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_faqs visible="always"}
     </fieldset>
     <fieldset class="mb-3 w-100">
-        <legend>{tr}Settings{/tr}</legend>
+        <legend class="h3">{tr}Settings{/tr}</legend>
         {preference name=faq_prefix}
         {preference name=feature_faq_comments}
         <div class="adminoptionboxchild" id="feature_faq_comments_childcontainer">

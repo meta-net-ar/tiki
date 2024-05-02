@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class TypeAnalyzerTest extends \Search_Index_TypeAnalyzerTest
+class TypeAnalyzerTest extends \SearchIndexTypeAnalyzer
 {
     use IndexBuilder;
 

@@ -28,7 +28,7 @@ watch(
 <template>
     <input
         v-model="modelValue"
-        class="form-control form-control-sm mb-2"
+        class="form-control form-control-sm"
         type="text"
         :placeholder="label"
         @input="$emit('update:modelValue', $event.target.value)"

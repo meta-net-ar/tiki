@@ -68,7 +68,7 @@
                 {$item.name}
             </label>
             <div class="col-sm-8 mb-3">
-                <select id="fgal_list_{$key}" name="fgal_list_{$key}" class="form-control">
+                <select id="fgal_list_{$key}" name="fgal_list_{$key}" class="form-select">
                     {if $key eq 'name' or $key eq 'name_admin'}
                         <option value="a"{if isset($item.value) and $item.value eq 'a'} selected="selected"{/if}>
                             {tr}Name-filename{/tr}

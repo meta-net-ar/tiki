@@ -1304,7 +1304,7 @@ class ModLib extends TikiLib
         $nocache = TEMPLATES_MODULES_PATH . '/mod-' . $mod_reference["name"] . '.tpl.nocache';
 
         // Uncacheable
-        if (! empty($user) || $mod_reference['cache_time'] <= 0 || file_exists($nocache)) {
+        if (! empty($user) || (isset($mod_reference['cache_time']) && $mod_reference['cache_time'] <= 0) || file_exists($nocache)) {
             return null;
         }
 

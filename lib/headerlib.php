@@ -1053,8 +1053,15 @@ class HeaderLib
             foreach ($jsarr[0] as $key => $tag) {
                 if (empty($jsarr[1][$key])) { //if there was no content in the script, it is a src file
                     //we load the js as a xml element, then look to see if it has a "src" tag, if it does, we push it to array for end back
+                    libxml_use_internal_errors(true);
                     $js = simplexml_load_string($tag);
-                    if (! empty($js['src'])) {
+                    if ($js === false) {
+                        $error = libxml_get_last_error();
+                        trigger_error("Failed parsing the HTML script tag. Error was: " . $error->message . ". Offending tag: " . $tag, E_USER_WARNING);
+                        libxml_clear_errors();
+                    } elseif (empty($js['src'])) {
+                        trigger_error("The src attribute is empty. Offending tag: " . $tag, E_USER_WARNING);
+                    } else {
                         array_push($js_script, (string)$js['src']);
                     }
                 }

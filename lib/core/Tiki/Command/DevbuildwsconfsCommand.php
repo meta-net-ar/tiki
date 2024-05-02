@@ -82,7 +82,7 @@ class DevbuildwsconfsCommand extends Command
 
             $excludeDir = [
             TEMP_PATH, //This needs to be changed once we are sure everything that needs to be served has been moved to TEMP_HTTP_PUBLIC_PATH
-            DEPRECATED_CUSTOM_PATH,
+            TIKI_CUSTOMIZATIONS_SRC_PATH,
             //These are only here because we still include some js and css assets from composer packages
             TIKI_VENDOR_NONBUNDLED_PATH,
             TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH,
@@ -123,6 +123,11 @@ class DevbuildwsconfsCommand extends Command
             $fileName = $file->getFilename();
             //$output->writeln("<info>$filePath</info>");
             if ($fileName == '..') {
+                //It seems RecursiveDirectoryIterator doesn't always obey \FilesystemIterator::SKIP_DOTS
+                continue;
+            }
+            if ($file->islink()) {
+                //It seems RecursiveDirectoryIterator sometimes follows links despite NOT passing FilesystemIterator::FOLLOW_SYMLINKS
                 continue;
             }
             if ($verbose) {
@@ -177,7 +182,7 @@ class DevbuildwsconfsCommand extends Command
                     $missingIndexMessageFixed .= '<fg=blue>' . $filePath . '</>' . PHP_EOL;
                 }
             } else {
-                $missingIndexMessage .= '<fg=blue>' . $filePath . '</>' . PHP_EOL;
+                $missingIndexMessage .= '<fg=red>' . $filePath . '</>' . PHP_EOL;
             }
 
             if ($this->folderHasHtaccess($filePath, $tikiRootFolder)) {

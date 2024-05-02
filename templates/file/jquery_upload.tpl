@@ -4,13 +4,13 @@
     <div class="col-md-12">
         <div class="card bg-body-tertiary fileupload mb-0">
             <div class="card-body">
-                <h3 class="text-center">{icon name="cloud-upload"} {tr}Drop files or {/tr}
+                <div class="h3 text-center">{icon name="cloud-upload"} {tr}Drop files or {/tr}
                     <div class="btn btn-primary fileinput-button">
                         <span>{tr}Choose files{/tr}</span>
                         {* The file input field used as target for the file upload widget *}
-                        <input id="fileupload" type="file" name="files[]" multiple{if isset($allowedMimeTypes)} accept="{$allowedMimeTypes|escape}"{/if}>
+                        <input id="fileupload" type="file" name="files[]" aria-label="{tr}Choose files{/tr}" multiple{if isset($allowedMimeTypes)} accept="{$allowedMimeTypes|escape}"{/if}>
                     </div>
-                </h3>
+                </div>
             </div>
         </div>
     </div>

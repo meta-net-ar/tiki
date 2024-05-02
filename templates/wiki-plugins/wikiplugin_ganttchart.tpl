@@ -152,16 +152,16 @@
         <div class="__template__" type="TASKROW">
             {*
             <tr taskId="(#=obj.id#)" class="taskEditRow (#=obj.isParent()?'isParent':''#) (#=obj.collapsed?'collapsed':''#)" level="(#=level#)">
-                <th class="gdfCell edit" align="right" style="cursor:pointer;"><span class="taskRowIndex">(#=obj.getRow()+1#)</span> <span class="teamworkIcon" style="font-size:12px;" >e</span></th>
-                <td class="gdfCell noClip" align="center"><div class="taskStatus cvcColorSquare" status="(#=obj.status#)"></div></td>
+                <th class="gdfCell edit text-right" style="cursor:pointer;"><span class="taskRowIndex">(#=obj.getRow()+1#)</span> <span class="teamworkIcon" style="font-size:12px;" >e</span></th>
+                <td class="gdfCell noClip text-center"><div class="taskStatus cvcColorSquare" status="(#=obj.status#)"></div></td>
                 <td class="gdfCell"><input type="text" name="code" value="(#=obj.code?obj.code:''#)" placeholder="code/short name"></td>
                 <td class="gdfCell indentCell" style="padding-left:(#=obj.level*10+18#)px;">
-                    <div class="exp-controller" align="center"></div>
+                    <div class="exp-controller text-center"></div>
                     <input type="text" name="name" value="(#=obj.name#)" placeholder="name">
                 </td>
-                <td class="gdfCell" align="center"><input type="checkbox" name="startIsMilestone"></td>
+                <td class="gdfCell text-center"><input type="checkbox" name="startIsMilestone" class="form-check-input" aria-label="{tr}Select{/tr}"></td>
                 <td class="gdfCell"><input type="text" name="start"  value="" class="date"></td>
-                <td class="gdfCell" align="center"><input type="checkbox" name="endIsMilestone"></td>
+                <td class="gdfCell text-center"><input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="endIsMilestone"></td>
                 <td class="gdfCell"><input type="text" name="end" value="" class="date"></td>
                 <td class="gdfCell"><input type="text" name="duration" autocomplete="off" value="(#=obj.duration#)"></td>
                 <td class="gdfCell"><input type="text" name="progress" class="validated" entrytype="PERCENTILE" autocomplete="off" value="(#=obj.progress?obj.progress:''#)" (#=obj.progressByWorklog?"readOnly":""#)></td>
@@ -229,35 +229,35 @@
                             </td>
                             <td colspan="3" valign="top">
                                 <label for="name" class="required">{/literal}{tr}name{/tr}{literal}</label><br>
-                                <input type="text" name="name" id="name"class="formElements" autocomplete='off' maxlength=255 style='width:100%' value="" required="true" oldvalue="1">
+                                <input type="text" name="name" id="name" class="formElements" autocomplete='off' maxlength=255 style='width:100%' value="" required="true" oldvalue="1">
                             </td>
                         </tr>
                         <tr class="dateRow">
                             <td nowrap="">
                                 <div style="position:relative">
-                                    <label for="start">{/literal}{tr}start{/tr}{literal}</label>&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <input type="checkbox" id="startIsMilestone" name="startIsMilestone" value="yes">
-                                    &nbsp;<label for="startIsMilestone">{/literal}{tr}is milestone{/tr}{literal}</label>&nbsp;<br>
-                                    <input type="text" name="begin" id="start" size="8" class="formElements dateField validated date" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DATE">
+                                    <label class="form-check-label" for="start">{/literal}{tr}start{/tr}{literal}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="checkbox" class="form-check-input" id="startIsMilestone" name="startIsMilestone" value="yes">
+                                    &nbsp;<label class="form-label" for="startIsMilestone">{/literal}{tr}is milestone{/tr}{literal}</label>&nbsp;<br>
+                                    <input type="text" class="form-control" name="begin" id="start" size="8" class="formElements dateField validated date" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DATE">
                                     <span title="calendar" id="starts_inputDate" class="teamworkIcon openCalendar" onclick="$(this).dateField({inputField:$(this).prevAll(':input').first(),isSearchField:false});">m</span>
                                 </div>
                             </td>
                             <td nowrap="">
-                                <label for="end">{/literal}{tr}End{/tr}{literal}</label>&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input type="checkbox" id="endIsMilestone" name="endIsMilestone" value="yes">
+                                <label class="form-check-label" for="end">{/literal}{tr}End{/tr}{literal}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="checkbox" class="form-check-input" id="endIsMilestone" name="endIsMilestone" value="yes">
                                 &nbsp;<label for="endIsMilestone">{/literal}{tr}is milestone{/tr}{literal}</label>&nbsp;
                                 <br><input type="text" name="end" id="end" size="8" class="formElements dateField validated date" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DATE">
                                 <span title="calendar" id="ends_inputDate" class="teamworkIcon openCalendar" onclick="$(this).dateField({inputField:$(this).prevAll(':input').first(),isSearchField:false});">m</span>
                             </td>
                             <td nowrap="" >
-                                <label for="duration" class="">{/literal}{tr}Days{/tr}{literal}</label><br>
-                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays" title="Duration is in working days." autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
+                                <label for="duration" class="form-label">{/literal}{tr}Days{/tr}{literal}</label><br>
+                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays form-control" title="Duration is in working days." autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
                             </td>
                         </tr>
                         <tr>
-                            <td  colspan="2">
+                            <td colspan="2">
                                 <label for="status" class=" ">{/literal}{tr}status{/tr}{literal}</label><br>
-                                <select id="status" name="status" class="taskStatus" status="(#=obj.status#)" onchange="$(this).attr('STATUS',$(this).val());">
+                                <select class="form-control" id="status" name="status" class="taskStatus" status="(#=obj.status#)" onchange="$(this).attr('STATUS',$(this).val());">
                                     <option value="STATUS_ACTIVE" class="taskStatus" status="STATUS_ACTIVE" >{/literal}{tr}active{/tr}{literal}</option>
                                     <option value="STATUS_SUSPENDED" class="taskStatus" status="STATUS_SUSPENDED" >{/literal}{tr}suspended{/tr}{literal}</option>
                                     <option value="STATUS_DONE" class="taskStatus" status="STATUS_DONE" >{/literal}{tr}completed{/tr}{literal}</option>
@@ -350,8 +350,8 @@
                         </tr>
                         <tr>
                             <td colspan="3" valign="top">
-                                <input type="checkbox" id="updateToDuplicate" name="updateToDuplicate">
-                                &nbsp;<label for="updateToDuplicate">{/literal}{tr}Update wiki page to duplicated Gantt chart{/tr}{literal}</label>&nbsp;
+                                <input type="checkbox" class="form-check-input" id="updateToDuplicate" name="updateToDuplicate">
+                                &nbsp;<label class="form-check-label" for="updateToDuplicate">{/literal}{tr}Update wiki page to duplicated Gantt chart{/tr}{literal}</label>&nbsp;
                             </td>
                         </tr>
                     </table>

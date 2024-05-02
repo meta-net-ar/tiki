@@ -12,11 +12,11 @@
  */
 class Tracker_Field_Header extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'h' => [
-                'name' => tr('Header'),
+                'name' => tr('Heading'),
                 'description' => tr('Display a heading between fields to delimit a section and allow visual folding of the fields.'),
                 'readonly' => true,
                 'help' => 'Header-Tracker-Field',

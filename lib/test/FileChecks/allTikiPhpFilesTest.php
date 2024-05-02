@@ -13,16 +13,16 @@ class allTikiPhpFilesTest extends TestCase
 {
     private $phpFiles;
 
-    public function __construct()
+    public function __construct($name = null)
     {
-        parent::__construct();
+        parent::__construct($name);
         $this->phpFiles = (new GlobRecursiveHelper('*.php'))->process();
     }
 
     public function testOutputBeforePhpTags(): void
     {
         foreach ($this->phpFiles as $fileName) {
-            if (strpos($fileName, '_custom') === 0) {
+            if (strpos($fileName, TIKI_CUSTOMIZATIONS_SRC_PATH) === 0) {
                 // not a tiki file
                 continue;
             }

@@ -113,13 +113,13 @@ $wizardlib = TikiLib::lib('wizard');
 $wizardlib->showPages($pages, true);
 
 // Build the TOC
-$toc = '<ul class="wizard_toc">';
+$toc = '<div class="list-group list-group-flush wizard_toc">';
 $stepNr = 0;
 $reqStepNr = $wizardlib->wizard_stepNr;
 $homepageUrl = $_REQUEST['url'];
 foreach ($pages as $page) {
     global $base_url;
-    $cssClasses = '';
+    $cssClasses = 'list-group-item list-group-item-action adminWizardTOCItem ';
 
     // Start the user wizard
     $url = $base_url . 'tiki-wizard_user.php?&amp;stepNr=' . $stepNr . '&amp;url=' . rawurlencode($homepageUrl);
@@ -128,8 +128,8 @@ foreach ($pages as $page) {
     if ($cnt <= 9) {
         $cnt = '&nbsp;&nbsp;' . $cnt;
     }
-    $toc .= '<li><a ';
-    $cssClasses .= 'adminWizardTOCItem ';
+    $toc .= '<a ';
+    $cssClasses .= ' ';
     if ($stepNr == $reqStepNr) {
         $cssClasses .= 'highlight ';
     }
@@ -141,10 +141,10 @@ foreach ($pages as $page) {
         $css = 'class="' . $cssClasses . '" ';
     }
     $toc .= $css;
-    $toc .= 'href="' . $url . '">' . $page->pageTitle() . '</a></li>';
+    $toc .= 'href="' . $url . '">' . $page->pageTitle() . '</a>';
     $stepNr++;
 }
-$toc .= '</ul>';
+$toc .= '</div>';
 
 if ($reqStepNr > 0) {
     $smarty->assign('wizard_toc', $toc);

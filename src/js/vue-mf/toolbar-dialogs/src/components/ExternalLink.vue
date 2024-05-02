@@ -7,10 +7,6 @@ const props = defineProps({
         type: Object,
         required: true,
     },
-    syntax: {
-        type: String,
-        default: "",
-    },
 });
 
 const tdgLabel = ref();
@@ -30,22 +26,21 @@ onMounted(() => {
 });
 
 function _shown() {
-    const $textArea = $("#" + toolbarObject.value.domElementId),
-            syntax = getTASelection($textArea.get(0));
-
+    const textArea = document.getElementById(toolbarObject.value.domElementId);
+    const selection = getTASelection(textArea);
 
     let parts;
 
     if (! toolbarObject.value.editor.isMarkdown) {
-        parts = syntax.match(/\[(.*?)\|(.*?)\|(.*?)]/);
+        parts = selection.match(/\[(.*?)\|(.*?)\|(.*?)]/);
         if (!parts) {
-            parts = syntax.match(/\[(.*?)\|(.*?)]/);
+            parts = selection.match(/\[(.*?)\|(.*?)]/);
         }
         if (!parts) {
-            parts = syntax.match(/\[(.*?)]/);
+            parts = selection.match(/\[(.*?)]/);
         }
     } else {
-        parts = syntax.match(/\[(.*?)]\((.*?)\)/);
+        parts = selection.match(/\[(.*?)]\((.*?)\)/);
         if (parts) {
             const label = parts[1];
             parts[1] = parts[2];
@@ -58,13 +53,13 @@ function _shown() {
         labelInput.value = parts[2] ?? "";
         relationInput.value = parts[3] ?? "";
     } else {
-        urlInput.value = "";
-        labelInput.value = syntax;
+        labelInput.value = toolbarObject.value.labelText != null ? toolbarObject.value.labelPage : selection;
+        urlInput.value = toolbarObject.value.labelPage != null ? toolbarObject.value.labelPage : "";
         relationInput.value = "";
     }
 }
 
-function _save() {
+function _insert() {
     let output = "";
     if (! toolbarObject.value.editor.isMarkdown) {
         if (urlInput.value) {
@@ -93,18 +88,16 @@ function _save() {
     return output;
 }
 
-defineExpose({ save: _save, shown: _shown });
+defineExpose({ execute: _insert, shown: _shown });
 </script>
 
 <template>
-    <DialogInput ref="tdgLabel" v-model="labelInput" label="Label" />
-    <DialogInput ref="tdgUrl" v-model="urlInput" label="URL" />
+    <DialogInput ref="tdgLabel" v-model="labelInput" label="Label" class="mb-2" />
+    <DialogInput ref="tdgUrl" v-model="urlInput" label="URL" class="mb-2" />
     <div class="input-group mr-sm-2" v-if="! toolbarObject.editor.isMarkdown">
         <DialogInput ref="tdgRelation" v-model="relationInput" label="Relation" />
-        <div class="input-group-append" data-bs-toggle="tooltip" title="Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.">
-            <div class="input-group-text">
-                <span class="fa fa-circle-info"></span>
-            </div>
+        <div class="input-group-text" data-bs-toggle="tooltip" title="Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.">
+            <span class="fa fa-circle-info"></span>
         </div>
     </div>
 </template>

@@ -15,21 +15,21 @@ class Search_GlobalSource_IndexNameSource implements Search_GlobalSource_Interfa
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'index_name',
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'index_name' => 'identifier',
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
         ];

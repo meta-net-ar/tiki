@@ -6565,6 +6565,7 @@ $lang_current = array(
 "After a certain number of consecutive unsuccessful log-in attempts, the user will receive an email with instruction to validate his or her account. However, the user can still log in with the old password" => "After a certain number of consecutive unsuccessful log-in attempts, the user will receive an email with instruction to validate his or her account. However, the user can still log in with the old password",
 "brute force, brute-force, login failure, login-failure, failed logins" => "brute force, brute-force, login failure, login-failure, failed logins",
 "Suspend account after" => "Pozastaviť účet po",
+"Suspend/lockout account after" => "Pozastaviť/uzamknúť účet po",
 "After a certain number of consecutive unsuccessful login attempts, the account is suspended. An admin must revalidate the account before the user can use it again" => "Účet je pozastavený po určitom počte po sebe idúcich neúspešných pokusov o prihlásenie. Administrátor musí účet znova overiť, aby ho mohol používateľ znova použiť ",
 "URL the user is redirected to after account validation" => "URL adresa, na ktorú je používateľ presmerovaný po úspešnom overení účtu",
 "The default page a Registered user sees after account validation is \"tiki-information.php?msg=Account validated successfully\"" => "Predvolená stránka, ktorú registrovaný používateľ uvidí po overení účtu je \"tiki-information.php?msg=Účet bol úspešne overený\"",

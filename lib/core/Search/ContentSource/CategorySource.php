@@ -18,7 +18,7 @@ class Search_ContentSource_CategorySource implements Search_ContentSource_Interf
         return $this->db->table('tiki_categories')->fetchColumn('categId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         $lib = TikiLib::lib('categ');
 
@@ -41,7 +41,7 @@ class Search_ContentSource_CategorySource implements Search_ContentSource_Interf
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -54,7 +54,7 @@ class Search_ContentSource_CategorySource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -67,7 +67,7 @@ class Search_ContentSource_CategorySource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

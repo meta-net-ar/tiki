@@ -84,7 +84,7 @@ if ($tiki_p_edit_structures == 'y') {
         $structlib->s_export_structure_tree($_REQUEST['export_tree']);
         die;
     }
-    if (isset($_REQUEST['batchaction'])) {
+    if (isset($_REQUEST['batchaction']) && isset($_REQUEST['action'])) {
         $access->checkCsrf(false, true);
         foreach ($_REQUEST['action'] as $batchid) {
             $structure_info = $structlib->s_get_structure_info($batchid);

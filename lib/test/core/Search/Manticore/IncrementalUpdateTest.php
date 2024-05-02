@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class IncrementalUpdateTest extends \Search_Index_IncrementalUpdateTest
+class IncrementalUpdateTest extends \SearchIndexIncrementalUpdate
 {
     use IndexBuilder;
 

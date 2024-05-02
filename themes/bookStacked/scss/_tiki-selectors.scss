@@ -27,6 +27,13 @@ body:not(.tiki-admin) .col1 {
     }
 }
 
+.admin-content {
+    padding: 16px 48px;
+    margin-bottom: 24px;
+    min-height: 60vh;
+    background-color: var(--tiki-main-content-bg);
+}
+
 .col1top-outer-wrapper + * {
     padding-top: 24px;
 }

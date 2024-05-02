@@ -17,12 +17,12 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
         $this->fileSource = $source;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['attachment_contents', 'attachments', 'primary_image'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'attachment_contents' => 'plaintext',
@@ -31,7 +31,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'attachment_contents' => false,

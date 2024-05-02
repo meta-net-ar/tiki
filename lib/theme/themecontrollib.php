@@ -265,7 +265,7 @@ class ThemeControlLib extends ThemeLib
         }
 
         //create the array with tc_theme and tc_theme_option
-        list($tc_theme, $tc_theme_option) = $this->extract_theme_and_option($tc_themeoption);
+        list($tc_theme, $tc_theme_option) = self::extractThemeAndOptionFromString($tc_themeoption);
 
         //return array
         return [$tc_theme, $tc_theme_option];

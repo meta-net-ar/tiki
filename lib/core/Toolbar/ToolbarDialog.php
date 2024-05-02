@@ -64,13 +64,13 @@ class ToolbarDialog extends ToolbarItem
                 $smarty = TikiLib::lib('smarty');
                 $object_selector = smarty_function_object_selector(
                     [
-                                                                       '_id'        => 'tbOLinkObjectSelector',
-                                                                       '_class'     => 'ui-widget-content ui-corner-all',
-                                                                       //              '_format' => '{title}',
-                                                                       '_filter'    => ['type' => ''],
-                                                                       '_parent'    => 'tbOLinkObjectType',
-                                                                       '_parentkey' => 'type',
-                                                                   ],
+                       '_id'        => 'tbOLinkObjectSelector',
+                       '_class'     => 'ui-widget-content ui-corner-all',
+                       //              '_format' => '{title}',
+                       '_filter'    => ['type' => ''],
+                       '_parent'    => 'tbOLinkObjectType',
+                       '_parentkey' => 'type',
+                        ],
                     $smarty->getEmptyInternalTemplate()
                 );
 
@@ -390,6 +390,8 @@ class ToolbarDialog extends ToolbarItem
         if (! $this->isWysiwyg) {   // not working in toast yet TODO
             $supported[] = 'table';
             $supported[] = 'emoji';
+            $supported[] = 'find';
+            $supported[] = 'replace';
         }
 
         return $prefs['vuejs_enable'] === 'y' &&

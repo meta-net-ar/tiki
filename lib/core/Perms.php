@@ -294,7 +294,6 @@ class Perms
         foreach ($perType as $type => $values) {
             $context = $baseContext;
             $context[ $contextMapMap[$type][$discriminator] ] = $type;
-
             self::$instance->loadBulk($context, $bulkKey, $values);
         }
 
@@ -376,6 +375,9 @@ class Perms
     private function loadBulk($baseContext, $bulkKey, $data)
     {
         foreach ($this->factories as $factory) {
+            if (empty($data)) {
+                $data = [];
+            }
             $data = $factory->bulk($baseContext, $bulkKey, $data);
         }
     }

@@ -46,9 +46,12 @@ const IMG_TIKIHELP_PATH = 'img/tikihelp';
 const INSTALLER_PATH = 'installer';
 
 
+/** Path to the language files distributed with tiki, relative to root */
+const LANG_SRC_PATH = 'lang';
+/** subdirectory where languages are found in sites, modules, etc. */
+const LANG_PATH_FRAGMENT = 'lang';
+const LANG_CUSTOM_PHP_BASENAME = 'custom.php';
 
-const LANG_PATH = 'lang';
-const LANGMAPPING_FILE = 'lang/langmapping.php';
 /** This is actually a route, will disapear in path_rework */
 const LISTS_PATH = 'lists';
 const LIB_PATH = 'lib';
@@ -74,6 +77,9 @@ const DEPRECATED_STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
 const SMARTY_COMPILED_TEMPLATES_PATH = 'temp/templates_c';
 /** Currently this is both the top level template path and the relative template path in themes and packages.  Needs to be separated if moved */
 const SMARTY_TEMPLATES_PATH = 'templates';
+const SMARTY_BASE_LAYOUTS_PATH = 'templates/layouts';
+/** Where are templates are looked for in multitiki sites, etc. */
+const SMARTY_TEMPLATES_PATH_FRAGMENT = 'templates';
 
 /** Path to store temporary files.  Use one of the more specific path if possible */
 const TEMP_PATH = 'temp';
@@ -82,6 +88,8 @@ const TEMP_HTTP_PUBLIC_PATH = 'temp/public';
 const TEMP_CACHE_PATH = 'temp/cache';
 const TEMP_PUBLIC_PATH = 'temp/public';
 const HTMLPURIFIERCACHE_CACHE_PATH = 'temp/cache/HTMLPurifierCache';
+
+const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
 //Question: where is the string or constant that generates these files?
 const WIKIPLUGIN_CACHE_FILES_GLOB = 'temp/cache/wikiplugin_*';
 
@@ -89,19 +97,48 @@ const SATIS_TEMP_PATH = 'temp/satis';
 const UNIFIED_INDEX_TEMP_PATH = 'temp/unified-index';
 const TEMPLATES_ADMIN_PATH = 'templates/admin';
 const TEMPLATES_MODULES_PATH = 'templates/modules';
-const TESTS_PATH = 'tests';
-const THEMES_TEMPLATE_OVERRIDES_PATH = 'themes/templates';
-const THEMES_BASE_FILES_FEATURE_CSS_PATH = 'themes/base_files/feature_css';
-/** Themes source directory */
-const THEMES_SRC_PATH = 'themes';
-/** This it for the old tiki_tests system which may not be functionnal - benoitg - 2023-11-16 */
+
+/** This it for the old tiki_tests system which may not be functional - benoitg - 2023-11-16 */
 const TIKI_TESTS_PATH = 'tiki_tests/tests';
+const TESTS_PATH = 'tests';
+
+const TIKI_MAIN_CLASS_LOADER_XML_PATH = 'db/config';
+
+/* BEGIN - _custom section */
+/** This is where custom themes, php files, etc. are stored, relative to project root */
+const TIKI_CUSTOMIZATIONS_SRC_PATH = '_custom';
+const TIKI_CUSTOMIZATIONS_SRC_DIST_PATH = '_custom_dist';
+/** Compiled themes and assets.  relative to tikiroot */
+const TIKI_CUSTOMIZATIONS_PUBLIC_PATH = 'public/generated/_custom';
+const TIKI_CUSTOMIZATIONS_SHARED_PATH = '_custom/shared';
+const TIKI_CUSTOMIZATIONS_SHARED_PUBLIC_PATH = 'public/generated/_custom/shared';
+const TIKI_CUSTOMIZATIONS_SHARED_TEMPLATES_PATH = '_custom/shared/templates';
+const TIKI_CUSTOMIZATIONS_SHARED_WIKIPLUGINS_PATH = '_custom/shared/wiki-plugins';
+const TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT = 'js/custom.js';
+const TIKI_CUSTOMIZATIONS_WIKIPLUGINS_PATH_FRAGMENT = 'wiki-plugins';
+/** If present, this php file will be included at the end of tiki-setup.php.  A last resort for custom php code.  Before tiki 27 this was in  _custom/lib/setup/custom.php */
+const TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE = '_custom/shared/custom.php';
+/** Path to directoy containing the custom.xml file in which the user can load additional classes.
+ * Before tiki 27 this was in db/config/
+ */
+const TIKI_CUSTOMIZATIONS_CLASS_LOADER_XML_PATH = '_custom/shared';
+
+const TIKI_CUSTOMIZATIONS_MULTITIKI_SITES_PATH = '_custom/sites';
+const TIKI_CUSTOMIZATIONS_MULTITIKI_SITES_PUBLIC_PATH = 'public/generated/_custom/sites';
+const TIKI_CUSTOMIZATIONS_MULTITIKI_DEFAULT_SITE_PATH = '_custom/sites/default_site';
+const TIKI_CUSTOMIZATIONS_MULTITIKI_DEFAULT_SITE_PUBLIC_PATH = 'public/generated/_custom/sites/default_site';
+
+/* END - _custom section */
+
+/** Where are themes looked for in multitiki sites, etc. */
+const THEMES_PATH_FRAGMENT = 'themes';
+const THEMES_LAYOUTS_PATH_FRAGMENT = 'templates/layouts';
+const THEMES_LEGACY_ALL_SITES_SHARED_TEMPLATES_PATH = 'themes/templates';
+const THEMES_BASE_FILES_FEATURE_CSS_PATH = 'themes/base_files/feature_css';
+/** Base themes source directory relative to project root */
+const BASE_THEMES_SRC_PATH = 'themes';
 
 const WHELP_PATH = 'whelp';
-/** This is where custom themes, php files, etc. are stored */
-const DEPRECATED_CUSTOM_PATH = '_custom';
-/** If present, this php file will be included at the end of tiki-setup.php.  A last resort for custom php code */
-const USER_CUSTOM_SETUP_PHP_FILE = '_custom/lib/setup/custom.php';
 
 /** This is only for permissions, not to include dependencies */
 const TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH = 'vendor_bundled';
@@ -117,22 +154,32 @@ const PRIMARY_AUTOLOAD_FILE_PATH = 'vendor_bundled/vendor/autoload.php';
 const PRIMARY_COMPOSERJSON_FILE_PATH = 'vendor_bundled/composer.json';
 const COMPOSERLOCK_FILE_PATH = 'vendor_bundled/composer.lock';
 
+
+/* BEGIN - HTTP PATHS */
 const HTTP_PUBLIC_PATH = 'public';
 /* Javascript assets servable over http, including css generated from js files. */
 const JS_ASSETS_PATH = 'public/generated/js';
 /** This is the path for JS vendor files that would normally be served by a content delivery network.  We both bundle these files in the tarball, and (usually) serve them locally. */
 const NODE_PUBLIC_DIST_PATH = 'public/generated/js/vendor_dist';
+const GENERATED_ICONSET_PATH = 'public/generated/iconsets';
+/* END - HTTP PATHS */
 
-const REVEALJS_ASSETS_PATH = 'vendor_bundled/vendor/npm-asset/reveal.js';
 
-const NESTEDSORTABLE_ASSETS_PATH = 'vendor_bundled/vendor/jquery-plugins/nestedsortable';
-//  TIKI_VENDOR_NONBUNDLED_PATH . '/'
+/* BEGIN - VENDOR ASSETS SECTION */
+const BOOTSTRAP_ICONS_FONT_PATH = 'public/generated/js/vendor_dist/bootstrap-icons/font';
+const BOOTSTRAP_TOUR_DIST_PATH = 'vendor_bundled/vendor/sorich87/bootstrap-tour/build';
+const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
+const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome';
+const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/webfonts';
+
 const MINICART_DIST_PATH = 'vendor_bundled/vendor/jquery/minicart/dist';
+const NESTEDSORTABLE_ASSETS_PATH = 'vendor_bundled/vendor/jquery-plugins/nestedsortable';
 const PIVOTTABLE_DIST_PATH = 'vendor_bundled/vendor/nicolaskruchten/pivottable/dist';
 const PLOTLYJS_DIST_PATH = 'vendor_bundled/vendor/plotly/plotly.js/dist';
+const REVEALJS_ASSETS_PATH = 'vendor_bundled/vendor/npm-asset/reveal.js';
 const SUBTOTAL_DIST_PATH = 'vendor_bundled/vendor/nagarajanchinnasamy/subtotal/dist';
 const SIGNATURE_PAD_DIST_PATH = 'vendor_bundled/vendor/npm-asset/signature_pad/dist';
 const SWIPER_DIST_PATH = 'vendor_bundled/vendor/nolimits4web/swiper/dist/js';
 const ZXING_DIST_PATH = 'vendor_bundled/vendor/npm-asset/zxing--library';
-const BOOTSTRAP_TOUR_DIST_PATH = 'vendor_bundled/vendor/sorich87/bootstrap-tour/build';
-const CONVERSEJS_DIST_PATH = 'vendor_bundled/vendor/npm-asset/converse.js/dist';
+
+/* END - VENDOR ASSETS SECTION */

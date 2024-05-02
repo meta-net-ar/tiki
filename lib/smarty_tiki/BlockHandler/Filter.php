@@ -30,7 +30,7 @@ class Filter extends Base
 
         $types = $unifiedsearchlib->getSupportedTypes();
 
-        $filter = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : [];
+        $filter = ! empty($_REQUEST['filter']) ? $_REQUEST['filter'] : [];
         if (isset($params['filter'])) {
             $filter = array_merge($filter, $params['filter']);
         }

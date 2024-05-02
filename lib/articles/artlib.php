@@ -12,33 +12,6 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 
 class ArtLib extends TikiLib
 {
-    //Special parsing for multipage articles
-    public function get_number_of_pages($data)
-    {
-        $parts = explode('...page...', $data);
-        return count($parts);
-    }
-
-    public function get_page($data, $i)
-    {
-        // Get slides
-        $parts = explode('...page...', $data);
-
-        if (! isset($parts[$i - 1])) {
-            $i = 1;
-        }
-        $ret = $parts[$i - 1];
-        if (substr($parts[$i - 1], 1, 5) == '<br/>') {
-            $ret = substr($parts[$i - 1], 6);
-        }
-
-        if (substr($parts[$i - 1], 1, 6) == '<br />') {
-            $ret = substr($parts[$i - 1], 7);
-        }
-
-        return $ret;
-    }
-
     public function approve_submission($subId)
     {
         $data = $this->get_submission($subId);
@@ -1538,7 +1511,7 @@ class ArtLib extends TikiLib
                                 `tiki_article_types`.`creator_edit`
                         from `tiki_articles`
                         left join `tiki_article_types` ON `tiki_articles`.`type` = `tiki_article_types`.`type`
-                        left join `users_users` on `tiki_articles`.`author` = `users_users`.`login` 
+                        left join `users_users` on `tiki_articles`.`author` = `users_users`.`login`
                         where `tiki_articles`.`articleId`=?"
                         ;
 

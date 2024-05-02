@@ -82,8 +82,8 @@
                         {if !empty($cat) && !empty($desc)}
                             <td class="text"><label for="group_watch{$i}">{$g|escape}</label></td>
                             {if $isTop ne 'y'}
-                                <td class="checkbox-cell"><div class="form-check"><input id="group_watch{$i}"type="checkbox" name="checked[]"
-                                                                                         value="{$g|escape}"{if in_array($g, $group_watches)} checked="checked"{/if}></div></td>
+                                <td class="checkbox-cell"><input id="group_watch{$i}" class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]"
+                                                                                         value="{$g|escape}"{if in_array($g, $group_watches)} checked="checked"{/if}></td>
                             {/if}
                             <td class="text">
                                 <input id="group_watch{$i}" type="radio" name="{$g|escape}" value="cat_leave_desc" checked="checked">
@@ -95,8 +95,10 @@
                             </td>
 
                         {else}
-                        <td class="checkbox-cell"><div class="form-check"><input id="group_watch{$i}" type="checkbox" name="checked[]" value="{$g|escape}"
-                                        {if in_array($g, $group_watches)} checked="checked"{/if}></div></td>
+                        <td class="checkbox-cell">
+                            <input id="group_watch{$i}" type="checkbox" class="form-check-input" name="checked[]" value="{$g|escape}"
+                                        {if in_array($g, $group_watches)} checked="checked"{/if}>
+                        </td>
                         <td class="text"><label for="group_watch{$i}">{$g|escape}</label></td>
                         {/if}
                     </tr>

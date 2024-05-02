@@ -74,7 +74,7 @@ class Language_WriteFileTest extends TikiTestCase
         );
     }
 
-    public function writeStringsToFileProvider(): array
+    public static function writeStringsToFileProvider(): array
     {
         $strings = [
             'First string' => ['name' => 'First string', 'files' => ['file1', 'file3']],

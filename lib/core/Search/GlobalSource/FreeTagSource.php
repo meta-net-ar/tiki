@@ -31,12 +31,12 @@ class Search_GlobalSource_FreeTagSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return ['freetags', 'freetags_text'];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'freetags' => 'multivalue',
@@ -44,7 +44,7 @@ class Search_GlobalSource_FreeTagSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'freetags_text' => true,

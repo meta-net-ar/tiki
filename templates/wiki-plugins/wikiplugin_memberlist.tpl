@@ -18,7 +18,10 @@
                                 {/if}
                             </div>
                         {/if}
-                        <h2>{$groupName|escape}</h2>
+                        {if $showgroupname eq true}
+                            <h2>{$groupName|escape}</h2>
+                        {else}
+                        {/if}
                         {if isset($groupData.info) and !empty($groupData.info.groupDesc)}
                             <p class="description">{$groupData.info.groupDesc}</p>
                         {/if}
@@ -28,8 +31,8 @@
                                 {foreach from=$groupData.members item=memberName}
                                     <li>
                                         {if $groupData.can_remove && $memberName != $user}
-                                            <label>
-                                                <input type="checkbox" name="remove[{$groupName|escape}][]" value="{$memberName|escape}">
+                                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="remove[{$groupName|escape}][]" id="remove[{$groupName|escape}][]" value="{$memberName|escape}">
+                                            <label for="remove[{$groupName|escape}][]">
                                                 {$memberName|userlink}
                                             </label>
                                         {else}
@@ -56,13 +59,13 @@
                         {/if}
                         {if !empty($groupData.can_join)}
                             <p class="action">
-                                <input type="checkbox" name="join[]" value="{$groupName|escape}" id="join-{$groupName|escape}">
+                                <input type="checkbox" class="form-check-input" name="join[]" value="{$groupName|escape}" id="join-{$groupName|escape}">
                                 <label for="join-{$groupName|escape}">{tr}Join myself{/tr}</label>
                             </p>
                         {/if}
                         {if !empty($groupData.can_leave)}
                             <p class="action">
-                                <input type="checkbox" name="leave[]" value="{$groupName|escape}" id="leave-{$groupName|escape}">
+                                <input type="checkbox" class="form-check-input" name="leave[]" value="{$groupName|escape}" id="leave-{$groupName|escape}">
                                 <label for="leave-{$groupName|escape}">{tr}Leave myself{/tr}</label>
                             </p>
                         {/if}

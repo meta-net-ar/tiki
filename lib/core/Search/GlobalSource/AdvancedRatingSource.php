@@ -16,7 +16,7 @@ class Search_GlobalSource_AdvancedRatingSource implements Search_GlobalSource_In
         $this->recalculate = $recalculate;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         if (is_null($this->fields)) {
             $ratingconfiglib = TikiLib::lib('ratingconfig');
@@ -30,7 +30,7 @@ class Search_GlobalSource_AdvancedRatingSource implements Search_GlobalSource_In
         return $this->fields;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $out = [];
         $fields = $this->getProvidedFields();
@@ -40,7 +40,7 @@ class Search_GlobalSource_AdvancedRatingSource implements Search_GlobalSource_In
         return $out;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

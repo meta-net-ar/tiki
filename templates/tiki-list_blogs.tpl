@@ -46,7 +46,7 @@
                 <th><a href="tiki-list_blogs.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'activity_desc'}activity_asc{else}activity_desc{/if}">{tr}Activity{/tr}</a></th>
             {/if}
             {assign var=numbercol value=$numbercol+1}
-            <th></th>
+            <td></td> {* empty th changed to td to avoid ARIA error *}
         </tr>
         {section name=changes loop=$listpages}
             <tr>

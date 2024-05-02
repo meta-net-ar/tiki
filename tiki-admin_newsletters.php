@@ -37,7 +37,7 @@ if ($_REQUEST["nlId"]) {
         Feedback::errorPage(tr('Newsletter does not exist'));
     }
     $update = "";
-    $info["articleClipTypes"] = unserialize($info["articleClipTypes"]);
+    $info["articleClipTypes"] = unserialize($info["articleClipTypes"] ?? '');
     $info["articleClipRangeDays"] = $info["articleClipRange"] / 3600 / 24;
 } else {
     $info = [

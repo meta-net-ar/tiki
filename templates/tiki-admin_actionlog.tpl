@@ -263,9 +263,7 @@
                             <tr>
                                 {if $prefs.feature_banning eq 'y'}
                                     <td class="checkbox-cell">
-                                        <div class="form-check">
-                                            <input type="checkbox" class="form-check-input" name="checked[]" value="{$actionlog.actionId}">
-                                        </div>
+                                        <input type="checkbox" class="form-check-input" name="checked[]" value="{$actionlog.actionId}">
                                     </td>
                                 {/if}
                                 <td class="username">{if !empty($actionlog.user)}{$actionlog.user|username}{else}{tr}Anonymous{/tr}{/if}</td>
@@ -812,15 +810,13 @@
                             <tr>
                                 {if $tiki_p_admin eq 'y'}
                                     <td class="checkbox-cell">
-                                        <div class="form-check all_recorded">
-                                            <input type="checkbox" class="form-check-input" id="select_all_recorded" />
+                                        <div class="all_recorded">
+                                            <input type="checkbox" class="form-check-input" id="select_all_recorded" aria-label="{tr}Select all recorded{/tr}">
                                         </div>
                                     </td>
                                 {/if}
                                 <td class="checkbox-cell">
-                                    <div class="form-check ">
-                                        <input type="checkbox" class="form-check-input" id="select_all_reported" >
-                                    </div>
+                                     <input type="checkbox" class="form-check-input" id="select_all_reported" aria-label="{tr}Select all reported{/tr}">
                                 </td>
                                 <td class="text-center">{tr}All{/tr}</td>
                                 <td class="text-center">{tr}All{/tr}</td>
@@ -828,18 +824,18 @@
                             {foreach from=$action_log_conf_selected item=actionlog}
                                 <tr>
                                     {if $tiki_p_admin eq 'y'}
-                                        <td class="checkbox-cell " id>
-                                            <div class="form-check all_recorded">
+                                        <td class="checkbox-cell">
+                                            <div class="all_recorded">
                                                 <input type="checkbox" class="form-check-input" name="{$actionlog.code}"
-                                                {if $actionlog.status eq 'y' or $actionlog.status eq 'v'}checked="checked"{/if}>
+                                                {if $actionlog.status eq 'y' or $actionlog.status eq 'v'}checked="checked"{/if} aria-label="{tr}Select{/tr}">
                                             </div>
                                         </td>
                                     {/if}
                                     {if $tiki_p_admin eq 'y' or $actionlog.status eq 'y' or $actionlog.status eq 'v'}
                                         <td class="checkbox-cell">
-                                            <div class="form-check all_reported">
+                                            <div class="all_reported">
                                                 <input type="checkbox" class="form-check-input" name="v_{$actionlog.code}"
-                                                {if $actionlog.status eq 'v'}checked="checked"{/if}>
+                                                {if $actionlog.status eq 'v'}checked="checked"{/if} aria-label="{tr}Select{/tr}">
                                             </div>
                                         </td>
                                         <td class="text text-center">{tr}{$actionlog.action}{/tr}</td>
@@ -854,7 +850,7 @@
             </div>
             <div class="mb-3 row">
                 <div class="col-sm-1 offset-sm-11">
-                    <input type="submit" class="btn btn-primary btn-sm" name="save" value="{tr}Set{/tr}"\>
+                    <input type="submit" class="btn btn-primary btn-sm" name="save" value="{tr}Set{/tr}">
                 </div>
             </div>
         </form>

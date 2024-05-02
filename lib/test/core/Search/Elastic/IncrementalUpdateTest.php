@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-class Search_Elastic_IncrementalUpdateTest extends Search_Index_IncrementalUpdateTest
+class Search_Elastic_IncrementalUpdateTest extends SearchIndexIncrementalUpdate
 {
     protected $index;
 

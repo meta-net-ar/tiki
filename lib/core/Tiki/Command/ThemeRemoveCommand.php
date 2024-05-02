@@ -59,7 +59,7 @@ class ThemeRemoveCommand extends Command
         /** @var LogsLib $logslib */
         $logslib = TikiLib::lib('logs');
         $themelib = TikiLib::lib('theme');
-        $listThemes = $themelib->get_themes();
+        $listThemes = $themelib->list_themes();
         if (! in_array($themeName, $listThemes)) {
             $output->writeln('<error>' . tr('Theme not found') . '</error>');
             return Command::FAILURE;

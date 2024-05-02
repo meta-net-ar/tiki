@@ -12,7 +12,7 @@
  */
 class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface, \Tracker\Field\EnumerableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'u' => [
@@ -327,10 +327,12 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
                 $value = TikiLib::lib('trk')->parse_user_field($value);
             }
             if (isset($context['history'])) {
-                Feedback::removeIf(function ($item) use ($value) {
+                $regexText = tr('User "%0" not found', 'replaceMe');
+                $regex = '/^' . str_replace('replaceMe', '.', $regexText) . '$/';
+                Feedback::removeIf(function ($item) use ($regex) {
                     if ($item['type'] == 'error') {
-                        foreach ($value as $user) {
-                            if (in_array(tr('User "%0" not found', $user), $item['mes'])) {
+                        foreach ($item['mes'] as $msg) {
+                            if (preg_match($regex, $msg) !== false) {
                                 return true;
                             }
                         }
@@ -413,13 +415,13 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text", "{$baseKey}_unstemmed"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -434,7 +436,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractField implements
      *
      * @return array
      */
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
 

@@ -29,6 +29,7 @@
                 {preference name=xmpp_openfire_rest_api}
                 {preference name=xmpp_openfire_rest_api_username}
                 {preference name=xmpp_openfire_rest_api_password}
+                {preference name=xmpp_openfire_allow_anonymous}
                 {preference name=xmpp_conversejs_always_load}
                 {preference name=xmpp_conversejs_debug}
                 {preference name=xmpp_conversejs_init_json}

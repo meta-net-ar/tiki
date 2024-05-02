@@ -15,7 +15,7 @@ use Tracker\Tabular\Schema;
 // TODO: validate parameters (several required)
 class Tracker_Field_DynamicList extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'w' => [
@@ -312,7 +312,7 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
         foreach ((array) $remoteItemIds as $remoteItemId) {
             $itemInfo = $trklib->get_tracker_item($remoteItemId);
 
-            if ($context['list_mode'] == 'csv' || $context['search_render'] == 'y') {
+            if ($context['list_mode'] == 'csv' || (isset($context['search_render']) && $context['search_render'] == 'y')) {
                 $output .= $output ? ', ' : '';
             } else {
                 $output .= $output ? '<br>' : '';
@@ -419,13 +419,13 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -434,7 +434,7 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return ["{$baseKey}_text" => true];

@@ -232,10 +232,12 @@ ol.bbb-recordings {
 // Structure drilldown menu
 .nav-breadcrumb .dropdown-menu ul.navbar-nav .nav-item { padding-left: 1rem !important; padding-right: 1rem !important; }
 
-// /* Inline CkEditor */
-//.cke_editable:hover {
-//    outline: @gray dotted 1px;
-//}
+// Structures
+.nav-breadcrumb {
+    display: flex;
+    justify-content: space-between;
+}
+
 
 .tiki_plugin {
     display: inline-block;
@@ -791,6 +793,35 @@ body.tiki_wiki #comments {
 
 .codelisting .CodeMirror-vscrollbar {
     display: none !important; /* we do not need to display vertical scrollbars in code listings - workaround for the "wrongly computed height with scrollbar" bug in CodeMirror */
+}
+
+// See tiki-selectors for commented-out properties
+.codecaption {
+    display: inline-block;
+//    color: $code-color;
+//    background: $code-bg;
+//    border: 1px solid $code-color;
+    border-bottom: none;
+    padding: 2px 9.5px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+//code,
+//pre.codelisting, .CodeMirror.codelisting {
+//    color: var(--tiki-code-color); //$code-color;
+//    background: var(--tiki-code-bg); // $code-bg;
+//    border: $border-width solid $border-color;
+//    padding: $kbd-padding-y $kbd-padding-x;
+//    border-radius: $border-radius;
+//}
+//code {
+//    border-radius: $border-radius-sm;
+//}
+
+pre.codelisting code {
+    color: inherit;
+    white-space: pre-wrap;
 }
 
 // /* wikiplugin_fade */

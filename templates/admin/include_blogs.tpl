@@ -10,16 +10,16 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_blogs visible="always"}
             </fieldset>
             <fieldset>
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 {preference name=wikiplugin_bloglist}
             </fieldset>
             {preference name=home_blog}
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Features{/tr}{help url="Blog+Config"}
                 </legend>
                 {preference name=feature_blog_rankings}
@@ -33,13 +33,13 @@
                 {preference name=blog_feature_copyrights}
                 </fieldset>
             <fieldset>
-                <legend>{tr}Comments{/tr}</legend>
+                <legend class="h3">{tr}Comments{/tr}</legend>
                 {preference name=feature_blogposts_comments}
                 {preference name=blog_comments_per_page}
                 {preference name=blog_comments_default_ordering}
             </fieldset>
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Sharing on social networks{/tr}{help url="Social+Networks#Using+ShareThis"}
                 </legend>
                 {preference name=feature_blog_sharethis}
@@ -52,7 +52,7 @@
             <br>
             {preference name=blog_list_order}
             <fieldset>
-                <legend>{tr}Items to display{/tr}</legend>
+                <legend class="h3">{tr}Items to display{/tr}</legend>
                 {preference name=blog_list_title}
                 <div class="adminoptionboxchild" id="blog_list_title_childcontainer">
                     {preference name=blog_list_title_len}

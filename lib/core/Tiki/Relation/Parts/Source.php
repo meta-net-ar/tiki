@@ -11,7 +11,7 @@ class Source extends Link
 {
     public ?int $fieldId;
 
-    public function __construct(string $type, string $itemId, int $fieldId = null)
+    public function __construct(string $type, string $itemId, ?int $fieldId = null)
     {
         parent::__construct($type, $itemId);
         $this->fieldId = $fieldId;

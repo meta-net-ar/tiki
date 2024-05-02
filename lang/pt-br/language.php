@@ -6564,6 +6564,7 @@ $lang_current = array(
 // "After a certain number of consecutive unsuccessful log-in attempts, the user will receive an email with instruction to validate his or her account. However, the user can still log in with the old password" => "After a certain number of consecutive unsuccessful log-in attempts, the user will receive an email with instruction to validate his or her account. However, the user can still log in with the old password",
 // "brute force, brute-force, login failure, login-failure, failed logins" => "brute force, brute-force, login failure, login-failure, failed logins",
 // "Suspend account after" => "Suspend account after",
+"Suspend/lockout account after" => "Suspender/bloquear conta após",
 // "After a certain number of consecutive unsuccessful login attempts, the account is suspended. An admin must revalidate the account before the user can use it again" => "After a certain number of consecutive unsuccessful login attempts, the account is suspended. An admin must revalidate the account before the user can use it again",
 // "URL the user is redirected to after account validation" => "URL the user is redirected to after account validation",
 // "The default page a Registered user sees after account validation is \"tiki-information.php?msg=Account validated successfully\"" => "The default page a Registered user sees after account validation is \"tiki-information.php?msg=Account validated successfully\"",

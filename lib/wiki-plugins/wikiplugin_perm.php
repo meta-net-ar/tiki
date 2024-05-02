@@ -87,7 +87,7 @@ function wikiplugin_perm($data, $params)
         Feedback::error(tr('One of either parameter %0perms%1 or %0notperms%1 are required.', '<code>', '</code>'));
         return '';
     }
-    if ($params['global']) {
+    if (! empty($params['global'])) {
         $global = true;
     } else {
         $global = false;

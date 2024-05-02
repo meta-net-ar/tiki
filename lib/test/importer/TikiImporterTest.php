@@ -9,7 +9,7 @@ require_once(__DIR__ . '/../../importer/tikiimporter.php');
 /**
  * @group importer
  */
-class TikiImporter_Test extends TikiImporter_TestCase
+class TikiImporterTest extends TikiImporter_TestCase
 {
     public function testGetOptions(): void
     {

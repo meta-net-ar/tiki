@@ -28,7 +28,7 @@ class Search_Query_OrderTest extends PHPUnit\Framework\TestCase
         ], $obtained->getParts());
     }
 
-    public function sortMatches()
+    public static function sortMatches()
     {
         return [
             ['', 'score', 'desc', 'numeric'],

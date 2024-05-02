@@ -25,7 +25,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h1-uppercase" class="nocolor check" data-selector=".h1" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h1-uppercase" class="nocolor check form-check-input" data-selector=".h1" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>
@@ -57,7 +57,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h2-uppercase" class="nocolor check" data-selector=".h2" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h2-uppercase" class="nocolor check form-check-input" data-selector=".h2" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>
@@ -89,7 +89,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h3-uppercase" class="nocolor check" data-selector=".h3" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h3-uppercase" class="nocolor check form-check-input" data-selector=".h3" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>
@@ -121,7 +121,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h4-uppercase" class="nocolor check" data-selector=".h4" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h4-uppercase" class="nocolor check form-check-input" data-selector=".h4" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>
@@ -153,7 +153,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h5-uppercase" class="nocolor check" data-selector=".h5" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h5-uppercase" class="nocolor check form-check-input" data-selector=".h5" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>
@@ -185,7 +185,7 @@
                     <span class="input-group-addon"><i></i></span>
                 </p>
                 <p>
-                    <input id="tc-h6-uppercase" class="nocolor check" data-selector=".h6" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
+                    <input id="tc-h6-uppercase" class="nocolor check form-check-input" data-selector=".h6" data-element="text-transform" type="checkbox" data-default="none" data-check="uppercase">
                     {tr}Uppercase{/tr}
                 </p>
             </div>

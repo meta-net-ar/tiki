@@ -1024,7 +1024,9 @@ class TikiAccessLib extends TikiLib
         }
 
         if ($this->is_serializable_request()) {
-            Feedback::error($errortitle, true);
+            if (! TIKI_API) {
+                Feedback::error($errortitle, true);
+            }
 
             $this->output_serialized($detail);
         } elseif ($this->is_xml_http_request()) {

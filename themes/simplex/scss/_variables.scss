@@ -1,4 +1,4 @@
-// Simplex 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/simplex/_variables.scss with
+// Simplex 5.3.3 -- This file contains variables to override or add to those in node_modules/bootswatch/dist/simplex/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "simplex" !default;
@@ -32,9 +32,9 @@ $cyan:    #029acf !default;
 
 $primary:       $red !default;
 $secondary:     $white !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $orange !default;
+$success:       #3F8406; // $green !default;
+$info:          #027EAC; // $cyan !default;
+$warning:       #AA6618; // $orange !default;
 $danger:        $purple !default;
 $light:         $white !default;
 $dark:          $gray-800 !default;
@@ -47,6 +47,9 @@ $min-contrast-ratio:   2.8 !default;
 // Options
 //Prefix
 $prefix: bs-;
+
+// Form-validation
+$form-valid-color: #3F8406;
 
 // Body
 $body-color: $gray-800 !default;
@@ -63,14 +66,9 @@ $font-family-sans-serif:      system-ui, sans-serif; // "Open Sans", -apple-syst
 
 // Dropdowns
 
-$dropdown-link-hover-color:         $white !default;
-$dropdown-link-hover-bg:            $primary !default;
-
 // Navs
 
-$nav-link-padding-y:                .9rem !default;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // $gray-400 !default;
-$nav-tabs-border-color:             darken(#fff, 6.5%) !default;
 
 // Navbar
 
@@ -79,40 +77,17 @@ $navbar-dark-hover-color:           $white !default;
 
 // Pagination
 
-$pagination-border-color:           $nav-tabs-border-color !default;
-$pagination-hover-color:            $white !default;
-$pagination-hover-bg:               $primary !default;
-$pagination-hover-border-color:     $primary !default;
-$pagination-disabled-color:         $gray-400 !default;
-$pagination-disabled-border-color:  $pagination-border-color !default;
-
 // Cards
-
-$card-border-color:                 $nav-tabs-border-color !default;
 
 // Popovers
 
-$popover-border-color:              $nav-tabs-border-color !default;
-
 // Modals
-
-$modal-content-border-color:        $nav-tabs-border-color !default;
-$modal-header-border-color:         $nav-tabs-border-color !default;
 
 // Progress bars
 
-$progress-bar-color:                $primary !default;
-
 // List group
 
-$list-group-border-color:           $nav-tabs-border-color !default;
-$list-group-disabled-bg:            $nav-tabs-border-color !default;
-
 // Breadcrumbs
-
-$breadcrumb-padding-y:              .375rem !default;
-$breadcrumb-padding-x:              .75rem !default;
-$breadcrumb-border-radius:          .25rem !default;
 
 // Code
 $code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3

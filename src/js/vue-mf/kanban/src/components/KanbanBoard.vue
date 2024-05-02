@@ -83,7 +83,7 @@ const handleAddRow = event => {
             </div>
             <Button v-if="false" sm variant="light" @click="handleAddRow"><i class="fas fa-plus mr-1"></i>Add swimlane</Button>
         </nav>
-        <PerfectScrollbar class="d-flex">
+        <PerfectScrollbar class="d-flex" :options="{}">
             <div class="board-container">
                 <KanbanRow
                     v-for="(row, index) in store.getters.getRows(board.rows)"

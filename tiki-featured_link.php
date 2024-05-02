@@ -13,10 +13,11 @@ include_once('lib/featured_links/flinkslib.php');
 
 $access->check_feature('feature_featuredLinks');
 
-$flinkslib->add_featured_link_hit($_REQUEST["url"]);
 // Get the page from the request var or default it to HomePage
 if (! isset($_REQUEST["url"]) || ! $flinkslib->get_featured_link($_REQUEST['url'])) {
     Feedback::errorPage(tr('No page indicated'));
+} else {
+    $flinkslib->add_featured_link_hit($_REQUEST["url"]);
 }
 
 $section = 'featured_links';

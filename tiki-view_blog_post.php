@@ -180,8 +180,8 @@ if ($post_info['wysiwyg'] == "y") {
 if (! isset($_REQUEST['page'])) {
     $_REQUEST['page'] = 1;
 }
-$pages = $bloglib->get_number_of_pages($parsed_data);
-$post_info['parsed_data'] = $bloglib->get_page($parsed_data, $_REQUEST['page']);
+$pages = \Tiki\Lib\Wiki\WikiPaginationUtils::getNumberOfPages($parsed_data);
+$post_info['parsed_data'] = \Tiki\Lib\Wiki\WikiPaginationUtils::getPage($parsed_data, $_REQUEST['page']);
 $post_info['pages'] = $pages;
 if ($pages > $_REQUEST['page']) {
     $post_info['next_page'] = $_REQUEST['page'] + 1;

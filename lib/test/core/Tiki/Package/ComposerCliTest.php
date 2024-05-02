@@ -103,7 +103,7 @@ class Tiki_Package_ComposerCliTest extends TikiTestCase
         $this->assertEquals(json_decode($expected, true), $composerCli->getComposerConfigOrDefault());
     }
 
-    public function getComposerConfigOrDefaultProvider()
+    public static function getComposerConfigOrDefaultProvider()
     {
         $phpFinder = new PhpExecutableFinder();
         return [
@@ -149,7 +149,7 @@ class Tiki_Package_ComposerCliTest extends TikiTestCase
         $this->assertEquals($expected, $composerCli->getListOfPackagesFromConfig());
     }
 
-    public function getListOfPackagesFromConfigProvider()
+    public static function getListOfPackagesFromConfigProvider()
     {
         return [
             [ // no package installed, no key
@@ -292,7 +292,7 @@ class Tiki_Package_ComposerCliTest extends TikiTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function addComposerPackageToJsonProvider()
+    public static function addComposerPackageToJsonProvider()
     {
 
         $returnDataProvider = [];

@@ -22,7 +22,7 @@ class Search_GlobalSource_TitleInitialTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($factory->identifier($letter), $out['title_initial']);
     }
 
-    public function mapping()
+    public static function mapping()
     {
         return [
             'basic' => ['H', 'Hello World'],

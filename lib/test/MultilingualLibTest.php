@@ -84,7 +84,7 @@ class MultilingualLibTest extends TikiTestCase
     }
 
 
-    public function dataProviderTranslateLinksInPageContent()
+    public static function dataProviderTranslateLinksInPageContent()
     {
         return [
 
@@ -129,7 +129,7 @@ class MultilingualLibTest extends TikiTestCase
         $this->assertEquals($got_lang, $exp_lang, $message . "\nThe default target language was not as expected.");
     }
 
-    public function dataProviderDefaultTargetLanguageForNewTranslation()
+    public static function dataProviderDefaultTargetLanguageForNewTranslation()
     {
         return [
 
@@ -161,7 +161,7 @@ class MultilingualLibTest extends TikiTestCase
         $this->assertEquals($got_pretranslation, $exp_pretranslation, "$message\nSource page was not properly pretranslated.");
     }
 
-    public function dataProviderPartiallyPretranslateContentOfPage()
+    public static function dataProviderPartiallyPretranslateContentOfPage()
     {
         return [
             ["SomePage", "fr",

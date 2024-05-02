@@ -13,7 +13,7 @@ class MultiSelect implements Control
     protected $extra;
     protected $values = [];
 
-    public function __construct($name, $options, callable $extra = null)
+    public function __construct($name, $options, callable|null $extra = null)
     {
         $this->fieldName = $name;
         $this->options = $options;

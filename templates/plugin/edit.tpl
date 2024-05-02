@@ -10,7 +10,7 @@
 
 {block name="content"}
     {function plugin_edit_row}{* needs to be in the same block it seems? *}
-        {if !empty($param.area)}{$inputId=$param.area|escape}{else}{$inputId="param_{$name|escape}_input"}{/if}
+        {if !empty($param.area)}{$inputId=$param.area|escape}{else}{$inputId="param_{$paramName|escape}_input"}{/if}
         <div class="col-sm-3">
             <label for="{$inputId}">{$param.name|escape}</label>
             {if not empty($param.required)}
@@ -25,7 +25,7 @@
                     <br>{icon name='file' title='{tr}Pick a file{/tr}' onclick=$onclick class='btn btn-sm btn-primary'}
                 {elseif $param.type eq 'kaltura'}
                     {jq}
-$("#picker_{{$name|escape}}").parent().on("click", function () {
+$("#picker_{{$paramName|escape}}").parent().on("click", function () {
     $(this).serviceDialog({
         title: tr("Upload or record media"),
         width: 710,
@@ -40,7 +40,7 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
     return false;
 });
                     {/jq}
-                    <br>{icon name='video' title='{tr}Upload or record media{/tr}' href={service controller='kaltura' action='upload'} id='picker_'|cat:$name|escape class='btn btn-sm btn-primary'}
+                    <br>{icon name='video' title='{tr}Upload or record media{/tr}' href={service controller='kaltura' action='upload'} id='picker_'|cat:$paramName|escape class='btn btn-sm btn-primary'}
                 {/if}
             {/if}
         </div>
@@ -53,18 +53,18 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
                 {$dataAttribute = ''}
             {/if}
             {if empty($param.options)}
-                {if isset($pluginArgs[$name])}{$val = $pluginArgs[$name]}{else}{$val=''}{/if}
+                {if isset($pluginArgs[$paramName])}{$val = $pluginArgs[$paramName]}{else}{$val=''}{/if}
                 {if not empty($param.selector_type)}
                     {if empty($param.separator)}
-                        {object_selector type=$param.selector_type _simplevalue=$val _simplename='params['|cat:$name|escape|cat:']' _simpleid=$inputId _parent=$param.parent _parentkey=$param.parentkey _class=$groupClass}
+                        {object_selector type=$param.selector_type _simplevalue=$val _simplename='params['|cat:$paramName|escape|cat:']' _simpleid=$inputId _parent=$param.parent _parentkey=$param.parentkey _class=$groupClass}
                     {else}
                         {if is_array($param.separator)}
-                            <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="text" name="params[{$name|escape}]"{$dataAttribute}>
+                            <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="text" name="params[{$paramName|escape}]"{$dataAttribute}>
                         {else}
                             {if $param.selector_type == 'extra'}
-                              {object_selector_multi type=$param.selector_type_reference _extra_type=$param.profile_reference_extra_values _simplevalue=$val _simplename='params['|cat:$name|escape|cat:']' _simpleid=$inputId _separator=$param.separator _parent=$param.parent _parentkey=$param.parentkey _sort=$param.sort_order _class=$groupClass}
+                              {object_selector_multi type=$param.selector_type_reference _extra_type=$param.profile_reference_extra_values _simplevalue=$val _simplename='params['|cat:$paramName|escape|cat:']' _simpleid=$inputId _separator=$param.separator _parent=$param.parent _parentkey=$param.parentkey _sort=$param.sort_order _class=$groupClass}
                             {else}
-                               {object_selector_multi type=$param.selector_type _use_permname=$param.use_permname _simplevalue=$val _simplename='params['|cat:$name|escape|cat:']' _simpleid=$inputId _separator=$param.separator _parent=$param.parent _parentkey=$param.parentkey _sort=$param.sort_order _class=$groupClass}
+                               {object_selector_multi type=$param.selector_type _use_permname=$param.use_permname _simplevalue=$val _simplename='params['|cat:$paramName|escape|cat:']' _simpleid=$inputId _separator=$param.separator _parent=$param.parent _parentkey=$param.parentkey _sort=$param.sort_order _class=$groupClass}
                            {/if}
                         {/if}
                     {/if}
@@ -73,9 +73,9 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
                     {/if}
                 {else}
                     {if $param.filter eq "password"}
-                        <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="password" name="params[{$name|escape}]"{$dataAttribute}>
+                        <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="password" name="params[{$paramName|escape}]"{$dataAttribute}>
                     {else}
-                        <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="text" name="params[{$name|escape}]"{$dataAttribute}>
+                        <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="text" name="params[{$paramName|escape}]"{$dataAttribute}>
                     {/if}
                     {if not empty($param.filter)}
                         {if $param.filter eq "pagename"}
@@ -84,7 +84,7 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
                             {jq}$({{$inputId}}).tiki("autocomplete", "groupname", {multiple: true, multipleSeparator: "|"});{/jq}
                         {elseif $param.filter eq "username"}
                             {jq}$({{$inputId}}).tiki("autocomplete", "username", {multiple: true, multipleSeparator: "|"});{/jq}
-                        {elseif $name eq "biblio_code"}
+                        {elseif $paramName eq "biblio_code"}
                             {jq}$({{$inputId}}).tiki("autocomplete", "reference", {multiple: true, multipleSeparator: ":"});{/jq}
                         {elseif $param.filter eq "date"}
                             {jq}
@@ -100,9 +100,9 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
                     {/if}
                 {/if}
             {else}
-                <select class="form-select{$groupClass}" type="text" name="params[{$name|escape}]" id="{$inputId}"{$dataAttribute}>
+                <select class="form-select{$groupClass}" type="text" name="params[{$paramName|escape}]" id="{$inputId}"{$dataAttribute}>
                     {foreach $param.options as $option}
-                        <option value="{$option.value|escape}" {if isset($pluginArgs[$name]) and $pluginArgs[$name] eq $option.value} selected="selected"{/if}>
+                        <option value="{$option.value|escape}" {if isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value} selected="selected"{/if}>
                             {$option.text|escape}
                         </option>
                     {/foreach}
@@ -117,14 +117,14 @@ $("#picker_{{$name|escape}}").parent().on("click", function () {
             {if not empty($info.params)}
                 {foreach $info.params as $name => $param}
                     <div class="mb-3 row {if !empty($param.advanced)} advanced{/if}" id="param_{$name|escape}">
-                        {plugin_edit_row param=$param name=$name info=$info pluginArgs=$pluginArgs}
+                        {plugin_edit_row param=$param paramName=$name info=$info pluginArgs=$pluginArgs}
                     </div>
                 {/foreach}
                 {if not empty($info.advancedParams)}
                     {button _text='Advanced' _onclick="$('.mb-3.advanced.default').toggle('fast'); return false;" _class='btn btn-sm mb-4'}
                     {foreach $info.advancedParams as $name => $param}
                         <div class="mb-3 advanced row default" style="display: none;">
-                            {plugin_edit_row param=$param name=$name info=$info pluginArgs=$pluginArgs}
+                            {plugin_edit_row param=$param paramName=$name info=$info pluginArgs=$pluginArgs}
                         </div>
                     {/foreach}
                 {/if}

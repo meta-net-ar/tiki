@@ -16,6 +16,7 @@ const props = defineProps({
 
 // console.log("toolbarObject: " + props.customProps.toolbarObject);
 const toolbarObject = ref(props.customProps.toolbarObject);
+const syntax = ref(props.customProps.syntax);
 </script>
 
 <template>

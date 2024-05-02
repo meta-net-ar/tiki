@@ -13,6 +13,7 @@ function wikiplugin_customsearch_info()
         'prefs' => ['wikiplugin_customsearch', 'wikiplugin_list', 'feature_search'],
         'body' => tra('LIST plugin configuration information'),
         'filter' => 'wikicontent',
+        'format' => 'html',
         'profile_reference' => 'search_plugin_content',
         'iconname' => 'search',
         'introduced' => 8,
@@ -21,7 +22,7 @@ function wikiplugin_customsearch_info()
             'wiki' => [
                 'required' => false,
                 'name' => tra('Template wiki page'),
-                'description' => tra('Wiki page where search user interface template is found'),
+                'description' => tra('Wiki page where the search form is found'),
                 'since' => '8.0',
                 'filter' => 'pagename',
                 'default' => '',
@@ -30,9 +31,9 @@ function wikiplugin_customsearch_info()
             'tpl' => [
                 'required' => false,
                 'name' => tra('Template file'),
-                'description' => tra('Smarty template (.tpl) file where search user interface template is found'),
+                'description' => tra('Smarty template (.tpl) file where the search form is found'),
                 'since' => '12.2',
-                'default' => '',
+                'default' => 'templates/search_customsearch/default_form.tpl',
             ],
             'id' => [
                 'required' => false,
@@ -189,25 +190,6 @@ function wikiplugin_customsearch_info()
 function wikiplugin_customsearch($data, $params)
 {
     global $prefs;
-
-    if ($prefs['javascript_enabled'] !== 'y') {
-        require_once('lib/wiki-plugins/wikiplugin_list.php');
-        $smarty = TikiLib::lib('smarty');
-        $repeat = false;
-
-        $out = smarty_block_remarksbox(
-            [
-                'type' => 'warning',
-                'title' => tr('JavaScript disabled'),
-            ],
-            tr('JavaScript is required for this search feature'),
-            $smarty->getEmptyInternalTemplate(),
-            $repeat
-        );
-
-        return '~np~' . $out . '~/np~' . wikiplugin_list($data, []);
-    }
-
     static $instance_id = null;
 
     if (empty($params['wiki']) && empty($params['tpl'])) {

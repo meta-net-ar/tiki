@@ -91,7 +91,7 @@ class Search_Formatter_Builder
         }
     }
 
-    public function getFormatter($errorInQuery = false)
+    public function getFormatter($errorInQuery = '')
     {
         global $prefs;
         $plugin = $this->formatterPlugin;
@@ -106,7 +106,7 @@ class Search_Formatter_Builder
         } else {
             $formatter->setAlternateOutput('{BOX(class="text-bg-light")}' . tra('No results for query.') . '{BOX}');
             if ($errorInQuery) {
-                $formatter->setAlternateOutput('{BOX(class="text-bg-light")}' . tra('There is a query error in the sort control block, please correct it to find results.') . '{BOX}');
+                $formatter->setAlternateOutput('{BOX(class="text-bg-light")}' . $errorInQuery . '{BOX}');
             }
         }
 

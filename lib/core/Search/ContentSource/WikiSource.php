@@ -32,7 +32,7 @@ class Search_ContentSource_WikiSource implements Search_ContentSource_Interface
         return $this->db->table('tiki_pages')->fetchColumn('pageName', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -122,7 +122,7 @@ class Search_ContentSource_WikiSource implements Search_ContentSource_Interface
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $fields = [
             'title',
@@ -155,7 +155,7 @@ class Search_ContentSource_WikiSource implements Search_ContentSource_Interface
         return $fields;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $fields = [
             'title' => 'sortable',
@@ -188,7 +188,7 @@ class Search_ContentSource_WikiSource implements Search_ContentSource_Interface
         return $fields;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

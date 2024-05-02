@@ -12,7 +12,7 @@
  */
 class Tracker_Field_File extends \Tracker\Field\AbstractField
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'A' => [
@@ -137,17 +137,17 @@ class Tracker_Field_File extends \Tracker\Field\AbstractField
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

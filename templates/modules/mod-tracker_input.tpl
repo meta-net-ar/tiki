@@ -2,10 +2,11 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="tracker_input" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
     <form class="mod-tracker-input simple" method="get" action="{service controller=tracker action=insert_item}" data-location="{$tracker_input.location|escape}" data-location-mode="{$tracker_input.locationMode|escape}" data-streetview="{$tracker_input.streetview|escape}" data-success="{$tracker_input.success|json_encode|escape}">
         {foreach from=$tracker_input.textInput key=token item=label}
-            <label>
+            <label class="form-label">
                 {$label|escape}
-                <input type="text" name="forced~{$token|escape}"/>
             </label>
+            <input class="form-control" type="text" id="forced-($token|escape)" name="forced~{$token|escape}"/>
+
         {/foreach}
         <div class="submit">
             <input type="hidden" name="trackerId" value="{$tracker_input.trackerId|escape}"/>

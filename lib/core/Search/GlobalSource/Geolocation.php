@@ -34,7 +34,7 @@ class Search_GlobalSource_Geolocation implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'geo_located',
@@ -43,7 +43,7 @@ class Search_GlobalSource_Geolocation implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'geo_located' => 'identifier',
@@ -52,7 +52,7 @@ class Search_GlobalSource_Geolocation implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
         ];

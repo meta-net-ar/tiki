@@ -202,33 +202,33 @@ class Services_Tracker_Utilities
         $trklib->replace_tracker_field(
             $trackerId,
             $fieldId,
-            isset($properties['name']) ? $properties['name'] : $field['name'],
-            isset($properties['type']) ? $properties['type'] : $field['type'],
-            isset($properties['isMain']) ? $properties['isMain'] : $field['isMain'],
-            isset($properties['isSearchable']) ? $properties['isSearchable'] : $field['isSearchable'],
-            isset($properties['isTblVisible']) ? $properties['isTblVisible'] : $field['isTblVisible'],
-            isset($properties['isPublic']) ? $properties['isPublic'] : $field['isPublic'],
-            isset($properties['isHidden']) ? $properties['isHidden'] : $field['isHidden'],
-            isset($properties['isMandatory']) ? $properties['isMandatory'] : $field['isMandatory'],
-            isset($properties['position']) ? $properties['position'] : $field['position'],
-            isset($properties['options']) ? $properties['options'] : $field['options'],
-            isset($properties['description']) ? $properties['description'] : $field['description'],
-            isset($properties['isMultilingual']) ? $properties['isMultilingual'] : $field['isMultilingual'],
+            $properties['name'] ?? $field['name'] ?? null,
+            $properties['type'] ?? $field['type'] ?? null,
+            $properties['isMain'] ?? $field['isMain'] ?? null,
+            $properties['isSearchable'] ?? $field['isSearchable'] ?? null,
+            $properties['isTblVisible'] ?? $field['isTblVisible'] ?? null,
+            $properties['isPublic'] ?? $field['isPublic'] ?? null,
+            $properties['isHidden'] ?? $field['isHidden'] ?? null,
+            $properties['isMandatory'] ?? $field['isMandatory'] ?? null,
+            $properties['position'] ?? $field['position'] ?? null,
+            $properties['options'] ?? $field['options'] ?? null,
+            $properties['description'] ?? $field['description'] ?? null,
+            $properties['isMultilingual'] ?? $field['isMultilingual'] ?? null,
             '', // itemChoices
-            isset($properties['errorMsg']) ? $properties['errorMsg'] : $field['errorMsg'],
-            isset($properties['visibleBy']) ? $properties['visibleBy'] : $field['visibleBy'],
-            isset($properties['editableBy']) ? $properties['editableBy'] : $field['editableBy'],
-            isset($properties['descriptionIsParsed']) ? $properties['descriptionIsParsed'] : $field['descriptionIsParsed'],
-            isset($properties['validation']) ? $properties['validation'] : $field['validation'],
-            isset($properties['validationParam']) ? $properties['validationParam'] : $field['validationParam'],
-            isset($properties['validationMessage']) ? $properties['validationMessage'] : $field['validationMessage'],
-            isset($properties['permName']) ? $properties['permName'] : $field['permName'],
-            isset($properties['rules']) ? $properties['rules'] : $field['rules'],
-            isset($properties['encryptionKeyId']) ? $properties['encryptionKeyId'] : $field['encryptionKeyId'],
-            isset($properties['excludeFromNotification']) ? $properties['excludeFromNotification'] : $field['excludeFromNotification'],
-            isset($properties['visibleInViewMode']) ? $properties['visibleInViewMode'] : $field['visibleInViewMode'],
-            isset($properties['visibleInEditMode']) ? $properties['visibleInEditMode'] : $field['visibleInEditMode'],
-            isset($properties['visibleInHistoryMode']) ? $properties['visibleInHistoryMode'] : $field['visibleInHistoryMode']
+            $properties['errorMsg'] ?? $field['errorMsg'] ?? null,
+            $properties['visibleBy'] ?? $field['visibleBy'] ?? null,
+            $properties['editableBy'] ?? $field['editableBy'] ?? null,
+            $properties['descriptionIsParsed'] ?? $field['descriptionIsParsed'] ?? null,
+            $properties['validation'] ?? $field['validation'] ?? null,
+            $properties['validationParam'] ?? $field['validationParam'] ?? null,
+            $properties['validationMessage'] ?? $field['validationMessage'] ?? null,
+            $properties['permName'] ?? $field['permName'] ?? null,
+            $properties['rules'] ?? $field['rules'] ?? null,
+            $properties['encryptionKeyId'] ?? $field['encryptionKeyId'] ?? null,
+            $properties['excludeFromNotification'] ?? $field['excludeFromNotification'] ?? null,
+            $properties['visibleInViewMode'] ?? $field['visibleInViewMode'] ?? null,
+            $properties['visibleInEditMode'] ?? $field['visibleInEditMode'] ?? null,
+            $properties['visibleInHistoryMode'] ?? ($field['visibleInHistoryMode'] ?? null)
         );
     }
 
@@ -334,7 +334,7 @@ class Services_Tracker_Utilities
             $info = $trklib->get_field_info($fieldId);
             $handler = $trklib->get_field_handler($info, $item);
             $data = $handler->getFieldData();
-            $out[$name] = $data['value'] ?? '';
+            $out[$name] = $data['value'] ?? null; // some handlers like Header don't return values
         }
 
         return $out;

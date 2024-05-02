@@ -45,10 +45,9 @@ class Services_ShowTikiOrg_Controller
 
         $conn = new SSH2($domain);
 
-        $privetKey = RSA::loadPrivateKey(file_get_contents($options->privateKey));
-        $publicKey = RSA::loadPublicKey(file_get_contents($options->publicKey));
+        $privateKey = RSA::loadPrivateKey(file_get_contents($options->privateKey));
 
-        $conntry = $conn->login($options->remoteShellUser, $privetKey, $publicKey);
+        $conntry = $conn->login($options->remoteShellUser, $privateKey);
 
         if (! $conntry) {
             $ret['status'] = 'DISCO';

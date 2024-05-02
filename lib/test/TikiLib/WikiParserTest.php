@@ -29,7 +29,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['', ''],
@@ -57,21 +57,21 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['::foo::', '<div style="text-align: center;">foo</div><br />'],    // center align
             [':: foo ::', '<div style="text-align: center;"> foo </div><br />'],    // center align
 
-            ['! foo', '<h1 class="showhide_heading" id="foo"> foo</h1>'],   // heading 1
-            ['!!foo', '<h2 class="showhide_heading" id="foo">foo</h2>'],    // heading 2
-            ['!! foo', '<h2 class="showhide_heading" id="foo"> foo</h2>'],  // heading 2
+            ['! foo', '<h1 class="showhide_heading d-flex justify-content-start" id="foo"> foo</h1>'],   // heading 1
+            ['!!foo', '<h2 class="showhide_heading d-flex justify-content-start" id="foo">foo</h2>'],    // heading 2
+            ['!! foo', '<h2 class="showhide_heading d-flex justify-content-start" id="foo"> foo</h2>'],  // heading 2
 
             //heading 1 with collapsible text open
             [
                 "!+foo\nheading text section",
-                "<h1 class=\"showhide_heading\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[-]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:block;\">\nheading text section<br /></div>",
+                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[-]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:block;\">\nheading text section<br /></div>",
                 ['page' => 'HomePage'],
             ],
 
             //heading 1 with collapsible text closed
             [
                 "!-foo\nheading text section",
-                "<h1 class=\"showhide_heading\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[+]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:none;\">\nheading text section<br /></div>",
+                "<h1 class=\"showhide_heading d-flex justify-content-start\" id=\"foo\">foo</h1><a id=\"flipperidHomePage1\" class=\"link\" href=\"#\" onclick=\"flipWithSign('idHomePage1');return false;\">[+]</a><div id=\"idHomePage1\" class=\"showhide_heading\" style=\"display:none;\">\nheading text section<br /></div>",
                 ['page' => 'HomePage'],
             ],
 

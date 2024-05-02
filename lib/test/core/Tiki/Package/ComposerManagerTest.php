@@ -358,7 +358,7 @@ class Tiki_Package_ComposerManagerTest extends TikiTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerForTestCheckThatCanInstallPackages()
+    public static function providerForTestCheckThatCanInstallPackages()
     {
         return [
             [ // root dir writable, no files

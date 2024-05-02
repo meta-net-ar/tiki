@@ -1,9 +1,6 @@
-// Solar 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/sketchy/_variables.scss with
+// Solar 5.3.3 -- This file contains variables to replace or add to those in node_modules/bootswatch/dist/sketchy/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
-$theme: "solar" !default;
-
-//
 // Color system
 //
 
@@ -31,16 +28,14 @@ $green:   #2aa198 !default;
 $teal:    #20c997 !default;
 $cyan:    #268bd2 !default;
 
-$primary:       $blue !default;
-$secondary:     $gray-600 !default;
-$success:       $green !default;
-$info:          $cyan !default;
+$primary:       #946F00; // $blue !default;
+$secondary:     #677979; // $gray-600 !default;
+$success:       #21837C; // $green !default;
+$info:          #227AB9; // $cyan !default;
 $warning:       $yellow !default;
 $danger:        $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
-
-$min-contrast-ratio:   2.5 !default;
 
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
@@ -57,68 +52,36 @@ $body-color:                $gray-600 !default;
 
 // Links
 
-$link-color:                $success !default;
+$link-color:                #289F97; //$success !default;
 $link-hover-color:          $link-color !default;
 $link-shade-percentage:                   20% !default;
 
 // Components
-
-$component-active-color:      rgba(255, 255, 255, .75) !default;
-$component-active-bg:         $gray-800 !default;
 
 // Fonts
 
 $font-family-sans-serif:      Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;  // "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $font-size-base:              1.1rem;
 // Tables
-
-$table-accent-bg:             rgba($white, .05) !default;
-$table-hover-bg:              rgba($white, .075) !default;
-$table-border-color:          $component-active-bg !default;
-$table-dark-bg:               $gray-500 !default;
-$table-dark-border-color:     darken($gray-500, 3%) !default;
+$table-color:                 var(--#{$prefix}body-color) !default;
 $table-dark-color:            var(--#{$prefix}body-bg);
-
-$table-bg-scale:              0% !default;
 
 // Forms
 
 $input-bg:                              #a9bdbd !default;
 $input-disabled-bg:                     #657b83 !default;
-
-$input-color:                           $gray-800 !default;
-$input-border-color:                    rgba($black, .15) !default;
-$input-placeholder-color:               #657b83 !default;
-$input-group-addon-color:               $gray-600 !default;
-$input-group-addon-bg:                  $gray-800 !default;
-
-$form-check-input-bg:                     rgba(255, 255, 255, .75) !default;
-$form-check-input-border:                 1px solid $white !default;
-$form-check-input-checked-bg-color:       $primary !default;
-
-$form-switch-color:               rgba(255, 255, 255, .75) !default;
-$form-switch-focus-color:         $form-switch-color !default;
-
-$form-range-track-bg:             $gray-800 !default;
-$form-range-thumb-bg:                      $primary !default;
-
-$form-file-button-color:          $gray-600 !default;
+$input-group-addon-color: #8B9C9C;
 
 // Dropdowns
 
 $dropdown-bg:                       $gray-800 !default;
 $dropdown-divider-bg:               var(--#{$prefix}body-bg);
 $dropdown-link-color:               var(--#{$prefix}body-color);
-$dropdown-link-hover-color:         rgba(255, 255, 255, .75) !default;
 $dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
 
 // Navs
 
-$nav-tabs-border-color:             $gray-800 !default;
-$nav-tabs-link-hover-border-color:  $nav-tabs-border-color !default;
-$nav-tabs-link-active-color:        $component-active-color !default;
 $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);
-$nav-tabs-link-active-border-color: $nav-tabs-border-color !default;
 
 // Navbars
 
@@ -127,71 +90,27 @@ $navbar-light-active-color:         rgba($black, .7) !default;
 
 // Pagination
 
-$pagination-bg:                     transparent !default;
-$pagination-border-color:           $gray-800 !default;
-$pagination-hover-bg:               $gray-800 !default;
-$pagination-hover-border-color:     $gray-800 !default;
-$pagination-active-color:           rgba(255, 255, 255, .75) !default;
-$pagination-active-bg:              $gray-800 !default;
-$pagination-active-border-color:    $gray-800 !default;
-$pagination-disabled-color:         $gray-800 !default;
-$pagination-disabled-bg:            transparent !default;
-$pagination-disabled-border-color:  $gray-800 !default;
-
 // Cards
-
-$card-border-color:                 rgba($gray-900, .95) !default;
-$card-cap-bg:                       rgba($gray-800, .25) !default;
-$card-bg:                           rgba($gray-200, .125) !default;
 
 // Popovers
 
-$popover-bg:                        $gray-800 !default;
 $popover-border-color:              var(--#{$prefix}body-bg);
-$popover-header-bg:                 $gray-800 !default;
 
 // Toasts
 
-$toast-background-color:            lighten($body-bg, 5%) !default;
-$toast-border-color:                rgba(0, 0, 0, .2) !default;
-$toast-header-color:                $body-color !default;
-$toast-header-background-color:     $toast-background-color !default;
-$toast-header-border-color:         $toast-border-color !default;
 
 // Modals
 
-$modal-content-bg:                  $gray-800 !default;
 $modal-content-border-color:        var(--#{$prefix}body-bg);
 $modal-header-border-color:         var(--#{$prefix}body-bg);
 
 // Progress bars
 
-$progress-bg:                       $gray-800 !default;
-$progress-bar-color:                $primary !default;
-
 // List group
-
-$list-group-color:                  $white !default;
-$list-group-bg:                     transparent !default;
-$list-group-border-color:           $gray-800 !default;
-$list-group-hover-bg:               $gray-800 !default;
-$list-group-active-color:           $white !default;
-$list-group-disabled-color:         $gray-600 !default;
-$list-group-disabled-bg:            transparent !default;
-$list-group-action-color:           $body-color !default;
-$list-group-action-hover-color:     $white !default;
 
 // Breadcrumbs
 
-$breadcrumb-padding-y:              .375rem !default;
-$breadcrumb-padding-x:              .75rem !default;
-$breadcrumb-bg:                     $component-active-bg !default;
-$breadcrumb-active-color:           $gray-500 !default;
-$breadcrumb-border-radius:          .25rem !default;
-
 // Close
-
-$btn-close-color:                       $white !default;
 
 // Code
 $code-color:                      $body-color; //   $pink !default;

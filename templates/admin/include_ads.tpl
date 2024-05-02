@@ -10,17 +10,17 @@
     </div>
 
     <fieldset id="Banners">
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_banners visible="always"}
     </fieldset>
 
     <fieldset class="mb-3 w-100">
-        <legend>{tr}Plugins{/tr}</legend>
+        <legend class="h3">{tr}Plugins{/tr}</legend>
         {preference name=wikiplugin_banner}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Site ads and banners{/tr}{help url="Banners"}</legend>
+        <legend class="h3">{tr}Site ads and banners{/tr}{help url="Banners"}</legend>
 
         {preference name=sitead_publish}
         {preference name=feature_sitead}

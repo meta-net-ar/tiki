@@ -2646,7 +2646,7 @@ class TikiLib extends TikiDb_Bridge
      * @param string $data
      * @return string
      */
-    public function convertAbsoluteLinksToRelative($data)
+    public function convertAbsoluteLinksToRelative(string $data): string
     {
         global $prefs, $tikilib;
 
@@ -3372,37 +3372,37 @@ class TikiLib extends TikiDb_Bridge
     }
     /* cachetime = 0 => no cache, otherwise duration cache is valid */
     /**
-     * @param $url
-     * @param $isFresh
-     * @param int $cachetime
-     * @return mixed
+     * @param string $url The URL to retrieve
+     * @param bool $isFresh Set to true if the data is fresh, false otherwise.
+     * @param int $cachetime is the time in seconds for which the data should be cached. If 0, the data will always be refreshed.
+     * @return array The cached data or updated data.
      */
-    public function get_cached_url($url, &$isFresh, $cachetime = 0)
+    public function get_cached_url(string $url, bool &$isFresh, int $cachetime = 0): array
     {
         $linkCache = $this->table('tiki_link_cache');
-
-        $res = $linkCache->fetchFullRow(['url' => $url]);
+        $retrievedRow = $linkCache->fetchFullRow(['url' => $url]);
         $now = $this->now;
 
-        // Check if $res is not false and if there's no cache or need to refresh
-        if ($res !== false && ($now - $res['refresh']) > $cachetime) {
-            $res['data'] = $this->httprequest($url);
+        if ($retrievedRow !== false && ($now - $retrievedRow['refresh']) > $cachetime) {
+            // Cache exists but is stale, refresh it
+            $futureRow['data'] = $this->httprequest($url);
             $isFresh = true;
-            //echo '<br />Not cached:'.$url.'/'.strlen($res['data']);
-            $res['refresh'] = $now;
-            if ($cachetime > 0) {
-                if (empty($res['cacheId'])) {
-                    $linkCache->insert(['url' => $url, 'data' => $res['data'], 'refresh' => $res['refresh']]);
-                    $res = $linkCache->fetchFullRow(['url' => $url]);
-                } else {
-                    $linkCache->update(['data' => $res['data'], 'refresh' => $res['refresh']], ['cacheId' => $res['cacheId']]);
-                }
-            }
+            $futureRow['refresh'] = $now;
+            $linkCache->update(['data' => $futureRow['data'], 'refresh' => $futureRow['refresh']], ['cacheId' => $retrievedRow['cacheId']]);
+            $returnValue = $futureRow;
+        } elseif ($retrievedRow === false) {
+            // Cache miss, create a new entry
+            $futureRow['data'] = $this->httprequest($url);
+            $isFresh = true;
+            $futureRow['refresh'] = $now;
+            $linkCache->insert(['url' => $url, 'data' => $futureRow['data'], 'refresh' => $futureRow['refresh']]);
+            $returnValue = $futureRow;
         } else {
-            //echo '<br />Cached:'.$url;
+            // Cache hit and HTTP data is not fresh
             $isFresh = false;
+            $returnValue = $retrievedRow;
         }
-        return $res;
+        return $returnValue;
     }
 
     // This funcion return the $limit most accessed pages
@@ -5904,157 +5904,6 @@ class TikiLib extends TikiDb_Bridge
     }
 
     /**
-     * @return  array of css files in the style dir
-     */
-    public function list_styles()
-    {
-        global $tikidomain;
-        $csslib = TikiLib::lib('css');
-
-        $sty = [];
-        $style_base_path = $this->get_style_path(); // knows about $tikidomain
-
-        if ($style_base_path) {
-            $sty = $csslib->list_css($style_base_path);
-        }
-
-        if ($tikidomain) {
-            $sty = array_unique(array_merge($sty, $csslib->list_css('styles')));
-        }
-        foreach ($sty as &$s) {
-            if (in_array($s, ['mobile', '960_gs'])) {
-                $s = '';
-            } elseif (substr($s, -4) == '-rtl' || substr($s, -6) == '-print') {
-                $s = '';
-            } else {
-                $s .= '.css';   // add the .css back onto the end of the style names
-            }
-        }
-        $sty = array_filter($sty);
-        sort($sty);
-        return $sty;
-
-        /* What is this $tikidomain section?
-         * Some files that call this method used to list styles without considering
-         * $tikidomain, now they do. They're listed below:
-         *
-         *  tiki-theme_control.php
-         *  tiki-theme_control_objects.php
-         *  tiki-theme_control_sections.php
-         *  tiki-my_tiki.php
-         *  modules/mod-switch_theme.php
-         *
-         *  lfagundes
-         *
-         *  Tiki 3.0 - now handled by get_style_path()
-         *  jonnybradley
-         */
-    }
-
-    /**
-     * @param $a_style - main style (e.g. "thenews.css")
-     * @return array of css files in the style options dir
-     */
-    public function list_style_options($a_style = '')
-    {
-        global $prefs;
-        $csslib = TikiLib::lib('css');
-
-        if (empty($a_style)) {
-            $a_style = $prefs['style'];
-        }
-
-        $sty = [];
-        $option_base_path = $this->get_style_path($a_style) . 'options/';
-
-        if (is_dir($option_base_path)) {
-            $sty = $csslib->list_css($option_base_path);
-        }
-
-        if (count($sty)) {
-            foreach ($sty as &$s) { // add .css back as above
-                $s .= '.css';
-            }
-            sort($sty);
-            return $sty;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $stl - main style (e.g. "thenews.css")
-     * @return string - style passed in up to - | or . char (e.g. "thenews")
-     */
-    public function get_style_base($stl)
-    {
-        $parts = preg_split('/[\-\.]/', $stl);
-        if (count($parts) > 0) {
-            return $parts[0];
-        } else {
-            return '';
-        }
-    }
-
-    /**
-     * @param $stl - main style (e.g. "thenews.css" - can be empty to return main styles dir)
-     * @param $opt - optional option file name (e.g. "purple.css")
-     * @param $filename - optional filename to look for (e.g. "purple.png")
-     * @return path to dir or file if found or empty if not - e.g. "styles/mydomain.tld/thenews/options/purple/"
-     */
-    public function get_style_path($stl = '', $opt = '', $filename = '')
-    {
-        global $tikidomain;
-
-        $path = '';
-        $dbase = '';
-        if ($tikidomain && is_dir("styles/$tikidomain")) {
-            $dbase = $tikidomain . '/';
-        }
-
-        $sbase = '';
-        if (! empty($stl)) {
-            $sbase = $this->get_style_base($stl) . '/';
-        }
-
-        $obase = '';
-        if (! empty($opt)) {
-            $obase = 'options/';
-            if ($opt != $filename) {    // exception for getting option.css as it doesn't live in it's own dir
-                $obase .= substr($opt, 0, strlen($opt) - 4) . '/';
-            }
-        }
-
-        if (empty($filename)) {
-            if (is_dir('styles/' . $dbase . $sbase . $obase)) {
-                $path = 'styles/' . $dbase . $sbase . $obase;
-            } elseif (is_dir('styles/' . $dbase . $sbase)) {
-                $path = 'styles/' . $dbase . $sbase;    // try "parent" style dir if no option one
-            } elseif (is_dir('styles/' . $sbase . $obase)) {
-                $path = 'styles/' . $sbase . $obase;    // try root style dir if no domain one
-            } else {
-                $path = 'styles/' . $sbase;         // fall back to "parent" style dir if no option one
-            }
-        } else {
-            if (is_file('styles/' . $dbase . $sbase . $obase . $filename)) {
-                $path = 'styles/' . $dbase . $sbase . $obase . $filename;
-            } elseif (is_file('styles/' . $dbase . $sbase . $filename)) {   // try "parent" style dir if no option one
-                $path = 'styles/' . $dbase . $sbase . $filename;
-            } elseif (is_file('styles/' . $sbase . $obase . $filename)) {   // try non-tikidomain dirs if not found
-                $path = 'styles/' . $sbase . $obase . $filename;
-            } elseif (is_file('styles/' . $sbase . $filename)) {
-                $path = 'styles/' . $sbase . $filename;             // fall back to "parent" style dir if no option
-            } elseif (is_file('styles/' . $dbase . $filename)) {
-                $path = 'styles/' . $dbase . $filename;             // tikidomain root style dir?
-            } elseif (is_file('styles/' . $dbase . $filename)) {
-                $path = 'styles/' . $filename;                  // root style dir?
-            }
-        }
-
-        return $path;
-    }
-
-    /**
      * @param bool $user
      * @return null
      */
@@ -6973,6 +6822,7 @@ class TikiLib extends TikiDb_Bridge
      *
      * Since Tiki 17, mb_strtolower() can be used directly instead since Tiki indirectly depends on the symfony/polyfill-mbstring compatibility library.
      *
+     * @deprecated 17
      * @param $string
      * @return string
      */

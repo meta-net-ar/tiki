@@ -10,11 +10,16 @@ interface IndexableInterface extends \Tracker\Field\FieldInterface
 {
     public function getDocumentPart(\Search_Type_Factory_Interface $typeFactory);
 
-    public function getProvidedFields();
+    public function getProvidedFields(): array;
 
-    public function getProvidedFieldTypes();
+    public function getProvidedFieldTypes(): array;
 
-    public function getGlobalFields();
+    public function getGlobalFields(): array;
 
+    /**
+     * Returns the start of the keys the field will be available unded in the unified interface.
+     *
+     * @return text
+     */
     public function getBaseKey();
 }

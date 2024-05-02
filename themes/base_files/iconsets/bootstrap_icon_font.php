@@ -15,6 +15,13 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 
 function iconset_bootstrap_icon_font()
 {
+    $file = __DIR__ . '/../../../' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.php';
+    global $prefs;
+    $bs_generated_icons = [];
+    if (is_readable($file)) {
+        include_once $file;
+        $bs_generated_icons = $prefs['bs_generated_icons'] ?? [];
+    }
     return [
         'name'        => tr('Bootstrap icon font'),
         'description' => tr('Bootstrap\'s own icon library, in icon font format'),
@@ -372,9 +379,8 @@ function iconset_bootstrap_icon_font()
             'circle-half' => [
                 'id' => 'circle-half'
             ]
-        ],
+        ] + $bs_generated_icons,
         'defaults'    => [
-
             '1-square',
             '1-square-fill',
             '2-circle',

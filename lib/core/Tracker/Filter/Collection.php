@@ -35,10 +35,15 @@ class Collection
                 return $collection->addFilter($field['permName']);
             }
         } else {
+            $types = TikiLib::lib('trk')->status_types();
+            $possibilities = array_map(function ($item) {
+                return $item['label'];
+            }, $types);
+
             // non-tracker field in the index
             $filter = new Filter($fieldName, 'default');
             $filter->setLabel($fieldName)
-                ->setControl(new Control\TextField("tf_" . $fieldName))
+                ->setControl(new Control\DropDown("tf_tracker_status_dd", $possibilities))
                 ->setApplyCondition(function ($control, Search_Query $query) use ($fieldName) {
                     $value = $control->getValue();
                     if ($value) {

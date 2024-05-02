@@ -15,11 +15,11 @@
         {tab name="{tr}Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_trackers visible="always"}
             </fieldset>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Tracker settings{/tr}</legend>
+                <legend class="h3">{tr}Tracker settings{/tr}</legend>
                 {preference name="tracker_remote_sync"}
                 {preference name="tracker_tabular_enabled"}
                 {preference name="tracker_clone_item"}
@@ -46,7 +46,7 @@
                 {preference name=tracker_history_diff_style}
             </fieldset>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Field settings{/tr}</legend>
+                <legend class="h3">{tr}Field settings{/tr}</legend>
                 {preference name=user_selector_threshold}
                 {preference name=user_selector_realnames_tracker}
                 {preference name=tiki_object_selector_threshold}
@@ -64,7 +64,7 @@
             </fieldset>
 
             <fieldset class="admin">
-                <legend>{tr}Linked wiki pages{/tr}</legend>
+                <legend class="h3">{tr}Linked wiki pages{/tr}</legend>
                 {remarksbox type="tip" title="{tr}Tip{/tr}"}
                     {tr}Wiki pages are linked to tracker items, and their page names to tracker fields, via the tiki.wiki.linkeditem and tiki.wiki.linkedfield relations. You need to be familiar with the Relations tracker field or use the outputwiki option in the TRACKER plugin to make use of these features.{/tr}
                 {/remarksbox}
@@ -73,14 +73,14 @@
             </fieldset>
 
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Tracker attachment preferences{/tr}</legend>
+                <legend class="h3">{tr}Tracker attachment preferences{/tr}</legend>
                 {preference name='t_use_db'}
                 <div class="adminoptionboxchild t_use_db_childcontainer n">
                     {preference name='t_use_dir'}
                 </div>
             </fieldset>
             <fieldset class="admin">
-                <legend>{tr}Tracker force-fill feature{/tr}</legend>
+                <legend class="h3">{tr}Tracker force-fill feature{/tr}</legend>
                 {preference name=tracker_force_fill}
                 {preference name=tracker_force_tracker_id}
                 {preference name=tracker_force_mandatory_field}
@@ -116,7 +116,7 @@
         {tab name="{tr}Field Types{/tr}"}
             <br>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Field types{/tr}</legend>
+                <legend class="h3">{tr}Field types{/tr}</legend>
                 {foreach from=$fieldPreferences item=name}
                     {preference name=$name}
                 {/foreach}
@@ -126,7 +126,7 @@
         {tab name="{tr}System Trackers{/tr}"}
             <br>
             <fieldset class="admin">
-                <legend>{tr}System trackers{/tr}</legend>
+                <legend class="h3">{tr}System trackers{/tr}</legend>
                 {preference name=tracker_system_currency}
                 <div class="adminoptionboxchild" id="tracker_system_currency_childcontainer">
                     {preference name=tracker_system_currency_tracker}
@@ -146,7 +146,7 @@
                 </div>
             </fieldset>
             <fieldset class="admin">
-                <legend>{tr}Relationship System Trackers{/tr}</legend>
+                <legend class="h3">{tr}Relationship System Trackers{/tr}</legend>
                 {remarksbox type="tip" title="{tr}Tip{/tr}"}
                     {tr _0="<a href='tiki-list_trackers.php'>" _1="</a>"}You can quickly create common used trackers to store relationship metadata and behaviour here. Alternatively use any %0tracker%1 for a relationship tracker by editing its properties.{/tr}
                 {/remarksbox}
@@ -187,7 +187,7 @@
 
 
 <fieldset>
-    <legend>{tr}Tracker attachments{/tr}</legend>
+    <legend class="h3">{tr}Tracker attachments{/tr}</legend>
     <div class="table">
         {if $attachments}
             <form action="tiki-admin.php?page=trackers" method="post">

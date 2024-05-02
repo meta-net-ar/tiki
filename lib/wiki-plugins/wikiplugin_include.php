@@ -165,6 +165,7 @@ function wikiplugin_include_info()
 function wikiplugin_include($dataIn, $params)
 {
     global $killtoc, $prefs;
+    $text = "";
 
     /** @var int[] $pluginIncludeNumberOfInclusions Associative array of the number of times each key (fragment) was included */
     global $pluginIncludeNumberOfInclusions;

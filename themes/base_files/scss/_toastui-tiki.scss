@@ -78,3 +78,6 @@
 }
 
 .tiki .toastui-editor-toolbar-item-wrapper { cursor: pointer; }
+.tiki .tui-widget .single-spa-container { display: inline-block; }
+.tiki>div[id^=single-spa-application] { display: none; }
+.tiki .toastui-editor-md-preview [id^=single-spa-application] { pointer-events: none; }

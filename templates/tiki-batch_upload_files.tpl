@@ -19,16 +19,18 @@
     <div class="table-responsive">
         <table class="table table-stripped" id="filelist">
             <tr>
-                <th>{select_all checkbox_names='files[]'}</th>
+                <td>{select_all checkbox_names='files[]'}</td> {* th changed to td to prevent ARIA empty header error *}
                 <th>{tr}Filename{/tr}</th>
-                <th width="80">{tr}Filesize{/tr}</th>
-                <th width="80">{tr}Filetype{/tr}</th>
-                <th class="text-center">{icon name='permission' title="{tr}File Permissions{/tr}"}</th>
+                <th width="80">{tr}File size{/tr}</th>
+                <th width="80">{tr}File type{/tr}</th>
+                <td class="text-center">{icon name='permission' title="{tr}File permissions{/tr}"}</td> {* th changed to td to prevent ARIA empty header error *}
             </tr>
 
             {foreach key=k item=it from=$filelist}
                 <tr>
-                    <td class="checkbox-cell"><div class="form-check"><input type="checkbox" name="files[]" value="{$it.file}" id="box_{$k}"></div></td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="files[]" value="{$it.file}" id="box_{$k}">
+                    </td>
                     <td><label for="box_{$k}">{$it.file|replace:$prefs.fgal_batch_dir:''}</label></td>
                     <td>{$it.size|kbsize}</td>
                     <td>{$it.ext}</td>
@@ -61,29 +63,33 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label" for="subdirToSubgal">{tr}Upload into galleries according to sub-directories{/tr}</label>
+        <label class="col-sm-4 form-check-label" for="subdirToSubgal">{tr}Upload into galleries according to sub-directories{/tr}</label>
         <div class="col-sm-8">
-            <input type="checkbox" name="subdirToSubgal" value="true" id="subdirToSubgal">
-            <div class="text-muted description">
+            <div class="form-check">
+                <input type="checkbox" name="subdirToSubgal" class="form-check-input" value="true" id="subdirToSubgal">
+            </div>
+            <div class="form-text">
                 {tr}eg. for "misc/screenshots/digicam0001.jpg" the file will be uploaded into a gallery called "screenshots" in the called "misc" inside the chosen gallery if it exists{/tr}
             </div>
         </div>
     </div>
     <div class="mb-3 row create-subgals" style="display:none;">
-        <label class="col-sm-4 col-form-label" for="createSubgals">{tr}Create sub-galleries?{/tr}</label>
+        <label class="col-sm-4 form-check-label" for="createSubgals">{tr}Create sub-galleries?{/tr}</label>
         <div class="col-sm-8">
-            <input type="checkbox" name="createSubgals" value="true" id="createSubgals">
-            <div class="text-muted description">
+            <div class="form-check">
+                <input type="checkbox" name="createSubgals" class="form-check-input" value="true" id="createSubgals">
+            </div>
+            <div class="form-text">
                 {tr}Sub-galleries will be automatically created if they don't exist and the user has permission. Note that these galleries will have the global file gallery permissions set.{/tr}
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="col-sm-4 col-form-label" for="subdirIntegerToSubgalId">{tr}Upload into galleries according sub-directory as galleryId{/tr}</label>
-
+            <label class="col-sm-4 form-check-label" for="subdirIntegerToSubgalId">{tr}Upload into galleries according sub-directory as galleryId{/tr}</label>
             <div class="col-sm-8">
-                <input type="checkbox" name="subdirIntegerToSubgalId" value="true" id="subdirIntegerToSubgalId">
-
-                <div class="text-muted description">
+                <div class="form-check">
+                    <input type="checkbox" name="subdirIntegerToSubgalId" class="form-check-input" value="true" id="subdirIntegerToSubgalId">
+                </div>
+                <div class="form-text">
                     {tr}eg. for "42/digicam0001.jpg" the file will be uploaded into a gallery with the Id "42" if it exists{/tr}
                 </div>
             </div>
@@ -112,16 +118,18 @@ $("#batchUploadForm").on("submit", function () {
         {/jq}
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label" for="subToDesc">{tr}Use the last sub directory name as description{/tr}</label>
+        <label class="col-sm-4 form-check-label" for="subToDesc">{tr}Use the last sub-directory name as description{/tr}</label>
         <div class="col-sm-8">
-            <input type="checkbox" name="subToDesc" value="true" id="subToDesc">
-            <div class="text-muted description">
+            <div class="form-check">
+                <input type="checkbox" name="subToDesc" class="form-check-input" value="true" id="subToDesc">
+            </div>
+            <div class="form-text">
                 {tr}eg. from "misc/screenshots/digicam0001.jpg" a description "screenshots" will be created{/tr}r}
             </div>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-4 col-form-label"></label>
+        <label class="col-sm-4 form-check-label"></label>
         <div class="col-sm-8">
             <input type="submit" class="btn btn-primary btn-sm" name="batch_upload" value="{tr}Process files{/tr}">
         </div>

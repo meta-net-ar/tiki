@@ -12,6 +12,7 @@
                     <a href="#"
                         class="tips"
                         title=":{tr}Show Tree{/tr}"
+                       aria-label="{tr}Show Tree{/tr}"
                         onclick="flip('fgalexplorer','');hide('fgalexplorer_close',false);show('fgalexplorer_open',false);return false;">
                         {icon name='file-archive'}
                     </a>
@@ -20,6 +21,7 @@
                     <a href="#"
                         class="tips"
                         title=":{tr}Hide Tree{/tr}"
+                       aria-label="{tr}Hide Tree{/tr}"
                         onclick="flip('fgalexplorer','');hide('fgalexplorer_open',false);show('fgalexplorer_close',false);return false;">
                         {icon name='file-archive-open'}
                     </a>
@@ -97,7 +99,7 @@
                         or $tiki_p_assign_perm_file_gallery eq 'y'
                     }
                         <div class="input-group col-sm-12">
-                            <select name="fgal_actions" class="form-select">
+                            <select name="fgal_actions" class="form-select" aria-label="{tr}Select action to perform with checked...{/tr}">
                                 <option value="" selected="selected">
                                     {tr}Select action to perform with checked...{/tr}
                                 </option>

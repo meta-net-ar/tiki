@@ -82,6 +82,29 @@ class RelationLib extends TikiDb_Bridge
 
         $result = [];
         foreach ($rows as $row) {
+            if (empty($row['source_itemId'])) {
+                Feedback::error(
+                    tr(
+                        'Relation #%0 to %1:%2 missing %3 source_itemId',
+                        $row['relationId'],
+                        $type,
+                        $object,
+                        $row['source_type']
+                    )
+                );
+                continue;
+            }
+            if (empty($row['target_itemId'])) {
+                Feedback::error(
+                    tr(
+                        'Relation to %0:%1 missing %2 target_itemId',
+                        $type,
+                        $object,
+                        $row['target_type']
+                    )
+                );
+                continue;
+            }
             $result[] = new ObjectRelation($row, $straight);
         }
 

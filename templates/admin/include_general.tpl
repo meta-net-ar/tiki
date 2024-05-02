@@ -11,11 +11,11 @@
         {tab name="{tr}General Preferences{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Release check{/tr}</legend>
+                <legend class="h3">{tr}Release check{/tr}</legend>
                 {include file='admin/version_check.tpl'}
             </fieldset>
             <fieldset>
-                <legend>{tr}Site identity{/tr}</legend>
+                <legend class="h3">{tr}Site identity{/tr}</legend>
                 {preference name=server_domain}
                 {preference name=browsertitle}
                 {preference name=fallbackBaseUrl}
@@ -26,7 +26,7 @@
                 {/remarksbox}
             </fieldset>
             <fieldset>
-                <legend>{tr}Mail{/tr}</legend>
+                <legend class="h3">{tr}Mail{/tr}</legend>
                 {preference name=sender_email}
                 {preference name=sender_name}
                 {preference name=default_mail_charset}
@@ -76,12 +76,12 @@
                     {preference name=zend_mail_smtp_security}
                     {preference name=zend_http_sslverifypeer}
                     {preference name=zend_mail_smtp_helo}
-                    {preference name=zend_mail_redirect}
                 </div>
                 {preference name=zend_mail_queue}
+                {preference name=zend_mail_redirect}
                 <div class="adminoptionbox mb-3 row clearfix">
-                    <label for="testMail" class="col-md-4 col-form-label">{tr}Email to send a test mail{/tr}</label>
-                    <div class="col-md-8">
+                    <label for="testMail" class="col-sm-3 col-form-label">{tr}Email to send a test mail{/tr}</label>
+                    <div class="col-sm-7">
                         <input type="text" name="testMail" id="testMail" class="form-control">
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                 {preference name=mail_template_custom_text}
             </fieldset>
             <fieldset>
-                <legend>{tr}Newsletter{/tr}</legend>
+                <legend class="h3">{tr}Newsletter{/tr}</legend>
                 {preference name=newsletter_throttle}
                 <div class="adminoptionboxchild" id="newsletter_throttle_childcontainer">
                     {preference name=newsletter_pause_length}
@@ -98,7 +98,7 @@
                 {preference name=newsletter_external_client}
             </fieldset>
             <fieldset>
-                <legend>{tr}Logging and reporting{/tr}</legend>
+                <legend class="h3">{tr}Logging and reporting{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=error_reporting_level}
                     <div class="adminoptionboxchild">
@@ -118,7 +118,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Error Tracking{/tr}</legend>
+                <legend class="h3">{tr}Error Tracking{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=error_tracking_dsn}
                     {preference name=error_tracking_sample_rate}
@@ -129,7 +129,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Web Cron{/tr}</legend>
+                <legend class="h3">{tr}Web Cron{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=webcron_enabled}
                     <div class="adminoptionboxchild" id="webcron_enabled_childcontainer">
@@ -145,7 +145,7 @@
                 </div>
             </fieldset>
             <fieldset id="Scheduler">
-                <legend>{tr}Scheduler Settings{/tr}</legend>
+                <legend class="h3">{tr}Scheduler Settings{/tr}</legend>
                 {preference name=feature_scheduler}
                 {preference name=scheduler_delay}
                 {preference name=scheduler_stalled_timeout}
@@ -164,7 +164,7 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Server{/tr}</legend>
+                <legend class="h3">{tr}Server{/tr}</legend>
                 {preference name=tmpDir}
                 {preference name=use_proxy}
                 <div class="adminoptionboxchild" id="use_proxy_childcontainer">
@@ -185,7 +185,7 @@
                 {preference name=php_cli_path}
             </fieldset>
             <fieldset>
-                <legend>{tr}Multi-domain{/tr}</legend>
+                <legend class="h3">{tr}Multi-domain{/tr}</legend>
                 {preference name=multidomain_active}
                 {preference name=multidomain_switchdomain}
                 <div class="adminoptionboxchild" id="multidomain_switchdomain_childcontainer">
@@ -196,7 +196,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Sessions{/tr}</legend>
+                <legend class="h3">{tr}Sessions{/tr}</legend>
                 {remarksbox type="note" title="{tr}Advanced configuration{/tr}"}
                     {tr}Note that storing session data in the database is an advanced systems administration option, and is for admins who have comprehensive access and understanding of the database, in order to deal with any unexpected effects.{/tr}
                 {/remarksbox}
@@ -208,14 +208,14 @@
                 {preference name=session_cookie_name}
             </fieldset>
             <fieldset>
-                <legend>{tr}Site terminal{/tr}</legend>
+                <legend class="h3">{tr}Site terminal{/tr}</legend>
                 {preference name=site_terminal_active}
                 <div class="adminoptionboxchild" id="site_terminal_active_childcontainer">
                     {preference name=site_terminal_config}
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Contact{/tr}</legend>
+                <legend class="h3">{tr}Contact{/tr}</legend>
                 {preference name=feature_contact}
                 <div class="adminoptionboxchild" id="feature_contact_childcontainer">
                     {preference name=contact_anon}
@@ -224,13 +224,13 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Stats{/tr}</legend>
+                <legend class="h3">{tr}Stats{/tr}</legend>
                 {preference name=feature_stats}
                 {preference name=feature_referer_stats}
                 {preference name=count_admin_pvs}
             </fieldset>
             <fieldset>
-                <legend>{tr}Terms and conditions{/tr}</legend>
+                <legend class="h3">{tr}Terms and conditions{/tr}</legend>
                 {preference name=conditions_enabled}
                 <div class="adminoptionboxchild" id="conditions_enabled_childcontainer">
                     {preference name=conditions_page_name}
@@ -238,7 +238,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Help{/tr}</legend>
+                <legend class="h3">{tr}Help{/tr}</legend>
                 {preference name=feature_help}
                 <div class="adminoptionboxchild" id="feature_help_childcontainer">
                     {preference name=helpurl}
@@ -248,7 +248,7 @@
         {tab name="{tr}Navigation{/tr}"}
             <br>
             <fieldset id="Menus">
-                <legend>{tr}Menus{/tr}</legend>
+                <legend class="h3">{tr}Menus{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=jquery_smartmenus_enable}
                     {preference name=feature_userlevels}
@@ -262,7 +262,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Home page{/tr}</legend>
+                <legend class="h3">{tr}Home page{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=useGroupHome}
                     <div id="useGroupHome_childcontainer">
@@ -281,7 +281,7 @@
                 {preference name=home_file_gallery}
             </fieldset>
             <fieldset>
-                <legend>{tr}Redirects{/tr}</legend>
+                <legend class="h3">{tr}Redirects{/tr}</legend>
                 {preference name=tiki_domain_prefix}
                 {preference name=tiki_domain_redirects}
                 {preference name=feature_redirect_on_error}
@@ -301,17 +301,17 @@
                 {preference name='feature_url_suffix_cleaner'}
             </fieldset>
             <fieldset>
-                <legend>{tr}User{/tr}</legend>
+                <legend class="h3">{tr}User{/tr}</legend>
                 {preference name='urlOnUsername'}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Sitemap protocol{/tr}</legend>
+                <legend class="h3">{tr}Sitemap protocol{/tr}</legend>
                 {preference name=sitemap_enable}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Site access{/tr}</legend>
+                <legend class="h3">{tr}Site access{/tr}</legend>
                 {preference name=site_closed}
                 <div class="adminoptionboxchild" id="site_closed_childcontainer">
                     {preference name=site_closed_title}
@@ -367,7 +367,7 @@
                 </a>
             {/remarksbox}
             <fieldset>
-                <legend>{tr}Time zone and format{/tr}{help url="Date+and+Time"}</legend>
+                <legend class="h3">{tr}Time zone and format{/tr}{help url="Date+and+Time"}</legend>
                 {preference name=server_timezone}
                 {preference name=users_prefs_display_timezone}
                 <div class="clearfix">
@@ -398,7 +398,7 @@
                 {preference name=short_time_format_js}
             </fieldset>
             <fieldset>
-                <legend>{tr}Date/time selectors{/tr}</legend>
+                <legend class="h3">{tr}Date/time selectors{/tr}</legend>
                 {preference name=display_field_order}
                 {preference name=display_start_year}
                 {preference name=display_end_year}

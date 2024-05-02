@@ -14,10 +14,10 @@ class EditLib_ParseToWysiwyg_LinkTest extends TikiTestCase
     private $ext1 = 'test_ext1'; // name of the external Wiki 1
 
 
-    public function __construct()
+    public function __construct($name = null)
     {
         $this->setPageRegex();
-        parent::__construct();
+        parent::__construct($name);
     }
 
 

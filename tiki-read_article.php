@@ -13,6 +13,7 @@ use Tiki\Lib\Image\Image;
 $section = 'cms';
 require_once('tiki-setup.php');
 $artlib = TikiLib::lib('art');
+
 $access->check_feature('feature_articles');
 if (! isset($_REQUEST["articleId"])) {
     $smarty->assign('msg', tra("No article indicated"));
@@ -131,8 +132,8 @@ if ($prefs['article_paginate'] == 'y') {
 
     $parserlib->plugins_remove($article_data["body"], $noparsed);
     $parserlib->parse_first($article_data["body"], $preparsed, $noparsed);
-    $pages = $artlib->get_number_of_pages($article_data["body"]);
-    $article_data["body"] = $artlib->get_page($article_data["body"], $_REQUEST['page']);
+    $pages = \Tiki\Lib\Wiki\WikiPaginationUtils::getNumberOfPages($article_data["body"]);
+    $article_data["body"] = \Tiki\Lib\Wiki\WikiPaginationUtils::getPage($article_data["body"], $_REQUEST['page']);
     $smarty->assign('pages', $pages);
     if ($pages > $_REQUEST['page']) {
         $smarty->assign('next_page', $_REQUEST['page'] + 1);

@@ -29,16 +29,18 @@
         {tab name="{tr}User Settings{/tr}"}
             <br>
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Default user preferences{/tr}
                     {help url="UsersDefaultPrefs" desc="{tr}Users Default Preferences{/tr}"}
                 </legend>
                 <div class="adminoptionbox">
                     {preference name=feature_userPreferences}
                     {preference name=feature_mytiki}
+                    {preference name=users_prefs_xmpp_jid}
                     {preference name=users_prefs_xmpp_password}
+                    {preference name=users_prefs_xmpp_custom_server_http_bind}
                     <div class="adminoptionboxchild" id="feature_mytiki_childcontainer">
-                        <legend>{tr}My Account Items{/tr}</legend>
+                        <legend class="h4">{tr}My Account Items{/tr}</legend>
                         {preference name=users_prefs_mytiki_pages}
                         {preference name=users_prefs_mytiki_blogs}
                         {preference name=users_prefs_mytiki_msgs}
@@ -57,7 +59,7 @@
                 </div>
                 </fieldset>
                 <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Admin user preferences{/tr}
                 </legend>
                 <div class="adminoptionbox">
@@ -79,7 +81,7 @@
         {tab name="{tr}User Features{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}User Account Features{/tr}</legend>
+                <legend class="h3">{tr}User Account Features{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=feature_wizard_user}
                     {preference name=feature_minical}
@@ -101,7 +103,7 @@
         {tab name="{tr}User Info and Picture{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}User information display{/tr}</legend>
+                <legend class="h3">{tr}User information display{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=users_prefs_user_information}
                     {preference name=user_show_realnames}
@@ -118,7 +120,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}Profile picture{/tr}</legend>
+                <legend class="h3">{tr}Profile picture{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=user_use_gravatar}
                     {preference name=user_store_file_gallery_picture}
@@ -132,12 +134,12 @@
         {tab name="{tr}Messaging and Notifications{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Messages{/tr}</legend>
+                <legend class="h3">{tr}Messages{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=users_prefs_mailCharset}
                     {preference name=feature_messages}
                     <div class="adminoptionboxchild" id="feature_messages_childcontainer">
-                        <legend>
+                        <legend class="h3">
                             {tr}User messages{/tr}
                             {help url="Inter-User-Messages"}
                         </legend>
@@ -150,7 +152,7 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{tr}User notifications{/tr}</legend>
+                <legend class="h3">{tr}User notifications{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=monitor_enabled}
                     <div class="adminoptionboxchild" id="monitor_enabled_childcontainer">
@@ -182,7 +184,7 @@
         {tab name="{tr}User Files{/tr}"}
             <br>
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_userfiles visible="always"}
                 <div class="adminoptionboxchild" id="feature_userfiles_childcontainer">
                     {preference name=feature_use_fgal_for_user_files mode=invert}
@@ -196,7 +198,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Settings{/tr}</legend>
+                <legend class="h3">{tr}Settings{/tr}</legend>
                 {preference name=userfiles_quota}
                 {preference name=userfiles_private}
                 {preference name=userfiles_hidden}

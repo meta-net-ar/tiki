@@ -82,6 +82,9 @@ class Services_Calendar_BaseController
                 if ($input->recurrenceTypeMonthy->word() === 'weekday') {
                     $monthlyWeekdayValue = $input->monthlyWeekNumber->raw() . $input->monthlyWeekday->word();
                     $recurrence->setMonthlyWeekdayValue($monthlyWeekdayValue);
+                } elseif ($input->recurrenceTypeMonthy->word() === 'firstlastweekday') {
+                    $monthlyFirstlastWeekdayValue = $input->monthlyFirstLastWeekNumber->int();
+                    $recurrence->setMonthlyFirstlastWeekdayValue($monthlyFirstlastWeekdayValue);
                 } else {
                     $recurrence->setDayOfMonth(implode(',', $input->asArray('dayOfMonth')));
                 }
@@ -97,6 +100,10 @@ class Services_Calendar_BaseController
                     $yearlyWeekdayValue = $input->yearlyWeekNumber->raw() . $input->yearlyWeekday->word();
                     $recurrence->setYearlyWeekdayValue($yearlyWeekdayValue);
                     $recurrence->setYearlyWeekMonth($input->yearlyWeekMonth->int());
+                } elseif ($input->recurrenceTypeYearly->word() === 'firstlastweekday') {
+                    $yearlyFirstlastWeekdayValue = $input->yearlyFirstLastWeekNumber->int();
+                    $recurrence->setYearlyFirstlastWeekdayValue($yearlyFirstlastWeekdayValue);
+                    $recurrence->setYearlyWeekMonth($input->yearlyWeekMonth->int());
                 } else {
                     $recurrence->setDateOfYear(
                         str_pad($input->yearlyMonth->word(), 2, '0', STR_PAD_LEFT) .
@@ -105,9 +112,10 @@ class Services_Calendar_BaseController
                 }
                 break;
         }
-        // startPeriod does not exist when using the old non-jscalendar time selector with 3 dropdowns
+        // Start/End periods adjusted from browser's timezone to UTC
         $startPeriod = $input->startPeriod->int();
         if (empty($startPeriod)) {
+            // startPeriod does not exist when using the old non-jscalendar time selector with 3 dropdowns - n.b. this might not be the case anymore with the new UI
             $startPeriod = mktime(
                 0,
                 0,
@@ -116,22 +124,24 @@ class Services_Calendar_BaseController
                 $input->startPeriod_Day->int(),
                 $input->startPeriod_Year->int()
             );
-        }
-        $calitem = $input->asArray('calitem');
-        if ($recurrence->getId() > 0 && ! empty($calitem['calitemId']) && $calitem['calitemId'] == $recurrence->getFirstItemId()) {
-            // modify start period when the first event is updated
-            $recurrence->setStartPeriod(TikiDate::getStartDay($calitem['start'], $displayTimezone));
         } else {
-            $recurrence->setStartPeriod($startPeriod);
+            $startPeriod = TikiDate::convertWithTimezone($input->asArray(), $startPeriod);
         }
+        $recurrence->setStartPeriod(TikiDate::getStartDay($startPeriod, 'UTC'));
         if ($input->endType->word() === "dt") {
-            $recurrence->setEndPeriod($input->endPeriod->word());
+            $endPeriod = $input->endPeriod->int();
+            $endPeriod = TikiDate::convertWithTimezone($input->asArray(), $endPeriod);
+            $server_offset = TikiDate::tzServerOffset($displayTimezone, $endPeriod);
+            $endPeriod -= $server_offset;
+            $recurrence->setEndPeriod($endPeriod);
+            $recurrence->setNbRecurrences(0);
         } else {
             $nbRecurrences = $input->nbRecurrences->int() ?? 1;
             if ($input->recurrenceType->word() === 'weekly') {
                 $nbRecurrences = $nbRecurrences * count($input->asArray('weekdays'));
             }
             $recurrence->setNbRecurrences($nbRecurrences);
+            $recurrence->setEndPeriod(0);
         }
         return $recurrence;
     }
@@ -143,10 +153,10 @@ class Services_Calendar_BaseController
      */
     protected function processParticipants(array $calitem): array
     {
-        if (is_string($calitem['organizers'])) {
+        if (isset($calitem['organizers'])  && is_string($calitem['organizers'])) {
             $calitem['organizers'] = preg_split('/\s*,\s*/', $calitem['organizers']);
         }
-        if ($calitem['organizers']) {
+        if (isset($calitem['organizers']) && array_key_exists('organizers', $calitem)) {
             $calitem['organizers'] = array_filter($calitem['organizers']);
         }
 

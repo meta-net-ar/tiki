@@ -1,6 +1,6 @@
 /* Simplex theme newsletter stylesheet */
 @import "../../base_files/css/newsletter.scss";
-@import "../../../vendor_bundled/vendor/thomaspark/bootswatch/dist/simplex/variables";
+@import "../../../node_modules/bootswatch/dist/simplex/variables";
 
 $web-font-path: "https://fonts.googleapis.com/css?family=Open+Sans:400,700" !default;
 @import url($web-font-path);

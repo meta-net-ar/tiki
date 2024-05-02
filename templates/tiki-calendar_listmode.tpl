@@ -43,7 +43,7 @@
                     {/if}
                 </td>
                 <td class="action">
-                    {if $event.perms->change_events}
+                    {if $event.perms && $event.perms->change_events}
                         {actions}
                             {strip}
                                 <action>

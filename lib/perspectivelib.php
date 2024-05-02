@@ -344,6 +344,21 @@ class PerspectiveLib
     }
 
     /**
+     * Replaces values for a specific preference across all perspectives.
+     *
+     * @param string $preference The name of the preference to replace.
+     * @param mixed $newValue The new value to set for the preference.
+     * @return void
+     */
+    public function replace_preference_values($preference, $newValue)
+    {
+        $this->perspectivePreferences->updateMultiple(
+            ['value' => serialize($newValue)],
+            ['pref' => $preference]
+        );
+    }
+
+    /**
      * Sets $preference's value for $perspectiveId to $value
      *
      */

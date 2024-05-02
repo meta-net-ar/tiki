@@ -1,4 +1,4 @@
-// Morph 5.2.0 -- This is a copy of vendor/vendor_bundled/thomaspark/bootswatch/dist/morph/_variables.scss with
+// Morph 5.2.0 -- This is a copy of node_modules/bootswatch/dist/morph/_variables.scss with
 // Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
 
 $theme: "morph" !default;
@@ -42,15 +42,12 @@ $dark:          $gray-900 !default;
 $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
-$min-contrast-ratio:   1.5 !default;
-
 // Options
 // Prefix for :root CSS variables
 
 $variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
 $prefix:                      $variable-prefix !default;
 
-$enable-shadows:              true !default;
 
 // Body
 
@@ -60,99 +57,39 @@ $body-color:                #506295;
 // Typography
 $link-shade-percentage:                   20% !default; // Bootstrap 5.3
 
-$link-color: darken($body-color, 20%) !default;
-
 // Components
-
-$border-width:                0 !default;
-$border-color:                rgba(darken($body-bg, 50%), .1) !default;
-
-$border-radius-pill:          50rem !default;
-
-$box-shadow:                  5px 5px 10px rgba(darken($body-bg, 50%), .2), -5px -5px 10px rgba($white, .4) !default;
-$box-shadow-sm:               0 .125rem .25rem rgba(darken($body-bg, 50%), .2) !default;
-$box-shadow-lg:               8px 8px 40px rgba(darken($body-bg, 90%), .15) !default;
-$box-shadow-inset:            inset 2px 2px 8px rgba(darken($body-bg, 50%), .3), inset -3px -2px 5px rgba($white, .8) !default;
-
 // Fonts
 
 // stylelint-disable-next-line value-keyword-case
 $font-family-sans-serif:      system-ui, sans-serif; // Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 
-$headings-color:              $link-color !default;
 
 $text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- lighten($body-color, 15%) !default;
 
 // Buttons + Forms
 
-$input-btn-padding-y:         1rem !default;
-$input-btn-padding-x:         1.5rem !default;
-
 // Buttons
-
-$btn-font-weight:             600 !default;
-
-$btn-padding-y-lg:            1.5rem !default;
-$btn-padding-x-lg:            2.25rem !default;
-
-$btn-box-shadow:              $box-shadow !default;
-
-$btn-border-radius:           $border-radius-pill !default;
-$btn-border-radius-sm:        $border-radius-pill !default;
-$btn-border-radius-lg:        $border-radius-pill !default;
 
 // Forms
 
-$form-label-font-weight:                $btn-font-weight !default;
-
 $input-bg:                              var(--#{$prefix}body-bg) !default; // $gray-100 !default;
-
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default; // $text-muted !default;
 
-$form-switch-color:               $white !default;
-$form-switch-focus-color:         $form-switch-color !default;
-
 $form-select-indicator-color:       var(--#{$prefix}body-color);
-$form-select-box-shadow:          $box-shadow-inset !default;
-
 $form-range-track-bg:             var(--#{$prefix}tertiary-bg) !default; // rgba(darken($body-bg, 50%), .15) !default;
-$form-range-thumb-bg:                      $gray-100 !default;
-$form-range-thumb-active-bg:               $form-range-thumb-bg !default;
 $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !default; // $gray-200 !default;
-
 $form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default; // $gray-100 !default;
 
 // Navs
 
 $nav-link-color:                    var(--#{$prefix}body-color);
-$nav-link-hover-color:              $nav-link-color !default;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // $text-muted !default;
-
-$nav-tabs-border-radius:            0 !default;
-$nav-tabs-link-active-color:        $white !default;
-$nav-tabs-link-active-bg:           $primary !default;
 
 // Navbar
 
-$navbar-dark-color:                 rgba($white, .75) !default;
-$navbar-dark-hover-color:           $white !default;
-$navbar-dark-active-color:          $navbar-dark-hover-color !default;
-$navbar-dark-disabled-color:        rgba($white, .25) !default;
-
 $navbar-light-color:                var(--#{$prefix}body-color);
-$navbar-light-hover-color:          $link-color !default;
-$navbar-light-active-color:         $navbar-light-hover-color !default;
-$navbar-light-disabled-color:       $text-muted !default;
 
 // Dropdowns
-
-$dropdown-bg:                       rgba($gray-100, .8) !default;
-$dropdown-border-color:             transparent !default;
-$dropdown-box-shadow:               $box-shadow-lg, inset 1px 1px 3px rgba($white, .5), inset -5px -5px 20px rgba($black, .05) !default;
-
-//$dropdown-link-color:               $gray-700 !default;
-//$dropdown-link-hover-color:         $gray-800 !default;
-//$dropdown-link-hover-bg:            transparent !default;
 
 $dropdown-color:                    var(--#{$prefix}body-color);
 $dropdown-bg:                       $white !default;
@@ -171,26 +108,10 @@ $dropdown-dark-link-hover-bg:       rgba($white, .15) !default;
 
 // Pagination
 
-$pagination-padding-y:              1rem !default;
-$pagination-padding-x:              .75rem !default;
-$pagination-padding-y-sm:           .5rem !default;
-$pagination-padding-y-lg:           1.5rem !default;
-
-$pagination-color:                  $gray-700 !default;
 $pagination-bg:                     var(--#{$prefix}body-bg);
-
-$pagination-active-color:           darken($pagination-color, 20%) !default;
-$pagination-active-bg:              transparent !default;
-
-$pagination-disabled-color:         $text-muted !default;
-
-$pagination-disabled-bg:            $pagination-bg !default;
 
 // Cards
 
-$card-spacer-y:                     1.5rem !default;
-$card-spacer-x:                     1.5rem !default;
-$card-cap-bg:                       transparent !default;
 $card-bg:                           lighten($body-bg, 3%) !default;
 
 // Bootswatch overrides
@@ -200,26 +121,17 @@ $web-font-path: none; // Override value in vendor file
 // Tooltips
 
 $tooltip-color:                     var(--#{$prefix}body-color);
-$tooltip-bg:                        $dropdown-bg !default;
 
 // Popovers
 
 $popover-bg:                        $dropdown-bg !default;
 
-$popover-header-bg:                 transparent !default;
-
 // Toasts
 
 $toast-background-color:            $dropdown-bg !default;
-$toast-border-width:                0 !default;
-
 $toast-header-color:                var(--#{$prefix}body-color);
-$toast-header-background-color:     transparent !default;
 
 // Badges
-
-$badge-padding-y:                   .75em !default;
-$badge-padding-x:                   1.25em !default;
 
 // Modals
 
@@ -227,34 +139,13 @@ $modal-content-bg:                  $dropdown-bg !default;
 
 // Progress bars
 
-$progress-height:                   1.5rem !default;
-$progress-border-radius:            $border-radius-pill !default;
-
 // List groups
 
 $list-group-bg:                     $card-bg !default;
 
-$list-group-hover-bg:               transparent !default;
-$list-group-active-color:           $link-color !default;
-$list-group-active-bg:              transparent !default;
-
-$list-group-disabled-color:         $text-muted !default;
-$list-group-disabled-bg:            transparent !default;
-
-$list-group-action-active-color:    $link-color !default;
-$list-group-action-active-bg:       transparent !default;
-
 // Breadcrumbs
 
-$breadcrumb-padding-y:              $pagination-padding-y !default;
-$breadcrumb-padding-x:              $pagination-padding-x !default;
-
-$breadcrumb-divider-color:          $text-muted !default;
-$breadcrumb-active-color:           $link-color !default;
-
 // Close
-
-$btn-close-color:            $headings-color !default;
 
 // Code
 $code-color:                       $body-color; //  $pink !default; // Bootstrap 5.3

@@ -18,7 +18,7 @@ class Search_ContentSource_GroupSource implements Search_ContentSource_Interface
         return $this->db->table('users_groups')->fetchColumn('groupName', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         $row = $this->db->table('users_groups')->fetchRow(['groupDesc'], ['groupName' => $objectId]);
 
@@ -40,7 +40,7 @@ class Search_ContentSource_GroupSource implements Search_ContentSource_Interface
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -52,7 +52,7 @@ class Search_ContentSource_GroupSource implements Search_ContentSource_Interface
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -64,7 +64,7 @@ class Search_ContentSource_GroupSource implements Search_ContentSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

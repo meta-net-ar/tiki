@@ -24,7 +24,7 @@ class Perms_ResolverFactory_TestFactoryTest extends TikiTestCase
         $this->assertEquals($out, $factory->getHash($in));
     }
 
-    public function hashes()
+    public static function hashes()
     {
         return [
             'empty' => [[], [], 'test:'],

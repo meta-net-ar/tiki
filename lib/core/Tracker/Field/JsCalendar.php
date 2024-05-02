@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         $definition = [
             'j' => [
@@ -55,7 +55,7 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             ],
         ];
 
-        $parentDef = parent::getTypes();
+        $parentDef = parent::getManagedTypesInfo();
 
         // params not relevant for datepicker field
         unset($parentDef['f']['startyear'], $parentDef['f']['endyear'], $parentDef['f']['blankdate']);

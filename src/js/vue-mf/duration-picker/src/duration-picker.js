@@ -15,23 +15,23 @@ const vueLifecycles = singleSpaVue({
                 // name: this.name,
                 // mountParcel: this.mountParcel,
                 // singleSpa: this.singleSpa,
-                durationData: this.durationData
+                durationData: this.durationData,
             });
-        }
+        },
     },
     handleInstance: (app) => {
         if (import.meta.env.MODE === "development") {
             console.log(import.meta.env);
         }
-    }
+    },
 });
 
 const cssLifecycle = singleSpaCss({
     cssUrls: [
         {
-            href: "public/generated/js/duration-picker.css"
-        }
-    ]
+            href: "public/generated/js/duration-picker.css",
+        },
+    ],
 });
 
 export const bootstrap = [cssLifecycle.bootstrap, vueLifecycles.bootstrap];

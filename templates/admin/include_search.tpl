@@ -28,7 +28,7 @@
             <br>
 
             <fieldset>
-                <legend>
+                <legend class="h3">
                     {tr}Search{/tr}{help url="Search-General-Settings"}
                 </legend>
                 {remarksbox type=tip title="{tr}About the Unified Index{/tr}"}
@@ -149,13 +149,13 @@
 
         {if $prefs.feature_file_galleries eq 'y'}
             <fieldset>
-                <legend>{tr}File galleries searches{/tr}{help url="Search-within-files" desc='{tr}You will need to rebuild the search index to see these changes{/tr}'}</legend>
+                <legend class="h3">{tr}File galleries searches{/tr}{help url="Search-within-files" desc='{tr}You will need to rebuild the search index to see these changes{/tr}'}</legend>
                 {preference name=fgal_enable_auto_indexing}
                 {preference name=fgal_enable_email_indexing}
                 {preference name=fgal_asynchronous_indexing}
                 <div class="adminoptionboxchild">
                     <fieldset>
-                        <legend>{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
+                        <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
                         <div class="adminoptionbox">
                             <div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
                                 <ul>
@@ -245,14 +245,14 @@
         {/if}
 
             <fieldset>
-                <legend>{tr}Features{/tr}</legend>
+                <legend class="h3">{tr}Features{/tr}</legend>
                 {preference name=search_autocomplete}
                 {preference name=feature_referer_highlight}
                 {preference name=search_file_thumbnail_preview}
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Forum searches{/tr}</legend>
+                <legend class="h3">{tr}Forum searches{/tr}</legend>
                 {preference name=feature_forums_name_search}
                 {preference name=feature_forums_search}
                 {preference name=feature_forum_content_search}
@@ -275,7 +275,7 @@
             {preference name=search_date_facets_ranges}
 
             <fieldset>
-                <legend>{tr}Items to display in search results{/tr}</legend>
+                <legend class="h3">{tr}Items to display in search results{/tr}</legend>
                 {preference name=search_default_interface_language}
                 {preference name=search_default_where}
                 {preference name=search_show_category_filter}
@@ -285,7 +285,7 @@
                 {preference name=feature_search_show_search_box}
             </fieldset>
             <fieldset>
-                <legend>{tr}Information to display for each result{/tr}</legend>
+                <legend class="h3">{tr}Information to display for each result{/tr}</legend>
                 {preference name=feature_search_show_visit_count}
                 {preference name=feature_search_show_pertinence}
                 {preference name=feature_search_show_object_type}
@@ -306,7 +306,7 @@
             {preference name=federated_elastic_url}
             {preference name=federated_manticore_index_prefix}
 
-            <legend>{tr}Configuration{/tr}</legend>
+            <legend class="h3">{tr}Configuration{/tr}</legend>
             <ul>
                 <li><a href="tiki-admin_external_wikis.php">{tr}External Wiki{/tr}</a></li>
                 <li><a href="{bootstrap_modal controller=search_manifold action=check}">{tr}ManifoldCF Configuration Checker{/tr}</a></li>

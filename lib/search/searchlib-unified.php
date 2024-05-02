@@ -933,7 +933,7 @@ class UnifiedSearchLib
     {
         global $tikilib;
         $lastStats = $tikilib->get_preference('unified_last_rebuild_stats', [], true);
-        if (! isset($lastStats[$index])) {
+        if (! isset($lastStats[$index]['counts'])) {
             return 0;
         }
         return array_sum($lastStats[$index]['counts']);

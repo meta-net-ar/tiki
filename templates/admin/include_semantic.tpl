@@ -6,7 +6,7 @@
         </div>
     </div>
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_semantic visible="always"}
         {preference name=feature_backlinks}
     </fieldset>

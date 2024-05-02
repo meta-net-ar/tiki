@@ -49,15 +49,15 @@
     var defaultText = $('#short-url-copy').html();
     var successText = '{{icon name="check"}} {tr}Copied{/tr}';
     var errorText = '{{icon name="close"}} {tr}Error copying url{/tr}';
-    $(document).tiki('copy')('#short-url-copy', () => $('#short-url-link input[type="text"]').val(), function() {
-        $('#short-url-copy').addClass('btn-success').html(successText);
-        setTimeout(function(){
-            $('#short-url-copy').removeClass('btn-success').html(defaultText);
+    $('#short-url-copy').tiki('copy')(() => $('#short-url-link input[type="text"]').val(), function() {
+        $(this).addClass('btn-success').html(successText);
+        setTimeout(() => {
+            $(this).removeClass('btn-success').html(defaultText);
         }, 1000);
     }, function() {
-        $('#short-url-copy').addClass('btn-danger').html(errorText);
-        setTimeout(function(){
-            $('#short-url-copy').removeClass('btn-danger').html(defaultText);
+        $(this).addClass('btn-danger').html(errorText);
+        setTimeout(() => {
+            $(this).removeClass('btn-danger').html(defaultText);
         }, 1000);
     })
 {/jq}

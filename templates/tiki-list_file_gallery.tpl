@@ -196,7 +196,7 @@
     {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Be careful to set the right permissions on the files you link to{/tr}.{/remarksbox}
     <div class="form-check">
         <input type="checkbox" class="form-check-input" id="keepOpenCbx" checked="checked">
-        <label for="keepOpenCbx" class="form-check-label">{tr}Keep gallery window open{/tr}</label>
+        <label for="keepOpenCbx" class="form-check-label" for="keepOpenCbx">{tr}Keep gallery window open{/tr}</label>
     </div>
 {/if}
 

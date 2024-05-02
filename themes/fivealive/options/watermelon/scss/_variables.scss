@@ -1,6 +1,8 @@
 //Custom styles for the FiveAlive Watermelon theme option.
 $tiki-top-bg: linear-gradient(90deg, rgba(224, 59, 44, 1) 0%, rgba(169, 25, 29, 1) 49%, rgba(195, 53, 50, 1) 100%);
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
+
+@import "../../../scss/variables";
 // Color system
 
 // scss-docs-start gray-color-variables
@@ -125,6 +127,7 @@ $nav-tabs-link-active-bg: #a61a32; // Same as $dropdown-link-hover-bg;
 // Navbar
 
 // Typography
+//$font-size-base: 1rem;
 $hr-color: #faada1;
 $text-muted:  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- #6B737B;
 $headings-font-weight: 700;
@@ -339,4 +342,8 @@ header.navbar.fixed-top {
     --bs-accordion-active-color: #fff;
     --bs-accordion-btn-bg: #{$topbar-light-bg};
     --bs-accordion-btn-color: #fff;
+}
+
+:root {
+    --bs-font-size-base: 1rem;
 }

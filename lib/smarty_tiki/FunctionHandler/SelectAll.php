@@ -59,11 +59,9 @@ class SelectAll extends Base
             $onclick = ' onclick="' . $onclick . '"';
         }
 
-        return "<div class=\"form-check\">\n" .
-            '<input name="switcher' . $id . '" id="clickall' . $id . '" class="form-check-input position-static" type="checkbox"' . $onclick .
-            (empty($params['label']) ? ' title="' . tra('Select All') . '"' : '') .
+        return '<input name="switcher' . $id . '" id="clickall' . $id . '" class="form-check-input position-static" type="checkbox"' . $onclick .
+            (empty($params['label']) ? ' aria-label="' . tra('Select All') . '"' : '') .
             '/>' . "\n" .
-            (! empty($params['label']) ? '<label class="form-check-label" for="clickall' . $id . '">' . $params['label'] . "</label>\n" : '') .
-            "</div>\n";
+            (! empty($params['label']) ? '<label class="form-check-label" for="clickall' . $id . '">' . $params['label'] . "</label>\n" : '');
     }
 }

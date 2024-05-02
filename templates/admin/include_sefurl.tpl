@@ -7,7 +7,7 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_sefurl visible="always"}
         {if $httpd eq 'IIS' and !$IIS_UrlRewriteModule}
             {remarksbox type="warning" title="{tr}Warning{/tr}"}
@@ -62,7 +62,7 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend>{tr}Settings{/tr}</legend>
+        <legend class="h3">{tr}Settings{/tr}</legend>
         {preference name=feature_sefurl_filter}
         <div class="adminoptionbox clearfix">
             <div class="adminoption mb-3 row">

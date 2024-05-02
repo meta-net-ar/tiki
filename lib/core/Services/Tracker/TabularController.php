@@ -28,7 +28,7 @@ class Services_Tracker_TabularController
 
         return [
             'title' => tr('Import-Export Formats'),
-            'list' => $lib->getList(),
+            'formatList' => $lib->getList(),
         ];
     }
 
@@ -719,9 +719,7 @@ class Services_Tracker_TabularController
                 $fieldDescriptor[$key]['mode'] = $this->getFieldTypeDefaultMode($fieldType);
 
                 // Force reload (number of fields and existing fields in tracker)
-                if (isset(Tracker_Definition::$definitions[$trackerId])) {
-                    unset(Tracker_Definition::$definitions[$trackerId]);
-                }
+                Tracker_Definition::clearCache($trackerId);
             }
 
             // Create tabular tracker
@@ -739,7 +737,7 @@ class Services_Tracker_TabularController
             // Import the loaded file
 
             // Force reload schema
-            unset(Tracker_Definition::$definitions[$trackerId]);
+            Tracker_Definition::clearCache($trackerId);
             $schema = $this->getSchema($info);
             $schema->validate();
 

@@ -121,7 +121,7 @@ function wikiplugin_shorten($data, $params)
                 . 'var hide_speed = $this.data("hide-speed") || 0;'
 
                 . 'var $btn_more = $sample.find(".btn_more").first();'
-                . 'var $btn_less = $content.find(".btn_less:last");'
+                . 'var $btn_less = $content.find(".btn_less").last();'
 
                 . '$btn_more.on("click", function(){'
                 . '$sample.hide();'

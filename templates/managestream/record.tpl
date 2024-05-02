@@ -22,8 +22,9 @@
             <div class="mb-3 row clearfix">
                 <div class="offset-md-3 col-md-9">
                     <div class="form-check">
-                        <label for="notification_checkbox">
-                            <input id="notification_checkbox" name="is_notification" type="checkbox"> {tr}Allow Notifications{/tr}
+                        <input class="form-check-input" id="notification_checkbox" name="is_notification" type="checkbox">
+                        <label class="form-check-label" for="notification_checkbox">
+                             {tr}Allow Notifications{/tr}
                         </label>
                     </div>
                 </div>

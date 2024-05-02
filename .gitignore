@@ -40,6 +40,8 @@ index.php
 
 #TIKI SECTION; ROOT PATHS
 /.htaccess
+/_custom
+
 /bin
 /composer.json
 /composer.lock
@@ -76,7 +78,7 @@ index.php
 /profiles/info.ini
 /profiles/*.yml
 /profiles/*/*
-/public/generated/js
+/public/generated
 
 /storage/tiki-manager
 /storage/public/*
@@ -103,12 +105,10 @@ index.php
 
 #TIKI, MATCH ANYWHERE SECTION 
 #(may repeat in subpaths, such as themes, Tiki Extension Packages, Multitiki, domains etc.).  As of 2023-04-13, some of this may be here in error
-_custom/*
 db/*.ini
 db/*.local
 db/.htaccess
 db/cert/*.pem
-db/config/custom.xml
 db/local.php
 db/lock
 db/tiki-secdb_*vcs_mysql.sql
@@ -125,6 +125,4 @@ themes/js/custom.js
 #These cannot go in public/generated as it would break the current theme system.
 themes/**/*.css
 themes/**/*.css.map
-
-
 

@@ -63,9 +63,7 @@
             {section name=user loop=$channels}
                 <tr>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="menu[{$channels[user].menuId}]">
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}"  name="menu[{$channels[user].menuId}]">
                     </td>
                     <td class="text">{$channels[user].position}</td>
                     <td class="text">

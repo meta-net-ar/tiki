@@ -175,7 +175,7 @@ class FakerTrackerCommand extends Command
                     $value = call_user_func_array([$faker, $fakerAction], $fakerArguments);
                 } elseif (! empty($fieldFaker['faker'])) {
                     $fakerAction = $fieldFaker['faker'];
-                    $value = $faker->$fakerAction;
+                    $value = $faker->$fakerAction();
                 }
 
                 if (isset($value)) {

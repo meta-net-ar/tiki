@@ -114,6 +114,7 @@ $dark:          $cooled-lava-dark; //#000;
 
 $body-emphasis-color:       #fff;
 
+
 //  Options
 
 // Prefix for :root CSS variables
@@ -127,6 +128,14 @@ $enable-dark-mode:            false;
 //  Body
 $body-bg: $cooled-lava-dark; //#242424;
 $body-color: $cloud; // #e9ecef;
+
+$body-secondary-color:      rgba($body-color, .75) !default;
+$body-secondary-bg:         $gray-800;
+
+$body-tertiary-color:       rgba($body-color, .5) !default;
+$body-tertiary-bg:          $gray-700;
+
+$body-emphasis-color:       $white !default;
 
 //  Links
 $link-color: $leaf; // $blossom-red; //#EB6347; //#fd0006; Lightened for WAI compliance

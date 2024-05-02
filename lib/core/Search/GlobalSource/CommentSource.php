@@ -15,7 +15,7 @@ class Search_GlobalSource_CommentSource implements Search_GlobalSource_Interface
         $this->table = TikiDb::get()->table('tiki_comments');
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'comment_count',
@@ -23,7 +23,7 @@ class Search_GlobalSource_CommentSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'comment_count' => 'numeric',
@@ -31,7 +31,7 @@ class Search_GlobalSource_CommentSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'comment_data' => false,

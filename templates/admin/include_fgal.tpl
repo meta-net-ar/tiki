@@ -23,7 +23,7 @@
             <br>
 
             <fieldset>
-                <legend>{tr}Activate the feature{/tr}</legend>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
                 {preference name=feature_file_galleries visible="always"}
             </fieldset>
 
@@ -50,7 +50,7 @@
             {preference name='fgal_podcast_dir'}
 
             <fieldset>
-                <legend>{tr}Features{/tr}{help url="File+Gallery+Config"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="File+Gallery+Config"}</legend>
 
                 {preference name='feature_file_galleries_rankings'}
                 {preference name='feature_file_galleries_comments'}
@@ -108,7 +108,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Quota{/tr}{help url="File+Gallery+Config#Quota"}</legend>
+                <legend class="h3">{tr}Quota{/tr}{help url="File+Gallery+Config#Quota"}</legend>
                 {preference name='fgal_quota'}{tr}Used:{/tr} {$usedSize|kbsize}
                 <div class="adminoptionboxchild" id="fgal_quota_childcontainer">
                     {if !empty($prefs.fgal_quota)}
@@ -123,13 +123,13 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Upload Regex{/tr}{help url="File+Gallery+Config#Filename_must_match:"}</legend>
+                <legend class="h3">{tr}Upload Regex{/tr}{help url="File+Gallery+Config#Filename_must_match:"}</legend>
                 {preference name='fgal_match_regex'}
                 {preference name='fgal_nmatch_regex'}
             </fieldset>
 
             <fieldset>
-                <legend> {tr}Settings for Media Alchemyst{/tr}{help url="Media-Alchemyst"}</legend>
+                <legend class="h3"> {tr}Settings for Media Alchemyst{/tr}{help url="Media-Alchemyst"}</legend>
                 {preference name=alchemy_ffmpeg_path}
                 {preference name=alchemy_ffprobe_path}
                 {preference name=alchemy_unoconv_path}
@@ -140,7 +140,7 @@
             </fieldset>
 
             <fieldset>
-                <legend> {tr}Settings for Diagrams{/tr}</legend>
+                <legend class="h3"> {tr}Settings for Diagrams{/tr}</legend>
                 {preference name='fgal_export_diagram_on_image_save'}
                 {preference name='fgal_use_casperjs_to_export_images'}
                 {preference name='fgal_use_drawio_services_to_export_images'}
@@ -151,7 +151,7 @@
             </fieldset>
 
             <fieldset>
-                <legend> {tr}Settings for RecordRTC{/tr}</legend>
+                <legend class="h3"> {tr}Settings for RecordRTC{/tr}</legend>
                 {preference name='fgal_use_record_rtc_screen'}
             </fieldset>
         {/tab}
@@ -159,7 +159,7 @@
         {tab name="{tr}Plugins{/tr}"}
             <br>
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Plugins{/tr}</legend>
+                <legend class="h3">{tr}Plugins{/tr}</legend>
                 {preference name=wikiplugin_files}
                 {preference name=wikiplugin_file}
                 {preference name=wikiplugin_img}
@@ -262,7 +262,7 @@
                 </div>
             <div class="adminoptionbox">
                 <fieldset>
-                    <legend>{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
+                    <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
                     <div class="adminoptionbox">
                         <div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
                             <ul>
@@ -363,7 +363,7 @@
             <br>
 
             <fieldset>
-                <legend>{tr}Access{/tr}</legend>
+                <legend class="h3">{tr}Access{/tr}</legend>
                 {preference name='feature_webdav'}
                 {preference name='fgal_elfinder_feature'}
                 <div class="adminoptionboxchild" id="fgal_elfinder_feature_childcontainer">
@@ -374,7 +374,7 @@
                 {preference name='fgal_pdfjs_feature'}
             </fieldset>
             <fieldset>
-                <legend>{tr}H5P{/tr}</legend>
+                <legend class="h3">{tr}H5P{/tr}</legend>
                 {preference name='h5p_enabled'}
                 <div class="adminoptionboxchild" id="h5p_enabled_childcontainer">
                     {preference name='h5p_filegal_id'}
@@ -407,7 +407,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Draw{/tr}</legend>
+                <legend class="h3">{tr}Draw{/tr}</legend>
                 {preference name=feature_draw}
                 <div class="adminoptionboxchild" id="feature_draw_childcontainer">
                     {preference name=feature_draw_hide_buttons}
@@ -419,7 +419,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}SCORM{/tr}{help desc="SCORM is a package format for Learning Management Systems. Tiki can create tracker items based on the SCORM metadata. This allows you to manage SCORM packages within Tiki."}</legend>
+                <legend class="h3">{tr}SCORM{/tr}{help desc="SCORM is a package format for Learning Management Systems. Tiki can create tracker items based on the SCORM metadata. This allows you to manage SCORM packages within Tiki."}</legend>
                 {preference name=scorm_enabled}
                 <div class="adminoptionboxchild" id="scorm_enabled_childcontainer">
                     {preference name=scorm_tracker}
@@ -427,7 +427,7 @@
             </fieldset>
 
             <fieldset>
-                <legend>{tr}Vimeo{/tr}</legend>
+                <legend class="h3">{tr}Vimeo{/tr}</legend>
                 {preference name=vimeo_upload}
                 {preference name=vimeo_delete}
                 <div class="adminoptionboxchild" id="vimeo_upload_childcontainer">

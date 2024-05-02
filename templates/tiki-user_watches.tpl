@@ -199,9 +199,7 @@
                     <tr>
                         {if $watches}
                             <td class="checkbox-cell">
-                                <div class="form-check">
-                                    <input type="checkbox" name="checked[]" value="{$w.watchId}">
-                                </div>
+                                <input type="checkbox" name="checked[]" value="{$w.watchId}" class="form-check-input" aria-label="{tr}Select{/tr}">
                             </td>
                         {/if}
                         <td class="text">

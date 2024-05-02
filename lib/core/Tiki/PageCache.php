@@ -116,7 +116,7 @@ class Tiki_PageCache
     public function dieAndOutputOrStore(): Tiki_PageCache
     {
         if (is_array($this->cacheDataKeys)) {
-            if (TikiLib::lib("memcache")->isFunctionnal()) {
+            if (TikiLib::lib("memcache")->isFunctional()) {
                 $memcachelib = TikiLib::lib("memcache");
                 $this->key = $memcachelib->buildKey($this->cacheDataKeys);
 

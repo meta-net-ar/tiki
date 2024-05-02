@@ -349,7 +349,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'description' => tra('Alternative file manager with drag and drop capability'),
             'type' => 'flag',
             'filter' => 'alpha',
-            'default' => 'n',
+            'default' => 'y',
             'help' => 'elFinder',
             'dependencies' => ['feature_jquery_ui'],
         ],
@@ -383,7 +383,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'name' => tra('Default view'),
             'type' => 'list',
             'options' => $defaultViews,
-            'default' => 'list',
+            'default' => 'finder',
         ],
         'fgal_sortField' => [
             'name' => tra('Default sort field'),
@@ -397,7 +397,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
                 'description' => tra('Description'),
                 'id' => tra('ID'),
             ],
-            'default' => 'created',
+            'default' => 'name',
         ],
         'fgal_sortDirection' => [
             'name' => tra('Default sort direction'),
@@ -406,7 +406,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
                 'desc' => tra('Descending'),
                 'asc' => tra('Ascending'),
             ],
-            'default' => 'desc',
+            'default' => 'asc',
         ],
         'fgal_icon_fileId' => [
             'name' => tra('Gallery icon'),

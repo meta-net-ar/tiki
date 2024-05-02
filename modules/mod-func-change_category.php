@@ -192,7 +192,7 @@ function module_change_category($mod_reference, $module_params)
         $smarty->assign('isInAllManagedCategories', $isInAllManagedCategories);
         $smarty->assign('showmodule', ! $shy);
         $objectlib = TikiLib::lib('object');
-        $title = $objectlib->get_title($cat_type, $cat_objid);
+        $title = $objectlib->get_title($cat_type, $cat_objid) ?? '';
         if (empty($cat_parent)) {
             $smarty->assign('tpl_module_title', sprintf(tra('Categorize %s'), htmlspecialchars($title)));
         } else {

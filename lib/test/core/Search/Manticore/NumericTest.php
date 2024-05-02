@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class NumericTest extends \Search_Index_NumericTest
+class NumericTest extends \SearchIndexNumeric
 {
     use IndexBuilder;
 

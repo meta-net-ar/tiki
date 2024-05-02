@@ -1,8 +1,8 @@
 <form method="get" action="{$filter_action|escape}" class="filter">
     <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label">{tr}Content{/tr}</label>
+        <label class="col-sm-2 col-form-label" for="filter~content">{tr}Find{/tr}</label>
         <div class="col-sm-4">
-            <input type="search" name="filter~content" class="form-control" value="{$filter_content|escape}">
+            <input type="search" name="filter~content" class="form-control" id="filter~content" value="{$filter_content|escape}">
         </div>
     </div>
     {if $prefs.search_show_sort_order eq 'y'}

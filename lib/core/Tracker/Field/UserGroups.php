@@ -12,7 +12,7 @@
  */
 class Tracker_Field_UserGroups extends \Tracker\Field\AbstractField implements \Tracker\Field\FilterableInterface
 {
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         return [
             'usergroups' => [
@@ -21,7 +21,7 @@ class Tracker_Field_UserGroups extends \Tracker\Field\AbstractField implements \
                 'help' => 'User-Groups',
                 'prefs' => ['trackerfield_usergroups'],
                 'tags' => ['advanced'],
-                'default' => 'n',
+                'default' => 'y',
                 'params' => [
                     'directOnly' => [
                         'name' => tr('Show direct groups memberships only'),
@@ -133,13 +133,13 @@ class Tracker_Field_UserGroups extends \Tracker\Field\AbstractField implements \
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey, "{$baseKey}_text"];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [
@@ -148,7 +148,7 @@ class Tracker_Field_UserGroups extends \Tracker\Field\AbstractField implements \
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         $baseKey = $this->getBaseKey();
         return [$baseKey => true];

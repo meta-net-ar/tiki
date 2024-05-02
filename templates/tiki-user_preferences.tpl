@@ -361,14 +361,16 @@
                 </div>
 
                 <div class="form-check">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" name="display_12hr_clock" {if $user_prefs.display_12hr_clock eq 'y'}checked="checked"{/if}>{tr}Use 12-hour clock in time selectors{/tr}
+                    <input class="form-check-input" type="checkbox" name="display_12hr_clock" id="display_12hr_clock" {if $user_prefs.display_12hr_clock eq 'y'}checked="checked"{/if}>
+                    <label class="form-check-label" for="display_12hr_clock">
+                        {tr}Use 12-hour clock in time selectors{/tr}
                     </label>
                 </div>
                 {if 1 eq 1 || $prefs.feature_community_mouseover eq 'y'}
                     <div class="form-check">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="show_mouseover_user_info" {if $show_mouseover_user_info eq 'y'}checked="checked"{/if}>{tr}Display info tooltip on mouseover for every user who allows his/her information to be public{/tr}
+                        <input class="form-check-input" type="checkbox" name="show_mouseover_user_info" id="show_mouseover_user_info" {if $show_mouseover_user_info eq 'y'}checked="checked"{/if}>
+                        <label class="form-check-label" for="show_mouseover_user_info">
+                            {tr}Display info tooltip on mouseover for every user who allows his/her information to be public{/tr}
                         </label>
                     </div>
                 {/if}
@@ -394,15 +396,15 @@
                     <div class="clearfix">
                         {if 1 eq 1 || $prefs.allowmsg_is_optional eq 'y'}
                             <div class="form-check">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" name="allowMsgs" {if $user_prefs.allowMsgs eq 'y'}checked="checked"{/if}>
+                                <input class="form-check-input" type="checkbox" name="allowMsgs" id="allowMsgs" {if $user_prefs.allowMsgs eq 'y'}checked="checked"{/if}>
+                                <label class="form-check-label" for="allowMsgs">
                                     {tr}Allow messages from other users{/tr}
                                 </label>
                             </div>
                         {/if}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mess_sendReadStatus" {if $user_prefs.mess_sendReadStatus eq 'y'}checked="checked"{/if}>
+                            <input class="form-check-input" type="checkbox" name="mess_sendReadStatus" id="mess_sendReadStatus" {if $user_prefs.mess_sendReadStatus eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mess_sendReadStatus">
                                 {tr}Notify sender when reading his mail{/tr}
                             </label>
                         </div>
@@ -498,55 +500,63 @@
                     <div class="col-md-8">
                     {if $prefs.feature_wiki eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_pages" {if $user_prefs.mytiki_pages eq 'y'}checked="checked"{/if}>{tr}My pages{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_pages" id="mytiki_pages" {if $user_prefs.mytiki_pages eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_pages">
+                                {tr}My pages{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_blogs eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_blogs" {if $user_prefs.mytiki_blogs eq 'y'}checked="checked"{/if}>{tr}My blogs{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_blogs" id="mytiki_blogs" {if $user_prefs.mytiki_blogs eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_blogs">
+                                {tr}My blogs{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_messages eq 'y' and $tiki_p_messages eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_msgs" {if $user_prefs.mytiki_msgs eq 'y'}checked="checked"{/if}>{tr}My messages{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_msgs" id="mytiki_msgs" {if $user_prefs.mytiki_msgs eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_msgs">
+                                {tr}My messages{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_tasks eq 'y' and $tiki_p_tasks eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_tasks" {if $user_prefs.mytiki_tasks eq 'y'}checked="checked"{/if}>{tr}My tasks{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_tasks" id="mytiki_tasks" {if $user_prefs.mytiki_tasks eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_tasks">
+                                {tr}My tasks{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_forums eq 'y' and $tiki_p_forum_read eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_forum_topics" {if $user_prefs.mytiki_forum_topics eq 'y'}checked="checked"{/if}>{tr}My forum topics{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_forum_topics" id="mytiki_forum_topics" {if $user_prefs.mytiki_forum_topics eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_forum_topics">
+                                {tr}My forum topics{/tr}
                             </label>
                         </div>
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_forum_replies" {if $user_prefs.mytiki_forum_replies eq 'y'}checked="checked"{/if}>{tr}My forum replies{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_forum_replies" id="mytiki_forum_replies" {if $user_prefs.mytiki_forum_replies eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_forum_replies">
+                                {tr}My forum replies{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_trackers eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_items" {if $user_prefs.mytiki_items eq 'y'}checked="checked"{/if}>{tr}My user items{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_items" id="mytiki_items" {if $user_prefs.mytiki_items eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_items">
+                                {tr}My user items{/tr}
                             </label>
                         </div>
                     {/if}
                     {if $prefs.feature_articles eq 'y'}
                         <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="mytiki_articles" {if $user_prefs.mytiki_articles eq 'y'}checked="checked"{/if}>{tr}My articles{/tr}
+                            <input class="form-check-input" type="checkbox" name="mytiki_articles" id="mytiki_articles" {if $user_prefs.mytiki_articles eq 'y'}checked="checked"{/if}>
+                            <label class="form-check-label" for="mytiki_articles">
+                                {tr}My articles{/tr}
                             </label>
                         </div>
                     {/if}
@@ -571,7 +581,7 @@
                             {tr}Keep closed remarksbox hidden{/tr}
                         </label>
                         <div class="col-md-8">
-                            <input type="checkbox" name="remember_closed_rboxes" id="remember_closed_rboxes" {if $user_prefs.remember_closed_rboxes eq 'y'}checked="checked"{/if}>
+                            <input type="checkbox"  class="form-check-input" name="remember_closed_rboxes" id="remember_closed_rboxes" {if $user_prefs.remember_closed_rboxes eq 'y'}checked="checked"{/if}>
                             <p class="text-info">
                                 {tr}Remember which remarksbox (alert box) you have closed and don't show them again{/tr}.<br>
                             </p>
@@ -738,9 +748,10 @@
                     {if !empty($userwatch)}<input type="hidden" name="view_user" value="{$userwatch|escape}">{/if}
                     <p>
                         <div class="form-check">
-                        <label for="deleteaccountconfirm" class="form-check-label">
-                            <input type='checkbox' class="form-check-input" name='deleteaccountconfirm' id="deleteaccountconfirm" value='1'> {tr}Check this box if you really want to delete the account{/tr}
-                        </label>
+                            <input type='checkbox' class="form-check-input" name='deleteaccountconfirm' id="deleteaccountconfirm" value='1'>
+                            <label for="deleteaccountconfirm" class="form-check-label">
+                                 {tr}Check this box if you really want to delete the account{/tr}
+                            </label>
                         </div>
                     </p>
                     <p>

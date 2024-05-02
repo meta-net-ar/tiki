@@ -8,43 +8,18 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 
-//Initialize variables for the actual theme and theme option to be displayed
-$theme_active = $prefs['theme'];
-$theme_option_active = $prefs['theme_option'] ?? '';
+$themelib = TikiLib::lib('theme');
 
-// User theme previously set up in lib/setup/user_prefs.php
+list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
+//Write back global variable and prefs so that they can be accessed elsewhere
+//This is not a great pattern, but it was like that and I didn't have time to refactor further.  At least now it's right after it's computed - benoitg - 2024-04-08
+$prefs['theme'] = $theme_active;
+$prefs['theme_option'] = $theme_option_active;
 
-//consider Group theme
-if ($prefs['useGroupTheme'] == 'y') {
-    $userlib = TikiLib::lib('user');
-    $users_group_groupTheme = $userlib->get_user_group_theme();
-    if (! empty($users_group_groupTheme)) {
-        //group theme and option is stored in one column (groupTheme) in the users_groups table, so the theme and option value needs to be separated first
-        list($group_theme, $group_theme_option) = $themelib->extract_theme_and_option($users_group_groupTheme); //for more info see list_themes_and_options() function in themelib
-
-        //set active theme
-        $theme_active = $group_theme;
-        $theme_option_active = $group_theme_option;
-
-        //set group_theme smarty variable so that it can be used elsewhere
-        $smarty->assign_by_ref('group_theme', $users_group_groupTheme);
-    }
-}
-
-//consider Admin Theme
-if (! empty($prefs['theme_admin']) && ($section === 'admin' || empty($section))) {        // use admin theme if set
-    $theme_active = $prefs['theme_admin'];
-    $theme_option_active = isset($prefs['theme_option_admin']) ? $prefs['theme_option_admin'] : '';                                // and its option
-}
 if ($prefs['theme_unified_admin_backend'] === 'y' && strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') !== false) {
     $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
 } else {
     $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
-}
-
-//consider CSS Editor (tiki-edit_css.php)
-if (! empty($_SESSION['try_theme'])) {
-    list($theme_active, $theme_option_active) = $themelib->extract_theme_and_option($_SESSION['try_theme']);
 }
 
 //START loading theme related items
@@ -98,7 +73,6 @@ foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $packa
 }
 
 //5) Now add the theme or theme option
-$themelib = TikiLib::lib('theme');
 
 if (! empty($prefs['header_custom_scss'])) {
     // TODO call compile_custom_scss() here
@@ -111,7 +85,7 @@ if (! empty($prefs['header_custom_scss'])) {
     }
 } else {
     //first load the main theme css
-    $theme_css = $themelib->get_theme_css($theme_active);
+    $theme_css = ThemeLib::getThemeCssFilePath($theme_active, '');
     if ($theme_css) {
         // exclude the main theme css if the option's css also includes it (pref is set)
         if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
@@ -119,21 +93,17 @@ if (! empty($prefs['header_custom_scss'])) {
         }
         //than load the theme option css file if needed
         if (! empty($theme_option_active)) {
-            $option_css = $themelib->get_theme_css($theme_active, $theme_option_active);
+            $option_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
             $headerlib->add_cssfile($option_css);
         }
     } else {
         trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
         $theme_active = 'default';
         $theme_option_active = '';
-        $theme_css = $themelib->get_theme_css($theme_active);
+        $theme_css = ThemeLib::getThemeCssFilePath($theme_active, null);
         $headerlib->add_cssfile($theme_css);
     }
 }
-
-//6) Allow to have a IE specific CSS files for the theme's specific hacks (IE 8 and 9 support dropped in Bootstrap 4)
-// $style_ie8_css = $themelib->get_theme_path($theme_active, $theme_option_active, 'ie8.css');
-// $style_ie9_css = $themelib->get_theme_path($theme_active, $theme_option_active, 'ie9.css');
 
 //7) include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css
 if (! empty($theme_option_active)) {
@@ -198,15 +168,6 @@ $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_opt
 // and add js support file
 $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
-
-//9) set global variable and prefs so that they can be accessed elsewhere
-$prefs['theme'] = $theme_active;
-$prefs['theme_option'] = $theme_option_active;
-
-//10) load additional language overrides that might be located in theme folder
-/** @var Language $langLib */
-$langLib = TikiLib::lib('language');
-$langLib->loadThemeOverrides($prefs['language'], $theme_active);
 
 //Note: if Theme Control is active, than tiki-tc.php can modify the active theme
 

@@ -61,7 +61,7 @@ class TestRunnerWithBaselineTest extends PHPUnit\Framework\TestCase
         );
     }
 
-    public function dataProviderProcessPhpunitLogData(): array
+    public static function dataProviderProcessPhpunitLogData(): array
     {
         return
             [
@@ -139,7 +139,7 @@ class TestRunnerWithBaselineTest extends PHPUnit\Framework\TestCase
         );
     }
 
-    public function dataProviderCompareTwoTestRuns(): array
+    public static function dataProviderCompareTwoTestRuns(): array
     {
         return
             [

@@ -28,7 +28,7 @@ $editing = $userlib->get_user_info($user);
 $credits = userPlansAndCredits();
 list($start_date, $end_date) = getStartDateFromRequest();
 
-$req_type = $_REQUEST['action_type'];
+$req_type = isset($_REQUEST['action_type']) ? $_REQUEST['action_type'] : '';
 $smarty->assign('act_type', $req_type);
 
 consumptionData();

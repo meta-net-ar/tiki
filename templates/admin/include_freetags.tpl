@@ -15,18 +15,18 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_freetags visible="always"}
     </fieldset>
 
     <fieldset class="mb-3 w-100">
-        <legend>{tr}Plugins{/tr}</legend>
+        <legend class="h3">{tr}Plugins{/tr}</legend>
         {preference name=wikiplugin_freetagged}
         {preference name=wikiplugin_addfreetag}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Tags{/tr}{help url="Tags"}</legend>
+        <legend class="h3">{tr}Tags{/tr}{help url="Tags"}</legend>
         {preference name=freetags_browse_show_cloud}
 
         <div class="adminoptionboxchild" id="freetags_browse_show_cloud_childcontainer">
@@ -63,7 +63,7 @@
     </fieldset>
 
     <fieldset class="admin">
-        <legend>{tr}Tag search page{/tr}</legend>
+        <legend class="h3">{tr}Tag search page{/tr}</legend>
         {preference name=freetags_sort_mode}
         {preference name=freetags_preload_random_search}
         <span class="form-text col-md-8 offset-md-4">{tr}When arriving on <a href="tiki-browse_freetags.php">tag search page</a>{/tr}.</span>

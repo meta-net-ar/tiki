@@ -4,7 +4,7 @@
 
     Important: This file is part of Tiki.
                If you want to load additional services, please create
-               a 'custom.xml' file to avoid conflicts.
+               a '_custom/shared/custom.xml' file to avoid conflicts.
 
     -->
     <services>

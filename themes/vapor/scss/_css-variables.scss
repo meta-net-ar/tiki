@@ -1,3 +1,4 @@
+@import "variables";
 //--------------------------- Tiki CSS variables
 .navbar-nav {
     --bs-navbar-color: #32fbe2;
@@ -69,7 +70,7 @@
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
-    --tiki-admin-dropdown-link-color: #{$navbar-light-color};
+    --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     .accordion-item.search-preferences,
@@ -120,3 +121,8 @@
      --bs-accordion-btn-bg: #311d4f;
      --bs-accordion-btn-color: #fff;
  }
+
+body {
+    --tiki-code-color:  #{$code-color}; // #{$code-color}; // #EA39B8FF;
+    --tiki-code-bg: transparent;
+}

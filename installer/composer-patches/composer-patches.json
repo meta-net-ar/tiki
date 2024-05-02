@@ -6,19 +6,10 @@
     "jquery/jquery-sheet": {
       "Fix visibility issues": "../installer/composer-patches/jquery-sheet_fix-visibility-issues.patch"
     },
-    "jquery-plugins/jquery-validation": {
-      "Fix remote validation unhighlights": "../installer/composer-patches/jquery-validator_fix-remote-validation-unhighlights.patch"
-    },
-    "pear/text_wiki": {
-      "Recursive call to constructor": "../installer/composer-patches/text_wiki__recursive_call_to_constructor.json"
-    },
     "pear/text_wiki_mediawiki": {
       "Removed deprecated syntax in PHP7": "../installer/composer-patches/text_wiki_mediawiki__php7fixes.patch",
       "Renamed method to avoid collision with func from parent class": "../installer/composer-patches/text_wiki_mediawiki__func_collision.patch",
       "Removed string access with curly braces syntax in PHP8": "../installer/composer-patches/text_wiki_mediawiki__php8fixes.patch"
-    },
-    "npm-asset/converse.js": {
-      "Remove native javascript for bootstrap": "../installer/composer-patches/jcbrand-conversejs_remove-native-javascript-for-bootstrap.patch"
     },
     "nicolaskruchten/pivottable": {
       "Sort rows and columns by key_z_to_a": "../installer/composer-patches/nicolaskruchten_pivottable__sort_by_key_z_to_a.patch",

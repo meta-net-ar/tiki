@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class StemmingTest extends \Search_Index_StemmingTest
+class StemmingTest extends \SearchIndexStemming
 {
     use IndexBuilder;
 

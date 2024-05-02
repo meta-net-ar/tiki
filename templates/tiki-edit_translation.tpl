@@ -127,6 +127,7 @@
             function validate_translation_request() {
                 var success = true;
                 var language_of_translation = $("#language_list").val();
+                var page_title = $('#translation_name').val().trim();
 
                 if (language_of_translation == "unspecified") {
             {/literal}
@@ -134,6 +135,10 @@
             {literal}
                     alert(message);
                     success = false;
+                    } else if (page_title === '') {
+                        var message = "{tr}You forgot to specify the page title. Please provide a title for your page.{/tr}";
+                        alert(message);
+                        success = false;
                 } else {
                     var page_list = $("#existing-page-src");
                     var page_name = $('#translation_name').val();

@@ -144,7 +144,7 @@ if ($prefs['feature_groupalert'] == 'y') {
     $smarty->assign_by_ref('showeachuser', $showeachuser);
 }
 $status_types = [];
-$status_raw = $trklib->status_types();
+$status_raw = $trackerDefinition->getStatusTypes();
 if (isset($_REQUEST['status'])) {
     $sts = preg_split('//', $_REQUEST['status'], -1, PREG_SPLIT_NO_EMPTY);
 } elseif (isset($tracker_info["defaultStatus"])) {
@@ -474,7 +474,13 @@ if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and i
 if (! empty($_REQUEST['filtervalue_other'])) {
     $filtervalue = $_REQUEST['filtervalue_other'];
 }
-$field = $trackerDefinition->getField($filterfield);
+
+if (! empty($filterfield)) {
+    $field = $trackerDefinition->getField($filterfield);
+} else {
+    $field = '';
+}
+
 if ($field && in_array($field['type'], ['d', 'D', 'R'])) {
     $exactvalue = $filtervalue;
 } else {

@@ -28,7 +28,11 @@ $pages = [];
 $_REQUEST['page'] = $wikilib->get_page_by_slug($_REQUEST['page']);
 
 $requested = $tikilib->get_page_info($_REQUEST['page']);
-$page_id = $requested['page_id'];
+if (isset($requested['page_id'])) {
+    $page_id = $requested['page_id'];
+} else {
+    $page_id = TikiLib::lib('tiki')->get_page_id_from_name($_REQUEST['page']);
+}
 $pages[] = $requested;
 $unordered = [];
 $excluded = [];
@@ -36,6 +40,14 @@ $excluded = [];
 $page = $_REQUEST['page'];
 $smarty->assign_by_ref('page', $page);
 
+if (
+    $prefs['feature_wiki_userpage'] == 'y'
+            && strcasecmp($prefs['feature_wiki_userpage_prefix'], substr($page, 0, strlen($prefs['feature_wiki_userpage_prefix']))) == 0
+) {
+    $isUserPage = true;
+} else {
+    $isUserPage = false;
+}
 // If the page doesn't exist
 if (empty($requested)) {
     // First, try cleaning the url to see if it matches an existing page.

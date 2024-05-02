@@ -1,6 +1,6 @@
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
-
+@import "variables";
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
     --tiki-top-bg: #{$primary};
@@ -161,4 +161,28 @@
 
 [data-bs-theme=dark] {
     --tiki-main-content-bg: #222;
+    .bg-light { background-color: #{$gray-800}; }
+    .nav-link { color: var(--#{$prefix}link-color); }
+//    $nav-link-hover-color:              var(--#{$prefix}link-hover-color);
+    .btn-outline-primary {
+        --bs-btn-color: #3192D8; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-secondary {
+        --bs-btn-color: #818A92; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-success {
+        --bs-btn-color: #1EA465; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-danger {
+        --bs-btn-color: #E35F6C; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-warning {
+        --bs-btn-color: #B38600; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-info {
+        --bs-btn-color: #0A9BB8; --bs-btn-border-color: var(--bs-btn-color);
+    }
+    .btn-outline-dark {
+        --bs-btn-color: #818A92; --bs-btn-border-color: var(--bs-btn-color); // Same as secondary
+    }
 }

@@ -5,11 +5,11 @@
 <form name="path" method="post" action="tiki-directory_admin_categories.php">
     {ticket}
     <div class="tiki-form-group row">
-        <label class="col-sm-4 col-form-label">
+        <label class="col-sm-4 col-form-label" for="parent">
             {tr}Parent directory category{/tr}
         </label>
         <div class="col-sm-7">
-            <select name="parent" onchange="javascript:path.submit();" class="form-control">
+            <select name="parent" id="parent" onchange="javascript:path.submit();" class="form-control">
                 <option value="0">{tr}Top{/tr}</option>
                 {section name=ix loop=$categs}
                     <option value="{$categs[ix].categId|escape}" {if $parent eq $categs[ix].categId}selected="selected"{/if}>{$categs[ix].path|escape}</option>
@@ -30,27 +30,27 @@
     <input type="hidden" name="siteId" value="{$siteId|escape}">
 
     <div class="tiki-form-group row">
-        <label class="col-sm-4 col-form-label">{tr}Name{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="name">{tr}Name{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="name" value="{$info.name|escape}" class="form-control">
+            <input type="text" name="name" id="name" value="{$info.name|escape}" class="form-control">
         </div>
     </div>
     <div class="tiki-form-group row">
-        <label class="col-sm-4 col-form-label">{tr}Description{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="description">{tr}Description{/tr}</label>
         <div class="col-sm-7">
-            <textarea rows="5" cols="60" name="description" class="form-control">{$info.description|escape}</textarea>
+            <textarea rows="5" cols="60" name="description" id="description" class="form-control">{$info.description|escape}</textarea>
         </div>
     </div>
     <div class="tiki-form-group row">
-        <label class="col-sm-4 col-form-label">{tr}URL{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="url">{tr}URL{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" size="60" name="url" value="{if $info.url ne ""}{$info.url|escape}{else}http://{/if}" class="form-control">
+            <input type="text" size="60" name="url" id="url" value="{if $info.url ne ""}{$info.url|escape}{else}https://{/if}" class="form-control">
         </div>
     </div>
     <div class="tiki-form-group row">
-        <label class="col-sm-4 col-form-label">{tr}Directory Categories{/tr}</label>
+        <label class="col-sm-4 col-form-label" for="siteCats[]">{tr}Directory Categories{/tr}</label>
         <div class="col-sm-7">
-            <select name="siteCats[]" multiple="multiple" size="4" class="form-control">
+            <select name="siteCats[]" id="siteCats[]" multiple="multiple" size="4" class="form-control">
                 {section name=ix loop=$categs}
                     <option value="{$categs[ix].categId|escape}" {if $categs[ix].belongs eq 'y' or $categs[ix].categId eq $addtocat}selected="selected"{/if}>
                         {$categs[ix].path|escape}
@@ -65,7 +65,7 @@
     </div>
     {if $prefs.directory_country_flag eq 'y'}
         <div class="tiki-form-group row">
-            <label class="col-sm-4 col-form-label">{tr}Country{/tr}</label>
+            <label class="col-sm-4 col-form-label" for="country">{tr}Country{/tr}</label>
             <div class="col-sm-7">
                 <select id="country" name="country" class="form-control">
                     {section name=ux loop=$countries}
@@ -76,9 +76,9 @@
         </div>
     {/if}
     <div class="row mb-2">
-        <label class="col-sm-4 col-form-label">{tr}Is valid{/tr}    </label>
+        <label class="col-sm-4 col-form-label" for="isValid">{tr}Is valid{/tr}    </label>
         <div class="col-sm-7">
-            <input name="isValid" type="checkbox" {if $info.isValid eq 'y'}checked="checked"{/if}>
+            <input name="isValid" id="isValid" type="checkbox" {if $info.isValid eq 'y'}checked="checked"{/if}>
         </div>
     </div>
     <div class="tiki-form-group row">
@@ -96,7 +96,7 @@
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
         <table class="table table-striped table-hover">
             <tr>
-                <th> </th>
+                <td></td> {* th changed to td to prevent AIRA empty header error *}
                 <th> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">{tr}Name{/tr}</a> </th>
                 <th> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'url_desc'}url_asc{else}url_desc{/if}">{tr}URL{/tr}</a> </th>
                 {if $prefs.directory_country_flag eq 'y'}
@@ -104,12 +104,12 @@
                 {/if}
                 <th class="text-center"> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'hits_desc'}hits_asc{else}hits_desc{/if}">{tr}Hits{/tr}</a> </th>
                 <th class="text-center"> <a href="tiki-directory_admin_sites.php?parent={$parent}&amp;offset={$offset}&amp;sort_mode={if $sort_mode eq 'isValid_desc'}isValid_asc{else}isValid_desc{/if}">{tr}Valid{/tr}</a> </th>
-                <th></th>
+                <td></td>
             </tr>
 
             {section name=user loop=$items}
             <tr class="{cycle advance=false}">
-                <td class="checkbox-cell"><div class="form-check"><input class="checkboxes" type="checkbox" name="remove[]" value="{$items[user].siteId}" required></div></td>
+                <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="remove[]" value="{$items[user].siteId}" required></td>
                 <td class="text">{$items[user].name|escape}</td>
                 <td class="text"><a href="{$items[user].url}" target="_new">{$items[user].url}</a></td>
                 {if $prefs.directory_country_flag eq 'y'}

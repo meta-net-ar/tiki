@@ -130,7 +130,7 @@
                     {else}
                         <div class="form-check">
                             <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" id="id_recurrent" name="recurrent" value="1"{if $calitem.recurrenceId gt 0 or $recurrent eq 1} checked="checked" {/if}>
+                                <input type="checkbox"  class="form-check-input" aria-label="{tr}Select{/tr}" id="id_recurrent" name="recurrent" value="1"{if $calitem.recurrenceId gt 0 or $recurrent eq 1} checked="checked" {/if}>
                                 {tr}This event depends on a recurrence rule{/tr}
                             </label>
                         </div>
@@ -141,16 +141,19 @@
             {include file='./recurrence.tpl'}
             {* / .row *}
             <div id="timezonePicker" class="row mt-md-3 mb-3 date" style=" {if ( !($calitem.recurrenceId gt 0) and $recurrent neq 1 )} display:none; {/if}">
-                <label class="col-form-label col-sm-3">{tr}Time zone{/tr}</label>
+                <label class="col-form-label col-sm-3">{tr}Recurrence time zone{/tr}</label>
                 {if $edit}
-                    <div class="col-sm-5">
-                        <select name="recurrenceDstTimezone" class="form-control" onChange="changeItemTimezone(this.options[this.selectedIndex].value);">
+                    <div class="col-sm-9">
+                        <select name="recurrenceDstTimezone" class="form-control">
                             {foreach from=$timezones key=k item=tz}
                                 <option value="{$tz}" {if $recurrence.recurrenceDstTimezone && $recurrence.recurrenceDstTimezone eq $tz} selected="selected" {else}{if $displayTimezone eq $tz} selected="selected" {/if}{/if}>
                                     {$tz}
                                 </option>
                             {/foreach}
                         </select>
+                        <div class="form-text">
+                            {tr}This timezone is used only for recurring events to determine the actual DST settings when creating future events.{/tr}
+                        </div>
                     </div>
                 {else}
                     <div class="col-sm-9">
@@ -166,8 +169,8 @@
                 </div>
                 <div class="col-sm-2">
                     <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" name="calitem[allday]" id="allday" value="true" {if $calitem.allday} checked="checked"{/if}>
+                        <input type="checkbox" class="form-check-input" name="calitem[allday]" id="allday" value="1" {if $calitem.allday} checked="checked"{/if}>
+                        <label class="form-check-label" for="allday">
                             {tr}All day{/tr}
                         </label>
                     </div>
@@ -323,13 +326,13 @@
             {/if}
             {if !empty($groupforalert) && $showeachuser eq 'y'}
                 <div class="mb-3 row">
-                    <label class="col-form-label col-sm-3">{tr}Choose users to alert{/tr}</label>
+                    <label class="col-form-label col-sm-3" for="listtoalert">{tr}Choose users to alert{/tr}</label>
                     <div class="col-sm-9">
                         {section name=idx loop=$listusertoalert}
                             {if $showeachuser eq 'n'}
                                 <input type="hidden" name="listtoalert[]" value="{$listusertoalert[idx].user}">
                             {else}
-                                <input type="checkbox" class="form-check-input" name="listtoalert[]" value="{$listusertoalert[idx].user}">
+                                <input type="checkbox" class="form-check-input" id="listtoalert" name="listtoalert[]" value="{$listusertoalert[idx].user}">
                                 {$listusertoalert[idx].user}
                             {/if}
                         {/section}
@@ -419,7 +422,7 @@
                             </div>
                             <div><a href="#" class="btn btn-secondary btn-sm availability-check">{tr}Check availability{/tr}</a></div>
                             <br/>
-                            <input type="checkbox" name="calitem[process_itip]" value="1" checked>
+                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
                             Send calendar invitations and event updates via email
                         {/if}
                     </div>
@@ -457,13 +460,21 @@
                 <input type="submit" class="btn btn-secondary" name="saveas" data-alt_controller="calendar" data-alt_action="copy_item"
                        onclick="needToConfirm=false" value="{tr}Copy to a new event{/tr}">
             {/if}
-            {if $calitemId}
+            {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
                        class="btn btn-danger" onclick="needToConfirm=false;" value="{tr}Delete event{/tr}">
             {/if}
             {if $recurrence.id}
-                <input type="submit" name="delete-recurrent" data-alt_controller="calendar" data-alt_action="delete_recurrent_items"
-                       class="btn btn-danger" onclick="needToConfirm=false;" value="{tr}Delete recurrent events{/tr}">
+                <div class="dropdown">
+                    <button class="btn btn-danger dropdown-toggle" type="button" id="deleteMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        {tr}Delete event(s){/tr}
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><button type="submit" data-alt_controller="calendar" data-alt_action="delete_item" class="dropdown-item" data-confirm="{tr}Are you sure you want to delete this event?{/tr}">{tr}This event only{/tr}</button></li>
+                        <li><button type="submit" data-alt_controller="calendar" data-alt_action="delete_recurrent_items" class="dropdown-item" data-confirm="{tr}Are you sure you want to delete recurring event series for all future events?{/tr}">{tr}Future recurring events{/tr}</button></li>
+                        <li><button type="submit" data-alt_controller="calendar" data-alt_action="delete_recurrent_items" data-alt_param="all" data-alt_param_value="1" class="dropdown-item" data-confirm="{tr}Are you sure you want to delete all recurring events in this series?{/tr}">{tr}All recurring events{/tr}</button></li>
+                    </ul>
+                </div>
             {/if}
             {if $prefs.calendar_export_item == 'y' and not empty($calitemId)}
                 {button href='tiki-calendar_export_ical.php? export=y&calendarItem='|cat:$calitemId _text="{tr}Export Event as iCal{/tr}"}

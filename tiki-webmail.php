@@ -161,7 +161,6 @@ function createPage($header_subject, $header_date, $header_from, $header_to, $ms
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link type="text/css" rel="stylesheet" href="lib/cypht/site.css" />
-  <link type="text/css" rel="stylesheet" href="lib/cypht/modules/tiki/site.css" />
   <title></title>
   <style type="text/css">
     body, td {font-size:13px}

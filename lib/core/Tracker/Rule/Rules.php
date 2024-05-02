@@ -92,7 +92,7 @@ class Rules
 
         foreach ($this->actions->predicates as $predicate) {
             if ($predicate->operator_id !== 'NoOp') {
-                $targetSelector = "\$(\"[name='{$predicate->target_id}']:last\", $(this).closest(\"form\"))";
+                $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
                 $actions[]
                     = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                 if (strpos($predicate->operator_id, 'Required') === false) {
@@ -113,7 +113,7 @@ class Rules
         if ($this->else->predicates) {
             foreach ($this->else->predicates as $predicate) {
                 if ($predicate->operator_id !== 'NoOp') {
-                    $targetSelector = "\$(\"[name='{$predicate->target_id}']:last\", $(this).closest(\"form\"))";
+                    $targetSelector = "\$(\"[name='{$predicate->target_id}']\", $(this).closest(\"form\")).last()";
                     $else[]
                         = "    if ($targetSelector.length === 0) { console.error('Tracker Rules: element $predicate->target_id not found'); return; }";
                     if (strpos($predicate->operator_id, 'Required') === false) {

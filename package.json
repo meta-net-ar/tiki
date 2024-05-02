@@ -16,15 +16,15 @@
   "name": "tiki",
   "version": "0.0.1",
   "type": "module",
-    "scriptsComments": {
-      "checkEnvironment:validNodeModules":  "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24."
-    },
-    "scripts": {
+  "scriptsComments": {
+    "checkEnvironment:validNodeModules": "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24."
+  },
+  "scripts": {
     "checkEnvironment:engine": "node src/js/build_utils/engineCheck.js",
     "checkEnvironment:validNodeModules": "npm ls",
     "checkEnvironmentComment": "The idea is to emulate running all processes sequentially with && (fail if any return a non zero exit code), but be compatible with the different shells on windows",
     "checkEnvironment": "run-s --print-label \"checkEnvironment:*\"",
-    "prebuild": "npm run checkEnvironment",
+    "prebuild": "run-s --print-label \"checkEnvironment\"",
     "build:js": "vite --config=src/js/vite.config.mjs build --mode=production",
     "build:scss": "npm run build -w src/scss",
     "build": "concurrently \"npm:build:*\"",
@@ -34,7 +34,10 @@
     "watch": "concurrently --kill-others-on-fail \"npm:watch:*\"",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "format": "prettier .  --write",
-    "clean": "php console.php dev:buildwsconfs --clean"
+    "clean:wsconf": "php console.php dev:buildwsconfs --clean",
+    "clean:scss": "npm run clean -w src/scss",
+    "clean": "concurrently \"npm:clean:*\"",
+    "build:generateIconList": "node lib/iconGeneratorNodeWrapper.js"
   },
   "engines": {
     "npm": ">=9.0.0 <11",
@@ -50,19 +53,22 @@
   },
   "depencenciesCommentSingleLibs": {},
   "devDependencies": {
+    "@guanghechen/rollup-plugin-copy": "^6.0.0-alpha.9",
+    "@stylistic/eslint-plugin-js": "^1.7.2",
     "@vitejs/plugin-vue": "^5.0.4",
     "check-engines": "^1.6.0",
     "concurrently": "^8.2.2",
-    "es-module-shims": "^1.8.3",
-    "eslint": "^8.57.0",
+    "es-module-shims": "^1.9.0",
+    "eslint": "^9.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-vue": "^9.22",
+    "eslint-plugin-vue": "^9.25",
+    "glob": "^10.3.12",
     "npm-run-all2": "^6.1.2",
     "prettier": "^3.2.5",
     "rollup-plugin-visualizer": "^5.12.0",
-    "vite": "^5.1.4",
-    "vite-plugin-static-copy": "^1.0.1"
+    "vite": "^5.2.10",
+    "vite-plugin-static-copy": "^1.0.3"
   },
   "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace": {
     "es-module-shims": "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
@@ -73,7 +79,8 @@
     "eslint-plugin-vue": "",
     "prettier": "",
     "sass": "https://github.com/sass/dart-sass/blob/main/CHANGELOG.md",
-    "vite": "https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md"
+    "vite": "https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md",
+    "vite-plugin-static-copy": "https://github.com/sapphi-red/vite-plugin-static-copy/blob/main/CHANGELOG.md"
   },
   "workspaces": [
     "src/js/common-externals",

@@ -3,7 +3,7 @@
 
     {if isset($allGroups) && $showallgroups eq 'y'}
         <fieldset>
-            <div id='mge-all-legend'><strong>{tr}All Groups{/tr}</strong></div>
+            <legend id='mge-all-legend'><strong>{tr}All Groups{/tr}</strong></legend>
             <ul id='mge-all' >
             {foreach from=$allGroups key=groupname item=inclusion name=ix}
                 <li>{$groupname|escape}</li>
@@ -14,7 +14,7 @@
 
     {if $showyourgroups eq 'y'}
         <fieldset>
-            <div id='mge-mine-legend'><strong>{tr}Your Groups{/tr}</strong></div>
+            <legend id='mge-mine-legend'><strong>{tr}Your Groups{/tr}</strong></legend>
             <ul id='mge-mine' >
             {foreach from=$userGroups key=groupname item=inclusion name=ix}
                 {if $inclusion eq 'included'}
@@ -29,7 +29,7 @@
 
     {if $groups_are_emulated eq 'y'}
         <fieldset>
-            <div id='mge-emulated-legend' ><strong>{tr}Emulated Groups{/tr}</strong></div>
+            <legend id='mge-emulated-legend' ><strong>{tr}Emulated Groups{/tr}</strong></legend>
             <ul id='mge-emulated' >
             {section name=ix loop=$groups_emulated}
                 <li>{$groups_emulated[ix]}</li>
@@ -43,7 +43,7 @@
 
     <form method="get" action="tiki-emulate_groups_switch.php" target="_self">
         <fieldset>
-            <div><strong>{tr}Switch to Groups{/tr}</strong></div>
+            <legend><strong>{tr}Switch to Groups{/tr}</strong></legend>
             <select name="switchgroups[]" size="{$module_rows}" multiple="multiple" class="form-select table">
                 {foreach from=$chooseGroups key=groupname item=inclusion name=ix}
                     <option value="{$groupname|escape}" >{$groupname|escape}</option>

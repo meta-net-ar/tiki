@@ -262,7 +262,7 @@
                     </ul>
                 {/if}
                 {if !isset($actions) or $actions eq "y"}
-                    <div class="btn-group actions float-end dropup">
+                    <div class="btn-group actions float-end dropdown">
                         {if $prefs.feature_multilingual eq 'y' and $listpages[ix].perms.tiki_p_edit_article eq 'y'}
                             {include file='translated-lang.tpl' object_type='article' trads=$listpages[ix].translations articleId=$listpages[ix].articleId}
                         {/if}

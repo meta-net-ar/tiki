@@ -27,17 +27,17 @@ class Search_GlobalSource_Static implements Search_GlobalSource_Interface
         return $out;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return array_keys($this->typeMap);
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return $this->typeMap;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return array_fill_keys(array_keys($this->typeMap), true);
     }

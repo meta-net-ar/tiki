@@ -250,7 +250,7 @@ function prefs_users_list()
             'name' => tra('Keep closed remarksbox hidden'),
             'description' => tra("Remember the alert boxes that users have closed and don't display them again."),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
         ],
         'users_prefs_xmpp_jid' => [
             'name' => tra('XMPP account JID or username'),

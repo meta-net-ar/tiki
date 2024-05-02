@@ -25,7 +25,7 @@ class Search_ContentSource_BlogPostSource implements Search_ContentSource_Interf
         return $this->db->table('tiki_blog_posts')->fetchColumn('postId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         $bloglib = TikiLib::lib('blog');
 
@@ -55,7 +55,7 @@ class Search_ContentSource_BlogPostSource implements Search_ContentSource_Interf
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -75,7 +75,7 @@ class Search_ContentSource_BlogPostSource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -95,7 +95,7 @@ class Search_ContentSource_BlogPostSource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

@@ -3,14 +3,13 @@
  */
 import { Calendar } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import moment from "moment";
 
 $.fn.setupFullCalendar = function (fullCalendarParams) {
     this.each(function () {
-
-        const calendarEl = document.getElementById('calendar');
+        const calendarEl = document.getElementById("calendar");
         $(calendarEl).tikiModal(tr("Loading..."));
 
         window.calendar = new Calendar(calendarEl, {
@@ -109,7 +108,8 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
                     let backgroundColor = event._def.ui.backgroundColor;
                     let textColor = event._def.ui.textColor;
                     let categoryBackgroundColor = event._def.extendedProps.categoryBackgroundColor;
-                    let eventDotElement = element.find('.fc-daygrid-event-dot'), defaultBackgroundColor;
+                    let eventDotElement = element.find(".fc-daygrid-event-dot"),
+                        defaultBackgroundColor;
                     if (eventDotElement.length === 0) {
                         eventDotElement = element;
                     }
@@ -130,15 +130,15 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
                     if (textColor === "#") {
                         textColor = defaultTextColor;
                     }
-                    $(element).attr('style', 'background-color: ' + backgroundColor);
-                    if (categoryBackgroundColor !== '') {
-                        $(element).attr('style', 'background-color: ' + categoryBackgroundColor);
+                    $(element).attr("style", "background-color: " + backgroundColor);
+                    if (categoryBackgroundColor !== "") {
+                        $(element).attr("style", "background-color: " + categoryBackgroundColor);
                     }
-                    $(element).find('.fc-event-time').css({
-                        "color": textColor,
+                    $(element).find(".fc-event-time").css({
+                        color: textColor,
                     });
-                    $(element).find('.fc-event-title').css({
-                        "color": textColor,
+                    $(element).find(".fc-event-title").css({
+                        color: textColor,
                     });
                 }
                 element.attr("title", event.title + "|" + event.extendedProps.description);
@@ -160,10 +160,11 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
 
                             $("form:not(.no-ajax)", this)
                                 .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                .on("submit",
+                                .on(
+                                    "submit",
                                     ajaxSubmitEventHandler(function (data) {
                                         calendarEditSubmit(data, this);
-                                    }),
+                                    })
                                 );
                         },
                     });
@@ -173,8 +174,8 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
                 // Handle date clicks in FullCalendar.
                 // If a date number is clicked, switch to Day View for the selected date.
                 // If any other part of the date cell is clicked, open a form to create a new event.
-                if (info.jsEvent.target.classList.contains('fc-daygrid-day-number')) {
-                    window.calendar.changeView('timeGridDay', info.dateStr);
+                if (info.jsEvent.target.classList.contains("fc-daygrid-day-number")) {
+                    window.calendar.changeView("timeGridDay", info.dateStr);
                 } else {
                     let $this = $(info.dayEl).tikiModal(" ");
                     const countCals = $("#filtercal ul li").length;
@@ -188,10 +189,11 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
 
                                 $("form:not(.no-ajax)", this)
                                     .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                    .on("submit",
+                                    .on(
+                                        "submit",
                                         ajaxSubmitEventHandler(function (data) {
                                             calendarEditSubmit(data, this);
-                                        }),
+                                        })
                                     );
                             },
                         });
@@ -217,13 +219,12 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
 
         calendar.render();
     });
-
 };
 
 // open modal for edit form
 $(document).on("click", ".edit-calendar-item-btn", function (e) {
     const $this = $(this);
-    const $modal = $this.parents().hasClass('modal-body');
+    const $modal = $this.parents().hasClass("modal-body");
     if ($modal) {
         e.preventDefault();
         $.closeModal({
@@ -236,78 +237,86 @@ $(document).on("click", ".edit-calendar-item-btn", function (e) {
                         $this.tikiModal();
 
                         $("form:not(.no-ajax)", this)
-                            .addClass('no-ajax') // Remove default ajax handling, we replace it
-                            .on("submit", ajaxSubmitEventHandler(function (data) {
-                                calendarEditSubmit(data, this);
-                            }));
-                    }
+                            .addClass("no-ajax") // Remove default ajax handling, we replace it
+                            .on(
+                                "submit",
+                                ajaxSubmitEventHandler(function (data) {
+                                    calendarEditSubmit(data, this);
+                                })
+                            );
+                    },
                 });
-            }
+            },
         });
 
         return false;
     }
 });
 
-
-$(function() {
-    let editable_rrule_update = function($ab) {
-        let $a = $ab.find('.editable_rrule');
-        let href = $a.data('base-href') + '&rrule=' + $a.text() + '&start=' + $ab.find('input[name*=dtstart]').val();
-        $a.attr('href', href);
+$(function () {
+    let editable_rrule_update = function ($ab) {
+        let $a = $ab.find(".editable_rrule");
+        let href = $a.data("base-href") + "&rrule=" + $a.text() + "&start=" + $ab.find("input[name*=dtstart]").val();
+        $a.attr("href", href);
     };
 
-    $(document).on('change', '.availability-block input[name*=dtstart]', function() {
-        let $ab = $(this).closest('.availability-block');
+    $(document).on("change", ".availability-block input[name*=dtstart]", function () {
+        let $ab = $(this).closest(".availability-block");
         editable_rrule_update($ab);
     });
 
-    $(document).on('submit', 'form.rrule-form', ajaxSubmitEventHandler(function (data) {
-        $.closeModal();
-        let $ab = $('.availability-block[data-uid="' + data.uid + '"]');
-        $ab.find('input[name*=rrule]').val(data.rrule);
-        $ab.find('.editable_rrule').text(data.rrule);
-        editable_rrule_update($ab);
-    }));
+    $(document).on(
+        "submit",
+        "form.rrule-form",
+        ajaxSubmitEventHandler(function (data) {
+            $.closeModal();
+            let $ab = $('.availability-block[data-uid="' + data.uid + '"]');
+            $ab.find("input[name*=rrule]").val(data.rrule);
+            $ab.find(".editable_rrule").text(data.rrule);
+            editable_rrule_update($ab);
+        })
+    );
 
-    $(document).on('click', '.availability-block .availability-remove', function(e) {
+    $(document).on("click", ".availability-block .availability-remove", function (e) {
         e.preventDefault();
-        $(this).closest('.availability-block').remove();
+        $(this).closest(".availability-block").remove();
         return false;
     });
 
-    $(document).on('click', '.availability-new', function(e) {
+    $(document).on("click", ".availability-new", function (e) {
         e.preventDefault();
         let $newbtn = $(this);
         $.ajax({
-            url: $newbtn.attr('href'),
-            success: function(data) {
+            url: $newbtn.attr("href"),
+            success: function (data) {
                 $newbtn.before(data);
-            }
+            },
         });
         return false;
     });
 
-    $(document).on('click', '.availability-check', function(e) {
+    $(document).on("click", ".availability-check", function (e) {
         e.preventDefault();
         let participants = [];
-        $('select[name*=participant_roles]').each(function(i, el) {
-            let m = $(el).attr('name').match(/calitem\[participant_roles\]\[(.*)\]/);
+        $("select[name*=participant_roles]").each(function (i, el) {
+            let m = $(el)
+                .attr("name")
+                .match(/calitem\[participant_roles\]\[(.*)\]/);
             if (m && m[1]) {
                 participants.push(m[1]);
             }
         });
         $.openModal({
-            remote: $.service('calendar_availability', 'check', $(this).closest('form').serialize()),
-            size: 'modal-lg'
+            remote: $.service("calendar_availability", "check", $(this).closest("form").serialize()),
+            size: "modal-lg",
         });
         return false;
     });
 
-    $(document).on('change', '.appointment-date-selector', function(e) {
+    $(document).on("change", ".appointment-date-selector", function (e) {
         e.preventDefault();
-        $('.slot-container').hide();
-        $('.slot-container.date' + $(this).val()).show();
+        $(".slot-container").hide();
+        $(".slot-container.date" + $(this).val()).show();
         return false;
     });
 });

@@ -18,7 +18,7 @@ class Search_ContentSource_CalendarSource implements Search_ContentSource_Interf
         return $this->db->table('tiki_calendars')->fetchColumn('calendarId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         $item = TikiLib::lib('calendar')->get_calendar($objectId);
 
@@ -43,7 +43,7 @@ class Search_ContentSource_CalendarSource implements Search_ContentSource_Interf
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -60,7 +60,7 @@ class Search_ContentSource_CalendarSource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -77,7 +77,7 @@ class Search_ContentSource_CalendarSource implements Search_ContentSource_Interf
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

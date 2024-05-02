@@ -30,12 +30,6 @@ $grays: (
     "900": $gray-900
 ) !default;
 
-$primary:       #0074C7;
-$secondary: #3911ce;// #7400c3; // $gray-600 !default;
-$success:       #214A21; // #5cb85c;
-$info:          #20809D; //#5bc0de;
-$warning:       #f0ad4e;
-$danger:        #B82D28; // #d9534f;
 $dark:          #01366c;
 $black: #000;
 $white: #fff;
@@ -48,7 +42,7 @@ $green-300: tint-color($green, 40%) !default;
 $red-300: tint-color($red, 40%) !default;
 
 $primary:       #0074C7;
-$secondary:     #3911ce;
+$secondary: green; // #4b3891; // #3911ce;
 $success:       #214A21;
 $info:          #20809D;
 $warning:       #975D0C;
@@ -56,7 +50,7 @@ $danger:        #B82D28;
 
 $theme-colors: (
     "primary": #0074C7,
-    "secondary": #3911ce,
+    "secondary": #4b3891, // #3911ce,
     "success": #214A21, //#5cb85c,
     "info": #20809D, //#5bc0de,
     "warning": #975D0C, // #f0ad4e,

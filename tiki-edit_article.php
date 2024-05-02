@@ -374,38 +374,42 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
     $data = urldecode($_REQUEST['image_data']);
 
     // Parse the information of an uploaded file and use it for the preview
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
-        }
-        $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
-        $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-        fclose($fp);
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $fp = fopen($_FILES['userfile1']['tmp_name'], 'rb');
+            $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+            fclose($fp);
 
-        $imgtype = $_FILES['userfile1']['type'];
-        $imgsize = $_FILES['userfile1']['size'];
-        $imgname = $_FILES['userfile1']['name'];
-        $smarty->assign('image_data', urlencode($data));
-        $smarty->assign('image_name', $imgname);
-        $smarty->assign('image_type', $imgtype);
-        $smarty->assign('image_size', $imgsize);
-        $hasImage = 'y';
-        $smarty->assign('hasImage', 'y');
-        // Create preview cache image, for display afterwards
-        $cachefile = $prefs['tmpDir'];
-        if ($tikidomain) {
-            $cachefile .= "/$tikidomain";
-        }
+            $imgtype = $_FILES['userfile1']['type'];
+            $imgsize = $_FILES['userfile1']['size'];
+            $imgname = $_FILES['userfile1']['name'];
+            $smarty->assign('image_data', urlencode($data));
+            $smarty->assign('image_name', $imgname);
+            $smarty->assign('image_type', $imgtype);
+            $smarty->assign('image_size', $imgsize);
+            $hasImage = 'y';
+            $smarty->assign('hasImage', 'y');
+            // Create preview cache image, for display afterwards
+            $cachefile = $prefs['tmpDir'];
+            if ($tikidomain) {
+                $cachefile .= "/$tikidomain";
+            }
 
-        $cachefile .= '/article_preview.' . $previewId;
-        if (move_uploaded_file($_FILES['userfile1']['tmp_name'], $cachefile)) {
-            $smarty->assign('imageIsChanged', 'y');
+            $cachefile .= '/article_preview.' . $previewId;
+            if (move_uploaded_file($_FILES['userfile1']['tmp_name'], $cachefile)) {
+                $smarty->assign('imageIsChanged', 'y');
+            }
+        } else {
+            Feedback::error($taglinelib->uploaded_file_error($_FILES['userfile1']['error']));
         }
     }
 
@@ -521,33 +525,37 @@ if (isset($_REQUEST['save']) && empty($errors)) {
     $imgtype = $_REQUEST['image_type'];
     $imgsize = $_REQUEST['image_size'];
 
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $file_name = $_FILES['userfile1']['name'];
+            $file_tmp_name = $_FILES['userfile1']['tmp_name'];
+            $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
+            if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
+                $smarty->assign('msg', tra('Errors detected'));
+                $smarty->display('error.tpl');
+                die();
+            }
+            $fp = fopen($tmp_dest, 'rb');
+            $imgdata = fread($fp, filesize($tmp_dest));
+            fclose($fp);
+            if (is_file($tmp_dest)) {
+                @unlink($tmp_dest);
+            }
+            $imgtype = $_FILES['userfile1']['type'];
+            $imgsize = $_FILES['userfile1']['size'];
+            $imgname = $_FILES['userfile1']['name'];
+        } else {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
         }
-        $file_name = $_FILES['userfile1']['name'];
-        $file_tmp_name = $_FILES['userfile1']['tmp_name'];
-        $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
-        if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
-            $smarty->assign('msg', tra('Errors detected'));
-            $smarty->display('error.tpl');
-            die();
-        }
-        $fp = fopen($tmp_dest, 'rb');
-        $imgdata = fread($fp, filesize($tmp_dest));
-        fclose($fp);
-        if (is_file($tmp_dest)) {
-            @unlink($tmp_dest);
-        }
-        $imgtype = $_FILES['userfile1']['type'];
-        $imgsize = $_FILES['userfile1']['size'];
-        $imgname = $_FILES['userfile1']['name'];
     }
 
     // TODO ImageGalleryRemoval23.x replace with a file gallery version

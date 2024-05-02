@@ -32,7 +32,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         );
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         $lib = TikiLib::lib('calendar');
 
@@ -60,6 +60,10 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'creation_date' => $typeFactory->timestamp($item['created']),
             'modification_date' => $typeFactory->timestamp($item['lastModif']),
             'contributors' => $typeFactory->multivalue([$item['user']]),
+            // Index object of all Participants including username, email, role, partstat. This is array of associative arrays, we keep that for the future.
+            'participants' => $typeFactory->multivalue([$item['participants']]),
+            // Index just participant emails. The value can be a username and not an email if 'login_is_email' pref is enabled.
+            'participant_emails' => $typeFactory->multivalue(array_column($item['participants'], 'email')),
             'description' => $typeFactory->plaintext($item['description']),
             'date' => $typeFactory->timestamp($item['start'], $allday),
 
@@ -84,7 +88,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'title',
@@ -93,6 +97,8 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'modification_date',
             'date',
             'contributors',
+            'participants',
+            'participant_emails',
             'description',
 
             'calendar_id',
@@ -112,7 +118,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'title' => 'sortable',
@@ -121,6 +127,8 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'modification_date' => 'timestamp',
             'date' => 'timestamp',
             'contributors' => 'multivalue',
+            'participants' => 'multivalue',
+            'participant_emails' => 'multivalue',
             'description' => 'plaintext',
 
             'calendar_id' => 'identifier',
@@ -140,7 +148,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'title' => true,

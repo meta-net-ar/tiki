@@ -57,7 +57,7 @@ class Handler
     public function themeExists($theme)
     {
         $themelib = TikiLib::lib('theme');
-        $listThemes = $themelib->get_themes();
+        $listThemes = $themelib->list_themes();
         if (in_array($theme, $listThemes)) {
             return true;
         }

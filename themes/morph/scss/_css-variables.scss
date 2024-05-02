@@ -72,8 +72,7 @@
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
-.tiki .tiki-admin-top-nav-light,
-.tiki .tiki-admin-aside-nav-light {
+@mixin admin-nav-light {
     --tiki-admin-navbar-bg: rgba(240, 245, 250, 1);
     --tiki-admin-top-nav-color: #485785;
     --tiki-admin-top-nav-hover-color: #485785;
@@ -96,8 +95,7 @@
 }
 
 // Dark navbar minus top nav
-.tiki .tiki-admin-top-nav-dark,
-.tiki .tiki-admin-aside-nav-dark {
+@mixin admin-nav-dark {
     --tiki-admin-top-nav-hover-color: #{$link-color};
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
     --tiki-admin-aside-nav-bg: #B0C0D5;
@@ -116,6 +114,22 @@
 .tiki.tiki-admin .top_modules.navbar-dark-parent {
     --tiki-admin-top-nav-bg: #B0C0D5;
 }
+
+// Color mode preference trumps L&F admin light navbar option
+[data-bs-theme=dark] {                              // dark color mode
+    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+        @include admin-nav-dark;                      // dark values
+    }
+}
+// Color mode preference trumps L&F admin dark navbar option
+[data-bs-theme=light] {                              // light color mode
+    .tiki .tiki-admin-top-nav-dark,
+    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
+        @include admin-nav-dark;                      // light values
+    }
+}
+
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 :root {

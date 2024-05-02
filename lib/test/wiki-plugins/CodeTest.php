@@ -19,7 +19,7 @@ class WikiPlugin_CodeTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($expectedOutput, wikiplugin_code($data, $params));
     }
 
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['', '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0"  data-clipboard-target="#codebox1" ><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting"  data-theme="off"  data-wrap="1"  dir="ltr"  style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" id="codebox1" ><div class="code"></div></pre></div>'],

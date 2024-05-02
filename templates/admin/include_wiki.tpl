@@ -17,7 +17,7 @@
             <br>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Activate the feature{/tr}</legend>
+                    <legend class="h3">{tr}Activate the feature{/tr}</legend>
                     {preference name=feature_wiki visible="always"}
                     {preference name=wikiHomePage}
                     {preference name=wiki_url_scheme}
@@ -25,7 +25,7 @@
             </div>
             <div class="adminoptionbox clearfix">
             <fieldset class="mb-3 w-100">
-                <legend>{tr}Page name{/tr}</legend>
+                <legend class="h3">{tr}Page name{/tr}</legend>
                 {preference name=wiki_badchar_prevent}
                 {preference name=wiki_page_regex}
                 {preference name=wiki_pagename_strip}
@@ -33,13 +33,16 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Page display{/tr}</legend>
+                    <legend class="h3">{tr}Page display{/tr}</legend>
                     {preference name=feature_page_title}
                     {preference name=wiki_page_name_above}
                     {preference name=wiki_page_name_inside}
                     {preference name=wiki_page_hide_title}
                     {preference name=wiki_heading_links}
                     {preference name=feature_wiki_description}
+                    <div class="adminoptionboxchild" id="wiki_description_childcontainer">
+                        {preference name=wiki_description_edit_tab_input}
+                    </div>
                     {preference name=feature_wiki_pageid}
                     {preference name=wiki_show_version}
                     {preference name=wiki_authors_style}
@@ -54,7 +57,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Editing{/tr}</legend>
+                    <legend class="h3">{tr}Editing{/tr}</legend>
                     {preference name=feature_wiki_undo}
                     {preference name=wiki_edit_minor}
                     {preference name=wiki_edit_plugin}
@@ -85,7 +88,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Automatic table of contents{/tr}</legend>
+                    <legend class="h3">{tr}Automatic table of contents{/tr}</legend>
                     {preference name=wiki_auto_toc}
                     <div class="adminoptionboxchild" id="wiki_auto_toc_childcontainer">
                         {preference name=wiki_inline_auto_toc}
@@ -98,7 +101,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Plugins{/tr}</legend>
+                    <legend class="h3">{tr}Plugins{/tr}</legend>
                     {preference name=wikiplugin_attach}
                     {preference name=wikiplugin_author}
                     {preference name=wikiplugin_backlinks}
@@ -125,7 +128,7 @@
             <br>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}General features{/tr}</legend>
+                    <legend class="h3">{tr}General features{/tr}</legend>
                     {preference name=wiki_uses_slides}
                     {preference name=feature_backlinks}
                             <div class="adminoptionboxchild" id="feature_backlinks_childcontainer">
@@ -195,7 +198,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Redirect and Similar{/tr}</legend>
+                    <legend class="h3">{tr}Redirect and Similar{/tr}</legend>
                         {preference name=feature_wiki_1like_redirection}
                         {preference name=wiki_prefixalias_tokens}
                         {preference name=feature_semantic}
@@ -210,7 +213,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Wikiwords Features{/tr}</legend>
+                    <legend class="h3">{tr}Wikiwords Features{/tr}</legend>
                     {preference name=feature_wikiwords}
                     {preference name=feature_wikiwords_usedash}
                     {preference name=feature_wiki_plurals}
@@ -218,7 +221,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Attachments{/tr}</legend>
+                    <legend class="h3">{tr}Attachments{/tr}</legend>
                     {preference name=feature_wiki_attachments}
                     <div class="adminoptionboxchild" id="feature_wiki_attachments_childcontainer">
                         {preference name=w_displayed_default}
@@ -256,7 +259,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Comments{/tr}</legend>
+                    <legend class="h3">{tr}Comments{/tr}</legend>
                     {preference name=feature_wiki_comments}
                     <div class="adminoptionboxchild" id="feature_wiki_comments_childcontainer">
                         {preference name=wiki_comments_allow_per_page}
@@ -270,7 +273,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Structures{/tr}{help url="Structures"}</legend>
+                    <legend class="h3">{tr}Structures{/tr}{help url="Structures"}</legend>
                     {preference name=feature_wiki_structure}
                     <div class="adminoptionboxchild" id="feature_wiki_structure_childcontainer">
                         {preference name=wiki_structure_bar_position}
@@ -289,7 +292,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Wiki watch{/tr}{help url="Watch"}</legend>
+                    <legend class="h3">{tr}Wiki watch{/tr}{help url="Watch"}</legend>
                     {preference name=wiki_watch_author}
                     {preference name=wiki_watch_editor}
                     {preference name=wiki_watch_comments}
@@ -298,7 +301,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Namespaces{/tr}{help url="Namespaces"}</legend>
+                    <legend class="h3">{tr}Namespaces{/tr}{help url="Namespaces"}</legend>
                     {preference name=namespace_enabled}
                     <div class="adminoptionboxchild" id="namespace_enabled_childcontainer">
                         <div class="offset-sm-4 colsm-8">
@@ -341,7 +344,7 @@
             <br>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                <legend>{tr}Options{/tr}</legend>
+                <legend class="h3">{tr}Options{/tr}</legend>
                     {preference name=feature_lastChanges}
                     {preference name=feature_listPages}
                     {preference name=feature_listorphanPages}
@@ -351,7 +354,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                <legend>{tr}Configuration{/tr}</legend>
+                <legend class="h3">{tr}Configuration{/tr}</legend>
                     {preference name=wiki_list_backlinks}
                     {preference name=wiki_list_categories}
                     {preference name=wiki_list_categories_path}
@@ -393,7 +396,7 @@
             <br>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Database dumps and restores{/tr}</legend>
+                    <legend class="h3">{tr}Database dumps and restores{/tr}</legend>
                     {tr}Create database archives of wiki pages for restoring at a later date.{/tr}
                     <div class="mb-3 row">
                         <label for="tagname" class="col-form-label col-sm-4">{tr}Name for dump{/tr}</label>
@@ -424,7 +427,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Dump files{/tr}</legend>
+                    <legend class="h3">{tr}Dump files{/tr}</legend>
                     {tr}Dump files archive wiki pages for various usages such as off-line browsing or distribution on optical disks.{/tr}
                     {remarksbox type="warning" title="{tr}Warning{/tr}"}
                     {tr}The HTML files generated may refer to files not included in the dump.{/tr} {tr}Dumps do not include files attached to wiki pages.{/tr}
@@ -437,7 +440,7 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend>{tr}Mass replace and page permissions report{/tr}</legend>
+                    <legend class="h3">{tr}Mass replace and page permissions report{/tr}</legend>
                     <div class="adminoptionbox clearfix">
                         {button href="tiki-search_replace.php" _text="{tr}Mass search and replace{/tr}" _icon_name="exchange-alt" _type="primary"}
                         {button href="tiki-report_direct_object_perms.php" _text="{tr}Report wiki pages with direct object permissions{/tr}" _icon_name="paperclip" _type="primary"}

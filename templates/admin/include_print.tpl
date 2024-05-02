@@ -5,7 +5,7 @@
     </div>
 
     <fieldset>
-        <legend>{tr}PDF settings{/tr}</legend>
+        <legend class="h3">{tr}PDF settings{/tr}</legend>
         {preference name=print_pdf_from_url}
         <div class="adminoptionboxchild print_pdf_from_url_childcontainer webkit">
             {preference name=print_pdf_webkit_path}
@@ -53,7 +53,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Wiki print version{/tr}</legend>
+        <legend class="h3">{tr}Wiki print version{/tr}</legend>
         {preference name=print_wiki_authors}
         {preference name=feature_wiki_print}
         <div class="adminoptionboxchild" id="feature_wiki_print_childcontainer">
@@ -64,12 +64,12 @@
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Articles{/tr}</legend>
+        <legend class="h3">{tr}Articles{/tr}</legend>
         {preference name=feature_cms_print}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Other features{/tr}</legend>
+        <legend class="h3">{tr}Other features{/tr}</legend>
         {preference name=print_original_url_tracker}
         {preference name=print_original_url_forum}
 

@@ -90,6 +90,7 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
     if ($result) {
         $perspectivelib = TikiLib::lib('perspective');
         $perspectivelib->replace_preference('wsHomepage', $page, $newName);
+        $perspectivelib->replace_preference_values('wikiHomePage', $newName);
 
         // If user has checked "semantic_alias" (Use Semantic Alias to redirect the old page to the new one?)
         // We'll append on the renamed page's content the following string, where $page is the original name

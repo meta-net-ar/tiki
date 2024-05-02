@@ -8,12 +8,12 @@
     </div>
 
     <fieldset>
-        <legend>{tr}Activate the feature{/tr}</legend>
+        <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_messages visible="always"}
     </fieldset>
 
     <fieldset>
-        <legend>{tr}Settings{/tr}</legend>
+        <legend class="h3">{tr}Settings{/tr}</legend>
 
         {preference name=allowmsg_by_default}
         {preference name=allowmsg_is_optional}

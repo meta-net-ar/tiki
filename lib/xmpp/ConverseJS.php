@@ -165,7 +165,7 @@ class ConverseJS
     public function get_js_dependencies()
     {
         $deps = [
-            CONVERSEJS_DIST_PATH . '/converse.js',
+            CONVERSEJS_DIST_PATH . '/converse.min.js',
             'lib/xmpp/js/conversejs-tiki.js',
             'lib/xmpp/js/conversejs-tiki-oauth.js',
         ];

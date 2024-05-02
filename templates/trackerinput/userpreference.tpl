@@ -42,15 +42,24 @@
         {/foreach}
     </select>
 {elseif $field.options_map.type eq 'gender'}
-    <label>
-        <input type="radio" name="{$field.ins_id}" value="Male" {if $field.value eq 'Male'}checked="checked"{/if}> {tr}Male{/tr}
+    <div class="form-check">
+        <input type="radio" name="{$field.ins_id}" id="gender_male" value="Male" {if $field.value eq 'Male'}checked="checked"{/if}>
+        <label for="gender_male">
+            {tr}Male{/tr}
     </label>
-    <label>
-        <input type="radio" name="{$field.ins_id}" value="Female" {if $field.value eq 'Female'}checked="checked"{/if}> {tr}Female{/tr}
-    </label>
-    <label>
-        <input type="radio" name="{$field.ins_id}" value="Hidden" {if $field.value eq 'Hidden'}checked="checked"{/if}> {tr}Hidden{/tr}
-    </label>
+    </div>
+    <div class="form-check">
+        <input type="radio" name="{$field.ins_id}" id="gender_female" value="Female" {if $field.value eq 'Female'}checked="checked"{/if}>
+        <label for="gender_female">
+             {tr}Female{/tr}
+        </label>
+    </div>
+    <div class="form-check">
+        <input type="radio" name="{$field.ins_id}" id="gender_hidden" value="Hidden" {if $field.value eq 'Hidden'}checked="checked"{/if}>
+        <label for="gender_hidden">
+             {tr}Hidden{/tr}
+        </label>
+    </div>
 {elseif $field.options_map.type eq 'location'}
     <div class="col-md-12 mb-5" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location">
         <div class="map-container" style="height: 250px;" data-geo-center="{defaultmapcenter}" data-target-field="location"></div>

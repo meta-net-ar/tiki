@@ -101,7 +101,7 @@ class MultiTikiMoveCommand extends Command
                     TEMP_HTTP_PUBLIC_PATH,
                     SMARTY_COMPILED_TEMPLATES_PATH,
                     SMARTY_TEMPLATES_PATH,
-                    THEMES_SRC_PATH,
+                    BASE_THEMES_SRC_PATH,
                     WHELP_PATH,
                     DEPRECATED_MODS_PATH,
                     DEPRECATED_FILES_PATH,

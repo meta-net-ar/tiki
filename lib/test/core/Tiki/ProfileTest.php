@@ -17,7 +17,7 @@ class ProfileTest extends TikiTestCase
         $this->assertEquals($expected, $profile->getTikiSupportedVersions());
     }
 
-    public function versionProfiles()
+    public static function versionProfiles()
     {
         return [
             [
@@ -51,7 +51,7 @@ class ProfileTest extends TikiTestCase
         $this->assertEquals($expected, $profile->isCompatible($tikiVersion));
     }
 
-    public function tikiVersionCompatibility()
+    public static function tikiVersionCompatibility()
     {
         $code = "{CODE(caption=>YAML,wrap=1)}\n%s\n{CODE}";
 
@@ -165,7 +165,7 @@ class ProfileTest extends TikiTestCase
         $this->assertEquals($expected, Tiki_Profile::isValidReference($reference));
     }
 
-    public function profileReferences()
+    public static function profileReferences()
     {
         return [
             ['$profiles.tiki.org:Test_All_Themes:Test_All_Themes', true],
@@ -177,7 +177,7 @@ class ProfileTest extends TikiTestCase
         ];
     }
 
-    public function profileDependencies()
+    public static function profileDependencies()
     {
         $code = "{CODE(caption=>YAML,wrap=1)}\n%s\n{CODE}";
 

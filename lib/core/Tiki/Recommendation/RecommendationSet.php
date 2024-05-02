@@ -41,32 +41,32 @@ class RecommendationSet implements \Countable, \Iterator
         return new \ArrayIterator($this->debug);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->recommendations);
     }
 
-    public function current()
+    public function current(): mixed
     {
         return current($this->recommendations);
     }
 
-    public function next()
+    public function next(): void
     {
         next($this->recommendations);
     }
 
-    public function key()
+    public function key(): string|int|null
     {
         return key($this->recommendations);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return current($this->recommendations) !== false;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->recommendations);
     }

@@ -265,7 +265,7 @@ class Services_Language_Utilities
     public function getCustomPhpTranslations($language)
     {
         $custom_file = $this->getLanguageDirectory($language);
-        $custom_file .= 'custom.php';
+        $custom_file .= LANG_CUSTOM_PHP_BASENAME;
 
         if (file_exists($custom_file)) {
             global $lang;
@@ -316,7 +316,7 @@ class Services_Language_Utilities
         $custom_file = $this->getLanguageDirectory($language);
 
         //add file name
-        $custom_file .= 'custom.php';
+        $custom_file .= LANG_CUSTOM_PHP_BASENAME;
 
         //prepare php file
         $custom_code = "<?php\r\n\$lang_custom = array(\r\n";

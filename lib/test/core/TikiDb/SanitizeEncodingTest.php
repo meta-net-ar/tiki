@@ -25,7 +25,7 @@ class SanitizeEncodingTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function filterUtf8DataProvider()
+    public static function filterUtf8DataProvider()
     {
         $c = SanitizeEncoding::INVALID_CHAR_REPLACEMENT;
 

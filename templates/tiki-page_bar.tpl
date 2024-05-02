@@ -175,7 +175,7 @@
             {if $more_section|trim neq ''}
                 <div class="btn-group dropup mb-2">
                     <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">{tr}More{/tr}</button>
-                    <div class="dropdown-menu" role="menu">
+                    <div class="dropdown-menu">
                         {$more_section}
                     </div>
                 </div>

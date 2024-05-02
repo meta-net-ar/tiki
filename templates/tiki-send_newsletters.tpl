@@ -168,7 +168,7 @@
             <span style="font-size: 50% !important;">{icon name='copy' title='|{tr}Copy the preview html{/tr}' class='tips copy-html'}</span>
         </h3>
         {jq}
-        $(document).tiki('copy')('.copy-html', () => $(".preview-html").html(), function() {
+        $('.copy-html').tiki('copy')(() => $(".preview-html").html(), function() {
             $(this).animate({opacity: .5}, 200, function () {
                 $(this).animate({opacity: 1}, 500);
             });

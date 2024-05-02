@@ -12,26 +12,26 @@
         <tr>
             <th>{tr}Directory{/tr}</th>
             <th>{tr}Files{/tr}/{tr}Size{/tr}</th>
-            <th></th>
+            <td></td>
         </tr>
         <tr>
             <td><b>./temp/templates_c/</b></td>
             <td>({$templates_c.cant} {tr}Files{/tr} / {$templates_c.total|kbsize|default:'0 Kb'})</td>
-            <td><a href="tiki-admin_system.php?do=templates_c" class="tips" title=":{tr}Empty{/tr}">{icon name="trash"}</a></td>
+            <td><a href="tiki-admin_system.php?do=templates_c" class="tips" title="{tr}Empty{/tr}" aria-label="{tr}Empty{/tr}">{icon name="trash"}</a></td>
         </tr>
         <tr>
             <td><b>./temp/cache/</b></td>
             <td>({$tempcache.cant} {tr}Files{/tr} / {$tempcache.total|kbsize|default:'0 Kb'})</td>
-            <td><a href="tiki-admin_system.php?do=temp_cache" class="tips" title=":{tr}Empty{/tr}">{icon name="trash"}</a></td>
+            <td><a href="tiki-admin_system.php?do=temp_cache" class="tips" title="{tr}Empty{/tr}" aria-label="{tr}Empty{/tr}">{icon name="trash"}</a></td>
         </tr>
         <tr>
             <td><b>./temp/public/</b></td>
             <td>({$temppublic.cant} {tr}Files{/tr} / {$temppublic.total|kbsize|default:'0 Kb'})</td>
-            <td><a href="tiki-admin_system.php?do=temp_public" class="tips" title=":{tr}Empty{/tr}">{icon name="trash"}</a></td>
+            <td><a href="tiki-admin_system.php?do=temp_public" class="tips" title="{tr}Empty{/tr}" aria-label="{tr}Empty{/tr}">{icon name="trash"}</a></td>
         </tr>
         <tr>
             <td colspan="2"><b>{tr}All user preference sessions{/tr}</b></td>
-            <td><a href="tiki-admin_system.php?do=prefs" class="tips" title=":{tr}Empty{/tr}">{icon name="trash"}</a></td>
+            <td><a href="tiki-admin_system.php?do=prefs" class="tips" title="{tr}Empty{/tr}" aria-label="{tr}Empty{/tr}">{icon name="trash"}</a></td>
         </tr>
     </table>
 </div>
@@ -48,7 +48,7 @@
     {/remarksbox}
     <form method="post" action="{$smarty.server.PHP_SELF|escape}" role="form" class"form">
         <div class="input-group">
-            <input type="text" name="zipPath" value="{$zipPath|escape}" class="form-control" placeholder="{tr}Full Path to the Zip File{/tr}" required="true">
+            <input type="text" name="zipPath" value="{$zipPath|escape}" class="form-control" placeholder="{tr}Full Path to the Zip File{/tr}" aria-label="{tr}Full Path to the Zip File{/tr}" required="true">
             <button type="submit" class="btn btn-primary" name="zip" title="{tr}ZIP{/tr}">{icon name="zip"} {tr}Generate zip{/tr}</button>
         </div>
         {if $zipPath}

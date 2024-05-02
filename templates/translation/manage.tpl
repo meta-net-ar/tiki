@@ -6,7 +6,7 @@
 
 {block name="content"}
     {if $translations|@count}
-        <label>
+        <label for="$trans.objId}">
             {tr}Current translation set{/tr}
         </label>
         <ul>

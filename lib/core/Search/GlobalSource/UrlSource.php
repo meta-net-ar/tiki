@@ -18,21 +18,21 @@ class Search_GlobalSource_UrlSource implements Search_GlobalSource_Interface
         ];
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         return [
             'url',
         ];
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         return [
             'url' => 'identifier',
         ];
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
         ];

@@ -323,42 +323,6 @@ class BlogLib extends TikiDb_Bridge
     }
 
     /**
-     * get_number_of_pages Returns the number of pages
-     *
-     * @param string $data
-     * @access public
-     * @return int number of pages
-     */
-    public function get_number_of_pages($data)
-    {
-        $parts = explode("...page...", $data);
-        return count($parts);
-    }
-
-    /**
-     * get_page Returns a spcific page of a post
-     *
-     * @param string $data
-     * @param int $i
-     * @access public
-     * @return string the page $i of the post
-     */
-    public function get_page($data, $i)
-    {
-        $parts = explode("...page...", $data);
-
-        $ret = $parts[$i - 1];
-        if (substr($parts[$i - 1], 1, 5) == "<br/>") {
-            $ret = substr($parts[$i - 1], 6);
-        }
-        if (substr($parts[$i - 1], 1, 6) == "<br />") {
-            $ret = substr($parts[$i - 1], 7);
-        }
-
-        return $ret;
-    }
-
-    /**
      * add_blog_hit Add a hit for the blog $blogId
      *
      * @param int $blogId
@@ -673,7 +637,7 @@ class BlogLib extends TikiDb_Bridge
 
         while ($res = $result->fetchRow()) {
             $res["comments"] = TikiLib::lib('comments')->count_comments('blog post:' . $res['postId']);
-            $res['pages'] = $this->get_number_of_pages($res['data']);
+            $res['pages'] = WikiPaginationUtils::getNumberOfPages($res['data']);
             $res['avatar'] = $tikilib->get_user_avatar($res['user']);
 
             $is_html = $res['wysiwyg'] === 'y' && $prefs['wysiwyg_htmltowiki'] !== 'y';
@@ -824,7 +788,7 @@ class BlogLib extends TikiDb_Bridge
      * @access public
      * @return int postId
      */
-    public function blog_post($blogId, $data, $excerpt, $user, $title = '', $contributions = '', $priv = 'n', $created = 0, $is_wysiwyg = false)
+    public function blog_post(int $blogId, string $data, string $excerpt, string $user, string $title = '', string $contributions = '', string $priv = 'n', $created = 0, bool $is_wysiwyg = false)
     {
         // update tiki_blogs and call activity functions
         global $prefs;

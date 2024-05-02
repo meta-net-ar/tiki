@@ -62,11 +62,9 @@
                 {/if}
                 <tr>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            {if $users[user].groupName ne 'Admins' and $users[user].groupName ne 'Anonymous' and $users[user].groupName ne 'Registered'}
-                                <input type="checkbox" name="checked[]" value="{$users[user].groupName|escape}">
+                        {if $users[user].groupName ne 'Admins' and $users[user].groupName ne 'Anonymous' and $users[user].groupName ne 'Registered'}
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$users[user].groupName|escape}">
                             {/if}
-                        </div>
                     </td>
                     <td class="id">{$users[user].id|escape}</td>
                     <td class="text">
@@ -582,8 +580,7 @@
                     {foreach from=$memberslist item=member}
                         <tr>
                             <td class="checkbox-cell">
-                                <div class="form-check"><input type="checkbox" name="checked[]" value="{$member.login}">
-                                </div>
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$member.login}">
                             </td>
                             <td class="username">{$member.login|userlink}</td>
                             <td class="date">{if not empty($member.created)}{$member.created|tiki_short_datetime}{/if}</td>
@@ -701,7 +698,9 @@
                             <tbody>
                                 {foreach from=$bannedlist item=member}
                                     <tr>
-                                        <td class="checkbox-cell"><div class="form-check"><input type="checkbox" name="user[]" value="{$member}"></div></td>
+                                        <td class="checkbox-cell">
+                                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="user[]" value="{$member}">
+                                        </td>
                                         <td class="username">{$member|userlink}</td>
                                         <td class="action">
                                             <a href="{bootstrap_modal controller=group action=unban_user user=$member group=$groupname}" class="tips" title=":{tr _0=$member _1=$group}Unban user %0 from group %1{/tr}">

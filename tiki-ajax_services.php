@@ -167,7 +167,7 @@ if ($access->is_serializable_request() && isset($_REQUEST['listonly'])) {
         $dir = 'img/icons';
         $max = isset($_REQUEST['max']) ? $_REQUEST['max'] : 10;
         $icons = [];
-        $style_dir = $tikilib->get_style_path($prefs['style'], $prefs['style_option']);
+        $style_dir = $tikilib->get_theme_path($prefs['style'], $prefs['style_option']);
         if ($style_dir && is_dir($style_dir . $dir)) {
             read_icon_dir($style_dir . $dir, $icons, $max, $query);
         }

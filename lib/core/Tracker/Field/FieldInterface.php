@@ -8,7 +8,17 @@ namespace Tracker\Field;
 
 interface FieldInterface
 {
-    public static function getTypes();
+    /**
+     * Return an array of types (ususally of just one element) that this
+     * class implements.  The key is the type string in the database,
+     * the content is an associative array of information about that type.
+     * For an example of a field implementing more than one type,
+     * see Tracker_Field_Dropdown
+     *
+     * Currently, we don't have constants to represent this.  The closest thing
+     * to a mapping is the return of Tracker_Field_Factory::buildTypeMap()
+    */
+    public static function getManagedTypesInfo(): array;
 
     /**
      * Optional method for implementations supporting multiple implementations or needing custom construction.

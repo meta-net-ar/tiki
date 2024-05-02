@@ -20,7 +20,7 @@ class Search_Elastic_QueryBuilder
     private $documentReader;
     private $index;
 
-    public function __construct(Search_Elastic_Index $index = null)
+    public function __construct(Search_Elastic_Index|null $index = null)
     {
         $this->factory = new Search_Elastic_TypeFactory();
         $this->documentReader = function ($type, $object) {

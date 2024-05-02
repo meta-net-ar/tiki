@@ -18,7 +18,7 @@
             {tr}or in{/tr}
             <span class="sr-only">Toggle dropdown</span>
         </button>
-        <div class="dropdown-menu" role="menu">
+        <div class="dropdown-menu">
             {if $prefs.feature_wiki eq 'y'}
                 <a class="dropdown-item" {if $type eq 'wiki page'} id="highlight"{/if} href="tiki-browse_categories.php?find={$find|escape:"url"}&amp;deep={$deep|escape:"url"}&amp;type=wiki+page&amp;parentId={$parentId|escape:"url"}&amp;sort_mode={$sort_mode|escape:"url"}">
                     {tr}Wiki pages{/tr}

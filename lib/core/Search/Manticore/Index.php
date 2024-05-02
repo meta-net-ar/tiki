@@ -55,7 +55,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $this->providedMappings = [];
             $stopwords_file = $this->getStopwordsFilePath();
             if (file_exists($stopwords_file)) {
-                unlink($stopwords_file);
+                @unlink($stopwords_file);
             }
             return true;
         }
@@ -200,8 +200,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     {
         global $prefs;
 
+        $old = umask(0);
         $stopwords_file = $this->getStopwordsFilePath();
         file_put_contents($stopwords_file, implode("\n", $prefs['unified_stopwords']));
+        chmod($stopwords_file, 0666);
+        umask($old);
 
         $settings = [
             'min_infix_len' => 2,

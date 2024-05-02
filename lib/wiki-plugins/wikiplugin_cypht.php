@@ -329,16 +329,16 @@ function wikiplugin_cypht($data, $params)
     $_SESSION[$session_prefix]['preference_name'] = $preference_name;
     $_SESSION[$session_prefix]['settings_per_page'] = $settings_per_page;
 
-    $_SESSION[$session_prefix]['groupmail'] = $params['groupmail'];
-    $_SESSION[$session_prefix]['group'] = $params['group'];
-    $_SESSION[$session_prefix]['trackerId'] = $params['trackerId'];
-    $_SESSION[$session_prefix]['fromFId'] = $params['fromFId'];
-    $_SESSION[$session_prefix]['subjectFId'] = $params['subjectFId'];
-    $_SESSION[$session_prefix]['messageFId'] = $params['messageFId'];
-    $_SESSION[$session_prefix]['contentFId'] = $params['contentFId'];
-    $_SESSION[$session_prefix]['accountFId'] = $params['accountFId'];
-    $_SESSION[$session_prefix]['datetimeFId'] = $params['datetimeFId'];
-    $_SESSION[$session_prefix]['operatorFId'] = $params['operatorFId'];
+    $_SESSION[$session_prefix]['groupmail'] = $params['groupmail'] ?? null;
+    $_SESSION[$session_prefix]['group'] = $params['group'] ?? null;
+    $_SESSION[$session_prefix]['trackerId'] = $params['trackerId'] ?? null;
+    $_SESSION[$session_prefix]['fromFId'] = $params['fromFId'] ?? null;
+    $_SESSION[$session_prefix]['subjectFId'] = $params['subjectFId'] ?? null;
+    $_SESSION[$session_prefix]['messageFId'] = $params['messageFId'] ?? null;
+    $_SESSION[$session_prefix]['contentFId'] = $params['contentFId'] ?? null;
+    $_SESSION[$session_prefix]['accountFId'] = $params['accountFId'] ?? null;
+    $_SESSION[$session_prefix]['datetimeFId'] = $params['datetimeFId'] ?? null;
+    $_SESSION[$session_prefix]['operatorFId'] = $params['operatorFId'] ?? null;
 
     if ($settings_per_page) {
         if ($data) {

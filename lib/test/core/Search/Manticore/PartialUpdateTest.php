@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class PartialUpdateTest extends \Search_Index_PartialUpdateTest
+class PartialUpdateTest extends \SearchIndexPartialUpdate
 {
     use IndexBuilder;
 

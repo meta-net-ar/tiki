@@ -11,9 +11,9 @@
     {/if}
     {if !isset($notable) || $notable neq 'y'}
         <div class="mb-3 row">
-            <label class="col-sm-{$labelcol} text-nowrap col-form-label pb-3{if !empty($labelclass)} {$labelclass}{/if}">
+            <div class="col-sm-{$labelcol} text-nowrap col-form-label pb-3{if !empty($labelclass)} {$labelclass}{/if}">
                 {tr}Categorize{/tr}
-            </label>
+            </div>
             <div class="col-sm-{$inputcol} pt-1">
                 {button href="#" _flip_id='categorizator' _class='btn btn-primary btn-sm tips' _text="{tr}Select Categories{/tr}" _flip_default_open='n'}
             </div>

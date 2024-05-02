@@ -55,7 +55,6 @@ blockquote {
     color: #BABABA;
 }
 
-
 h3.card-title {
     color: #9d9d9d;
     font-size: 24px;
@@ -66,10 +65,9 @@ h3.card-title {
     border-width: 0 8px .5rem 8px;
 }
 
-
 .module.card { border: none; }
 
-.card-header,
+.card-header:not(.text-bg-warning),
 .card.postbody .card-header{ background: #292929; } // Was .card-primary - still ok?
 
 .card-link,
@@ -97,7 +95,7 @@ h3.card-title {
 .tiki a.ui-button:active,
 .tiki .ui-button:active,
 .tiki .ui-button.ui-state-active:hover {
-    background: #818181; /* Old browsers */
+//    background: #818181; /* Old browsers */
     background: linear-gradient(to bottom, #818181 0%, #393939 100%);
 
 }
@@ -157,13 +155,13 @@ h3.card-title {
     color: #f2f2f2;
 }
 
-.top_modules {
-    .navbar-dark,
-    .navbar-light {
-        background: transparent !important;
-        border: none;
-    }
-}
+//.top_modules {
+//    .navbar-dark,
+//    .navbar-light {
+//        background: transparent !important;
+//        border: none;
+//    }
+//}
 
 .btn-link,
 .btn-outline-primary,
@@ -175,19 +173,19 @@ h3.card-title {
 .btn-outline-light,
 .btn-outline-dark {background: none !important;}
 
-.topbar {
-    margin-bottom: 1.3rem;
-}
+//.topbar {
+//    margin-bottom: 1.3rem;
+//}
 
-#topbar_modules,
-#top_modules {
-    .bg-dark,
-    .bg-light {
-        background: transparent !important;
-        border: none;
-        margin-bottom: 0;
-    }
-}
+//#topbar_modules,
+//#top_modules {
+//    .bg-dark,
+//    .bg-light {
+//        background: transparent !important;
+//        border: none;
+//        margin-bottom: 0;
+//    }
+//}
 
 #topbar_modules .mb-3 {
     margin-bottom: 0
@@ -201,23 +199,13 @@ h3.card-title {
     padding: .4rem 10px;
 }
 
-select {
-    background: #292929
-}
+//select {
+//    background: #292929
+//}
 
 .cke_wysiwyg_frame, .cke_wysiwyg_div {
     background: #292929 !important;
     color: #ffffff !important;
-}
-
-.even {
-    background: $table-accent-bg;
-}
-
-.odd,
-#trig_dptxt {
-    background: $table-bg;
-    color: $primary;
 }
 
 input[type="checkbox"] {
@@ -230,25 +218,14 @@ input.reportBuilderInput,
     background: #292929;
 }
 
-//textarea,  OLD?
-//input {
-//    background: $input-bg;
-//    color: $input-color;
-//}
-
 // Forums
 .form-control {
-    background: rgb(71,71,71);
     background: linear-gradient(180deg, rgba(71,71,71,1) 1%, rgba(99,99,99,1) 18%);
 }
 
 .jtrack-form {
     background: #292929 !important;
 }
-
-//.box-quickadmin .cssmenu_horiz ul li {
-//    background-color: $body-bg;
-//}
 
 a.toolbar {
     color: $link-color;
@@ -273,9 +250,4 @@ body.tiki.tiki-webmail {
     &.bg-success,
     &.bg-info,
     &.bg-warning { color: #000 !important; }
-}
-
-// Breadcrumbs
-.breadcrumb {
-    display: inline-block;
 }

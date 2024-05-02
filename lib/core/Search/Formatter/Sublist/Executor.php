@@ -79,18 +79,20 @@ class Executor
                                 // parent sublists might have entries with multiple records per key
                                 foreach ($row as $j => $subrow) {
                                     if (! empty($subrow[$field])) {
-                                        $values[] = $subrow[$field];
+                                        $actual_value = str_replace($placeholder, $subrow[$field], $value);
+                                        $values[] = $actual_value;
                                         $this->reverseMapping[$i][$j][] = [
-                                            'value' => $subrow[$field],
+                                            'value' => $actual_value,
                                             'target_field' => $arguments['field'],
                                         ];
                                     }
                                 }
                             }
                             if (! empty($row[$field])) {
-                                $values[] = $row[$field];
+                                $actual_value = str_replace($placeholder, $row[$field], $value);
+                                $values[] = $actual_value;
                                 $this->reverseMapping[$i][0][] = [
-                                    'value' => $row[$field],
+                                    'value' => $actual_value,
                                     'target_field' => $arguments['field'],
                                 ];
                             }
@@ -98,9 +100,10 @@ class Executor
                     } else {
                         foreach ($this->root_data as $i => $row) {
                             if (! empty($row[$field])) {
-                                $values[] = $row[$field];
+                                $actual_value = str_replace($placeholder, $row[$field], $value);
+                                $values[] = $actual_value;
                                 $this->reverseMapping[$i][0][] = [
-                                    'value' => $row[$field],
+                                    'value' => $actual_value,
                                     'target_field' => $arguments['field'],
                                 ];
                             }

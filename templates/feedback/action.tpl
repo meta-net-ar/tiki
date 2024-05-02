@@ -2,7 +2,9 @@
     {foreach $fb as $item}
         {remarksbox type="{$item.type}" title="{$item.title}"}
             {if !empty($item.mes)}
-                {$item.mes|escape}
+                {foreach $item.mes as $msg}
+                    {$msg|escape}
+                {/foreach}
             {/if}
             {if isset($item.items) && $item.items|count > 0}
                 <ul>

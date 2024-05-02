@@ -21,6 +21,11 @@ abstract class TikiTestCase extends TestCase
 {
     protected $backupGlobals = false;
 
+    /**
+     * @var string[]
+     */
+    private $warnings = [];
+
     protected function ensureDefaultGalleryExists()
     {
         $filegallib = TikiLib::lib('filegal');
@@ -57,5 +62,13 @@ abstract class TikiTestCase extends TestCase
         } catch (Throwable $e) {
             $this->assertEquals($message, $e->getMessage());
         }
+    }
+
+    /**
+     * @internal This method is not covered by the backward compatibility promise for PHPUnit
+     */
+    public function addWarning(string $warning): void
+    {
+        $this->warnings[] = $warning;
     }
 }

@@ -3,7 +3,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Roboto:400,500,700" !de
 @import url($web-font-path);
 
 @import "../../base_files/css/newsletter.scss";
-@import "../../../vendor_bundled/vendor/thomaspark/bootswatch/dist/sandstone/variables";
+@import "../../../node_modules/bootswatch/dist/sandstone/variables";
 
 //$font-family-sans-serif:  "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 //$font-family-base:        $font-family-sans-serif;

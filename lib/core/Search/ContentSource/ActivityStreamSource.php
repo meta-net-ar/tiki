@@ -29,7 +29,7 @@ class Search_ContentSource_ActivityStreamSource implements Search_ContentSource_
         return $this->lib->getActivityList();
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         global $prefs;
 
@@ -104,13 +104,13 @@ class Search_ContentSource_ActivityStreamSource implements Search_ContentSource_
         return $document;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $mapping = $this->lib->getMapping();
         return array_merge(['event_type', 'modification_date', 'clear_list', 'date'], array_keys($mapping));
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $mapping = $this->lib->getMapping();
         return array_merge([
@@ -121,7 +121,7 @@ class Search_ContentSource_ActivityStreamSource implements Search_ContentSource_
         ], $mapping);
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [
             'date' => true,

@@ -32,7 +32,7 @@
                             {tr}Read{/tr}
                         {/if}
                     </td>
-                    <td><input type="checkbox" name="complete[]" value="{$entry.object_id|escape}"></td>
+                    <td><input type="checkbox" name="complete[]"  class="form-check-input" aria-label="{tr}Select{/tr}" value="{$entry.object_id|escape}"></td>
                 </tr>
             {foreachelse}
                 <tr>

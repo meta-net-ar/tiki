@@ -2,9 +2,9 @@
     {if ! empty( $mod_transitions )}
         <form method="post" action="">
             {foreach from=$mod_transitions item=trans}
-                <div>
-                    <input id="transition-{$trans.transitionId|escape}" type="radio" name="transition" value="{$trans.transitionId|escape}" {if ! $trans.enabled}disabled="disabled"{/if} />
-                    <label for="transition-{$trans.transitionId|escape}">{$trans.name|escape}</label>
+                <div class="form-check">
+                    <input class="form-check-input" id="transition-{$trans.transitionId|escape}" type="radio" name="transition" value="{$trans.transitionId|escape}" {if ! $trans.enabled}disabled="disabled"{/if} />
+                    <label class="form-check-label" for="transition-{$trans.transitionId|escape}">{$trans.name|escape}</label>
                     {if ! $trans.enabled}
                         <a href="#trans{$trans.transitionId|escape}" class="mouseover">Why?</a>
                         <div id="trans{$trans.transitionId|escape}">

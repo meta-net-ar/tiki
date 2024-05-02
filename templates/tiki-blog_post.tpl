@@ -59,7 +59,7 @@
         {/if}
         <div class="mb-3 row">
             <div class="col-md-12">
-                <label class="col-form-label" for="title">{tr}Title{/tr}</label>
+                <label class="col-form-label" for="blog_title">{tr}Title{/tr}</label>
                 <input type="text" maxlength="255" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
             </div>
         </div>
@@ -114,7 +114,7 @@
         <div class="mb-3 row">
             <label class="col-md-4 col-form-label" for="blogpriv">{tr}Private{/tr}</label>
             <div class="col-md-8">
-                <input type="checkbox" name="blogpriv" id="blogpriv" {if $blogpriv eq 'y'}checked="checked"{/if}>
+                <input type="checkbox" class="form-check-input" name="blogpriv" id="blogpriv" {if $blogpriv eq 'y'}checked="checked"{/if}>
             </div>
         </div>
         {if $prefs.feature_blog_edit_publish_date eq 'y'}
@@ -126,8 +126,9 @@
                     {else}
                         {$created = ''}
                     {/if}
-                    {html_select_date prefix="publish_" time=$created start_year=$prefs.display_start_year end_year=$prefs.display_end_year field_order=$prefs.display_field_order} {tr}at{/tr}
-                    {html_select_time prefix="publish_" time=$created display_seconds=false use_24_hours=$use_24hr_clock}
+                    {html_select_date prefix="publish_" time=$created start_year=$prefs.display_start_year end_year=$prefs.display_end_year field_order=$prefs.display_field_order}
+                    <div class="ms-3 my-2">{tr}at{/tr}</div>
+                    <div class="ms-2">{html_select_time prefix="publish_" time=$created display_seconds=false use_24_hours=$use_24hr_clock}</div>
                 </div>
             </div>
         {/if}

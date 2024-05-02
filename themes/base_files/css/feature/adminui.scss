@@ -79,10 +79,10 @@ body.tiki-admin {
 // has been offset by removing rules not involving color where color classes were unnecessarily used repeatedly, one for light and one for dark.
 
 // Top nav light ------------------------------------------ Fixed-top position, light (background) option
-.tiki.tiki-admin .tiki-top-nav-light,
-.tiki.tiki-admin .top_modules.navbar-light-parent,
-.tiki.tiki-admin .navbar-light-parent .top_modules {
-    background: var(--tiki-admin-top-nav-bg) !important;
+.tiki-admin .tiki-top-nav-light,
+.tiki-admin .top_modules.navbar-light-parent,
+.tiki-admin .navbar-light-parent .top_modules {
+    background: var(--tiki-admin-top-nav-bg);
 }
 
 // Top links

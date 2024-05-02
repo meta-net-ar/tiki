@@ -65,10 +65,10 @@ class MachineLearningLib extends TikiDb_Bridge
     {
         if (empty($class)) {
             return [
-                'learner' => null,
-                'class' => null,
-                'instance' => null,
-                'serialized_args' => null
+            'learner' => null,
+            'class' => null,
+            'instance' => null,
+            'serialized_args' => null
             ];
         }
         $ref = new ReflectionClass('Rubix\ML\\' . $class);
@@ -98,10 +98,10 @@ class MachineLearningLib extends TikiDb_Bridge
             $instance = tr('(error instantiating)');
         }
         return [
-            'learner' => preg_replace('/^[^\\\\]*\\\\/', '', $class),
-            'class' => $class,
-            'instance' => $instance,
-            'serialized_args' => json_encode(['class' => $class, 'args' => $args])
+        'learner' => preg_replace('/^[^\\\\]*\\\\/', '', $class),
+        'class' => $class,
+        'instance' => $instance,
+        'serialized_args' => json_encode(['class' => $class, 'args' => $args])
         ];
     }
 
@@ -126,7 +126,7 @@ class MachineLearningLib extends TikiDb_Bridge
 
         $trklib = TikiLib::lib('trk');
         $items = $trklib->list_items($model['sourceTrackerId'], 0, $test ? 10 : -1);
-        $definition = Tracker_Definition::get($model['sourceTrackerId']);
+
         foreach ($items['data'] as $item) {
             $item = Tracker_Item::fromId($item['itemId']);
             switch ($model['labelField']) {
@@ -135,17 +135,21 @@ class MachineLearningLib extends TikiDb_Bridge
                     break;
                 case "itemTitle":
                     $label = $trklib->get_isMain_value($model['sourceTrackerId'], $item->getId());
-                    if ($trklib->get_main_field_type($model['sourceTrackerId']) === "n") {
+                    $definition = Tracker_Definition::get($model['sourceTrackerId']);
+                    $mainFieldId = $definition->getMainFieldId();
+                    $field = $definition->getFieldInfoFromFieldId($mainFieldId);
+                    $mainFieldType = $field['type'];
+                    if ($mainFieldType === "n") {
                         $label = floatval($label);
                     }
                     break;
                 default:
-                    $label = $trklib->get_item_value($model['sourceTrackerId'], $item->getId(), $model['labelField']);
+                        $label = $trklib->get_item_value($model['sourceTrackerId'], $item->getId(), $model['labelField']);
                     if ($trklib->get_tracker_field($model['labelField'], false)['type'] === "n") {
                         $label = floatval($label);
                     }
             }
-            $sample = [];
+                $sample = [];
             foreach ($model['trackerFields'] as $fieldId) {
                 $field = $trklib->get_tracker_field($fieldId, false);
                 $value = $trklib->get_item_value($model['sourceTrackerId'], $item->getId(), $fieldId);
@@ -163,8 +167,8 @@ class MachineLearningLib extends TikiDb_Bridge
             if (empty($sample)) {
                 continue;
             }
-            $samples[] = $sample;
-            $labels[] = $label;
+                $samples[] = $sample;
+                $labels[] = $label;
         }
 
         if (empty($samples) || empty($labels)) {

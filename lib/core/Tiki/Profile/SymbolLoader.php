@@ -22,7 +22,7 @@ class Tiki_Profile_SymbolLoader implements ArrayAccess
     private $filters;
     private $nextFilters;
 
-    public function __construct($store = null, array $filters = null, array $nextFilters = ['profile', 'domain'])
+    public function __construct($store = null, ?array $filters = null, array $nextFilters = ['profile', 'domain'])
     {
         $this->store = $store ?: new Tiki_Profile_SymbolLoader_Store();
         $this->nextFilters = $nextFilters;

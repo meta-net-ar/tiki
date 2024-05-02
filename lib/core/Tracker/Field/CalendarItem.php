@@ -12,7 +12,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
     /** @var CalendarLib $calendarLib */
     private $calendarLib;
 
-    public static function getTypes()
+    public static function getManagedTypesInfo(): array
     {
         $def = [
             'CAL' => [
@@ -44,7 +44,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
             ],
         ];
 
-        $parentDef = parent::getTypes();
+        $parentDef = parent::getManagedTypesInfo();
 
         $def['CAL']['params'] = array_merge($def['CAL']['params'], $parentDef['j']['params']);
 
@@ -186,7 +186,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $data = parent::getProvidedFields();
 
@@ -203,7 +203,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
         return $data;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
         return [

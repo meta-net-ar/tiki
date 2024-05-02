@@ -3,9 +3,9 @@
 
 <div class="pollnav">
 {if $show_toggle ne 'n'}
-<a onclick="javascript:toggleBlock('pollzone{$tracker.trackerId}');toggleBlock('polledit{$tracker.trackerId}');toggleSpan('pollicon{$tracker.trackerId}');toggleSpan('pollicon{$tracker.trackerId}o')" class="link" title="{tr}Toggle display{/tr}">
-<span id="pollicon{$tracker.trackerId}" style="display:inline;float:left"><img src="img/icons/bullet_toggle_plus.png" alt="{tr}Toggle{/tr}"></span>
-<span id="pollicon{$tracker.trackerId}o" style="display:none;float:left;"><img src="img/icons/bullet_toggle_minus.png" alt="{tr}Toggle{/tr}"></span>
+<a onclick="javascript:$('#pollzone{$tracker.trackerId}').toggle();$('#polledit{$tracker.trackerId}').toggle();$('#pollicon{$tracker.trackerId}').toggle();$('#pollicon{$tracker.trackerId}o').toggle()" class="link" title="{tr}Toggle display{/tr}">
+<span id="pollicon{$tracker.trackerId}" style="display:inline;float:left;"><i class="fa-solid fa-square-plus"></i></span>
+<span id="pollicon{$tracker.trackerId}o" style="display:none;float:left;"><i class="fa-regular fa-square-minus"></i></span>
 </a>
 {/if}
 {if $has_already_voted ne 'y'}<span class="highlight">{/if}{$tracker.name|escape}{if $has_already_voted ne 'y'}</span>{/if}

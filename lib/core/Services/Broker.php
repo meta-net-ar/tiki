@@ -41,6 +41,9 @@ class Services_Broker
             }
 
             if ($access->is_serializable_request()) {
+                if (TIKI_API) {
+                    TikiLib::lib('logs')->api_add_action();
+                }
                 echo $access->output_serialized($output);
             } else {
                 TikiLib::events()->trigger('tiki.process.render');
@@ -57,6 +60,9 @@ class Services_Broker
                 $smarty->assign('global_extend_layout', 'layouts/internal/layout_empty.tpl');
                 $smarty->display("extends:internal/modal.tpl|error-ajax.tpl");
             } else {
+                if (TIKI_API) {
+                    TikiLib::lib('logs')->api_add_action($e->getMessage(), $e->getCode());
+                }
                 $access->display_error(null, $e->getMessage(), $e->getCode());
             }
         } catch (Exception $e) {
@@ -70,6 +76,9 @@ class Services_Broker
                 $smarty->assign('global_extend_layout', 'layouts/internal/layout_empty.tpl');
                 $smarty->display("extends:internal/modal.tpl|error-ajax.tpl");
             } else {
+                if (TIKI_API) {
+                    TikiLib::lib('logs')->api_add_action($e->getMessage(), $e->getCode());
+                }
                 $access->display_error(null, $e->getMessage(), $e->getCode());
             }
         }

@@ -426,6 +426,9 @@ class StructLib extends TikiLib
         //The structure page is used as a title
         if ($level == 0) {
             $struct_info = $this->s_get_page_info($page_ref_id);
+            if (! $struct_info) {
+                return [];
+            }
             $aux['first']       = true;
             $aux['last']        = true;
             $aux['pos']         = '';

@@ -28,24 +28,28 @@ if ($topic_info == DB_ERROR) {
 $smarty->assign_by_ref('topic_info', $topic_info);
 $errors = false;
 if (isset($_REQUEST["edittopic"])) {
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
-        }
-        $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-        $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-        fclose($fp);
-        $imgtype = $_FILES['userfile1']['type'];
-        $imgsize = $_FILES['userfile1']['size'];
-        $imgname = $_FILES['userfile1']['name'];
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+            $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+            fclose($fp);
+            $imgtype = $_FILES['userfile1']['type'];
+            $imgsize = $_FILES['userfile1']['size'];
+            $imgname = $_FILES['userfile1']['name'];
 
-        $artlib->replace_topic_image($_REQUEST["topicid"], $imgname, $imgtype, $imgsize, $data);
+            $artlib->replace_topic_image($_REQUEST["topicid"], $imgname, $imgtype, $imgsize, $data);
+        } else {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
     }
 
     if (isset($_REQUEST["name"])) {

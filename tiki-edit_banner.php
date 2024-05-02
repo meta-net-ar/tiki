@@ -251,29 +251,33 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     $imgname = $_REQUEST["imageName"];
     $imgtype = $_REQUEST["imageType"];
 
-    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-        $filegallib = TikiLib::lib('filegal');
-        try {
-            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-        } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
-        }
-        $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
+    if (isset($_FILES['userfile1'])) {
+        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+            } catch (Exception $e) {
+                $smarty->assign('errortype', 403);
+                $smarty->assign('msg', $e->getMessage());
+                $smarty->display("error.tpl");
+                die;
+            }
+            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
 
-        $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
-        fclose($fp);
-        $imgtype = $_FILES['userfile1']['type'];
-        $imgsize = $_FILES['userfile1']['size'];
-        $imgname = $_FILES['userfile1']['name'];
-        $smarty->assign('imageData', urlencode($data));
-        $smarty->assign('imageName', $imgname);
-        $smarty->assign('imageType', $imgtype);
-        $_REQUEST["imageData"] = urlencode($data);
-        $_REQUEST["imageName"] = $imgname;
-        $_REQUEST["imageType"] = $imgtype;
+            $data = fread($fp, filesize($_FILES['userfile1']['tmp_name']));
+            fclose($fp);
+            $imgtype = $_FILES['userfile1']['type'];
+            $imgsize = $_FILES['userfile1']['size'];
+            $imgname = $_FILES['userfile1']['name'];
+            $smarty->assign('imageData', urlencode($data));
+            $smarty->assign('imageName', $imgname);
+            $smarty->assign('imageType', $imgtype);
+            $_REQUEST["imageData"] = urlencode($data);
+            $_REQUEST["imageName"] = $imgname;
+            $_REQUEST["imageType"] = $imgtype;
+        } else {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
     }
 
     $smarty->assign('imageData', $_REQUEST["imageData"]);

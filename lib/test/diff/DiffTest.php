@@ -28,13 +28,13 @@ class DiffTest extends TikiTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function providerDiffByType(): array
+    public static function providerDiffByType(): array
     {
         return [
             [
                 'htmldiff',
-                $this->loadAndParseFile(__DIR__ . '/fixtures/page1.wiki'),
-                $this->loadAndParseFile(__DIR__ . '/fixtures/page2.wiki'),
+                self::loadAndParseFile(__DIR__ . '/fixtures/page1.wiki'),
+                self::loadAndParseFile(__DIR__ . '/fixtures/page2.wiki'),
                 file_get_contents(__DIR__ . '/fixtures/htmldiff.html'),
             ],
             [
@@ -94,7 +94,7 @@ class DiffTest extends TikiTestCase
         ];
     }
 
-    protected function loadAndParseFile($file)
+    protected static function loadAndParseFile($file)
     {
         $parserLib = TikiLib::lib('parser');
 

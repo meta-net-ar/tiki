@@ -147,6 +147,7 @@ $creator = $wikilib->get_creator($page);
 $smarty->assign('creator', $creator);
 $smarty->assign('print_page', 'y');
 $smarty->assign('urlprefix', $base_url); // Obsolete, use base_url instead. This is for compatibility purposes only.
+$smarty->assign('global_extend_layout', 'layouts/internal/layout_empty.tpl');
 $smarty->assign('mid', 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl');
 $smarty->assign('display', isset($_REQUEST['display']) ? $_REQUEST['display'] : '');
 

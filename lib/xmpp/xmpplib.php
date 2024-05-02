@@ -62,13 +62,13 @@ class XMPPLib extends TikiLib
         $login = $query->fetchRow();
 
         if (empty($login['jid']) && $user) {
-            $login['jid'] = sprintf('%s@%s', $user, $prefs['xmpp_server_host']);
+            $login['jid'] = $user;
         }
 
         $info = [
             'domain'    => $this->server_host,
             'http_bind' => $this->server_http_bind,
-            'jid'       => JID::buildJid($login['jid'], $prefs['xmpp_server_host']),
+            'jid'       => $prefs['xmpp_server_host'] ? JID::buildJid($login['jid'], $prefs['xmpp_server_host']) : '',
             'password'  => $login['password'] ?: '',
             'username'  => $login['jid'],
             'nickname'  => $login['nickname'] ?: $user,
@@ -232,7 +232,7 @@ class XMPPLib extends TikiLib
         }
 
         $xmpp = $this->get_user_connection_info($user);
-        $xmpp_prebind_class = XmppPrebind;
+        $xmpp_prebind_class = 'XmppPrebind';
 
         $use_tikitoken = $xmpp['username'] === $user;
         $use_tikitoken = $use_tikitoken && $xmpp['domain'] === $this->server_host;
@@ -250,7 +250,7 @@ class XMPPLib extends TikiLib
                 ]
             );
             $xmpp['password'] = "$token";
-            $xmpp_prebind_class = TikiXmppPrebind;
+            $xmpp_prebind_class = 'TikiXmppPrebind';
         } else {
             if (empty($xmpp['password'])) {
                 return [];

@@ -9,7 +9,7 @@
     <h2>{tr}Add Type{/tr}</h2>
         <div class="mb-3 row mx-0">
             <div class="input-group">
-                <input type="text" name="new_type" class="form-control" placeholder="{tr}Add article type{/tr}...">
+                <input type="text" name="new_type" class="form-control" aria-label="{tr}Add article type{/tr} placeholder="{tr}Add article type{/tr}...">
                 <button type="submit" class="btn btn-secondary" name="add_type">{tr}Add{/tr}</button>
             </div>
         </div>
@@ -36,54 +36,34 @@
                 <tr>
                     <td class="integer">{$types[user].article_cnt}</td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="use_ratings[{$types[user].type|escape}]" {if $types[user].use_ratings eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="use_ratings[{$types[user].type|escape}]" {if $types[user].use_ratings eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_pre_publ[{$types[user].type|escape}]" {if $types[user].show_pre_publ eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_pre_publ[{$types[user].type|escape}]" {if $types[user].show_pre_publ eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_post_expire[{$types[user].type|escape}]" {if $types[user].show_post_expire eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_post_expire[{$types[user].type|escape}]" {if $types[user].show_post_expire eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="heading_only[{$types[user].type|escape}]" {if $types[user].heading_only eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="heading_only[{$types[user].type|escape}]" {if $types[user].heading_only eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="allow_comments[{$types[user].type|escape}]" {if $types[user].allow_comments eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="allow_comments[{$types[user].type|escape}]" {if $types[user].allow_comments eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="comment_can_rate_article[{$types[user].type|escape}]" {if $types[user].comment_can_rate_article eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="comment_can_rate_article[{$types[user].type|escape}]" {if $types[user].comment_can_rate_article eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_image[{$types[user].type|escape}]" {if $types[user].show_image eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_image[{$types[user].type|escape}]" {if $types[user].show_image eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_avatar[{$types[user].type|escape}]" {if $types[user].show_avatar eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_avatar[{$types[user].type|escape}]" {if $types[user].show_avatar eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_author[{$types[user].type|escape}]" {if $types[user].show_author eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_author[{$types[user].type|escape}]" {if $types[user].show_author eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_pubdate[{$types[user].type|escape}]" {if $types[user].show_pubdate eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_pubdate[{$types[user].type|escape}]" {if $types[user].show_pubdate eq 'y'}checked="checked"{/if}>
                     </td>
                 </tr>
                 <tr>
@@ -95,48 +75,32 @@
                     <th>{tr}Show source{/tr}</th>
                     <th>{tr}Show image caption{/tr}</th>
                     <th>{tr}Creator can edit{/tr}</th>
-                    <th colspan="3"></th>
+                    <td colspan="3"></td> {* th changed to td to prevent ARIA empty header error  *}
                 </tr>
                 <tr>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_expdate[{$types[user].type|escape}]" {if $types[user].show_expdate eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_expdate[{$types[user].type|escape}]" {if $types[user].show_expdate eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_reads[{$types[user].type|escape}]" {if $types[user].show_reads eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_reads[{$types[user].type|escape}]" {if $types[user].show_reads eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_size[{$types[user].type|escape}]" {if $types[user].show_size eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_size[{$types[user].type|escape}]" {if $types[user].show_size eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_topline[{$types[user].type|escape}]" {if $types[user].show_topline eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_topline[{$types[user].type|escape}]" {if $types[user].show_topline eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_subtitle[{$types[user].type|escape}]" {if $types[user].show_subtitle eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_subtitle[{$types[user].type|escape}]" {if $types[user].show_subtitle eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_linkto[{$types[user].type|escape}]" {if $types[user].show_linkto eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_linkto[{$types[user].type|escape}]" {if $types[user].show_linkto eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="show_image_caption[{$types[user].type|escape}]" {if $types[user].show_image_caption eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_image_caption[{$types[user].type|escape}]" {if $types[user].show_image_caption eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="creator_edit[{$types[user].type|escape}]" {if $types[user].creator_edit eq 'y'}checked="checked"{/if}>
-                        </div>
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="creator_edit[{$types[user].type|escape}]" {if $types[user].creator_edit eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="action" colspan="3">
                         {if $types[user].article_cnt eq 0}
@@ -155,20 +119,20 @@
                 <table class="table table-striped table-hover">
                     <tr>
                         <th>{tr}Custom attribute{/tr}</th>
-                        <th></th>
+                        <td></td> {* th changed to td to prevent ARIA empty header error *}
                     </tr>
                     {foreach from=$types[user].attributes item=att key=attname}
                         <tr>
                             <td>{$attname|escape}</td>
                             <td class="action">
-                                <a class="tips" title=":{tr}Remove{/tr}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
+                                <a class="tips" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" href="tiki-article_types.php?att_type={$types[user].type|escape:url}&att_remove={$att.relationId|escape:url}">
                                     {icon name='remove' alt="{tr}Remove{/tr}"}
                                 </a>
                             </td>
                         </tr>
                     {/foreach}
                     <tr>
-                        <td><input type="text" name="new_attribute[{$types[user].type|escape}]" value="" class="form-control"></td>
+                        <td><input type="text" name="new_attribute[{$types[user].type|escape}]" aria-label="{tr}Custom attribute{/tr}" value="" class="form-control"></td>
                         <td>&nbsp;</td>
                     </tr>
                 </table>

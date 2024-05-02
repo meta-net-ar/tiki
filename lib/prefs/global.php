@@ -352,10 +352,10 @@ function prefs_global_list($partial = false)
             'help' => 'Login-General-Preferences#Remember_Me',
             'options' => [
                 'disabled' => tra('Disabled'),
-                'all'           => tra("User's choice"),
-                'always'    => tra('Always'),
+                'all'      => tra("User's choice"),
+                'always'   => tra('Always'),
             ],
-            'default' => 'disabled',
+            'default' => 'all',
             'tags' => ['basic'],
         ],
         'remembertime' => [
@@ -378,7 +378,7 @@ function prefs_global_list($partial = false)
                 '2629743'   => '1 ' . tra('month'),
                 '31556926'  => '1 ' . tra('year'),
             ],
-            'default' => 7200,
+            'default' => 2629743,
             'tags' => ['basic'],
         ],
         'urlIndexBrowserTitle' => [

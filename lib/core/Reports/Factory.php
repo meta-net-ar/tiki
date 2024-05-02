@@ -14,7 +14,7 @@ require_once(__DIR__ . '/../../webmail/tikimaillib.php');
  */
 class Reports_Factory
 {
-    public static function build($className, DateTime $dt = null, TikiMail $tm = null, TikiLib $tikilib = null, $tikiPrefs = null)
+    public static function build($className, ?DateTime $dt = null, ?TikiMail $tm = null, ?TikiLib $tikilib = null, $tikiPrefs = null)
     {
         $db = TikiDb::get();
 

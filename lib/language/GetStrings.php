@@ -83,7 +83,7 @@ class Language_GetStrings
      * @param array $options list of options to control object behavior (see above)
      * @return null
      */
-    public function __construct(Language_CollectFiles $collectFiles, Language_WriteFile_Factory $writeFileFactory, array $options = null)
+    public function __construct(Language_CollectFiles $collectFiles, Language_WriteFile_Factory $writeFileFactory, array|null $options = null)
     {
         $this->collectFiles = $collectFiles;
         $this->writeFileFactory = $writeFileFactory;

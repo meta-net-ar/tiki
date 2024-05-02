@@ -1,0 +1,255 @@
+// Custom styles for the Business theme.
+
+// - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
+
+// Color system
+
+// scss-docs-start gray-color-variables
+$white:    #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #495057 !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
+// scss-docs-end gray-color-variables
+
+$grays: (
+    "100": $gray-100,
+    "200": $gray-200,
+    "300": $gray-300,
+    "400": $gray-400,
+    "500": $gray-500,
+    "600": $gray-600,
+    "700": $gray-700,
+    "800": $gray-800,
+    "900": $gray-900
+) !default;
+
+$primary:       #0074C7;
+$secondary: #3911ce;// #7400c3; // $gray-600 !default;
+$success:       #214A21; // #5cb85c;
+$info:          #20809D; //#5bc0de;
+$warning:       #f0ad4e;
+$danger:        #B82D28; // #d9534f;
+$dark:          #01366c;
+$black: #000;
+$white: #fff;
+$light: #f6f6f6;
+
+$green:   #198754 !default; // Bootstrap 5.3
+$red:     #dc3545 !default;
+$pink:    #d63384 !default; // Bootstrap 5.3
+$green-300: tint-color($green, 40%) !default;
+$red-300: tint-color($red, 40%) !default;
+
+$primary:       #0074C7;
+$secondary:     #3911ce;
+$success:       #214A21;
+$info:          #20809D;
+$warning:       #975D0C;
+$danger:        #B82D28;
+
+$theme-colors: (
+    "primary": #0074C7,
+    "secondary": #3911ce,
+    "success": #214A21, //#5cb85c,
+    "info": #20809D, //#5bc0de,
+    "warning": #975D0C, // #f0ad4e,
+    "danger": #B82D28, // #d9534f
+    "light":      $light,
+    "dark":       $dark
+);
+
+
+// scss-docs-start theme-text-variables
+$primary-text-emphasis:   shade-color($primary, 60%) !default;
+$secondary-text-emphasis: shade-color($secondary, 60%) !default;
+$success-text-emphasis:   shade-color($success, 60%) !default;
+$info-text-emphasis:      shade-color($info, 60%) !default;
+$warning-text-emphasis:   shade-color($warning, 60%) !default;
+$danger-text-emphasis:    shade-color($danger, 60%) !default;
+$light-text-emphasis:     $gray-700 !default;
+$dark-text-emphasis:      $gray-700 !default;
+// scss-docs-end theme-text-variables
+
+// scss-docs-start theme-bg-subtle-variables
+$primary-bg-subtle:       tint-color($primary, 80%) !default;
+$secondary-bg-subtle:     tint-color($secondary, 80%) !default;
+$success-bg-subtle:       tint-color($success, 80%) !default;
+$info-bg-subtle:          tint-color($info, 80%) !default;
+$warning-bg-subtle:       tint-color($warning, 80%) !default;
+$danger-bg-subtle:        tint-color($danger, 80%) !default;
+$light-bg-subtle:         mix($gray-100, $white) !default;
+$dark-bg-subtle:          $gray-400 !default;
+// scss-docs-end theme-bg-subtle-variables
+
+// scss-docs-start theme-border-subtle-variables
+$primary-border-subtle:   tint-color($primary, 60%) !default;
+$secondary-border-subtle: tint-color($secondary, 60%) !default;
+$success-border-subtle:   tint-color($success, 60%) !default;
+$info-border-subtle:      tint-color($info, 60%) !default;
+$warning-border-subtle:   tint-color($warning, 60%) !default;
+$danger-border-subtle:    tint-color($danger, 60%) !default;
+$light-border-subtle:     $gray-200 !default;
+$dark-border-subtle:      $gray-500 !default;
+// scss-docs-end theme-border-subtle-variables
+
+// Options
+// Prefix for :root CSS variables
+$enable-shadows:              true;
+$enable-gradients:              true;
+$variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
+$prefix:                      $variable-prefix !default;
+
+// Spacing
+// Position
+// Body
+$body-color: $gray-800;
+$body-bg: #fff;
+
+// Utility maps
+//Links
+$link-color: #005999; //#0074C7;
+$link-shade-percentage:                   20% !default; // Bootstrap 5.3
+$link-hover-color:                        shift-color($link-color, $link-shade-percentage) !default;
+
+// Grid breakpoints
+// Grid containers
+// Grid columns
+// Container padding
+//Components
+$border-radius-lg: 8px;
+$border-color: $gray-400;
+
+// Typography
+// Fonts
+$font-family-sans-serif:        Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif; //'Merriweather Sans', sans-serif;
+$font-size-base:                1rem;
+$font-weight-normal:            400;
+$headings-font-weight:          400;
+
+$text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- $gray-700;
+
+$blockquote-color: #4D4D4D;
+$headings-color:              inherit !default;
+
+// Tables
+$table-border-color:               #dddddd;
+
+// Buttons + Forms
+// Buttons (Primary and info need to be explicitly defined for converse.js.)
+$btn-primary-color: #ffffff;
+$btn-primary-bg: #3676c4;
+$btn-primary-border: #3676c4;
+
+$btn-secondary-color: #ffffff;
+$btn-secondary-bg: #3676c4;
+
+$btn-info-bg: #fff;
+$btn-info-color: #17a2b8;
+$btn-info-border: #17a2b8;
+
+// Forms
+$input-border: #dddddd;
+$input-group-addon-bg: var(--#{$prefix}tertiary-bg) !default; // #DBDBDB;
+
+// Form validation
+// Z-index master list
+
+// Navs
+$nav-link-color:                    var(--#{$prefix}link-color); // !important;
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color); // !important;
+
+//Navbar
+$navbar-dark-color:             #ffffff;
+$navbar-dark-bg:                 #1f5daa;
+$navbar-dark-border:             darken($navbar-dark-bg, 6.5%);
+
+
+
+// Navbar links
+$navbar-dark-color:                  #ffffff;
+$navbar-dark-hover-color:          darken(#fff, 10%);
+$navbar-dark-hover-bg:              transparent;
+$navbar-dark-active-color:          #ffffff;
+$navbar-dark-active-bg:              #3270bd;
+$navbar-dark-disabled-color:         #cccccc;
+
+$navbar-light-color:                $link-color;
+$navbar-light-hover-color:          lighten($link-color,5%);
+$navbar-light-active-color:         $navbar-light-hover-color;
+$navbar-light-disabled-color:       rgba($black, .3) !default;
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-light-toggler-border-color: rgba($black, .1) !default;
+
+$navbar-light-brand-color:                $navbar-light-active-color !default;
+$navbar-light-brand-hover-color:          $navbar-light-active-color !default;
+$navbar-dark-brand-color:                 $navbar-dark-active-color !default;
+$navbar-dark-brand-hover-color:           $navbar-dark-active-color !default;
+
+// Dropdowns
+$dropdown-color:                    $body-color !default;
+$dropdown-bg:                       #fff; //$white !default;
+//$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
+$dropdown-link-color:               $link-color;
+$dropdown-link-hover-color:         shade-color($dropdown-link-color, 10%) !default;
+$dropdown-link-hover-bg:            $gray-200 !default;
+
+//$dropdown-link-active-color:        $component-active-color !default;
+//$dropdown-link-active-bg:           $component-active-bg !default;
+
+$dropdown-link-disabled-color:      $gray-500 !default;
+
+$dropdown-dark-color:               $gray-300;
+$dropdown-dark-bg:                  $gray-800;
+$dropdown-dark-link-hover-color:    $white !default;
+$dropdown-dark-link-hover-bg:       rgba($white, .15) !default;
+// Pagination
+// Placeholders
+// Cards
+$card-border-radius: $border-radius-lg;
+$card-text: #fff; // @gray-lighter;
+$card-header-bg: #386dbb;
+
+// Accordion
+// Tooltips
+// Popovers
+$popover-bg:                        var(--#{$prefix}body-bg) !default;
+$popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
+$popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
+$popover-header-color:              $headings-color !default;
+$popover-body-color:                var(--#{$prefix}body-color) !default;
+
+// Toasts
+// Badges
+// Modals
+$modal-header-border-color:   #386dbb;
+
+// Alerts
+// Progress bars
+// List group
+// Image thumbnails
+// Figures
+// Breadcrumbs
+// Carousel
+// Spinners
+// Close
+// Offcanvas
+// Code
+$code-color:                        $body-color; // $pink !default; // Bootstrap 5.3
+
+// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
+
+// base_files/scss/tiki-variables.scss overrides start
+$tiki-module-h3-card-title-font-size: .95rem;
+
+//------- Tiki SCSS variables
+
+$tiki-nav-link-vertical-color: $link-color;
+$tiki-nav-link-vertical-hover-color: $link-hover-color;
+$tiki-nav-link-vertical-focus-color: $link-hover-color;

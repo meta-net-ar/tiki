@@ -36,7 +36,7 @@ class TestableTikiLibTest extends TikiTestCase
 
         $this->assertInstanceOf(CalendarLib::class, TikiLib::lib('calendar'));
         $obj->overrideLibs(['calendar' => $calendarlib]);
-        $this->assertStringContainsString('Mock_CalendarLib_', get_class(TikiLib::lib('calendar')));
+        $this->assertStringContainsString('MockObject_CalendarLib_', get_class(TikiLib::lib('calendar')));
     }
 
     public function testOverrideLibCheckIfLibReturnedToOriginalStateAfterLastTest(): void

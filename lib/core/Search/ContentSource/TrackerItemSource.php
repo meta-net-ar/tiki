@@ -30,14 +30,8 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         return $this->db->table('tiki_tracker_items')->fetchColumn('itemId', []);
     }
 
-    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory)
+    public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
-        /*
-            If you wonder why this method uses straight SQL and not trklib, it's because
-            trklib performs no meaningful work when extracting the data and strips all
-            required semantics.
-        */
-
         $data = [];
 
         $item = $this->trklib->get_tracker_item($objectId);
@@ -46,20 +40,20 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             return false;
         }
 
-        $itemObject = Tracker_Item::fromInfo($item);
-
-        if (empty($itemObject) || ! $itemObject->getDefinition()) { // ignore corrupted items, e.g. where trackerId == 0
+        try {
+            $itemObject = Tracker_Item::fromInfo($item);
+            $definition = $itemObject->getDefinition();
+            if (! $definition) {
+                throw new InvalidArgumentException("Tracker definition not found for item $objectId");
+            }
+        } catch (InvalidArgumentException $e) {
+            // ignore corrupted items, e.g. where trackerId == 0
+            trigger_error($e->getMessage());
             return false;
         }
 
         $permNeeded = $itemObject->getViewPermission();
         $specialUsers = $itemObject->getSpecialPermissionUsers($objectId, 'View');
-
-        $definition = Tracker_Definition::get($item['trackerId']);
-
-        if (! $definition) {
-            return $data;
-        }
 
         $fieldPermissions = [];
 
@@ -72,7 +66,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             $data = array_merge($data, $documentPart);
 
             $field = $handler->getFieldDefinition();
-            // if isHidden is "y" (Visible after creation by administrators only) then fiueld perms apply
+            // if isHidden is "y" (Visible after creation by administrators only) then field perms apply
             // all other settings of "visibility" control writing, not reading
             if ($field['isHidden'] === 'y' || ! empty($field['visibleBy'])) {
                 $fieldPermissions[$field['permName']] = array_merge(
@@ -122,7 +116,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         return $data;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         static $data;
 
@@ -146,14 +140,14 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'parent_object_type',
         ];
 
-        foreach ($this->getAllIndexableHandlers() as $handler) {
+        foreach (self::getAllIndexableHandlers() as $handler) {
             $data = array_merge($data, $handler->getProvidedFields());
         }
 
         return array_unique($data);
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         static $data;
 
@@ -177,14 +171,14 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'parent_object_type' => 'identifier',
         ];
 
-        foreach ($this->getAllIndexableHandlers() as $handler) {
+        foreach (self::getAllIndexableHandlers() as $handler) {
             $data = array_merge($data, $handler->getProvidedFieldTypes());
         }
 
         return $data;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         static $data;
 
@@ -194,16 +188,21 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
 
         $data = [];
 
-        foreach ($this->getAllIndexableHandlers() as $handler) {
-            $data = array_merge($data, $handler->getGlobalFields());
+        foreach (self::getAllIndexableHandlers() as $handler) {
+            if (! ($handler->isMainField())) {
+                $data = array_merge($data, $handler->getGlobalFields());
+            } else {
+                //Skip this field if it's the main title field, it will still be part of title later, we don't want it twice in contents, and we want it at the end
+                //var_dump($handler->getBaseKey());
+            }
         }
 
         $data['title'] = true;
-        $data['date'] = true;
+        //$data['date'] = true;//Why would we want to append the date to contents? - benoitg - 2024-03-09
         return $data;
     }
 
-    public static function getIndexableHandlers($definition, $item = [])
+    public static function getIndexableHandlers(Tracker_Definition $definition, $item = [])
     {
         return self::getHandlersMatching('\Tracker\Field\IndexableInterface', $definition, $item);
     }
@@ -232,9 +231,15 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         return $handlers;
     }
 
-    private function getAllIndexableHandlers()
+    /**
+     * Get all indexable field handlers from EVERY field configured in
+     * ANY tracker in the database.
+     *
+    */
+    private static function getAllIndexableHandlers()
     {
-        $trackers = $this->db->table('tiki_trackers')->fetchColumn('trackerId', []);
+        //I think this will hit the database a ridiculous number of times as currently implemented - benoitg - 2024-03-09
+        $trackers = TikiDb::get()->table('tiki_trackers')->fetchColumn('trackerId', []);
 
         $handlers = [];
         foreach ($trackers as $trackerId) {
@@ -268,10 +273,11 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             Search_Query_Facet_Term::fromField('tracker_status')
                 ->setLabel(tr('Tracker Status'))
                 ->setRenderCallback(function ($status) {
+                    $status_types = TikiLib::lib('trk')->status_types();
                     $statuses = [
-                        'o' => 'Open',
-                        'p' => 'Pending',
-                        'c' => 'Closed'
+                        'o' => $status_types['o']['label'],
+                        'p' => $status_types['p']['label'],
+                        'c' => $status_types['c']['label']
                     ];
                     return $statuses[$status];
                 })

@@ -99,7 +99,7 @@
                     <th id="hits" class="text-end">{self_link _sort_arg='sort_mode' _sort_field='hits'}{tr}Visits{/tr}{/self_link}</th>
                 {/if}
                 {$numbercol = $numbercol + 1}
-                <th id="actions"></th>
+                <td id="actions"></td>
             </tr>
         </thead>
         {/block}

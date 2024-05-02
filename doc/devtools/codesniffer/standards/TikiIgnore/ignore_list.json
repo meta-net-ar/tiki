@@ -387,6 +387,18 @@
         "lib\/tikisession-pdo.php": {
             "class:Session": true
         },
+        "lib\/test\/core\/Search\/Index\/SearchIndexTypeAnalyzer.php": {
+            "class:SearchIndexTypeAnalyzer": true
+        },
+        "lib\/test\/core\/Search\/Index\/SearchIndexIncrementalUpdate.php": {
+            "class:SearchIndexIncrementalUpdate": true
+        },
+        "lib\/test\/core\/Search\/Index\/SearchIndexStemming.php": {
+            "class:SearchIndexStemming": true
+        },
+        "lib\/test\/core\/Search\/Index\/SearchIndexNumeric.php": {
+            "class:SearchIndexNumeric": true
+        },
         "lib\/core\/Search\/Elastic\/Connection.php": {
             "class:Search_Elastic_Connection": true
         },
@@ -440,6 +452,21 @@
         },
         "lib\/webmail\/contactlib.php": {
             "class:ContactLib": true
+        },
+        "lib\/test\/core\/Search\/MySql\/SearchMySqlPartialUpdateTest.php": {
+            "class:SearchMySqlPartialUpdateTest": true
+        },
+        "lib\/test\/language\/LanguageFileTest.php": {
+            "class:LanguageFileTest": true
+        },
+        "lib\/test\/core\/Search\/Elastic\/SearchElasticQueryRepository.php": {
+            "class:SearchElasticQueryRepository": true
+        },
+        "lib\/test\/core\/Search\/Elastic\/SearchElasticPartialUpdateTest.php": {
+            "class:SearchElasticPartialUpdateTest": true
+        },
+        "lib\/test\/importer\/TikiImporterBlogWordpressTest.php": {
+            "class:TikiImporterBlogWordpressTest": true
         },
         "lib\/test\/core\/Multilingual\/Aligner\/SentenceAlignmentsTest.php": {
             "class:Multilingual_Aligner_SentenceAlignmentsTest": true
@@ -955,8 +982,8 @@
         "lib\/core\/Search\/Action\/Action.php": {
             "interface:Search_Action_Action": true
         },
-        "lib\/test\/core\/Search\/Elastic\/QueryRepositoryTest.php": {
-            "class:Search_Elastic_QueryRepositoryTest": true
+        "lib\/test\/core\/Search\/Elastic\/QueryRepository.php": {
+            "class:Search_Elastic_QueryRepository": true
         },
         "lib\/core\/Search\/Action\/UnknownStep.php": {
             "class:Search_Action_UnknownStep": true
@@ -1037,7 +1064,7 @@
             "class:Search_Action_FileGalleryChangeFilename": true
         },
         "lib\/test\/core\/Search\/Index\/NumericTest.php": {
-            "class:Search_Index_NumericTest": true
+            "class:SearchIndexNumeric": true
         },
         "lib\/smarty_tiki\/resource.tplwiki.php": {
             "class:Smarty_Resource_Tplwiki": true
@@ -1045,8 +1072,8 @@
         "lib\/core\/Perms\/ResolverFactory\/ObjectFactory.php": {
             "class:Perms_ResolverFactory_ObjectFactory": true
         },
-        "lib\/test\/core\/Search\/Index\/PartialUpdateTest.php": {
-            "class:Search_Index_PartialUpdateTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexPartialUpdate.php": {
+            "class:SearchIndexPartialUpdate": true
         },
         "lib\/core\/Search\/Action\/EmailAction.php": {
             "class:Search_Action_EmailAction": true
@@ -1054,8 +1081,8 @@
         "lib\/core\/Perms\/ResolverFactory\/TestFactory.php": {
             "class:Perms_ResolverFactory_TestFactory": true
         },
-        "lib\/test\/core\/Search\/Index\/BaseTest.php": {
-            "class:Search_Index_BaseTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexBase.php": {
+            "class:SearchIndexBase": true
         },
         "lib\/core\/Search\/Action\/FileGalleryImageOverlay.php": {
             "class:Search_Action_FileGalleryImageOverlay": true
@@ -1063,8 +1090,8 @@
         "lib\/core\/Category\/Manipulator.php": {
             "class:Category_Manipulator": true
         },
-        "lib\/test\/core\/Search\/Index\/SortTest.php": {
-            "class:Search_Index_SortTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexSort.php": {
+            "class:SearchIndexSort": true
         },
         "lib\/core\/Search\/Action\/Exception.php": {
             "class:Search_Action_Exception": true
@@ -1072,26 +1099,26 @@
         "lib\/core\/DeclFilter\/FilterRule.php": {
             "class:DeclFilter_FilterRule": true
         },
-        "lib\/test\/core\/Search\/Index\/IncrementalUpdateTest.php": {
-            "class:Search_Index_IncrementalUpdateTest": true
+        "lib\/test\/core\/Search\/Index\/Search_Index_IncrementalUpdate.php": {
+            "class:Search_Index_IncrementalUpdate": true
         },
         "lib\/core\/Search\/Action\/Snapshot.php": {
             "class:Search_Action_Snapshot": true
         },
         "lib\/test\/core\/Search\/Index\/StemmingTest.php": {
-            "class:Search_Index_StemmingTest": true
+            "class:Search_Index_Stemming": true
         },
         "lib\/core\/Search\/Action\/ReportingTransform.php": {
             "class:Search_Action_ReportingTransform": true
         },
         "lib\/test\/core\/Search\/Index\/TypeAnalyzerTest.php": {
-            "class:Search_Index_TypeAnalyzerTest": true
+            "class:Search_Index_TypeAnalyzer": true
         },
         "lib\/core\/Search\/Action\/UserGroupModify.php": {
             "class:Search_Action_UserGroupModify": true
         },
-        "lib\/test\/core\/Search\/Index\/PaginationTest.php": {
-            "class:Search_Index_PaginationTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexPagination.php": {
+            "class:SearchIndexPagination": true
         },
         "lib\/core\/Search\/Action\/WikiApprovalAction.php": {
             "class:Search_Action_WikiApprovalAction": true
@@ -1142,6 +1169,9 @@
         },
         "lib\/core\/Multilingual\/Aligner\/UpdatePages.php": {
             "class:Multilingual_Aligner_UpdatePages": true
+        },
+        "lib\/core\/Search\/Formatter\/ValueFormatter\/Count.php": {
+            "class:Search_Formatter_ValueFormatter_Count": true
         },
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Templaterender.php": {
             "class:Search_Formatter_ValueFormatter_Templaterender": true
@@ -2366,10 +2396,10 @@
             "class:TikiImporter_TestCase": true
         },
         "lib\/test\/importer\/TikiImporterWikiMediawikiTest.php": {
-            "class:TikiImporter_Wiki_Mediawiki_Test": true
+            "class:TikiImporterWikiMediawikiTest": true
         },
         "lib\/test\/importer\/TikiImporterTest.php": {
-            "class:TikiImporter_Test": true,
+            "class:TikiImporterTest": true,
             "class:TikiImporterFirstChild": true,
             "class:TikiImporterSecondChild": true,
             "class:TikiImporterGranSon": true
@@ -2443,11 +2473,8 @@
         "lib\/core\/Services\/Search\/ManifoldController.php": {
             "class:Services_Search_ManifoldController": true
         },
-        "lib\/test\/importer\/TikiImporterBlogWordpressTest.php": {
-            "class:TikiImporter_Blog_Wordpress_Test": true
-        },
         "lib\/test\/importer\/TikiImporterBlogTest.php": {
-            "class:TikiImporter_Blog_Test": true
+            "class:TikiImporterBlogTest": true
         },
         "doc\/devtools\/composer_packages_in_use.php": {
             "class:ComposerGetPackages": true
@@ -2459,7 +2486,7 @@
             "class:Tiki_Log": true
         },
         "lib\/test\/importer\/TikiImporterWikiTest.php": {
-            "class:TikiImporter_Wiki_Test": true,
+            "class:TikiImporterWikiTest": true,
             "class:TikiImporter_Wiki_InsertPage_Test": true
         },
         "lib\/core\/Services\/Search\/CustomSearchController.php": {
@@ -2951,6 +2978,9 @@
         },
         "lib\/core\/TikiFilter\/PregFilter.php": {
             "class:TikiFilter_PregFilter": true
+        },
+        "lib\/core\/TikiFilter\/Raw.php": {
+            "class:TikiFilter_Raw": true
         },
         "lib\/core\/TikiFilter\/Alnum.php": {
             "class:TikiFilter_Alnum": true
@@ -4750,8 +4780,8 @@
         "lib\/core\/Search\/Action\/Action.php": {
             "Search_Action_Action": true
         },
-        "lib\/test\/core\/Search\/Elastic\/QueryRepositoryTest.php": {
-            "Search_Elastic_QueryRepositoryTest": true
+        "lib\/test\/core\/Search\/Elastic\/SearchElasticQueryRepository.php": {
+            "SearchElasticQueryRepository": true
         },
         "lib\/core\/Search\/Action\/UnknownStep.php": {
             "Search_Action_UnknownStep": true
@@ -4831,8 +4861,8 @@
         "lib\/core\/Search\/Action\/FileGalleryChangeFilename.php": {
             "Search_Action_FileGalleryChangeFilename": true
         },
-        "lib\/test\/core\/Search\/Index\/NumericTest.php": {
-            "Search_Index_NumericTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexNumeric.php": {
+            "SearchIndexNumeric": true
         },
         "lib\/smarty_tiki\/resource.tplwiki.php": {
             "Smarty_Resource_Tplwiki": true
@@ -4840,8 +4870,8 @@
         "lib\/core\/Perms\/ResolverFactory\/ObjectFactory.php": {
             "Perms_ResolverFactory_ObjectFactory": true
         },
-        "lib\/test\/core\/Search\/Index\/PartialUpdateTest.php": {
-            "Search_Index_PartialUpdateTest": true
+        "lib\/test\/core\/Search\/Index\/Search_Index_PartialUpdate.php": {
+            "Search_Index_PartialUpdate": true
         },
         "lib\/core\/Search\/Action\/EmailAction.php": {
             "Search_Action_EmailAction": true
@@ -4858,8 +4888,8 @@
         "lib\/core\/Category\/Manipulator.php": {
             "Category_Manipulator": true
         },
-        "lib\/test\/core\/Search\/Index\/SortTest.php": {
-            "Search_Index_SortTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexSort.php": {
+            "SearchIndexSort": true
         },
         "lib\/core\/Search\/Action\/Exception.php": {
             "Search_Action_Exception": true
@@ -4867,26 +4897,26 @@
         "lib\/core\/DeclFilter\/FilterRule.php": {
             "DeclFilter_FilterRule": true
         },
-        "lib\/test\/core\/Search\/Index\/IncrementalUpdateTest.php": {
-            "Search_Index_IncrementalUpdateTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexIncrementalUpdate.php": {
+            "SearchIndexIncrementalUpdate": true
         },
         "lib\/core\/Search\/Action\/Snapshot.php": {
             "Search_Action_Snapshot": true
         },
-        "lib\/test\/core\/Search\/Index\/StemmingTest.php": {
-            "Search_Index_StemmingTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexStemming.php": {
+            "SearchIndexStemming": true
         },
         "lib\/core\/Search\/Action\/ReportingTransform.php": {
             "Search_Action_ReportingTransform": true
         },
-        "lib\/test\/core\/Search\/Index\/TypeAnalyzerTest.php": {
-            "Search_Index_TypeAnalyzerTest": true
+        "lib\/test\/core\/Search\/Index\/SearchIndexTypeAnalyzer.php": {
+            "SearchIndexTypeAnalyzer": true
         },
         "lib\/core\/Search\/Action\/UserGroupModify.php": {
             "Search_Action_UserGroupModify": true
         },
         "lib\/test\/core\/Search\/Index\/PaginationTest.php": {
-            "Search_Index_PaginationTest": true
+            "SearchIndexPagination": true
         },
         "lib\/core\/Search\/Action\/WikiApprovalAction.php": {
             "Search_Action_WikiApprovalAction": true
@@ -4924,6 +4954,9 @@
         },
         "lib\/core\/Multilingual\/Aligner\/UpdatePages.php": {
             "Multilingual_Aligner_UpdatePages": true
+        },
+        "lib\/core\/Search\/Formatter\/ValueFormatter\/Count.php": {
+            "Search_Formatter_ValueFormatter_Count": true
         },
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Templaterender.php": {
             "Search_Formatter_ValueFormatter_Templaterender": true
@@ -5725,7 +5758,7 @@
         "lib\/test\/language\/WriteFileTest.php": {
             "Language_WriteFileTest": true
         },
-        "lib\/test\/language\/ParseFileTest.php": {
+        "lib\/test\/language\/Language_FileTest.php": {
             "Language_FileTest": true
         },
         "lib\/test\/language\/MergeFilesTest.php": {
@@ -5744,10 +5777,10 @@
             "TikiImporter_TestCase": true
         },
         "lib\/test\/importer\/TikiImporterWikiMediawikiTest.php": {
-            "TikiImporter_Wiki_Mediawiki_Test": true
+            "TikiImporterWikiMediawikiTest": true
         },
         "lib\/test\/importer\/TikiImporterTest.php": {
-            "TikiImporter_Test": true
+            "TikiImporterTest": true
         },
         "lib\/mail\/mimelib.php": {
             "mime": true
@@ -5786,10 +5819,10 @@
             "Services_Search_ManifoldController": true
         },
         "lib\/test\/importer\/TikiImporterBlogWordpressTest.php": {
-            "TikiImporter_Blog_Wordpress_Test": true
+            "TikiImporterBlogWordpressTest": true
         },
         "lib\/test\/importer\/TikiImporterBlogTest.php": {
-            "TikiImporter_Blog_Test": true
+            "TikiImporterBlogTest": true
         },
         "lib\/core\/Tiki\/PageCache.php": {
             "Tiki_PageCache": true
@@ -5798,7 +5831,7 @@
             "Tiki_Log": true
         },
         "lib\/test\/importer\/TikiImporterWikiTest.php": {
-            "TikiImporter_Wiki_Test": true,
+            "TikiImporterWikiTest": true,
             "TikiImporter_Wiki_InsertPage_Test": true
         },
         "lib\/core\/Services\/Search\/CustomSearchController.php": {
@@ -5989,6 +6022,9 @@
         },
         "lib\/core\/TikiFilter\/PregFilter.php": {
             "TikiFilter_PregFilter": true
+        },
+        "lib\/core\/TikiFilter\/Raw.php": {
+            "TikiFilter_Raw": true
         },
         "lib\/core\/TikiFilter\/Alnum.php": {
             "TikiFilter_Alnum": true
@@ -6937,8 +6973,6 @@
             "ObjectSelectorTest::get_title": true
         },
         "lib\/articles\/artlib.php": {
-            "ArtLib::get_number_of_pages": true,
-            "ArtLib::get_page": true,
             "ArtLib::approve_submission": true,
             "ArtLib::add_article_hit": true,
             "ArtLib::remove_article": true,
@@ -8031,8 +8065,6 @@
         },
         "lib\/wiki\/wikilib.php": {
             "WikiLib::max_pagename_length": true,
-            "WikiLib::get_number_of_pages": true,
-            "WikiLib::get_page": true,
             "WikiLib::get_page_by_slug": true,
             "WikiLib::get_slug_by_page": true,
             "WikiLib::get_creator": true,
@@ -9277,8 +9309,6 @@
             "BlogLib::list_user_blogs": true,
             "BlogLib::list_blogs_user_can_post": true,
             "BlogLib::list_posts": true,
-            "BlogLib::get_number_of_pages": true,
-            "BlogLib::get_page": true,
             "BlogLib::add_blog_hit": true,
             "BlogLib::add_blog_post_hit": true,
             "BlogLib::get_post_image": true,
@@ -9728,6 +9758,7 @@
             "LogsLib::old_list_logs": true,
             "LogsLib::clean_logs": true,
             "LogsLib::add_action": true,
+            "LogsLib::api_add_action": true,
             "LogsLib::action_must_be_logged": true,
             "LogsLib::action_is_viewed": true,
             "LogsLib::set_actionlog_conf": true,
@@ -10113,6 +10144,7 @@
             "PerspectiveLib::replace_perspective": true,
             "PerspectiveLib::remove_perspective": true,
             "PerspectiveLib::replace_preferences": true,
+            "PerspectiveLib::replace_preference_values": true,
             "PerspectiveLib::replace_preference": true,
             "PerspectiveLib::set_preference": true,
             "PerspectiveLib::perspective_exists": true,

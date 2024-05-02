@@ -44,7 +44,7 @@ class Services_Tracker_TodoController
             'title' => tr('Events'),
             'trackerId' => $trackerId,
             'todos' => $todolib->listTodoObject('tracker', $trackerId),
-            'statusTypes' => $trklib->status_types(),
+            'statusTypes' => $definition->getStatusTypes(),
         ];
     }
 

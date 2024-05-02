@@ -24,10 +24,8 @@
                 {/if}
                 {if $prefs.namespace_enabled == 'y' && $prefs.namespace_default}
                     <div>
-                        <label>
-                            <input type="checkbox" class="form-check-input" name="namespace" value="{$prefs.namespace_default|escape}" checked="checked" />
+                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="namespace" value="{$prefs.namespace_default|escape}" checked="checked" />
                             {tr _0=$prefs.namespace_default}Within %0{/tr}
-                        </label>
                     </div>
                 {/if}
             </div>

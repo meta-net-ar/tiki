@@ -67,6 +67,12 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
     ];
 
     /**
+     * Reference of the server in order to access request header variables that might
+     * change behavior of certain methods.
+     */
+    public $server;
+
+    /**
      * Returns a list of calendars for a principal.
      *
      * Every project is an array with the following keys:
@@ -727,7 +733,12 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $this->ensureCalendarAccess($calendarId, $instanceId, $item['calitemId'], 'change_events', 'write');
 
         if ($rec) {
-            $rec->delete(0);
+            if ($this->server && $this->server->httpRequest->hasHeader('X-Tiki-Delete-All-Recurring')) {
+                $all = $this->server->httpRequest->getHeader('X-Tiki-Delete-All-Recurring');
+            } else {
+                $all = 1;
+            }
+            $rec->delete($all ? 0 : null);
         } else {
             TikiLib::lib('calendar')->drop_item($user, $item['calitemId']);
         }

@@ -524,7 +524,7 @@ class AbsoluteToRelativeLinkTest extends TestCase
         $this->assertEquals($dataResult, $dataConverted);
     }
 
-    public function urlBases(): array
+    public static function urlBases(): array
     {
         return [
             [self::BASE_URL],

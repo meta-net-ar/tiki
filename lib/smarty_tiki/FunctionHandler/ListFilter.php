@@ -46,14 +46,14 @@ class ListFilter extends Base
             $childPrefix = isset($childPrefix) ? $childPrefix : 'child-of-';
             $exclude = isset($exclude) ? $exclude : '';
 
-            $input = ' <div class="form-horizontal my-2"><div class="tiki-form-group form-row"><div class="col"><div class="input-group"><div class="input-group-prepend"><label class="col-form-label input-group-text">';
+            $input = ' <div class="form-horizontal my-2"><div class="tiki-form-group form-row"><div class="col"><div class="input-group"><div class="input-group-text" id="filter_label">';
 
             if (! isset($prefix)) {
                 $input .= tra("Filter:");
             } else {
                 $input .= tra($prefix);
             }
-            $input .= '</label></div><input type="text" class="form-control listfilter"';
+            $input .= '</div><input type="text" class="form-control listfilter"';
             if (! isset($id)) {
                 if (isset($listfilter_id)) {
                     $listfilter_id++;
@@ -65,6 +65,7 @@ class ListFilter extends Base
             } else {
                 $input .= " id='$id'";
             }
+            $input .= 'aria-labelledby="filter_label"';
             if (isset($size)) {
                 $input .= " size='$size'";
             }
@@ -107,12 +108,12 @@ class ListFilter extends Base
                 );
             }
 
-            $input .= "><div class='input-group-append'>";
-            $smartylib = \TikiLib::lib('smarty');
-            $icon = smarty_function_icon(['name' => 'times-circle'], $smartylib->getEmptyInternalTemplate());
-            $input .= "<a href='#' onclick=\"\$('#$id').val('').trigger('focus').trigger('keyup');return false;\" class='btn input-group-text closeicon tips' title=':"
-                . tr('Clear filter') . "'>$icon</a>";
-            $input .= '</div></div></div></div></div>';
+            $input .= ">";
+//            $smartylib = \TikiLib::lib('smarty'); Changed to Bootstrap close button
+//            $icon = smarty_function_icon(['name' => 'times-circle'], $smartylib->getEmptyInternalTemplate());
+            $input .= "<button class='btn btn-close p-3 border' href='#' area-label='Clear filter' onclick=\"\$('#$id').val('').trigger('focus').trigger('keyup');return false;\" title=':"
+                . tr('Clear filter') . "'>";
+            $input .= '</div></div></div></div>';
 
             if (! isset($selectors)) {
                 $selectors = ".$id table tr";

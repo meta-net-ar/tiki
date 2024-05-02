@@ -13,7 +13,7 @@
                     {remarksbox type="error" title="{tr}Error{/tr}"}{tr}You are not allowed to remove this notification !{/tr}{/remarksbox}
                 {/if}
 
-                <div class="form-check"><input type="checkbox" class="form-check-input" name="use_daily_reports" value="true" {if $report_preferences != false}checked{/if}> {tr}Use reports{/tr}</div>
+                <div class="form-check"><input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="use_daily_reports" value="true" {if $report_preferences != false}checked{/if}> {tr}Use reports{/tr}</div>
 
                     {tr}Interval in which you want to get the reports{/tr}
                     <select name="interval">
@@ -34,7 +34,7 @@
                     <input type="radio" name="type" value="plain"{if $report_preferences.type eq "plain"} checked="checked"{/if}> {tr}Plain text{/tr}<br>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="always_email" value="1"{if $report_preferences.always_email eq 1 OR $report_preferences eq false} checked="checked"{/if}> {tr}Send me an email also if nothing happened{/tr}
+                    <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="always_email" value="1"{if $report_preferences.always_email eq 1 OR $report_preferences eq false} checked="checked"{/if}> {tr}Send me an email also if nothing happened{/tr}
                 </div>
 
             </table>

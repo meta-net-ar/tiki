@@ -3716,8 +3716,6 @@ lib/payment/discountlib.php -text
 lib/payment/index.php -text
 lib/payment/paymentlib.php -text
 lib/payment/paypallib.php -text
-lib/pdf/fontdata/fa-codes.json -text
-lib/pdf/fontdata/fontttf/fontawesome.ttf -text
 lib/pdfimages.php -text
 lib/pdflib.php -text
 lib/perspective/binderlib.php -text
@@ -4450,7 +4448,7 @@ lib/test/core/Search/Elastic/NumericTest.php -text
 lib/test/core/Search/Elastic/PaginationTest.php -text
 lib/test/core/Search/Elastic/ProtocolTest.php -text
 lib/test/core/Search/Elastic/QueryBuilderTest.php -text
-lib/test/core/Search/Elastic/QueryRepositoryTest.php -text
+lib/test/core/Search/Elastic/QueryRepository.php -text
 lib/test/core/Search/Elastic/RescoreQueryBuilderTest.php -text
 lib/test/core/Search/Elastic/SortTest.php -text
 lib/test/core/Search/Elastic/StemmingTest.php -text
@@ -6375,7 +6373,7 @@ templates/tracker/export.tpl -text
 templates/tracker/export_fields.tpl -text
 templates/tracker/export_profile.tpl -text
 templates/tracker/fetch_item_field.tpl -text
-templates/tracker/file_trackers.tpl -text
+templates/tracker/fileTrackers.tpl -text
 templates/tracker/import.tpl -text
 templates/tracker/import_fields.tpl -text
 templates/tracker/import_items.tpl -text

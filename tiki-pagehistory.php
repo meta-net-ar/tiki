@@ -282,7 +282,7 @@ if (isset($_REQUEST['source_idx'])) {
         }
     }
 }
-if (isset($_REQUEST['preview_idx'])) {
+if (isset($_REQUEST['preview_idx']) && array_key_exists($_REQUEST['preview_idx'], $history_versions)) {
     $preview = $history_versions[$_REQUEST['preview_idx']];
 } else {
     if (isset($_REQUEST['preview_date'])) {

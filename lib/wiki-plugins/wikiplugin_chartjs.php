@@ -153,7 +153,6 @@ function wikiplugin_chartjs($data, $params)
     }
 
     $to_PDF = $jitRequest->display->string() == 'pdf';
-    $min = $params['debug'] ? '' : 'min.';
 
     // Disable animation
     if ($to_PDF) {
@@ -166,22 +165,28 @@ function wikiplugin_chartjs($data, $params)
     var chartjs_' . $params['id'] . ' = new Chart("' . $params['id'] . '", {
         type: "' . $params['type'] . '",
         data: ' . json_encode($data) . ',
-        options: ' . json_encode($options) . '
+        options: ' . (empty($options) ? '{}' : json_encode($options)) . '
     });
 ';
 
     $canvas = '<canvas id="' . $params['id'] . '" width="' . $params['width'] . '" height="' . $params['height'] . '"></canvas>';
 
     if (! $to_PDF) {
-        TikiLib::lib('header')->add_jsfile("vendor_bundled/vendor/npm-asset/chart.js/dist/Chart.bundle.{$min}js")
-            ->add_jq_onready('setTimeout(function () {' . $script . '}, 500);');
+        TikiLib::lib('header')->add_js_module('
+            import { Chart, registerables } from "chartjs";
+            Chart.register(...registerables);
+            setTimeout(function () {' . $script . '}, 500);
+         ');
 
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
     // PDF export related logic
     $html_content = <<<HTML
-<script src="{$base_url}vendor_bundled/vendor/npm-asset/chart.js/dist/Chart.bundle.{$min}js"></script>
+<script type="module">
+    import { Chart, registerables } from "chartjs";
+    Chart.register(...registerables);
+</script>
 <div>
     $canvas
 </div>

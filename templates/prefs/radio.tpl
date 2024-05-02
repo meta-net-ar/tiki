@@ -2,7 +2,7 @@
     {if !empty($p.name)}
         <label for="{$p.id|escape}" class="col-form-label col-sm-3">{$p.name|escape}</label>
     {/if}
-    <div class="col-sm-2">
+    <div class="col">
         {foreach from=$p.options key=value item=label name=loop}
             <div class="adminoptionlabel form-check">
                 <input class="form-check-input" id="{$p.id|cat:'_'|cat:$smarty.foreach.loop.index|escape}" type="radio" name="{$p.preference|escape}"

@@ -47,14 +47,14 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/' . TIKI_CONFIG_PATH,
         __DIR__ . '/' . DEPRECATED_DEVTOOLS_PATH,
         __DIR__ . '/' . INSTALLER_PATH,
-        //__DIR__ . '/' . LANG_PATH,
+        //__DIR__ . '/' . LANG_SRC_PATH,
         __DIR__ . '/' . LIB_PATH,
         __DIR__ . '/' . PHP_SOURCES_PATH,
         __DIR__ . '/' . LISTS_PATH,
         __DIR__ . '/' . MODULES_PATH,
         __DIR__ . '/' . PERMISSIONCHECK_PATH,
         __DIR__ . '/' . PROFILES_PATH,
-        __DIR__ . '/' . THEMES_SRC_PATH,
+        __DIR__ . '/' . BASE_THEMES_SRC_PATH,
     ]);
     $rectorConfig->skip([
         // __DIR__ . '/src/SingleFile.php',

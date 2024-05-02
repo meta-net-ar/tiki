@@ -66,7 +66,7 @@ class TrackerFields extends Base
 
         $trackerInfo = $definition->getInformation();
         $smarty->assign('tracker_info', $trackerInfo);
-        $smarty->assign('status_types', TikiLib::lib('trk')->status_types());
+        $smarty->assign('status_types', $definition->getStatusTypes());
 
         $title = tr('General');
         $sections = [];

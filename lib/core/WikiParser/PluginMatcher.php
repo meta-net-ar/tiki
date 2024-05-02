@@ -26,7 +26,7 @@ class WikiParser_PluginMatcher implements Iterator, Countable
     {
         $matcher = new self();
         $matcher->text = $text;
-        $matcher->findMatches(0, strlen($text));
+        $matcher->findMatches(0, strlen($text ?? ''));
 
         return $matcher;
     }
@@ -91,7 +91,7 @@ class WikiParser_PluginMatcher implements Iterator, Countable
         $this->findNoParseRanges($start, $end);
 
         $pos = $start;
-        while (false !== $pos = strpos($this->text, '{', $pos)) {
+        while (false !== $pos = strpos($this->text ?? '', '{', $pos)) {
             // Shortcut {$var} syntax
             if (substr($this->text, $pos + 1, 1) === '$') {
                 ++$pos;
@@ -257,7 +257,7 @@ class WikiParser_PluginMatcher implements Iterator, Countable
 
     public function findText($string, $from, $to)
     {
-        if ($from >= strlen($this->text)) {
+        if ($from >= strlen($this->text ?? '')) {
             return false;
         }
 

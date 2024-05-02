@@ -13,7 +13,7 @@ class OrderBuilder
 {
     private $index;
 
-    public function __construct(Index $index = null)
+    public function __construct(Index|null $index = null)
     {
         $this->index = $index;
     }

@@ -29,13 +29,12 @@
     img, span { margin-right: 6px; }
 }
 
-.tracker-item-files .file-actions {
-    position: absolute;
-    top: 0;
-    right: 0;
-//    display: inline-block;
-//    clear: right;
-//    float: right;
+@media (min-width: 768px) {
+    .tracker-item-files .file-actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }
 
 .tracker-item-files {

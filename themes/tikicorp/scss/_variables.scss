@@ -13,6 +13,7 @@ $gray-800: #343a40;
 $gray-900: #212529;
 $black:    #000;
 
+
 $primary: #087EB4;
 $success: #5cb85c; //#48ca3b;
 //$info: #4d3a7d;
@@ -31,6 +32,8 @@ $green:   #198754 !default;
 $teal:    #20c997 !default;
 $cyan:    #0dcaf0 !default;
 // scss-docs-end color-variables
+
+$yellow-800: shade-color($yellow, 60%) !default;
 
 // scss-docs-start colors-map
 $colors: (
@@ -108,7 +111,7 @@ $headings-color:               inherit;
 //$link-color:                   tint-color($primary, 40%) !default;
 //$link-hover-color:             shift-color($link-color-dark, -$link-shade-percentage) !default;
 //$code-color:                   tint-color($code-color, 40%) !default;
-$mark-color:                   $body-color-dark;
+$mark-color:                   $gray-500 !default; // $body-color-dark;
 $mark-bg:                      $yellow-800;
 
 // Options

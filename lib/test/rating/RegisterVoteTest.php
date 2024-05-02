@@ -35,7 +35,7 @@ class Rating_RegisterVoteTest extends TikiTestCase
         $prefs['rating_allow_multi_votes'] = $this->ratingAllowMultipleVotes;
     }
 
-    public function tokenFormats(): array
+    public static function tokenFormats(): array
     {
         return [
             'unknown' => ['foobar', 233, null],

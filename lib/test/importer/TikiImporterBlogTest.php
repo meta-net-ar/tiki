@@ -10,7 +10,7 @@ require_once(__DIR__ . '/../../importer/tikiimporter_blog.php');
 /**
  * @group importer
  */
-class TikiImporter_Blog_Test extends TikiImporter_TestCase
+class TikiImporterBlogTest extends TikiImporter_TestCase
 {
     public $obj;
     protected function setUp(): void

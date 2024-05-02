@@ -457,6 +457,7 @@ function wikiplugin_pivottable($data, $params)
     $splittedAttributes = [];
     $attributesOrder = [];
     $heatmapParams = [];
+    $displayFormattedFields = [];
 
     if ($dataType === "tracker") {
         $trackerIds = preg_split('/\s*,\s*/', $params['data'][1]);
@@ -591,6 +592,11 @@ function wikiplugin_pivottable($data, $params)
         foreach ($matches as $match) {
             if ($match->getName() == 'display' || $match->getName() == 'column') {
                 $columnsListed = true;
+                $parser = new WikiParser_PluginArgumentParser();
+                $arguments = $parser->parse($match->getArguments());
+                if (isset($arguments['name'])) {
+                    $displayFormattedFields[] = str_replace('tracker_field_', '', $arguments['name']);
+                }
             } elseif ($match->getName() == 'derivedattribute') {
                 if (
                     preg_match('/name="([^"]+)"/', $match->getArguments(), $match_name)
@@ -899,7 +905,10 @@ function wikiplugin_pivottable($data, $params)
         $field = wikiplugin_pivottable_field_from_definitions($field['permName'], $definitions, $field);
         $fieldsArr[$field['name']] = $field['permName'];
         if ($field['type'] == 'f' || $field['type'] == 'j') {
-            $dateFields[] = $field['name'];
+            // formatted date fields might not be parsable to datetime anymore, so exclude them from special date sorting
+            if (! in_array($field['permName'], $displayFormattedFields)) {
+                $dateFields[] = $field['name'];
+            }
         }
     }
 
@@ -948,6 +957,27 @@ function wikiplugin_pivottable($data, $params)
     }
 
     $highlight = [];
+    if (! empty($params['highlightRequest'])) {
+        $compare = [];
+        foreach ($params['highlightRequest'] as $pair) {
+            list($tf, $rf) = explode('-', $pair);
+            if (isset($_REQUEST[$rf])) {
+                $compare[$tf] = $_REQUEST[$rf];
+            }
+        }
+        foreach ($pivotData as $item) {
+            $matching = true;
+            foreach ($compare as $tf => $value) {
+                if ($item[$tf] != $value) {
+                    $matching = false;
+                    break;
+                }
+            }
+            if ($matching) {
+                $highlight[] = ['item' => $item, 'group' => 'request', 'color' => $params['highlightGroupColors'][0] ?? null];
+            }
+        }
+    }
     if (! empty($params['highlightMine']) && $params['highlightMine'] === 'y' && $params['data'][0] !== 'activitystream') {
         $ownerFields = [];
         foreach ($definitions as $definition) {
@@ -1011,26 +1041,6 @@ function wikiplugin_pivottable($data, $params)
                         }
                     }
                 }
-            }
-        }
-    }
-
-    if (! empty($params['highlightRequest'])) {
-        $compare = [];
-        foreach ($params['highlightRequest'] as $pair) {
-            list($tf, $rf) = explode('-', $pair);
-            $compare[$tf] = $_REQUEST[$rf];
-        }
-        foreach ($pivotData as $item) {
-            $matching = true;
-            foreach ($compare as $tf => $value) {
-                if ($item[$tf] != $value) {
-                    $matching = false;
-                    break;
-                }
-            }
-            if ($matching) {
-                $highlight[] = ['item' => $item, 'group' => 'request', 'color' => $params['highlightGroupColors'][0] ?? null];
             }
         }
     }

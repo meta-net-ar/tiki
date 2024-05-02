@@ -63,7 +63,7 @@ class Search_GlobalSource_CategorySource implements Search_GlobalSource_Interfac
         return $list;
     }
 
-    public function getProvidedFields()
+    public function getProvidedFields(): array
     {
         $list = ['categories', 'deep_categories'];
         foreach ($this->categlib->getCustomFacets() as $categId) {
@@ -74,7 +74,7 @@ class Search_GlobalSource_CategorySource implements Search_GlobalSource_Interfac
         return $list;
     }
 
-    public function getProvidedFieldTypes()
+    public function getProvidedFieldTypes(): array
     {
         $list = [
             'categories' => 'multivalue',
@@ -88,7 +88,7 @@ class Search_GlobalSource_CategorySource implements Search_GlobalSource_Interfac
         return $list;
     }
 
-    public function getGlobalFields()
+    public function getGlobalFields(): array
     {
         return [];
     }

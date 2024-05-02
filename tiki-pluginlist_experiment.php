@@ -21,7 +21,8 @@ if ($tiki_p_edit !== 'y') {
     die;
 }
 
-$editwiki = $_REQUEST['editwiki'];
+$editwiki = $_REQUEST['editwiki'] ?? '';
+
 $listunparsed = '{LIST()}' . $editwiki . '{LIST}';
 $listparsed = TikiLib::lib('parser')->parse_data(
     $listunparsed,

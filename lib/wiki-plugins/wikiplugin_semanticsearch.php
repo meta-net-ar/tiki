@@ -16,13 +16,28 @@ function wikiplugin_semanticsearch_info()
         'introduced' => 27,
         'tags' => ['advanced'],
         'params' => [
-            'tpl' => [
+            'resultstpl' => [
                 'required' => false,
                 'name' => tra('Template file'),
                 'description' => tra('Smarty template (.tpl) file where search user interface template is found'),
                 'since' => '27',
-                'default' => 'wiki-plugins/wikiplugin_semanticsearch.tpl',
+                'default' => 'wiki-plugins/wikiplugin_semanticsearch_results.tpl',
                 ],
+            'searchformtpl' => [
+                'required' => false,
+                'name' => tra('Template file'),
+                'description' => tra('Smarty template (.tpl) file where search user interface template is found'),
+                'since' => '27',
+                'default' => 'wiki-plugins/wikiplugin_semanticsearch_form.tpl',
+                ],
+            'searchformwiki' => [
+                'required' => false,
+                'name' => tra('Template wiki page'),
+                'description' => tra('Wiki page where the search form is found'),
+                'since' => '27',
+                'filter' => 'pagename',
+                'default' => ''
+            ],
             'indexer' => [
                 'required' => false,
                 'name' => tra('Textualization indexer'),
@@ -59,8 +74,22 @@ function wikiplugin_semanticsearch($data, $params)
     }
     $params = array_merge($defaults, $params);
 
-    $id = 'semanticsearch';
+    if (empty($params['searchformwiki']) && empty($params['searchformtpl'])) {
+        $params['searchformtpl'] = 'templates/search_customsearch/default_form.tpl';
+    } elseif (! empty($params['searchformwiki']) && ! TikiLib::lib('tiki')->page_exists($params['searchformwiki'])) {
+        $link = new WikiParser_OutputLink();
+        $link->setIdentifier($params['searchformwiki']);
+        return tra('Template page not found') . ' ' . $link->getHtml();
+    }
+    if (! empty($params['searchformwiki'])) {
+        $wikitpl = "tplwiki:" . $params['searchformwiki'];
+    } else {
+        $wikitpl = $params['searchformtpl'];
+    }
+
+    $id = 'default';
     $html = '';
+
     $location = $params['dblocation'];
     if (! is_file($location)) {
         throw new InvalidArgumentException("$location isn't a file");
@@ -89,6 +118,17 @@ function wikiplugin_semanticsearch($data, $params)
     $smarty->assign('query', $query);
     $smarty->assign('facets', []);
 
+
+    $searchFormContent = $smarty->fetch($wikitpl);
+
+    $formHtml = '';
+    $formHtml .= "<div id='semanticsearch_{$id}_form'>\n";
+    $formHtml .= "<form id='semanticsearch_{$id}' class='customsearch_form'>\n";
+    $formHtml .= $searchFormContent . "\n";
+    $formHtml .= "</form'>\n";
+    $formHtml .= "</div'>\n";
+    $html .= $formHtml;
+
     $smartyResults = [];
     if ($query) {
         $results = $index->search($query);
@@ -102,13 +142,18 @@ function wikiplugin_semanticsearch($data, $params)
 
             $smartyResult['url'] = $result->url;
             $smartyResult['title'] = $result->title;
-            $smartyResult['score'] = sprintf('%.2f', $result->score);
+            //Scores are not usable currently for some reason
+            //$smartyResult['score'] = sprintf('%.2f', $result->score);
             $chunkText = $index->fetch_document($result->url, $result->chunk_num)->text;
-            $smartyResult['highlight'] = substr($chunkText, 0, strrpos(substr($chunkText, 0, 300), ' '));
+            //So we remove the title we know the textualization added at the begining of the first chunk
+            $chunkTextNoTitle = str_replace($result->title, '', $chunkText);
+            $smartyResult['highlight'] = substr($chunkTextNoTitle, 0, strrpos(substr($chunkTextNoTitle, 0, 300), ' '));
             $smartyResults[] = $smartyResult;
         }
     }
     $smarty->assign('results', $smartyResults);
-    $html .= $smarty->fetch($params['tpl']);
+    $html .= "<div id='semanticsearch_{$id}_results'  class='customsearch_results'>\n";
+    $html .= $smarty->fetch($params['resultstpl']);
+    $html .= "</div>";
     return $html;
 }

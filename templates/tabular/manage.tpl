@@ -20,9 +20,9 @@
             <tr>
                 <th>{tr}Name{/tr}</th>
                 <th>{tr}Tracker{/tr}</th>
-                <th></th>
+                <td></td>
             </tr>
-            {foreach $list as $row}
+            {foreach $formatList as $row}
                 <tr>
                     <td><a href="{service controller=tabular action=list tabularId=$row.tabularId}">{$row.name|escape}</a></td>
                     <td>{object_title type=tracker id=$row.trackerId}</td>

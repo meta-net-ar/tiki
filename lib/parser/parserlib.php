@@ -171,16 +171,20 @@ class ParserLib extends TikiDb_Bridge
     // This function removed the protection of html entities so that they are rendered as expected by the viewer
     public function unprotectSpecialChars($data = '', $is_html = false)
     {
+        if ($data === null) {
+            $data = '';
+        }
+
         if (
             ( $is_html != false || ( isset($this->option['is_html']) && $this->option['is_html']))
             || $this->option['wysiwyg']
         ) {
             foreach ($this->specialChars as $key => $specialChar) {
-                $data = str_replace($key, $specialChar['html'], $data);
+                $data = str_replace($key, $specialChar['html'], $data ?? '');
             }
         } else {
             foreach ($this->specialChars as $key => $specialChar) {
-                $data = str_replace($key, $specialChar['nonHtml'], $data);
+                $data = str_replace($key, $specialChar['nonHtml'], $data ?? '');
             }
         }
 
@@ -471,14 +475,7 @@ class ParserLib extends TikiDb_Bridge
     //*
     public function plugin_exists($name, $include = false)
     {
-        $php_name = 'lib/wiki-plugins/wikiplugin_';
-        $php_name .= TikiLib::strtolower($name) . '.php';
-
-        $exists = file_exists($php_name);
-
-        if ($include && $exists) {
-            include_once $php_name;
-        }
+        $exists = WikiPlugin_Negotiator_Wiki::loadPluginFromName($name, ! $include);
 
         if ($exists) {
             return true;
@@ -2189,7 +2186,7 @@ class ParserLib extends TikiDb_Bridge
                                 }
                             }
 
-                            if ($approval['lastModif'] != null) {
+                            if (isset($approval['lastModif']) && $approval['lastModif'] != null) {
                                 $value = $tikilib->get_short_datetime($approval['lastModif']);
                                 break;
                             } else {
@@ -2255,7 +2252,7 @@ class ParserLib extends TikiDb_Bridge
                     }
 
                     $needles[] = $arg[0];
-                    $replacements[] = $value;
+                    $replacements[] = $value ?? '';
                 }
                 $data = str_replace($needles, $replacements, $data);
             }
@@ -2794,15 +2791,15 @@ class ParserLib extends TikiDb_Bridge
 
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' )) {
                             $smarty = TikiLib::lib('smarty');
-                            $headingLink = '<a href="#' . $thisid . '" class="heading-link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
+                            $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
                         } else {
                             $headingLink = '';
                         }
 
                         if ($prefs['feature_wiki_show_hide_before'] == 'y') {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
                         } else {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
                         }
                     } elseif (! strcmp($line, $prefs['wiki_page_separator'])) {
                         // Close open paragraph, lists, and div's
@@ -2985,7 +2982,7 @@ class ParserLib extends TikiDb_Bridge
                         $maketoc_title = "<div id='toctitle'><h3>" . tra($maketoc_args['title'], $this->option['language']) . '</h3>';
 
                         if (isset($maketoc_args['showhide']) && $maketoc_args['showhide'] == 'y') {
-                            $maketoc_title .= '<a class="link"  href="javascript:toggleToc()">' . '[' . tra('Show/Hide') . ']' . '</a>';
+                            $maketoc_title .= '<a class="link"  href="javascript:$(\'#toc ul\').toggle();">' . '[' . tra('Show/Hide') . ']' . '</a>';
                         }
                         $maketoc_title .= '</div>';
                     } else {
