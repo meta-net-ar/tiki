@@ -52,8 +52,8 @@ class QuizLib extends TikiLib
                     'quizName' => $quizName,
                     'timesTaken' => (int) $timesTaken,
                     'avgpoints' => (float) $avgpoints,
-                    'avgtime' => $avgtime,
-                    'avgavg' => $avgavg,
+                    'avgtime' => (float) $avgtime,
+                    'avgavg' => (float) $avgavg,
                 ]
             );
         }

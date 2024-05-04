@@ -186,12 +186,12 @@
                     </div>
                     <div id="export_options_container">
                         <ul id="prefs_to_export_list" class="profile_export_list"{if not empty($export_type) and $export_type neq "prefs"} style=display:none;"{/if}>
-                            {foreach from=$modified_list key="name" item="data"}
+                            {foreach $modified_list as $name => $data}
                                 <li class="form-check">
                                     {if is_array($data.current.expanded)}
-                                        {assign var=current value="[$current]"}
+                                        {$current = $data.current.expanded|join:', '}
                                     {else}
-                                        {assign var=current value=$data.current.expanded}
+                                        {$current = $data.current.expanded}
                                     {/if}
                                     <input type="checkbox" class="form-check-input" name="prefs_to_export[{$name}]" value="{$current|escape}"
                                            id="checkbox_{$name}"{if isset($prefs_to_export[$name])} checked="checked"{/if}

@@ -104,8 +104,10 @@ if (isset($_REQUEST["change"])) {
         $cryptlib->onChangeUserPassword($_REQUEST["oldpass"], $_REQUEST["pass"]);
     }
 
-    // re-evaluate homepage since we just login the user
-    include TIKI_PATH . '/lib/setup/default_homepage.php';
+    // re-evaluate homepage since we just login the user but not if it's the first time after a clean install
+    if ($jitRequest->oldpass->text() !== 'admin') {
+        include TIKI_PATH . '/lib/setup/default_homepage.php';
+    }
     $homePageUrl = $prefs['tikiIndex']; // set up in lib/setup/default_homepage.php
 
     // Check if a wizard should be run.

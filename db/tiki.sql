@@ -2061,9 +2061,9 @@ CREATE TABLE `tiki_quiz_stats_sum` (
   `quizId` int(10) NOT NULL default '0',
   `quizName` varchar(255) default NULL,
   `timesTaken` int(10) default NULL,
-  `avgpoints` decimal(5,2) default NULL,
-  `avgavg` decimal(5,2) default NULL,
-  `avgtime` decimal(5,2) default NULL,
+  `avgpoints` float default NULL,
+  `avgavg` float default NULL,
+  `avgtime` float default NULL,
   PRIMARY KEY (`quizId`)
 ) ENGINE=MyISAM;
 

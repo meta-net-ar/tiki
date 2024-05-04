@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
 
-namespace Tiki\Lib\Wiki;
+namespace Tiki\Lib\wiki;
 
 /**
 * Contains utility functions for pagination

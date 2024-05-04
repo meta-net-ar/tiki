@@ -691,7 +691,13 @@ class Tiki_Profile_Installer
                 $prefslib = TikiLib::lib('prefs');
                 $pinfo = $prefslib->getPreference($pref);
                 if (! empty($pinfo['separator']) && ! is_array($value)) {
-                    $value = explode($pinfo['separator'], $value);
+                    // previously YAML values like '[ attach, box, code ]' were automatically parsed as arrays
+                    if (preg_match('/^\[[^]]*]$/', $value)) {
+                        $value = trim($value, " \n\r\t\v\0[]");
+                        $value = array_map('trim', explode($pinfo['separator'], $value));
+                    } else {
+                        $value = explode($pinfo['separator'], $value);
+                    }
                 }
 
                 if (! isset($prefs[$pref]) || $prefs[$pref] != $value) {

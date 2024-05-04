@@ -66,13 +66,16 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $customflags["customcategories"] = $_REQUEST["customcategories"];
     $customflags["custompriorities"] = $_REQUEST["custompriorities"];
     $customflags["customsubscription"] = isset($_REQUEST["customsubscription"]) ? $_REQUEST["customsubscription"] : 'n';
-    $objectperms = Perms::get('calendar', $info['calendarId']);
-    if ($objectperms->admin_calendar) {
-        $customflags["personal"] = $_REQUEST["personal"];
-        $customflags["private"] = $_REQUEST["private"];
-    } else {
-        $customflags["personal"] = 'y';
-        $customflags["private"] = 'y';
+    if (isset($info)) {
+        $objectperms = Perms::get('calendar', $info['calendarId']);
+
+        if ($objectperms->admin_calendar) {
+            $customflags["personal"] = $_REQUEST["personal"];
+            $customflags["private"] = $_REQUEST["private"];
+        } else {
+            $customflags["personal"] = 'y';
+            $customflags["private"] = 'y';
+        }
     }
     $customflags['customstatus'] = isset($_REQUEST['customstatus']) ? $_REQUEST['customstatus'] : 'y';
     $options = $_REQUEST['options'];

@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\Image\Image;
+use Tiki\Lib\wiki\WikiPaginationUtils;
 
 $section = 'cms';
 require_once('tiki-setup.php');

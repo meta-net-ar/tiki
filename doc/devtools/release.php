@@ -382,12 +382,16 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
                     }
                 }
 
-                // Escape filename. Since this requires a connection to MySQL (due to the charset), do so conditionally to reduce the risk of connection failure.
+                // Escape filename. Since this requires a connection to MySQL (due to the charset),
+                // do so conditionally to reduce the risk of connection failure.
                 if (! preg_match('/^[a-zA-Z!-9\/ _+.-@]+$/', $file)) {
                     if (! $link) {
                         try {
-                            if (class_exists('Tiki\TikiInit')) {
-                                require TikiInit::getCredentialsFile();
+                            $credentialsFile = TikiInit::getCredentialsFile();
+                            if (class_exists('Tiki\TikiInit') && file_exists($credentialsFile)) {
+                                global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki;
+                                require $credentialsFile;
+
                                 $link = mysqli_connect(
                                     $host_tiki,
                                     $user_tiki,
@@ -400,8 +404,10 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
                         } catch (Exception $e) {
                             global $phpCommand, $phpCommandArguments;
                             error(
-                                "SecDB step failed because some filenames (e.g. {$file}) need escaping but no MySQL connection has been found (" . mysqli_connect_error() . ")."
-                                . "\nTry this command line instead (replace HOST, USER and PASS by a valid MySQL host, user and password) :"
+                                "SecDB step failed because some filenames (e.g. {$file}) need" .
+                                "escaping but no MySQL connection has been found (" . mysqli_connect_error() . ")."
+                                . "\nTry this command line instead (replace HOST, USER and PASS with" .
+                                "a valid MySQL host, user and password) :"
                                 . "\n\n\t" . $phpCommand
                                 . " -d mysqli.default_host=HOST -d mysqli.default_user=USER -d mysqli.default_pw=PASS "
                                 . $phpCommandArguments . "\n"

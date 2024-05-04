@@ -21,6 +21,38 @@ class WikiLib extends TikiLib
     }
 
     /**
+     * Return the page details corresponding to the provided slug.
+     *
+     * @param string $slug The slug of the page
+     * @return mixed|null The page details if found, or null if not found
+    */
+    public function get_page_by_slug($slug)
+    {
+        if ($slug === null) {
+            return null;
+        }
+
+        $pages = TikiDb::get()->table('tiki_pages');
+        $found = $pages->fetchOne('pageName', ['pageSlug' => $slug]);
+
+        if ($found) {
+            return $found;
+        }
+
+        if (function_exists('mb_convert_encoding')) {
+            $slug_utf8 = mb_convert_encoding($slug, 'UTF-8', 'ISO-8859-1');
+            if ($slug != $slug_utf8) {
+                $found = $pages->fetchOne('pageName', ['pageSlug' => $slug_utf8]);
+                if ($found) {
+                    return $found;
+                }
+            }
+        }
+
+        return $slug;
+    }
+
+    /**
      * Return a Slug, if set, or the page name supplied as result
      *
      * @param string $page
