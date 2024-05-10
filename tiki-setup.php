@@ -871,7 +871,7 @@ if ($prefs['xmpp_conversejs_always_load'] === 'y') {
 if ($prefs['markdown_enabled'] === 'y' && $prefs['feature_wysiwyg'] === 'y') {
     $str = $prefs['tiki_minify_javascript'] === 'y' ? '.min' : '';
 
-    $headerlib ->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/toastui-editor.css");
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/toastui-editor.css");
 }
 
 if ($prefs['workspace_ui'] == 'y') {
