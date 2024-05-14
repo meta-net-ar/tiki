@@ -166,7 +166,7 @@ class Services_Broker
 
         if ($access->is_xml_http_request() && ! $access->is_serializable_request()) {
             $headerlib = TikiLib::lib('header');
-            $headerlib->clear_js(true); // Only need the partials
+            $headerlib->startNewContext(); // Only need the partials
         }
     }
 

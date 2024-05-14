@@ -85,6 +85,15 @@ class HeaderLib
      */
     private $skip_minify = [];
 
+    public const OUTPUT_FORMAT_TEST_RAW_STRINGS = 'OUTPUT_FORMAT_TEST_RAW_STRINGS';
+    public const OUTPUT_FORMAT_HTML_TAGS = 'OUTPUT_FORMAT_HTML_TAGS';
+    public static function getOutputFormats(): array
+    {
+        return [
+        self::OUTPUT_FORMAT_TEST_RAW_STRINGS,
+        self::OUTPUT_FORMAT_HTML_TAGS
+        ];
+    }
     private const FORMAT_JS_FILE = 'JS_FILE';
     private const FORMAT_JS_CLASSIC = 'JS_CLASSIC';
     private const FORMAT_JS_MODULE = 'JS_MODULE';
@@ -134,11 +143,13 @@ class HeaderLib
      *  ['format' => FORMAT_JS_CLASSIC,FORMAT_JS_MODULE or FORMAT_CSS
      *   'content'=> For FORMAT_JS_FILE, it's the final url.  For others, it's the raw (unwrapped) script.
      *   'order'=>string, how the scripts will be sorted.
+     *   'contentLoadedIn'=>string, the id or hash of where the content was loaded, such as a script tag or a combined minified file.
      *  ]
      *
      * TODO:  Ajax needs to potentially dynamically load CSS as well after a snapshot
      */
-    private $loadableContent = [];
+    private ?array $loadableContent = null;
+    private ?array $contextStack = [];
 
     private function addLoadableContent($contentInfo)
     {
@@ -220,12 +231,25 @@ class HeaderLib
     /** Tracks if `add_map` has been called, only needed once */
     private bool $mapAdded = false;
 
-    private $outputHasBeenCalledCount = 0;
-
     public function __construct()
     {
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('headerlib', $this);
+        $this->startNewContext();
+    }
+
+    public function startNewContext()
+    {
+        $loadableContent = [];
+        $this->contextStack[] =& $loadableContent;
+        $this->loadableContent =& $loadableContent;
+    }
+    public function dropCurrentContext()
+    {
+        array_pop($this->contextStack);
+        $this->loadableContent =& end($this->contextStack);
+        $this->outputHeadersWasStartedBy = null;
+        $this->outputStaticJSFooterWasStartedBy = null;
     }
 
     private function getOutputCallerInfo()
@@ -573,9 +597,9 @@ class HeaderLib
     public function add_jsfile_late($file, $skip_minify = false): HeaderLib
     {
         // late stuff can vary by page. if we would include it in main, then we get multiple big js files.
-            // better to accept 2 js request: a big one which rarely changes and small ones that include (page specific) late stuff.
-            // at the end we could get rid of this pref though
-                $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y' ? true : false;
+        // better to accept 2 js request: a big one which rarely changes and small ones that include (page specific) late stuff.
+        // at the end we could get rid of this pref though
+            $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y' ? true : false;
 
         $this->addJsFile($file, self::GROUP_LATE, $skip_minify || ! $minifyLateActive);
         return $this;
@@ -584,7 +608,7 @@ class HeaderLib
 
     private function addJsFile($file, $group, bool $skipMinify = false, bool $skipCdn = false, bool $allowExternalSrc = false)
     {
-        if (!$allowExternalSrc && ! is_file($file)) {
+        if (! $allowExternalSrc && ! is_file($file)) {
             throw new Exception("File not found: $file");
         }
         $this->addLoadableContent([
@@ -916,6 +940,7 @@ class HeaderLib
         // array that holds a sorted list for all JS files including script tags in the correct order
         $output = [];
         $jsfilesToMinify = [];
+        $jsOriginalContentHashesToMinify = [];
         // minification only happens if activated and if the file was not blocked by $skip_minify
 
         // check whether we need to minify. minify also includes to put the minified files into one single file
@@ -932,9 +957,10 @@ class HeaderLib
                 } else {
                     $entry = $originalSrcUrl;
                 }
-                $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
+                $output[] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $hash);
             } else {
                 $jsfilesToMinify[] = $originalSrcUrl;
+                $jsOriginalContentHashesToMinify[] = $hash;
             }
         }
 
@@ -943,8 +969,11 @@ class HeaderLib
         if ($jsfilesToMinify) {
             // handling of user defined cdn servers is done inside minifyJSFiles()
             $entry = $this->minifyJSFiles($jsfilesToMinify);
-
-            $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+            $entryHash = $entry;
+            foreach ($jsOriginalContentHashesToMinify as $hash) {
+                $this->loadableContent[$hash]['contentLoadedIn'] = $entryHash;
+            }
+            $output[] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $entryHash);
         }
         return $output;
     }
@@ -1089,24 +1118,6 @@ class HeaderLib
         return md5($hash);
     }
 
-    /** @deprecated, seems only used by code trying to get the partial list of js files added by a chunck of php code.   But ported to not have to refactor everything at once - benoitg */
-    public function clear_js($clear_js_files = false): HeaderLib
-    {
-        $this->throwIfJSFooterAlreadyOutput();
-        $this->loadableContent = self::filterNoInlineJs($this->loadableContent);
-        if ($clear_js_files) {
-             $this->loadableContent = self::filterNoJsFiles($this->loadableContent);
-        }
-        return $this;
-    }
-    private function getScriptForJsSrc($content, string $id)
-    {
-        $html = "<!-- js " . $content['format'] . " " . $content['group'] . " " . $content['order'] . " -->\n";
-
-        $html .= '<script id="' . $id . '" type="text/javascript" src="' . smarty_modifier_escape(trim($content['content'])) . '"></script>' . "\n";
-        return $html;
-    }
-
     private static function filterJsFiles($loadableContent)
     {
         $retVal = [];
@@ -1127,7 +1138,7 @@ class HeaderLib
         }
         return  $retVal;
     }
-    private static function filterNoInlineJs($loadableContent)
+    private static function filterNoInlineJs(array $loadableContent)
     {
         $retVal = [];
         foreach ($loadableContent as $hash => $content) {
@@ -1137,7 +1148,7 @@ class HeaderLib
         }
         return  $retVal;
     }
-    private static function groupLoadableContent($loadableContent)
+    private static function groupLoadableContent(array $loadableContent)
     {
         $retVal = [];
         foreach ($loadableContent as $hash => $content) {
@@ -1145,6 +1156,82 @@ class HeaderLib
             $retVal[$content['group']][$hash] = $content;
         }
         return  $retVal;
+    }
+    private const TIKI_SCRIPTS_HASH_VAR = "tikiLoadedJavascriptSourceHashes";
+    private function generateJsLoadedList(): string
+    {
+        if (! $this->outputStaticJSFooterWasStartedBy) {
+            throw new Error("You need to use one of the output functions before generateJsLoadedList() can be called");
+        }
+        $js = "//This will be manipulated by ajax requests as other scripts are loaded in the page\n";
+
+        $js .= self::TIKI_SCRIPTS_HASH_VAR . "=[\n";
+        foreach ($this->loadableContent as $hash => $content) {
+            $loadedIn = $content['contentLoadedIn'] ?? null;
+            if ($loadedIn) {
+                $loadedInComment = $loadedIn !== $hash ? " //Combined into $loadedIn" : "";
+                $js .= "\"$hash\",$loadedInComment\n";
+            }
+        }
+        $js .= "]\n";
+        return $js;
+    }
+
+    public function outputJsArray(string $outputFormat): array
+    {
+        $this->outputStaticJSFooterWasStartedBy = $this->getOutputCallerInfo();
+        if (
+            ! in_array($outputFormat, self::getOutputFormats())
+        ) {
+            throw new InvalidParameterException("format parameter has an invalid value: $outputFormat");
+        }
+        $retVal = [];
+
+        uasort($this->loadableContent, ['self', 'loadableContentCmp']);
+
+        $contentByGroup = self::groupLoadableContent($this->loadableContent);
+        foreach ($contentByGroup as $group => $loadableGroupContent) {//Begin main loop by group
+            if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+                $retVal[] = "<!-- Begin group: $group --> ";
+            }
+
+            if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+                $retVal[] = " <!-- Begin $group js files --> ";
+            }
+            $JsFiles = self::filterJsFiles($loadableGroupContent);
+            $retVal = array_merge($retVal, self::getJsFilesWithScriptTags($JsFiles));
+
+            if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+                $retVal[] = " <!-- Begin $group inline js --> ";
+            }
+            foreach ($loadableGroupContent as $hash => $content) {
+                if (in_array($content['format'], [self::FORMAT_JS_CLASSIC, self::FORMAT_JS_MODULE, self::FORMAT_JS_READY_HANDLER])) {
+                    $js = '';
+                    if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+                        $js .= "// START inline js $hash " . $content['format'] . " " . $content['order'] . "\n";
+                    }
+                    if ($content['format'] === self::FORMAT_JS_READY_HANDLER) {
+                         //Ideally we'd want all onReady handlers to fire in a single event.  But that would cause too much potential for attaching the same event multiple times if they are grouped together and can't be deduplicated by headerlib.js when adding js in ajax calls - benoitg - 2024-05-14
+                        $js .= self::wrapJsOnReady(trim($content['content']));
+                    } else {
+                        $js .= trim($content['content']);
+                    }
+
+                    if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+                        $isModule = $content['format'] === self::FORMAT_JS_MODULE;
+                        $retVal[] = self::wrapJs($js, $isModule ? 'MODULE' : 'STANDARD', $hash);
+                    } else {
+                        $retVal[] = $js;
+                    }
+                    $this->loadableContent[$hash]['contentLoadedIn'] = $hash;
+                }
+            }
+        }//End main loop by group
+
+        if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
+            $retVal []  = self::wrapJs(self::generateJsLoadedList(), 'STANDARD');
+        }
+        return $retVal;
     }
 
     /**
@@ -1155,52 +1242,9 @@ class HeaderLib
      */
     public function output_js(bool $raw = false): string
     {
-        // called in tiki.tpl - JS output at end of file now (pre 5.0)
-        $this->outputStaticJSFooterWasStartedBy = $this->getOutputCallerInfo();
-
         $retVal = "\n";
-
-        uasort($this->loadableContent, ['self', 'loadableContentCmp']);
-        $contentByGroup = self::groupLoadableContent($this->loadableContent);
-        foreach ($contentByGroup as $group => $loadableGroupContent) {//Begin main loop by group
-            $jsOnready = '';
-            if (! $raw) {
-                $retVal .= "<!-- Begin javascript for group: $group -->\n";
-            }
-            $JsFiles = self::filterJsFiles($loadableGroupContent);
-
-            //var_dump($JsFiles);
-            /*foreach ($JsFiles as $hash => $content) {
-            $retVal .= $this->getScriptForJsSrc($content, $hash);
-            }*/
-            $retVal .= implode("\n", self::getJsFilesWithScriptTags($JsFiles));
-            //var_dump($this->loadableContent);
-            foreach ($loadableGroupContent as $hash => $content) {
-                if (in_array($content['format'], [self::FORMAT_JS_CLASSIC, self::FORMAT_JS_MODULE, self::FORMAT_JS_READY_HANDLER])) {
-                    $js = '';
-                    if (! $raw) {
-                        $js .= "// START inline js $hash " . $content['format'] . " " . $content['order'] . "\n";
-                    }
-                    if ($content['format'] === self::FORMAT_JS_READY_HANDLER) {
-                        $jsOnready .= trim($content['content']) . "\n";
-                    } else {
-                        $js .= trim($content['content']) . "\n";
-                    }
-
-                    if (! $raw) {
-                        $isModule = $content['format'] === self::FORMAT_JS_MODULE;
-                        $retVal .= self::wrapJs($js, $isModule, $hash);
-                    } else {
-                        $retVal .= $js;
-                    }
-                }
-            }
-            if ($jsOnready) {
-                //We want all onReady handlers to fire in a single event.
-                $retVal .= self::wrapJs(self::wrapJsOnReady($jsOnready));
-            }
-        }//End main loop by group
-
+        $format = $raw ? self::OUTPUT_FORMAT_TEST_RAW_STRINGS : self::OUTPUT_FORMAT_HTML_TAGS;
+        $retVal .= implode("\n", $this->outputJsArray($format));
 
         return $retVal;
     }
@@ -1254,17 +1298,22 @@ class HeaderLib
      * @param boolean $module
      * @return string the script tag
      */
-    public static function wrapJs(string $inJs, bool $module = false, ?string $id = null)
+    public static function wrapJs(string $inJs, string $scriptFormat, ?string $id = null)
     {
 
         $idString = '';
         if ($id) {
              $idString = " id=\"$id\" ";
         }
-        if ($module) {
-            return "<script $idString type=\"module\" name=\"App\">\n" . $inJs . "\n</script>\n";
+
+        if ($scriptFormat === 'STANDARD') {
+            return "<script $idString type=\"text/javascript\">\n<!--//--><![CDATA[//><!--\n" . $inJs . "//--><!]]>\n</script>";
+        } elseif ($scriptFormat === 'MODULE') {
+            return "<script $idString type=\"module\" name=\"App\">\n" . $inJs . "\n</script>";
+        } elseif ($scriptFormat === 'SRC') {
+            return "<script $idString type=\"text/javascript\" src=\"$inJs\" ></script>";
         } else {
-            return "<script type=\"text/javascript\">\n<!--//--><![CDATA[//><!--\n" . $inJs . "//--><!]]>\n</script>\n";
+            throw new InvalidArgumentException("Invalid scriptFormat: $scriptFormat");
         }
     }
 

@@ -649,7 +649,7 @@ $smarty->assign_by_ref('users', $users);
 if ($tiki_p_export_tracker == 'y') {
     $trackers = $trklib->list_trackers();
     $smarty->assign_by_ref('trackers', $trackers['data']);
-    include_once('lib/wiki-plugins/wikiplugin_trackerfilter.php');
+    require_once('lib/wiki-plugins/wikiplugin_trackerfilter.php');
     $formats = '';
     $filters = wikiplugin_trackerFilter_get_filters($_REQUEST['trackerId'], [], $formats);
     $smarty->assign_by_ref('filters', $filters);

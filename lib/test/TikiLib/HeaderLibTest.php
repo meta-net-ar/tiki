@@ -14,6 +14,7 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
 {
     private $firstJs = "//First normalJS\nsomeVariable = new Array();";
     private $secondJs = "//Second normalJS\nsomeOtherVariable = null;";
+    private $thirdJs = "//Third normalJS\nyetAnotherVariable = null;";
     protected function setUp(): void
     {
         TikiLib::lib('cache')->empty_cache();
@@ -47,16 +48,6 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $output);
     }
 
-    public function testClearJs(): void
-    {
-        $headerLib = new HeaderLib();
-        $headerLib->add_js($this->firstJs, 10)->add_js($this->secondJs, 10);
-        $headerLib->clear_js();
-        $output = trim($headerLib->output_js(true));
-        $expected = '';
-        $this->assertEquals($expected, $output);
-    }
-
     public function testNoDuplicates(): void
     {
         $headerLib = new HeaderLib();
@@ -80,5 +71,22 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
         $output = trim($headerLib->output_js(true));
         $expected = trim($this->secondJs) . "\n" . trim($this->firstJs);
         $this->assertEquals($expected, $output, "Javascript should respect rank, even if added out of order");
+    }
+
+    public function testContext(): void
+    {
+        $headerLib = new HeaderLib();
+        $headerLib->add_js($this->firstJs, 10);
+        $headerLib->startNewContext();
+        $headerLib->add_js($this->secondJs, 10);
+        $output = trim($headerLib->output_js(true));
+        $expected = trim($this->secondJs);
+        $this->assertEquals($expected, $output);
+        $headerLib->dropCurrentContext();
+        //Check we can add js again even if there was output
+        $headerLib->add_js($this->thirdJs, 10);
+        $output = trim($headerLib->output_js(true));
+        $expected = trim($this->firstJs) . "\n" . trim($this->thirdJs);
+        $this->assertEquals($expected, $output);
     }
 }

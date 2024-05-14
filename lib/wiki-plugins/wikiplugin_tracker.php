@@ -1804,9 +1804,7 @@ function wikiplugin_tracker($data, $params)
         }
         if (! empty($params['_ajax_form_ins_id'])) {
             $headerlib = TikiLib::lib('header');
-            $old_js['js'] = $headerlib->js;                     // of tracker form JS into a function to initialise it when the dialog is created
-            $old_js['jq_onready'] = $headerlib->jq_onready;
-            $headerlib->clear_js();                             // so store existing js for later and clear
+            $headerlib->startNewContext();
         }
 
         if ($prefs['feature_jquery_validation'] == 'y') {
@@ -2326,12 +2324,12 @@ FILL;
             $back .= '</form>';
         }
 
-        if (! empty($params['_ajax_form_ins_id'])) {    // save new js in a function for the form init fn
-            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->output_js(false) . '}', 10);
-
+        if (! empty($params['_ajax_form_ins_id'])) {
+            $addedJs = $headerlib->output_js(true);
             // put back the pre-existing js
-            $headerlib->js = array_merge($headerlib->js, $old_js['js']);
-            $headerlib->jq_onready = array_merge($headerlib->jq_onready, $old_js['jq_onready']);
+            $headerlib->dropCurrentContext();
+            // save new js in a function for the form init fn
+            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $addedJs . '}', 10);
         }
 
         return $back;

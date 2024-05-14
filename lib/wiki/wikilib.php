@@ -781,7 +781,7 @@ class WikiLib extends TikiLib
                 $js = array_diff($js2, $js1);
 
                 $jsFile = implode("\n", $jsFile);
-                $js = $headerlib->wrapJs(implode("\n", $js));
+                $js = $headerlib->wrapJs(implode("\n", $js), 'STANDARD');
 
                 $this->update_cache($page, $content . $jsFile . $js);
             }

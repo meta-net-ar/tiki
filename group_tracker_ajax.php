@@ -12,10 +12,9 @@ require_once('tiki-setup.php');
 
 $access->check_feature(['feature_trackers', 'feature_ajax', 'wikiplugin_tracker']);
 
-include_once('lib/wiki-plugins/wikiplugin_tracker.php');
+require_once('lib/wiki-plugins/wikiplugin_tracker.php');
 
-$headerlib->clear_js();                             // so store existing js for later and clear
-
+$headerlib->startNewContext();
 $json_data = [];
 $re = $userlib->get_group_info($_REQUEST['chosenGroup'] ?? 'Registered');
 if (! empty($re['usersTrackerId']) && ! empty($re['registrationUsersFieldIds'])) {

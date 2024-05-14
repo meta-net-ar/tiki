@@ -1285,7 +1285,7 @@ class Tracker_Query
 
         foreach ($trackerDefinition->getFields() as $field) {
             if ($includeJs == true) {
-                $headerlib->clear_js();
+                $headerlib->startNewContext();
             }
 
             $field['ins_id'] = "ins_" . $field['fieldId'];
