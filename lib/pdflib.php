@@ -472,6 +472,27 @@ class PdfGenerator
             $textAlign = 'center';
             $textBgColor = '';
             $coverPageTextBorder = '';
+            $subHeading = $coverPage[1] ?? '';
+            if (count($coverPage) === 1 && ! empty($pdfSettings['coverpage_settings'])) {
+                list($bgColorValue, $borderWidthValue, $borderColorValue) = explode('|', $pdfSettings['coverpage_settings'] . '||');
+                $coverPageBgColor = ! empty($bgColorValue) ? "background-color:{$bgColorValue};" : '';
+                $coverPageBorder = ! empty($borderWidthValue) ? "border:{$borderWidthValue}px solid " . ("{$borderColorValue};" ?: 'black;') : '';
+            } else {
+                //getting border settings
+                if (count($coverPage) > 5) {
+                    $borderWidth = empty($coverPage[5]) ? 1 : $coverPage[5];
+                    $coverPageTextBorder = "border:{$borderWidth}px solid {$coverPage[6]};";
+                }
+                $textAlign = empty($coverPage[2]) ? 'center' : $coverPage[2];
+                $textBgColor = ! empty($coverPage[3]) ? "background-color:{$coverPage[3]};" : '';
+                $textColor = ! empty($coverPage[4]) ? "color:{$coverPage[4]};" : '';
+            }
+            $mpdf->WriteHTML('<body style="' . $coverPageBgColor . 'margin:0px;padding:0px"><div style="height:100%;background-image:url(' . $coverImage . ');padding:20px;background-repeat: no-repeat;background-position: center; "><div style="' . $coverPageBorder . 'height:95%;">
+            <div style="text-align:' . $textAlign . ';margin-top:30%;' . $textColor . '"><div style="' . $textBgColor . $coverPageTextBorder . 'margin-bottom:10px;font-size:50px;">' . $coverPage[0] . '</div>' . $subHeading . '</div></div></body>');
+            $textColor = '';
+            $textAlign = 'center';
+            $textBgColor = '';
+            $coverPageTextBorder = '';
             $coverPageBgColor = '';
             $coverPageBorder = '';
             if (count($coverPage) === 1 && ! empty($pdfSettings['coverpage_settings'])) {

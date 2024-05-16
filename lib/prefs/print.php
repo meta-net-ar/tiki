@@ -295,6 +295,20 @@ function prefs_print_list()
             'type' => 'text',
             'default' => '',
         ],
+        'print_pdf_mpdf_coverpage_wiki' => [
+            'name' => tra('CoverPage wiki'),
+            'description' => tra('Name of the wiki page that will be used for the text of the coverpage.'),
+            'tags' => ['advanced', 'experimental'],
+            'type' => 'text',
+            'default' => '',
+        ],
+        'print_pdf_mpdf_coverpage_settings' => [
+            'name' => tra('CoverPage settings'),
+            'description' => tra('Background color|Page border|Border color. Enter settings separated by |. Leave blank for default settings. Sequence is important, for example <code>#fff|1|#000</code>'),
+            'tags' => ['advanced', 'experimental'],
+            'type' => 'text',
+            'default' => '',
+        ],
         'print_pdf_mpdf_coverpage_image_settings' => [
             'name' => tra('Coverpage image URL'),
             'description' => tra('Enter the full URL.'),
