@@ -10,12 +10,17 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="lib/test/bootstrap.php"
          beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="false"
+         displayDetailsOnTestsThatTriggerErrors="true"
+        displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          colors="true"
          stopOnFailure="false"
          backupGlobals="false"
          stopOnRisky="false"
-         cacheResultFile="temp/cache">
+         cacheResultFile="temp/cache"
+         >
   <source>
         <include>
             <directory suffix=".php">./lib</directory>

@@ -247,7 +247,8 @@ class HeaderLib
     public function dropCurrentContext()
     {
         array_pop($this->contextStack);
-        $this->loadableContent =& end($this->contextStack);
+        end($this->contextStack);
+        $this->loadableContent =& $this->contextStack[key($this->contextStack)];
         $this->outputHeadersWasStartedBy = null;
         $this->outputStaticJSFooterWasStartedBy = null;
     }
