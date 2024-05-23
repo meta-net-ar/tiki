@@ -15,6 +15,9 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
     private $firstJs = "//First normalJS\nsomeVariable = new Array();";
     private $secondJs = "//Second normalJS\nsomeOtherVariable = null;";
     private $thirdJs = "//Third normalJS\nyetAnotherVariable = null;";
+    private $firstCss = "/* First CSS */\np { color: red; }";
+    private $secondCss = "/* Second CSS */\np { color: green; }";
+    private $thirdCss = "/* Third CSS */\np { color: blue; }";
     protected function setUp(): void
     {
         TikiLib::lib('cache')->empty_cache();
@@ -73,7 +76,7 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $output, "Javascript should respect rank, even if added out of order");
     }
 
-    public function testContext(): void
+    public function testContextJs(): void
     {
         $headerLib = new HeaderLib();
         $headerLib->add_js($this->firstJs, 10);
@@ -87,6 +90,22 @@ class HeaderLibTest extends \PHPUnit\Framework\TestCase
         $headerLib->add_js($this->thirdJs, 10);
         $output = trim($headerLib->output_js(true));
         $expected = trim($this->firstJs) . "\n" . trim($this->thirdJs);
+        $this->assertEquals($expected, $output);
+    }
+    public function testContextCss(): void
+    {
+        $headerLib = new HeaderLib();
+        $headerLib->add_css($this->firstCss, 10);
+        $headerLib->startNewContext();
+        $headerLib->add_css($this->secondCss, 10);
+        $output = trim(implode($headerLib->outputCssArray(HeaderLib::OUTPUT_FORMAT_TEST_RAW_STRINGS)));
+        $expected = trim($this->secondCss);
+        $this->assertEquals($expected, $output);
+        $headerLib->dropCurrentContext();
+        //Check we can add css again even if there was output
+        $headerLib->add_css($this->thirdCss, 10);
+        $output = trim(implode("\n", $headerLib->outputCssArray(HeaderLib::OUTPUT_FORMAT_TEST_RAW_STRINGS)));
+        $expected = trim($this->firstCss) . "\n" . trim($this->thirdCss);
         $this->assertEquals($expected, $output);
     }
 }
