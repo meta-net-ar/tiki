@@ -137,4 +137,45 @@ class Tiki_Hm_Functions
         }
         return $res;
     }
+
+    public static function initCyphtForBackend($page = null)
+    {
+        global $user, $tikipath;
+
+        static $config = null;
+        static $session = null;
+        static $cache = null;
+        static $module_exec = null;
+        static $request = null;
+
+        if (defined('APP_PATH') && empty($config)) {
+            throw new Exception(tr('Cannot initialize Cypht backend when it is already initialized'));
+        }
+
+        if (is_null($config)) {
+            // init Cypht app
+            $_SESSION['cypht'] = [];
+            $_SESSION['cypht']['preference_name'] = 'cypht_user_config';
+            require_once $tikipath . '/lib/cypht/integration/classes.php';
+            $_SESSION['cypht']['request_key'] = Hm_Crypt::unique_id();
+            $_SESSION['cypht']['username'] = $user;
+
+            $config = new Tiki_Hm_Site_Config_File();
+            $config->set('disable_empty_superglobals', true);
+            $session_config = new Hm_Session_Setup($config);
+            $session = $session_config->setup_session();
+            $cache_setup = new Hm_Cache_Setup($config, $session);
+            $cache = $cache_setup->setup_cache();
+
+            $module_exec = new Hm_Module_Exec($config);
+            $request = new Hm_Request($module_exec->filters, $config);
+        }
+
+        if ($page) {
+            $module_exec->load_module_sets($page);
+            $module_exec->run_handler_modules($request, $session, $page);
+        }
+
+        return compact('config', 'session', 'cache', 'module_exec', 'request');
+    }
 }

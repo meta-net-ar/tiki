@@ -23,6 +23,8 @@ class Search_Query implements Search_Query_Interface
     private $transformations = [];
     private $returnOnlyResultList = [];
 
+    private $cyphtSearch = null;
+
     public function __construct($query = null, $expr = 'and')
     {
         if ($expr === 'or') {
@@ -70,6 +72,11 @@ class Search_Query implements Search_Query_Interface
     public function isCountOnly()
     {
         return $this->countOnly;
+    }
+
+    public function getCyphtSearch()
+    {
+        return $this->cyphtSearch;
     }
 
     public function addObject($type, $objectId)
@@ -303,6 +310,11 @@ class Search_Query implements Search_Query_Interface
         $this->addPart(new Search_Expr_Distance($distance, $lat, $lon), 'geo_distance', $field);
     }
 
+    public function filterCypht($value)
+    {
+        $this->cyphtSearch = $value;
+    }
+
     private function addPart($query, $type, $field)
     {
         if (is_string($field)) {
@@ -387,7 +399,13 @@ class Search_Query implements Search_Query_Interface
     {
         $this->finalize();
         try {
-            $resultset = $index->find($this, $this->start, $this->count, $multisearchId, $resultFromMultisearch);
+            // TODO: make it possible to search for cypht and non-cypht results
+            if ($this->cyphtSearch) {
+                $cyphtIndex = new \Search\Index\Cypht();
+                $resultset = $cyphtIndex->find($this, $this->start, $this->count);
+            } else {
+                $resultset = $index->find($this, $this->start, $this->count, $multisearchId, $resultFromMultisearch);
+            }
         } catch (Search_Elastic_SortException $e) {
             //on sort exception, try again without the sort field
             $this->sortOrder = null;
@@ -444,6 +462,9 @@ class Search_Query implements Search_Query_Interface
         $this->finalize();
 
         try {
+            if ($this->cyphtSearch) {
+                $index = new \Search\Index\Cypht();
+            }
             $res = $index->scroll($this);
             foreach ($res as $row) {
                 foreach ($this->transformations as $trans) {

@@ -540,7 +540,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $fileId = $filegallib->upload_single_file($galinfo, $file['name'], $file['size'], $file['type'], $file['content']);
         if ($fileId) {
             $existing[] = $fileId;
-            TikiLib::lib('relation')->add_relation('tiki.file.attach', 'trackeritem', $this->getItemId(), 'file', $fileId);
+            TikiLib::lib('relation')->add_relation('tiki.file.attach', 'trackeritem', $this->getItemId(), 'file', $fileId, false, $this->getConfiguration('fieldId'));
         }
     }
 

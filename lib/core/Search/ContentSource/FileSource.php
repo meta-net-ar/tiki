@@ -90,8 +90,30 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
                     'email_body' => $typeFactory->plainmediumtext($parsed_fields['body']),
                     'email_plaintext' => $typeFactory->plainmediumtext($parsed_fields['plaintext']),
                     'email_html' => $typeFactory->plainmediumtext($parsed_fields['html']),
-
                 ];
+                $sources = TikiLib::lib('relation')->get_relations_to('file', $objectId, 'tiki.file.attach');
+                foreach ($sources as $rel) {
+                    if ($rel['type'] == 'trackeritem' && ! empty($rel['fieldId'])) {
+                        $view_path = 'tiki-webmail.php';
+                        if (! empty($parsed_fields['source_id'])) {
+                            $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
+                            if ($page_info && stristr($page_info['data'], "cypht")) {
+                                $view_path = smarty_modifier_sefurl($page_info['pageName']);
+                                if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
+                                    $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
+                                }
+                            }
+                        }
+                        if (strstr($view_path, '?')) {
+                            $view_path .= '&';
+                        } else {
+                            $view_path .= '?';
+                        }
+                        $view_path .= "page=message&uid=" . $file['fileId'] . "&list_path=tracker_folder_" . $rel['itemId'] . "_" . $rel['fieldId'] . "&list_parent=tracker_" . TikiLib::lib('trk')->get_tracker_for_item($rel['itemId']);
+                        $data['url'] = $typeFactory->identifier($view_path);
+                        break;
+                    }
+                }
             }
         }
 
