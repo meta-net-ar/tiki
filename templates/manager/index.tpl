@@ -67,6 +67,11 @@
                                     {icon name=copy _menu_text='y' _menu_icon='y' alt="{tr}Clone{/tr}"}
                                 </a>
                             </action>
+                            <action>
+                                <a href="{service controller=manager action=cloneandredact instanceId=$instance->id}">
+                                    {icon name=copy _menu_text='y' _menu_icon='y' alt="{tr}Clone and redact{/tr}"}
+                                </a>
+                            </action>
                             {if $instance->app != null}
                             <action>
                                 <a href="{service controller=manager action=console instanceId=$instance->id}">

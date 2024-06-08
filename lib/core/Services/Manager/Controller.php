@@ -1316,7 +1316,6 @@ class Services_Manager_Controller
                 case "update":
                     $instance_list = Instance::getUpdatableInstances();
                     break;
-
                 case "backup":
                     $instance_list = Instance::getInstances(true);
                     break;
@@ -1646,5 +1645,54 @@ class Services_Manager_Controller
         }
 
         return $availableBranches;
+    }
+
+    public function action_cloneandredact($input)
+    {
+        $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
+
+        // Extract instance ID from $input
+        $instanceId = $input->instanceId->text();
+
+        if (!$instanceId) {
+            $input_array = [
+                "command" => $cmd->getName(),
+                "--instances" => $instanceId
+            ];
+
+            $inputCommand = new ArrayInput($input_array);
+
+            $this->runCommand($cmd, $inputCommand);
+
+            return [
+                'title' => tr('Manager Clone and Redact Instance Result'),
+                'info' => $this->manager_output->fetch(),
+                'refresh' => true,
+            ];
+        } else {
+            $instances = TikiManager\Application\Instance::getInstances();
+
+            if (count($instances) > 0) {
+                // Form initialization
+                $inputValues = [
+                    'instances' => $instances,
+                    'help' => $this->getCommandHelpTexts($cmd),
+                ];
+
+                return [
+                    'title' => tr('Manager Clone and Redact Instance'),
+                    'info' => '',
+                    'refresh' => true,
+                    'inputValues' => $inputValues,
+                ];
+            } else {
+                return [
+                    'title' => tr('Clone and Redact (No Instance Found)'),
+                    'info' => "No Tiki instances available for clone and redact",
+                    'refresh' => true,
+                ];
+            }
+        }
+
     }
 }
