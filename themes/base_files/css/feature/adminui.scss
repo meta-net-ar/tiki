@@ -62,16 +62,22 @@ body.tiki-admin {
 .tiki-admin .container.container-std .col1 {
     padding-left: 0;
 }
-.tiki-admin .offcanvas.offcanvas-start {
-    --bs-offcanvas-width: 268px; }
+//.tiki-admin .offcanvas.offcanvas-start {
+//    --bs-offcanvas-width: 300px; }
 .tiki-admin .top_modules .box-login_box { margin-left: auto; }
+
+@media (min-width: 992px) {
+    .tiki-admin.uab aside.admin-nav .navbar-expand-lg .offcanvas  .offcanvas-body {
+        flex-direction: column;
+    }
+}
 
 .tiki-admin aside.admin-nav > nav {
     /*height: unset;
       width: unset !important;
      overflow-y: auto;
      overflow-x: hidden; */
-    top: 50px !important;
+    top: var(--tiki-admin-top-modules-height) !important; //50px !important;
 }
 
 
@@ -319,15 +325,15 @@ body.tiki-admin {
 
 .tiki-admin /*.page-header*/ .top_modules { //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
     width: 100%;
-    height: 50px;
+    height: var(--tiki-admin-top-modules-height); // 50px;
     padding: 0 1.6rem;
 }
 .tiki-admin aside.admin-nav > nav {
-    height: calc(100% - 50px - 2.3rem);
-    width: 268px !important;
+    height: calc(100% - var(--tiki-admin-top-modules-height) - 2.3rem);
+ //   width: 268px !important;
     overflow-y: auto;
     overflow-x: hidden;
-    top: 50px !important;
+    top: var(--tiki-admin-top-modules-height) !important; //50px !important;
 }
 
 .tiki-admin aside.admin-nav .narrow .dropdown-item {
@@ -772,7 +778,7 @@ body.tiki-admin {
 
 .tiki-admin .admin-content nav.navbar-expand-md.mb-4 .navbar-brand {
     padding: 0;
-    height: 50px;
+    height: var(--tiki-admin-top-modules-height); //50px;
     width: 60px;
     display: flex;
     justify-content: center;
@@ -864,7 +870,7 @@ body.tiki-admin {
 }
 
 .tiki-admin aside.admin-nav nav .admin-menu-collapser {
-    width: 268px;
+    width: 300px; // 268px;
     position: fixed;
     bottom: 0;
     height: 2.3rem;

@@ -130,6 +130,9 @@ $tiki-blockquote-left-border-color: var(--#{$prefix}secondary-color); // #e5e5e5
     --tiki-site-subtitle-font-weight: 400;
     --tiki-top-border-width: 0;
     --tiki-static-top-light-border: none;
+
+    --tiki-admin-top-modules-height: 50px; // UAB top modules (top navbar) height
+    --tiki-admin-offcanvas-width: 300px; // UAB aside navbar width
 }
 
 // These are redundant re: --tiki-top-border-width, but need to be explicit for calculation of fixed-top navbar height in templates/modules/mod-logo.tpl. A unit is required.
