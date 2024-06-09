@@ -8,3 +8,8 @@
     height: 0.5rem;
     width: 0.5rem;
 }
+
+// Direct child of col or col- classes should be the width of the col (Ex: Available themes selector on tiki-admin.php?page=look
+div[class^='col'] > .select2-container, div[class*=' col'] > .select2-container {
+    display: block;
+}
