@@ -1647,20 +1647,15 @@ class Services_Manager_Controller
         return $availableBranches;
     }
 
-    public function action_cloneandredact($input)
+    public function action_clone_and_redact($input)
     {
         $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
 
-        // Extract instance ID from $input
-        $instanceId = $input->instanceId->text();
-
-        if (!$instanceId) {
-            $input_array = [
+       if ($input->clone_and_redact->text()) {
+            $inputCommand = new ArrayInput([
                 "command" => $cmd->getName(),
-                "--instances" => $instanceId
-            ];
-
-            $inputCommand = new ArrayInput($input_array);
+                "-i" => $instanceId
+            ]);
 
             $this->runCommand($cmd, $inputCommand);
 
@@ -1670,29 +1665,29 @@ class Services_Manager_Controller
                 'refresh' => true,
             ];
         } else {
-            $instances = TikiManager\Application\Instance::getInstances();
+            $cmd = new TikiManager\Command\CloneInstanceCommand();
+            $definition = $cmd->getDefinition();
 
-            if (count($instances) > 0) {
-                // Form initialization
-                $inputValues = [
-                    'instances' => $instances,
-                    'help' => $this->getCommandHelpTexts($cmd),
-                ];
-
-                return [
-                    'title' => tr('Manager Clone and Redact Instance'),
-                    'info' => '',
-                    'refresh' => true,
-                    'inputValues' => $inputValues,
-                ];
-            } else {
-                return [
-                    'title' => tr('Clone and Redact (No Instance Found)'),
-                    'info' => "No Tiki instances available for clone and redact",
-                    'refresh' => true,
+            $options = [];
+            foreach ($definition->getOptions() as $option) {
+                $options[] = [
+                    'name' => $option->getName(),
+                    'label' => ucwords(str_replace('-', ' ', $option->getName())),
+                    'type' => 'text',
+                    'help' => $option->getDescription(),
+                    'is_array' => $option->isArray(),
                 ];
             }
-        }
 
+            return [
+                'title' => tr('Clone and Redact Tiki Instance'),
+                'options' => $options,
+            ];
+            // return [
+            //     'title' => tr('Clone and Redact (No Instance Found)'),
+            //     'info' => "No Tiki instances available for clone and redact",
+            //     'refresh' => true,
+            // ];
+        }
     }
 }

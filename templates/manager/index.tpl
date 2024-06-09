@@ -68,7 +68,7 @@
                                 </a>
                             </action>
                             <action>
-                                <a href="{service controller=manager action=cloneandredact instanceId=$instance->id}">
+                                <a href="{service controller=manager action=clone_and_redact instanceId=$instance->id}">
                                     {icon name=copy _menu_text='y' _menu_icon='y' alt="{tr}Clone and redact{/tr}"}
                                 </a>
                             </action>
