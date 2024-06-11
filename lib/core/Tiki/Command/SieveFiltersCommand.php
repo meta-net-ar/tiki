@@ -11,17 +11,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Exception;
 use TikiLib;
-use Tiki_Hm_Site_Config_File;
-use Hm_Session_Setup;
-use Hm_Cache;
-use Hm_Module_Exec;
-use Hm_Request;
 use Hm_IMAP_List;
 use Hm_SMTP_List;
 use Hm_Msgs;
+use Tiki_Hm_Functions;
 use Hm_Handler_tiki_sieve_placeholder;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Tiki_Hm_Functions;
 
 /**
  * Runs periodically to execute defined Cypht/Sieve filters and block list
@@ -46,23 +41,14 @@ class SieveFiltersCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        global $user, $tikipath, $tikiroot;
+        global $user, $tikiroot, $tikipath;
 
-        $_SESSION['cypht'] = [];
-        $_SESSION['cypht']['preference_name'] = 'cypht_user_config';
-        require_once $tikipath . '/lib/cypht/integration/classes.php';
-        require_once APP_PATH . 'modules/site/lib.php';
+        require_once $tikipath . '/lib/cypht/integration/Tiki_Hm_Functions.php';
 
-        $site_config = new Tiki_Hm_Site_Config_File();
-        $session_config = new Hm_Session_Setup($site_config);
-        $cypht_session = $session_config->setup_session();
-        $cypht_cache = new Hm_Cache($site_config, $cypht_session);
-        $module_exec = new Hm_Module_Exec($site_config);
-        $module_exec->request = new Hm_Request($site_config->get('input_filters', []), $site_config);
-        $module_exec->cache = $cypht_cache;
-        $mods = $site_config->get_modules();
-        $module_exec->load_module_set_files($mods, ['core', 'imap', 'smtp', 'profiles', 'tiki']);
-        $hmod = new Hm_Handler_tiki_sieve_placeholder($module_exec, 'system', [], []);
+        $init = Tiki_Hm_Functions::initCyphtForBackend('sieve_filters');
+        extract($init, EXTR_PREFIX_ALL, 'cypht');
+
+        $hmod = new Hm_Handler_tiki_sieve_placeholder($cypht_module_exec, 'system', [], []);
 
         $userPreferences = TikiLib::lib('tiki')->table('tiki_user_preferences');
         $configs = $userPreferences->fetchAll([], [
@@ -130,7 +116,7 @@ class SieveFiltersCommand extends Command
                 $msg_list = array_merge($msg_list, $tikiRulesMsgList);
 
                 // Connection failed
-                if (! is_array($msg_list)) {
+                if (empty($msg_list)) {
                     continue;
                 }
 

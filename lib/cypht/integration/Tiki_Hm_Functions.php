@@ -148,7 +148,7 @@ class Tiki_Hm_Functions
         static $module_exec = null;
         static $request = null;
 
-        if (defined('APP_PATH') && empty($config)) {
+        if (defined('APP_PATH') && ! empty($config)) {
             throw new Exception(tr('Cannot initialize Cypht backend when it is already initialized'));
         }
 
@@ -177,5 +177,18 @@ class Tiki_Hm_Functions
         }
 
         return compact('config', 'session', 'cache', 'module_exec', 'request');
+    }
+
+    public static function lastTimestampCheck(&$config)
+    {
+        if (isset($config['tiki_last_timestamp'])) {
+            $last_timestamp = $config['tiki_last_timestamp'];
+        } else {
+            $last_timestamp = strtotime('1 hour ago');
+        }
+
+        $config['tiki_last_timestamp'] = time();
+
+        return $last_timestamp;
     }
 }

@@ -174,6 +174,11 @@ class MonitorLib
         return TikiDb::get()->table('tiki_user_monitors');
     }
 
+    public function monitoredEvent($userId, $eventName)
+    {
+        return $this->table()->fetchFullRow(['userId' => $userId, 'event' => $eventName]);
+    }
+
     /**
      * Replaces the current priority for an event/target pair, for a specific user.
      */
@@ -306,6 +311,16 @@ class MonitorLib
 
         // Send email (rather slow, dealing with external services) after Tiki's management is done
         $monitormail->sendQueue();
+    }
+
+    public function getMonitoringUsers($events, $targets)
+    {
+        $table = $this->table();
+
+        return $table->fetchAll(['priority', 'userId'], [
+            'event' => $table->in($events),
+            'target' => $table->in($targets),
+        ]);
     }
 
     private function finalHandleEvent($args, $events, $force)
@@ -474,6 +489,8 @@ class MonitorLib
                 'tiki.save' => ['global' => false, 'local' => true, 'label' => tr('Any activity')],
                 'tiki.wiki.save' => ['global' => false, 'local' => false, 'label' => tr('Page modified')],
                 'tiki.wiki.create' => ['global' => true, 'local' => false, 'label' => tr('Page created')],
+                'tiki.webmail.email.received' => ['global' => true, 'local' => false, 'label' => tr('New mail received')],
+                'tiki.webmail.email.received' => ['global' => false, 'local' => false, 'label' => tr('New mail received')],
                 ];
             case 'forum post':
                 return [

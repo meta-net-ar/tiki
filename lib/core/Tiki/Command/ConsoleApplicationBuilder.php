@@ -207,6 +207,8 @@ class ConsoleApplicationBuilder
                 new SieveFiltersCommand(),
                 new CalendarSyncCommand(),
                 new SchedulerRunCommand(),
+                new WebmailUnreadPagesCommand(),
+                new WebmailUnreadGlobalCommand(),
                 ],
             ],[
             'condition' => 'checkIsOCRAvailable',
