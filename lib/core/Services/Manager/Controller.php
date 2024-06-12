@@ -1649,13 +1649,12 @@ class Services_Manager_Controller
 
     public function action_clone_and_redact($input)
     {
-        $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
+       $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
 
        if ($input->clone_and_redact->text()) {
-            $inputCommand = new ArrayInput([
-                "command" => $cmd->getName(),
-                "-i" => $instanceId
-            ]);
+            $inputCommand = new ArrayInput(array_merge([
+                'command' => $cmd->getName(),
+            ], $input->options->asArray()));
 
             $this->runCommand($cmd, $inputCommand);
 
@@ -1664,16 +1663,45 @@ class Services_Manager_Controller
                 'info' => $this->manager_output->fetch(),
                 'refresh' => true,
             ];
-        } else {
-            $cmd = new TikiManager\Command\CloneInstanceCommand();
+       } else {
+            $instances = TikiManager\Application\Instance::getInstances(true);
+
+            $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
             $definition = $cmd->getDefinition();
 
             $options = [];
             foreach ($definition->getOptions() as $option) {
+                switch ($option->getName()) {
+                    case 'source':
+                    case 'target':
+                        $type = 'select';
+                        $values = [];
+                        foreach ($instances as $i) {
+                            $values[$i->id] = $i->name;
+                        }
+                        $selected = $input->instanceId->int() ? $input->instanceId->int() : '';
+                        break;
+                    case 'branch':
+                        $type = 'select';
+                        $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
+                        $selected = 'master';
+                        break;
+                    default:
+                        if ($option->acceptValue()) {
+                            $type = 'text';
+                        } else {
+                            $type = 'checkbox';
+                        }
+                        $values = [];
+                        $selected = $option->getDefault();
+                }
+
                 $options[] = [
                     'name' => $option->getName(),
                     'label' => ucwords(str_replace('-', ' ', $option->getName())),
-                    'type' => 'text',
+                    'type' => $type,
+                    'values' => $values,
+                    'selected' => $selected,
                     'help' => $option->getDescription(),
                     'is_array' => $option->isArray(),
                 ];
@@ -1683,11 +1711,6 @@ class Services_Manager_Controller
                 'title' => tr('Clone and Redact Tiki Instance'),
                 'options' => $options,
             ];
-            // return [
-            //     'title' => tr('Clone and Redact (No Instance Found)'),
-            //     'info' => "No Tiki instances available for clone and redact",
-            //     'refresh' => true,
-            // ];
-        }
+       }
     }
 }
