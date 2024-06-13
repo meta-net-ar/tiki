@@ -1245,12 +1245,7 @@ class Services_Manager_Controller
         }
     }
 
-    /**
-     * @param $input
-     *
-     * @return array
-     */
-    public function action_manager_backup($input): array
+    public function action_manager_backup($input)
     {
         $cmd = new SetupBackupManagerCommand();
 
@@ -1649,9 +1644,9 @@ class Services_Manager_Controller
 
     public function action_clone_and_redact($input)
     {
-       $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
+        $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
 
-       if ($input->clone_and_redact->text()) {
+      if ($input->clone_and_redact->text()) {
             $inputCommand = new ArrayInput(array_merge([
                 'command' => $cmd->getName(),
             ], $input->options->asArray()));
@@ -1665,7 +1660,7 @@ class Services_Manager_Controller
             ];
        } else {
             $instances = TikiManager\Application\Instance::getInstances(true);
-
+            $instanceId = $input->instanceId->int();
             $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
             $definition = $cmd->getDefinition();
 
@@ -1679,12 +1674,17 @@ class Services_Manager_Controller
                         foreach ($instances as $i) {
                             $values[$i->id] = $i->name;
                         }
-                        $selected = $input->instanceId->int() ? $input->instanceId->int() : '';
+                        $selected = $instanceId;
                         break;
                     case 'branch':
                         $type = 'select';
                         $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
                         $selected = 'master';
+                        break;
+                    case 'instances':
+                        $type = 'select';
+                        $values = [$instanceId];
+                        $selected = $instanceId;
                         break;
                     default:
                         if ($option->acceptValue()) {
