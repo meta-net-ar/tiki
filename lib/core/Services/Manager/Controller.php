@@ -1665,36 +1665,36 @@ class Services_Manager_Controller
                 $definition = $cmd->getDefinition();
 
                 $options = [];
-                foreach ($definition->getOptions() as $option) {
-                    switch ($option->getName()) {
-                        case 'source':
-                        case 'target':
-                            $type = 'select';
-                            $values = [];
-                            foreach ($instances as $i) {
-                                $values[$i->id] = $i->name;
-                            }
-                            $selected = $instanceId;
-                            break;
-                        case 'branch':
-                            $type = 'select';
-                            $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
-                            $selected = 'master';
-                            break;
-                        case 'instances':
-                            $type = 'select';
-                            $values = [$instanceId];
-                            $selected = $instanceId;
-                            break;
-                        default:
-                            if ($option->acceptValue()) {
-                                $type = 'text';
-                            } else {
-                                $type = 'checkbox';
-                            }
-                            $values = [];
-                            $selected = $option->getDefault();
-                    }
+            foreach ($definition->getOptions() as $option) {
+                switch ($option->getName()) {
+                    case 'source':
+                    case 'target':
+                        $type = 'select';
+                        $values = [];
+                        foreach ($instances as $i) {
+                            $values[$i->id] = $i->name;
+                        }
+                        $selected = $instanceId;
+                        break;
+                    case 'branch':
+                        $type = 'select';
+                        $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
+                        $selected = 'master';
+                        break;
+                    case 'instances':
+                        $type = 'select';
+                        $values = [$instanceId];
+                        $selected = $instanceId;
+                        break;
+                    default:
+                        if ($option->acceptValue()) {
+                            $type = 'text';
+                        } else {
+                            $type = 'checkbox';
+                        }
+                        $values = [];
+                        $selected = $option->getDefault();
+                }
 
                     $options[] = [
                         'name' => $option->getName(),
@@ -1705,12 +1705,12 @@ class Services_Manager_Controller
                         'help' => $option->getDescription(),
                         'is_array' => $option->isArray(),
                     ];
-                }
+            }
 
-                return [
-                    'title' => tr('Clone and Redact Tiki Instance'),
-                    'options' => $options,
-                ];
+            return [
+                'title' => tr('Clone and Redact Tiki Instance'),
+                'options' => $options,
+            ];
         }
     }
 }
