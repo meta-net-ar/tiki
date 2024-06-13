@@ -747,10 +747,10 @@ class HeaderLib
     public function replace_cssfile($old, $new, $rank): HeaderLib
     {
         /*foreach ($this->cssfiles[$rank] as $i => $css) {
-            if ($css == $old) {
-                $this->cssfiles[$rank][$i] = $new;
-                break;
-            }
+        if ($css == $old) {
+            $this->cssfiles[$rank][$i] = $new;
+            break;
+        }
         }
         return $this;*/
     }
@@ -759,11 +759,11 @@ class HeaderLib
     {
         /*$out = [];
         foreach ($this->cssfiles as $rank => $data) {
-            foreach ($data as $f) {
-                if ($f != $file) {
-                    $out[$rank][] = $f;
-                }
+        foreach ($data as $f) {
+            if ($f != $file) {
+                $out[$rank][] = $f;
             }
+        }
         }
         $this->cssfiles = $out;
         return $this;*/
@@ -1147,10 +1147,10 @@ class HeaderLib
         return  $retVal;
     }
     private const TIKI_SCRIPTS_HASH_VAR = "tikiLoadedJavascriptSourceHashes";
-    private function generateJsLoadedList(): string
+    private function generateJsLoadedContentList(): string
     {
         if (! $this->outputStaticJSFooterWasStartedBy) {
-            throw new Error("You need to use one of the output functions before generateJsLoadedList() can be called");
+            throw new Error("You need to use one of the output functions before generateJsLoadedContentList() can be called");
         }
         $js = "//This will be manipulated by ajax requests as other scripts are loaded in the page\n";
 
@@ -1218,7 +1218,7 @@ class HeaderLib
         }//End main loop by group
 
         if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
-            $retVal []  = self::wrapJs(self::generateJsLoadedList(), 'STANDARD');
+            $retVal []  = self::wrapJs(self::generateJsLoadedContentList(), 'STANDARD');
         }
         return $retVal;
     }
@@ -1369,6 +1369,7 @@ class HeaderLib
 
     public function get_all_css_content()
     {
+        throw new Error("FIXME:  collect_css_files has changed... benoitg");
         $files = $this->collect_css_files();
         $minifier = new MatthiasMullie\Minify\CSS();
 
@@ -1386,7 +1387,7 @@ class HeaderLib
 
         $idString = '';
         if ($id) {
-             $idString = " id=\"$id\" ";
+             $idString = "id=\"$id\"";
         }
 
         if ($scriptFormat === 'INLINE') {
@@ -1410,7 +1411,7 @@ class HeaderLib
 
         uasort($this->loadableContent, [self::class, 'loadableContentCmp']);
 
-        //FIXME!  benoitg
+        //FIXME!  Needs to not return a string - benoitg
         $retVal[] = $this->output_css_files();
         foreach ($this->loadableContent as $hash => $content) {
             if ($content['format'] === self::FORMAT_CSS) {
@@ -1421,25 +1422,32 @@ class HeaderLib
                 } else {
                     $retVal[] = $css;
                 }
+                $this->loadableContent[$hash]['contentLoadedIn'] = $hash;
             }
         }
         return $retVal;
     }
     private function output_css_files()
     {
-        $files = $this->collect_css_files();
-
-        $retVal = $this->output_css_files_list($files['default'], '');
-        $retVal .= $this->output_css_files_list($files['screen'], 'screen');
-        $retVal .= $this->output_css_files_list($files['print'], 'print');
+        $retVal = $this->output_css_files_list('default');
+        $retVal .= $this->output_css_files_list('screen');
+        $retVal .= $this->output_css_files_list('print');
         return $retVal;
     }
 
-    private function output_css_files_list($files, $media = '')
+    private function output_css_files_list(string $media)
     {
         global $prefs;
         $retVal = '';
 
+        $files = [];
+        foreach ($this->loadableContent as $hash => $content) {
+            if ($content['format'] === self::FORMAT_CSS_FILE) {
+                $mediaFiles = $this->collect_css_files($content)[$media];
+                $files = array_merge($files, $mediaFiles);
+            }
+        }
+        array_filter($files);
         // remove any remote css files
         $external = [];
         foreach ($files as $index => $file) {
@@ -1464,7 +1472,7 @@ class HeaderLib
         foreach ($files as $file) {
             $file = $this->convert_cdn($file);
             $retVal .= "<link rel=\"stylesheet\" href=\"" . \SmartyTiki\Modifier\Escape::apply($file) . "\" type=\"text/css\"";
-            if (! empty($media)) {
+            if ($media !=='default') {
                 $retVal .= " media=\"" . \SmartyTiki\Modifier\Escape::apply($media) . "\"";
             }
             $retVal .= ">\n";
@@ -1535,39 +1543,34 @@ class HeaderLib
         return $minifier->minify();
     }
 
-    private function collect_css_files()
+    private function collect_css_files(array $content): array
     {
         global $tikipath;
-
         $files = [
-        'default' => [],
-        'screen' => [],
-        'print' => [],
+            'default' => [],
+            'screen' => [],
+            'print' => [],
         ];
+        if ($content['format'] === self::FORMAT_CSS_FILE) {
+            $pushFile = function ($section, $file, &$loadableContent) use (&$files) {
+                global $prefs;
+                $files[$section][] = $file;
 
-        $pushFile = function ($section, $file) use (&$files) {
-            global $prefs;
-            $files[$section][] = $file;
+                if (Language::isRTL()) {
+                    $rtl = str_replace('.css', '', $file) . '-rtl.css';
 
-            if (Language::isRTL()) {
-                $rtl = str_replace('.css', '', $file) . '-rtl.css';
-
-                if (file_exists($rtl)) {
-                    $files[$section][] = $rtl;
+                    if (file_exists($rtl)) {
+                        $files[$section][] = $rtl;
+                    }
                 }
-            }
-        };
-
-        foreach ($this->loadableContent as $hash => $content) {
-            if ($content['format'] === self::FORMAT_CSS_FILE) {
-                $cf = trim($content['content']);
-                $cfprint = str_replace('.css', '', $cf) . '-print.css';
-                if (! file_exists($tikipath . $cfprint)) {
-                    $pushFile('default', $cf);
-                } else {
-                    $pushFile('screen', $cf);
-                    $pushFile('print', $cfprint);
-                }
+            };
+            $cf = trim($content['content']);
+            $cfprint = str_replace('.css', '', $cf) . '-print.css';
+            if (! file_exists($tikipath . $cfprint)) {
+                $pushFile('default', $cf, $content);
+            } else {
+                $pushFile('screen', $cf, $content);
+                $pushFile('print', $cfprint, $content);
             }
         }
         return $files;
