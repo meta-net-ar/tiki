@@ -1646,71 +1646,71 @@ class Services_Manager_Controller
     {
         $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
 
-      if ($input->clone_and_redact->text()) {
-            $inputCommand = new ArrayInput(array_merge([
-                'command' => $cmd->getName(),
-            ], $input->options->asArray()));
+        if ($input->clone_and_redact->text()) {
+                $inputCommand = new ArrayInput(array_merge([
+                    'command' => $cmd->getName(),
+                ], $input->options->asArray()));
 
-            $this->runCommand($cmd, $inputCommand);
+                $this->runCommand($cmd, $inputCommand);
 
-            return [
-                'title' => tr('Manager Clone and Redact Instance Result'),
-                'info' => $this->manager_output->fetch(),
-                'refresh' => true,
-            ];
-       } else {
-            $instances = TikiManager\Application\Instance::getInstances(true);
-            $instanceId = $input->instanceId->int();
-            $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
-            $definition = $cmd->getDefinition();
+                return [
+                    'title' => tr('Manager Clone and Redact Instance Result'),
+                    'info' => $this->manager_output->fetch(),
+                    'refresh' => true,
+                ];
+        } else {
+                $instances = TikiManager\Application\Instance::getInstances(true);
+                $instanceId = $input->instanceId->int();
+                $cmd = new TikiManager\Command\CloneAndRedactInstanceCommand();
+                $definition = $cmd->getDefinition();
 
-            $options = [];
-            foreach ($definition->getOptions() as $option) {
-                switch ($option->getName()) {
-                    case 'source':
-                    case 'target':
-                        $type = 'select';
-                        $values = [];
-                        foreach ($instances as $i) {
-                            $values[$i->id] = $i->name;
-                        }
-                        $selected = $instanceId;
-                        break;
-                    case 'branch':
-                        $type = 'select';
-                        $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
-                        $selected = 'master';
-                        break;
-                    case 'instances':
-                        $type = 'select';
-                        $values = [$instanceId];
-                        $selected = $instanceId;
-                        break;
-                    default:
-                        if ($option->acceptValue()) {
-                            $type = 'text';
-                        } else {
-                            $type = 'checkbox';
-                        }
-                        $values = [];
-                        $selected = $option->getDefault();
+                $options = [];
+                foreach ($definition->getOptions() as $option) {
+                    switch ($option->getName()) {
+                        case 'source':
+                        case 'target':
+                            $type = 'select';
+                            $values = [];
+                            foreach ($instances as $i) {
+                                $values[$i->id] = $i->name;
+                            }
+                            $selected = $instanceId;
+                            break;
+                        case 'branch':
+                            $type = 'select';
+                            $values = array_combine($this->getTikiBranches(), $this->getTikiBranches());
+                            $selected = 'master';
+                            break;
+                        case 'instances':
+                            $type = 'select';
+                            $values = [$instanceId];
+                            $selected = $instanceId;
+                            break;
+                        default:
+                            if ($option->acceptValue()) {
+                                $type = 'text';
+                            } else {
+                                $type = 'checkbox';
+                            }
+                            $values = [];
+                            $selected = $option->getDefault();
+                    }
+
+                    $options[] = [
+                        'name' => $option->getName(),
+                        'label' => ucwords(str_replace('-', ' ', $option->getName())),
+                        'type' => $type,
+                        'values' => $values,
+                        'selected' => $selected,
+                        'help' => $option->getDescription(),
+                        'is_array' => $option->isArray(),
+                    ];
                 }
 
-                $options[] = [
-                    'name' => $option->getName(),
-                    'label' => ucwords(str_replace('-', ' ', $option->getName())),
-                    'type' => $type,
-                    'values' => $values,
-                    'selected' => $selected,
-                    'help' => $option->getDescription(),
-                    'is_array' => $option->isArray(),
+                return [
+                    'title' => tr('Clone and Redact Tiki Instance'),
+                    'options' => $options,
                 ];
-            }
-
-            return [
-                'title' => tr('Clone and Redact Tiki Instance'),
-                'options' => $options,
-            ];
-       }
+        }
     }
 }
