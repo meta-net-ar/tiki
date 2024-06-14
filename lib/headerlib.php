@@ -748,8 +748,8 @@ class HeaderLib
     {
         /*foreach ($this->cssfiles[$rank] as $i => $css) {
         if ($css == $old) {
-            $this->cssfiles[$rank][$i] = $new;
-            break;
+        $this->cssfiles[$rank][$i] = $new;
+        break;
         }
         }
         return $this;*/
@@ -760,9 +760,9 @@ class HeaderLib
         /*$out = [];
         foreach ($this->cssfiles as $rank => $data) {
         foreach ($data as $f) {
-            if ($f != $file) {
-                $out[$rank][] = $f;
-            }
+        if ($f != $file) {
+            $out[$rank][] = $f;
+        }
         }
         }
         $this->cssfiles = $out;
@@ -826,6 +826,12 @@ class HeaderLib
         ksort($this->rssfeeds);
         $retVal = generateJsImportmapScripts();
         $retVal .= "\n";
+        $retVal .= <<<'EOT'
+        <script type="module">
+            import * as tikiHeaderlib from "@jquery-tiki/headerlib";
+            window.tikiHeaderlib = tikiHeaderlib;  //Make it accessible to legacy js scripts.
+        </script>;
+        EOT;
         if ($this->title) {
             $retVal = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
@@ -936,7 +942,7 @@ class HeaderLib
                 } else {
                     $entry = $originalSrcUrl;
                 }
-                $output[] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $hash);
+                $output[$hash] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $hash);
             } else {
                 $jsfilesToMinify[] = $originalSrcUrl;
                 $jsOriginalContentHashesToMinify[] = $hash;
@@ -949,10 +955,13 @@ class HeaderLib
             // handling of user defined cdn servers is done inside minifyJSFiles()
             $entry = $this->minifyJSFiles($jsfilesToMinify);
             $entryHash = $entry;
+            $hashes = [];
             foreach ($jsOriginalContentHashesToMinify as $hash) {
                 $this->loadableContent[$hash]['contentLoadedIn'] = $entryHash;
+                $hashes[] = $hashes;
             }
-            $output[] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $entryHash);
+            $combinedHashes = implode(',', $hashes);
+            $output[$combinedHashes] = self::wrapJs(\SmartyTiki\Modifier\Escape::apply($entry), 'SRC', $entryHash);
         }
         return $output;
     }
@@ -1208,9 +1217,9 @@ class HeaderLib
 
                     if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
                         $isModule = $content['format'] === self::FORMAT_JS_MODULE;
-                        $retVal[] = self::wrapJs($js, $isModule ? 'MODULE' : 'STANDARD', $hash);
+                        $retVal[$hash] = self::wrapJs($js, $isModule ? 'MODULE' : 'STANDARD', $hash);
                     } else {
-                        $retVal[] = $js;
+                        $retVal[$hash] = $js;
                     }
                     $this->loadableContent[$hash]['contentLoadedIn'] = $hash;
                 }
@@ -1222,6 +1231,7 @@ class HeaderLib
         }
         return $retVal;
     }
+
 
     /**
      * @TODO:  Aside from tests, $wrap = false il only used by unit tests and wikiplugin_tracker.  Rename/remove this.
@@ -1235,6 +1245,27 @@ class HeaderLib
         $format = $raw ? self::OUTPUT_FORMAT_TEST_RAW_STRINGS : self::OUTPUT_FORMAT_HTML_TAGS;
         $retVal .= implode("\n", $this->outputJsArray($format));
 
+        return $retVal;
+    }
+
+    public function outputHeaderlibJsJson(): array
+    {
+        $retVal = [];
+        $retVal['js'] = [];
+        foreach ($this->outputJsArray(self::OUTPUT_FORMAT_HTML_TAGS) as $hash => $html) {
+            //Php automatic array keys are all integers, we only want the real hashes
+            if (! is_int($hash)) {
+                $retVal['js'][$hash] = $html;
+            }
+        }
+        $retVal['css'] = [];
+        trigger_error("WRITEME:  Need to deal with minification", E_USER_WARNING);
+        foreach ($this->outputCssArray(self::OUTPUT_FORMAT_HTML_TAGS) as $hash => $html) {
+            if (! is_int($hash)) {
+                $retVal['css'][$hash] = $html;
+            }
+        }
+        //print_r($json);die;
         return $retVal;
     }
 
@@ -1418,9 +1449,9 @@ class HeaderLib
                 $css = '';
                 $css .= trim($content['content']);
                 if ($outputFormat !== self::OUTPUT_FORMAT_TEST_RAW_STRINGS) {
-                    $retVal[] = self::wrapCss($css, 'INLINE', $hash);
+                    $retVal[$hash] = self::wrapCss($css, 'INLINE', $hash);
                 } else {
-                    $retVal[] = $css;
+                    $retVal[$hash] = $css;
                 }
                 $this->loadableContent[$hash]['contentLoadedIn'] = $hash;
             }
@@ -1472,7 +1503,7 @@ class HeaderLib
         foreach ($files as $file) {
             $file = $this->convert_cdn($file);
             $retVal .= "<link rel=\"stylesheet\" href=\"" . \SmartyTiki\Modifier\Escape::apply($file) . "\" type=\"text/css\"";
-            if ($media !=='default') {
+            if ($media !== 'default') {
                 $retVal .= " media=\"" . \SmartyTiki\Modifier\Escape::apply($media) . "\"";
             }
             $retVal .= ">\n";

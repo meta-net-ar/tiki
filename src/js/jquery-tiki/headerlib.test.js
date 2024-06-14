@@ -43,6 +43,11 @@ test("Script can be added", ({ newScript }) => {
     expect(addReturn).toBe(true);
     scripts = document.querySelectorAll("script");
     expect(scripts.length).toBe(4);
+    //Script isn't added twice
+    addReturn = headerlib.addScript("newScriptHash", newScript);
+    expect(addReturn).toBe(false);
+    scripts = document.querySelectorAll("script");
+    expect(scripts.length).toBe(4);
 });
 
 test("Script with an existing hash isn't added", ({ newScript }) => {

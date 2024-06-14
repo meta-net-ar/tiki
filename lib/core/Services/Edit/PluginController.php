@@ -359,8 +359,7 @@ class Services_Edit_PluginController
     {
         global $jitRequest;
         $header = TikiLib::lib('header');
-        $header->unsafeClearAllCss();
-        $header->clear_js(true);
+        $header->startNewContext();
 
         $content = $input->markup->wikicontent();
         $plugins = TikiLib::lib('parser')->find_plugins($content);
@@ -372,8 +371,7 @@ class Services_Edit_PluginController
             'html' => $html,
             'plugins' => $plugins,
             'pageName' => $jitRequest->page->pagename(),
-            'css' => $header->outputCss() . $header->output_css_files(),
-            'js' => $header->output_js() . $header->output_js_files(),
+            'headerlibJsJson' => $header->outputHeaderlibJsJson()
         ];
     }
 
