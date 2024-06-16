@@ -17,7 +17,7 @@
 //.layout_social header.navbar.navbar-light.bg-light                     // Classic Bootstrap layout -- Menu itself
 .tiki .tiki-top-nav-light
 {
-    background: var(--tiki-top-bg) !important;
+    background: var(--tiki-top-bg);
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
     a:not(.navbar-brand,.dropdown-item),
     .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
@@ -69,7 +69,7 @@
 //.layout_social header.navbar.navbar-dark.bg-dark                     // Classic Bootstrap layout -- Menu itself
 .tiki .tiki-top-nav-dark
 {
-    background: var(--tiki-top-bg) !important;
+    background: var(--tiki-top-bg);
     color: var(--tiki-top-text-color);
     a:not(.navbar-brand,.dropdown-item),
     .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)

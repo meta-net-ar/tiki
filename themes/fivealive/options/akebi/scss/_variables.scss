@@ -288,8 +288,6 @@ $bg-dark-info: #00DAE6;
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
     --tiki-top-text-color: #{$navbar-dark-link-hover-color};
     --tiki-top-border: solid #000;
-//    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-//    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 @mixin topbar-nav-dark {
@@ -333,7 +331,7 @@ $bg-dark-info: #00DAE6;
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-dark;                      // light values
+        @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
@@ -344,6 +342,7 @@ $bg-dark-info: #00DAE6;
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
+    --tiki-admin-top-nav-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
     --tiki-admin-top-nav-color: #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: ; // --tiki-topbar-hover-color
     --tiki-admin-top-nav-hover-bg: none ;
@@ -359,13 +358,10 @@ $bg-dark-info: #00DAE6;
         border-color: transparent !important;
     }
 }
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%);
-}
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
+    --tiki-admin-top-nav-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%) !important;
     --tiki-admin-top-nav-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-link-hover-color};
@@ -385,18 +381,15 @@ $bg-dark-info: #00DAE6;
     }
 }
 
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: linear-gradient(to right, #0a8794 0%, #169fb6 53%, #18a4bc 72%, #19a5bd 100%) !important;
-}
-
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -405,6 +398,7 @@ $bg-dark-info: #00DAE6;
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -412,8 +406,9 @@ $bg-dark-info: #00DAE6;
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-dark;                      // dark values
     }
 }
 

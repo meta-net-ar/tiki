@@ -327,29 +327,31 @@ $btn-link-disabled-color:     $gray-600;  // default
     @include topbar-nav-dark;
 }
 
- // Color mode preference trumps L&F admin light navbar option
- [data-bs-theme=dark] {                              // color mode
-     .tiki-top-nav-light {                           // light top selector
-         @include top-nav-dark;                      // dark values
-     }
-     .tiki-topbar-nav-light {
-         @include topbar-nav-dark;
-     }
- }
+// Color mode preference trumps L&F admin light navbar option
+[data-bs-theme=dark] {                              // color mode
+    .tiki-top-nav-light {                           // light top selector
+        @include top-nav-dark;                      // dark values
+    }
+    .tiki-topbar-nav-light {
+        @include topbar-nav-dark;
+    }
+}
 
- // Color mode preference trumps L&F admin dark navbar option
- [data-bs-theme=light] {                              // color mode
-     .tiki-top-nav-dark {                           // dark top selector
-         @include top-nav-dark;                      // light values
-     }
-     .tiki-topbar-nav-dark {
-         @include topbar-nav-light;
-     }
- }
+// Color mode preference trumps L&F admin dark navbar option
+[data-bs-theme=light] {                              // color mode
+    .tiki-top-nav-dark {                           // dark top selector
+        @include top-nav-dark;                      // dark values
+    }
+    .tiki-topbar-nav-dark {
+        @include topbar-nav-light;
+    }
+}
+
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
  @mixin admin-nav-light {
+     --tiki-admin-top-nav-bg: #f7b512;
    --tiki-admin-top-nav-color: #3C3106;
    --tiki-admin-top-nav-hover-color: #3C3106FF;
    --tiki-admin-top-nav-link-hover-bg: none ;
@@ -361,13 +363,10 @@ $btn-link-disabled-color:     $gray-600;  // default
    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
 }
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: #f7b512;
-}
 
 // Dark navbar minus top nav
  @mixin admin-nav-dark {
+     --tiki-admin-top-nav-bg: #f7b512;
    --tiki-admin-top-nav-color: #3C3106;
    --tiki-admin-top-nav-hover-color: #{$link-color};
    --tiki-admin-top-nav-hover-bg: #3C3106FF;
@@ -379,18 +378,16 @@ $btn-link-disabled-color:     $gray-600;  // default
    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
 }
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: #f7b512;
-}
 
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -399,6 +396,7 @@ $btn-link-disabled-color:     $gray-600;  // default
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -406,8 +404,9 @@ $btn-link-disabled-color:     $gray-600;  // default
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-dark;                      // dark values
     }
 }
 

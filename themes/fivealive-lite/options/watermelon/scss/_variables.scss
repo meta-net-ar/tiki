@@ -338,7 +338,7 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-dark;                      // light values
+        @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
@@ -349,6 +349,7 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
+    --tiki-admin-top-nav-bg: #{$top-light-bg};
     --tiki-admin-top-nav-color: #{$top-link-color};
     --tiki-admin-top-nav-hover-color: #{$top-link-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;
@@ -363,13 +364,10 @@ $btn-focus-width:             $input-btn-focus-width;  // default
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 }
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: #{$top-light-bg};
-}
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
+    --tiki-admin-top-nav-bg: #{$top-dark-bg};
    --tiki-admin-top-nav-color: #{$navbar-dark-link-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-link-hover-color};
 //    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
@@ -384,18 +382,16 @@ $btn-focus-width:             $input-btn-focus-width;  // default
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 }
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: #{$top-dark-bg};
-}
 
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -404,6 +400,7 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -411,8 +408,9 @@ $btn-focus-width:             $input-btn-focus-width;  // default
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-dark;                      // dark values
     }
 }
 

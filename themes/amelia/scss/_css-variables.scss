@@ -22,7 +22,7 @@
 
 $navbar-light-hover-bg: red;
 
-.tiki-top-nav-light {
+@mixin top-nav-light {
     --tiki-top-bg: #5AE3ED;
     --tiki-top-color: #322B0B;
     --tiki-top-hover-color: #5B5015;
@@ -31,11 +31,19 @@ $navbar-light-hover-bg: red;
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
 }
 
-.tiki-topbar-nav-light {
+@mixin topbar-nav-light {
     --tiki-topbar-bg: #68D6DE; //#{$light};
     --tiki-topbar-color: #3C320B;
     --tiki-topbar-hover-color: #615314;
     --tiki-topbar-text-color: #615314;
+}
+
+.tiki-top-nav-light {
+    @include top-nav-light;
+}
+
+.tiki-topbar-nav-light {
+    @include topbar-nav-light;
 }
 
 .tiki-top-nav-dark {
@@ -56,10 +64,21 @@ $navbar-light-hover-bg: red;
     }
 }
 
+// Color mode preference trumps L&F admin dark navbar option
+[data-bs-theme=light] {                              // color mode
+    .tiki-top-nav-dark {                           // dark top selector
+        @include top-nav-light;                      // light values
+    }
+    .tiki-topbar-nav-dark {
+        @include topbar-nav-light;
+    }
+}
+
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
+    --tiki-admin-top-nav-bg: #68D6DE;
     --tiki-admin-navbar-bg: #68D6DE; //#68D6DE !important;
     --tiki-admin-top-nav-color: #322B0B; // --tiki-top-color
     --tiki-admin-top-nav-hover-color: #5B5015; // --tiki-topbar-hover-color
@@ -79,10 +98,6 @@ $navbar-light-hover-bg: red;
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
-}
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: #68D6DE;
 }
 
 // Dark navbar minus top nav
@@ -107,17 +122,16 @@ $navbar-light-hover-bg: red;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
 }
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: #ad1d28;
-}
+
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -126,6 +140,7 @@ $navbar-light-hover-bg: red;
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -133,10 +148,12 @@ $navbar-light-hover-bg: red;
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-light;                      // light values
     }
 }
+
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 // - - - - - - Other CSS variables - - - - - - -

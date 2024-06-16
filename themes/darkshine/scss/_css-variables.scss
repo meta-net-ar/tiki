@@ -75,6 +75,7 @@
 // Light navbar minus top nav
 @mixin admin-nav-light {
     --tiki-admin-top-nav-bg: #{$top-navbar-bg};
+    --tiki-admin-top-nav-bg: #{$top-navbar-bg};
     --tiki-top-bg: #{$top-navbar-bg};
     --tiki-admin-navbar-bg: #{$top-navbar-bg};
     --tiki-admin-top-nav-color: #{$gray-100};
@@ -92,10 +93,6 @@
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
 }
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: #{$top-navbar-bg};
-}
 
 // The CSS variable for this, above, isn't being applied for some reason, so trying here:
 //nav#top_modules.tiki-top-nav-light { background: linear-gradient(to bottom, #040404 0%, #060606 2%, #121212 55%, #0f0f0f 57%, #030303 59%, #000000 61%, #000000 100%) !important; }
@@ -103,6 +100,7 @@
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
+    --tiki-admin-top-nav-bg: #{$top-navbar-bg};
     --tiki-admin-navbar-bg: #{$top-navbar-bg};
     --tiki-admin-top-nav-color:  #{$gray-100};
     --tiki-admin-top-nav-hover-color: #{$gray-200};
@@ -119,18 +117,16 @@
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
 }
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: #{$top-navbar-bg};
-}
 
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -139,6 +135,7 @@
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -146,10 +143,13 @@
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-dark;                      // dark values
     }
 }
+
+// - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
 .middle-wrapper {
     --tiki-page-content-top-margin: 0;

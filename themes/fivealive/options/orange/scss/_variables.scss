@@ -17,7 +17,6 @@ $gray-900: #212529;  // default
 $black:    #000;  // default
 // scss-docs-end gray-color-variables
 
-// fusv-disable
 // scss-docs-start gray-colors-map
 $grays: (
     "100": $gray-100,
@@ -31,7 +30,6 @@ $grays: (
     "900": $gray-900
 );  // default
 // scss-docs-end gray-colors-map
-// fusv-enable
 
 // scss-docs-start color-variables
 $blue:    #0d6efd;  // default
@@ -284,7 +282,7 @@ header.navbar.fixed-top {
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-dark;                      // light values
+        @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
@@ -295,7 +293,7 @@ header.navbar.fixed-top {
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-//    --tiki-admin-navbar-bg: ; //
+    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(190, 133, 20, 1) 2%, rgba(199, 159, 29, 1) 93%, rgba(202, 172, 78, 1) 100%);
     --tiki-admin-top-nav-color: #3C3106;
     --tiki-admin-top-nav-hover-color: #3C3106FF;
     --tiki-admin-top-nav-hover-bg: none ;
@@ -307,13 +305,10 @@ header.navbar.fixed-top {
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
 }
-// Light top nav
-.tiki.tiki-admin .top_modules.navbar-light-parent {
-    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(190, 133, 20, 1) 2%, rgba(199, 159, 29, 1) 93%, rgba(202, 172, 78, 1) 100%);
-}
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
+    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(190, 133, 20, 1) 2%, rgba(199, 159, 29, 1) 93%, rgba(202, 172, 78, 1) 100%);
     --tiki-admin-top-nav-color: #{$top-dark-link-color};
     --tiki-admin-top-nav-hover-color: #{$top-link-hover-color};
 //    --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
@@ -325,18 +320,16 @@ header.navbar.fixed-top {
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
 //    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
 }
-// Dark top nav
-.tiki.tiki-admin .top_modules.navbar-dark-parent {
-    --tiki-admin-top-nav-bg: linear-gradient(90deg, rgba(190, 133, 20, 1) 2%, rgba(199, 159, 29, 1) 93%, rgba(202, 172, 78, 1) 100%);
-}
 
 // When color mode switch isn't active
 :root {
-    .tiki .tiki-admin-top-nav-light,
+    .tiki .tiki-admin-top-nav-light, // Legacy
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {
         @include admin-nav-light;
     }
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {
         @include admin-nav-dark;
     }
@@ -345,6 +338,7 @@ header.navbar.fixed-top {
 // Color mode preference trumps L&F admin light navbar option
 [data-bs-theme=dark] {                              // dark color mode
     .tiki .tiki-admin-top-nav-light,
+    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-light {               // light top selectors
         @include admin-nav-dark;                      // dark values
     }
@@ -352,12 +346,14 @@ header.navbar.fixed-top {
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // light color mode
     .tiki .tiki-admin-top-nav-dark,
+    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-dark;                      // light values
+        @include admin-nav-dark;                      // dark values
     }
 }
 
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
+
 .accordion {
     --bs-accordion-active-bg: #{$topbar-light-bg};
     --bs-accordion-active-color: #000;
