@@ -48,7 +48,7 @@ $("#switchbox-{{$module_logo_instance}} .submit").on("click", function () {
     {if $mode eq "header"}<div class="siteloginbar{if $user} logged-in{/if}">{/if}
     {if $user}
         {if empty($mode) or $mode eq "module"}
-            <div class="mb-3 row mx-0">{tr}Logged in as:{/tr} <span class="d-inline-block col-12 text-truncate">&nbsp;{$user|userlink}</span></div>
+            <div class="mb-3 mx-0">{tr}Logged in as:{/tr} <span class="d-inline-block col-12 text-truncate">&nbsp;{$user|userlink}</span></div>
             <div class="text-center">
                 {button href="tiki-logout.php" _text="{tr}Log out{/tr}"}
             </div>
@@ -76,7 +76,7 @@ $("#switchbox-{{$module_logo_instance}} .submit").on("click", function () {
                     {ticket}
                     <fieldset>
                         <legend class="fs-5">{tr}Switch User{/tr}</legend>
-                        <div class="mb-3 row mx-0">
+                        <div class="mb-3 mx-0">
                             <label class="col-form-label" for="login-switchuser_{$module_logo_instance}">
                                 {if $prefs.login_is_email eq 'y'}
                                     {if $prefs.login_is_email_obscure eq 'n'}
