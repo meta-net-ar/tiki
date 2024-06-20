@@ -80,9 +80,15 @@ class Tracker_Definition
         $this->trackerInfo = $trackerInfo;
     }
 
+    /** @deprecated */
     public function getInformation()
     {
         return $this->trackerInfo;
+    }
+
+    public function getId(): int
+    {
+        return $this->trackerInfo['trackerId'];
     }
 
     public function getFieldFactory(): Tracker_Field_Factory

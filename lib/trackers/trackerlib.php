@@ -425,6 +425,7 @@ class TrackerLib extends TikiLib
      * This should probably never have been made public
      * @param mixed $itemId, will be casted to int
      * @return false if item is not found, otherwise and array containing an internal structure with the $id => $value of it's fields.
+     * @deprecated.  Use Tracker_Item::fromId or Tracker_Item::fromInfo
      */
     public function get_tracker_item($itemId): array|false
     {
@@ -4133,15 +4134,14 @@ class TrackerLib extends TikiLib
      *
      * @param [type] $trackerId, optionnal (will be retrieved from itemId if missing)
      * @param [type] $itemId
-     * @return void
      */
     public function get_isMain_value($trackerId, $itemId): string
     {
         global $prefs;
 
         $query = "select tif.`value` from `tiki_tracker_item_fields` tif, `tiki_tracker_items` i, `tiki_tracker_fields` tf where i.`itemId`=? and i.`itemId`=tif.`itemId` and tf.`fieldId`=tif.`fieldId` and tf.`isMain`=? ORDER BY tf.`position`";
-        $result = $this->getOne($query, [ (int) $itemId, "y"]);
-
+        $queryResult = $this->getOne($query, [ (int) $itemId, "y"]);
+        $result = $queryResult;
         if (! $trackerId) {
             $trackerId = (int) $this->table('tiki_tracker_items')->fetchOne('trackerId', ['itemId' => $itemId]);
         }
