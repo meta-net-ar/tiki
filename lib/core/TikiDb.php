@@ -298,6 +298,16 @@ abstract class TikiDb
         return $sort_mode;
     }
 
+    public function validateSortColumn($table, $column)
+    {
+        // Removing the _desc or _asc suffix
+        $base_column = preg_replace('/_(desc|asc)$/', '', $column);
+        $query = "SHOW COLUMNS FROM $table LIKE '$base_column'";
+        $result = $this->query($query);
+
+        return $result->numrows > 0;
+    }
+
     public function getQuery()
     {
         return $this->savedQuery;

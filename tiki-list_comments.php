@@ -219,6 +219,11 @@ if (isset($_REQUEST['checked'])) {
 
 if (isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
+     $column_validity = TikiDb::get()->validateSortColumn('tiki_comments', $sort_mode);
+    if (! $column_validity) {
+        $sort_mode = 'commentDate_desc';
+        Feedback::error(tr('Invalid sort mode'));
+    }
 } else {
     $sort_mode = 'commentDate_desc';
 }
