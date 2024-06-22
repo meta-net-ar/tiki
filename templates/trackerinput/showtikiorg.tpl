@@ -58,7 +58,7 @@
             <p>{tr}Show.tiki.org is in the progress of creating the new instance. Please continue waiting for a minute or two. If this continues on for more than 10 minutes, please let us know of the problem so that we can do something about it. Thanks.{/tr}</p>
         {/remarksbox}
     </div>
-    <div class="shownone{$myId}" {if $field.status neq 'NONE'}style="display: none;"{/if}>
+    <div class="shownone{$myId}" {if $field.status neq 'NONE' or not $user}style="display: none;"{/if}>
         {remarksbox type="info" title="{tr}About {$field.options_map.domain|escape}{/tr}" close="n"}
             <p>{tr}To help developers solve the bug, we kindly request that you demonstrate your bug on a {$field.options_map.domain|escape} instance. To start, simply select a version and click on "Create {$field.options_map.domain|escape} instance". Once the instance is ready (in a minute or two), as indicated in the status window below, you can then access that instance, login (the initial admin username/password is "admin") and configure the Tiki to demonstrate your bug. Priority will be given to bugs that have been demonstrated on {$field.options_map.domain|escape}.{/tr}</p>
         {/remarksbox}
