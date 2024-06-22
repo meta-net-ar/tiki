@@ -1,0 +1,18 @@
+# Ignore minified files anywhere
+**/*.min.js
+**/*-min.js
+
+# Ignore included libraries
+/vendor/
+/vendor_bundled/
+/vendor_custom/
+
+# Ignore site.js installed by composer from included library
+/lib/cypht/site.js
+
+# Ignore Generated Files
+/public/generated
+/temp/**/*.js
+
+# These folders have their own rules, so ignore in main eslint
+

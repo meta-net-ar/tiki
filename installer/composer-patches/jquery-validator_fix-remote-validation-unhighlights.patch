@@ -1,0 +1,22 @@
+--- dist/jquery.validate.js.orig	2021-08-25 19:18:09.788720377 -0300
++++ dist/jquery.validate.js	2021-08-25 19:20:31.023530504 -0300
+@@ -741,9 +741,16 @@
+ 		},
+ 
+ 		invalidElements: function() {
+-			return $( this.errorList ).map(function() {
+-				return this.element;
+-			});
++			var
++				v = this,
++				invalid = v.invalid,
++				elements = $([]);
++			$.each(invalid, function(key, value) {
++				if ( value !== false && v.invalid.hasOwnProperty( key ) ) {
++					elements = elements.add( v.findByName( key ) );
++				}
++			} );
++			return elements;
+ 		},
+ 
+ 		showLabel: function( element, message ) {

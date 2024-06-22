@@ -1,0 +1,21 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": false,
+        "es6": true,
+        "jquery": true
+    },
+    "rules": {
+        "no-tabs": "off",
+        "no-trailing-spaces": "error",
+        "linebreak-style": ["error", "unix"],
+        "semi": [
+            "error",
+            "always"
+        ]
+    },
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "sourceType": "module"
+    }
+}
