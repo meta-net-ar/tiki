@@ -56,7 +56,7 @@ class Services_Tracker_TabularController
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $lib = TikiLib::lib('tabular');
 
-            $tabularId = $lib->create($input->name->text(), $input->trackerId->int(), $input->use_odbc->int() ? $input->odbc->array() : []);
+            $tabularId = $lib->create($input->name->text(), $input->trackerId->int(), $input->use_odbc->int() ? $input->odbc->none() : []);
 
             $forward = [
                 'controller' => 'tabular',
@@ -100,8 +100,8 @@ class Services_Tracker_TabularController
             // $schema->validate();
 
             $config = ! empty($input->config->none()) ? $input->config->none() : [];
-            $odbc_config = $input->use_odbc->int() ? $input->odbc->array() : [];
-            $api_config = $input->use_api->int() ? $input->api->array() : [];
+            $odbc_config = $input->use_odbc->int() ? $input->odbc->none() : [];
+            $api_config = $input->use_api->int() ? $input->api->none() : [];
             $result = $lib->update($info['tabularId'], $input->name->text(), $schema->getFormatDescriptor(), $schema->getFilterDescriptor(), $config, $odbc_config, $api_config);
 
             if ($result->numRows() > 0) {
@@ -493,7 +493,7 @@ class Services_Tracker_TabularController
                 ]
             ];
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $info['api_config']) {
-            $source = new \Tracker\Tabular\Source\APISource($schema, $info['api_config'], $input->placeholders->array() ?? []);
+            $source = new \Tracker\Tabular\Source\APISource($schema, $info['api_config'], $input->placeholders->none() ?? []);
             $writer = new \Tracker\Tabular\Writer\TrackerWriter();
             $done = $writer->write($source);
 
