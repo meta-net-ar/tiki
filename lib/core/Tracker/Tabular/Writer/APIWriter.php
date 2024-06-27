@@ -10,9 +10,10 @@ class APIWriter
 {
     private $config;
 
-    public function __construct($config)
+    public function __construct($config, $tabular_config)
     {
         $this->config = $config;
+        $this->config['format'] = $tabular_config['format'];
     }
 
     public function write(\Tracker\Tabular\Source\SourceInterface $source)
@@ -89,6 +90,8 @@ class APIWriter
                         $formatted_row = $this->formatRow(@$this->config['update_format'], $columns, $row);
                         if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
                             $result = $client->$method('', $formatted_row, 'application/json');
+                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
+                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
                         } else {
                             $result = $client->$method('', $formatted_row);
                         }
@@ -105,6 +108,8 @@ class APIWriter
                         $formatted_row = $this->formatRow(@$this->config['create_format'], $columns, $row);
                         if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
                             $result = $client->$method('', $formatted_row, 'application/json');
+                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
+                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
                         } else {
                             $result = $client->$method('', $formatted_row);
                         }

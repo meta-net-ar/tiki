@@ -101,20 +101,26 @@ class Manager
         $schema = $this->getSchema($definition, $tabular);
 
         try {
-            $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-            $remote = $writer->sync($schema, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
-            foreach ($remote as $field => $value) {
-                if (isset($args['values_by_permname'][$field])) {
-                    $differs = $value !== $args['values_by_permname'][$field];
-                } elseif ($is_new) {
-                    $differs = true;
-                } else {
-                    $differs = false;
+            if ($tabular['odbc_config']) {
+                $writer = new Writer\ODBCWriter($tabular['odbc_config']);
+                $remote = $writer->sync($schema, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
+                foreach ($remote as $field => $value) {
+                    if (isset($args['values_by_permname'][$field])) {
+                        $differs = $value !== $args['values_by_permname'][$field];
+                    } elseif ($is_new) {
+                        $differs = true;
+                    } else {
+                        $differs = false;
+                    }
+                    if ($differs) {
+                        $field = $definition->getFieldFromPermName($field);
+                        $trklib->modify_field($args['object'], $field['fieldId'], $value);
+                    }
                 }
-                if ($differs) {
-                    $field = $definition->getFieldFromPermName($field);
-                    $trklib->modify_field($args['object'], $field['fieldId'], $value);
-                }
+            } elseif ($tabular['api_config']) {
+                $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+                $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+                $writer->write($source);
             }
         } catch (\Exception $e) {
             \Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));

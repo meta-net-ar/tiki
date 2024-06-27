@@ -282,7 +282,7 @@ class Services_Tracker_TabularController
                 ],
             ];
         } elseif ($info['api_config']) {
-            $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config']);
+            $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config'], $info['config']);
             $result = $writer->write($source);
 
             Feedback::success(tr('Your export was completed. %0 item(s) succeeded, %1 item(s) failed and %2 items skipped.', $result['succeeded'], $result['failed'], $result['skipped']));
@@ -336,7 +336,7 @@ class Services_Tracker_TabularController
             $source = new \Tracker\Tabular\Source\QuerySource($schema, $query);
 
             if ($info['api_config']) {
-                $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config']);
+                $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config'], $info['config']);
                 $result = $writer->write($source);
 
                 Feedback::success(tr('Your export was completed. %0 item(s) succeeded, %1 item(s) failed and %2 items skipped.', $result['succeeded'], $result['failed'], $result['skipped']));

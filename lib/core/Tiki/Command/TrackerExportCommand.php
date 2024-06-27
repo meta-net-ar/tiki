@@ -93,7 +93,7 @@ class TrackerExportCommand extends Command
         } elseif (! empty($info['odbc_config'])) {
             $writer = new \Tracker\Tabular\Writer\ODBCWriter($info['odbc_config']);
         } elseif (! empty($info['api_config'])) {
-            $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config']);
+            $writer = new \Tracker\Tabular\Writer\APIWriter($info['api_config'], $info['config']);
         } else {
             throw new \Exception(tr('Tracker Export: No filename or remote import-export synchronization settings provided.'));
         }
