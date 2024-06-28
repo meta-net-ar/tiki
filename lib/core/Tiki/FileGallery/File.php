@@ -49,6 +49,7 @@ class File
         "comment"   => "",
         "archiveId" => 0,
         "deleteAfter"   => 0,
+        "deleteAfterDuration" => null,
         "backlinkPerms" => "",
         "ocr_state" => null,
     ];
@@ -195,7 +196,7 @@ class File
         return $archives;
     }
 
-    public function replace($data, $type = null, $name = null, $filename = null, $resizex = null, $resizey = null, $description = null)
+    public function replace($data, $type = null, $name = null, $filename = null, $resizex = null, $resizey = null, $description = null, $deleteAfterDuration = null)
     {
         global $user, $prefs, $jitRequest;
 
@@ -209,6 +210,9 @@ class File
         }
         if ($filename) {
             $this->setParam('filename', $filename);
+        }
+        if ($deleteAfterDuration) {
+            $this->setParam('deleteAfterDuration', $deleteAfterDuration);
         }
         if (($jitRequest instanceof JitFilter) && ! empty($jitRequest->ocr_state->int())) {
             $this->setParam('ocr_state', $jitRequest->ocr_state->int());
