@@ -172,6 +172,68 @@ class Manager
         }
     }
 
+    public function syncCommentSaved($args)
+    {
+        if (isset($args['skip_sync']) && $args['skip_sync']) {
+            return;
+        }
+
+        if (empty($args['parentobject'])) {
+            return;
+        }
+
+        $definition = \Tracker_Definition::get($args['parentobject']);
+        $tabularId = $definition->getConfiguration('tabularSync');
+        if (empty($tabularId)) {
+            return;
+        }
+
+        $tabular = $this->getInfo($tabularId);
+        if (empty($tabular['tabularId'])) {
+            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            return;
+        }
+
+        $trklib = \TikiLib::lib('trk');
+        $schema = $this->getSchema($definition, $tabular);
+        if ($tabular['api_config']) {
+            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+            $writer->writeComment($args, $source);
+        }
+    }
+
+    public function syncCommentDeleted($args)
+    {
+        if (isset($args['skip_sync']) && $args['skip_sync']) {
+            return;
+        }
+
+        if (empty($args['parentobject'])) {
+            return;
+        }
+
+        $definition = \Tracker_Definition::get($args['parentobject']);
+        $tabularId = $definition->getConfiguration('tabularSync');
+        if (empty($tabularId)) {
+            return;
+        }
+
+        $tabular = $this->getInfo($tabularId);
+        if (empty($tabular['tabularId'])) {
+            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            return;
+        }
+
+        $schema = $this->getSchema($definition, $tabular);
+
+        if ($tabular['api_config']) {
+            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+            $writer->writeComment($args, $source, 'delete');
+        }
+    }
+
     public function getSchema($definition, $tabular)
     {
         $schema = new Schema($definition);

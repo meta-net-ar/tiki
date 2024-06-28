@@ -3143,10 +3143,18 @@ class Comments extends TikiLib
                     'type' => $comment['objectType'],
                     'object' => $comment['object'],
                     'parentobject' => $parentobject,
-                    'title' => $title,
                     'comment' => $threadId,
                     'user' => $GLOBALS['user'],
+                    'title' => $title,
                     'content' => $data,
+                    'commentDate' => $comment['commentDate'],
+                    'userName' => $comment['userName'],
+                    'email' => $comment['email'],
+                    'website' => $comment['website'],
+                    'parentId' => $comment['parentId'],
+                    'summary' => $comment['summary'],
+                    'message_id' => $comment['message_id'],
+                    'in_reply_to' => $comment['in_reply_to'],
                 ]
             );
         }
@@ -3411,6 +3419,14 @@ class Comments extends TikiLib
                     'user' => $GLOBALS['user'],
                     'title' => $title,
                     'content' => $data,
+                    'commentDate' => (int) $postDate,
+                    'userName' => $userName,
+                    'email' => $anonymous_email,
+                    'website' => $anonymous_website,
+                    'parentId' => (int) $parentId,
+                    'summary' => $summary,
+                    'message_id' => $message_id,
+                    'in_reply_to' => $in_reply_to,
                 ]
             );
         }
@@ -3554,6 +3570,22 @@ class Comments extends TikiLib
                     $logslib = TikiLib::lib('logs');
                     $logslib->add_action('Removed', $res['object'], 'forum', "comments_parentId=$threadId&amp;del=" . strlen($res['data']));
                 }
+                $forum_info = $this->get_forum($res['object']);
+                TikiLib::events()->trigger(
+                    'tiki.forumpost.delete',
+                    [
+                        'type' => $res['objectType'],
+                        'object' => $res['object'],
+                        'parent_id' => $res['parentId'],
+                        'forum_id' => $res['object'],
+                        'forum_section' => $forum_info['section'],
+                        'user' => $GLOBALS['user'],
+                        'title' => $res['title'],
+                        'name' => $forum_info['name'],
+                        'content' => $res['data'],
+                        'index_handled' => true,
+                    ]
+                );
             } else {
                 $this->remove_object($res['objectType'] . ' comment', $res['threadId']);
                 if ($prefs['feature_actionlog'] == 'y') {
@@ -3565,6 +3597,31 @@ class Comments extends TikiLib
                         'type=' . $res['objectType'] . '&amp;del=' . strlen($res['data']) . "threadId#$threadId"
                     );
                 }
+                if ($res['objectType'] == 'trackeritem') {
+                    $parentobject = TikiLib::lib('trk')->get_tracker_for_item($res['object']);
+                } else {
+                    $parentobject = 'not implemented';
+                }
+                TikiLib::events()->trigger(
+                    'tiki.comment.delete',
+                    [
+                        'type' => $res['objectType'],
+                        'object' => $res['object'],
+                        'parentobject' => $parentobject,
+                        'comment' => $res['threadId'],
+                        'user' => $GLOBALS['user'],
+                        'title' => $res['title'],
+                        'content' => $res['data'],
+                        'commentDate' => $res['commentDate'],
+                        'userName' => $res['userName'],
+                        'email' => $res['email'],
+                        'website' => $res['website'],
+                        'parentId' => $res['parentId'],
+                        'summary' => $res['summary'],
+                        'message_id' => $res['message_id'],
+                        'in_reply_to' => $res['in_reply_to'],
+                    ]
+                );
             }
             if ($prefs['feature_contribution'] == 'y') {
                 $contributionlib = TikiLib::lib('contribution');

@@ -85,6 +85,8 @@ function tiki_setup_events()
         if ($prefs['tracker_tabular_enabled'] == 'y') {
             $events->bind('tiki.trackeritem.save', $defer('tabular', 'syncItemSaved'));
             $events->bind('tiki.trackeritem.delete', $defer('tabular', 'syncItemDeleted'));
+            $events->bind('tiki.comment.save', $defer('tabular', 'syncCommentSaved'));
+            $events->bind('tiki.comment.delete', $defer('tabular', 'syncCommentDeleted'));
         }
 
         $events->bind('tiki.trackeritem.create', $defer('trk', 'setup_wiki_fields'));
@@ -325,6 +327,7 @@ function tiki_setup_events()
     $events->bind('tiki.forumpost.reply', 'tiki.forumpost.save');
     $events->bind('tiki.forumpost.update', 'tiki.forumpost.save');
     $events->bind('tiki.forumpost.save', 'tiki.save');
+    $events->bind('tiki.forumpost.delete', 'tiki.save');
     $events->bind('tiki.forumpost.view', 'tiki.view');
 
     $events->bind('tiki.group.update', 'tiki.group.save');
@@ -336,6 +339,7 @@ function tiki_setup_events()
     $events->bind('tiki.comment.reply', 'tiki.comment.save');
     $events->bind('tiki.comment.update', 'tiki.comment.save');
     $events->bind('tiki.comment.save', 'tiki.save');
+    $events->bind('tiki.comment.delete', 'tiki.save');
 
     $events->bind('tiki.user.groupjoin', 'tiki.user.update');
     $events->bind('tiki.user.groupleave', 'tiki.user.update');

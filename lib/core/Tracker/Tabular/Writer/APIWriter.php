@@ -173,6 +173,90 @@ class APIWriter
         return compact('succeeded', 'failed', 'skipped', 'errors');
     }
 
+    public function writeComment($comment, \Tracker\Tabular\Source\TrackerItemSource $source, $action = null)
+    {
+        $schema = $source->getSchema();
+        $schema = $schema->getPlainOutputSchema();
+        $schema->validate();
+
+        $columns = $schema->getColumns();
+
+        $owner_columns = [];
+        foreach ($schema->getDefinition()->getItemOwnerFields() as $ownerField) {
+            $ownerField = $schema->getDefinition()->getField($ownerField);
+            foreach ($columns as $column) {
+                if ($ownerField && $column->getField() == $ownerField['permName']) {
+                    $owner_columns[] = $column;
+                }
+            }
+        }
+
+        $entry = $source->getEntries()->current();
+
+        $row = [];
+        foreach ($columns as $column) {
+            $row[$column->getLabel()] = $entry->render($column, false);
+        }
+
+        $user = null;
+        foreach ($owner_columns as $column) {
+            $owners = $entry->raw($column);
+            $owners = \TikiLib::lib('trk')->parse_user_field($owners);
+            if ($owners) {
+                $user = $owners[0];
+                break;
+            }
+        }
+
+        try {
+            if ($action === 'delete') {
+                // DELETE endpoint
+                if (! empty($this->config['comment_delete_url'])) {
+                    $client = new \Services_ApiClient($this->config['comment_delete_url'], false);
+                    $client->setContextUser($user);
+                    $method = strtolower($this->config['comment_delete_method'] ?? 'delete');
+                    $formatted_parent = $this->formatRow(@$this->config['delete_format'], $columns, $row);
+                    if (is_string($formatted_parent) && @json_decode($formatted_parent) !== null) {
+                        $formatted_parent = json_decode($formatted_parent);
+                    }
+                    $comment['parent'] = $formatted_parent;
+                    $client->$method('', json_encode($comment), 'application/json');
+                }
+            } elseif (! empty($comment['comment'])) {
+                // UPDATE endpoint
+                if (! empty($this->config['comment_update_url'])) {
+                    $client = new \Services_ApiClient($this->config['comment_update_url'], false);
+                    $client->setContextUser($user);
+                    $method = strtolower($this->config['comment_update_method'] ?? 'patch');
+                    $formatted_parent = $this->formatRow(@$this->config['update_format'], $columns, $row);
+                    if (is_string($formatted_parent) && @json_decode($formatted_parent) !== null) {
+                        $formatted_parent = json_decode($formatted_parent);
+                    }
+                    $comment['parent'] = $formatted_parent;
+                    $client->$method('', json_encode($comment), 'application/json');
+                }
+            } else {
+                // CREATE endpoint
+                if (! empty($this->config['comment_create_url'])) {
+                    $client = new \Services_ApiClient($this->config['comment_create_url'], false);
+                    $client->setContextUser($user);
+                    $method = strtolower($this->config['comment_create_method'] ?? 'post');
+                    $formatted_parent = $this->formatRow(@$this->config['create_format'], $columns, $row);
+                    if (is_string($formatted_parent) && @json_decode($formatted_parent) !== null) {
+                        $formatted_parent = json_decode($formatted_parent);
+                    }
+                    $comment['parent'] = $formatted_parent;
+                    $client->$method('', json_encode($comment), 'application/json');
+                }
+            }
+            $result = true;
+        } catch (\Services_Exception $e) {
+            $result = false;
+        }
+
+        return $result;
+    }
+
     private function formatRow($format, $columns, $row)
     {
         if (! empty($format)) {

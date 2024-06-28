@@ -277,6 +277,106 @@
                         <textarea class="form-control" name="api[delete_format]" rows="5">{$api_config.delete_format|escape}</textarea>
                     </div>
                 </div>
+                <div class="mb-3 row">
+                    <label class="form-check-label col-sm-2 offset-sm-1">
+                        {tr}Synchronize comments?{/tr}
+                        <a class="tikihelp text-info" title="{tr}Synchronize comments:{/tr} {tr}Configure tracker item comments synchronization endpoints.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <div class="form-check">
+                            <input class="form-check-input use-api-comments" type="checkbox" name="api[sync_comments]" {if $api_config.sync_comments}checked{/if} value="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="api-comments-container" {if !$api_config.sync_comments}style="display: none"{/if}>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment create endpoint URL{/tr}
+                            <a class="tikihelp text-info" title="{tr}Create URL:{/tr} {tr}URL of the endpoint to create new comments.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="text" name="api[comment_create_url]" value="{$api_config.comment_create_url|escape}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment create endpoint method{/tr}
+                            <a class="tikihelp text-info" title="{tr}Create method:{/tr} {tr}HTTP method to access the endpoint. Usually POST.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="api[comment_create_method]">
+                                <option value=""></option>
+                                <option value="GET" {if $api_config.comment_create_method eq 'GET'}selected{/if}>GET</option>
+                                <option value="PUT" {if $api_config.comment_create_method eq 'PUT'}selected{/if}>PUT</option>
+                                <option value="POST" {if $api_config.comment_create_method eq 'POST'}selected{/if}>POST</option>
+                                <option value="PATCH" {if $api_config.comment_create_method eq 'PATCH'}selected{/if}>PATCH</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment update endpoint URL{/tr}
+                            <a class="tikihelp text-info" title="{tr}Update URL:{/tr} {tr}URL of the endpoint to update comments.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="text" name="api[comment_update_url]" value="{$api_config.comment_update_url|escape}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment update endpoint method{/tr}
+                            <a class="tikihelp text-info" title="{tr}Update method:{/tr} {tr}HTTP method to access the endpoint. Usually PATCH or PUT.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="api[comment_update_method]">
+                                <option value=""></option>
+                                <option value="GET" {if $api_config.comment_update_method eq 'GET'}selected{/if}>GET</option>
+                                <option value="PUT" {if $api_config.comment_update_method eq 'PUT'}selected{/if}>PUT</option>
+                                <option value="POST" {if $api_config.comment_update_method eq 'POST'}selected{/if}>POST</option>
+                                <option value="PATCH" {if $api_config.comment_update_method eq 'PATCH'}selected{/if}>PATCH</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment delete endpoint URL{/tr}
+                            <a class="tikihelp text-info" title="{tr}Delete URL:{/tr} {tr}URL of the endpoint to delete comments when synchronizing.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <input class="form-control" type="text" name="api[comment_delete_url]" value="{$api_config.comment_delete_url|escape}">
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-2 offset-sm-2">
+                            {tr}Comment delete endpoint method{/tr}
+                            <a class="tikihelp text-info" title="{tr}Delete method:{/tr} {tr}HTTP method to access the endpoint. Usually DELETE.{/tr}">
+                                {icon name=information}
+                            </a>
+                        </label>
+                        <div class="col-sm-8">
+                            <select class="form-control" name="api[comment_delete_method]">
+                                <option value=""></option>
+                                <option value="GET" {if $api_config.comment_delete_method eq 'GET'}selected{/if}>GET</option>
+                                <option value="PUT" {if $api_config.comment_delete_method eq 'PUT'}selected{/if}>PUT</option>
+                                <option value="POST" {if $api_config.comment_delete_method eq 'POST'}selected{/if}>POST</option>
+                                <option value="PATCH" {if $api_config.comment_delete_method eq 'PATCH'}selected{/if}>PATCH</option>
+                                <option value="DELETE" {if $api_config.comment_delete_method eq 'DELETE'}selected{/if}>DELETE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-2">{tr}Fields{/tr}</label>

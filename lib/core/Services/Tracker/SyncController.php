@@ -53,7 +53,7 @@ class Services_Tracker_SyncController
                 $trackers = $this->getRemoteTrackerList($url);
                 return [
                     'url' => $url,
-                    'list' => $trackers['list'],
+                    'tracker_list' => $trackers['list'],
                 ];
             } else {
                 // Proceed with the tracker import

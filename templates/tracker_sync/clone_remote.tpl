@@ -9,11 +9,11 @@
         <a href="{$trackerId|sefurl:'trackerfields'}">{tr}Admin Fields{/tr}</a>
     {else}
         <form method="post" action="{service controller=tracker_sync action=clone_remote}" class="simple" role="form">
-            {if $list}
+            {if $tracker_list}
                 <label>
                     {tr}Tracker:{/tr}
-                    <select name="remote_tracker_id">
-                        {foreach from=$list key=id item=label}
+                    <select id="remote_tracker_id" name="remote_tracker_id">
+                        {foreach from=$tracker_list key=id item=label}
                             <option value="{$id|escape}">{$label|escape}</option>
                         {/foreach}
                     </select>
@@ -32,7 +32,7 @@
                 {if !$modal}
                     <a href="tiki-list_trackers.php" class="btn btn-link">{tr}Cancel{/tr}</a>
                 {/if}
-                {if $list}
+                {if $tracker_list}
                     <input type="submit" class="btn btn-primary" value="{tr}Clone{/tr}">
                 {else}
                     <input type="submit" class="btn btn-info" value="{tr}Search for trackers to clone{/tr}">
