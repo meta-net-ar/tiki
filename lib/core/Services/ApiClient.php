@@ -113,7 +113,7 @@ class Services_ApiClient
             default:
                 throw new Services_Exception(tr('Remove service invalid method used: %0, endpoint: %1', $method, $endpoint));
         }
-        if (in_array($method, ['post', 'put', 'patch'])) {
+        if (in_array($method, ['post', 'put', 'patch', 'delete'])) {
             if (is_array($arguments)) {
                 $client->setParameterPost(array_merge(
                     $client->getRequest()->getPost()->getArrayCopy(),

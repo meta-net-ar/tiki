@@ -237,6 +237,46 @@
                         <input class="form-control" type="text" name="api[modify_data_path]" value="{$api_config.modify_data_path|escape}">
                     </div>
                 </div>
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Delete endpoint URL{/tr}
+                        <a class="tikihelp text-info" title="{tr}Delete URL:{/tr} {tr}URL of the endpoint to delete entries when synchronizing. Placeholder #id will be replaced with the remote item id if previously imported from remote source. Leave empty to skip synchronizing deletes.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="api[delete_url]" value="{$api_config.delete_url|escape}">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Delete endpoint method{/tr}
+                        <a class="tikihelp text-info" title="{tr}Delete method:{/tr} {tr}HTTP method to access the endpoint. Usually DELETE.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <select class="form-control" name="api[delete_method]">
+                            <option value=""></option>
+                            <option value="GET" {if $api_config.delete_method eq 'GET'}selected{/if}>GET</option>
+                            <option value="PUT" {if $api_config.delete_method eq 'PUT'}selected{/if}>PUT</option>
+                            <option value="POST" {if $api_config.delete_method eq 'POST'}selected{/if}>POST</option>
+                            <option value="PATCH" {if $api_config.delete_method eq 'PATCH'}selected{/if}>PATCH</option>
+                            <option value="DELETE" {if $api_config.delete_method eq 'DELETE'}selected{/if}>DELETE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Delete endpoint format{/tr}
+                        <a class="tikihelp text-info" title="{tr}Delete format:{/tr} {tr}Use special formatting when sending data to delete endpoint if tabular's data format is not sufficient. E.g. [&quot;%field1%&quot;, &quot;%field3%&quot;]{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" name="api[delete_format]" rows="5">{$api_config.delete_format|escape}</textarea>
+                    </div>
+                </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-2">{tr}Fields{/tr}</label>

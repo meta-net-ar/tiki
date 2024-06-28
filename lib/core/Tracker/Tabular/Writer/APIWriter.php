@@ -16,7 +16,7 @@ class APIWriter
         $this->config['format'] = $tabular_config['format'];
     }
 
-    public function write(\Tracker\Tabular\Source\SourceInterface $source)
+    public function write(\Tracker\Tabular\Source\SourceInterface $source, $action = null)
     {
         $schema = $source->getSchema();
         $schema = $schema->getPlainOutputSchema();
@@ -65,7 +65,27 @@ class APIWriter
             }
 
             try {
-                if ($id) {
+                if ($action === 'delete') {
+                    // DELETE endpoint
+                    if (! empty($this->config['delete_url'])) {
+                        $url = str_replace('#id', $id, $this->config['delete_url']);
+                        $client = new \Services_ApiClient($url, false);
+                        $client->setContextUser($user);
+                        $method = strtolower($this->config['delete_method'] ?? 'delete');
+                        $formatted_row = $this->formatRow(@$this->config['delete_format'], $columns, $row);
+                        if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
+                            $result = $client->$method('', $formatted_row, 'application/json');
+                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
+                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
+                        } else {
+                            $result = $client->$method('', $formatted_row);
+                        }
+                    } else {
+                        $skipped++;
+                        continue;
+                    }
+                } elseif ($id) {
+                    // UPDATE endpoint
                     if (! empty($this->config['update_limit'])) {
                         parse_str($this->config['update_limit'], $params);
                         foreach ($params as $field => $value) {
@@ -100,6 +120,7 @@ class APIWriter
                         continue;
                     }
                 } else {
+                    // CREATE endpoint
                     if (! empty($this->config['create_url'])) {
                         $url = $this->config['create_url'];
                         $client = new \Services_ApiClient($url, false);

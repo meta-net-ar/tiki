@@ -12,9 +12,13 @@ class TrackerSourceEntry implements SourceEntryInterface
     private $data;
     private $extra;
 
-    public function __construct($itemId)
+    public function __construct($itemIdOrItem)
     {
-        $this->item = \Tracker_Item::fromId($itemId);
+        if (is_numeric($itemIdOrItem)) {
+            $this->item = \Tracker_Item::fromId($itemIdOrItem);
+        } else {
+            $this->item = $itemIdOrItem;
+        }
         $this->data = $this->item->getData();
         $this->extra = [
             'itemId' => $this->data['itemId'],

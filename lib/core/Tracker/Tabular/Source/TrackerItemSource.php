@@ -6,20 +6,31 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Tabular\Source;
 
+use Tracker\Tabular\Schema;
+use Tracker_item;
+
 class TrackerItemSource implements SourceInterface
 {
-    private $schema;
-    private $itemId;
+    private Schema $schema;
+    private Tracker_Item $item;
 
-    public function __construct(\Tracker\Tabular\Schema $schema, $itemId)
+    public function __construct(Schema $schema, $itemId = null, $itemInfo = null)
     {
         $this->schema = $schema;
-        $this->itemId = $itemId;
+        if ($itemId && $itemId > 0) {
+            $this->item = Tracker_Item::fromId($itemId);
+        } elseif ($itemInfo) {
+            $this->item = Tracker_Item::fromInfo($itemInfo);
+        } else {
+            $this->item = null;
+        }
     }
 
     public function getEntries()
     {
-        yield new TrackerSourceEntry($this->itemId);
+        if ($this->item) {
+            yield new TrackerSourceEntry($this->item);
+        }
     }
 
     public function getSchema()

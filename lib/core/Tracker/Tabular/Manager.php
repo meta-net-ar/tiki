@@ -143,25 +143,32 @@ class Manager
             \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
             return;
         }
-        if (empty($tabular['odbc_config']['sync_deletes'])) {
-            return;
-        }
 
         $schema = $this->getSchema($definition, $tabular);
-        foreach ($schema->getColumns() as $column) {
-            if ($column->isPrimaryKey()) {
-                $field = $definition->getFieldFromPermName($column->getField());
-                $id = $args['values'][$field['fieldId']] ?: null;
-                if ($id) {
-                    try {
-                        $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-                        $writer->delete($column->getRemoteField(), $id);
-                    } catch (\Exception $e) {
-                        \Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
+
+        if ($tabular['odbc_config']) {
+            if (empty($tabular['odbc_config']['sync_deletes'])) {
+                return;
+            }
+            foreach ($schema->getColumns() as $column) {
+                if ($column->isPrimaryKey()) {
+                    $field = $definition->getFieldFromPermName($column->getField());
+                    $id = $args['values'][$field['fieldId']] ?: null;
+                    if ($id) {
+                        try {
+                            $writer = new Writer\ODBCWriter($tabular['odbc_config']);
+                            $writer->delete($column->getRemoteField(), $id);
+                        } catch (\Exception $e) {
+                            \Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
+                        }
+                        break;
                     }
-                    break;
                 }
             }
+        } elseif ($tabular['api_config']) {
+            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, null, $args['values']);
+            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+            $writer->write($source, 'delete');
         }
     }
 
