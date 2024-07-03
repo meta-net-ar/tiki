@@ -12,7 +12,7 @@
     {if not empty($info)}
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
-        <form method="post" action="{service controller=manager action=cloneAndRedact}">
+        <form method="post" action="{service controller=manager action=clone_and_redact}">
             {foreach item=option from=$options}
                 <div class="tiki-form-group row p-2">
                     <label class="col-form-label col-sm-3">
