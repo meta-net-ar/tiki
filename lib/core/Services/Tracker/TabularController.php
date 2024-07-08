@@ -537,6 +537,50 @@ class Services_Tracker_TabularController
         ];
     }
 
+    public function action_delete_csv($input)
+    {
+        $lib = TikiLib::lib('tabular');
+        $info = $lib->getInfo($input->tabularId->int());
+        $trackerId = $info['trackerId'];
+
+        Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
+
+        $schema = $this->getSchema($info);
+        $schema->validate();
+
+        $done = false;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $source = $schema->getSource($_FILES['file']['tmp_name']);
+            $writer = new \Tracker\Tabular\Writer\TrackerWriter();
+
+            return TikiLib::lib('tiki')->allocate_extra(
+                'tracker_import_items',
+                function () use ($writer, $source, $info) {
+                    $writer->delete($source);
+
+                    unlink($_FILES['file']['tmp_name']);
+
+                    $message = tr('Your delete request was completed successfully.');
+
+                    if (TIKI_API) {
+                        return ['feedback' => $message];
+                    }
+
+                    Feedback::success($message);
+                }
+            );
+        }
+
+        return [
+            'FORWARD' => [
+                'controller' => 'tabular',
+                'action' => 'list',
+                'tabularId' => $info['tabularId'],
+            ]
+        ];
+    }
+
     public function action_filter($input)
     {
         $tabularId = $input->tabularId->int();

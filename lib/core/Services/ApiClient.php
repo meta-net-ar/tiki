@@ -36,6 +36,7 @@ class Services_ApiClient
         $endpoint = $args[0] ?? '';
         $arguments = $args[1] ?? [];
         $content_type = $args[2] ?? null;
+        $uploads = $args[3] ?? [];
 
         $client = $this->getClient($method, $endpoint, $arguments);
 
@@ -43,6 +44,10 @@ class Services_ApiClient
         $headers->addHeaders(['Accept' => $this->getAcceptHeader()]);
         if ($content_type) {
             $headers->addHeaders(['Content-Type' => $content_type]);
+        }
+
+        foreach ($uploads as $name => $upload) {
+            $client->setFileUpload($upload['filename'], $name, $upload['content'], $upload['filetype']);
         }
 
         $response = $client->send();

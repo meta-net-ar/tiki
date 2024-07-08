@@ -131,6 +131,7 @@ class Services_ApiBridge
         $routes->add('tabulars-view', (new Route('tabulars/{tabularId}', ['controller' => 'tabular', 'action' => 'edit']))->setMethods(['GET']));
         $routes->add('tabulars-export', (new Route('tabulars/{tabularId}/export', ['controller' => 'tabular', 'action' => 'export_full_csv']))->setMethods(['GET']));
         $routes->add('tabulars-import', (new Route('tabulars/{tabularId}/import', ['controller' => 'tabular', 'action' => 'import_csv']))->setMethods(['POST']));
+        $routes->add('tabulars-delete', (new Route('tabulars/{tabularId}/delete', ['controller' => 'tabular', 'action' => 'delete_csv']))->setMethods(['POST']));
         $routes->add('trackers', (new Route('trackers', ['controller' => 'tracker', 'action' => 'list_trackers']))->setMethods(['GET']));
         $routes->add('trackers-create', (new Route('trackers', ['controller' => 'tracker', 'action' => 'replace', 'confirm' => 1]))->setMethods(['POST']));
         $routes->add('trackers-view', (new Route('trackers/{trackerId}', ['controller' => 'tracker', 'action' => 'list_items', 'offset' => -1, 'maxRecords' => -1]))->setMethods(['GET']));

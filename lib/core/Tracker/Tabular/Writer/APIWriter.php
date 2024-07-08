@@ -69,17 +69,9 @@ class APIWriter
                     // DELETE endpoint
                     if (! empty($this->config['delete_url'])) {
                         $url = str_replace('#id', $id, $this->config['delete_url']);
-                        $client = new \Services_ApiClient($url, false);
-                        $client->setContextUser($user);
                         $method = strtolower($this->config['delete_method'] ?? 'delete');
                         $formatted_row = $this->formatRow(@$this->config['delete_format'], $columns, $row);
-                        if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
-                            $result = $client->$method('', $formatted_row, 'application/json');
-                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
-                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
-                        } else {
-                            $result = $client->$method('', $formatted_row);
-                        }
+                        $result = $this->sendApiRequest($url, $method, $formatted_row);
                     } else {
                         $skipped++;
                         continue;
@@ -104,17 +96,9 @@ class APIWriter
                     }
                     if (! empty($this->config['update_url'])) {
                         $url = str_replace('#id', $id, $this->config['update_url']);
-                        $client = new \Services_ApiClient($url, false);
-                        $client->setContextUser($user);
                         $method = strtolower($this->config['update_method'] ?? 'patch');
                         $formatted_row = $this->formatRow(@$this->config['update_format'], $columns, $row);
-                        if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
-                            $result = $client->$method('', $formatted_row, 'application/json');
-                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
-                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
-                        } else {
-                            $result = $client->$method('', $formatted_row);
-                        }
+                        $result = $this->sendApiRequest($url, $method, $formatted_row);
                     } else {
                         $skipped++;
                         continue;
@@ -123,17 +107,9 @@ class APIWriter
                     // CREATE endpoint
                     if (! empty($this->config['create_url'])) {
                         $url = $this->config['create_url'];
-                        $client = new \Services_ApiClient($url, false);
-                        $client->setContextUser($user);
                         $method = strtolower($this->config['create_method'] ?? 'post');
                         $formatted_row = $this->formatRow(@$this->config['create_format'], $columns, $row);
-                        if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
-                            $result = $client->$method('', $formatted_row, 'application/json');
-                        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
-                            $result = $client->$method('', json_encode($formatted_row), 'application/json');
-                        } else {
-                            $result = $client->$method('', $formatted_row);
-                        }
+                        $result = $this->sendApiRequest($url, $method, $formatted_row);
                     } else {
                         $skipped++;
                         continue;
@@ -257,12 +233,46 @@ class APIWriter
         return $result;
     }
 
+    private function sendApiRequest($url, $method, $formatted_row)
+    {
+        $client = new \Services_ApiClient($url, false);
+        $client->setContextUser($user);
+        if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
+            $content_type = 'application/json';
+        } elseif (is_array($formatted_row) && $this->config['format'] == 'json') {
+            $formatted_row = json_encode($formatted_row);
+            $content_type = 'application/json';
+        } else {
+            $content_type = null;
+        }
+        if (preg_match('#api/tabulars/\d+/(import|delete)$#', $url)) {
+            if (empty($this->config['format'])) {
+                $content_type = 'text/csv';
+            }
+            return $client->$method('', [], null, [
+                'file' => [
+                    'filename' => 'import.' . ($content_type == 'text/csv' ? 'csv' : 'json'),
+                    'filetype' => $content_type,
+                    'content' => $formatted_row
+                ],
+            ]);
+        } else {
+            return $client->$method('', $formatted_row, $content_type);
+        }
+    }
+
     private function formatRow($format, $columns, $row)
     {
         if (! empty($format)) {
             $formatted_row = $format;
-            foreach ($columns as $column) {
-                $formatted_row = str_replace('%' . $column->getLabel() . '%', $row[$column->getLabel()], $formatted_row);
+            if (@json_decode($format) !== null) {
+                foreach ($columns as $column) {
+                    $formatted_row = str_replace('%' . $column->getLabel() . '%', preg_replace(["/\r/", "/\n/"], ["", "\\n"], addslashes($row[$column->getLabel()])), $formatted_row);
+                }
+            } else {
+                foreach ($columns as $column) {
+                    $formatted_row = str_replace('%' . $column->getLabel() . '%', $row[$column->getLabel()], $formatted_row);
+                }
             }
         } else {
             $formatted_row = $row;

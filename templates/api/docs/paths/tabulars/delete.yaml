@@ -1,0 +1,28 @@
+---
+post:
+  description: Delete data by primary keys through this import-export in configured format.
+  parameters:
+    - name: tabularId
+      in: path
+      description: Import-Export ID
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+  responses:
+    '200':
+      description: delete request result
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

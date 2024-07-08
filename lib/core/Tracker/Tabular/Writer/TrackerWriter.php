@@ -168,6 +168,37 @@ class TrackerWriter
         return true;
     }
 
+    /**
+     * Similar to write method but iterates through the source entries and deletes
+     * matching tracker items by primary key.
+     */
+    public function delete(\Tracker\Tabular\Source\SourceInterface $source)
+    {
+        $utilities = new \Services_Tracker_Utilities();
+        $schema = $source->getSchema();
+        $columns = $schema->getColumns();
+
+        $lookup = $this->getItemIdLookup($schema);
+
+        $result = [];
+        foreach ($source->getEntries() as $line => $entry) {
+            $info = [
+                'itemId' => false,
+                'fields' => [],
+            ];
+            foreach ($columns as $column) {
+                $entry->parseInto($info, $column);
+            }
+            $info['itemId'] = $lookup($info);
+
+            if (! empty($info['itemId'])) {
+                $utilities->removeItem($info['itemId']);
+            }
+        }
+
+        return true;
+    }
+
     private function getItemIdLookup($schema)
     {
         $pk = $schema->getPrimaryKey();
