@@ -83,6 +83,8 @@ class Manager
 
     public function syncItemSaved($args)
     {
+        global $url_host;
+
         if (isset($args['skip_sync']) && $args['skip_sync']) {
             return;
         }
@@ -118,6 +120,10 @@ class Manager
                     }
                 }
             } elseif ($tabular['api_config']) {
+                if (TIKI_API && ! empty($tabular['api_config']['update_url']) && ! empty($url_host) && stristr($tabular['api_config']['update_url'], $url_host)) {
+                    // skip syncing back changes coming from the target host via the API
+                    return;
+                }
                 $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
                 $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
                 $writer->write($source);
@@ -129,6 +135,8 @@ class Manager
 
     public function syncItemDeleted($args)
     {
+        global $url_host;
+
         if (isset($args['skip_sync']) && $args['skip_sync']) {
             return;
         }
@@ -166,6 +174,10 @@ class Manager
                 }
             }
         } elseif ($tabular['api_config']) {
+            if (TIKI_API && ! empty($tabular['api_config']['delete_url']) && ! empty($url_host) && stristr($tabular['api_config']['delete_url'], $url_host)) {
+                // skip syncing back changes coming from the target host via the API
+                return;
+            }
             $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, null, $args['values']);
             $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
             $writer->write($source, 'delete');
