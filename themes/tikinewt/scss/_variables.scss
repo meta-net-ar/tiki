@@ -57,6 +57,8 @@ $font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu San
 $font-size-base: 1.1rem;
 $popover-font-size:    $font-size-base * .875;
 
+$blockquote-footer-color:     $gray-700;
+
 // Tables
 //$table-border-color: #dddddd;
 
@@ -67,6 +69,12 @@ $btn-primary-border: #999999;
 
 // Forms
 $input-border-color:                      var(--#{$prefix}border-color); // #8cacbb;
+
+// Form validation
+$form-valid-color:                  #115F3B; // $form-feedback-valid-color !default;
+$form-valid-border-color:           #115F3B; // $form-feedback-valid-color !default;
+$form-invalid-color:                #A01C2A; // $form-feedback-invalid-color !default;
+$form-invalid-border-color:         #A01C2A; // $form-feedback-invalid-color !default;
 
 // Dropdowns
 // Navs
