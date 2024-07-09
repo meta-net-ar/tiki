@@ -83,8 +83,6 @@ class Manager
 
     public function syncItemSaved($args)
     {
-        global $url_host;
-
         if (isset($args['skip_sync']) && $args['skip_sync']) {
             return;
         }
@@ -120,7 +118,9 @@ class Manager
                     }
                 }
             } elseif ($tabular['api_config']) {
-                if (TIKI_API && ! empty($tabular['api_config']['update_url']) && ! empty($url_host) && stristr($tabular['api_config']['update_url'], $url_host)) {
+                global $jitRequest;
+                $remote_url = $jitRequest->tiki_skip_sync_url->raw();
+                if (TIKI_API && ! empty($tabular['api_config']['update_url']) && ! empty($remote_url) && stristr($tabular['api_config']['update_url'], $remote_url)) {
                     // skip syncing back changes coming from the target host via the API
                     return;
                 }
@@ -135,8 +135,6 @@ class Manager
 
     public function syncItemDeleted($args)
     {
-        global $url_host;
-
         if (isset($args['skip_sync']) && $args['skip_sync']) {
             return;
         }
@@ -174,7 +172,9 @@ class Manager
                 }
             }
         } elseif ($tabular['api_config']) {
-            if (TIKI_API && ! empty($tabular['api_config']['delete_url']) && ! empty($url_host) && stristr($tabular['api_config']['delete_url'], $url_host)) {
+            global $jitRequest;
+            $remote_url = $jitRequest->tiki_skip_sync_url->raw();
+            if (TIKI_API && ! empty($tabular['api_config']['delete_url']) && ! empty($remote_url) && stristr($tabular['api_config']['delete_url'], $remote_url)) {
                 // skip syncing back changes coming from the target host via the API
                 return;
             }

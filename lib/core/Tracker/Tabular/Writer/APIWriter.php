@@ -235,6 +235,7 @@ class APIWriter
 
     private function sendApiRequest($url, $method, $formatted_row)
     {
+        global $url_host;
         $client = new \Services_ApiClient($url, false);
         $client->setContextUser($user);
         if (is_string($formatted_row) && @json_decode($formatted_row) !== null) {
@@ -249,7 +250,7 @@ class APIWriter
             if (empty($this->config['format'])) {
                 $content_type = 'text/csv';
             }
-            return $client->$method('', [], null, [
+            return $client->$method('', ['tiki_skip_sync_url' => $url_host], null, [
                 'file' => [
                     'filename' => 'import.' . ($content_type == 'text/csv' ? 'csv' : 'json'),
                     'filetype' => $content_type,
