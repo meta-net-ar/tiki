@@ -33,6 +33,7 @@ $inputConfiguration = [
                         //'watch_object' => 'word', TODO
                         'approve' => 'text',
                         'revision' => 'digits',
+                        'embeddable' => 'digits',
                     ],
                     'catchAllUnset' => null
                 ],
@@ -496,6 +497,22 @@ if (isset($_REQUEST['reject'], $_REQUEST['revision']) && $_REQUEST['revision'] <
 
 $pageRenderer = new WikiRenderer($info, $user);
 $objectperms = $pageRenderer->applyPermissions();
+
+if (! empty($_REQUEST['embeddable']) && $prefs['auth_token_access'] == 'y') {
+    require_once 'lib/auth/tokens.php';
+    $tokenlib = new AuthTokens(TikiDb::get(), ['maxTimeout' => -1, 'maxHits' => -1]);
+    $embeddable_url = $tokenlib->includeToken(rtrim($base_url, '/') . '/tiki-embed.php?page=' . $info['pageSlug'], $objectperms->getGroups());
+    $div_id = "tiki_embed_" . uniqid();
+    $embeddable_code = "
+<script src=\"{$base_url}generated/js/jquery-tiki/embed.js\"></script>
+<script type=\"text/javascript\">
+window.addEventListener(\"load\", function() {
+    tiki_load_embedded_content(\"{$div_id}\", \"$embeddable_url\");
+});
+</script>
+<div id=\"{$div_id}\"></div>";
+    $smarty->assign('embeddable_code', $embeddable_code);
+}
 
 if ($prefs['flaggedrev_approval'] == 'y' && isset($_REQUEST['latest']) && $objectperms->wiki_view_latest) {
     $pageRenderer->forceLatest();
