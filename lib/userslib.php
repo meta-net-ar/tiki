@@ -930,9 +930,12 @@ class UsersLib extends TikiLib
                         return [false, $user, $result];
                     }
                 } else {
-                    // otherwise
-                    // just say no!
-                    return [false, $user, $result];
+                    //If it's a tiki user, just log in
+                    if ($userTiki && $userTikiPresent) {//Update lastlogin
+                        return [$this->update_lastlogin($user), $user, $result];
+                    } else {//user exists in tiki but bad password or the user does not exist
+                        return [false, $user, $result];
+                    }
                 }
             } elseif ($userLdap && ! $userTikiPresent) {
                 // if the user was logged into Auth but not found in Tiki
