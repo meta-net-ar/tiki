@@ -86,6 +86,7 @@ if ($prefs['feature_actionlog'] == 'y') {
 // Display the Index Template
 $pageRenderer->runSetups();
 
+header("Access-Control-Allow-Origin: *");
 echo (string) $smarty->getTemplateVars('parsed');
 
 TikiLib::events()->trigger(
