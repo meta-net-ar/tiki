@@ -7,4 +7,4 @@ window.tiki_load_embeddable_content = function (div_id, url) {
     };
     req.open("GET", url);
     req.send();
-}
+};
