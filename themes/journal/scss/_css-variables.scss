@@ -36,11 +36,11 @@
 }
 
 .tiki-top-nav-light {
-    @include top-nav-dark; // Top and topbar are always dark
+    @include top-nav-light;
 }
 
 .tiki-topbar-nav-light {
-    @include topbar-nav-dark; // "
+    @include topbar-nav-light;
 }
 
 .tiki-top-nav-dark {

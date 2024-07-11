@@ -1,4 +1,6 @@
 //--------------------------- Tiki CSS variables
+@import "../../../node_modules/bootswatch/dist/cosmo/_variables.scss";
+@import "variables";
 
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
@@ -34,6 +36,14 @@
     --tiki-topbar-color: #{$blue};
     --tiki-topbar-hover-color: #{lighten($blue, 10%)};
     --tiki-topbar-text-color: #{lighten($blue, 10%)};
+}
+
+.tiki-top-nav-light {
+    @include top-nav-light;
+}
+
+.tiki-topbar-nav-light {
+    @include topbar-nav-light;
 }
 
 .tiki-top-nav-dark {

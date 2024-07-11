@@ -11,11 +11,11 @@
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
-@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
-@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
+//@import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+//@import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/superhero/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
-@import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
+//@import "../../default/scss/variables-dark"; // 6. Adds default dark variables for any not declared by the theme dark variables file.
 
 @import "../../base_files/scss/_tiki-variables.scss"; // 7. Default value declarations for Tiki variables (in addition to Bootstrap variables) such as in _tiki-selectors.scss.
 
@@ -56,4 +56,11 @@ body.fullscreen { background: $body-bg; }
 
 a.linkmodule {
     color: #BBD9F7;
+}
+
+// This is added here because I couldn't get the normal variable method to work - g_c-l
+.navbar-light.bg-light {
+    .nav-link {
+        --bs-nav-link-color: rgba(0, 0, 0, 0.65) !important;
+    }
 }

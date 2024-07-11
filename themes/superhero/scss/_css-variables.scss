@@ -4,19 +4,21 @@
 }
 
 @mixin top-nav-light { // Light and Dark are same in this theme.
-    --tiki-top-bg: rgb(32, 55, 76);
-    --tiki-top-color: rgba(255, 255, 255, 0.75); //  #fff;
-    --tiki-top-hover-color: #fff;
-    --tiki-top-text-color: #fff;
+    --tiki-top-bg: rgba(171,182,194,1);
+    --tiki-top-color: var(--bs-navbar-color); // rgba(255, 255, 255, 0.75); //  #fff;
+    --tiki-top-hover-color: var(--bs-navbar-hover-color); // #fff;
+    --tiki-top-text-color:var(--tiki-top-color);
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-top-border: solid #333;
+    --tiki-top-border-width: 0px 0px 1px 0px;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #2C465E;
-    --tiki-topbar-color: rgba(255, 255, 255, 0.75); // #fff;
-    --tiki-topbar-hover-color: #fff;
-    --tiki-topbar-text-color: #fff;
+    --tiki-topbar-bg: rgba(171,182,194,1);
+    --tiki-topbar-color: rgba(0, 0, 0, 0.65); //  #fff;
+    --tiki-topbar-hover-color: var(--bs-navbar-hover-color); // #fff;
+    --tiki-topbar-text-color:var(--tiki-topbar-color);
 //    --tiki-topbar-bg: rgba(171, 182, 184, 1);
 //    --tiki-topbar-color: rgba(0, 0, 0, 0.55); // rgba(0, 0, 0, 0.9);
 //    --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
@@ -38,11 +40,11 @@
     --tiki-topbar-text-color: #fff;
 }
 
-.tiki-top-nav-light {
+.tiki .tiki-top-nav-light {
     @include top-nav-light;
 }
 
-.tiki-topbar-nav-light {
+.tiki .tiki-topbar-nav-light {
     @include topbar-nav-light;
 }
 
@@ -67,10 +69,10 @@
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
+        @include top-nav-dark;                      // light values
     }
     .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
+        @include topbar-nav-dark;
     }
 }
 

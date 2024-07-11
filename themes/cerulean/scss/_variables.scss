@@ -26,7 +26,7 @@ $prefixTiki:                  tiki-;
 
 // Body
 // Links
-//$link-color:                              $primary;  // default
+$link-color:                            #1578B2; //  $primary;  // default - Darkened for WCAG 2
 $link-shade-percentage:                   20%;  // default
 //$link-hover-color:                        shift-color($link-color, $link-shade-percentage);  // default
 
@@ -35,6 +35,7 @@ $font-family-sans-serif:        Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'Dej
 $font-size-base:                1.1rem;
 
 $headings-color: #1F9CE5; // Darkened for WCAG2.2
+$blockquote-footer-color: #6D767E; // Darkened for WCAG 2
 
 // Components
 $border-color:                $gray-400;
@@ -66,3 +67,5 @@ $navbar-bg-light: #2fa4e7;
 $navbar-light-color: #000;
 $navbar-light-link-color: #000;
 $navbar-light-link-hover-color: lighten(#000,10%);
+
+

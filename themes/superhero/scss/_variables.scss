@@ -11,13 +11,13 @@ $red-300: tint-color($red, 40%) !default;
 $green-300: tint-color($green, 40%) !default;
 
 $primary:       #BC5815; // $orange;
-//$secondary:     $gray-200 !default;
+$secondary:     $gray-200 !default;
 $success:       #3A833A; // $green !default;
 $info:          #20809D; // $cyan !default;
 $warning:       #946F00; // $yellow !default;
 $danger:        #D33B36; // $red !default;
-//$light:         lighten($gray-200, 35%) !default;
-//$dark:          #20374c !default;
+$light:         #F6F6F6FF; // lighten($gray-200, 35%) !default;
+$dark:          #20374c !default;
 
 $min-contrast-ratio:   1.6 !default;
 
@@ -53,11 +53,14 @@ $font-family-sans-serif:      Optima, Candara, 'Noto Sans', source-sans-pro, san
 //$dropdown-bg:                       $gray-200 !default;
 
 // Navs
+$nav-link-color:                    rgba(0, 0, 0, 0.65); //var(--#{$prefix}link-color) !default;
 //$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default; // rgba(255, 255, 255, .4) !default;
 //$nav-tabs-border-color:             $gray-200 !default;
 //$nav-tabs-link-active-border-color: $gray-200 !default;
 
 // Navbar
+$navbar-light-color:  rgba(0, 0, 0, 0.65);
+
 // Pagination
 //$pagination-bg:                     $gray-200 !default;
 

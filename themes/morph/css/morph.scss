@@ -23,7 +23,7 @@
 @import "../../../node_modules/bootswatch/dist/morph/bootswatch"; // 9. Bootswatch theme selectors
 @import "../../base_files/scss/_tiki-selectors.scss"; // 10. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 11. Optionally imported to group (separately) the top and topbar zone components for styling.
-//@import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+@import "../scss/_tiki-selectors.scss"; // 12. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 

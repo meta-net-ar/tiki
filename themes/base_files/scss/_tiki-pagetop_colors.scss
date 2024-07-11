@@ -15,7 +15,8 @@
 //.tiki-admin .top_modules.navbar-light-parent,
 //.layout_social header.navbar-light-parent.bg-light-parent,             // Classic Bootstrap layout (fixed-top navbar) -- Complete header
 //.layout_social header.navbar.navbar-light.bg-light                     // Classic Bootstrap layout -- Menu itself
-.tiki .tiki-top-nav-light
+.tiki .tiki-top-nav-light,
+.tiki .tiki-top-nav-dark
 {
     background: var(--tiki-top-bg);
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
@@ -60,6 +61,8 @@
     box-shadow: var(--tiki-topbar-box-shadow);
 }
 
+// The following are commented out because these selectors are the same as above, and the appropriate CSS variable is then applied
+// depending on which (light or dark) selector is in use:
 // Top module zone and parent divs - dark color
 //.layout_basic .page-header.navbar-dark-parent.bg-dark-parent,         // Single-container layout -- Parent of the top module zone
 //.layout_classic .header_outer.bg-dark-parent,                         // Classic Tiki layout -- Parent of the top module zone
@@ -67,25 +70,25 @@
 //.tiki-admin .top_modules.navbar-dark-parent,
 //.layout_social header.navbar-light-parent.bg-dark-parent,             // Classic Bootstrap layout (fixed-top navbar) -- Complete header
 //.layout_social header.navbar.navbar-dark.bg-dark                     // Classic Bootstrap layout -- Menu itself
-.tiki .tiki-top-nav-dark
-{
-    background: var(--tiki-top-bg);
-    color: var(--tiki-top-text-color);
-    a:not(.navbar-brand,.dropdown-item),
-    .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
-    .nav-link.dropdown-toggle,
-    .btn.btn-link,
-    .nav-link  {
-        color: var(--tiki-top-color);
-        &:hover {
-            color: var(--tiki-top-hover-color);
-            background: var(--tiki-top-hover-bg);
-        }
-    }
-    border: var(--tiki-top-border);
-    border-width: var(--tiki-top-border-width);
-    box-shadow: var(--tiki-top-box-shadow);
-}
+//.tiki .tiki-top-nav-dark
+//{
+//    background: var(--tiki-top-bg);
+//    color: var(--tiki-top-text-color);
+//    a:not(.navbar-brand,.dropdown-item),
+//    .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
+//    .nav-link.dropdown-toggle,
+//    .btn.btn-link,
+//    .nav-link  {
+//        color: var(--tiki-top-color);
+//        &:hover {
+//            color: var(--tiki-top-hover-color);
+//            background: var(--tiki-top-hover-bg);
+//        }
+//    }
+//    border: var(--tiki-top-border);
+//    border-width: var(--tiki-top-border-width);
+//    box-shadow: var(--tiki-top-box-shadow);
+//}
 
 .tiki:not(.tiki-admin.uab) .tiki-top-nav-dark {
     background: var(--tiki-top-bg);

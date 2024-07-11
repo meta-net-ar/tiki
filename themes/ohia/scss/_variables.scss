@@ -31,7 +31,7 @@ $gray-600: #6c757d;  // default
 $gray-700: #495057;  // default
 $gray-800: #343a40;  // default
 $gray-900: #212529;  // default
-$black:    #000;  // default
+$black:    $cooled-lava-dark; //#000;  // default
 // scss-docs-end gray-color-variables
 
 // fusv-disable
@@ -81,7 +81,6 @@ $colors: (
     "gray-dark":  $gray-800
 );  // default
 // scss-docs-end colors-map
-$black:    $cooled-lava-dark; //#000;
 
 $red-300: tint-color($red, 40%);  // default
 $green-300: tint-color($green, 40%);  // default
@@ -92,15 +91,6 @@ $green-300: tint-color($green, 40%);  // default
 //$warning: #deceb3; //  darken(#f0ad4e, 30%)
 //$danger: #dda8a7;
 
-$theme-colors: (
-     "primary":           $leaf,
-     "secondary":         darken($leaf,15%),
-     "success":           $sky-deep,
-     "info":              $sky-light,
-     "warning":           $blossom-yellow,
-     "danger":            $blossom-red
-);
-
 // scss-docs-start theme-color-variables
 $primary:       $leaf; // #193c5a;
 $secondary:     darken($leaf,15%); // #dddddd;
@@ -108,9 +98,20 @@ $success:       $sky-deep; // #aad4ab;
 $info:          $sky-light; // #aad0e2;
 $warning:       $blossom-yellow; // #deceb3;
 $danger:        $blossom-red; // #dda8a7;
-$light:         $sky-light; //$gray-100;
+$light:         #3585D0; //$sky-light; //$gray-100;
 $dark:          $cooled-lava-dark; //#000;
 // scss-docs-end theme-color-variables
+
+$theme-colors: (
+    "primary":           $leaf,
+    "secondary":         darken($leaf,15%),
+    "success":           $sky-deep,
+    "info":              $sky-light,
+    "warning":           $blossom-yellow,
+    "danger":            $blossom-red,
+    "light":             $sky-light,
+    "dark":              $cooled-lava-dark
+);
 
 $body-emphasis-color:       #fff;
 
@@ -246,13 +247,6 @@ $nav-tabs-link-active-border-color: $wood $wood $nav-tabs-link-active-bg;
 
     // Navbar
 // scss-docs-start navbar-theme-variables
-$navbar-dark-color:                 rgba($white, .55);  // default
-$navbar-dark-hover-color:           rgba($white, .75);  // default
-$navbar-dark-active-color:          $white;  // default
-$navbar-dark-disabled-color:        rgba($white, .25);  // default
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
-$navbar-dark-toggler-border-color:  rgba($white, .1);  // default
-
 $navbar-light-color:                $cooled-lava-dark;
 $navbar-light-hover-color:          lighten($cooled-lava-dark, 8%);
 $navbar-light-active-color:         $navbar-light-hover-color;
@@ -260,26 +254,32 @@ $navbar-light-disabled-color:       rgba($black, .3);  // default
 $navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-light-toggler-border-color: rgba($black, .1);  // default
 
-$navbar-light-brand-color:                $navbar-light-active-color;  // default
-$navbar-light-brand-hover-color:          $navbar-light-active-color;  // default
-$navbar-dark-brand-color:                 $navbar-dark-active-color;  // default
-$navbar-dark-brand-hover-color:           $navbar-dark-active-color;  // default
+$navbar-light-brand-color: $navbar-light-color;
+$navbar-light-brand-hover-color:darken($navbar-light-color,10%);
+$navbar-light-brand-hover-bg:transparent;
+
+$navbar-dark-color:                 rgba($white, .55);  // default
+$navbar-dark-hover-color:           rgba($white, .75);  // default
+$navbar-dark-active-color:          $white;  // default
+$navbar-dark-disabled-color:        rgba($white, .25);  // default
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
+$navbar-dark-toggler-border-color:  rgba($white, .1);  // default
+
+
 // scss-docs-end navbar-theme-variables
 
 
 // Navbar links
-$navbar-light-link-color: #fd0006;
-$navbar-light-link-hover-color: #f4f4f4;
-$navbar-light-link-hover-bg:transparent;
-$navbar-light-link-active-color: #f4f4f4;
-//darken($navbar-light-bg,6.5%);
-$navbar-light-link-disabled-color: #cccccc;
-$navbar-light-link-disabled-bg:transparent;
+//$navbar-light-color: #fd0006;
+//$navbar-light-hover-color: #f4f4f4;
+//$navbar-light-hover-bg:transparent;
+//$navbar-light-active-color: #f4f4f4;
+////darken($navbar-light-bg,6.5%);
+//$navbar-light-disabled-color: #cccccc;
+//$navbar-light-disabled-bg:transparent;
 
 // Navbar brand label
-$navbar-light-brand-color: $navbar-light-color;
-$navbar-light-brand-hover-color:darken($navbar-light-color,10%);
-$navbar-light-brand-hover-bg:transparent;
+
 
 
 // Dropdowns

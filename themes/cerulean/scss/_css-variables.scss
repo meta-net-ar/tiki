@@ -1,7 +1,7 @@
 // --------- Tiki CSS variables
 
 @mixin top-nav-dark {
-    --tiki-top-bg: linear-gradient(#545a5f, #343a40 60%, #31373c);
+    --tiki-top-bg: linear-gradient(to bottom, #545a5f, #343a40 60%, #31373c) !important;
     --tiki-top-color: #{$navbar-dark-link-color};
     --tiki-top-hover-color: #{$navbar-dark-link-hover-color};
     --tiki-top-text-color:#{$navbar-dark-link-hover-color};
@@ -17,7 +17,7 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: linear-gradient(#f9fafb, #f8f9fa 60%, #e9eaeb); // BLUE OPTION: linear-gradient(#50b3eb, #2fa4e7 60%, #2c9ad9);
+    --tiki-top-bg: linear-gradient(to bottom, #f9fafb, #f8f9fa 60%, #e9eaeb) !important; // BLUE OPTION: linear-gradient(#50b3eb, #2fa4e7 60%, #2c9ad9);
     --tiki-top-color: #000; //#{$navbar-light-link-color};
     --tiki-top-hover-color: #000; //#{$navbar-light-link-hover-color};
     --tiki-top-text-color: #000;
@@ -61,7 +61,7 @@
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
+        @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
@@ -141,5 +141,16 @@
     .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
     .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
         @include admin-nav-dark;                      // dark values
+    }
+}
+// - - - - - New admin pages (Unified Admin Backend) end - - - - - - - //
+
+.navbar-dark .nav-link {
+    --bs-nav-link-color: #fff;
+}
+
+[data-bs-theme=light] {
+    h5, .h5, h6, .h6 {
+        --bs-heading-color: #157BB7; // Darkened for WCAG 2
     }
 }
