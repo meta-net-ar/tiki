@@ -504,10 +504,10 @@ if (! empty($_REQUEST['embeddable']) && $prefs['auth_token_access'] == 'y') {
     $embeddable_url = $tokenlib->includeToken(rtrim($base_url, '/') . '/tiki-embed.php?page=' . $info['pageSlug'], $objectperms->getGroups());
     $div_id = "tiki_embed_" . uniqid();
     $embeddable_code = "
-<script src=\"{$base_url}generated/js/jquery-tiki/embed.js\"></script>
+<script src=\"{$base_url}public/generated/js/jquery-tiki/embed.js\"></script>
 <script type=\"text/javascript\">
 window.addEventListener(\"load\", function() {
-    tiki_load_embedded_content(\"{$div_id}\", \"$embeddable_url\");
+    tiki_load_embeddable_content(\"{$div_id}\", \"$embeddable_url\");
 });
 </script>
 <div id=\"{$div_id}\"></div>";

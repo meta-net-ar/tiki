@@ -63,7 +63,7 @@
             {assign var=urlurl value="{$page|sefurl}{$smarty.server.REQUEST_URI|regex_replace:'/^[^\?\&]*/':''|regex_replace:'/(\?page=[^\&]+)/':''}"}{button _script="tiki-user_bookmarks.php" urlname=$page urlurl=$urlurl addurl="Add" _type="link" _class="dropdown-item" _text="{tr}Bookmark{/tr}" _auto_args="urlname,urlurl,addurl"}
         {/if}
 
-        {if $prefs.auth_token_access eq 'y'}
+        {if ! empty($user) && $prefs.auth_token_access eq 'y'}
             {button _keepall='y' href="tiki-index.php" page=$page embeddable="1" _type="link" _class="dropdown-item" _text="{tr}Get embedding code{/tr}"}
         {/if}
 
