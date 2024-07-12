@@ -124,6 +124,13 @@ Note: The show content block must be defined at root level to use the include. A
             {/remarksbox}
         {/if}
 
+        {if $embeddable_code}
+            {remarksbox type="info" title="{tr}Copy embeddable code{/tr}" highlight="y"}
+                <p>{tr}You can use this code to embed this webpage into external sites. The embedded content will be based off the permissions you have on this page and the rendered HTML of the wiki content. It won't include this site's CSS or JS assets, so the actual layout and display of elements will ultiamtely depend on the targe site assets.{/tr}</p>
+                {wikiplugin _name="code"}{$embeddable_code}{/wikiplugin}
+            {/remarksbox}
+        {/if}
+
         <div id="page-data" class="clearfix">
             {if $prefs.wiki_page_name_inside eq 'y'}
                 <h1 class="pagetitle">{breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs machine_translate=$machine_translate_to_lang source_lang=$pageLang target_lang=$machine_translate_to_lang}</h1>

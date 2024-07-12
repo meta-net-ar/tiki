@@ -106,7 +106,7 @@ class AuthTokens
         }
 
         global $prefs, $tikiroot;       // $full defined in route.php
-        if ($prefs['feature_sefurl'] === 'y' && strpos($entry, 'tiki-autologin.php') === false) {
+        if ($prefs['feature_sefurl'] === 'y' && strpos($entry, 'tiki-autologin.php') === false && strpos($entry, 'tiki-embed.php') === false) {
             $sefurlTypeMap = $this->getSefurlTypeMap();
             $keys = array_keys($_GET);
             $seftype = '';
@@ -121,7 +121,7 @@ class AuthTokens
                     break;
                 }
             }
-            if (empty($key)) {  // missing object type?
+            if (empty($key)) {
                 return null;
             }
 
