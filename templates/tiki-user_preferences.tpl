@@ -655,6 +655,16 @@
                         </div>
                     {/if}
                     {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq 'admin')}
+                        {if $tiki_p_admin ne 'y' or $userwatch eq $user}
+                            <div class="tiki-form-group row">
+                                <label class="col-md-4 col-form-label" for="pass">
+                                    {tr}Current password (required):{/tr}
+                                </label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="password" name="pass" id="pass" autocomplete="current-password">
+                                </div>
+                            </div>
+                        {/if}
                         {if $prefs.change_password neq 'n'}
                             <div class="tiki-form-group row">
                                 <label class="col-md-4 col-form-label" for="pass1">
@@ -677,16 +687,6 @@
                                 </label>
                                 <div class="col-md-8">
                                     <input class="form-control" type="password" name="pass2" id="pass2" autocomplete="new-password">
-                                </div>
-                            </div>
-                        {/if}
-                        {if $tiki_p_admin ne 'y' or $userwatch eq $user}
-                            <div class="tiki-form-group row">
-                                <label class="col-md-4 col-form-label" for="pass">
-                                    {tr}Current password (required):{/tr}
-                                </label>
-                                <div class="col-md-8">
-                                    <input class="form-control" type="password" name="pass" id="pass" autocomplete="current-password">
                                 </div>
                             </div>
                         {/if}
