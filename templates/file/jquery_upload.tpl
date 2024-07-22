@@ -32,4 +32,15 @@
     {icon name='video' id='video_icon'}
     {icon name='audio' id='audio_icon'}
     {icon name='zip' id='zip_icon'}
+    {icon name='word' id='word_icon'}
+    {icon name='excel' id='excel_icon'}
+    {icon name='powerpoint' id='powerpoint_icon'}
+    {icon name='textfile' id="txt_icon"}
+    {icon name='css3' id='css_icon'}
+    {icon name='mailbox' id='mailbox_icon'}
+    {icon name='html' id='html_icon'}
+    {icon name='php' id='php_icon'}
+    {icon name='js' id='js_icon'}
+    {icon name='font-awesome' id='font_icon'}
+    {icon name='trackers' id='trackers_icon'}
 </div>

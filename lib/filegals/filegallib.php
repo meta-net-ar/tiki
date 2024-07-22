@@ -2266,8 +2266,12 @@ class FileGalLib extends TikiLib
         if (empty($syntax)) {
             $syntax = '{img fileId="%fileId%" thumb="box"}';    // should be a pref
 
-            if (! empty($fileinfo['filetype']) && preg_match('/video\/*/', $fileinfo['filetype'])) {
-                $syntax = '{mediaplayer src="display%fileId%"}';
+            if (! empty($fileinfo['filetype'])) {
+                if (preg_match('/video\/*/', $fileinfo['filetype'])) {
+                    $syntax = '{mediaplayer src="display%fileId%"}';
+                } else if (! preg_match('/image\/*/', $fileinfo['filetype'])) {
+                    $syntax = '{file type="gallery" fileId="%fileId%" showicon="y"}';
+                }
             }
         }
 
