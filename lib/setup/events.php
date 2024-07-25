@@ -18,8 +18,12 @@ function tiki_setup_events()
     $events = TikiLib::events();
     $events->reset();
 
-    $defer = function ($lib, $function) {
-        return Tiki_Event_Lib::defer($lib, $function);
+    $defer = function ($lib, $function, $condition = null) {
+        return function (...$args) use ($lib, $function, $condition) {
+            if ($condition === null || $condition(...$args)) {
+                return Tiki_Event_Lib::defer($lib, $function)(...$args);
+            }
+        };
     };
 
     if ($prefs['feature_wiki'] == 'y') {
@@ -85,8 +89,9 @@ function tiki_setup_events()
         if ($prefs['tracker_tabular_enabled'] == 'y') {
             $events->bind('tiki.trackeritem.save', $defer('tabular', 'syncItemSaved'));
             $events->bind('tiki.trackeritem.delete', $defer('tabular', 'syncItemDeleted'));
-            $events->bind('tiki.comment.save', $defer('tabular', 'syncCommentSaved'));
-            $events->bind('tiki.comment.delete', $defer('tabular', 'syncCommentDeleted'));
+            $checkIsTrackerItemTypeFn = fn ($args) => $args['type'] === 'trackeritem';
+            $events->bind('tiki.comment.save', $defer('tabular', 'syncCommentSaved', $checkIsTrackerItemTypeFn));
+            $events->bind('tiki.comment.delete', $defer('tabular', 'syncCommentDeleted', $checkIsTrackerItemTypeFn));
         }
 
         $events->bind('tiki.trackeritem.create', $defer('trk', 'setup_wiki_fields'));
