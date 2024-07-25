@@ -19,8 +19,9 @@
             </tr>
             {foreach $tokens as $token}
                 <tr>
-                    <td class="js-allow-copy" data-content="{$token.token|escape}">
-                        {$token.token|truncate:20} {icon name='clipboard' title="Copy"}
+                    <span hidden id="token-{$token.tokenId}">{$token.token|escape}</span>
+                    <td class="copy" data-clipboard-target="#token-{$token.tokenId}">
+                        {$token.token|truncate:20} {icon name='clipboard' title="{tr}Copy{/tr}"}
                     </td>
                     <td>
                         {$token.user|escape}
