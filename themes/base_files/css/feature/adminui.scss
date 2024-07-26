@@ -22,7 +22,7 @@ body.tiki-admin {
 
 
 // In larger screens, when UAB is active, prevent content from being covered by aside (offcanvas content); may need adjusting -- g_c-l
-@media (min-width: 993px) and (max-width: 1370px) {
+@media (min-width: 993px) and (max-width: 2000px /*1675px *//*1370px */) {
     .tiki-admin.uab #tikifeedback,
     .tiki-admin.uab .admin-content,
     .tiki-admin.uab .bottom_modules {
@@ -30,13 +30,13 @@ body.tiki-admin {
     }
 }
 
-@media (min-width: 1440px) and (max-width: 1675px) {
-    .tiki-admin.uab #tikifeedback,
-    .tiki-admin.uab .admin-content,
-    .tiki-admin.uab .bottom_modules {
-        padding-left: 320px !important;
-    }
-}
+//@media (min-width: 1440px) and (max-width: 1675px) {
+//    .tiki-admin.uab #tikifeedback,
+//    .tiki-admin.uab .admin-content,
+//    .tiki-admin.uab .bottom_modules {
+//        padding-left: 320px !important;
+//    }
+//}
 
 // Provide space for aside toggle button in screens with full-width content
 .tiki-admin.uab:not(.fixed_width) #tikifeedback,
