@@ -108,6 +108,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     }
     $options['allday'] = isset($_REQUEST['allday']) ? 'y' : 'n';
     $options['nameoneachday'] = isset($_REQUEST['nameoneachday']) ? 'y' : 'n';
+    $options['copybuttononeachevent'] = isset($_REQUEST['copybuttononeachevent']) ? 'y' : 'n';
     $valid_custom_flags = array_map(function ($customflag) {
         $flag = strtolower(trim($customflag));
         if (! in_array($flag, ['n', 'y', 'yes'])) {
@@ -191,6 +192,7 @@ if ($_REQUEST['calendarId'] != 0) {
     $info["endday"] = ! empty($prefs['calendar_end_day']) ? $prefs['calendar_end_day'] : 72000;
     $info["allday"] = '';
     $info["nameoneachday"] = '';
+    $info["copybuttononeachevent"] = '';
     $info["defaulteventstatus"] = 1;
     $info['viedays'] = $prefs['calendar_view_days'];
     if (! empty($_REQUEST['show']) && $_REQUEST['show'] == 'mod') {

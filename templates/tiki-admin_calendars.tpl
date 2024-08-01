@@ -457,6 +457,14 @@
                     <input type="checkbox" name="nameoneachday"{if $info.nameoneachday eq 'y'} checked="checked"{/if}>
                 </div>
             </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="copybuttononeachevent">
+                    {tr}Show copy button of event link in each event in calendar view{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="checkbox" name="copybuttononeachevent"{if $info.copybuttononeachevent eq 'y'} checked="checked"{/if}>
+                </div>
+            </div>
             <div class="mb-3 text-center">
                 <input type="submit" class="btn btn-primary" name="save" value="{tr}Save{/tr}">
             </div>
