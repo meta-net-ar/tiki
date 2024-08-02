@@ -892,6 +892,8 @@ class Services_Tracker_Controller
         $processedFields = [];
 
         $trackerId = $input->trackerId->int();
+        $redirect = $input->redirect->url();
+        $access = TikiLib::lib('access');
 
         if (! $trackerId) {
             return [
@@ -1057,7 +1059,6 @@ class Services_Tracker_Controller
                 TikiLib::events()->trigger('tiki.process.redirect'); // wait for indexing to complete before loading of next request to ensure updated info shown
 
                 if ($next = $input->next->url()) {
-                    $access = TikiLib::lib('access');
                     $access->redirect($next, tr('Item created'));
                 }
 
@@ -1097,6 +1098,15 @@ class Services_Tracker_Controller
                 // send a new ticket back to allow subsequent new items
                 $util->setTicket();
                 $item['nextTicket'] = $util->getTicket();
+
+                if ($redirect) {
+                    //return to page
+                    if ($access->is_xml_http_request()) {
+                        return Services_Utilities::redirect($redirect);
+                    } else {
+                        $access->redirect($redirect);
+                    }
+                }
 
                 return $item;
             } else {
@@ -1145,6 +1155,7 @@ class Services_Tracker_Controller
             'format' => $format,
             'editItemPretty' => $editItemPretty,
             'next' => $input->next->url(),
+            'redirect' => $redirect,
             'suppressFeedback' => $suppressFeedback,
             'skipRefresh' => $input->skipRefresh->bool(),
             'refreshMeta' => $input->refreshMeta->raw(),

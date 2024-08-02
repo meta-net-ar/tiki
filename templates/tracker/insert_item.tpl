@@ -40,6 +40,7 @@
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
                 <input type="hidden" name="refreshMeta" value="{$refreshMeta|escape}">
                 <input type="hidden" name="refreshObject" value="{$refreshObject|escape}">
+                <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input
                     type="submit"
                     class="btn btn-primary"
