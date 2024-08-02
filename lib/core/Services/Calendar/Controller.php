@@ -244,7 +244,6 @@ class Services_Calendar_Controller
                 'color'       => '#' . $calendars[$event['calendarId']]['custombgcolor'],
                 'textColor'   => '#' . $calendars[$event['calendarId']]['customfgcolor'],
                 'showCopyButton' => $calendars[$event['calendarId']]['copybuttononeachevent'],
-                'eventCreation' => $event['created'],
                 'baseUrl'   => $base_url
             ];
         }
