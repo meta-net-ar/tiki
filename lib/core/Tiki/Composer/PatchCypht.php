@@ -84,7 +84,6 @@ class PatchCypht
         copy($vendors . $fixDS('jason-munro/cypht/site/site.js'), $cypht . 'site.js');
         copy($vendors . $fixDS('jason-munro/cypht/site/site.css'), $cypht . 'site.css');
 
-
         // css custom pacthes, keep the bootstrap-icons path relative to lib/cypht as Tiki might be running in a subdirectory and absolute web paths don't work here
         $css = file_get_contents($cypht . 'site.css');
         $css = str_replace('url("./fonts/bootstrap-icons', 'url("../../' . NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/fonts/bootstrap-icons', $css);
