@@ -153,6 +153,9 @@ class Executor
         $builder->skipPagination();
         $builder->apply($matches);
 
+        // try to retrieve as many as possible from the sublist subqueries
+        $query->setRange(0, 9999);
+
         $index = TikiLib::lib('unifiedsearch')->getIndex();
         return $query->search($index);
     }
