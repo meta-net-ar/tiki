@@ -294,16 +294,24 @@ class TikiMail
                 $new_body = $email_body . PHP_EOL . PHP_EOL . $prefs['email_footer'];
                 $this->mail->setBody($new_body);
             } else {
+                $has_html = false;
+                $has_text = false;
                 foreach ($email_body->getParts() as $part) {
                     $content = $part->getContent();
                     if ($part->getType() === 'text/html') {
+                        $has_html = true;
                         $content = str_replace('</body>', '<br><br>' . $prefs['email_footer'] . '</body>', $content);
                     } else {    // hopefully plain text
+                        $has_text = true;
                         $content = $content . PHP_EOL . PHP_EOL . $prefs['email_footer'];
                     }
                     $part->setContent($content);
                 }
                 $this->mail->setBody($email_body);
+                if ($has_html && $has_text) {
+                    // use multipart/alternative for mail clients to display html and fall back to plain text parts
+                    $this->mail->getHeaders()->get('content-type')->setType('multipart/alternative');
+                }
             }
         }
 
