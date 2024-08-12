@@ -29,8 +29,9 @@ function wikiplugin_totp_info()
                 'required'    => false,
                 'name'        => tra('Secret'),
                 'description' => tra(
-                    'Secret key required to generate time-based one-time passwords'
+                    'Secret key required to generate time-based one-time passwords. If not provided, a new secret key will be generated automatically.'
                 ),
+                'default'     => '',
             ],
             'interval' => [
                 'required'    => false,
@@ -43,7 +44,7 @@ function wikiplugin_totp_info()
                 'required'    => false,
                 'name'        => tra('Issuer'),
                 'description' => tra(
-                    'Name of the application where the generated time-based one-time password will be use.'
+                    'Name of the application where the generated time-based one-time password will be used.'
                 ),
             ],
         ],
@@ -53,6 +54,7 @@ function wikiplugin_totp_info()
 function wikiplugin_totp($data, $params)
 {
     global $user, $page;
+    $smarty = TikiLib::lib('smarty');
 
     $sourcePerm = TikiLib::lib('tiki')->user_has_perm_on_object(
         $user,
@@ -90,12 +92,20 @@ function wikiplugin_totp($data, $params)
         'sourcePerm' => $sourcePerm,
     ];
     $params = array_merge($defaults, $params);
+    // Automatically generate a secret key if none is provided
+    $google2fa = new Google2FA();
+    if (! isset($params['secret']) || $params['secret'] === '') {
+        $params['secret'] = $google2fa->generateSecretKey();
+    }
 
-    if (
-        ! isset($params['secret']) && isset($_REQUEST['action'])
-        && $_REQUEST['action'] == 'add_totp'
-        && isset($_REQUEST['secret'])
-    ) {
+     // Validate the secret key length and format
+    if (strlen($params['secret']) !== 16 || ! preg_match('/^[A-Z2-7]+$/', $params['secret'])) {
+        $smarty->assign('msg', tra('Error: The secret key must be 16 characters long and contain only uppercase letters A-Z and digits 2-7.'));
+        $smarty->display('error.tpl');
+        die;
+    }
+
+    if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'add_totp' && isset($_REQUEST['secret'])) {
         $defaults = [
             'period' => 30,
             'issuer' => 'Unknown Application',
@@ -104,7 +114,7 @@ function wikiplugin_totp($data, $params)
         addTOTPPlugin(
             $page,
             $user,
-            $data['secret'],
+            $params['secret'],
             $data['period'],
             $data['issuer']
         );
@@ -112,11 +122,10 @@ function wikiplugin_totp($data, $params)
         die;
     }
 
-    if (! isset($params['secret'])) { //try to request camera and id not possible show a form
+    if (! isset($params['secret'])) {
         if (! $editPerm) {
             return;
         }
-        $smarty = TikiLib::lib('smarty');
         $smarty->assign($params);
         $html = $smarty->fetch('wiki-plugins/wikiplugin_totp_scanner.tpl');
         $html = preg_replace('/(\v|\s)+/', ' ', $html);
@@ -141,6 +150,7 @@ function wikiplugin_totp($data, $params)
         'tfaSecretQR',
         getSecretQR($secretKey, $params['interval'], $user, $params['issuer'])
     );
+    $smarty->assign('secretKey', $secretKey);
     $smarty->assign($params);
     $html = $smarty->fetch('wiki-plugins/wikiplugin_totp.tpl');
     $html = preg_replace('/(\v|\s)+/', ' ', $html);
@@ -178,7 +188,6 @@ function getSecretQR($secretKey, $interval, $user, $issuer)
 
 function addTOTPPlugin($pageName, $user, $secret, $interval, $issuer)
 {
-
     $widget = sprintf(
         '{totp secret="%s" interval="%s" issuer="%s"}',
         $secret,
