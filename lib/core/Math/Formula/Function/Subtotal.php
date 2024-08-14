@@ -149,7 +149,7 @@ class Math_Formula_Function_Subtotal extends Math_Formula_Function
                 }
                 return $result;
             });
-        } else {
+        } elseif ($order) {
             uksort($out, function ($group1, $group2) use ($out, $order, $direction) {
                 $variables = $this->prepareGroupRowWithVariables($group1, $out[$group1]);
                 $el1 = $this->evaluateChild($order, $variables);
