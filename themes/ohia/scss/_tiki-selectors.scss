@@ -16,6 +16,15 @@ h1,h2,h3,h4,h5,h6 {
     font-variant: small-caps;
 }
 
+// Added here because the normal method to specify the color wasn't working.
+.nav-link {
+    color: $leaf;
+    &:hover,
+    &.active {
+        color: lighten($leaf, 10%);
+    }
+}
+
 
 .navbar-light.navbar-fixed-top > .container {
     border: none;

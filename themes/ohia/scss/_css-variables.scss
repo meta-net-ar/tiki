@@ -1,5 +1,7 @@
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
+@import "variables";
+
 @mixin top-nav-light {
     --tiki-top-bg: #{$sky-light};
     --tiki-top-color: #{$navbar-light-color};

@@ -233,7 +233,7 @@ $input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-colo
 $custom-control-indicator-focus-box-shadow:     0 0 0 1px var(--#{$prefix}body-bg), $input-btn-focus-box-shadow;
 
 // Navs
-$nav-link-color:                    $leaf; // $link-color;
+$nav-link-color:                    var(--#{$prefix}link-color); //  !default; $leaf;
 $nav-link-hover-color: $link-hover-color;
 
 $nav-tabs-border-color:             $wood;

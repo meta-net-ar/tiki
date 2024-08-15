@@ -8,7 +8,7 @@
 @import "../../base_files/scss/_tiki-variables.scss"; // 2. Default value declarations for Tiki variables and the default vendor Bootstrap variables.
 @import "../scss/variables"; // 3. The theme's variable declarations are used when they are imported after the Bootstrap defaults (order changed for Tiki 27).
 
-@import "../../default/scss/variables-dark"; // 4. Adds default dark variables for any not declared by the theme dark variables file.
+//@import "../../default/scss/variables-dark"; // 4. Adds default dark variables for any not declared by the theme dark variables file.
 //@import "../scss/variables-dark"; // 5. Values of dark variables if color modes are enabled (Order of importing this and the default variables-dark doesn't seem to make a difference).
 @import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 6. Remainder of required Bootstrap parts.
 @import "../../base_files/scss/_tiki-selectors.scss"; // 7. Tiki CSS selectors used globally.
