@@ -52,7 +52,7 @@ if (! ($options = get_options()) || $options['help']) {
 }
 
 $vcs = 'svn';
-if ($options['use-git'] || is_dir(ROOT . '/.git')) {
+if ($options['use-git'] || file_exists(ROOT . '/.git')) {
     $vcs = 'git';
 }
 

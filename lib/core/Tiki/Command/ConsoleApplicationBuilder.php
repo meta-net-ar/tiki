@@ -326,7 +326,8 @@ class ConsoleApplicationBuilder
      */
     protected function checkIsVCS(): void
     {
-        if (! (is_dir('.svn') || is_dir('.git'))) {
+        if (! (is_dir('.svn') || file_exists('.git'))) {
+            //.git may be a directory (normal case) or a file (in the case of a git workspace)
             throw new UnavailableException(
                 'You must be running Tiki as a VCS see: https://dev.tiki.org/Get-code',
                 UnavailableException::CHECK_VCS
