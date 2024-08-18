@@ -23759,5 +23759,8 @@ $lang_current = array(
 // "Note, deprecated file tiki-wikiplugin_edit.php, code moved to service plugin->replace" => "Note, deprecated file tiki-wikiplugin_edit.php, code moved to service plugin->replace",
 "Top pages" => "热门页面",
 "Last pages" => "最近页面",
+"Create item" => "Create item",
+"Select Tracker" => "Select Tracker",
+"Move to trackers..." => 'Move to trackers...'
 );
 $lang = array_replace($lang, $lang_current);

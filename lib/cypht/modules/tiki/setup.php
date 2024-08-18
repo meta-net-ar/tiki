@@ -129,6 +129,7 @@ add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 
 add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
 add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
+add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 setup_base_ajax_page('ajax_move_to_tracker', 'core');
 add_handler('ajax_move_to_tracker', 'load_imap_servers_from_config', true, 'imap');
@@ -174,7 +175,6 @@ setup_base_ajax_page('ajax_tiki_get_trackers', 'core');
 add_handler('ajax_tiki_get_trackers', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_tiki_get_trackers', 'settings_load_imap', true);
 add_handler('ajax_tiki_get_trackers', 'tiki_get_trackers', true);
-add_output('ajax_tiki_get_trackers', 'tiki_get_trackers_output', true);
 
 /* get trackers script */
 setup_base_ajax_page('ajax_tiki_tracker_info', 'core');
