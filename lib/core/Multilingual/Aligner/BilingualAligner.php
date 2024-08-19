@@ -208,8 +208,8 @@ class Multilingual_Aligner_BilingualAligner
 
     public function sentence_length_delta($l1_sentence, $l2_sentence)
     {
-        $l1_length = strlen($l1_sentence);
-        $l2_length = strlen($l2_sentence);
+        $l1_length = strlen($l1_sentence ?? '');
+        $l2_length = strlen($l2_sentence ?? '');
         $delta = 0;
         if ($l1_length != 0) {
             $delta = abs($l1_length - $l2_length) / $l1_length;

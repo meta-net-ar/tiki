@@ -8,10 +8,11 @@ class PasswordTest extends TikiTestCase
 {
     public function testPass(): void
     {
-        global $prefs;
+        global $prefs, $user;
+        $user = 'ABc123user_';
         $userlib = TikiLib::lib('user');
         $prefs['pass_chr_num'] = $prefs['pass_chr_case'] = $prefs['pass_chr_special'] = $prefs['pass_repetition'] = $prefs['pass_diff_username'] = 'y';
-        $passwords = ['1234', 'abcd', '123abc', '123ABc', '123AAbc*'];
+        $passwords = ['1234', 'abcd', '123abc', '123ABc', '123AAbc*', 'ABc123user_'];
         foreach ($passwords as $pass) {
             $res = $userlib->check_password_policy($pass);
             $this->assertEquals("$pass=n", "$pass=" . ($res === '' ? 'y' : 'n'));

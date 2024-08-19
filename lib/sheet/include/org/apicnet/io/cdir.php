@@ -267,23 +267,35 @@ Class CDir extends ErrorManager {
 
            switch($type){
                case 1: // Case insensitive natural.
-                   $t = 'strcasenatcmp($a[' . $key . '], $b[' . $key . '])';
+                   $t = function($a, $b) use($key) {
+                    return strnatcasecmp($a[$key], $b[$key]);
+                   };
                    break;
                case 2: // Numeric.
-                   $t = '$a[' . $key . '] - $b[' . $key . ']';
+                   $t = function($a, $b) use($key) {
+                    return $a[$key] - $b[$key];
+                   };
                    break;
                case 3: // Case sensitive string.
-                   $t = 'strcmp($a[' . $key . '], $b[' . $key . '])';
+                   $t = function($a, $b) use($key) {
+                    return strcmp($a[$key], $b[$key]);
+                   };
                    break;
                case 4: // Case insensitive string.
-                   $t = 'strcasecmp($a[' . $key . '], $b[' . $key . '])';
+                   $t = function($a, $b) use($key) {
+                    return strcasecmp($a[$key], $b[$key]);
+                   };
                    break;
                default: // Case sensitive natural.
-                   $t = 'strnatcmp($a[' . $key . '], $b[' . $key . '])';
+                   $t = function($a, $b) use($key) {
+                    return strnatcmp($a[$key], $b[$key]);
+                   };
                    break;
            }
 
-           uasort($array, create_function('$a, $b', 'return ' . ($order ? '' : '-') . '(' . $t . ');'));
+           uasort($array, function($a, $b) use($t, $order) {
+            return $order ? $t($a, $b) : -$t($a, $b);
+           });
        }
 
        return $array;

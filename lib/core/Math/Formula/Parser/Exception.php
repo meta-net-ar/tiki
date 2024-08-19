@@ -9,6 +9,6 @@ class Math_Formula_Parser_Exception extends Math_Formula_Exception
     public function __construct($message, array $tokens, $code = null)
     {
         $message = tr('%0 near "%1"', $message, implode(' ', $tokens));
-        parent::__construct($message, $code);
+        parent::__construct($message, $code ?? 0);
     }
 }

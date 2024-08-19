@@ -283,7 +283,7 @@ class CalRecurrence extends TikiLib
                 $possibleWeekdayValues[] = $i . $day;
             }
         }
-        $invalidDaysOfMonth = array_filter(explode(',', $this->getDayOfMonth()), function ($d) {
+        $invalidDaysOfMonth = array_filter(explode(',', $this->getDayOfMonth() ?? ''), function ($d) {
             return $d > 31 || $d < 1;
         });
         if (
@@ -1085,7 +1085,7 @@ class CalRecurrence extends TikiLib
             'weekdays' => $this->getWeekdays(),
             'monthly' => $this->isMonthly(),
             'months' => $this->getMonths(),
-            'dayOfMonth' => array_filter(explode(',', $this->getDayOfMonth())),
+            'dayOfMonth' => array_filter(explode(',', $this->getDayOfMonth() ?? '')),
             'monthlyType' => $this->getMonthlyType(),
             'monthlyWeekdayValue' => $this->getMonthlyWeekdayValue(),
             'monthlyFirstlastWeekdayValue' => $this->getMonthlyFirstlastWeekdayValue(),

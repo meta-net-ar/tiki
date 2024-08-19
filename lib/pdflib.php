@@ -1354,7 +1354,9 @@ function loadHTMLContent($html)
     // Set error reporting to ignore warnings
     error_reporting($errorLevel & ~E_WARNING);
 
-    $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+    $html = htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML401, 'UTF-8');
+    $doc->loadHTML($html);
 
     // Restore the previous error reporting level
     error_reporting($errorLevel);

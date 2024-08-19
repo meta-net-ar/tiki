@@ -38,7 +38,7 @@ class Math_Formula_Parser
 
         $element = new Math_Formula_Element($type);
 
-        while (strlen($token = array_shift($tokens)) != 0 && $token != ')') {
+        while (($token = array_shift($tokens)) != null && strlen($token) != 0 && $token != ')') {
             if ($token == '(') {
                 array_unshift($tokens, $token);
                 $token = $this->getElement($tokens);

@@ -3369,7 +3369,7 @@ class ParserLib extends TikiDb_Bridge
             }
         }
 
-        $data = $matches->getText();
+        $data = $matches->getText() ?? '';
 
         $htmlLinks = ["0" => "dummy"];
         $htmlLinksSefurl = ["0" => "dummy"];
