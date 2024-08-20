@@ -197,6 +197,7 @@ ajaxLoadingShow("' . $dom_id . '");
     ' . (empty($params['rows']) ? ',height: "' . (empty($params['height']) ? '400' : $params['height']) . '"' : '') . '
     , resize_dir: "both"
     , allowedContent: true
+    , versionCheck: false
 }';
 
 //  , extraAllowedContent: {        // TODO one day, currently disabling the "Advanced Content Filter" as tiki plugins are too complex
