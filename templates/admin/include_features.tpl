@@ -68,7 +68,6 @@
                     {preference name=feature_perspective}
                     {preference name=feature_sefurl}
                     {preference name=feature_html_pages}
-                    {preference name=feature_htmlfeed}
                     {preference name=feature_areas}
                     {preference name=feature_system_suggestions}
                     {preference name=feature_templated_groups}
@@ -195,7 +194,6 @@
                         {preference name=jquery_smartmenus_open_close_click}
                     </div>
                 </div>
-                {preference name=feature_jquery_tooltips}
                 {preference name=feature_jquery_tagcanvas}
                 {preference name=feature_jquery_ui_theme}
                 {preference name=feature_jquery_ui}

@@ -26,7 +26,7 @@ $inputConfiguration = [
 
 $section = 'file_galleries';
 require_once('tiki-setup.php');
-$access->check_feature(['feature_file_galleries', 'feature_jquery_tooltips']);
+$access->check_feature('feature_file_galleries');
 $filegallib = TikiLib::lib('filegal');
 $statslib = TikiLib::lib('stats');
 

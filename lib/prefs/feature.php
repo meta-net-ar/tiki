@@ -1902,13 +1902,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
-        'feature_jquery_tooltips' => [
-            'name' => tra('Tooltips'),
-            'description' => tra('Enable tooltips such as this to have a custom appearance, styled by CSS.'),
-            'type' => 'flag',
-            'help' => 'JQuery#Tooltips',
-            'default' => 'y',       // use JQuery tooltips and override Overlib
-        ],
         'feature_jquery_autocomplete' => [
             'name' => tra('Autocomplete'),
             'description' => tra('Provides various dropdown menus on many text input boxes for page names, user names, groups, tags, etc.'),
