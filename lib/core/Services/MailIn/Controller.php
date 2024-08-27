@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class Services_MailIn_Controller
 {
     public function setUp()
@@ -26,20 +27,26 @@ class Services_MailIn_Controller
 
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
+            $protocol = $input->protocol->word();
+            $port = $input->port->int();
+            $tls = $input->tls->int();
+            // Adjust the port if TLS is enabled
+            if ($tls && $port == 0) {
+                $port = 995;
+            }
             $account = [
-                'protocol' => $input->protocol->word(),
+                'protocol' => $protocol,
                 'host' => $input->host->url(),
-                'port' => $input->port->int(),
+                'port' => $port,
                 'username' => $input->username->text(),
                 'pass' => $input->pass->none(),
             ];
-
             $result = $mailinlib->replace_mailin_account(
                 $accountId,
                 $input->account->text(),
-                $input->protocol->word(),
+                $protocol,
                 $input->host->url(),
-                $input->port->int(),
+                $port,
                 $input->username->text(),
                 $input->pass->none(),
                 $input->type->text(),
@@ -62,12 +69,9 @@ class Services_MailIn_Controller
                 $input->trackerId->int(),
                 $input->preferences->text()
             );
-
             if ($result) {
                 Feedback::success(tr('Account created or modified'));
-
                 $account = $mailinlib->get_mailin_account($result);
-
                 try {
                     if (! Tiki\MailIn\Account::test($account)) {
                         Feedback::error(tr('Failed to connect or authenticate with remote host.'));
@@ -94,9 +98,9 @@ class Services_MailIn_Controller
                     'account' => '',
                     'username' => '',
                     'pass' => '',
-                    'protocol' => 'pop',
+                    'protocol' => 'imap',
                     'host' => '',
-                    'port' => 110,
+                    'port' => 993,
                     'type' => 'wiki-put',
                     'active' => 'y',
                     'anonymous' => 'n',

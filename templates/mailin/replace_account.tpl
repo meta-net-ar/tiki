@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="mb-3 row">
-            <label for="host" class="col-form-label col-md-3">{tr}POP server{/tr} / {tr}Port{/tr}</label>
+            <label for="host" class="col-form-label col-md-3">{tr}Server Protocol{/tr} / {tr}Port{/tr}</label>
             <div class="col-md-3">
                 <select name="protocol" class="form-select">
                     <option value="pop" {if $info.protocol eq 'pop'}selected{/if}>{tr}POP{/tr}</option>
@@ -55,6 +55,16 @@
             </div>
             <div class="col-md-2">
                 <input type="text" name="port" value="{$info.port|escape}" class="form-control" placeholder="{tr}Port{/tr}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="offset-md-3 col-md-9">
+                <div class="form-check">
+                    <label>
+                        <input type="checkbox" class="form-check-input" name="tls" value="1"{if $info.tls eq 'y'} checked{/if}>
+                        {tr}Use TLS{/tr}
+                    </label>
+                </div>
             </div>
         </div>
         <div class="mb-3 row">

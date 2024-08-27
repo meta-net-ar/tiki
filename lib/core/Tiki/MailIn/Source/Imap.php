@@ -28,4 +28,40 @@ class Imap extends Pop3
             throw new TransportException(tr("Login failed for IMAP account on %0:%1 for user %2", $this->host, '******', $this->username));
         }
     }
+    public function getMessages()
+    {
+        $imap = $this->connect();
+        $toDelete = [];
+        foreach ($imap as $i => $source) {
+            /* @var $source \Laminas\Mail\Storage\Message */
+            $message = new Message($i, function () use ($i, &$toDelete) {
+                $toDelete[] = $i;
+            });
+            $from = $source->from ?: $source->{'return-path'};
+            if (! empty($source->{'message-id'})) {
+                $message->setMessageId(str_replace(['<', '>'], '', $source->{'message-id'}));
+            }
+            $message->setRawFrom($from);
+            $message->setSubject($source->subject);
+            $message->setRecipient($source->to);
+            $message->setHtmlBody($this->getBody($source, 'text/html'));
+            $message->setBody($this->getBody($source, 'text/plain'));
+            $content = '';
+            foreach ($source->getHeaders() as $header) {
+                $content .= $header->toString() . "\r\n";
+            }
+            $content .= "\r\n" . $source->getContent();
+            $message->setContent($content);
+            $this->handleAttachments($message, $source);
+            yield $message;
+        }
+        if ($toDelete) {
+            $toDelete = array_reverse($toDelete);
+
+            foreach ($toDelete as $i) {
+                $imap->removeMessage($i);
+            }
+        }
+        $imap->close();
+    }
 }
