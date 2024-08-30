@@ -385,13 +385,14 @@ table.table {
 
 .heading-link { font-size: 60%; }
 
-.description {
-	font-style: italic;
-	margin-top: 1rem;
-	margin-bottom: 1rem;
+.page-description,  // Properties from Tufte.css
+.sitesubtitle {
+//	font-style: italic;
+//	margin-top: 1rem;
+//	margin-bottom: 1rem;
 	font-size: 1.8rem;
-	display: block;
-	line-height: 1;
+//	display: block;
+//	line-height: 1;
 }
 
 #col2 .navbar {

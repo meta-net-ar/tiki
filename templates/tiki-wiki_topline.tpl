@@ -10,7 +10,7 @@
                     <small><a class="link" href="tiki-index.php?page_id={$page_id}">{tr}page id:{/tr} {$page_id}</a></small>
                 {/if}
 
-                {breadcrumbs type="desc" loc="page" crumbs=$crumbs}
+                <div class="description page-description">{breadcrumbs type="desc" loc="page" crumbs=$crumbs}</div>
 
                 {if $cached_page eq 'y'}<span class="cachedStatus">({tr}Cached{/tr})</span>{/if}
                 {if $is_categorized eq 'y' and $prefs.feature_categories eq 'y' and $prefs.feature_categorypath eq 'y' and $tiki_p_view_category eq 'y'}
