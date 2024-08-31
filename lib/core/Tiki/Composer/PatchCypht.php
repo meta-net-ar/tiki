@@ -74,8 +74,7 @@ class PatchCypht
         // copy site.js and site.css
         copy($vendors . $fixDS('jason-munro/cypht/site/site.js'), $cypht . 'site.js');
         copy($vendors . $fixDS('jason-munro/cypht/site/site.css'), $cypht . 'site.css');
-        // Copy the entire themes folder to the destination
-        $fs->copy($vendors . $fixDS('jason-munro/cypht/site/modules/themes'), $cypht . 'modules/themes');
+
 
         // css custom pacthes, keep the bootstrap-icons path relative to lib/cypht as Tiki might be running in a subdirectory and absolute web paths don't work here
         $css = file_get_contents($cypht . 'site.css');
