@@ -90,6 +90,11 @@
     }
 }
 
+.mailbox_list_title {
+    display: flex !important;
+    width: fit-content !important;
+}
+
 .inline-cypht {
     background-color: transparent !important;
     position: relative;
