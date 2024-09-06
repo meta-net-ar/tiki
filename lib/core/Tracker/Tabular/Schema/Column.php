@@ -256,7 +256,7 @@ class Column implements \JsonSerializable
         return $column;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'label' => $this->label,

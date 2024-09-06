@@ -79,7 +79,9 @@ class TrackerWriter
             if (! empty($resultUpdated)) {
                 $feedback[] = count($resultUpdated) . ' ' . tr('tracker(s) item(s) updated');
             }
-            \Feedback::success(implode('<br>', $feedback));
+            if (! empty($feedback)) {
+                \Feedback::success(implode('<br>', $feedback));
+            }
 
             return $result;
         };
@@ -136,7 +138,14 @@ class TrackerWriter
                         $currentItem['bulk_import'] = $info['bulk_import'];
                     }
 
-                    $diff = array_diff_assoc($info, $currentItem);
+                    $diff = array_diff_assoc(
+                        array_filter($info, function ($item) {
+                            return is_string($item);
+                        }),
+                        array_filter($currentItem, function ($item) {
+                            return is_string($item);
+                        })
+                    );
                     if (! $diff) {
                         $diff = array_diff_assoc($info['fields'], $currentItem['fields']);
                         if (! $diff) {
