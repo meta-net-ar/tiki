@@ -122,11 +122,13 @@
     }
 
     .folder_list, .content_cell { border: 1px solid $input-border-color; }
-    .content_cell { width: 70% !important; }
+    .content_cell { width: 70%; }
 
-    .message_list .content_title, .message_list .content_title div:first-child {
+    .message_list .content_title, .message_list .content_title > div:first-child {
         flex-direction: column;
         align-items: flex-start;
+        display: block;
+        margin-bottom: 10px;
     }
     .mailbox_list_title { display: inline-block; }
     .msg_controls { position: absolute; top: 25px; left: 50px; }
@@ -140,6 +142,7 @@
 
     .msg_text_inner {
         width: 100%;
+        word-break: break-word;
     }
 
     .msg_text .content {
@@ -164,7 +167,7 @@
     .msg_text #contact_info { white-space: unset; }
 
     .src_name, .content_title, .list_controls {
-        background-color: $popover-header-bg;
+        background-color: inherit !important;
         color: $popover-header-color;
         background-image: inherit !important;
     }
