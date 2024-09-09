@@ -162,6 +162,7 @@ class Tiki_Hm_Functions
 
             $config = new Tiki_Hm_Site_Config_File();
             $config->set('disable_empty_superglobals', true);
+            $environment->define_default_constants($config);
             $session_config = new Hm_Session_Setup($config);
             $session = $session_config->setup_session();
             $cache_setup = new Hm_Cache_Setup($config, $session);

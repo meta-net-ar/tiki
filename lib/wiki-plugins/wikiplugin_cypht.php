@@ -448,9 +448,6 @@ function wikiplugin_cypht($data, $params)
         }
     }
 
-    $js = "$('.draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select').attr('style', 'background-color: #fff !important; z-index: 1');";
-    $headerlib->add_js($js);
-
     return '<div class="inline-cypht">'
         . '<input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
         . '<input type="hidden" id="hm_session_prefix" value="' . htmlentities($session_prefix, ENT_COMPAT) . '" />'

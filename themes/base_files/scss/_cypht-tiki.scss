@@ -6,8 +6,8 @@
     .hide { display: none !important; }
     // override colors when not using cypht default theme
     img { opacity: 1 !important; max-width: 100%; }
-    ul, li:not(.select2-results__option) { background-color: transparent !important; }
     main, div { border-radius: 0; }
+    i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
     .ui-widget-content { background-color: $tiki-ui-default-bg !important; }
     .ui-menu-item-wrapper { color: var(--bs-body-color) !important; }
     .ui-state-active { color: $tiki-ui-default-link-active-color !important; }
@@ -32,10 +32,6 @@
             &, small { color: inherit !important; }
         }
     }
-    .dropdown-menu {
-        background-color: $dropdown-bg !important;
-        border-color: $dropdown-border-color !important;
-    }
     .dropdown-divider { border-color: $dropdown-divider-bg !important; }
     .dropdown-header { color: $dropdown-header-color !important; }
     .moduletitle { color: var(--bs-body-color) !important; }
@@ -51,9 +47,12 @@
         .nav-link.active, .nav-item.show .nav-link { color: var(--bs-link-hover-color) !important; }
         .nav-link:not(.active) { border: none !important; }
     }
+    .compose_to, .compose_bcc, .compose_cc { color: var(--bs-body-color) !important; }
     // override colors when not using cypht default theme
 
-
+    .draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select {
+        background-color: var(--bs-body-bg);
+    }
     a:not(.btn), a.btn-link {
         color: inherit !important;
         &:hover {
@@ -61,11 +60,7 @@
             text-decoration: inherit;
         }
     }
-
-    .folders li, .inner_list li {
-        color: inherit;
-        padding: 0;
-    }
+    .s_pre { opacity: 0.5; color: var(--bs-body-color) !important; }
 
     .flipmodtitle.close, .close {
         height: $btn-close-height; // Bootstrap 5 changed from font to svg button bg.
@@ -105,7 +100,7 @@
     .folders a, .subject a, .selected_menu a,
     .unread_link, .selected_menu, .manage_folder_link {
         &:not(.btn) {
-            color: inherit !important;
+            color: var(--bs-body-color) !important;
             &:hover {
                 color: var(--bs-link-hover-color) !important;
                 text-decoration: $link-hover-decoration;
@@ -138,7 +133,11 @@
         padding: 1px 3px;
         border-radius: 5px;
         font-weight: bold;
+        color: var(--bs-body-color);
     }
+    .msg_controls > .core_msg_control { display: none; }
+    .msg_controls .dropdown.on_mobile { display: block; }
+    .move_to_location 
 
     .msg_text_inner {
         width: 100%;
@@ -243,6 +242,7 @@
     .folders li, .inner_list li {
         word-break: break-all;
         white-space: unset;
+        padding: 0;
     }
     .toggle_link { margin-right: 10px; }
     .folder_list { min-width: 95%; }
@@ -259,6 +259,7 @@
         background-color: $popover-bg;
         color: $popover-body-color;
         border: 1px solid $input-border-color;
+        i { color: var(--bs-body-color) !important; }
 
         .src_name {
             border-left-color: transparent;
@@ -401,6 +402,7 @@
         .msg_parts { table-layout: auto; }
         .msg_controls { position: relative; left: 0 !important; height: auto; padding-top: 0; }
         .select2-container { min-width: 100px; }
+        #list_controls_menu { background-color: var(--bs-body-bg); }
         #list_controls_menu.show { flex-direction: row; justify-content: center; align-items: center; }
         #list_controls_menu.show > form { margin: 0 10px }
         .msg_text table { word-break: normal; }

@@ -388,7 +388,7 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             }
         }
         $res = "<div class=\"d-inline-block\">";
-        $res .= "<a class=\"hlink" . (! $message_view ? ' btn btn-sm btn-light no_mobile border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\">" . $mod->trans($title) . "</a>";
+        $res .= "<a class=\"hlink" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\">" . $mod->trans($title) . "</a>";
         $res .= "<div class='" . $class . " dropdown-menu' style=\"display: none;\"><div class='move_to_title'>" . $mod->trans($dropdown_title) . "<span><a class=\"close_{$class}\" href='#'>X</a></span></div>" . implode("<br>\n", $field_list) . "</div></div>";
 
         return $res;
