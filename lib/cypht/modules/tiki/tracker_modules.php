@@ -861,6 +861,19 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
  * Add move/copy dialog to the message list controls
  * @subpackage imap/output
  */
+class Hm_Output_add_multiple_item_to_trackers extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers');
+        $this->concat('msg_controls_extra', $res);
+    }
+}
+
+/**
+ * Add move/copy dialog to the message list controls
+ * @subpackage imap/output
+ */
 class Hm_Output_add_multiple_move_to_trackers extends Hm_Output_Module
 {
     protected function output()
