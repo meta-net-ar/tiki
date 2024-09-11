@@ -716,19 +716,8 @@ function prefs_feature_list($partial = false)
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
-            'tags' => ['basic',
-
-                /* FIXME: If wysiwyg_optional is enabled, which is the case by default, switching an article's body to WYSIWYG loses any unsaved modifications. Chealer 2018-01-04
-                 * FIXME: If wysiwyg_optional is enabled, switching from WYSIWYG to non-WYSIWYG or the opposite can quietly alter parse result (see ticket #5512). Chealer 2018-01-04
-                 * FIXME: If wysiwyg_htmltowiki is enabled, which is the case by default, the table builder inserts broken code (see ticket #6522). Chealer 2018-01-08
-                 * FIXME: If wysiwyg_htmltowiki is enabled, "Advanced" tables can be altered (see ticket #6518). Chealer 2018-01-10
-                 * FIXME: What you see in WYSIWYG editor is NOT NECESSARILY what you get (see tickets #6523 and #6532). Chealer 2018-01-09
-                 * FIXME: If wysiwyg_wiki_parsed is disabled, WYSIWYG help is wrong/broken (see ticket #6527). Chealer 2018-01-09
-                 * Several other presumed bugs are reported. Chealer 2018-01-09
-                 */
-                'experimental'
-
-            ],
+            'tags' => ['deprecated'],
+            'warning' => tra('CKEditor4 is no longer supported.'),
         ],
 
         'feature_kaltura' => [
