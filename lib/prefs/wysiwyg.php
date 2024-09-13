@@ -94,7 +94,8 @@ function prefs_wysiwyg_list()
 			'dependencies' => [
 				'feature_wysiwyg',
 			],
-			'tags' => ['experimental'],
+			'tags' => ['deprecated'],
+			'warning' => tra('CKEditor4 is no longer supported.'),
 		],
 		'wysiwyg_extra_plugins' => [
 			'name' => tra('Extra plugins'),
@@ -103,6 +104,8 @@ function prefs_wysiwyg_list()
 			'type' => 'textarea',
 			'size' => '1',
 			'default' => 'bidi,colorbutton,divarea,find,font,justify,pagebreak,showblocks,smiley',
+			'tags' => ['deprecated'],
+			'warning' => tra('CKEditor4 is no longer supported.'),
 		],
 	];
 }
