@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //print_r(\Tracker\Field\AbstractItemField);
 
-class Tracker_Field_Action implements \Tracker\Field\ItemFieldInterface
+class Tracker_Field_Action extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ItemFieldInterface
 {
     public static function getManagedTypesInfo(): array
     {
