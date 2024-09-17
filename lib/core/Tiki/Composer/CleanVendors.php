@@ -307,13 +307,6 @@ class CleanVendors
 			]
 		);
 		self::remove(
-			$vendors . 'mediumjs/mediumjs',
-			[
-				'src',
-				'medium.min.js'
-			]
-		);
-		self::remove(
 			$vendors . 'player',
 			[
 				'flv/base',
