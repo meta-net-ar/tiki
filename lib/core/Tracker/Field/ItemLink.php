@@ -815,7 +815,9 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
                     $displayFieldsList,
                     $this->getOption('status', 'opc'),
                     ' ',
-                    true
+                    true,
+                    true,
+                    $this->getOption('displayFieldsListFormat')
                 );
                 $list = $this->handleDuplicates($list);
             }

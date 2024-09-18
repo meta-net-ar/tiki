@@ -956,35 +956,25 @@ class TrackerLib extends TikiLib
         return $res;
     }
 
-    public function concat_all_items_from_fieldslist($trackerId, $fieldsId, $status = 'o', $separator = ' ', $strip_tags = false)
+    public function concat_all_items_from_fieldslist($trackerId, $fieldsId, $status = 'o', $separator = ' ', $list_mode = '', $strip_tags = false, $format = '')
     {
         if (is_string($fieldsId)) {
             $fieldsId = preg_split('/\|/', $fieldsId, -1, PREG_SPLIT_NO_EMPTY);
         }
         $res = [];
         $definition = Tracker_Definition::get($trackerId);
-        foreach ($fieldsId as $field) {
-            if ($myfield = $definition->getField($field)) {
-                $is_date = ($myfield['type'] == 'f');
-                $is_trackerlink = ($myfield['type'] == 'r');
-                $tmp = $this->get_all_items($trackerId, $field, $status);
-                $options = $myfield['options_map'];
-                foreach ($tmp as $key => $value) {
-                    if ($is_date) {
-                        $value = $this->date_format("%e/%m/%y", $value);
-                    }
-                    if ($is_trackerlink && $options['displayFieldsList'] && ! empty($options['displayFieldsList'][0])) {
-                        $item = $this->get_tracker_item($key);
-                        $itemId = $item[$field];
-                        $value = $this->concat_item_from_fieldslist($options['trackerId'], $itemId, $options['displayFieldsList'], $status, $separator, '', $strip_tags);
-                    }
-                    if (! empty($res[$key])) {
-                        $res[$key] .= $separator . $value;
-                    } else {
-                        $res[$key] = $value;
-                    }
-                }
-            }
+        $itemIds = $this->get_all_tracker_items($trackerId);
+        foreach ($itemIds as $itemId) {
+            $res[$itemId] = $this->concat_item_from_fieldslist(
+                $trackerId,
+                $itemId,
+                $fieldsId,
+                $status,
+                $separator,
+                $list_mode,
+                $strip_tags,
+                $format
+            );
         }
         return $res;
     }
