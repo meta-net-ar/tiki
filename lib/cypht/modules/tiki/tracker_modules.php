@@ -348,6 +348,107 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         ]);
     }
 }
+/**
+ * Prevent saving a draft message to IMAP if it originated from a tracker
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_tiki_presave_draft extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $path = $this->request->get['list_path'];
+        if (strstr($path, 'tracker_folder_')) {
+            $this->out('save_draft_to_imap', false);
+        }
+    }
+}
+
+/**
+ * Save a draft message to EmailFolder field
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $mime = $this->get('draft_mime');
+        if (! $mime) {
+            return;
+        }
+
+        $path = $this->request->get['list_path'];
+        if (! strstr($path, 'tracker_folder_')) {
+            return;
+        }
+        $path = str_replace('tracker_folder_', '', $path);
+        list ($itemId, $fieldId) = explode('_', $path);
+
+        $trk = TikiLib::lib('trk');
+        $item = $trk->get_item_info($itemId);
+        if (! $item) {
+            Hm_Msgs::add('ERRTracker item not found');
+            return;
+        }
+        $field = $trk->get_field_info($fieldId);
+        if (! $field) {
+            Hm_Msgs::add('ERRTracker field not found');
+            return;
+        }
+
+        $fileId = $this->request->get['draft_id'];
+
+        $headers = $mime->get_headers();
+        $msg = "Flags: \Draft\r\n" . $mime->get_mime_msg();
+
+        $fileValue = [
+            'name' => ! empty($headers['Message-Id']) ? $headers['Message-Id'] : $headers['Subject'],
+            'size' => strlen($msg),
+            'type' => 'message/rfc822',
+            'content' => $msg
+        ];
+
+        if ($fileId) {
+            $fileValue['fileId'] = $fileId;
+            $action = 'replace';
+        } else {
+            $action = 'new';
+        }
+
+        $field['value'] = [
+            'folder' => 'draft',
+            $action => $fileValue
+        ];
+        $trk->replace_item($item['trackerId'], $item['itemId'], [
+            'data' => [$field]
+        ]);
+
+        if ($this->request->post['draft_notice']) {
+            Hm_Msgs::add('Draft saved');
+        }
+    }
+}
+
+class Hm_Handler_tiki_compose_from_draft extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $draftId = $this->request->get['draft_id'];
+        $path = $this->request->get['list_path'];
+        if (! strstr($path, 'tracker_folder_') || ! $draftId) {
+            return;
+        }
+
+        $file_object = Tiki\FileGallery\File::id($draftId);
+        $parsed_fields = (new Tiki\FileGallery\Manipulator\EmailParser($file_object))->run();
+        $draft = [];
+        $draft['draft_to'] = $parsed_fields['recipient'];
+        $draft['draft_subject'] = $parsed_fields['subject'];
+        $draft['draft_body'] = $parsed_fields['body'];
+        $draft['draft_cc'] = ($parsed_fields['message_raw'])->getHeader('Cc');
+        $draft['draft_bcc'] = ($parsed_fields['message_raw'])->getHeader('Bcc');
+        $this->out('compose_draft', $draft);
+    }
+}
 
 /**
  * Archive a replied message

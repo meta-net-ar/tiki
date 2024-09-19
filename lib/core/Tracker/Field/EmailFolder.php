@@ -215,8 +215,15 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         } else {
             $view_path .= '?';
         }
-        $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+
+
+        if (in_array('Draft', $parsed_fields['flags'])) {
+            $view_path .= "page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+        } else {
+            $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+        }
         $parsed_fields['view_path'] = $view_path;
+
         return $parsed_fields;
     }
 
@@ -317,6 +324,8 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             $this->deleteEmail($existing, $value['delete'], $value['skip_trash'] ?? false);
         } elseif (isset($value['archive'])) {
             $this->archiveEmail($existing, $value['archive']);
+        } elseif (isset($value['replace'])) {
+            $this->updateDraftEmail($value['replace']);
         }
         return [
             'value' => json_encode($existing)
@@ -578,5 +587,17 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 break;
             }
         }
+    }
+
+    protected function updateDraftEmail($file)
+    {
+        $filegallib = TikiLib::lib('filegal');
+        $galleryId = (int) $this->getOption('galleryId');
+        $galinfo = $filegallib->get_file_gallery($galleryId, false);
+        if (! $galinfo || empty($galinfo['galleryId'])) {
+            Feedback::error(tr('%0 field: Gallery #%1 not found', $this->getConfiguration('name'), $galleryId));
+            return;
+        }
+        $filegallib->update_single_file($galinfo, $file['name'], $file['size'], $file['type'], $file['content'], $file['fileId']);
     }
 }

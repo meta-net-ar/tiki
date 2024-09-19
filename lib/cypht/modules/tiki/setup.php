@@ -128,10 +128,13 @@ add_handler('compose', 'tiki_mark_as_answered', true, 'smtp', 'process_compose_f
 add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 'after');
 add_handler('compose', 'tiki_archive_replied', true, 'smtp', 'tiki_save_sent', 'after');
 add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_archive_replied', 'after');
+add_handler('compose', 'tiki_compose_from_draft', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
 add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 add_output('message_list', 'add_multiple_item_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
+add_handler('ajax_smtp_save_draft', 'tiki_presave_draft', true, 'smtp', 'smtp_save_draft', 'before');
+add_handler('ajax_smtp_save_draft', 'tiki_save_draft', true, 'smtp', 'smtp_save_draft', 'after');
 setup_base_ajax_page('ajax_move_to_tracker', 'core');
 add_handler('ajax_move_to_tracker', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_move_to_tracker', 'imap_oauth2_token_check', true, 'imap');
