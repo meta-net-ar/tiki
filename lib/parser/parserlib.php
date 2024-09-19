@@ -178,7 +178,6 @@ class ParserLib extends TikiDb_Bridge
 
         if (
             ( $is_html != false || ( isset($this->option['is_html']) && $this->option['is_html']))
-            || $this->option['wysiwyg']
         ) {
             foreach ($this->specialChars as $key => $specialChar) {
                 $data = str_replace($key, $specialChar['html'], $data ?? '');
