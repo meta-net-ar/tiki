@@ -76,19 +76,19 @@ class Text_Diff_Renderer_sidebyside extends Tiki_Text_Diff_Renderer
         } elseif ($type == 'added') {
             foreach ($lines as $line) {
                 if (! empty($line)) {
-                    echo "<tr><td colspan='2'>&nbsp;</td><td class='diffadded'>$prefix</td><td class='diffadded'>" . htmlspecialchars($line) . "</td></tr>\n";
+                    echo "<tr><td colspan='2'>&nbsp;</td><td class='diffadded diffprefix'>$prefix</td><td class='diffadded diffcontent'>" . htmlspecialchars($line) . "</td></tr>\n";
                 }
             }
         } elseif ($type == 'deleted') {
             foreach ($lines as $line) {
                 if (! empty($line)) {
-                    echo "<tr><td class='diffdeleted'>$prefix</td><td class='diffdeleted'>" . htmlspecialchars($line) . "</td><td colspan='2'>&nbsp;</td></tr>\n";
+                    echo "<tr><td class='diffdeleted diffprefix'>$prefix</td><td class='diffdeleted diffcontent'>" . htmlspecialchars($line) . "</td><td colspan='2'>&nbsp;</td></tr>\n";
                 }
             }
         } elseif ($type == 'change-deleted') {
-            echo '<tr><td class="diffdeleted">' . $prefix . '</td><td class="diffdeleted">' . implode("<br />", $lines) . "</td>\n";
+            echo '<tr><td class="diffdeleted diffprefix">' . $prefix . '</td><td class="diffdeleted diffcontent">' . implode("<br />", $lines) . "</td>\n";
         } elseif ($type == 'change-added') {
-            echo '<td class="diffadded">' . $prefix . '</td><td class="diffadded">' . implode("<br />", $lines) . "</td></tr>\n";
+            echo '<td class="diffadded diffprefix">' . $prefix . '</td><td class="diffadded diffcontent">' . implode("<br />", $lines) . "</td></tr>\n";
         }
     }
 

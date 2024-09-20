@@ -760,7 +760,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         $addedFileInfos = empty($filesAdded) ? [] : $filegallib->get_files_info(null, $filesAdded);
         $removedFileInfos = empty($filesRemoved) ? [] : $filegallib->get_files_info(null, $filesRemoved);
 
-        $result = '<table class="table"><tr><td class="diffdeleted">-</td><td class="diffdeleted"><del class="diffchar deleted">';
+        $result = '<table class="table"><tr><td class="diffdeleted diffprefix">-</td><td class="diffdeleted diffcontent"><del class="diffchar deleted">';
 
         foreach ($removedFileInfos as $file) {
             $url = smarty_modifier_sefurl($file['fileId'], 'file');
@@ -768,7 +768,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
             $result .= ' <a href="' . $url . '">' . smarty_modifier_escape($file['name']) . '</a><br>';
         }
 
-        $result .= '</del></td><td class="diffadded">+</td><td class="diffadded"><ins class="diffchar inserted">';
+        $result .= '</del></td><td class="diffadded diffprefix">+</td><td class="diffadded diffcontent"><ins class="diffchar inserted">';
 
         foreach ($addedFileInfos as $file) {
             $url = smarty_modifier_sefurl($file['fileId'], 'file');

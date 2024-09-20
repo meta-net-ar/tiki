@@ -471,7 +471,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             }
         }
 
-        $result = '<table class="table"><tr><td class="diffdeleted">-</td><td class="diffdeleted"><del class="diffchar deleted">';
+        $result = '<table class="table"><tr><td class="diffdeleted diffprefix">-</td><td class="diffdeleted diffcontent"><del class="diffchar deleted">';
         foreach ($changes['removed'] as $folder => $removed) {
             $result .= '</del><strong>' . ucfirst($folder) . ':</strong><br><del class="diffchar deleted">';
             foreach ($removed as $fileId) {
@@ -485,7 +485,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             }
         }
 
-        $result .= '</del></td><td class="diffadded">+</td><td class="diffadded"><ins class="diffchar inserted">';
+        $result .= '</del></td><td class="diffadded diffprefix">+</td><td class="diffadded diffcontent"><ins class="diffchar inserted">';
         foreach ($changes['added'] as $folder => $added) {
             $result .= '</ins><strong>' . ucfirst($folder) . ':</strong><br><ins class="diffchar inserted">';
             foreach ($added as $fileId) {
