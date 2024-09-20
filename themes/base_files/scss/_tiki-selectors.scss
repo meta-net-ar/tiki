@@ -919,6 +919,15 @@ body.wikitext {
     color: lighten($success, 50%);
 }
 
+// diff email converts <ins> and <del> to spans for better rendering
+span.diffchar.inserted {
+    text-decoration: underline;
+}
+
+span.diffchar.deleted {
+    text-decoration: line-through;
+}
+
 .highlight_word {
     font-size: bold;
 }
