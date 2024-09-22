@@ -31,6 +31,9 @@ class ModuleList extends Base
             if (strpos($class, 'navbar') !== false) {
                 $tag = 'nav';
             }
+            if (strpos($class, 'aside') !== false) {
+                $tag = 'aside';
+            }
         }
 
         $id = $zone . '_modules';
@@ -41,6 +44,21 @@ class ModuleList extends Base
         $dir = '';
         if (\Language::isRTL()) {
             $dir = ' dir="rtl"';
+        }
+
+        $heading_id = $id . '_heading';
+        if (! empty($params['heading'])) {
+            $id = $params['heading'];
+        }
+
+        $heading_text = '';
+        if (! empty($params['heading_text'])) {
+            $heading_text = $params['heading_text'];
+        }
+
+        $role = '';
+        if (! empty($params['role'])) {
+            $role = $params['role'];
         }
 
         $content = '';
@@ -87,7 +105,8 @@ class ModuleList extends Base
         }
 
         return <<<OUT
-    <$tag class="$class" id="$id"$dir>
+    <$tag class="$class" id="$id"$dir aria-labelledby="#$heading_id" role="$role">
+        <h2 class="visually-hidden-focusable" id="$heading_id">$heading_text</h2>
         $content
     </$tag>
     OUT;
