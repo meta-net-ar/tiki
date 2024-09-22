@@ -189,6 +189,7 @@ setup_base_ajax_page('ajax_tiki_get_trackers', 'core');
 add_handler('ajax_tiki_get_trackers', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_tiki_get_trackers', 'settings_load_imap', true);
 add_handler('ajax_tiki_get_trackers', 'tiki_get_trackers', true);
+add_output('ajax_tiki_get_trackers', 'tiki_get_trackers_output', true);
 
 /* get trackers script */
 setup_base_ajax_page('ajax_tiki_tracker_info', 'core');
