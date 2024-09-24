@@ -39,7 +39,7 @@
                     {block name=content}{/block}
                 </main>
                 {if $prefs.module_zones_pagebottom eq 'fixed' or ($prefs.module_zones_pagebottom ne 'n' && ! zone_is_empty('pagebottom'))}
-                    {modulelist zone=pagebottom class='mt-3' heading_text='{tr}Pagebottom heading{/tr}' role=complementary}
+                    {modulelist zone=pagebottom class='mt-3' heading_text='{tr}Related content{/tr}' role=complementary}
                 {/if}
             </div>
         {elseif zone_is_empty('left') or $prefs.feature_left_column eq 'n'}
@@ -108,7 +108,7 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if} order-sm-2 order-md-2 order-lg-1" id="col2">
-                {modulelist zone=left class="left-aside" heading_text='{tr}Left aside{/tr}' heading_text='{tr}More content and functionality (left side){/tr}'}
+                {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}'}
             </div>
         {else}
             <div class="col col1 col-sm-12 col-lg-8 order-xs-1 order-lg-2 pb-4" id="col1">
