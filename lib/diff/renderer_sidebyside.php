@@ -76,13 +76,13 @@ class Text_Diff_Renderer_sidebyside extends Tiki_Text_Diff_Renderer
         } elseif ($type == 'added') {
             foreach ($lines as $line) {
                 if (! empty($line)) {
-                    echo "<tr><td colspan='2'>&nbsp;</td><td class='diffadded diffprefix'>$prefix</td><td class='diffadded diffcontent'>" . htmlspecialchars($line) . "</td></tr>\n";
+                    echo "<tr><td colspan='2' class='diffempty'>&nbsp;</td><td class='diffadded diffprefix'>$prefix</td><td class='diffadded diffcontent'>" . htmlspecialchars($line) . "</td></tr>\n";
                 }
             }
         } elseif ($type == 'deleted') {
             foreach ($lines as $line) {
                 if (! empty($line)) {
-                    echo "<tr><td class='diffdeleted diffprefix'>$prefix</td><td class='diffdeleted diffcontent'>" . htmlspecialchars($line) . "</td><td colspan='2'>&nbsp;</td></tr>\n";
+                    echo "<tr><td class='diffdeleted diffprefix'>$prefix</td><td class='diffdeleted diffcontent'>" . htmlspecialchars($line) . "</td><td colspan='2' class='diffempty'>&nbsp;</td></tr>\n";
                 }
             }
         } elseif ($type == 'change-deleted') {
