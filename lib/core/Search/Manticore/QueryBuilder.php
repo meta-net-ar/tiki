@@ -130,7 +130,10 @@ class QueryBuilder
                 return '';
             } elseif ($non_fulltext) {
                 $result = '(' . implode(' OR ', $non_fulltext) . ')';
-                while (preg_match('/\(\(([^)]* OR [^)]*)\) OR ([^)]*)\)/', $result, $m)) {
+                while (preg_match('/\(\(([^)]* OR [^)]*)\) OR ([^()]*)\)/', $result, $m)) {
+                    $result = '(' . $m[1] . ' OR ' . $m[2] . ')';
+                }
+                while (preg_match('/\(\(([^)]* OR [^)]*)\) OR (\([^)]*\))\)/', $result, $m)) {
                     $result = '(' . $m[1] . ' OR ' . $m[2] . ')';
                 }
                 return $result;
@@ -151,7 +154,10 @@ class QueryBuilder
             }
             if ($non_fulltext) {
                 $result = '(' . implode(' AND ', $non_fulltext) . ')';
-                while (preg_match('/\(\(([^)]* AND [^)]*)\) AND ([^)]*)\)/', $result, $m)) {
+                while (preg_match('/\(\(([^)]* AND [^)]*)\) AND ([^()]*)\)/', $result, $m)) {
+                    $result = '(' . $m[1] . ' AND ' . $m[2] . ')';
+                }
+                while (preg_match('/\(\(([^)]* AND [^)]*)\) AND (\([^)]*\))\)/', $result, $m)) {
                     $result = '(' . $m[1] . ' AND ' . $m[2] . ')';
                 }
                 return $result;

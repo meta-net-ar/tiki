@@ -6,6 +6,10 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
+use Search_Query;
+use Search_Expr_Or;
+use Search_Expr_Token;
+
 class ComplexQueriesTest extends \PHPUnit\Framework\TestCase
 {
     use IndexBuilder;
@@ -123,5 +127,22 @@ class ComplexQueriesTest extends \PHPUnit\Framework\TestCase
         $query->filterContent('NOT "Business Travel"', 'tracker_field_ExpenseType');
 
         $this->assertCount(2, $query->search($this->index));
+    }
+
+    public function testNestedOrStatements()
+    {
+        $query = new \Search_Query();
+        \TikiLib::lib('unifiedsearch')->initQuery($query);
+        $query->filterType('trackeritem');
+        $query->filterContent(implode(' OR ', [49, 52]), 'tracker_id');
+        $subq = $query->getSubQuery('status');
+        $subsubq = $subq->getSubQuery('expense');
+        $subsubq->filterIdentifier('Paid', 'tracker_field_ExpenseLifecycleStatus_text');
+        $subsubq->filterIdentifier('Invoiced', 'tracker_field_ExpenseLifecycleStatus_text');
+        $subsubq = $subq->getSubQuery('revenue');
+        $subsubq->filterIdentifier('Paid', 'tracker_field_RevenueLifecycleStatus_text');
+        $subsubq->filterIdentifier('Invoiced', 'tracker_field_RevenueLifecycleStatus_text');
+
+        $this->assertCount(3, $query->search($this->index));
     }
 }
