@@ -48,7 +48,6 @@ if (isset($_REQUEST['add']) || ! empty($_REQUEST['router_type'])) {
 }
 
 $smarty->assign('route', $route);
-$smarty->assign('routeId', $_REQUEST['route']);
 $smarty->assign(
     'routerTypes',
     [

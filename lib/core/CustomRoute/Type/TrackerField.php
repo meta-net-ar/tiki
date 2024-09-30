@@ -20,22 +20,22 @@ class TrackerField extends Type
     public function getParams()
     {
         return [
-            'tracker' => [
-                'name' => tr('Tracker'),
-                'type' => 'select',
+            'tracker'       => [
+                'name'     => tr('Tracker'),
+                'type'     => 'select',
                 'required' => true,
                 'function' => 'getTrackers',
             ],
             'tracker_field' => [
-                'name' => tr('Field'),
-                'type' => 'select',
+                'name'     => tr('Field'),
+                'type'     => 'select',
                 'required' => true,
-                'function' => 'getTrackerFields',
-                'args' => ['tracker'],
+                'function' => 'getTrackerFieldsWithValidation',
+                'args'     => ['tracker'],
             ],
-            'wiki_page' => [
-                'name' => tr('Wiki page'),
-                'type' => 'select',
+            'wiki_page'     => [
+                'name'     => tr('Wiki page'),
+                'type'     => 'select',
                 'required' => false,
                 'function' => 'getWikiPageNames'
             ],
@@ -59,6 +59,7 @@ class TrackerField extends Type
      * Get the list of tracker items available for a given tracker
      *
      * @param $trackerId
+     *
      * @return array
      */
     public static function getTrackerFields($trackerId)
@@ -94,5 +95,22 @@ class TrackerField extends Type
         }
 
         return $list;
+    }
+
+    /**
+     * Get the list of tracker fields but only if the trackerId is valid
+     *
+     * @param $trackerId
+     *
+     * @return array
+     */
+    public static function getTrackerFieldsWithValidation($trackerId)
+    {
+        // Validate if trackerId is present
+        if (empty($trackerId)) {
+            return ['' => tr('No tracker selected')];
+        }
+
+        return self::getTrackerFields($trackerId);
     }
 }

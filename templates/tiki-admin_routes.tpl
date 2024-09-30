@@ -53,10 +53,10 @@
                                 {$routes[route].type|escape}
                             </td>
                             <td class="route_short_url">
-                                {icon name="{if $routes[route].short_url}check{else}close{/if}" alt="$routes[route].short_url"}
+                                {icon name="{if $routes[route].short_url}check{else}close{/if}" alt="{$routes[route].short_url}"}
                             </td>
                             <td class="route_active">
-                                {icon name="{if $routes[route].active}check{else}close{/if}" alt="$routes[route].active"}
+                                {icon name="{if $routes[route].active}check{else}close{/if}" alt="{$routes[route].active}"}
                             </td>
                             <td class="action">
                                 {actions}

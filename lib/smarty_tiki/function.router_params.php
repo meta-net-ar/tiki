@@ -42,10 +42,11 @@ function smarty_function_router_params($params, $smarty)
 
                 if (! empty($param['function'])) {
                     $args = [];
-                    foreach ($param['args'] as $value) {
-                        $args[] = smarty_modifier_escape($routerParams[$value]);
+                    if ($param['args']) {
+                        foreach ($param['args'] as $value) {
+                            $args[] = smarty_modifier_escape($routerParams[$value]);
+                        }
                     }
-
                     $objects = call_user_func_array([$className, $param['function']], $args);
                     $param['options'] = $objects;
                 }
