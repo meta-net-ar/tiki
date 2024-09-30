@@ -176,3 +176,14 @@
     body {background-color: #000;}
  //   $card-cap-bg:                       rgba(var(--#{$prefix}body-color-rgb), .03) !default;
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: var(--bs-secondary-bg) !important;
+    }
+    .fc-event-time,
+    .fc-event-title {
+        color: var(--bs-body-color) !important;
+    }
+}

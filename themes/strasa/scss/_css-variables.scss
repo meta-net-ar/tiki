@@ -154,3 +154,14 @@ $imagePath: "../images/";
         background: #212529;
     }
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: var(--bs-secondary-bg) !important;
+    }
+    .fc-event-time,
+    .fc-event-title {
+        color: var(--bs-body-color) !important;
+    }
+}

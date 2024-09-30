@@ -164,3 +164,10 @@ $navbar-light-hover-bg: red;
 [data-bs-theme=dark] {
     --bs-secondary-bg: #2c3237;
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: var(--bs-secondary-bg) !important;
+    }
+}

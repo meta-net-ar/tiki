@@ -158,3 +158,14 @@
     --tiki-vert-nav-link-color: rgba(var(--bs-link-color-rgb));
     --tiki-vert-nav-link-hover-color: rgba(var(--bs-link-hover-color-rgb));
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: var(--bs-secondary-bg) !important;
+    }
+    .fc-event-time,
+    .fc-event-title {
+        color: var(--bs-body-color) !important;
+    }
+}

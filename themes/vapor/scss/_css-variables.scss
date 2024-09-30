@@ -187,3 +187,10 @@ body {
     --tiki-code-color:  #{$code-color}; // #{$code-color}; // #EA39B8FF;
     --tiki-code-bg: transparent;
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: #7645C0 !important; // --bs-secondary-bg doesn't seem to be set
+    }
+}

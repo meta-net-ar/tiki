@@ -137,3 +137,14 @@
 .fc {
     --fc-page-bg-color: #000;
 }
+
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: #292929 !important;
+    }
+    .fc-event-time,
+    .fc-event-title {
+        color: var(--bs-body-color) !important;
+    }
+}

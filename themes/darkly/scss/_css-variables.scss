@@ -88,3 +88,9 @@
 [data-bs-theme="dark"]{
     --tiki-code-bg: #303030;
 }
+:root {
+    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
+    .fc-v-event {
+        background: var(--bs-secondary-bg) !important;
+    }
+}
