@@ -32,12 +32,12 @@
     <div class="middle_outer" id="middle_outer">
         {if $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}
-                {modulelist zone=top class="top_modules uab d-flex align-content-center justify-content-between top navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                {modulelist zone=top class="top_modules uab top navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
             {/if}
         {/if}
         <div class="topbar-wrapper navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}">
             <div class="topbar container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
-                {modulelist zone=topbar class='topbar_modules d-flex align-content-center justify-content-between w-100' heading_text='{tr}Navigation and related functionality and content{/tr}'}
+                {modulelist zone=topbar class='topbar_modules w-100' heading_text='{tr}Navigation and related functionality and content{/tr}'}
             </div>
         </div>
         <div class="middle-wrapper">
@@ -188,7 +188,7 @@
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}
             <header class="navbar navbar-expand-md  tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} fixed-top">
                 <div class="container-fluid">
-                    {modulelist zone=top class="top_modules d-flex align-content-center justify-content-between w-100 tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                    {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                 </div>
             </header>
         {/if}

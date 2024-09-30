@@ -23,7 +23,7 @@
             <div class="header_container">
                 <div class="container{* {if $smarty.session.fullscreen eq 'y'}*}-fluid{*{/if}*} container-std">
                     <header class="header page-header row" id="page-header" role="banner">
-                        {modulelist zone=top class="top_modules d-flex justify-content-between w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
+                        {modulelist zone=top class="top_modules w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
                     </header>
                 </div>
             </div>
@@ -34,7 +34,7 @@
     <div class="middle_outer" id="middle_outer" >
         <div class="topbar-wrapper navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}">
             <div class="topbar container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
-                {modulelist zone=topbar class="topbar_modules d-flex align-content-center justify-content-between w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant}" heading_text='{tr}Navigation and related functionality and content{/tr}'}
+                {modulelist zone=topbar class="topbar_modules w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant}" heading_text='{tr}Navigation and related functionality and content{/tr}'}
             </div>
         </div>
         <div class="container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">

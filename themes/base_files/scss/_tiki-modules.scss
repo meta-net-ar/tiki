@@ -17,10 +17,10 @@ header.container,
 // Vertically center visible content in fixed-top navbar
 @media(min-width: 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
 
-#top_modules,
-#topbar_modules,
-#pagetop_modules,
-#pagebottom_modules,
+.top_modules,
+.topbar_modules,
+.pagetop_modules,
+.pagebottom_modules,
 .bottom_modules {
     display: flex;
     flex-direction: row;
@@ -29,8 +29,8 @@ header.container,
 
 .topbar .navbar { padding: 0; }
 
-#pagetop_modules,
-#pagebottom_modules,
+.pagetop_modules,
+.pagebottom_modules,
 .bottom_modules {
     align-items: flex-start;
     flex-wrap: wrap;
