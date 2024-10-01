@@ -358,7 +358,7 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
     echo $data;
     die;
 }
-if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && $access->checkCsrf()) {
+if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $access->checkCsrf()) {
     $fname = $_FILES['csvlist']['tmp_name'];
     $fhandle = fopen($fname, 'r');
     $fields = fgetcsv($fhandle, 1000);
