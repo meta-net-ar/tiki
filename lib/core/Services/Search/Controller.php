@@ -157,7 +157,9 @@ class Services_Search_Controller
             /** @var UnifiedSearchLib $lib */
             $lib = TikiLib::lib('unifiedsearch');
 
-            if (! empty($filter['title']) && preg_match_all('/\{(\w+)\}/', $format, $matches)) {
+            $format_pattern = '/\{([\w\.]+)\}/';
+
+            if (! empty($filter['title']) && preg_match_all($format_pattern, $format, $matches)) {
                 // formatted object_selector search results should also search in formatted fields besides the title
                 $titleFilter = $filter['title'];
                 unset($filter['title']);
@@ -185,14 +187,18 @@ class Services_Search_Controller
             $query->setOrder($input->sort_order->text() ?: 'title_asc');
             $query->setRange($input->offset->int(), $input->maxRecords->int() ?: $prefs['maxRecords']);
 
+            if (preg_match_all($format_pattern, $format, $m)) {
+                $query->setSelectionFields($m[1]);
+            }
+
             $result = $query->search($lib->getIndex());
 
-            $result->applyTransform(function ($item) use ($format, $smarty) {
+            $result->applyTransform(function ($item) use ($format, $format_pattern, $smarty) {
                 $transformed = [
                     'object_type' => $item['object_type'],
                     'object_id' => $item['object_id'],
                     'parent_id' => $item['gallery_id'],
-                    'title' => preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($item, $format) {
+                    'title' => preg_replace_callback($format_pattern, function ($matches) use ($item, $format) {
                         $key = $matches[1];
                         if (isset($item[$key])) {
                             // if this is a trackeritem we do not want only the name but also the trackerid listed when setting up a field

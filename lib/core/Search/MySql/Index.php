@@ -132,7 +132,13 @@ class Search_MySql_Index implements Search_Index_Interface
 
             $order = $this->getOrderClause($query, (bool) $scoreFields);
 
-            $selectFields = $this->table->all();
+            if ($selectFields = $query->getSelectionFields()) {
+                $selectFields = array_map(function($field) {
+                    return $this->tfTranslator->shortenize($field);
+                }, $selectFields);
+            } else  {
+                $selectFields = $this->table->all();
+            }
 
             if ($scoreFields) {
                 $str = $this->db->qstr(implode(' ', $words));

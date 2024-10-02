@@ -607,9 +607,13 @@ class ObjectLib extends TikiLib
                 'object_type' => $type,
                 'object_id'   => $id
             ]);
+            $format_pattern = '/\{([\w\.]+)\}/';
+            if (preg_match_all($format_pattern, $format, $m)) {
+                $query->setSelectionFields($m[1]);
+            }
             $result = $query->search($lib->getIndex());
-            $result->applyTransform(function ($item) use ($format) {
-                return preg_replace_callback('/\{(\w+)\}/', function ($matches) use ($item, $format) {
+            $result->applyTransform(function ($item) use ($format, $format_pattern) {
+                return preg_replace_callback($format_pattern, function ($matches) use ($item, $format) {
                     $key = $matches[1];
                     if (isset($item[$key])) {
                         return $item[$key];
