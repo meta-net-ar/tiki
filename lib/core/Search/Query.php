@@ -49,6 +49,12 @@ class Search_Query implements Search_Query_Interface
 
     public function setSelectionFields(array $fields)
     {
+        if (! in_array('object_type', $fields)) {
+            $fields[] = 'object_type';
+        }
+        if (! in_array('object_id', $fields)) {
+            $fields[] = 'object_id';
+        }
         $this->selectionFields = $fields;
     }
 
