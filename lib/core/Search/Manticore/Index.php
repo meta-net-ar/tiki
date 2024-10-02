@@ -396,7 +396,15 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         $builder->setPossibleFields($this->pdo_client->possibleFacetFields($table));
         $facets = $builder->build($query->getFacets());
 
-        $sql = "SELECT *";
+        if ($selectionFields = $query->getSelectionFields()) {
+            foreach ($selectionFields as $key => $field) {
+                $this->ensureHasField($field);
+                $selectionFields[$key] = strtolower($field);
+            }
+            $sql = "SELECT " . implode(',', $selectionFields);
+        } else {
+            $sql = "SELECT *";
+        }
 
         foreach ($select as $key => $expr) {
             $sql .= ", $expr as $key";

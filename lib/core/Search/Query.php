@@ -13,6 +13,7 @@ class Search_Query implements Search_Query_Interface
     private $count = 50;
     private $weightCalculator = null;
     private $identifierFields = null;
+    private $selectionFields = null;
 
     private $postFilter;
     private $subQueries = [];
@@ -42,6 +43,16 @@ class Search_Query implements Search_Query_Interface
     public function setIdentifierFields(array $fields)
     {
         $this->identifierFields = $fields;
+    }
+
+    public function setSelectionFields(array $fields)
+    {
+        $this->selectionFields = $fields;
+    }
+
+    public function getSelectionFields()
+    {
+        return $this->selectionFields;
     }
 
     public function addObject($type, $objectId)
