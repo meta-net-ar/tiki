@@ -8747,11 +8747,15 @@ class UsersLib extends TikiLib
 		$smarty->assign('token_expiry', $this->get_long_datetime($this->now + $timeout));
 		require_once 'lib/auth/tokens.php';
 
+		$emailTokenURLs = [];
+
 		foreach ($emails as $email) {
 			$tokenlib = AuthTokens::build($prefs);
 			$token_url = $tokenlib->includeToken($machine . "/$path", $groups, $email, $timeout, -1, true, $prefix);
 			include_once('tiki-sefurl.php');
 			$token_url = filter_out_sefurl($token_url);
+			$emailTokenURLs[$email] = $token_url;
+
 			$smarty->assign('token_url', $token_url);
 			$mail->setUser($user);
 			$mail->setSubject($smarty->fetch('mail/invite_tempuser_subject.tpl'));
@@ -8768,6 +8772,8 @@ class UsersLib extends TikiLib
 			}
 			$smarty->assign_by_ref('user', $user);
 		}
+
+		return $emailTokenURLs;
 	}
 
 	/**

@@ -159,6 +159,7 @@ class ConsoleApplicationBuilder
 					new UserUnlockCommand,
 					new UsersListCommand,
 					new UsersPasswordCommand,
+					new UsersTemporaryCommand(),
 					new StatsCommand,
 				],
 			],
