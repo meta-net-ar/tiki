@@ -333,7 +333,7 @@ class TikiMail
             }
 
             if ($title == 'mail error' || $prefs['log_mail'] == 'y') {
-                foreach ($recipients as $u) {
+                foreach ((array) $recipients as $u) {
                     $logslib->add_log($title, $u . '/' . $this->mail->getSubject() . $error);
                 }
             }
