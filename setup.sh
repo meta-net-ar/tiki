@@ -659,7 +659,7 @@ composer()
 	#${PHPCLI} ${PHP_OPTION}
 	LOCAL_PHP_VERSION=`"${PHPCLI}" ${PHP_OPTION} | ${GREP} ^PHP | ${CUT} -c5,7`
 	#echo ${LOCAL_PHP_VERSION}
-	LIKELY_ALTERNATE_PHP_CLI="php73 php7.3 php7.3-cli php72 php7.2 php7.2-cli" # These have been known to exist on some hosting platforms
+	LIKELY_ALTERNATE_PHP_CLI="php74 php7.4 php7.4-cli php73 php7.3 php7.3-cli php72 php7.2 php7.2-cli" # These have been known to exist on some hosting platforms
 	if [ "${LOCAL_PHP_VERSION}" -lt "${REQUIRED_PHP_VERSION}" ] ; then
 		echo "Wrong PHP version: php${LOCAL_PHP_VERSION} < required PHP version.  A version >= php${REQUIRED_PHP_VERSION} is necessary."
 		echo "Searching for typically named alternative PHP version ..."
