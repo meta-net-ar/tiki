@@ -211,7 +211,7 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
                     $info = $trklib->get_tracker_item($value);
                     if ($info) {
                         $fieldInfo = $trklib->get_field_by_perm_name($field);
-                        if (isset($info[$fieldInfo['fieldId']])) {
+                        if (array_key_exists($fieldInfo['fieldId'], $info)) {
                             $value = $info[$fieldInfo['fieldId']];
                         } else {
                             throw new Search_Action_Exception(
