@@ -407,15 +407,15 @@ $("#add_object_type").on("change", function () {
                                 <label class="col-sm-3 col-form-label" for="pageName">
                                     {tr}Page{/tr}
                                 </label>
-                                <div class="col-sm-6 input-group">
-                                    <select name="pageName[]" id="pageName" class="form-select" multiple="multiple" size="5">
+                                <div class="col-sm-12">
+                                    <select name="pageName[]" id="pageName" class="form-select" multiple="multiple" size="5" >
                                         {section name=ix loop=$pages}
                                             <option value="{$pages[ix].pageName|escape}">
                                                 {$pages[ix].pageName|truncate:80:"(...)":true|escape}
                                             </option>
                                         {/section}
                                     </select>
-                                    <div>
+                                    <div class="mt-2">
                                         <input
                                             type="submit"
                                             class="btn btn-primary"

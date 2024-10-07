@@ -101,34 +101,38 @@ if (isset($_REQUEST["addpage"]) && $_REQUEST["parentId"] != 0 && $access->checkC
     // Here we categorize a page
     // add multiple pages at once
     $totalRows = 0;
-    foreach ($_REQUEST['pageName'] as $value) {
-        $result = $categlib->categorize_any('wiki page', $value, $_REQUEST["parentId"]);
-        if ($result) {
-            $totalRows++;
+    if (! empty($_REQUEST['pageName'])) {
+        foreach ($_REQUEST['pageName'] as $value) {
+            $result = $categlib->categorize_any('wiki page', $value, $_REQUEST["parentId"]);
+            if ($result) {
+                $totalRows++;
+            }
+            $category = $categlib->get_category($_REQUEST["parentId"]);
+            $categorizedObject = $categlib->get_categorized_object('wiki page', $value);
+            // Notify the users watching this category.
+            $values = [
+                "categoryId" => $_REQUEST["parentId"],
+                "categoryName" => $category['name'],
+                "categoryPath" => $categlib->get_category_path_string_with_root($_REQUEST["parentId"]),
+                "description" => $category['description'],
+                "parentId" => $category['parentId'],
+                "parentName" => $categlib->get_category_name($category['parentId']),
+                "action" => "object entered category",
+                "objectName" => $categorizedObject['name'],
+                "objectType" => $categorizedObject['type'],
+                "objectUrl" => $categorizedObject['href'],
+            ];
+            $categlib->notify($values);
         }
-        $category = $categlib->get_category($_REQUEST["parentId"]);
-        $categorizedObject = $categlib->get_categorized_object('wiki page', $value);
-        // Notify the users watching this category.
-        $values = [
-            "categoryId" => $_REQUEST["parentId"],
-            "categoryName" => $category['name'],
-            "categoryPath" => $categlib->get_category_path_string_with_root($_REQUEST["parentId"]),
-            "description" => $category['description'],
-            "parentId" => $category['parentId'],
-            "parentName" => $categlib->get_category_name($category['parentId']),
-            "action" => "object entered category",
-            "objectName" => $categorizedObject['name'],
-            "objectType" => $categorizedObject['type'],
-            "objectUrl" => $categorizedObject['href'],
-        ];
-        $categlib->notify($values);
-    }
-    if ($totalRows) {
-        $msg = $totalRows === 1 ? tr('One page added to category')
-            : tr('%0 pages added to category', $totalRows);
-        Feedback::success($msg);
+        if ($totalRows) {
+            $msg = $totalRows === 1 ? tr('One page added to category')
+                : tr('%0 pages added to category', $totalRows);
+            Feedback::success($msg);
+        } else {
+            Feedback::error(tr('No pages added to category'));
+        }
     } else {
-        Feedback::error(tr('No pages added to category'));
+        Feedback::error(tr('No page has been selected, please choose at least one page.'));
     }
 }
 if (isset($_REQUEST["addpoll"]) && $_REQUEST["parentId"] != 0 && $access->checkCsrf()) {
