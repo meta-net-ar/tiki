@@ -57,6 +57,9 @@
 
             {preference name=metatag_robots}
             {preference name=metatag_revisitafter}
+            {preference name=feature_robots_allow}
+            {preference name=feature_robots_disallow}
+            {preference name=feature_robots_remove_base}
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}
