@@ -19,6 +19,17 @@
             {tr}Your import was completed successfully.{/tr}
         {/remarksbox}
     {else}
+        
+        {literal}
+            <script type="text/javascript">
+                function updateFileName(inputFileId, fileNameFieldId) {
+                    const inputFile = document.getElementById(inputFileId);
+                    const fileNameField = document.getElementById(fileNameFieldId);
+                    fileNameField.value = inputFile.files[0] ? inputFile.files[0].name : 'Choose file';
+                }
+            </script>
+        {/literal}
+
         <form class="no-ajax" method="post" action="{service controller=tabular action=import_csv tabularId=$tabularId}" enctype="multipart/form-data">
             {if $odbc}
             <p>{tr}Import from remote ODBC source.{/tr}</p>
@@ -35,38 +46,30 @@
             {elseif $format eq 'json'}
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroupText">{tr}JSON File{/tr}</span>
-                <div class="custom-file">
-                    <input type="file" name="file" accept="application/json" class="custom-file-input" id="inputFile" aria-describedby="inputGroupText"
-                        onchange="$(this).next('.custom-file-label').text($(this).val().replace('C:\\fakepath\\', ''));">
-                    <label class="form-label custom-file-label" for="inputFile">Choose file</label>
-                </div>
+                <input type="text" class="form-control" id="jsonFileName" aria-describedby="inputGroupText" placeholder="Choose file" readonly onclick="document.getElementById('jsonInputFile').click();" style="cursor: pointer;">
+                <input type="file" class="d-none" id="jsonInputFile" name="file" accept="application/json" onchange="updateFileName('jsonInputFile', 'jsonFileName')">
+                <label class="input-group-text" for="jsonInputFile" style="cursor: pointer;">Browse</label>
             </div>
             {elseif $format eq 'ndjson'}
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroupText">{tr}NDJSON File{/tr}</span>
-                <div class="custom-file">
-                    <input type="file" name="file" accept="application/x-ndjson" class="custom-file-input" id="inputFile" aria-describedby="inputGroupText"
-                        onchange="$(this).next('.custom-file-label').text($(this).val().replace('C:\\fakepath\\', ''));">
-                    <label class="form-label custom-file-label" for="inputFile">Choose file</label>
-                </div>
+                <input type="text" class="form-control" id="ndjsonFileName" aria-describedby="inputGroupText" placeholder="Choose file" readonly onclick="document.getElementById('ndjsonInputFile').click();" style="cursor: pointer;">
+                <input type="file" class="d-none" id="ndjsonInputFile" name="file" accept="application/x-ndjson" onchange="updateFileName('ndjsonInputFile', 'ndjsonFileName')">
+                <label class="input-group-text" for="ndjsonInputFile" style="cursor: pointer;">Browse</label>
             </div>
             {elseif $format eq 'ical'}
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroupText">{tr}iCal File{/tr}</span>
-                <div class="custom-file">
-                    <input type="file" name="file" accept="text/calendar" class="custom-file-input" id="inputFile" aria-describedby="inputGroupText"
-                        onchange="$(this).next('.custom-file-label').text($(this).val().replace('C:\\fakepath\\', ''));">
-                    <label class="form-label custom-file-label" for="inputFile">Choose file</label>
-                </div>
+                <input type="text" class="form-control" id="icalFileName" aria-describedby="inputGroupText" placeholder="Choose file" readonly onclick="document.getElementById('icalInputFile').click();" style="cursor: pointer;">
+                <input type="file" class="d-none" id="icalInputFile" name="file" accept="text/calendar" onchange="updateFileName('icalInputFile', 'icalFileName')">
+                <label class="input-group-text" for="icalInputFile" style="cursor: pointer;">Browse</label>
             </div>
             {else}
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroupText">{tr}CSV File{/tr}</span>
-                <div class="custom-file">
-                    <input type="file" name="file" accept="text/csv" class="custom-file-input" id="inputFile" aria-describedby="inputGroupText"
-                        onchange="$(this).next('.custom-file-label').text($(this).val().replace('C:\\fakepath\\', ''));">
-                    <label class="form-label custom-file-label" for="inputFile">Choose file</label>
-                </div>
+                <input type="text" class="form-control" id="fileName" aria-describedby="inputGroupText" placeholder="Choose file" readonly onclick="document.getElementById('inputFile').click();" style="cursor: pointer;">
+                <input type="file" class="d-none" id="inputFile" name="file" accept="text/csv" onchange="updateFileName('inputFile', 'fileName')">
+                <label class="input-group-text" for="inputFile" style="cursor: pointer;">Browse</label>
             </div>
             {/if}
             <div class="submit">
