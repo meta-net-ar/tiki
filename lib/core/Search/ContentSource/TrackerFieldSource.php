@@ -58,6 +58,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
             'tracker_id' => $typeFactory->identifier($field['trackerId']),
             'tracker_name' => $typeFactory->sortable($trackername),
             'position' => $typeFactory->numeric($field['position']),
+            'permName' => $typeFactory->identifier($field['permName']),
 
             'searchable' => $typeFactory->identifier('n'),
 
@@ -75,6 +76,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
             'tracker_id',
             'tracker_name',
             'position',
+            'permName',
 
             'searchable',
 
@@ -90,6 +92,7 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
             'tracker_id' => 'identifier',
             'tracker_name' => 'sortable',
             'position' => 'numeric',
+            'permName' => 'identifier',
 
             'searchable' => 'identifier',
 
