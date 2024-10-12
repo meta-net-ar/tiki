@@ -10,6 +10,8 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
     exit;
 }
 
+$tikiroot = realpath(__DIR__ . '/../../..');
+
 define('VENDOR_PATH', $tikipath . '/vendor_bundled/vendor/');
 define('APP_PATH', VENDOR_PATH . 'jason-munro/cypht/');
 define('CONFIG_PATH', VENDOR_PATH . 'jason-munro/cypht/config/');
