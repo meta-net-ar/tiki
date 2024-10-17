@@ -8916,7 +8916,7 @@ class UsersLib extends TikiLib
 
         $userId = $this->getOne('select `userId` from `users_users` where `login` = ?', [$user]);
         // Added a waiting status / flag 'l' for locked
-        $user_lock_update = $lock_status == 'lock' ? 'l' : 'NULL';
+        $user_lock_update = $lock_status == 'lock' ? 'l' : null;
 
         $query = 'update `users_users` set `waiting`= ? where  `userId`= ?';
         $this->query($query, [ $user_lock_update, $userId ]);
