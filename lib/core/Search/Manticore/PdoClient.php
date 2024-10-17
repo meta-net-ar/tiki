@@ -337,7 +337,7 @@ class PdoClient
         $this->prepareAndExecute("DELETE FROM $index WHERE object_type = :object_type AND object_id = :object_id", ['object_type' => $type, 'object_id' => $id]);
     }
 
-    public function document($index, $type, $id)
+    public function document($index, $type, $id): ResultSet
     {
         $stmt = $this->prepareAndExecute("SELECT * FROM $index WHERE object_type = :object_type AND object_id = :object_id", ['object_type' => $type, 'object_id' => $id]);
         return new ResultSet($stmt->fetch());
@@ -464,6 +464,8 @@ class PdoClient
                         $type = 'trackeritem';
                     }
                     $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
+                    //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
+                    $sql .= " LIMIT 0, $resultCount ";
                     $stmt = $this->prepareAndExecute($sql, $object_ids);
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;
