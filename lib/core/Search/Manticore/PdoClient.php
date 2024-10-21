@@ -463,7 +463,7 @@ class PdoClient
                     }
                     $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
                     //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
-                    $$sql .= " LIMIT 0, $resultCount ";
+                    $sql .= " LIMIT 0, $resultCount ";
                     $stmt = $this->prepareAndExecute($sql, $object_ids);
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;
