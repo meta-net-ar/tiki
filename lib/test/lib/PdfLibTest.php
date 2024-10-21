@@ -41,4 +41,14 @@ HTML;
         $this->assertStringNotContainsString('<sup>&nbsp;[4]&nbsp;</sup><a name="lnk4">ftp://example.tiki.org</a>', $output);
         $this->assertStringNotContainsString('href="ftp://example.tiki.org"', $output);
     }
+
+    public function testEncodeCharacters()
+    {
+        $generator = new PdfGenerator();
+        //Sample unicode character example
+        $content = '&Delta;';
+        $inData = 'Δ';
+        $generator->_parseHTML($inData);
+        $this->assertStringContainsString($content, $inData);
+    }
 }
