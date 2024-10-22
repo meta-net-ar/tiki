@@ -214,12 +214,14 @@
             {if $calendar.customstatus eq 'y'}
                 <tr>
                     <td colspan="2">
-                        {if $calitem.status eq 0}
+                        {if $calitem.status eq "Tentative"}
                             <label class="badge bg-secondary mb-1">{tr}Tentative{/tr}</label>
-                        {elseif $calitem.status eq 1}
+                        {elseif $calitem.status eq "Confirmed"}
                             <label class="badge bg-success mb-1">{tr}Confirmed{/tr}</label>
-                        {elseif $calitem.status eq 2}
+                        {elseif $calitem.status eq "Cancelled"}
                             <label class="badge bg-danger mb-1">{tr}Cancelled{/tr}</label>
+                        {else}
+                            <label class="badge bg-info mb-1">{tr}{$calitem.status|escape}{/tr}</label>
                         {/if}
                     </td>
                 </tr>

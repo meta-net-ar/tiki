@@ -398,8 +398,12 @@
                 <label class="col-sm-4 col-form-label">
                     {tr}Default event status:{/tr}
                 </label>
-                <div class="col-sm-3">
-                    {html_options class="form-control" name='options[defaulteventstatus]' options=$eventstatus selected=$defaulteventstatus}
+                <div class="col-sm-4">
+                    {html_options class="form-control" name='options[defaulteventstatus]' output=$eventstatusoutput values=$eventstatus selected=$defaulteventstatus}
+                    <div class="input-group my-2">
+                        <span class="input-group-text">{tr}New status:{/tr}</span>
+                        <input type="text" class="form-control" name="newstatus">
+                    </div>
                 </div>
             </div>
             <div class="mb-3 row">

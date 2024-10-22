@@ -298,28 +298,20 @@ class Utilities
 
     public static function mapEventStatus($event_status)
     {
-        switch ($event_status) {
-            case '0':
-                return 'TENTATIVE';
-            case '1':
-                return 'CONFIRMED';
-            case '2':
-                return 'CANCELLED';
+        $defaultstatus = ["Tentative", "Confirmed", "Cancelled"];
+        if (in_array($event_status, $defaultstatus)) {
+            return strtoupper($event_status);
         }
-        return '';
+        return $event_status;
     }
 
     public static function reverseMapEventStatus($event_status)
     {
-        switch ($event_status) {
-            case 'TENTATIVE':
-                return '0';
-            case 'CONFIRMED':
-                return '1';
-            case 'CANCELLED':
-                return '2';
+        $defaultstatus = ["TENTATIVE", "CONFIRMED", "CANCELLED"];
+        if (in_array($event_status, $defaultstatus)) {
+            return ucfirst(strtolower($event_status));
         }
-        return '';
+        return $event_status;
     }
 
     public static function mapAttendeeRole($role)

@@ -76,7 +76,19 @@ class CalendarLib extends TikiLib
             }
             $res2 = $this->query("select `optionName`,`value` from `tiki_calendar_options` where `calendarId`=?", [(int)$k]);
             while ($r2 = $res2->fetchRow()) {
-                $r[$r2['optionName']] = $r2['value'];
+                if ($r2['optionName'] == 'eventstatus') {
+                    $eventstatus = json_decode($r2['value']);
+                    $r[$r2['optionName']] = $eventstatus;
+                    //add translation tag to statuses for display
+                    $r["eventstatusoutput"] = array_map(
+                        function ($status) {
+                            return tra($status);
+                        },
+                        $eventstatus
+                    );
+                } else {
+                    $r[$r2['optionName']] = $r2['value'];
+                }
             }
             if ($user) {
                 // override with per user instance values if those exist
@@ -183,6 +195,9 @@ class CalendarLib extends TikiLib
                 } else {
                     $options['viewdays'] = serialize($prefs['calendar_view_days']);
                 }
+                if (isset($options['eventstatus'])) {
+                    $options['eventstatus'] = json_encode($options['eventstatus']);
+                }
                 foreach ($options as $name => $value) {
                     $name = preg_replace('/[^-_a-zA-Z0-9]/', '', $name);
                     $this->query('insert into `tiki_calendar_options` (`calendarId`,`optionName`,`value`) values (?,?,?)', [(int)$calendarId,$name,$value]);
@@ -220,6 +235,17 @@ class CalendarLib extends TikiLib
             $cal['viewdays'] = unserialize($cal['viewdays']);
         } else {
             $cal['viewdays'] = $prefs['calendar_view_days'];
+        }
+
+        if (isset($cal['eventstatus'])) {
+            $cal['eventstatus'] = json_decode($cal['eventstatus']);
+            //add translation tag to statuses for display
+            $cal["eventstatusoutput"] = array_map(
+                function ($status) {
+                    return tra($status);
+                },
+                $cal["eventstatus"]
+            );
         }
         $cal = array_merge(['allday' => 'n', 'nameoneachday' => 'n', 'copybuttononeachevent' => 'n'], $cal);
         return $cal;

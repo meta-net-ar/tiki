@@ -127,7 +127,7 @@ class CalRecurrence extends TikiLib
             $this->setCategoryId(0);
             $this->setNlId(0);
             $this->setPriority(0);
-            $this->setStatus(0);
+            $this->setStatus('');
             $this->setUrl('');
             $this->setLang('');
             $this->setName('');
@@ -925,6 +925,7 @@ class CalRecurrence extends TikiLib
             'LAST-MODIFIED' => DateTime::createFromFormat('U', $this->getLastModif() ?? 0)->format('Ymd\THis\Z'),
             'SUMMARY' => $this->getName(),
             'PRIORITY' => $this->getPriority(),
+            'STATUS' => $this->getStatus(),
             'TRANSP' => 'OPAQUE',
             'DTSTART' => $dtstart,
             'DTEND'   => $dtend,
@@ -1161,7 +1162,7 @@ class CalRecurrence extends TikiLib
 
     public function getStatus()
     {
-        return $this->status ?? '1';
+        return $this->status ?? 'Tentative';
     }
 
     /**

@@ -642,31 +642,14 @@
                 <div class="mb-3 row">
                     <label class="col-form-label col-sm-3">{tr}Status{/tr}</label>
                     <div class="col-sm-9">
-                        <div class="statusbox {if $calitem.status eq 0}status0{/if}">
-                            <input id="status0" type="radio" name="calitem[status]" value="0"
-                                    {if (!empty($calitem) and $calitem.status eq 0) or (empty($calitem) and $calendar.defaulteventstatus eq 0)}
-                                        checked="checked"
-                                    {/if}
-                            >
-                            <label for="status0">
-                                {tr}Tentative{/tr}
-                            </label>
-                        </div>
-                        <div class="statusbox    {if $calitem.status eq 1}status1{/if}">
-                            <input id="status1" type="radio" name="calitem[status]" value="1" {if $calitem.status eq 1} checked="checked" {/if} >
-                            <label for="status1">
-                                {tr}Confirmed{/tr}
-                            </label>
-                        </div>
-                        <div class="statusbox {if $calitem.status eq 2}status2{/if}">
-                            <input id="status2" type="radio" name="calitem[status]" value="2" {if $calitem.status eq 2} checked="checked" {/if}>
-                            <label for="status2">
-                                {tr}Cancelled{/tr}
-                            </label>
-                        </div>
+                        {if (! empty($calitem))}
+                            {assign var="selected" value="{$calitem.status}"}
+                        {else}
+                            {assign var="selected" value="{$calendar.defaulteventstatus}"}
+                        {/if}
+                        {html_options class="form-control" name='calitem[status]' output=$calendar.eventstatusoutput values=$calendar.eventstatus selected=$selected}
                     </div>
-                </div>
-                {* / .mb-3 *}
+                </div> {* / .mb-3.row *}
             {/if}
             {if $calendar.custompriorities eq 'y'}
                 <div class="mb-3 row clearfix">
