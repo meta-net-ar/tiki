@@ -413,8 +413,8 @@
                                     <label class="col-form-label" for="force_utf8">{tr}Always force connection to use UTF-8{/tr}</label>
                                     <p><a href="https://doc.tiki.org/Understanding-Encoding" onclick="window.open(this.href); return false;">{tr}More information{/tr}</a></p>
                                 </fieldset>
-                                <div class="mb-3 row text-center">
-                                    <input type="submit" class="btn btn-info" name="dbinfo" value="{tr}Continue{/tr}">
+                                <div class="mb-3 text-center">
+                                    <input type="submit" class="btn btn-primary" name="dbinfo" value="{tr}Continue{/tr}">
                                 </div>
                             </form>
                         </div>
