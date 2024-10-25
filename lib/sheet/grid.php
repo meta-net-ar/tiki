@@ -341,11 +341,13 @@ class TikiSheet
     public function getTableHtml($incsubs = true, $date = null)
     {
         global $prefs;
-        $sheetlib = TikiLib::lib('sheet');
 
+        $isParse = isset($_REQUEST['parse']) && $_REQUEST['parse'] != 'n';
+
+        $sheetlib = TikiLib::lib('sheet');
         $filegallib = TikiLib::lib("filegal");
 
-        $handler = new TikiSheetOutputHandler(null, ($this->parseValues == 'y' && ($_REQUEST['parse'] ?? '') != 'n'));
+        $handler = new TikiSheetOutputHandler(null, ($this->parseValues == 'y' && $isParse));
 
         $this->export($handler);
 

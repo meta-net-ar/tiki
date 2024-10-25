@@ -13,10 +13,12 @@
             notitle="{if isset($module_params.notitle)}{$module_params.notitle}{/if}"}
     <div class="youtubemodule" >
         {foreach from=$data.videos item=videoEntry key=videoId}
-            <a class="linkmodule" href="http://www.youtube.com/watch?v={$videoId}" {if $verbose eq 'y'}title="{$videoEntry.description|escape:'html'}"{/if} >
+            <a class="linkmodule" href="http://www.youtube.com/watch?v={$videoId}" {if $verbose eq 'y' && isset($videoEntry.description)} title="{$videoEntry.description|escape:'html'}"{/if} >
                 {$videoEntry.title|escape:"html"}
             </a>
-            <div class="module video youtube" >{$videoEntry.xhtml}</div>
+            {if isset($videoEntry.xhtml)}
+                <div class="module video youtube" >{$videoEntry.xhtml}</div>
+            {/if}
         {/foreach}
     </div>
     {if $link_url neq ''}

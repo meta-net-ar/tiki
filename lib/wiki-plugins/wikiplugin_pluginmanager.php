@@ -51,6 +51,10 @@ class WikiPluginPluginManager extends PluginsLib
         $params = $this->getParams($params);
         extract($params, EXTR_SKIP);
 
+        $singletitle = $params['singletitle'] ?? null;
+        $info = $params['info'] ?? null;
+        $titletag = $params['titletag'] ?? null;
+
         if (! empty($module) && ! empty($plugin)) {
             return $this->error(tra('Either the module or plugin parameter must be set, but not both.'));
         } elseif (! empty($module)) {

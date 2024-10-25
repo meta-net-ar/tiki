@@ -289,7 +289,7 @@
                 {if $gal_info.show_checked ne 'n' and ($tiki_p_admin_file_galleries eq 'y' or $tiki_p_upload_files eq 'y')}
                     <td class="checkbox-cell">
                         <div class="form-check">
-                            {if $files[changes].isgal eq 1}
+                            {if isset($files[changes].isgal) && $files[changes].isgal eq 1}
                                 {assign var='checkname' value='subgal'}
                             {else}
                                 {assign var='checkname' value='file'}
@@ -412,7 +412,7 @@
                         {elseif $propname eq 'size'}
                             {assign var=propval value=$propval|kbsize:true}
                         {elseif $propname eq 'type'}
-                            {if $files[changes].isgal eq 1}
+                            {if isset($files[changes].isgal) && $files[changes].isgal eq 1}
                                 {capture assign=propval}{icon name='file-archive-open' class=''}{/capture}
                             {else}
                                 {assign var=propval value=$files[changes].filename|iconify:$files[changes].type}

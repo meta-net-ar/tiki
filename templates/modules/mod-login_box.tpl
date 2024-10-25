@@ -44,7 +44,7 @@ $("#switchbox-{{$module_logo_instance}} .submit").click( function () {
     {if isset($nobox)}{$module_params.nobox = $nobox}{/if}
     {if isset($style)}{$module_params.style = $style}{/if}
 {/if}
-{tikimodule error=$module_params.error title=$tpl_module_title name="login_box" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle style=$module_params.style}
+{tikimodule error="{if isset($module_params.error)}{$module_params.error}{/if}" title=$tpl_module_title name="login_box" flip="{if isset($module_params.flip)}{$module_params.flip}{/if}" decorations=$module_params.decorations nobox="{if isset($module_params.nobox)}{$module_params.nobox}{/if}" notitle="{if isset($module_params.notitle)}{$module_params.notitle}{/if}" style=$module_params.style}
     {if $mode eq "header"}<div class="siteloginbar{if $user} logged-in{/if}">{/if}
     {if $user}
         {if empty($mode) or $mode eq "module"}
