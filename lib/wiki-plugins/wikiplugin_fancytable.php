@@ -374,6 +374,8 @@ function process_section($data, $type, $line_sep, $cellbeg, $cellend, $widths, $
 	$rnum2 = '';
 	$wret = '';
 	$row_is_odd = true;
+    $parts = [];
+
 	//Each row
 	foreach ($lines as $line) {
 		$line = trim($line);
