@@ -74,14 +74,6 @@ function wikiplugin_addtogooglecal($data, $params)
     $date_to = date('Ymd', $calitem['end']) . 'T' . date('His', $calitem['end']) . 'Z';
     date_default_timezone_set($old_tz);
     $gcal_dates = $date_from . '/' . $date_to;
-    if (isset($params['iconstyle']) && $params['iconstyle'] == 1) {
-        $gcal_icon = 'https://www.google.com/calendar/images/ext/gc_button6.gif';
-    } elseif (isset($params['iconstyle']) && $params['iconstyle'] == 2) {
-        $gcal_icon = 'https://www.google.com/calendar/images/ext/gc_button2.gif';
-    } elseif (isset($params['iconstyle']) && $params['iconstyle'] == 3) {
-        $gcal_icon = 'https://www.google.com/calendar/images/ext/gc_button1.gif';
-    } else {
-        $gcal_icon = 'https://www.google.com/calendar/images/ext/gc_button6.gif';
-    }
-    return '<a target="_blank" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '"><img src="' . $gcal_icon . '"></a>';
+    return '<a target="_blank" title="' . tr('Add Event to Google Calendar') . '" class="btn btn-primary" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '">
+            <i class="fas fa-calendar-plus"></i></a>';
 }
