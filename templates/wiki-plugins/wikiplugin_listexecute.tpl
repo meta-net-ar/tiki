@@ -17,7 +17,9 @@
     <select name="list_action" class="form-select">
         <option></option>
         {foreach from=$actions item=action}
-            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}">{$action->getName()|escape}</option>
+            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}"{if $action->getDefault()} selected{/if}>
+                {$action->getName()|escape}
+            </option>
         {/foreach}
     </select>
     <input type="text" name="list_input" value="" class="form-control" style="display:none">

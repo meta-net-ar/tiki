@@ -20,7 +20,8 @@ class Search_Action_Factory
         $arguments = $parser->parse($match->getArguments());
 
         if (! empty($arguments['name'])) {
-            $sequence = $this->build($arguments['name'], $arrayBuilder->getData($match->getBody()));
+            $default = $arguments['default'] === 'y' || $arguments['default'] === '1';
+            $sequence = $this->build($arguments['name'], $default, $arrayBuilder->getData($match->getBody()));
 
             if (isset($arguments['group'])) {
                 $sequence->setRequiredGroup($arguments['group']);
@@ -30,9 +31,9 @@ class Search_Action_Factory
         }
     }
 
-    public function build($name, array $data)
+    public function build($name, $default, array $data)
     {
-        $sequence = new Search_Action_Sequence($name);
+        $sequence = new Search_Action_Sequence($name, $default);
 
         if (! isset($data['step'])) {
             $data['step'] = [];

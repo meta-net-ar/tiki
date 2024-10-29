@@ -10,10 +10,12 @@ class Search_Action_Sequence
     private $steps = [];
     private $fields = [];
     private $requiredGroup;
+    private $default;
 
-    public function __construct($name)
+    public function __construct($name, $default)
     {
         $this->name = $name;
+        $this->default = $default;
     }
 
     public function setRequiredGroup($groupName)
@@ -29,6 +31,10 @@ class Search_Action_Sequence
     public function getFields()
     {
         return $this->fields;
+    }
+    public function getDefault()
+    {
+        return $this->default;
     }
 
     public function isAllowed(array $groups)
@@ -78,5 +84,10 @@ class Search_Action_Sequence
     public function getSteps()
     {
         return $this->steps;
+    }
+
+    public function setDefault($default)
+    {
+        $this->default = $default;
     }
 }
