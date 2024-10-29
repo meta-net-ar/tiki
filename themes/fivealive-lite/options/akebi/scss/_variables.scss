@@ -234,17 +234,25 @@ $bg-dark-info: #00DAE6;
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-light {
     --tiki-top-bg: #{$tiki-top-light-bg} !important;
-    --tiki-top-color: #{$tiki-top-link-color};
+    --tiki-top-color: #{$navbar-dark-link-color}; // #{$tiki-top-link-color};
     --tiki-top-hover-color: #{$tiki-top-link-hover-color};
     --tiki-top-text-color: #{$tiki-top-link-hover-color};
     --tiki-top-border: solid #000;
+    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+    .navbar-light {
+        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
 }
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: #{$tiki-topbar-light-bg};
-    --tiki-topbar-color: #{$topbar-link-color};
+    --tiki-topbar-color: #{$navbar-dark-link-color}; // #{$topbar-link-color};
     --tiki-topbar-hover-color: #{$navbar-light-link-hover-color};
     --tiki-topbar-text-color: #{$navbar-light-link-hover-color};
+    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+    .navbar-light {
+        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
 }
 
 @mixin top-nav-dark {
