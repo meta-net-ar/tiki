@@ -521,6 +521,7 @@
                             <tr>
                                 <th>{tr}Field{/tr}</th>
                                 <th>{tr}Mode{/tr}</th>
+                                <th>{tr}Applied Value{/tr}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -544,51 +545,55 @@
                                     </div>
                                 </td>
                                 <td><span class="field">Field Name</span>:<span class="mode">Mode</span></td>
+                                <td>{tr}save first{/tr}</td>
                                 <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
                             </tr>
-                            {foreach $filterCollection->getFilters() as $filter}
-                                <tr>
-                                    <td>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">{icon name=sort}</span>
-                                            <input type="text" class="field-label form-control" value="{$filter->getLabel()|escape}">
-                                            <div class="input-group-text">
-                                                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span class="position-label">{$filter->getPosition()|ucfirst|tra}</span>
-                                                    <input class="position" type="hidden" value="{$filter->getPosition()|escape}">
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-end" role="menu">
-                                                    <a class="dropdown-item position-option" href="#default">{tr}Default{/tr}</a>
-                                                    <a class="dropdown-item position-option" href="#primary">{tr}Primary{/tr}</a>
-                                                    <a class="dropdown-item position-option" href="#side">{tr}Side{/tr}</a>
+                                {foreach $filterCollection->getFilters() as $idx => $filter}
+                                    <tr>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">{icon name=sort}</span>
+                                                <input type="text" class="field-label form-control" value="{$filter->getLabel()|escape}">
+                                                <div class="input-group-text">
+                                                    <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <span class="position-label">{$filter->getPosition()|ucfirst|tra}</span>
+                                                        <input class="position" type="hidden" value="{$filter->getPosition()|escape}">
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end" role="menu">
+                                                        <a class="dropdown-item position-option" href="#default">{tr}Default{/tr}</a>
+                                                        <a class="dropdown-item position-option" href="#primary">{tr}Primary{/tr}</a>
+                                                        <a class="dropdown-item position-option" href="#side">{tr}Side{/tr}</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </td>
+                                        <td><span class="field">{$filter->getField()|escape}</span>:<span class="mode">{$filter->getMode()|escape}</td>
+                                        <td><a href="{service controller=tabular action=choose_applied_value tabularId=$tabularId filterIndex=$idx}" class="btn btn-secondary choose-applied-value">{tr}: choose{/tr}</a></td>
+                                        <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                    </tr>
+                                {/foreach}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>
+                                        <select class="selection form-select">
+                                            <option disabled="disabled" selected="selected">{tr}Select a field...{/tr}</option>
+                                            {foreach $filterCollection->getAvailableFields() as $permName => $label}
+                                                <option value="{$permName|escape}">{$label|escape}</option>
+                                            {/foreach}
+                                        </select>
                                     </td>
-                                    <td><span class="field">{$filter->getField()|escape}</span>:<span class="mode">{$filter->getMode()|escape}</td>
-                                    <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                    <td>
+                                        <a href="{service controller=tabular action=select_filter trackerId=$trackerId}" class="btn btn-secondary add-filter">{tr}Select Mode{/tr}</a>
+                                        <textarea name="filters" class="d-none">{$filterCollection->getFilterDescriptor()|json_encode}</textarea>
+                                    </td>
+                                    <td colspan="2">&nbsp;</td>
                                 </tr>
-                            {/foreach}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td>
-                                    <select class="selection form-select">
-                                        <option disabled="disabled" selected="selected">{tr}Select a field...{/tr}</option>
-                                        {foreach $filterCollection->getAvailableFields() as $permName => $label}
-                                            <option value="{$permName|escape}">{$label|escape}</option>
-                                        {/foreach}
-                                    </select>
-                                </td>
-                                <td>
-                                    <a href="{service controller=tabular action=select_filter trackerId=$trackerId}" class="btn btn-secondary add-filter">{tr}Select Mode{/tr}</a>
-                                    <textarea name="filters" class="d-none">{$filterCollection->getFilterDescriptor()|json_encode}</textarea>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </tfoot>
+                        </table>
+                    </div>
                     <div class="form-text">
-                        <p>{tr}Filters will be available in partial export menus.{/tr}</p>
+                        <p>{tr}Filters will be available in partial export menus, tracker:export command and main format list page. You can also specify default filter values to be applied in full export or list mode when you want a subset of the tracker items to be exportable.{/tr}</p>
                     </div>
                 </div>
             </div>

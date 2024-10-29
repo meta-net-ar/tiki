@@ -121,6 +121,7 @@ class Filter implements \JsonSerializable
             'field' => $this->permName,
             'mode' => $this->mode,
             'position' => $this->position,
+            'applied_value' => $this->control->getQueryArguments(),
         ];
     }
 }

@@ -188,6 +188,49 @@ class Schema
         return $this->filters;
     }
 
+    /**
+     * If we have default filters configured with a value, return a QuerySource with configured
+     * query to filter only those records. Otherwise, we use a normal TrackerSource to fetch
+     * all tracker items for that tracker.
+     */
+    public function getDefaultFilterSource(): Source\SourceInterface
+    {
+        $query = $this->getDefaultFilterQuery();
+        if ($query) {
+            $source = new Source\QuerySource($this, $query);
+        } else {
+            $source = new Source\TrackerSource($this, $this->getDefinition());
+        }
+        return $source;
+    }
+
+    /**
+     * If we have default filters configured with a value, return a query to filter only those records.
+     */
+    public function getDefaultFilterQuery()
+    {
+        $has_default_filter = false;
+        $collection = $this->getFilterCollection();
+        $collection->applyInput(new \JitFilter([]), true);
+        foreach ($collection->getFilters() as $filter) {
+            if ($filter->getPosition() === 'default' && $filter->getControl()->hasValue()) {
+                $has_default_filter = true;
+                break;
+            }
+        }
+        if ($has_default_filter) {
+            $search = \TikiLib::lib('unifiedsearch');
+            $query = $search->buildQuery([
+                'type' => 'trackeritem',
+                'tracker_id' => $this->getDefinition()->getId(),
+            ]);
+            $collection->applyConditions($query);
+            return $query;
+        } else {
+            return null;
+        }
+    }
+
     public function getFormatDescriptor()
     {
         return array_map(function ($column) {

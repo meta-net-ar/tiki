@@ -258,6 +258,36 @@ class Services_Tracker_TabularController
         ];
     }
 
+    public function action_choose_applied_value($input)
+    {
+        $tabularId = $input->tabularId->int();
+
+        $info = TikiLib::lib('tabular')->getInfo($tabularId);
+        $trackerId = $info['trackerId'];
+
+        Services_Exception_Denied::checkObject('tiki_p_view_trackers', 'tracker', $trackerId);
+
+        $schema = $this->getSchema($info);
+        $collection = $schema->getFilterCollection();
+        $filter = $collection->getFilters()[$input->filterIndex->int()] ?? null;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($filter) {
+                $filter->applyInput($input);
+                return $filter->jsonSerialize();
+            } else {
+                return [];
+            }
+        }
+
+        return [
+            'title' => tr('Choose applied value'),
+            'tabularId' => $tabularId,
+            'filterIndex' => $input->filterIndex->int(),
+            'filter' => $filter,
+        ];
+    }
+
     public function action_export_full_csv($input)
     {
         $lib = TikiLib::lib('tabular');
@@ -268,7 +298,7 @@ class Services_Tracker_TabularController
         $schema = $this->getSchema($info);
         $schema->validate();
 
-        $source = new \Tracker\Tabular\Source\TrackerSource($schema);
+        $source = $schema->getDefaultFilterSource();
 
         if ($info['odbc_config']) {
             $writer = new \Tracker\Tabular\Writer\ODBCWriter($info['odbc_config']);
@@ -656,7 +686,7 @@ class Services_Tracker_TabularController
         $schema = $this->getSchema($info);
         $collection = $schema->getFilterCollection();
 
-        $collection->applyInput($input);
+        $collection->applyInput($input, true);
 
         $search = TikiLib::lib('unifiedsearch');
         $query = $search->buildQuery([

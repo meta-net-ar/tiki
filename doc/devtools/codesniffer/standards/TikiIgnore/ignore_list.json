@@ -5493,6 +5493,7 @@
             "Services_Tracker_TabularController::action_duplicate": true,
             "Services_Tracker_TabularController::action_select": true,
             "Services_Tracker_TabularController::action_select_filter": true,
+            "Services_Tracker_TabularController::action_choose_applied_value": true,
             "Services_Tracker_TabularController::action_export_full_csv": true,
             "Services_Tracker_TabularController::action_export_partial_csv": true,
             "Services_Tracker_TabularController::action_export_search_csv": true,

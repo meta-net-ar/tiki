@@ -12,7 +12,7 @@ use Tracker_item;
 class TrackerItemSource implements SourceInterface
 {
     private Schema $schema;
-    private Tracker_Item $item;
+    private ?Tracker_Item $item;
 
     public function __construct(Schema $schema, $itemId = null, $itemInfo = null)
     {
@@ -23,6 +23,15 @@ class TrackerItemSource implements SourceInterface
             $this->item = Tracker_Item::fromInfo($itemInfo);
         } else {
             $this->item = null;
+        }
+        if ($itemId && $query = $schema->getDefaultFilterQuery()) {
+            // filter out default query not returning the target tracker item
+            $query->filterIdentifier($itemId, 'object_id');
+            $this->forceFreshIndex();
+            $result = $query->search(\TikiLib::lib('unifiedsearch')->getIndex());
+            if ($result->count() == 0) {
+                $this->item = null;
+            }
         }
     }
 
@@ -36,5 +45,17 @@ class TrackerItemSource implements SourceInterface
     public function getSchema()
     {
         return $this->schema;
+    }
+
+    /**
+     * Ensure index queue is processed as normal tracker save happens in a transaction
+     * and by the time sync event is executed, queue has not been processed yet.
+     */
+    private function forceFreshIndex()
+    {
+        global $prefs;
+        if ($prefs['feature_search'] == 'y' && $prefs['unified_incremental_update'] == 'y') {
+            \TikiLib::lib('unifiedsearch')->processUpdateQueue(10, true);
+        }
     }
 }
