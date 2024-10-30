@@ -136,6 +136,8 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
     }
 }
 
+$smarty->assign('global_extend_layout', 'layouts/social/layout_webmail.tpl');
+
 $smarty->display('tiki.tpl');
 
 /**
