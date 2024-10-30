@@ -66,6 +66,11 @@ class Tracker_Definition
         return $this->trackerInfo;
     }
 
+    public function getId()
+    {
+        return $this->trackerInfo['trackerId'];
+    }
+
     public function getFieldFactory()
     {
         if ($this->factory) {
