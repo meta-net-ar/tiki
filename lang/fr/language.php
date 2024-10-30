@@ -23010,6 +23010,7 @@ $lang_current = array(
 "Address book" => "Carnet d'adresses",
 "Top pages" => "Pages les plus populaires",
 "Last pages" => "Dernières pages",
+"The possible value for the default parameter is 'y' or '1'. Not putting this parameter means that the action is not set as default. The value you provided for the default parameter is %0%1%2 on the action named %0%3%2" => "La valeur possible pour le paramètre par défaut est 'y' ou '1'. Ne pas mettre ce paramètre signifie que l'action n'est pas définie par défaut. La valeur que vous avez fournie pour le paramètre par défaut est %0%1%2 sur l'action nommée %0%3%2",
 // "Note, deprecated file tiki-wikiplugin_edit.php, code moved to service plugin->replace" => "Note, deprecated file tiki-wikiplugin_edit.php, code moved to service plugin->replace",
 "Start Translation" => "Commencer la traduction",
 "System Menu" => "Menu Système",

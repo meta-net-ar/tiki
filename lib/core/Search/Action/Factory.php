@@ -20,7 +20,10 @@ class Search_Action_Factory
         $arguments = $parser->parse($match->getArguments());
 
         if (! empty($arguments['name'])) {
-            $default = $arguments['default'] === 'y' || $arguments['default'] === '1';
+            $default = isset($arguments['default']) && ($arguments['default'] === 'y' || $arguments['default'] === '1');
+            if (isset($arguments['default']) && $arguments['default'] != 'y' && $arguments['default'] != '1') {
+                Feedback::error(tr("The possible value for the default parameter is 'y' or '1'. Not putting this parameter means that the action is not set as default. The value you provided for the default parameter is %0%1%2 on the action named %0%3%2", '<code>', htmlentities($arguments['default']), '</code>', htmlentities($arguments['name'])));
+            }
             $sequence = $this->build($arguments['name'], $default, $arrayBuilder->getData($match->getBody()));
 
             if (isset($arguments['group'])) {
