@@ -47,7 +47,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
         $files = [];
 
         foreach ($relations as $rel) {
-            if ($rel['type'] == 'file') {
+            if ($rel['type'] == 'file' && ! empty($rel['itemId'])) {
                 $files[] = $rel['itemId'];
                 if ($data = $this->fileSource->getDocument($rel['itemId'], $typeFactory)) {
                     foreach ($this->fileSource->getGlobalFields() as $name => $keep) {

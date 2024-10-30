@@ -945,6 +945,9 @@ function wikiplugin_img($data, $params)
             $fwidth = $imageObj->getWidth();
             $fheight = $imageObj->getHeight();
         }
+
+        $fheightt = 1;
+        $fwidtht = 1;
         //get image gal thumbnail image for height and width
         if (! empty($dbinfot['data']) || ! empty($dbinfot['path'])) {
             if (! empty($dbinfot['data'])) {

@@ -2141,7 +2141,7 @@ class ParserLib extends TikiDb_Bridge
                                 $histlib = TikiLib::lib('hist');
                                 // get_page_history arguments: page name, page contents (set to "false" to save memory), history_offset (none, therefore "0"), max. records (just one for this case);
                                 $history = $histlib->get_page_history($this->option['page'], false, 0, 1);
-                                if ($history[0]['version'] != null) {
+                                if (! empty($history) && ! empty($history[0]['version'])) {
                                     $value = $history[0]['version'];
                                     break;
                                 } else {

@@ -103,7 +103,7 @@ class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
     public function renderInnerOutput($context = [])
     {
         $fieldData = $this->getFieldData();
-        $value = $fieldData['value'];
+        $value = $fieldData['value'] ?: '';
         if ($this->getOption('type') === 'country') {
             $value = str_replace('_', ' ', $value);
         } elseif ($this->getOption('type') === 'display_timezone' && empty($value)) {
