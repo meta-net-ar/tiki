@@ -90,10 +90,14 @@ class ObjectSelector implements Control
         if ($this->multi) {
             $params['_name'] = $this->fieldName;
             $type = $this->filters['type'];
-            $value = array_map(function ($v) use ($type) {
-                return str_replace($type . ':', '', $v);
-            }, $this->value);
-            $params['_simplevalue'] = implode(',', $value);
+            if (is_array($this->value)) {
+                $value = array_map(function ($v) use ($type) {
+                    return str_replace($type . ':', '', $v);
+                }, $this->value);
+                $params['_simplevalue'] = implode(',', $value);
+            } else {
+                $params['_simplevalue'] = $this->value;
+            }
             $params['_separator'] = ',';
 
             $smarty->loadPlugin('smarty_function_object_selector_multi');
