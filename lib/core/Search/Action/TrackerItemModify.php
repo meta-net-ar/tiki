@@ -106,6 +106,11 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
         return $executed;
     }
 
+    public function inputType(): string
+    {
+        return "text";
+    }
+
     public function requiresInput(JitFilter $data)
     {
         if (empty($data->value->text()) && empty($data->calc->text()) && empty($data->add->text()) && empty($data->remove->text())) {

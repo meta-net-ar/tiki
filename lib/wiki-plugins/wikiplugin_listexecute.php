@@ -29,6 +29,7 @@ function wikiplugin_listexecute_info()
 
 function wikiplugin_listexecute($data, $params)
 {
+    global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
     static $iListExecute = 0;
     $iListExecute++;
 
@@ -50,6 +51,7 @@ function wikiplugin_listexecute($data, $params)
             'filegal_image_overlay' => 'Search_Action_FileGalleryImageOverlay',
             'snapshot' => 'Search_Action_Snapshot',
             'user_group_modify' => 'Search_Action_UserGroupModify',
+            'categorize_object' => 'Search_Action_CategorizeObjectAction'
         ]
     );
 
@@ -91,7 +93,6 @@ function wikiplugin_listexecute($data, $params)
     }
 
     $customOutput = false;
-
     foreach ($matches as $match) {
         $name = $match->getName();
 
@@ -148,6 +149,21 @@ function wikiplugin_listexecute($data, $params)
             'iListExecute' => $iListExecute
         ];
 
+        if ($prefs['feature_categories'] == 'y') {
+            $categlib = TikiLib::lib('categ');
+            $categories = $categlib->getCategories();
+
+            foreach ($categories as &$category) {
+                $category['canchange'] = 'y';
+            }
+            // Get the categories tree for display
+            $cat_tree = $categlib->generate_cat_tree($categories);
+            $pluginData['categories'] = $categories;
+            $pluginData['cat_tree'] = $cat_tree;
+            $pluginData['tiki_p_modify_object_categories'] = $tiki_p_modify_object_categories;
+            $pluginData['tiki_p_admin_categories'] = $tiki_p_admin_categories;
+        }
+
         $page = $_GET['page'] ?? null;
 
         if (! is_null($page)) {
@@ -203,10 +219,15 @@ function wikiplugin_listexecute($data, $params)
             $list = $formatter->getPopulatedList($result);
 
             foreach ($list as $entry) {
+                $entry['object_type'] = str_replace(['~/np~', '~np~'], '', $entry['object_type']); // Remove ~/np~~np~ from object type
                 $identifier = "{$entry['object_type']}:{$entry['object_id']}";
                 if (in_array($identifier, $selectedObjects) || in_array('ALL', $selectedObjects)) {
                     if (isset($_POST['list_input'])) {
                         $entry['value'] = $_POST['list_input'];
+                    }
+                    // If it is a categorization action
+                    if (isset($_POST['cat_categories'])) {
+                        $entry['category'] = $_POST['cat_categories'];
                     }
 
                     try {

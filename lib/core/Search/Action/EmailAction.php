@@ -205,6 +205,11 @@ class Search_Action_EmailAction implements Search_Action_Action
         }
     }
 
+    public function inputType(): string
+    {
+        return "text";
+    }
+
     public function requiresInput(JitFilter $data)
     {
         return false;

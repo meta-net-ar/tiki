@@ -65,6 +65,10 @@ class Search_Action_Snapshot implements Search_Action_Action
         return true;
     }
 
+    public function inputType(): string
+    {
+        return "text";
+    }
 
     public function requiresInput(JitFilter $data)
     {

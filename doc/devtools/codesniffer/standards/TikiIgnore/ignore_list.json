@@ -896,6 +896,9 @@
         "lib\/core\/Search\/Action\/UserGroupModify.php": {
             "class:Search_Action_UserGroupModify": true
         },
+        "lib\/core\/Search\/Action\/CategorizeObjectAction.php": {
+            "class:Search_Action_CategorizeObjectAction": true
+        },
         "lib\/core\/Search\/Action\/WikiApprovalAction.php": {
             "class:Search_Action_WikiApprovalAction": true
         },
@@ -8731,6 +8734,9 @@
         },
         "lib\/core\/Search\/Action\/UserGroupModify.php": {
             "Search_Action_UserGroupModify": true
+        },
+        "lib\/core\/Search\/Action\/CategorizeObjectAction.php": {
+            "Search_Action_CategorizeObjectAction": true
         },
         "lib\/core\/Search\/Action\/WikiApprovalAction.php": {
             "Search_Action_WikiApprovalAction": true

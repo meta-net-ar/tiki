@@ -17,12 +17,42 @@
     <select name="list_action" class="form-select">
         <option></option>
         {foreach from=$actions item=action}
-            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}"{if $action->getDefault()} selected{/if}>
+            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}" data-inputtype="{$action->inputtype()}"{if $action->getDefault()} selected{/if}>
                 {$action->getName()|escape}
             </option>
         {/foreach}
     </select>
     <input type="text" name="list_input" value="" class="form-control" style="display:none">
+    {* category_tree *}
+    {if $prefs.feature_categories eq 'y' and $tiki_p_modify_object_categories eq 'y' and count($categories) gt 0}
+        <div class="multiselect form-select cat_tree" style="display:none;">
+            {if is_array($categories) and count($categories) gt 0}
+                {$cat_tree}
+                <input type="hidden" name="cat_categorize" value="on">
+                <div class="clearfix">
+                    {if $tiki_p_admin_categories eq 'y'}
+                        <div class="float-sm-end">
+                            <a class="btn btn-link btn-sm tips" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                {icon name="cog"} {tr}Categories{/tr}
+                            </a>
+                        </div>
+                    {/if}
+                    {select_all checkbox_names='cat_categories[]' label="{tr}Select/deselect all categories{/tr}"}
+                </div> {* end .clear *}
+            {else}
+                <div class="clearfix">
+                    {if $tiki_p_admin_categories eq 'y'}
+                        <div class="float-sm-end">
+                            <a class="btn btn-link" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                {icon name="cog"} {tr}Categories{/tr}
+                            </a>
+                        </div>
+                    {/if}
+                </div> {* end .clear *}
+                {tr}No categories defined{/tr}
+            {/if}
+        </div> {* end #multiselect *}
+    {/if}
     <input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}">
     {if isset($smarty.get.page) && isset($schedulers_amount)}
         <div class="ms-3">
@@ -43,10 +73,17 @@ $('.listexecute-select-all').removeClass('listexecute-select-all').on('click', f
     e.preventDefault();
 });
 $('#listexecute-{{$iListExecute}}').find('select[name=list_action]').on('change', function() {
+    var inputType = $(this).find('option:selected').data('inputtype');
     if( $(this).find('option:selected').data('input') ) {
-        $(this).siblings('input[name=list_input]').show();
+        //if it is 'text', show the text input, else it is 'category_tree', show the category tree.
+        if (inputType === "text") {
+            $(this).siblings('input[name=list_input]').show();
+        } else {
+            $(".cat_tree").show();
+        }
     } else {
         $(this).siblings('input[name=list_input]').hide();
+        $(".cat_tree").hide();
     }
 });
 $('#listexecute-{{$iListExecute}}').submit(function(){

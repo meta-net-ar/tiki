@@ -177,6 +177,11 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         return true;
     }
 
+    public function inputType(): string
+    {
+        return "text";
+    }
+
     public function requiresInput(JitFilter $data)
     {
         return false;
