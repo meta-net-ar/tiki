@@ -18,7 +18,7 @@
 .tiki .tiki-top-nav-light,
 .tiki .tiki-top-nav-dark
 {
-    background-color: var(--tiki-top-bg);
+    background: var(--tiki-top-bg);
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
     a:not(.navbar-brand,.dropdown-item,.btn),
     .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
@@ -27,7 +27,7 @@
         color: var(--tiki-top-color);
         &:hover {
             color: var(--tiki-top-hover-color);
-            background-color: var(--tiki-top-hover-bg);
+            background: var(--tiki-top-hover-bg);
         }
     }
     border: var(--tiki-top-border); // Style and color, for example, solid black
@@ -74,7 +74,7 @@
 //.layout_social header.navbar.navbar-dark.bg-dark                     // Classic Bootstrap layout -- Menu itself
 //.tiki .tiki-top-nav-dark
 //{
-//    background-color: var(--tiki-top-bg);
+//    background: var(--tiki-top-bg);
 //    color: var(--tiki-top-text-color);
 //    a:not(.navbar-brand,.dropdown-item),
 //    .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
@@ -93,7 +93,7 @@
 //}
 
 .tiki:not(.tiki-admin.uab) .tiki-top-nav-dark {
-    background-color: var(--tiki-top-bg);
+    background: var(--tiki-top-bg);
 }
 
 // Topbar module zone and parent divs - dark color
