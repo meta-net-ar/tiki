@@ -25,6 +25,7 @@ body.tiki-admin {
 @media (min-width: 993px) and (max-width: 2000px /*1675px *//*1370px */) {
     .tiki-admin.uab #tikifeedback,
     .tiki-admin.uab .admin-content,
+    .tiki-admin.uab .errors-wrapper,
     .tiki-admin.uab .bottom_modules {
         padding-left: 320px !important;
     }
