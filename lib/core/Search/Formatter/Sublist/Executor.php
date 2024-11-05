@@ -211,13 +211,18 @@ class Executor
                     if ($count == count($mapping)) {
                         if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                             if ($this->record->isMultiple()) {
-                                $this->data[$i][$j][$key][] = $subrow;
+                                // might be ArrayObject (Search_Formatter_Transform_DynamicLoaderWrapper) where array auto-creation doesn't work
+                                $arr = $this->data[$i][$j][$key] ?? [];
+                                $arr[] = $subrow;
+                                $this->data[$i][$j][$key] = $arr;
                             } else {
                                 $this->data[$i][$j][$key] = $subrow;
                             }
                         } else {
                             if ($this->record->isMultiple()) {
-                                $this->data[$i][$key][] = $subrow;
+                                $arr = $this->data[$i][$key] ?? [];
+                                $arr[] = $subrow;
+                                $this->data[$i][$key] = $arr;
                             } else {
                                 $this->data[$i][$key] = $subrow;
                             }
@@ -260,10 +265,10 @@ class Executor
             foreach ($this->data as $i => $row) {
                 if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                     foreach ($row as $j => $_) {
-                        $subdata[$i][$j] = &$this->data[$i][$j][$key];
+                        $subdata[] = &$this->data[$i][$j][$key];
                     }
                 } else {
-                    $subdata[$i] = &$this->data[$i][$key];
+                    $subdata[] = &$this->data[$i][$key];
                 }
             }
             foreach ($sublists as $sublist) {
