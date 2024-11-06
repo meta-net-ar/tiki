@@ -126,7 +126,10 @@ class Manager
                 }
                 $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
                 $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-                $writer->write($source);
+                $result = $writer->write($source);
+                if (! empty($result['errors'])) {
+                    throw new \Exception($result['errors'][0]);
+                }
             }
         } catch (\Exception $e) {
             \Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
@@ -180,7 +183,10 @@ class Manager
             }
             $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, null, $args['values']);
             $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-            $writer->write($source, 'delete');
+            $result = $writer->write($source, 'delete');
+            if (! empty($result['errors'])) {
+                throw new \Exception($result['errors'][0]);
+            }
         }
     }
 
