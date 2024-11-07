@@ -606,20 +606,16 @@ class MenuLib extends TikiLib
     {
         $data = '"optionId","type","name","url","position","section","perm","groupname","userlevel","class","icon","remove"' . "\r\n";
         $options = $this->list_menu_options($menuId, 0, -1, 'position_asc', '', true, 0, true);
+        $keysToKeep = [
+            "optionId", "type", "name", "url", "position", "section",
+            "perm", "groupname", "userlevel", "class", "icon"
+        ];
         foreach ($options['data'] as $option) {
-            $data .= $option['optionId']
-                            . ',"' . $option['type']
-                            . '","' . str_replace('"', '""', $option['name'])
-                            . '","' . str_replace('"', '""', $option['canonic'])
-                            . '",' . $option['position']
-                            . ',"' . $option['section']
-                            . '","' . $option['perm']
-                            . '","' . $option['groupname']
-                            . '",' . $option['userlevel']
-                            . ',' . $option['class']
-                            . ',' . $option['icon']
-                            . ',"n"' . "\r\n"
-                            ;
+            $option = array_intersect_key($option, array_flip($keysToKeep));
+            $option = array_map(fn($value) => $this->sanitizeForCsv($value), $option);
+            $option['remove'] = 'n';
+            $data .= $this->str_putcsv($option);
+            $data .= "\r\n";
         }
         if (empty($encoding)) {
             $encoding = 'UTF-8';

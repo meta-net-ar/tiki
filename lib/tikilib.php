@@ -2644,7 +2644,16 @@ class TikiLib extends TikiDb_Bridge
         return $links;
     }
 
-    /**
+    public function sanitizeForCsv($input)
+    {
+        // Check if the input starts with characters that can trigger CSV injection
+        if (preg_match('/^[=+\-@]/', $input)) {
+            $input = "'" . $input; // Prefix with a single quote
+        }
+        return $input;
+    }
+
+   /**
      * Convert internal links from absolute to relative
      *
      * @param string $data
