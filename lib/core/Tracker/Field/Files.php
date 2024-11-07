@@ -9,6 +9,8 @@ use Tiki\Package\ComposerManager;
 
 class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface
 {
+    protected $fileIdsToBeAttached = [];
+
     public static function getTypes()
     {
         global $prefs;
@@ -62,6 +64,19 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                         'description' => tr('Maximum number of files to be attached on the field.'),
                         'filter' => 'int',
                         'legacy_index' => 2,
+                    ],
+                    'excessBehavior' => [
+                        'name' => tr('Excess File Upload Behavior'),
+                        'description' => tr('Determines the system behavior when user uploads more than the allowed number of files.'),
+                        'filter' => 'text',
+                        'default' => 'discard',
+                        'options' => [
+                            'discard' => 'Discard extra uploaded files and use the latest one(s)',
+                            'split' => 'Allow upload and split the files in separate tracker items'
+                        ],
+                        'depends' => [
+                            'field' => 'count'
+                        ],
                     ],
                     'displayMode' => [
                         'name' => tr('Display Mode'),
@@ -222,6 +237,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
             $galleryId = (int) $_SESSION['lastUploadGalleryId'];
         }
         $count = (int) $this->getOption('count');
+        $excessBehavior = $this->getOption('excessBehavior');
         $deepGallerySearch = (bool) $this->getOption('deepGallerySearch');
 
         // to use the user's userfiles gallery enter the fgal_root_user_id which is often (but not always) 2
@@ -250,14 +266,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
                 }
             }
 
-            // Keep only the last files if a limit is applied
-            if ($count) {
-                $fileIds = array_filter($fileIds);
-                $fileIds = array_slice($fileIds, -$count);
-                $value = implode(',', $fileIds);
-            } else {
-                $value = implode(',', array_filter($fileIds));
-            }
+            $value = implode(',', array_filter($fileIds));
         } else {
             $value = $this->getValue();
 
@@ -318,6 +327,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
             'galleryId' => $galleryId,
             'canUpload' => $canUpload,
             'limit' => $count,
+            'excessBehavior' => $excessBehavior,
             'files' => $fileInfo,
             'firstfile' => $firstfile,
             'value' => $value,
@@ -616,8 +626,24 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
 
     public function handleSave($value, $oldValue)
     {
-        $new = array_diff(explode(',', $value), explode(',', $oldValue));
-        $remove = array_diff(explode(',', $oldValue), explode(',', $value));
+        $excessBehavior = $this->getOption('excessBehavior');
+        $count = (int) $this->getOption('count');
+
+        $fileIds = array_filter(explode(',', $value));
+
+        if ($count) {
+            if ($excessBehavior === 'split') {
+                // take the ones above the maximum for handleFinalSave to attach to new items
+                $this->fileIdsToBeAttached = array_slice($fileIds, $count);
+                $fileIds = array_slice($fileIds, 0, $count);
+            } else {
+                // Keep only the last files if a limit is applied and the rest are discarded
+                $fileIds = array_slice($fileIds, -$count);
+            }
+        }
+
+        $new = array_diff($fileIds, explode(',', $oldValue));
+        $remove = array_diff(explode(',', $oldValue), $fileIds);
 
         $itemId = $this->getItemId();
 
@@ -642,8 +668,30 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractField implements \Track
         }
 
         return [
-            'value' => $value,
+            'value' => implode(',', $fileIds),
         ];
+    }
+
+    /**
+     * Implement excessBehavior = split - create additonal clones of the tracker item to store
+     * excessive files attached to this one.
+     */
+    public function handleFinalSave(array &$data)
+    {
+        $fileIdsForCurrentItem = $data[$this->getConfiguration('permName')];
+        if ($this->getOption('excessBehavior') === 'split' && ! empty($this->fileIdsToBeAttached)) {
+            $utilities = new Services_Tracker_Utilities();
+            foreach (array_chunk($this->fileIdsToBeAttached, $this->getOption('count')) as $fileIdsPerItem) {
+                $data[$this->getConfiguration('permName')] = implode(',', $fileIdsPerItem);
+                $itemId = $utilities->insertItem($this->getTrackerDefinition(), [
+                    'status' => $this->getData('status'),
+                    'fields' => $data,
+                    'validate' => false,
+                    'bulk_import' => true,
+                ]);
+            }
+        }
+        return $fileIdsForCurrentItem;
     }
 
     public function bindFiles($values, $attach = true)

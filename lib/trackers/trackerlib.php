@@ -2303,7 +2303,7 @@ class TrackerLib extends TikiLib
             }
 
             foreach ($final as $job) {
-                if (isset($job['field']['value'])) {
+                if (isset($job['field']['value']) && empty($data[$job['field']['permName']])) {
                     $data[$job['field']['permName']] = $job['field']['value'];
                 }
                 $value = $job['handler']->handleFinalSave($data);
