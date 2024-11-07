@@ -268,9 +268,9 @@ OUT;
         }
 
         if (TikiLib::lib('tiki')->page_exists("Some Page")) {
-            $url2 = "tiki-index.php?page=Some Page";
+            $url2 = "tiki-index.php?page=Some+Page";
         } else {
-            $url2 = "tiki-editpage.php?page=Some Page";
+            $url2 = "tiki-editpage.php?page=Some+Page";
         }
 
         $expect = <<<OUT
