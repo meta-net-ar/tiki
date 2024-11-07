@@ -1,4 +1,6 @@
-// This file contains rules for colors, consolidated from the tiki_base less files. They're moved here so that theme variables can provide values for them.
+// This file, which is imported by each theme, is for CSS rules containing SCSS variables for the themes to provide values for.
+// CSS rules that are global and themes don't need to provide values for should go into _tiki-miscellaneous_global.scss or one of the more-specific SCSS files.
+
 //@import "_bs3-bs4-transition.scss";
 //@import "_tiki-variables.scss";
 @use "sass:color";
@@ -1172,29 +1174,4 @@ blockquote {
 }
 .profile-tab-content h2{
     margin-top:0;
-}
-
-[data-mobile-tooltip] {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
-[data-mobile-tooltip]::after {
-    content: attr(data-mobile-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    border-radius: 5px;
-    white-space: nowrap;
-    display: none;
-    z-index: 1;
-}
-
-[data-mobile-tooltip].show-tooltip::after {
-    display: block;
 }

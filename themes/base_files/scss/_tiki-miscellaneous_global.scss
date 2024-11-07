@@ -713,7 +713,7 @@ ul.sm-horizontal {
     visibility: visible;
 }
 
-// Following 78 lines moved from tiki-selectors as they contain no variables
+// Following lines moved from tiki-selectors as they contain no variables
 .permission_table {
     .form-row {
         margin-left: 0; margin-right: 0;
@@ -792,4 +792,29 @@ ul.sm-horizontal {
     #page-data.col-sm-9 { padding-left: 0; padding-right: 0; }
     .syslog-table textarea { min-height: 5.5em; }
     .tiki .ui-dialog { width: 80vw !important; }
+}
+
+[data-mobile-tooltip] {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+[data-mobile-tooltip]::after {
+    content: attr(data-mobile-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    display: none;
+    z-index: 1;
+}
+
+[data-mobile-tooltip].show-tooltip::after {
+    display: block;
 }
