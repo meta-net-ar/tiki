@@ -41,7 +41,9 @@
     "clean": "concurrently \"npm:clean:*\"",
     "build:generateIconList": "node lib/iconGeneratorNodeWrapper.js",
     "test": "vitest --config=src/js/vite.config.mjs --coverage",
-    "testci": "vitest --config=src/js/vite.config.mjs --coverage --run"
+    "testci": "vitest --config=src/js/vite.config.mjs --coverage --run",
+    "postinstall": "patch-package --patch-dir=src/js/patches",
+    "patch": "patch-package --patch-dir=src/js/patches"
   },
   "engines": {
     "npm": ">=9.0.0 <11",
@@ -72,6 +74,7 @@
     "glob": "^11.0.0",
     "happy-dom": "^14.12.0",
     "npm-run-all2": "^6.2.3",
+    "patch-package": "^8.0.0",
     "prettier": "^3.3.3",
     "rollup-plugin-visualizer": "^5.12.0",
     "unplugin-auto-import": "^0.18.3",
