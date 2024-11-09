@@ -221,13 +221,12 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractField implements \Tr
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
         $value = $this->getValue();
+        // possibly milliseconds from js picker
+        $value = ($value && strlen($value) > 10 && substr($value, -3) === '000') ? ($value / 1000) : $value;
         $timestamp = $typeFactory->timestamp($value, $this->getOption('datetime') == 'd');
 
         if ($value && strlen($value) > 10) {
             trigger_error("Possibly incorrect timestamp value found when trying to send to search index. Tracker item " . $this->getItemId() . ", field " . $this->getConfiguration('permName') . ", value " . $value, E_USER_WARNING);
-            if (substr($value, -3) === '000') { // possibly milliseconds from js picker
-                $timestamp = $typeFactory->timestamp($value / 1000, $this->getOption('datetime') == 'd');
-            }
         }
 
         $data = [

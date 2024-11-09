@@ -252,6 +252,7 @@ class UnifiedSearchLib
 
         $stat = [];
         $indexer = null;
+        $totalFieldsUsedIn = 'total fields used in the ' . $prefs['unified_engine'] . ' search index: ';
         try {
             $indexDecorator = new Search_Index_TypeAnalysisDecorator($index);
             $indexer = $this->buildIndexer($indexDecorator, $loggit);
@@ -275,7 +276,7 @@ class UnifiedSearchLib
                 $fieldsCount = $engineResults->getEngineFieldsCount();
 
                 if ($fieldsCount !== $stat['total tiki fields indexed']) {
-                    $stat['total fields used in the ' . $prefs['unified_engine'] . ' search index: '] = $fieldsCount;
+                    $stat[$totalFieldsUsedIn] = $fieldsCount;
                 }
                 $tikilib->set_preference('unified_total_fields', $fieldsCount);
             }
