@@ -171,6 +171,8 @@ class ToolbarPicker extends ToolbarDialog
         global $toolbarPickerIndex;
         ++$toolbarPickerIndex;
         $tag->index = $toolbarPickerIndex;
+        $tag->singleSpaAppName = "@vue-mf/emoji-picker-" . \Tiki\Utilities\Identifiers::getHttpRequestId() . '_' . $tag->index;
+        $tag->singleSpaDomId = "single-spa-application:{$tag->singleSpaAppName}";
         $tag->setupJs();
 
         return $tag;
@@ -196,8 +198,7 @@ class ToolbarPicker extends ToolbarDialog
             return 'displayPicker( this, \'' . $this->name . '\', \'' .
                 $this->domElementId . '\', true, \'' . $this->styleType . '\' )';
         } elseif ($this->name == 'emoji' && $this->isVueTool()) {
-            return 'displayEmojiPicker(\'emoji-picker-' . $this->index . '\', \'' .
-                $this->domElementId . '\')';
+            return 'displayEmojiPicker(\'' . str_replace('@vue-mf/', '', $this->singleSpaAppName) . '\', \'' . $this->domElementId . '\')';
         } else {
             return 'displayPicker( this, \'' . $this->name . '\', \'' .
                 $this->domElementId . '\' )';
@@ -218,12 +219,12 @@ class ToolbarPicker extends ToolbarDialog
             ');
             $data = get_object_vars($this);
             unset($data['list']);
-            $data['pickerId'] = "emoji-picker-{$this->index}";
+            $data['pickerId'] = str_replace('@vue-mf/', '', $this->singleSpaAppName);
 
                         // language=JavaScript
             TikiLib::lib('header')->add_jq_onready('
     window.registerApplication({
-        name: "@vue-mf/emoji-picker",
+        name: ' . json_encode($this->singleSpaAppName) . ',
         app: () => importShim("@vue-mf/emoji-picker"),
         activeWhen: (location) => {
             let condition = true;
@@ -238,8 +239,8 @@ class ToolbarPicker extends ToolbarDialog
             }
         },
     })
-    onDOMElementRemoved("single-spa-application:@vue-mf/emoji-picker", function () {
-        window.unregisterApplication("@vue-mf/emoji-picker");
+    onDOMElementRemoved(' . json_encode($this->singleSpaDomId) . ', function () {
+        window.unregisterApplication(' . json_encode($this->singleSpaAppName) . ');
     });');
         } elseif (! $pickerAdded) {
             TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-toolbars.js');
@@ -318,6 +319,6 @@ class ToolbarPicker extends ToolbarDialog
 
     public function getEmojiPicker(): string
     {
-        return "<div id='emoji-picker-{$this->index}' class='emoji-picker' style='display:none'></div>";
+        return "<div id='" . str_replace('@vue-mf/', '', $this->singleSpaAppName) . "' class='emoji-picker' style='display:none'></div>";
     }
 }
