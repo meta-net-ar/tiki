@@ -152,6 +152,17 @@ class Schema
             } catch (Exception\ModeNotSupported $e) {
                 \Feedback::error($e->getMessage());
                 continue;
+            } catch (\Exception $e) {
+                // TODO make error message appear when exporting
+                \Feedback::error(
+                    tr(
+                        'Error on field %0 mode "%1"<br>&nbsp;&nbsp;',
+                        $column['field'],
+                        $column['mode']
+                    ) .
+                    $e->getMessage()
+                );
+                continue;
             }
             $col->setExportOnly(! empty($column['isExportOnly']));
             $col->setUniqueKey(! empty($column['isUniqueKey']));
