@@ -17,7 +17,7 @@ body.tiki-admin {
 .tiki-admin.uab #tikifeedback,
 .tiki-admin.uab .admin-content,
 .tiki-admin.uab .bottom_modules {
-    padding-left: 2.5rem !important;
+    padding-left: 3.5rem;
 }
 
 
@@ -27,7 +27,7 @@ body.tiki-admin {
     .tiki-admin.uab .admin-content,
     .tiki-admin.uab .errors-wrapper,
     .tiki-admin.uab .bottom_modules {
-        padding-left: 320px !important;
+        padding-left: 320px;
     }
 }
 
@@ -35,21 +35,21 @@ body.tiki-admin {
 //    .tiki-admin.uab #tikifeedback,
 //    .tiki-admin.uab .admin-content,
 //    .tiki-admin.uab .bottom_modules {
-//        padding-left: 320px !important;
+//        padding-left: 320px;
 //    }
 //}
 
 // Provide space for aside toggle button in screens with full-width content
 .tiki-admin.uab:not(.fixed_width) #tikifeedback,
 .tiki-admin.uab:not(.fixed_width) .admin-content {
-    padding-left: 2.5rem !important;
+    padding-left: 3.5rem;
 }
 
 @media (min-width: 993px) {
     .tiki-admin.uab:not(.fixed_width) #tikifeedback,
     .tiki-admin.uab:not(.fixed_width) .admin-content,
     .tiki-admin.uab:not(.fixed_width) .bottom_modules {
-        padding-left: 320px !important;
+        padding-left: 320px;
     }
 }
 
