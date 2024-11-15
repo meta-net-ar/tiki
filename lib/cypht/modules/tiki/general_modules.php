@@ -100,7 +100,7 @@ class Hm_Output_tiki_contacts_page_link extends Hm_Output_Module
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-people-fill fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Contacts') . '</a></li>';
+        $res .= '<span class="nav-label">' . $this->trans('Contacts') . '</span></a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

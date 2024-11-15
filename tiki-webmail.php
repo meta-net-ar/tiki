@@ -75,9 +75,9 @@ if (! empty($_SESSION['cypht']['user_data']['debug_mode_setting'])) {
 
 $out = str_replace("<th></th>", "<th><pre>     <pre></th>", $dispatcher->output);
 
-$smarty->assign('output_data', '<div class="inline-cypht"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
+$smarty->assign('output_data', '<div class="inline-cypht"><div class="app-container"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
     . $out
-    . "</div>");
+    . "</div></div>");
 $smarty->assign('mid', 'tiki-webmail.tpl');
 
 //handle message priting

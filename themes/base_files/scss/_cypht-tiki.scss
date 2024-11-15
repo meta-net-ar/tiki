@@ -1,7 +1,10 @@
 .inline-cypht {
-    background-color: var(--bs-body-bg) !important;
     font-family: $font-family-base;
     color: var(--bs-body-color) !important;
+    position: relative;
+    overflow-y: hidden;
+    height: 90vh;
+    background-color: var(--bs-secondary-bg);
 
     .hide { display: none !important; }
     // override colors when not using cypht default theme
@@ -86,8 +89,6 @@
 }
 
 .inline-cypht {
-    background-color: transparent !important;
-    position: relative;
     a:not(.btn):hover {
         text-decoration: $link-hover-decoration !important;
     }
@@ -115,9 +116,6 @@
         background-color: $popover-bg;
         color: $popover-body-color;
     }
-
-    .folder_list, .content_cell { border: 1px solid $input-border-color; }
-    .content_cell { width: 70%; }
 
     .message_list .content_title, .message_list .content_title > div:first-child {
         flex-direction: column;
@@ -238,16 +236,27 @@
     .select2-container { min-width: 150px; margin-bottom: 0; }
     .combined_sort { display: inline-block; margin-left: 10px; }
 
-    .folder_cell { max-width: 27%; width: 27%; }
     .folders li, .inner_list li {
         word-break: break-all;
         white-space: unset;
         padding: 0;
     }
     .toggle_link { margin-right: 10px; }
-    .folder_list { min-width: 95%; }
     .move_to_location .folders a:not(.btn), .move_to_location i { color: $dropdown-link-color !important; }
     .shortcut_table { width: 100%; }
+    .app-container {
+        padding: 20px;
+        position: absolute;
+    }
+    .folder_list, .content_cell{
+        position: relative;
+        min-height: calc(90vh - 40px);
+        max-height: calc(90vh - 40px);
+        overflow-y: auto;
+    }
+    .collapsed ul {
+        display: inherit;
+    }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
@@ -277,15 +286,9 @@
 //
 .mobile {
     .inline-cypht {
-        nav.folder_cell {
-            position: fixed;
-            z-index: 9999;
-        }
-        .menu-toggle {
-            z-index: 9999;
-        }
         .content_cell {
-            padding: 20px 0 20px; border: none;
+            padding: 0;
+            border: none;
             display: block !important;
         }
 
@@ -320,12 +323,6 @@
         .sys_messages {
             top: 0; right: 0; width: 100%; min-height: 5px;
             padding-bottom: 15px; white-space: normal;
-        }
-
-        // mobile main menu
-        .folder_toggle {
-            display: block !important; letter-spacing: normal; z-index: 10000;
-            img { width: 24px; height: 30px; margin: -5px 0 0 5px; }
         }
 
         // mobile home
@@ -427,33 +424,6 @@
         }
     }
 
-
-    // mobile main menu animation
-    .inner_list { margin-bottom: 0; }
-    .src_name {
-        max-height: 100px; margin: 0;
-        padding-top: 10px; padding-bottom: 10px;
-    }
-
-    .folder_cell {
-        position: fixed; width: 300px;
-        top: 60px; left: -310px;
-        overflow: auto; z-index: 1;
-        transition: all 1s ease;
-        transform: translateX(-300px);
-
-        &.slide-in {
-            transition: all 0.5s ease;
-            transform: translateX(300px);
-        }
-
-        .folder_list {
-            display: block !important; width: auto;
-            margin-bottom: 50px; font-size: 100%;
-            li a { padding-top: 0; }
-            .update_message_list, .hide_folders { display: none; }
-        }
-    }
     // Remove the fixed navbar as it will make Cypht navbar not visible
     .navbar.fixed-top { display: none; }
 }
