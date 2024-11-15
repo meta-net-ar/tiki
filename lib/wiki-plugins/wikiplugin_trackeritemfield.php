@@ -278,7 +278,8 @@ function wikiplugin_trackeritemfield($data, $params)
             $test = false;
         }
 
-        if (($val = $trklib->get_item_value($trackerId, $itemId, $fieldId)) !== false) {
+        $val = $trklib->get_item_value($trackerId, $itemId, $fieldId);
+        if ($val !== false || $field['type'] == 'S') {
             if ($test) {
                 if (empty($value) && empty($val)) {
                     return $data;

@@ -56,7 +56,8 @@ class Search_Formatter_ValueFormatter
             $value = $this->valueSet[$name];
         }
 
-        if ($format !== 'wikiplugin' && is_null($value)) {
+        // let wikiplugin or trackerrender formatters get the actual value if it is not stored in the db/index (e.g. might be calculated, static text, retrieved from a plugin)
+        if ($format !== 'wikiplugin' && $format !== 'trackerrender' && is_null($value)) {
             return tr("No value for '%0'", $name);
         }
 
