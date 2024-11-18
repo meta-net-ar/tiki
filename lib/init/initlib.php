@@ -23,6 +23,8 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
     exit;
 }
 
+require_once('lib/enforce_php_version_constraints.php');
+
 if (! file_exists(__DIR__ . '/../../vendor_bundled/vendor/autoload.php')) {
     $error = "Your Tiki is not completely installed because Composer has not been run to fetch package dependencies.\n" .
         "You need to run 'sh setup.sh' from the command line.\n" .

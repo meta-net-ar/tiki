@@ -26,6 +26,9 @@ if (http_response_code() !== false) {
 const TIKI_CONSOLE = 1;
 $_autoloaderIsAvailable = false;
 
+// Enforce php version constraints
+require_once('lib/enforce_php_version_constraints.php');
+
 // we autoload if autoloading is available, otherwise we continue so Tiki can throw its regular errors.
 if (include('vendor_bundled/vendor/autoload.php')) {
     $_autoloaderIsAvailable = true;

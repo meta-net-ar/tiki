@@ -17,6 +17,7 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
     exit;
 }
 
+require_once('lib/enforce_php_version_constraints.php');
 
 if (! file_exists('vendor_bundled/vendor/autoload.php')) {
     $title = "Tiki Installer missing third party software files";
@@ -25,50 +26,4 @@ if (! file_exists('vendor_bundled/vendor/autoload.php')) {
     $content .= "<p>See <a href='https://doc.tiki.org/Composer' target='_blank' class='text-yellow-inst'>https://doc.tiki.org/Composer</a> for details.</p>";
     createPage($title, $content);
     exit;
-}
-
-/**
- * creates the HTML page to be displayed.
- *
- * Tiki may not have been installed when we reach here, so we can't use our templating system yet.
- * This needs to be done before tiki-setup.php is called because tiki-setup.php produces a message formatted for command-line only
- *
- * @param string $title   page Title
- * @param mixed  $content page Content
- */
-function createPage($title, $content)
-{
-    echo <<<END
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link type="text/css" rel="stylesheet" href="themes/default/css/default.css" />
-        <link type="text/css" rel="stylesheet" href="themes/css/tiki-install.css" />
-        <title>$title</title>
-    </head>
-    <body class="installer-body">
-        <div id="fixedwidth" class="fixedwidth">
-
-            <header class="header-main">
-                <img alt="Site Logo" src="img/tiki/Tiki_WCG_light.png" class="logo-box" />
-                    <div class="text-box">
-                        <div class="heading-text">
-                            <h3 class="main-text">$title</h3>
-                        </div>
-                        <div class="text-info">
-                            $content
-                        </div>
-                    </div>
-                     <a href="https://tiki.org" class="btn_powered" target="_blank" title="Powered by Tiki Wiki CMS Groupware">
-                        <img src="img/tiki/tikibutton.png" alt="Powered by Tiki Wiki CMS Groupware">
-                    </a>
-            </header>
-        </div>
-    </body>
-</html>
-END;
-    die;
 }
