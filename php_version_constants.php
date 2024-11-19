@@ -18,4 +18,4 @@ const TIKI_MIN_PHP_VERSION = '8.1.0';
 /** Beyond this (usually the next major PHP version), tiki will not even attempt to run.  Even developpers haven't tried this.
  *  * If you update this, don't forget to update tiki-check.php
  */
-const TIKI_TOO_RECENT_PHP_VERSION = '8.2.0';
+const TIKI_TOO_RECENT_PHP_VERSION = '9.0.0';
