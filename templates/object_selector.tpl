@@ -86,6 +86,6 @@
 </div>
 
 {jq}
-$('#{{$object_selector.id|escape}}')
+$('[id={{$object_selector.id|escape}}]')
     .object_selector();
 {/jq}
