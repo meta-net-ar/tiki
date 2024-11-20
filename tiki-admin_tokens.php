@@ -77,6 +77,7 @@ foreach ($tokens as $key => $token) {
 	}
 	$tokens[$key]['entry'] = preg_replace('#^' . preg_quote($tikiroot) . '#', '', $token['entry']);
 }
+krsort($tokens);
 
 $smarty->assign('tokens', $tokens);
 $smarty->assign('mid', 'tiki-admin_tokens.tpl');

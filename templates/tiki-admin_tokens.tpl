@@ -31,8 +31,8 @@
 						<td>{$token.tokenId}</td>
 						<td>{$token.entry}</td>
 						<td>{$token.email}</td>
-						<td>{if $token.expires}{$token.expires|tiki_short_datetime}{else}{tr}none{/tr}{/if}</td>
-						<td style="max-width: 6em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{$token.token}">
+						<td>{if !empty($token.expires)}{$token.expires|tiki_short_datetime}{else}{tr}none{/tr}{/if}</td>
+						<td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{$token.token}">
 							{$token.token}
 						</td>
 						<td>{$token.creation|tiki_short_datetime}</td>
