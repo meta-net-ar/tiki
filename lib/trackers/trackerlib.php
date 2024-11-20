@@ -2017,7 +2017,7 @@ class TrackerLib extends TikiLib
 
         $tracker_definition = Tracker_Definition::get($trackerId);
 
-        if (method_exists($tracker_definition, 'getInformation') == false) {
+        if (empty($tracker_definition) || ! method_exists($tracker_definition, 'getInformation')) {
             return -1;
         }
 

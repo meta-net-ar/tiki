@@ -1907,7 +1907,7 @@ CREATE TABLE `tiki_pages` (
   `pageSlug` varchar(160) NULL,
   `hits` int(8) default NULL,
   `data` mediumtext,
-  `description` varchar(200) default NULL,
+  `description` MEDIUMTEXT default NULL,
   `lastModif` int(14) default NULL,
   `comment` MEDIUMTEXT default NULL,
   `version` int(8) NOT NULL default '0',
