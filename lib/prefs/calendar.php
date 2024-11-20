@@ -184,5 +184,12 @@ function prefs_calendar_list()
             'units' => tra('seconds'),
             'default' => 72000,
         ],
+        'calendar_holidays' => [
+            'name' => tra('Holidays calendar'),
+            'description' => tra('Choose a calendar to store non-working days which are used in date calculations involving working days.'),
+            'type' => 'text',
+            'default' => '',
+            'profile_reference' => 'calendar',
+        ],
     ];
 }

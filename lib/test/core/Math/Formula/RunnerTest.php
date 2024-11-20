@@ -354,4 +354,70 @@ class Math_Formula_RunnerTest extends TikiTestCase
             ['(str "Say:" a b "!")', 'Say: a b !'],
         ];
     }
+
+    public function testStrToTime()
+    {
+        $this->runner->setFormula('(str-to-time (str +1 day) a)');
+        $this->runner->setVariables(['a' => strtotime('2024-11-20')]);
+        $this->assertEquals('2024-11-21', date('Y-m-d', $this->runner->evaluate()));
+    }
+
+    public function testStrToTimeNonWorkingDays()
+    {
+        global $prefs;
+        $origPrefs = $prefs;
+
+        $prefs['calendar_holidays'] = $calendarId = TikiLib::lib('calendar')->set_calendar(0, 'admin', 'Holidays', '');
+
+        // setup recurring weekends as holidays
+        $weekends = new CalRecurrence();
+        $weekends->setCalendarId($calendarId);
+        $weekends->setName('Weekends');
+        $weekends->setLang('en');
+        $weekends->setPriority(1);
+        $weekends->setStart(strtotime('2024-12-01'));
+        $weekends->setEnd(strtotime('2024-12-01'));
+        $weekends->setAllday(true);
+        $weekends->setWeekly(true);
+        $weekends->setWeekdays('SU,SA');
+        $weekends->setEndPeriod(strtotime('2025-01-31'));
+        $weekends->save();
+
+        // setup recurring new year day as holiday
+        $newyear = new CalRecurrence();
+        $newyear->setCalendarId($calendarId);
+        $newyear->setName('New Year');
+        $newyear->setLang('en');
+        $newyear->setPriority(1);
+        $newyear->setStart(strtotime('2025-01-01'));
+        $newyear->setEnd(strtotime('2025-01-01'));
+        $newyear->setAllday(true);
+        $newyear->setYearly(true);
+        $newyear->setNbRecurrences(2);
+        $newyear->setYearlyType('date');
+        $newyear->setDateOfYear('101');
+        $newyear->save();
+
+        // setup a one-time public holiday
+        TikiLib::lib('calendar')->set_item('admin', 0, [
+            'calendarId' => $calendarId,
+            'start' => strtotime('2024-12-24 00:00:00'),
+            'end' => strtotime('2024-12-26 23:59:59'),
+            'name' => 'Christmas',
+            'description' => '',
+        ]);
+
+        $this->runner->setFormula('(str-to-time (str +10 working days) a)');
+        $this->runner->setVariables(['a' => strtotime('2024-12-20')]);
+        $evaluated = $this->runner->evaluate();
+
+        // cleanup
+        $weekends->delete(strtotime('2024-01-01'));
+        $newyear->delete(strtotime('2024-01-01'));
+        TikiLib::lib('calendar')->drop_calendar($calendarId);
+        $prefs = $origPrefs;
+
+        // asset calculation is correct
+        $this->assertEquals('2025-01-09', date('Y-m-d', $evaluated));
+    }
 }
