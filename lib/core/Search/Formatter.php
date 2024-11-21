@@ -60,7 +60,7 @@ class Search_Formatter
             . $this->render($this->plugin, $list, Search_Formatter_Plugin_Interface::FORMAT_WIKI);
     }
 
-    public function getPopulatedList($list, $preload = true)
+    public function getPopulatedList($list, $preload = true, $preloadAdditionalFields = [])
     {
         global $prefs;
 
@@ -98,6 +98,11 @@ class Search_Formatter
                     if (isset($pre[$f])) {
                         $pre[$f]; // Dynamic loading if applicable
                     }
+                }
+            }
+            foreach ($preloadAdditionalFields as $f) {
+                if (isset($pre[$f])) {
+                    $pre[$f];
                 }
             }
 

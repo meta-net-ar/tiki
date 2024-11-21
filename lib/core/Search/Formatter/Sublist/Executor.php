@@ -182,26 +182,27 @@ class Executor
     {
         $key = $this->record->getKey();
 
-        foreach ($result as $entry) {
-            $subrow = [];
-            foreach ($this->formatterPlugins as $name => $plugin) {
-                $defaultValues = $plugin->getFields();
-                $fields = array_keys($defaultValues);
-                $row = [];
-                foreach ($fields as $f) {
-                    if (self::checkFieldIsAvailable($f, $entry)) {
-                        $row[$f] = $entry[$f];
-                    }
-                }
-                $subInput = new Search_Formatter_ValueFormatter(array_merge($defaultValues, $row));
-                $subrow[$name] = $this->searchFormatter->render($plugin, Search_ResultSet::create([$plugin->prepareEntry($subInput)]), $this->searchFormatter->plugin->getFormat());
-                if ($this->searchFormatter->plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_HTML && $plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
-                    $subrow[$name] = preg_replace('/^~\/np~|~np~$/', '', $subrow[$name]);
-                    $subrow[$name] = TikiLib::lib('parser')->parse_data($subrow[$name]);
+        $fieldsToPreload = [];
+        foreach ($this->reverseMapping as $i => $mappings) {
+            foreach ($mappings as $j => $mapping) {
+                foreach ($mapping as $map) {
+                    $fieldsToPreload[] = $map['target_field'];
                 }
             }
-            if (count($this->formatterPlugins) == 0) {
-                $subrow = $entry;
+        }
+        $fieldsToPreload = array_unique($fieldsToPreload);
+
+        $sf = new Search_Formatter($this->searchFormatter->plugin);
+        foreach ($this->formatterPlugins as $name => $plugin) {
+            $sf->addSubFormatter($name, $plugin);
+        }
+        $formatted = $sf->getPopulatedList($result, true, $fieldsToPreload);
+
+        foreach ($formatted as $entry) {
+            foreach ($this->formatterPlugins as $name => $plugin) {
+                if ($this->searchFormatter->plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_HTML && $plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
+                    $entry[$name] = preg_replace('/^~\/np~|~np~$/', '', $entry[$name]);
+                }
             }
             foreach ($this->reverseMapping as $i => $mappings) {
                 foreach ($mappings as $j => $mapping) {
@@ -231,18 +232,18 @@ class Executor
                             if ($this->record->isMultiple()) {
                                 // might be ArrayObject (Search_Formatter_Transform_DynamicLoaderWrapper) where array auto-creation doesn't work
                                 $arr = $this->data[$i][$j][$key] ?? [];
-                                $arr[] = $subrow;
+                                $arr[] = $entry;
                                 $this->data[$i][$j][$key] = $arr;
                             } else {
-                                $this->data[$i][$j][$key] = $subrow;
+                                $this->data[$i][$j][$key] = $entry;
                             }
                         } else {
                             if ($this->record->isMultiple()) {
                                 $arr = $this->data[$i][$key] ?? [];
-                                $arr[] = $subrow;
+                                $arr[] = $entry;
                                 $this->data[$i][$key] = $arr;
                             } else {
-                                $this->data[$i][$key] = $subrow;
+                                $this->data[$i][$key] = $entry;
                             }
                         }
                     }
