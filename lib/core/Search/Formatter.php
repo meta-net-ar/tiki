@@ -10,14 +10,14 @@ use Search\Formatter\Sublist\Record as Sublist;
 class Search_Formatter
 {
     public $plugin;
-    private $counter;
+    private int $counter;
     private $subFormatters = [];
     private $customFilters = [];
     private $subLists = [];
     private $alternateOutput;
     private ?string $context;
 
-    public function __construct(Search_Formatter_Plugin_Interface $plugin, $counter = 0)
+    public function __construct(Search_Formatter_Plugin_Interface $plugin, int $counter = 0)
     {
         $this->plugin = $plugin;
         $this->counter = $counter;

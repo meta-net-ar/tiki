@@ -17,7 +17,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
     private $tsOn;
     private $tsettings;
 
-    public static function create($list)
+    public static function create($list): self
     {
         if ($list instanceof self) {
             return $list;
