@@ -3,7 +3,6 @@
     color: var(--bs-body-color) !important;
     position: relative;
     overflow-y: hidden;
-    height: 90vh;
     background-color: var(--bs-secondary-bg);
 
     .hide { display: none; }
@@ -265,13 +264,11 @@
     .shortcut_table { width: 100%; }
     .app-container {
         padding: 20px;
-        position: absolute;
     }
     .folder_list, .content_cell{
         position: relative;
-        min-height: calc(90vh - 40px);
-        max-height: calc(90vh - 40px);
         overflow-y: auto;
+        border-radius: var(--bs-border-radius);
     }
 
     .content_title {
