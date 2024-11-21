@@ -12,13 +12,13 @@ use Search\Formatter\Sublist\Parser as SublistParser;
 class Search_Formatter_Builder
 {
     private $parser;
-    private $sublistParser;
+    private SublistParser $sublistParser;
     private $paginationArguments;
 
-    private $formatterPlugin;
+    private Search_Formatter_Plugin_Interface $formatterPlugin;
     private $subFormatters = [];
     private $customFilters = [];
-    private $subLists = [];
+    private array $subLists = [];
     private $alternateOutput;
     private $id;
     private $count;
@@ -91,7 +91,7 @@ class Search_Formatter_Builder
         }
     }
 
-    public function getFormatter($errorInQuery = '')
+    public function getFormatter($errorInQuery = ''): Search_Formatter
     {
         global $prefs;
         $plugin = $this->formatterPlugin;
@@ -140,7 +140,7 @@ class Search_Formatter_Builder
         }
     }
 
-    private function handleFilter($match)
+    private function handleFilter(WikiParser_PluginMatcher_Match $match): void
     {
         $arguments = $this->parser->parse($match->getArguments());
 
@@ -172,7 +172,7 @@ class Search_Formatter_Builder
      *
      * @throws Exception
      */
-    private function handleOutput($output, $params)
+    private function handleOutput(WikiParser_PluginMatcher_Match $output, $params): void
     {
         global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
         $smarty = TikiLib::lib('smarty');
@@ -213,7 +213,7 @@ class Search_Formatter_Builder
                 $temp = $smarty->get_filename($arguments['template']);
                 if (empty($temp)) { //if get_filename cannot find template, return error
                     Feedback::error(tr('Missing template "%0"', $arguments['template']));
-                    return '';
+                    return;
                 }
                 $arguments['template'] = $temp;
             }

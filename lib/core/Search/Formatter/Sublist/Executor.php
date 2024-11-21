@@ -7,6 +7,7 @@
 
 namespace Search\Formatter\Sublist;
 
+use ArrayObject;
 use Exception;
 use Search_Formatter;
 use Search_Formatter_Plugin_ArrayTemplate;
@@ -57,6 +58,19 @@ class Executor
         }
     }
 
+    /** @array typically a raw array or a Search_Formatter_Transform_DynamicLoaderWrapper */
+    private static function checkFieldIsAvailable(string $fieldName, array|\ArrayObject $record)
+    {
+        $arrayObject = is_array($record) ? new ArrayObject($record) : $record;
+        $retVal = $arrayObject->offsetExists($fieldName);
+        if (! $retVal) {
+            $availableFields = array_keys($arrayObject->getArrayCopy());
+            sort($availableFields);
+            $msg = tr('Field %0 not found.  The fields available in the current context are: %1', $fieldName, implode(', ', $availableFields));
+            throw new Exception($msg);
+        }
+        return $retVal;
+    }
     protected function replacePlaceholders()
     {
         $body = $this->record->getBody();
@@ -68,9 +82,10 @@ class Executor
                 throw new Exception(tr('Filter blocks inside sublist sections in PluginList need field reference.'));
             }
             foreach ($arguments as $name => $value) {
+                // Sublist special processing will only happen if parent or root is provided
                 if (preg_match('/\$(parent|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
                     $placeholder = $m[0];
-                    $type = $m[1];
+                    $type = $m[1]; // parent or root
                     $field = $m[2];
                     $modifier = $m[3] ?? null;
                     $values = [];
@@ -98,15 +113,25 @@ class Executor
                             if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                                 // parent sublists might have entries with multiple records per key
                                 foreach ($row as $j => $subrow) {
-                                    if (! empty($subrow[$field])) {
+                                    if (self::checkFieldIsAvailable($field, $subrow)) {
                                         $this->reverseMapping[$i][$j][] = [
                                             'value' => $valueExtractor($subrow[$field]),
                                             'target_field' => $arguments['field'],
                                         ];
                                     }
                                 }
+                            } else {
+                                if (self::checkFieldIsAvailable($field, $row)) {
+                                    $this->reverseMapping[$i][0][] = [
+                                        'value' => $valueExtractor($row[$field]),
+                                        'target_field' => $arguments['field'],
+                                    ];
+                                }
                             }
-                            if (! empty($row[$field])) {
+                        }
+                    } elseif ($type == 'root') {
+                        foreach ($this->root_data as $i => $row) {
+                            if (self::checkFieldIsAvailable($field, $row)) {
                                 $this->reverseMapping[$i][0][] = [
                                     'value' => $valueExtractor($row[$field]),
                                     'target_field' => $arguments['field'],
@@ -114,14 +139,7 @@ class Executor
                             }
                         }
                     } else {
-                        foreach ($this->root_data as $i => $row) {
-                            if (! empty($row[$field])) {
-                                $this->reverseMapping[$i][0][] = [
-                                    'value' => $valueExtractor($row[$field]),
-                                    'target_field' => $arguments['field'],
-                                ];
-                            }
-                        }
+                        throw new Exception("This should not be possible");
                     }
                     $values = array_unique($values);
                     $arguments[$name] = implode(' OR ', $values);
@@ -171,7 +189,7 @@ class Executor
                 $fields = array_keys($defaultValues);
                 $row = [];
                 foreach ($fields as $f) {
-                    if (isset($entry[$f])) {
+                    if (self::checkFieldIsAvailable($f, $entry)) {
                         $row[$f] = $entry[$f];
                     }
                 }

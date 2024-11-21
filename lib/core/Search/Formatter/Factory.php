@@ -8,7 +8,7 @@ class Search_Formatter_Factory
 {
     public static $counter = 0;
 
-    public static function newFormatter($plugin)
+    public static function newFormatter($plugin): Search_Formatter
     {
         self::$counter++;
         return new Search_Formatter($plugin, self::$counter);

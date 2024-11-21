@@ -8,6 +8,7 @@
 namespace Search\Formatter\Sublist;
 
 use Search_Formatter;
+use Exception;
 
 class Record
 {
@@ -15,8 +16,9 @@ class Record
     private $multiple;
     private $required;
     private $body;
-    private $sublists;
-    private $parent;
+    /** Array of Record */
+    private array $sublists = [];
+    private ?self $parent;
 
     private $parser;
 
@@ -44,12 +46,12 @@ class Record
         return $this->parent;
     }
 
-    public function setParent($parent)
+    public function setParent(self $parent): void
     {
         $this->parent = $parent;
     }
 
-    public function addSublist(Record $sublist)
+    public function addSublist(Record $sublist): void
     {
         $sublist->setParent($this);
         $this->sublists[] = $sublist;
@@ -85,10 +87,17 @@ class Record
         $this->required = $required;
     }
 
-    public function executeOverDataset(&$data, &$root_data, Search_Formatter $sf)
+    public function executeOverDataset(&$data, &$root_data, Search_Formatter $sf): void
     {
         $executor = new Executor($this, $sf);
-        $executor->runOnDataset($data, $root_data);
+        try {
+            $executor->runOnDataset($data, $root_data);
+        } catch (Exception $e) {
+            if (empty($e->suppress_feedback)) {
+                \Feedback::error(tr('Sublist error: %0', $e->getMessage()));
+                trigger_error($e->getMessage(), E_USER_WARNING);
+            }
+        }
     }
 
     public function getFormats()

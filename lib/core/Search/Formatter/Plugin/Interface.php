@@ -11,6 +11,7 @@ interface Search_Formatter_Plugin_Interface
     public const FORMAT_ARRAY = 'array';
     public const FORMAT_CSV = 'csv';
 
+    /** @return The array of fields this Formatter looks for.  The key is the  field name, the value is the default value for that field */
     public function getFields();
 
     public function getFormat();

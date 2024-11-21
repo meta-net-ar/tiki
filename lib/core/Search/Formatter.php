@@ -7,17 +7,17 @@
 
 use Search\Formatter\Sublist\Record as Sublist;
 
-/** This it to format a list of search results.  It moslty handles all the FORMAT blocks of pluginlist (in ValueFormatter) as opposed to class Search_Formatter which mostly deals with the OUTPUT block.  */
+/** This it to format a list of search results.  It mostly handles all the FORMAT blocks of pluginlist (in ValueFormatter) as opposed to class Search_Formatter_Builder which mostly deals with the OUTPUT block.  */
 class Search_Formatter
 {
     public $plugin;
-    private $counter;
+    private int $counter;
     private $subFormatters = [];
     private $customFilters = [];
     private $subLists = [];
     private $alternateOutput;
 
-    public function __construct(Search_Formatter_Plugin_Interface $plugin, $counter = 0)
+    public function __construct(Search_Formatter_Plugin_Interface $plugin, int $counter = 0)
     {
         $this->plugin = $plugin;
         $this->counter = $counter;
