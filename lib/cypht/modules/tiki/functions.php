@@ -111,6 +111,7 @@ if (! hm_exists('tiki_mime_part_to_bodystructure')) {
                 $file_attributes[$header->getValue()][] = $header->getValueFor('filename');
             }
         }
+        $msgContent = (string) $part->getContent();
         $result = [$part_num => [
         'type' => $content_type[0],
         'subtype' => $content_type[1],
@@ -118,8 +119,8 @@ if (! hm_exists('tiki_mime_part_to_bodystructure')) {
         "id" => $part->getContentId(),
         'description' => false,
         'encoding' => $part->getContentTransferEncoding(),
-        'size' => strlen($part->getContent()),
-        'lines' => $part->isTextPart() ? substr_count($part->getContent(), "\n") : false,
+        'size' => strlen($msgContent),
+        'lines' => $part->isTextPart() ? substr_count($msgContent, "\n") : false,
         'md5' => false,
         'disposition' => $part->getContentDisposition(false),
         'file_attributes' => $file_attributes,
@@ -269,6 +270,7 @@ if (! hm_exists('tiki_flag_message')) {
         } else {
             $flags = '';
         }
+        $state = $flag;
         if ($action == 'remove') {
             $flags = preg_replace('/\\\?' . ucfirst($flag) . '/', '', $flags);
             $state = 'un' . $flag;

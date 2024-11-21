@@ -731,7 +731,7 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         $this->out('show_archive', $email['show_archive']);
 
         clear_existing_reply_details($this->session);
-        if ($part == 0) {
+        if ($part_num == 0) {
             $msg_struct_current['type'] = 'text';
             $msg_struct_current['subtype'] = 'plain';
         }

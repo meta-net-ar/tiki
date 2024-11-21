@@ -15,7 +15,7 @@ global $tikiroot;
 define('VENDOR_PATH', $tikipath . '/vendor_bundled/vendor/');
 define('APP_PATH', VENDOR_PATH . 'jason-munro/cypht/');
 define('CONFIG_PATH', VENDOR_PATH . 'jason-munro/cypht/config/');
-define('WEB_ROOT', $tikiroot);
+define('WEB_ROOT', 'vendor_bundled/vendor/jason-munro/cypht/');
 define('DEBUG_MODE', false);
 
 define('CACHE_ID', 'FoHc85ubt5miHBls6eJpOYAohGhDM61Vs%2Fm0BOxZ0N0%3D'); // Cypht uses for asset cache busting but we run the assets through Tiki pipeline, so no need to generate a unique key here

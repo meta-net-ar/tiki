@@ -260,7 +260,8 @@ return [
     'flag_state' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'trackers' => [FILTER_DEFAULT, false],
     'tracker_data' => [FILTER_DEFAULT, false],
-    'mailboxes' => [FILTER_UNSAFE_RAW, false]
+    'mailboxes' => [FILTER_UNSAFE_RAW, false],
+    'msg_headers' => [FILTER_UNSAFE_RAW, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
