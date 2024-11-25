@@ -1556,9 +1556,9 @@ class WikiLib extends TikiLib
         $pages = TikiDb::get()->table('tiki_pages');
         if (TikiLib::lib('tiki')->page_exists($page) || TikiLib::lib('tiki')->getPageBySlug($page)) {
             $page = $pages->fetchOne('pageSlug', ['pageName' => $page]) ?: $page;
-            $href = "$script_name?page=" . $page;
+            $href = "$script_name?page=" . urlencode($page);
         } else {
-            $href = "$script_name2?page=" . $page;
+            $href = "$script_name2?page=" . urlencode($page);
         }
 
         if (isset($prefs['feature_wiki_use_date_links']) && $prefs['feature_wiki_use_date_links'] == 'y') {
