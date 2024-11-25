@@ -542,8 +542,8 @@ class Hm_Handler_tiki_compose_from_draft extends Hm_Handler_Module
 {
     public function process()
     {
-        $draftId = $this->request->get['draft_id'];
-        $path = $this->request->get['list_path'];
+        $draftId = $this->request->get['draft_id'] ?? '';
+        $path = $this->request->get['list_path'] ?? '';
         if (! strstr($path, 'tracker_folder_') || ! $draftId) {
             return;
         }

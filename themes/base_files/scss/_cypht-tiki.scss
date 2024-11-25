@@ -201,32 +201,12 @@
 
     // message list / text
     .refresh_list, .list_settings_link { padding:0; margin: 5px 2px 0; }
-    .toggle_recipients { right: 25px; }
     .msg_date { font-weight: bold; }
     .msg_parts tr:not(:last-child) { border-bottom: 1px solid #444; }
     .part_desc, .part_size, .download_link { margin-left: 25px; }
     .msg_part_icon { padding: 0; margin-left: 5px; }
     .msg_headers td { padding-right: 35px; }
     .noselect2 { display: none !important; }
-
-    //Search
-    .search_form {
-        form {
-            display: flex;
-            max-width: 100%;
-            flex-wrap: wrap;
-        }
-        .search_terms {
-            min-width: 100px;
-            max-width: 150px;
-            margin: 0px;
-            margin-bottom: 10px;
-        }
-    }
-
-    .save_search, .delete_search {
-        img { padding: 5px 0 0 5px; }
-    }
 
     .advanced_search_form {
         input[type="radio"], input[type="checkbox"] { margin-right: 5px; }
