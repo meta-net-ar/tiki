@@ -62,6 +62,33 @@ class Hm_Handler_tiki_sieve_placeholder extends Hm_Handler_Module
     }
 }
 
+/**
+ * Adds a sieve config host if storage is tiki
+ * @subpackage tiki/output
+ */
+class Hm_Handler_tiki_add_sieve_config_host extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $factory = get_sieve_client_factory($this->config);
+        $imap_servers = $this->user_config->get('imap_servers', []);
+        foreach ($imap_servers as $imap_server) {
+            if (isset($imap_server['sieve_config_host'])) {
+                continue;
+            }
+            try {
+                $client = $factory->init($this->user_config, $imap_server);
+                if (method_exists($client, 'isTikiStorage') && $client->isTikiStorage()) {
+                    $imap_server['sieve_config_host'] = 'localhost';
+                    Hm_IMAP_List::edit($imap_server['id'], $imap_server);
+                }
+            } catch (Exception $e) {
+                // Nothing to do
+            }
+        }
+    }
+}
+
 
 /**
  * @subpackage sievefilters/handler
