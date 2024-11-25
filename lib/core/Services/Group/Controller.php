@@ -408,7 +408,8 @@ class Services_Group_Controller
     public function action_add_user($input)
     {
         global $prefs;
-        Services_Exception_Denied::checkGlobal('admin');
+        Services_Exception_Denied::checkGlobal('admin_users');
+        Services_Exception_Denied::checkGlobal('group_add_member');
         $util = new Services_Utilities();
         $userlib = TikiLib::lib('user');
         //first pass - show confirm modal popup

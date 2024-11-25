@@ -2701,12 +2701,16 @@ class UsersLib extends TikiLib
         return $retval;
     }
 
-    public function list_all_users()
+    public function list_all_users($group = null)
     {
-        global $tiki_p_list_users, $tiki_p_admin;
         $cachelib = TikiLib::lib('cache');
-
-        if ($tiki_p_list_users !== 'y' && $tiki_p_admin != 'y') {
+        $perms = Perms::get();
+        $has_permission = $perms->list_users || $perms->admin;
+        if (! $has_permission && ! empty($group)) {
+            $perms = Perms::get(['type' => 'group', 'object' => $_REQUEST['group']]);
+            $has_permission = $perms->group_add_member || $perms->group_remove_member;
+        }
+        if (! $has_permission) {
             return [];
         }
 
@@ -3252,6 +3256,7 @@ class UsersLib extends TikiLib
 
         return $ret;
     }
+
 
     public function get_recur_group_users($group, $recur = 0, $what = 'login')
     {

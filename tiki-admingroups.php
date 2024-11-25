@@ -39,7 +39,22 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
-$access->check_permission('tiki_p_admin');
+
+if (! empty($_REQUEST['group'])) {
+    if (! $userlib->group_exists($_REQUEST['group'])) {
+        $access->display_error('', tra('Group does not exist'), 400);
+    }
+
+    //Check if the user has the tiki_admin_users right required to view the list of members, add members to a group (tiki-group-add_user) and remove members from a group (tiki-user-manage_groups)
+    $access->check_permission('tiki_p_admin_users');
+    $perms = Perms::get(['type' => 'group', 'object' => $_REQUEST['group']]);
+    $has_permission = $perms->group_add_member || $perms->group_remove_member;
+    if (! $has_permission) {
+        $access->check_permission('tiki_p_admin');
+    }
+} else {
+    $access->check_permission('tiki_p_admin');
+}
 
 $auto_query_args = ['group'];
 
@@ -272,14 +287,16 @@ if (! empty($_REQUEST["group"])) {
     $smarty->assign('bannedlist', $bannedlist['data']);
     $smarty->assign('bannedCount', $bannedlist['cant']);
 
-    $userslist = $userlib->list_all_users();
+    $userslist = $userlib->list_all_users($_REQUEST['group']);
+
     if (! empty($memberslist)) {
         foreach ($memberslist as $key => $values) {
             if (in_array($values["login"], $userslist)) {
                 unset($userslist[array_search($values["login"], $userslist, true)]);
             }
         }
-        foreach ($bannedlist as $key => $value) {
+
+        foreach ($bannedlist['data'] as $key => $value) {
             if (in_array($value, $userslist)) {
                 unset($userslist[array_search($value, $userslist, true)]);
             }
