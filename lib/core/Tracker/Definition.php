@@ -143,7 +143,33 @@ class Tracker_Definition
         }
     }
 
-    public function getFieldFromName($name)
+    public function hasFieldId(int $id): bool
+    {
+        if (! $id) {
+            throw new InvalidArgumentException("id parameter must be provided");
+        }
+        foreach ($this->getFields() as $f) {
+            if ($f['fieldId'] == $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getFieldInfoFromFieldId(int $id): array
+    {
+        if (! $id) {
+            throw new InvalidArgumentException("id parameter must be provided");
+        }
+        foreach ($this->getFields() as $f) {
+            if ($f['fieldId'] == $id) {
+                return $f;
+            }
+        }
+        throw new Error("Field with fieldId: {$id} not found in definition of {$this->trackerInfo['trackerId']}");
+    }
+
+    public function getFieldFromName($name): ?array
     {
         foreach ($this->getFields() as $f) {
             if ($f['name'] == $name) {

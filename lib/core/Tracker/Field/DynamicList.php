@@ -312,7 +312,7 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
         foreach ((array) $remoteItemIds as $remoteItemId) {
             $itemInfo = $trklib->get_tracker_item($remoteItemId);
 
-            if ($context['list_mode'] == 'csv' || $context['search_render'] == 'y') {
+            if ($context['list_mode'] == 'csv' || (isset($context['search_render']) && $context['search_render'] == 'y')) {
                 $output .= $output ? ', ' : '';
             } else {
                 $output .= $output ? '<br>' : '';
