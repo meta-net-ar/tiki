@@ -13,7 +13,7 @@ class Search_Formatter_Builder
     private SublistParser $sublistParser;
     private $paginationArguments;
 
-    private Search_Formatter_Plugin_Interface $formatterPlugin;
+    private ?Search_Formatter_Plugin_Interface $formatterPlugin = null;
     private $subFormatters = [];
     private $customFilters = [];
     private array $subLists = [];
