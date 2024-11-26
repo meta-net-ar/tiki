@@ -123,6 +123,7 @@ class Search_Formatter
         }
 
         foreach ($this->subLists as $sublist) {
+            //The root data is the same as data, since we are in the root list
             $sublist->executeOverDataset($data, $data, $this);
         }
 

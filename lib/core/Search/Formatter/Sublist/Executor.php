@@ -111,22 +111,25 @@ class Executor
                     };
                     if ($type == 'parent') {
                         foreach ($this->data as $i => $row) {
-                            if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
-                                // parent sublists might have entries with multiple records per key
-                                foreach ($row as $j => $subrow) {
-                                    if (self::checkFieldIsAvailable($field, $subrow)) {
-                                        $this->reverseMapping[$i][$j][] = [
-                                            'value' => $valueExtractor($subrow[$field]),
+                            //Row will be an empty array (so no keys to re-map) if the parent sublist didn't match anything.  But we still want to continue executing the sublist as there may be static output in the output block, or the sublist may not refer to anything on it's parent (which has little practical use except debugging, but for some reason doesn't seem to work now) - benoitg - 2024-11-26
+                            if ($row) {
+                                if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
+                                    // parent sublists might have entries with multiple records per key
+                                    foreach ($row as $j => $subrow) {
+                                        if (self::checkFieldIsAvailable($field, $subrow)) {
+                                            $this->reverseMapping[$i][$j][] = [
+                                                'value' => $valueExtractor($subrow[$field]),
+                                                'target_field' => $arguments['field'],
+                                            ];
+                                        }
+                                    }
+                                } else {
+                                    if (self::checkFieldIsAvailable($field, $row)) {
+                                        $this->reverseMapping[$i][0][] = [
+                                            'value' => $valueExtractor($row[$field]),
                                             'target_field' => $arguments['field'],
                                         ];
                                     }
-                                }
-                            } else {
-                                if (self::checkFieldIsAvailable($field, $row)) {
-                                    $this->reverseMapping[$i][0][] = [
-                                        'value' => $valueExtractor($row[$field]),
-                                        'target_field' => $arguments['field'],
-                                    ];
                                 }
                             }
                         }
@@ -179,7 +182,8 @@ class Executor
         return $query->search($index);
     }
 
-    protected function formatResult($result)
+    /** This applies formatters, which will rewrite $this->data */
+    protected function formatResult($result): void
     {
         $key = $this->record->getKey();
 
