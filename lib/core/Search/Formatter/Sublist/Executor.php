@@ -12,6 +12,7 @@ use Exception;
 use Search_Formatter;
 use Search_Formatter_Plugin_ArrayTemplate;
 use Search_Formatter_Plugin_Interface;
+use Search_Formatter_Plugin_Sublist;
 use Search_Formatter_Plugin_WikiTemplate;
 use Search_Formatter_ValueFormatter;
 use Search_Query;
@@ -192,18 +193,13 @@ class Executor
         }
         $fieldsToPreload = array_unique($fieldsToPreload);
 
-        $sf = new Search_Formatter($this->searchFormatter->plugin);
+        $sf = new Search_Formatter(new Search_Formatter_Plugin_Sublist);
         foreach ($this->formatterPlugins as $name => $plugin) {
             $sf->addSubFormatter($name, $plugin);
         }
         $formatted = $sf->getPopulatedList($result, true, $fieldsToPreload);
 
         foreach ($formatted as $entry) {
-            foreach ($this->formatterPlugins as $name => $plugin) {
-                if ($this->searchFormatter->plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_HTML && $plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
-                    $entry[$name] = preg_replace('/^~\/np~|~np~$/', '', $entry[$name]);
-                }
-            }
             foreach ($this->reverseMapping as $i => $mappings) {
                 foreach ($mappings as $j => $mapping) {
                     $count = 0;
