@@ -129,8 +129,8 @@ class Search_Formatter
                 if (! $finalValue && $rawValue) {
                     $finalValue = $rawValue;
                 }
-                if ($finalValue) {
-                    // Only set if not a blank value so the defaults prevail
+                if ($finalValue || ! isset($row[$k])) {
+                    // Only set if not a blank value so the defaults prevail but make sure to set it if default is not specified
                     $row[$k] = $finalValue;
                 }
             }
