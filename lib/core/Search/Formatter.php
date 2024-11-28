@@ -149,7 +149,14 @@ class Search_Formatter
         foreach ($data as $i => $row) {
             $subEntries = [];
             foreach ($this->subFormatters as $key => $plugin) {
-                $subInput = new Search_Formatter_ValueFormatter(array_merge($subDefault[$key], $row));
+                // use more intelligent merge - prefer non-null default values if target row key is null, so defaults prevail
+                $subRow = $subDefault[$key];
+                foreach ($row as $col => $val) {
+                    if (! isset($subRow[$col]) || ! is_null($val)) {
+                        $subRow[$col] = $val;
+                    }
+                }
+                $subInput = new Search_Formatter_ValueFormatter($subRow);
                 $subEntries[$key] = $this->render($plugin, Search_ResultSet::create([$plugin->prepareEntry($subInput)]), $this->plugin->getFormat());
             }
 

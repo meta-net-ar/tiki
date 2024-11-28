@@ -345,6 +345,39 @@ OUT;
 
         $this->assertStringContainsString('<strong>Hello</strong>', $output);
     }
+
+    public function testDefaultValuesInSubformatters()
+    {
+        $plugin = new Search_Formatter_Plugin_WikiTemplate('{display name=field}');
+
+        $formatter = new Search_Formatter($plugin);
+        $formatter->addSubFormatter('field', new Search_Formatter_Plugin_WikiTemplate('{display name=field}'));
+
+        $output = $formatter->format(
+            [
+                [
+                    'object_type' => 'wiki page',
+                    'object_id' => 'HomePage'
+                ],
+            ]
+        );
+
+        $this->assertEquals("No value for 'field'", $output);
+
+        $formatter = new Search_Formatter($plugin);
+        $formatter->addSubFormatter('field', new Search_Formatter_Plugin_WikiTemplate('{display name=field default="x"}'));
+
+        $output = $formatter->format(
+            [
+                [
+                    'object_type' => 'wiki page',
+                    'object_id' => 'HomePage'
+                ],
+            ]
+        );
+
+        $this->assertEquals("x", $output);
+    }
 }
 
 class Search_FormatterTest_HighlightHelper implements Laminas\Filter\FilterInterface
