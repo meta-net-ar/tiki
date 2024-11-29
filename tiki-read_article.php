@@ -12,6 +12,7 @@ use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
 
 $section = 'cms';
+$here = [];
 
 $inputConfiguration = [
     [
