@@ -3,7 +3,6 @@ import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import copy from "@guanghechen/rollup-plugin-copy";
 import { glob } from "glob";
 import path from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
@@ -496,27 +495,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/vue/dist",
                     }
                 ],
-            }),
-            copy({
-                targets: [
-                    {
-                        //Theme assets
-                        src: "_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}",
-                        dest: "public/generated/_custom",
-                        flatten: false,
-                        verbose: true,
-                    },
-                    //lang/ and js/ javascripts
-                    {
-                        src: "_custom/**/{lang,js}/**/*.{js,mjs}",
-                        dest: "public/generated/_custom",
-                        flatten: false,
-                        verbose: true,
-                    },
-                ],
-                //baseDir: "../../",
-                silent: false,
-                onWatch: true,
             }),
             AutoImport({
                 // We don't use https://github.com/unplugin/unplugin-vue-components/resolvers because of https://github.com/vitest-dev/vitest/issues/1402 raised during the execution of the tests
