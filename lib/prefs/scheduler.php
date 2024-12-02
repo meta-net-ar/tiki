@@ -69,5 +69,12 @@ function prefs_scheduler_list($partial = false)
             'default' => 0,
             'tags' => ['advanced'],
         ],
+        'scheduler_shell_command' => [
+            'name' => tr('Allow shell command execution'),
+            'description' => tr('Give the possibility to execute shell commands.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced'],
+        ],
     ];
 }
