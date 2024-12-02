@@ -11,9 +11,9 @@
   "devDependencies": {
   },
   "dependencies": {
-    "single-spa": "^6.0.1"
+    "single-spa": "6.0.3"
   },
   "devDepencenciesComment": {
-    "single-spa": "https://github.com/single-spa/single-spa/releases"
+    "single-spa": "Pinned to 6.0.3 to prevent unintentional upgrades from bypassing the patch at src/js/patches/single-spa+6.0.3.patch"
   }
 }
