@@ -455,6 +455,9 @@ class Utilities
                 if (isset($attendee['PARTSTAT'])) {
                     $participant['partstat'] = (string)$attendee['PARTSTAT'];
                 }
+                if (isset($attendee['X-COMMENT'])) {
+                    $participant['comment'] = (string)$attendee['X-COMMENT'];
+                }
                 $result['participants'][] = $participant;
             }
             // fetch attendees as they are for later reference like RSVP actions via Cypht
@@ -739,7 +742,7 @@ class Utilities
             if (! isset($par['role'])) {
                 $par['role'] = 0;
             }
-            $vevent->add(
+            $attendee = $vevent->add(
                 'ATTENDEE',
                 'mailto:' . $par['email'],
                 [
@@ -748,6 +751,9 @@ class Utilities
                     'PARTSTAT' => $par['partstat'],
                 ]
             );
+            if (! empty($par['comment'])) {
+                $attendee->add('X-COMMENT', $par['comment']);
+            }
         }
 
         if ((string)$vevent->UID != @$row['uid']) {

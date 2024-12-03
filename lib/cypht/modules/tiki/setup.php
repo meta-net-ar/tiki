@@ -273,6 +273,7 @@ return [
     'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
     'list_path' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'rsvp_action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'rsvp_comment' => FILTER_DEFAULT,
     'calendar_id' => FILTER_VALIDATE_INT,
     'debug_mode' => FILTER_VALIDATE_INT,
     'allow_external_images' => FILTER_VALIDATE_INT,

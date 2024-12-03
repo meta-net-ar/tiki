@@ -122,9 +122,14 @@ class Hm_Handler_event_rsvp_action extends Hm_Handler_Module
             if (isset($component->ATTENDEE)) {
                 foreach ($component->ATTENDEE as $attendee) {
                     $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                    if ($email === $recipient && $partstat) {
-                        $attendee['PARTSTAT'] = $partstat;
-                        unset($attendee['RSVP']);
+                    if ($email === $recipient) {
+                        if ($partstat) {
+                            $attendee['PARTSTAT'] = $partstat;
+                            unset($attendee['RSVP']);
+                        }
+                        if (isset($this->request->post['rsvp_comment'])) {
+                            $attendee['X-COMMENT'] = $this->request->post['rsvp_comment'];
+                        }
                         $component->ATTENDEE = $attendee;
                     }
                 }
@@ -146,13 +151,13 @@ class Hm_Handler_event_rsvp_action extends Hm_Handler_Module
 
         // use specific text body for the reply
         $event = $this->get('calendar_event');
-        $body = "$from_name has $action the invitation to the following event:
-
-*{$event['name']}*
-
-When: " . TikiLib::lib('tiki')->get_long_datetime($event['start']) . " - " . TikiLib::lib('tiki')->get_long_datetime($event['end']) . "
-
-Invitees: " . implode(",\n", $event['attendees']);
+        $comment = $this->request->post['rsvp_comment'] ?? '';
+        $body = "$from_name has $action the invitation to the following event: \n\n*{$event['name']}*";
+        if ($comment) {
+            $body .= "\n\nNote: $comment";
+        }
+        $body .= "\n\nWhen: " . TikiLib::lib('tiki')->get_long_datetime($event['start']) . " - " . TikiLib::lib('tiki')->get_long_datetime($event['end']) . "
+        \n\nInvitees: " . implode(",\n", $event['attendees']);
 
         // add attachments
         $content = Hm_Crypt::ciphertext($event_response, Hm_Request_Key::generate());
@@ -192,8 +197,13 @@ Invitees: " . implode(",\n", $event['attendees']);
                 $event['calitemId'] = $existing['calitemId'];
                 if (! empty($event['participants'])) {
                     foreach ($event['participants'] as &$role) {
-                        if ($role['email'] === $recipient && $partstat) {
-                            $role['partstat'] = $partstat;
+                        if ($role['email'] === $recipient) {
+                            if ($partstat) {
+                                $role['partstat'] = $partstat;
+                            }
+                            if (isset($this->request->post['rsvp_comment'])) {
+                                $role['comment'] = $this->request->post['rsvp_comment'];
+                            }
                         }
                     }
                 }
@@ -445,6 +455,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
             }
             if ($method == 'REQUEST') {
                 $partstat = null;
+                $comment = '';
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
                 if ($existing) {
                     $existing = TikiLib::lib('calendar')->get_item($existing['calitemId']);
@@ -453,32 +464,13 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                     foreach ($existing['participants'] as $role) {
                         if ($role['email'] == $this->get('recipient')) {
                             $partstat = $role['partstat'];
+                            $comment = $role['comment'] ?? '';
                         }
                     }
                 }
-                $yes_tag = $maybe_tag = $no_tag = "a";
-                if ($partstat == 'ACCEPTED') {
-                    $yes_tag = "span";
-                }
-                if ($partstat == 'TENTATIVE') {
-                    $maybe_tag = "span";
-                }
-                if ($partstat == 'DECLINED') {
-                    $no_tag = "span";
-                }
-                $res .= sprintf(
-                    '<tr class="header_event_rsvp"><th>%s</th><td class="header_links"><%s class="event_rsvp_link hlink" data-action="accept" href="#">%s</%s> | <%s class="event_rsvp_link hlink" data-action="maybe" href="#">%s</%s> | <%s class="event_rsvp_link hlink" data-action="decline" href="#">%s</%s></td></tr>',
-                    tr('RSVP'),
-                    $yes_tag,
-                    tr('Yes'),
-                    $yes_tag,
-                    $maybe_tag,
-                    tr('Maybe'),
-                    $maybe_tag,
-                    $no_tag,
-                    tr('No'),
-                    $no_tag
-                );
+                $res .= '<tr>
+                    <th><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></th>
+                </tr>';
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'REPLY') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);

@@ -364,6 +364,7 @@
                                         <th>{tr}Invitee{/tr}</th>
                                         <th>{tr}Status{/tr}</th>
                                         <th>{tr}Role{/tr}</th>
+                                        <th>{tr}Note{/tr}</th>
                                         <th></th>
                                     </tr>
                                     <tr class="d-none" id="participant-template-row">
@@ -407,6 +408,8 @@
                                                     <option value="3" {if $ppl.role eq '3'}selected{/if}>{tr}non-participant{/tr}</option>
                                                 </select>
                                             </td>
+                                            <td class="w-25">
+                                                <input type="text" name="calitem[participant_comment][{$ppl.username}]" value="{$ppl.comment|escape}" class="form-control">
                                             <td>
                                                 <a href="#" class="delete-participant"><span class="icon icon-remove fas fa-times"></span></a>
                                             </td>
