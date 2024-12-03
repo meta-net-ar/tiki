@@ -87,6 +87,50 @@ class Record
         $this->required = $required;
     }
 
+    /**
+     * Return a list of filter fields used in sublist blocks
+     */
+    public function getTargetFields()
+    {
+        $fields = [];
+        foreach ($this->getFilters() as $filter) {
+            if (! empty($filter['arguments']['field'])) {
+                $fields[] = $filter['arguments']['field'];
+            }
+        }
+        return array_unique($fields);
+    }
+
+    /**
+     * Return parent or root-level (or both) sublist record value fields used in filter blocks.
+     * This is a recursive function to get to the nested sublists referencing root record fields.
+     */
+    public function getParentFields($parent = true, $root = true)
+    {
+        $fields = [];
+        foreach ($this->getFilters() as $filter) {
+            foreach ($filter['arguments'] as $name => $value) {
+                $look_for = [];
+                if ($parent) {
+                    $look_for[] = 'parent';
+                }
+                if ($root) {
+                    $look_for[] = 'root';
+                }
+                if (empty($look_for)) {
+                    continue;
+                }
+                if (preg_match('/\$(' . implode('|', $look_for) . ')\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
+                    $fields[] = $m[2];
+                }
+            }
+        }
+        foreach ($this->getSublists() as $sublist) {
+            $fields = array_merge($fields, $sublist->getParentFields(false, true));
+        }
+        return array_unique($fields);
+    }
+
     public function executeOverDataset(&$data, &$root_data, Search_Formatter $sf): void
     {
         $executor = new Executor($this, $sf);

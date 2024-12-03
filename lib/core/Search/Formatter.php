@@ -60,7 +60,7 @@ class Search_Formatter
             . $this->render($this->plugin, $list, Search_Formatter_Plugin_Interface::FORMAT_WIKI);
     }
 
-    public function getPopulatedList($list, $preload = true, $preloadAdditionalFields = [])
+    public function getPopulatedList($list, $preload = true)
     {
         global $prefs;
 
@@ -100,9 +100,12 @@ class Search_Formatter
                     }
                 }
             }
-            foreach ($preloadAdditionalFields as $f) {
-                if (isset($pre[$f])) {
-                    $pre[$f];
+            // preload target fields that sublists will search for - this is necessary for multivalue fields that need dereferencing to actual values
+            foreach ($this->subLists as $sublist) {
+                foreach ($sublist->getParentFields() as $f) {
+                    if (isset($pre[$f])) {
+                        $pre[$f];
+                    }
                 }
             }
 

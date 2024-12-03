@@ -99,13 +99,21 @@ class Executor
                             $values = array_merge($values, $val);
                             return $val;
                         } elseif ($modifier == 'multivalue') {
-                            $val = str_replace($placeholder, $val, $value);
-                            $values[] = $val;
+                            if (is_array($val)) {
+                                $values = array_merge($values, $val);
+                            } else {
+                                $val = str_replace($placeholder, $val, $value);
+                                $values[] = $val;
+                            }
                             $converter = TikiLib::lib('unifiedsearch')->getIndex()->getTypeFactory()->multivalue($val);
                             return $converter->getValue();
                         } else {
-                            $val = str_replace($placeholder, $val, $value);
-                            $values[] = $val;
+                            if (is_array($val)) {
+                                $values = array_merge($values, $val);
+                            } else {
+                                $val = str_replace($placeholder, $val, $value);
+                                $values[] = $val;
+                            }
                             return $val;
                         }
                     };
@@ -151,7 +159,7 @@ class Executor
                         $arguments['content'] = $arguments['exact'];
                         unset($arguments['exact']);
                     }
-                    if (empty($values)) {
+                    if (empty($values) || array_keys(array_filter($arguments)) == ['field']) {
                         $replacement = str_replace($placeholder, '', (string)$match);
                     } else {
                         $replacement = $match->buildPluginString('filter', $arguments, $match->getBody());
@@ -187,21 +195,11 @@ class Executor
     {
         $key = $this->record->getKey();
 
-        $fieldsToPreload = [];
-        foreach ($this->reverseMapping as $i => $mappings) {
-            foreach ($mappings as $j => $mapping) {
-                foreach ($mapping as $map) {
-                    $fieldsToPreload[] = $map['target_field'];
-                }
-            }
-        }
-        $fieldsToPreload = array_unique($fieldsToPreload);
-
-        $sf = new Search_Formatter(new Search_Formatter_Plugin_Sublist);
+        $sf = new Search_Formatter(new Search_Formatter_Plugin_Sublist($this->record));
         foreach ($this->formatterPlugins as $name => $plugin) {
             $sf->addSubFormatter($name, $plugin);
         }
-        $formatted = $sf->getPopulatedList($result, true, $fieldsToPreload);
+        $formatted = $sf->getPopulatedList($result, true);
 
         foreach ($formatted as $entry) {
             foreach ($this->reverseMapping as $i => $mappings) {
