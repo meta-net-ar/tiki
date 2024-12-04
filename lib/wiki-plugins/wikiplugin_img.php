@@ -1350,6 +1350,11 @@ function wikiplugin_img($data, $params)
         $replimg .= ' data-src="' . $src . '"';
     }
 
+    //src
+    if (! empty($imgdata['src'])) {
+        $replimg .= ' src="' . $src . '"';
+    }
+
     //title (also used for description and link title below)
     //first set description, which is used for title if no title is set
     if (! empty($imgdata['desc']) || ! empty($imgdata['title'])) {
