@@ -245,7 +245,7 @@
                         <input type="hidden" name="fileId" value="{$editFileId}">
                         <input type="hidden" name="lockedby" value="{$fileInfo.lockedby|escape}">
                     {else}
-                        {if count($galleries) eq 0}
+                        {if isset($galleries) and count($galleries) eq 0}
                             {if !empty($galleryId)}
                                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
                             {else}
