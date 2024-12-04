@@ -39,45 +39,61 @@ class Search_Action_EmailAction implements Search_Action_Action
         try {
             $mail = tiki_get_admin_mail();
 
-            if ($replyto = $this->dereference($data->replyto->text())) {
+            if ($replyto = $this->dereference($data->replyto->raw())) {
                 $mail->setReplyTo($replyto[0]);
             }
 
-            foreach ($data->to->text() as $to) {
+            foreach ($data->to->raw() as $to) {
                 if (is_array($to)) {
                     foreach ($to as $user_email) {
                         if ($user_email = $this->dereference($user_email)) {
-                            foreach ($user_email as $email) {
-                                $mail->addTo($email);
+                            foreach ($user_email as $name => $email) {
+                                if (! is_numeric($name)) {
+                                    $mail->addTo($email, $name);
+                                } else {
+                                    $mail->addTo($email);
+                                }
                             }
                         }
                     }
                 } else {
                     if ($to = $this->dereference($to)) {
-                        foreach ($to as $email) {
-                            $mail->addTo($email);
+                        foreach ($to as $name => $email) {
+                            if (! is_numeric($name)) {
+                                $mail->addTo($email, $name);
+                            } else {
+                                $mail->addTo($email);
+                            }
                         }
                     }
                 }
             }
 
-            foreach ($data->cc->text() as $cc) {
+            foreach ($data->cc->raw() as $cc) {
                 if ($cc = $this->dereference($cc)) {
-                    foreach ($cc as $email) {
-                        $mail->addCc($email);
+                    foreach ($cc as $name => $email) {
+                        if (! is_numeric($name)) {
+                            $mail->addCc($email, $name);
+                        } else {
+                            $mail->addCc($email);
+                        }
                     }
                 }
             }
 
-            foreach ($data->bcc->text() as $bcc) {
+            foreach ($data->bcc->raw() as $bcc) {
                 if ($bcc = $this->dereference($bcc)) {
-                    foreach ($bcc as $email) {
-                        $mail->addBcc($email);
+                    foreach ($bcc as $name => $email) {
+                        if (! is_numeric($name)) {
+                            $mail->addBcc($email, $name);
+                        } else {
+                            $mail->addBcc($email);
+                        }
                     }
                 }
             }
 
-            if ($from = $data->from->text()) {
+            if ($from = $data->from->raw()) {
                 $fromEmail = $this->dereference($from);
                 $fromName = $this->dereferenceName($from);
                 if (! empty($fromEmail[0])) {
@@ -244,14 +260,25 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return null;
         }
-        $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        $email_or_username = trim($this->stripNp($email_or_username));
+        if (preg_match_all('/([^<]*?)<([^@>]+@[^>]+)>/', $email_or_username, $m)) {
+            $emails = [];
+            foreach ($m[0] as $key => $_) {
+                $name = trim($m[1][$key], ",;\n\r\t ");
+                $emails[$name] = $m[2][$key];
+            }
+            return $emails;
+        } elseif (preg_match_all('/[^@]+@[^,;]+/', $email_or_username, $m)) {
+            return array_map(function ($email) {
+                return trim($email, ",;\n\r\t ");
+            }, $m[0]);
+        } elseif (strstr($email_or_username, '@')) {
             return [$email_or_username];
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
-            return array_map(function ($username) {
+            return array_filter(array_map(function ($username) {
                 return TikiLib::lib('user')->get_user_email($username);
-            }, $users);
+            }, $users));
         }
     }
 
