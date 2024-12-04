@@ -382,8 +382,6 @@ if ( \$('#$id') ) {
             TikiLib::lib('parser')->core_options = TikiLib::lib('parser')->option;
         }
 
-        $this->parse_wiki_argvariable($data);
-
         $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
 
         /* <x> XSS Sanitization handling */
@@ -399,8 +397,9 @@ if ( \$('#$id') ) {
 
         if (! $this->option['noparseplugins'] || $this->option['stripplugins']) {
             $this->parse_first($data, $preparsed, $noparsed);
-            $this->parse_wiki_argvariable($data);
         }
+
+        $this->parse_wiki_argvariable($data);
 
         $data = $this->wikiParse($data, $noparsed);
 
@@ -449,6 +448,8 @@ if ( \$('#$id') ) {
         if (! empty($option)) {
             $this->setOptions($option);
         }
+
+        $this->parse_wiki_argvariable($data);
 
         $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
