@@ -76,9 +76,9 @@ if ($calendarViewMode['casedefault'] == 'month') {
 $stopTime = $endDate->getTime();
 
 if (isset($_REQUEST['stop_date_Month'])) {
-    $stopTime = TikiLib::make_time(0, 0, 0, $_REQUEST['stop_date_Month'], $_REQUEST['stop_date_Day'], $_REQUEST['stop_date_Year']);
+    $stopTime = TikiLib::make_time(23, 59, 59, $_REQUEST['stop_date_Month'], $_REQUEST['stop_date_Day'], $_REQUEST['stop_date_Year']);
 } elseif (isset($_REQUEST["tstop"])) {
-    $stopTime = $_REQUEST["tstop"];
+    $stopTime = strtotime('23:59:59', $_REQUEST["tstop"]);
 }
 
 $calendarIds = [];
@@ -116,26 +116,24 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
     if (isset($_REQUEST['csv'])) {
         header('Content-type: text/csv');
         header("Content-Disposition: inline; filename=tiki-calendar.csv");
-        $first = true;
-        $description = '';
-        foreach ($events as $event) {
-            $line = '';
-            foreach ($event as $name => $field) {
-                if ($first === true) {
-                    $description .= '"' . $name . '";';
-                }
-                if (is_array($field)) {
-                    $line .= '"' . str_replace(["\n","\r",'"'], ['\\n','','""'], join(',', $field)) . '";';
-                } else {
-                    $line .= '"' . str_replace(["\n","\r",'"'], ['\\n','','""'], $field) . '";';
-                }
-            }
-            if ($first === true) {
-                echo (trim($description, ';')) . "\n";
-                $first = false;
-            }
-            echo trim($line, ';') . "\n";
+        $fh = fopen('php://temp', 'rw');
+        if (! empty($events)) {
+            $header = array_keys(reset($events));
+            fputcsv($fh, $header, escape: "");
         }
+        foreach ($events as $event) {
+            foreach ($event as $name => $field) {
+                if (is_array($field)) {
+                    $event[$name] = implode(',', $field);
+                }
+            }
+            $event = array_values($event);
+            fputcsv($fh, $event, escape: "");
+        }
+        rewind($fh);
+        $csv = stream_get_contents($fh);
+        fclose($fh);
+        echo trim($csv);
     } else {
         // create ical
 
