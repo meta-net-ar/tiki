@@ -15,6 +15,7 @@ class PreferencesLib
         'smarty_security_dirs',
         'tiki_allow_trust_input',
         'feature_create_webhelp',
+        'scheduler_shell_command',
     ];
 
     private $data = [];

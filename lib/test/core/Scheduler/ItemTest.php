@@ -138,6 +138,7 @@ class ItemTest extends TestCase
     public function testRunOnlyOnce()
     {
         global $prefs, $tikilib;
+        $prefs['scheduler_shell_command'] = 'y';
         $logger = new Tiki_Log('UnitTests', LogLevel::ERROR);
         $scheduler = Scheduler_Item::fromArray([
             'id' => null,
