@@ -42,7 +42,9 @@ if (! isset($calendarViewMode)) {
 # If specified, limit the export to the maximum number of records (events)
 # indicated in the request; otherwise, the limit is from the global preferences.
 if (isset($_REQUEST['maxRecords'])) {
-        $maxRecords = $_REQUEST['maxRecords'];
+    $maxRecords = $_REQUEST['maxRecords'];
+} else {
+    $maxRecords = -1;
 }
 
 if (isset($_SESSION['CalendarFocusDate'])) {
