@@ -1253,9 +1253,11 @@ function wikiplugin_img($data, $params)
         ');
         TikiLib::lib('header')->add_jsfile($lozadJsPath);
         $lozadScript = "
+            const observer = lozad();
+            observer.observe();
+            
             lozad('.lozad', {
-                load: function(el) {
-                    el.src = el.dataset.src;
+                loaded: function(el) {
                     el.onload = function() {
                         el.classList.add('lozadFade');
                     }
