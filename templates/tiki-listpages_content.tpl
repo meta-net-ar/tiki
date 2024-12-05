@@ -51,7 +51,9 @@
                     {assign var='cntcol' value=$cntcol+1}
                     <th id="pageid">
                         {self_link _sort_arg='sort_mode' _sort_field='page_id'}{tr}Id{/tr}{/self_link}
-                    </th>
+                    </th> 
+                {else}
+                    <th id="pageid">{$ln|escape}</th>
                 {/if}
 
                 {if $prefs.wiki_list_name eq 'y'}
