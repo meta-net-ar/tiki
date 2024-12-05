@@ -129,11 +129,47 @@ class Search_Formatter_Builder
             return;
         }
 
-        if (isset($arguments['name'])) {
+        if (! isset($arguments['name'])) {
+            return;
+        }
+
+        $smarty = TikiLib::lib('smarty');
+        $tikilib = TikiLib::lib('tiki');
+
+        if (isset($arguments['template'])) {
+            if (! file_exists($arguments['template'])) {
+                $temp = $smarty->get_filename($arguments['template']);
+                if (empty($temp)) {
+                    Feedback::error(tr('Missing template "%0"', $arguments['template']));
+                    return;
+                }
+                $arguments['template'] = $temp;
+            }
+            $plugin = new Search_Formatter_Plugin_SmartyTemplate($arguments['template']);
+            $templateData = file_get_contents($arguments['template']);
+        } elseif (isset($arguments['tplwiki'])) {
+            if (! $tikilib->page_exists($arguments['tplwiki'])) {
+                Feedback::error(tr('Template tplwiki page "%0" not found', $arguments['tplwiki']));
+                return;
+            }
+            $wikitpl = "tplwiki:" . $arguments['tplwiki'];
+            $plugin = new Search_Formatter_Plugin_SmartyTemplate($wikitpl);
+            $data = $tikilib->get_page_info($arguments['tplwiki']);
+            $templateData = $data['data'];
+        } else {
             $plugin = new Search_Formatter_Plugin_WikiTemplate($match->getBody());
             $plugin->setRaw(! empty($arguments['mode']) && $arguments['mode'] == 'raw');
-            $this->subFormatters[$arguments['name']] = $plugin;
+            $templateData = null;
         }
+
+        if ($templateData) {
+            $abuilder = new Search_Formatter_ArrayBuilder();
+            $outputData = $abuilder->getData($match->getBody());
+            $plugin->setData($outputData);
+            $plugin->setFields($this->findFields($outputData, $templateData));
+        }
+
+        $this->subFormatters[$arguments['name']] = $plugin;
     }
 
     private function handleFilter($match)
@@ -217,9 +253,9 @@ class Search_Formatter_Builder
             foreach ($this->paginationArguments as $k => $v) {
                 $outputData[$k] = $this->paginationArguments[$k];
             }
+            $outputData['actions'] = $this->actions;
             if (strstr($arguments['template'], 'table')) {
                 $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y' ? true : false;
-                $outputData['actions'] = $this->actions;
                 if (isset($arguments['downloadable'])) {
                     $outputData['downloadable'] = true;
                     $this->downloadName = $arguments['downloadable'];
@@ -256,6 +292,7 @@ class Search_Formatter_Builder
                 foreach ($this->paginationArguments as $k => $v) {
                     $outputData[$k] = $this->paginationArguments[$k];
                 }
+                $outputData['actions'] = $this->actions;
                 $data = $tikilib->get_page_info($arguments['tplwiki']);
                 $wikicontent = $data['data'];
                 $plugin = new Search_Formatter_Plugin_SmartyTemplate($wikitpl);
