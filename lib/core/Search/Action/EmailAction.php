@@ -20,6 +20,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             'content' => true,
             'is_html' => false,
             'pdf_page_attachment' => false,
+            'file_attachments+' => false,
             'file_attachment_field' => false,
             'file_attachment_gal' => false,
         ];
@@ -136,14 +137,13 @@ class Search_Action_EmailAction implements Search_Action_Action
                 }
             }
 
+            $fileIds = [];
             if (! empty($data->file_attachment_field->text()) || ! empty($data->file_attachment_gal->text())) {
                 $objectType = $data->object_type->text();
                 if ($objectType !== 'trackeritem') {
                     Feedback::error(tr('Parameters file_attachment_field and file_attachment_gal can only be used with trackeritem'));
                     return false;
                 }
-
-                $fileIds = [];
 
                 // get fileIds from Files field
                 if (! empty($data->file_attachment_field->text())) {
@@ -171,22 +171,31 @@ class Search_Action_EmailAction implements Search_Action_Action
                         }
                     }
                 }
+            }
+            foreach ($data->file_attachments->text() as $fileAttIds) {
+                if (is_string($fileAttIds)) {
+                    $fileAttIds = preg_split('/\s*,\s*/', trim($fileAttIds));
+                }
+                if (is_array($fileAttIds)) {
+                    $fileIds = array_merge($fileIds, $fileAttIds);
+                }
+            }
 
-                foreach ($fileIds as $fileId) {
-                    $file = $this->getFileAttachment($fileId);
-                    if ($file) {
-                        $type = $file['filetype'];
-                        $fileName = $file['filename'];
-                        $attachment = new \Laminas\Mime\Part($file['contents']);
-                        $attachment->type = $type;
-                        $attachment->filename = $fileName;
-                        $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
-                        $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
+            $fileIds = array_filter(array_unique($fileIds));
+            foreach ($fileIds as $fileId) {
+                $file = $this->getFileAttachment($fileId);
+                if ($file) {
+                    $type = $file['filetype'];
+                    $fileName = $file['filename'];
+                    $attachment = new \Laminas\Mime\Part($file['contents']);
+                    $attachment->type = $type;
+                    $attachment->filename = $fileName;
+                    $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
+                    $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
 
-                        $messageParts[] = $attachment;
-                    } else {
-                        return false;
-                    }
+                    $messageParts[] = $attachment;
+                } else {
+                    return false;
                 }
             }
 
