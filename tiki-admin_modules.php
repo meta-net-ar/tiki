@@ -55,6 +55,7 @@ $polllib = TikiLib::lib('poll');
 $structlib = TikiLib::lib('struct');
 $modlib = TikiLib::lib('mod');
 $menulib = TikiLib::lib('menu');
+$tikilib = TikiLib::lib('tiki');
 
 $userHasAssignedModules = $prefs['user_assigned_modules'] === 'y'
     && TikiLib::lib('usermodules')->user_has_assigned_modules($user);
@@ -311,15 +312,15 @@ if (isset($_REQUEST['preview'])) {
         $phpfile = 'modules/mod-' . $_REQUEST['assign_name'] . '.php';
         $phpfuncfile = 'modules/mod-func-' . $_REQUEST['assign_name'] . '.php';
         $template = 'modules/mod-' . $_REQUEST['assign_name'] . '.tpl';
-        if (file_exists($phpfile)) {
-            include($phpfile);
-        } elseif (file_exists($phpfuncfile)) {
+        if ($file = $tikilib->safeFileExistsInPath($phpfile, MODULES_PATH)) {
+            include($file);
+        } elseif ($file = $tikilib->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             if (isset($_REQUEST['assign_params']['rows'])) {
                 $module_rows = $_REQUEST['assign_params']['rows'];
             } else {
                 $module_rows = 10;
             }
-            include_once($phpfuncfile);
+            include_once($file);
             $function = 'module_' . $_REQUEST['assign_name'];
             $assign_param = $_REQUEST['assign_params'] ?? [];
             if (function_exists($function)) {
@@ -336,8 +337,8 @@ if (isset($_REQUEST['preview'])) {
             }
         }
 
-        if (file_exists('templates/' . $template)) {
-            $data = $smarty->fetch($template);
+        if ($file = $tikilib->safeFileExistsInPath('templates/' . $template, TEMPLATES_MODULES_PATH)) {
+            $data = $smarty->fetch($file);
         } else {
             $data = '';
         }

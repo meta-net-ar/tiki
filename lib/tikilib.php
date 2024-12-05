@@ -7194,33 +7194,34 @@ class TikiLib extends TikiDb_Bridge
 
         return $group_ids;
     }
+
+/**
+     * function to check if a file or directory is in the path
+     * returns FALSE if incorrect
+     * returns the canonicalized absolute pathname otherwise
+     *
+     * @param $file
+     * @param $dir
+     * @return bool|string
+     */
+    public function safeFileExistsInPath($file, $dir)
+    {
+        $realfile = realpath($file);
+        $realdir = realpath($dir);
+        if (! $realfile) {
+            return (false);
+        }
+        if (! $realdir) {
+            return (false);
+        }
+        if (substr($realfile, 0, strlen($realdir)) != $realdir) {
+            return(false);
+        } else {
+            return($realfile);
+        }
+    }
 }
 // end of class ------------------------------------------------------
-
-// function to check if a file or directory is in the path
-// returns FALSE if incorrect
-// returns the canonicalized absolute pathname otherwise
-/**
- * @param $file
- * @param $dir
- * @return bool|string
- */
-function inpath($file, $dir)
-{
-    $realfile = realpath($file);
-    $realdir = realpath($dir);
-    if (! $realfile) {
-        return (false);
-    }
-    if (! $realdir) {
-        return (false);
-    }
-    if (substr($realfile, 0, strlen($realdir)) != $realdir) {
-        return(false);
-    } else {
-        return($realfile);
-    }
-}
 
 /**
  * @param $ar1

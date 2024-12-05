@@ -267,7 +267,7 @@ class Services_Edit_PluginController
                     $pluginArgs['module'] = $selectedMod;
                 }
                 $file = 'modules/mod-func-' . $pluginArgs['module'] . '.php';
-                if (file_exists($file)) {
+                if ($file = TikiLib::lib('tiki')->safeFileExistsInPath($file)) {
                     include_once($file);
                     $info_func = "module_{$pluginArgs['module']}_info";
                     if (function_exists($info_func)) {

@@ -298,8 +298,8 @@ if (isset($_REQUEST['page'])) {
     // Check if the associated incude_*.php file exists. If not, check to see if it might exist in the Addons.
     // If it exists, include the associated file
     $utilities = new \Tiki\Package\Extension\Utilities();
-    if (file_exists("admin/include_$adminPage.php")) {
-        include_once("admin/include_$adminPage.php");
+    if ($file = TikiLib::lib('tiki')->safeFileExistsInPath("admin/include_$adminPage.php", "admin")) {
+        include_once($file);
     } elseif ($filepath = $utilities->getExtensionFilePath("admin/include_$adminPage.php")) {
         include_once($filepath);
     }

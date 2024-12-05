@@ -866,7 +866,7 @@ class ModLib extends TikiLib
         $info_func = "module_{$moduleName}_info";
         $info = [];
 
-        if (file_exists($phpfuncfile)) {
+        if ($phpfuncfile = $this->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             include_once $phpfuncfile;
 
             if (function_exists($info_func)) {
