@@ -216,7 +216,9 @@ function wikiplugin_listexecute($data, $params)
 
             $action = $actions[$action];
             $numGood = 0;
+            $formatter->setContext('actions');
             $list = $formatter->getPopulatedList($result);
+            $formatter->setContext(null);
 
             foreach ($list as $entry) {
                 $entry['object_type'] = str_replace(['~/np~', '~np~'], '', $entry['object_type']); // Remove ~/np~~np~ from object type

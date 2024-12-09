@@ -10,11 +10,15 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
     private $changeDelimiters;
     private $data = [];
     private $fields = [];
+    private string $editable;
+    private string $editableId;
+    private ?string $context;
 
     public function __construct($templateFile, $changeDelimiters = false)
     {
         $this->templateFile = $templateFile;
         $this->changeDelimiters = (bool) $changeDelimiters;
+        $this->editable = '';
     }
 
     public function setData(array $data)
@@ -32,6 +36,17 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
         $this->fields = $fields;
     }
 
+    public function setEditable(string $editable, string $id)
+    {
+        $this->editable = $editable;
+        $this->editableId = $id;
+    }
+
+    public function setContext(?string $context)
+    {
+        $this->context = $context;
+    }
+
     public function getFormat()
     {
         return self::FORMAT_HTML;
@@ -44,6 +59,10 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
 
     public function renderEntries(Search_ResultSet $entries)
     {
+        if ($this->editable && isset($_REQUEST[$this->editableId])) {
+            return $this->wrapEditableByContext($_REQUEST[$this->editableId]);
+        }
+
         $smarty = new Smarty_Tiki();
 
         if ($this->changeDelimiters) {
@@ -93,6 +112,31 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
             }
         }
 
-        return $smarty->fetch($this->templateFile);
+        $r = $smarty->fetch($this->templateFile);
+
+        if ($this->editable) {
+            $r = $this->wrapEditableByContext($r);
+        }
+
+        return $r;
+    }
+
+    private function wrapEditableByContext($content)
+    {
+        if ($this->context !== 'actions') {
+            return new Tiki_Render_Editable(
+                $content,
+                [
+                    'layout' => $this->editable,
+                    'field' => [
+                        'id' => $this->editableId,
+                        'type' => 'form',
+                        'wysiwyg' => true,
+                    ],
+                ],
+            );
+        } else {
+            return $content;
+        }
     }
 }

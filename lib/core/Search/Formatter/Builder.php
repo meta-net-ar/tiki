@@ -169,6 +169,10 @@ class Search_Formatter_Builder
             $plugin->setFields($this->findFields($outputData, $templateData));
         }
 
+        if (! empty($arguments['editable'])) {
+            $plugin->setEditable($arguments['editable'], 'format' . hash('sha256', $match->getArguments() . $match->getBody()));
+        }
+
         $this->subFormatters[$arguments['name']] = $plugin;
     }
 

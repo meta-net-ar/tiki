@@ -15,16 +15,23 @@ class Search_Formatter
     private $customFilters = [];
     private $subLists = [];
     private $alternateOutput;
+    private ?string $context;
 
     public function __construct(Search_Formatter_Plugin_Interface $plugin, $counter = 0)
     {
         $this->plugin = $plugin;
         $this->counter = $counter;
+        $this->context = null;
     }
 
     public function setAlternateOutput($output)
     {
         $this->alternateOutput = $output;
+    }
+
+    public function setContext(?string $context)
+    {
+        $this->context = $context;
     }
 
     public function addSubFormatter($name, $formatter)
@@ -208,6 +215,9 @@ class Search_Formatter
     public function render($plugin, $resultSet, $target)
     {
         $pluginFormat = $plugin->getFormat();
+        if (method_exists($plugin, 'setContext')) {
+            $plugin->setContext($this->context);
+        }
         $out = $plugin->renderEntries($resultSet);
 
         if ($target == $pluginFormat || $pluginFormat == Search_Formatter_Plugin_Interface::FORMAT_CSV) {
