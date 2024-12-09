@@ -277,8 +277,13 @@
 //
 .mobile {
     .inline-cypht {
-        padding-top: 30px;
-
+        nav.folder_cell {
+            position: fixed;
+            z-index: 9999;
+        }
+        .menu-toggle {
+            z-index: 9999;
+        }
         .content_cell {
             padding: 20px 0 20px; border: none;
             display: block !important;
