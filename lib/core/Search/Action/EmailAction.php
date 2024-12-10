@@ -267,7 +267,15 @@ class Search_Action_EmailAction implements Search_Action_Action
     private function dereference($email_or_username)
     {
         if (empty($email_or_username)) {
-            return null;
+            return [];
+        }
+        if (strpbrk($email_or_username, ',;') !== false) {
+            $list = preg_split('/\s*[,;]\s*/', $email_or_username);
+            $res = [];
+            foreach ($list as $email_or_username) {
+                $res = array_merge($res, $this->dereference($email_or_username));
+            }
+            return array_filter($res);
         }
         $email_or_username = trim($this->stripNp($email_or_username));
         if (preg_match_all('/([^<]*?)<([^@>]+@[^>]+)>/', $email_or_username, $m)) {

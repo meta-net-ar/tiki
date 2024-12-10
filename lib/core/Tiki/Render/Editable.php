@@ -77,10 +77,6 @@ class Tiki_Render_Editable
         if (is_null($value)) {
             $value = '';
         }
-        if (trim(strip_tags($value)) == '') {
-            // When the value is empty, make sure it becomes visible/clickable
-            $value .= '&nbsp;';
-        }
 
         $class = "editable-inline";
         if ($this->layout == 'dialog') {
@@ -101,14 +97,22 @@ class Tiki_Render_Editable
             ];
             if ($params['_wysiwyg'] === 'y') {
                 $ckoptions = TikiLib::lib('wysiwyg')->setUpEditor('y', $fieldId, $params);
-                $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1" /><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="visibility:hidden;width:100%;" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
+                $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1" /><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="display:none" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
                 TikiLib::lib('header')->add_jq_onready('CKEDITOR.replace( "' . $fieldId . '",' . $ckoptions . ');', 20);  // after dialog tools init (10)
-            } else {
+            } elseif ($this->layout == 'block') {
                 $editable = '<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
+                $value = TikiLib::lib('parser')->parse_data($value);
+            } else {
+                $editable = '<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />';
+                $value = TikiLib::lib('parser')->parse_data($value);
             }
             $editable = '<div style="display: none">' . $editable . '</div>';
         } else {
             $editable = '';
+            if (trim(strip_tags($value)) == '') {
+                // When the value is empty, make sure it becomes visible/clickable
+                $value .= '&nbsp;';
+            }
         }
 
         $smarty->loadPlugin('smarty_function_icon');
