@@ -100,11 +100,9 @@ class Tiki_Render_Editable
                 $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1" /><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="display:none" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
                 TikiLib::lib('header')->add_jq_onready('CKEDITOR.replace( "' . $fieldId . '",' . $ckoptions . ');', 20);  // after dialog tools init (10)
             } elseif ($this->layout == 'block') {
-                $editable = '<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
-                $value = TikiLib::lib('parser')->parse_data($value);
+                $editable = $this->wrapNp('<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>');
             } else {
-                $editable = '<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />';
-                $value = TikiLib::lib('parser')->parse_data($value);
+                $editable = $this->wrapNp('<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />');
             }
             $editable = '<div style="display: none">' . $editable . '</div>';
         } else {
@@ -117,5 +115,10 @@ class Tiki_Render_Editable
 
         $smarty->loadPlugin('smarty_function_icon');
         return "<$tag class=\"$class\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\" data-group=\"$group\" data-label=\"$label\" data-field-id=\"$fieldId\" data-field-type=\"$fieldType\">$value" . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty->getEmptyInternalTemplate()) . "</$tag>$editable";
+    }
+
+    private function warpNp($content)
+    {
+        return '~np~' . str_replace(['~np~', '~/np~'], '', $content) . '~/np~';
     }
 }

@@ -105,7 +105,7 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
     private function wrapEditableByContext($content)
     {
         if ($this->context !== 'actions') {
-            $content = new Tiki_Render_Editable(
+            return new Tiki_Render_Editable(
                 $content,
                 [
                     'layout' => $this->editable,
@@ -116,7 +116,6 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
                     ],
                 ],
             );
-            return "~np~$content~/np~";
         } else {
             return $content;
         }
