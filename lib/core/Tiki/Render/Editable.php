@@ -117,7 +117,7 @@ class Tiki_Render_Editable
         return "<$tag class=\"$class\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\" data-group=\"$group\" data-label=\"$label\" data-field-id=\"$fieldId\" data-field-type=\"$fieldType\">$value" . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty->getEmptyInternalTemplate()) . "</$tag>$editable";
     }
 
-    private function warpNp($content)
+    private function wrapNp($content)
     {
         return '~np~' . str_replace(['~np~', '~/np~'], '', $content) . '~/np~';
     }
