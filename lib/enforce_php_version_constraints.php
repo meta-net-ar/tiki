@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-require_once('php_version_constants.php');
+require_once(__DIR__ . '/../php_version_constants.php');
 
 // Check that PHP version is sufficient or if the PHP version is too recent, i.e. higher than the required version.
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<') || version_compare(PHP_VERSION, TIKI_TOO_RECENT_PHP_VERSION, '>=')) {
