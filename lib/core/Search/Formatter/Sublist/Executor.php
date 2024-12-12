@@ -78,13 +78,13 @@ class Executor
         foreach ($this->record->getFilters() as $filter) {
             $match = $filter['match'];
             $arguments = $filter['arguments'];
-            if (! isset($arguments['field'])) {
-                // TODO: consider other filter types as range searches
-                throw new Exception(tr('Filter blocks inside sublist sections in PluginList need field reference.'));
-            }
             foreach ($arguments as $name => $value) {
                 // Sublist special processing will only happen if parent or root is provided
                 if (preg_match('/\$(parent|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
+                    if (! isset($arguments['field'])) {
+                        // TODO: consider other filter types as range searches
+                        throw new Exception(tr('Filter blocks inside sublist sections in PluginList that use parent element values need field reference.'));
+                    }
                     $placeholder = $m[0];
                     $type = $m[1]; // parent or root
                     $field = $m[2];
