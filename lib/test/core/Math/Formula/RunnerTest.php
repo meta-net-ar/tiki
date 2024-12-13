@@ -362,7 +362,7 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $this->assertEquals('2024-11-21', date('Y-m-d', $this->runner->evaluate()));
     }
 
-    public function testStrToTimeNonWorkingDays()
+    public function testStrToTimeDateDiffNonWorkingDays()
     {
         global $prefs;
         $origPrefs = $prefs;
@@ -411,13 +411,23 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $this->runner->setVariables(['a' => strtotime('2024-12-20')]);
         $evaluated = $this->runner->evaluate();
 
+        $this->runner->setFormula('(round (div (date-diff a b) 86400))');
+        $this->runner->setVariables(['a' => strtotime('2024-12-20'), 'b' => strtotime('2024-12-30')]);
+        $calendarDiff = $this->runner->evaluate();
+
+        $this->runner->setFormula('(round (div (date-diff a b 1) 86400))');
+        $this->runner->setVariables(['a' => strtotime('2024-12-20'), 'b' => strtotime('2024-12-30')]);
+        $workingDiff = $this->runner->evaluate();
+
         // cleanup
         $weekends->delete(strtotime('2024-01-01'));
         $newyear->delete(strtotime('2024-01-01'));
         TikiLib::lib('calendar')->drop_calendar($calendarId);
         $prefs = $origPrefs;
 
-        // asset calculation is correct
+        // asset calculations are correct
         $this->assertEquals('2025-01-09', date('Y-m-d', $evaluated));
+        $this->assertEquals(10, $calendarDiff);
+        $this->assertEquals(3, $workingDiff);
     }
 }

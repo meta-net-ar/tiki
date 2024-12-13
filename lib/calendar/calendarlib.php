@@ -2095,4 +2095,42 @@ class CalendarLib extends TikiLib
 
         $categlib->update_object_categories($categories, $itemId, 'calendaritem', $cat_desc, $cat_name, $cat_href, $managed_categories);
     }
+
+    /**
+     * Skip the non-working days between 2 dates via this algorithm:
+     * 1. extend the new time with the number of non-working days between start/end time
+     * 2. check if there are more non-working days added by this extension
+     * 3. go to step 1 to repeat the extension until there are no more non-working days to add
+     * @param int $ts1 unix timestamp
+     * @param int $ts2 unix timestamp
+     */
+    public function skipNonWorkingDays($ts1, $ts2)
+    {
+        $inc = $ts1 < $ts2 ? -1 : 1;
+        $tempTS = $ts1;
+        $nonWorking = $this->countNonWorkingDaysBetweenDates($ts2, $tempTS);
+        while (($tempTS - $ts2) * $inc != ($ts1 + $inc * $nonWorking * 86400 - $ts2) * $inc) {
+            $tempTS = $ts1 + $inc * $nonWorking * 86400;
+            $nonWorking = $this->countNonWorkingDaysBetweenDates($ts2, $tempTS);
+        }
+        return $tempTS;
+    }
+
+    public function countNonWorkingDaysBetweenDates($ts1, $ts2)
+    {
+        global $prefs;
+        if (empty($prefs['calendar_holidays'])) {
+            return 0;
+        }
+        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2));
+        $dates = [];
+        foreach ($events as $event) {
+            $start = $event['start'];
+            while ($start <= $event['end']) {
+                $dates[] = date('Y-m-d', $start);
+                $start = strtotime('+1 day', $start);
+            }
+        }
+        return count(array_unique($dates));
+    }
 }
