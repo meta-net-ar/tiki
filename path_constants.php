@@ -72,13 +72,15 @@ const STORAGE_PREFSDOC_PATH = 'storage/prefsdoc';
 /** File gallery default storage path. This is only the default value of the preference, so will not change with this constant */
 const FILE_GALLERY_DEFAULT_STORAGE_PATH = 'storage/fgal';
 const DEPRECATED_H5P_STORAGE_SUFFIX = 'public/h5p';
-/** This is not correct id tikidomains are used.  A new STORAGE_PUBLIC_H5P_PATH should be created with a different handling of tikidomain */
+/** This is not correct if tikidomains are used. A new STORAGE_PUBLIC_H5P_PATH should be created with a different handling of tikidomain */
 const DEPRECATED_STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
 const SMARTY_COMPILED_TEMPLATES_PATH = 'temp/templates_c';
-/** Currently this is both the top level template path and the relative template path in themes and packages.  Needs to be separated if moved */
+/** Currently this is both the top level template path and the relative template path in themes and packages. Needs to be separated if moved */
 const SMARTY_TEMPLATES_PATH = 'templates';
 const SMARTY_BASE_LAYOUTS_PATH = 'templates/layouts';
-/** Where are templates are looked for in multitiki sites, etc. */
+/** What is the default layout template in Tiki */
+const SMARTY_DEFAULT_LAYOUT = 'social';
+/** Where are templates looked for in multitiki sites, etc. */
 const SMARTY_TEMPLATES_PATH_FRAGMENT = 'templates';
 
 /** Path to store temporary files.  Use one of the more specific path if possible */

@@ -8,8 +8,8 @@ function prefs_site_list()
 {
     global $prefs;
 
-    $available_layouts = TikiLib::lib('theme')::listUserSelectableLayouts(isset($prefs['site_theme']) ? $prefs['site_theme'] : ($prefs['theme'] ?? ''), isset($prefs['theme_option']) ? $prefs['theme_option'] : '');
-    $available_admin_layouts = TikiLib::lib('theme')::listUserSelectableLayouts(isset($prefs['theme_admin']) ? $prefs['theme_admin'] : ($prefs['theme'] ?? ''), isset($prefs['theme_option_admin']) ? $prefs['theme_option_admin'] : '');
+    $available_layouts = TikiLib::lib('theme')::listUserSelectableLayouts($prefs['site_theme'] ?? ($prefs['theme'] ?? ''), $prefs['theme_option'] ?? '');
+    $available_admin_layouts = TikiLib::lib('theme')::listUserSelectableLayouts($prefs['theme_admin'] ?? ($prefs['theme'] ?? ''), $prefs['theme_option_admin'] ?? '');
     $listGroups = TikiLib::lib('user')->get_groups();
     $groups[''] = tr('All');
     foreach ($listGroups['data'] as $group) {
@@ -233,7 +233,7 @@ function prefs_site_list()
             'name' => tr('Site layout'),
             'description' => tr('Changes the template for the overall site layout'),
             'type' => 'list',
-            'default' => 'social',
+            'default' => SMARTY_DEFAULT_LAYOUT,
             'help' => 'Site-Layout',
             'hint' => tra('Important: when using the Classic Bootstrap (fixed top navbar) layout, be sure to set the fixed-top navbar height, below, to prevent content overlap.'),
             'tags' => ['advanced'],
@@ -243,7 +243,9 @@ function prefs_site_list()
             'name' => tr('Admin layout'),
             'description' => tr('Specify which layout template to use for admin pages.'),
             'type' => 'list',
-            'default' => 'basic',
+            'default' => SMARTY_DEFAULT_LAYOUT,
+            'help' => 'Site-Layout',
+            'hint' => tra('Note: this does not affect the Unified Admin Backend. Only the legacy admin pages when UAB is disabled. An admin theme must be selected first.'),
             'tags' => ['advanced'],
             'options' => $available_admin_layouts,
         ],
