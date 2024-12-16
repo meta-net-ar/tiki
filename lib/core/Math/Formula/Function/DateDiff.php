@@ -22,14 +22,35 @@ class Math_Formula_Function_DateDiff extends Math_Formula_Function
             $elements[] = $this->evaluateChild($child);
         }
 
+        $tikilib = TikiLib::lib('tiki');
+        $tz = $tikilib->get_display_timezone();
+        $oldTz = date_default_timezone_get();
+        if ($tz) {
+            date_default_timezone_set($tz);
+        }
+
+        if (! is_numeric($elements[0])) {
+            $elements[0] = strtotime($elements[0]);
+        }
+
+        if (! is_numeric($elements[1])) {
+            $elements[1] = strtotime($elements[1]);
+        }
+
         $ts1 = intval($elements[0]);
         $ts2 = intval($elements[1]);
-        $diff = abs($ts1 - $ts2);
+        $diff = $ts1 - $ts2;
 
         if (! empty($elements[2])) {
             $nonWorking = TikiLib::lib('calendar')->countNonWorkingDaysBetweenDates($ts1, $ts2);
-            $diff -= $nonWorking * 86400;
+            if ($diff > 0) {
+                $diff -= $nonWorking * 86400;
+            } else {
+                $diff += $nonWorking * 86400;
+            }
         }
+
+        date_default_timezone_set($oldTz);
 
         return $diff;
     }
