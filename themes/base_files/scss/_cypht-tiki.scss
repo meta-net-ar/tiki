@@ -129,12 +129,6 @@
         color: $popover-body-color;
     }
 
-    .message_list .content_title, .message_list .content_title > div:first-child {
-        flex-direction: column;
-        align-items: flex-start;
-        display: block;
-        margin-bottom: 10px;
-    }
     .mailbox_list_title { display: inline-block; }
     .move_to_location {
         background-color: var(--bs-dropdown-bg);
@@ -212,7 +206,6 @@
     .msg_parts tr:not(:last-child) { border-bottom: 1px solid #444; }
     .part_desc, .part_size, .download_link { margin-left: 25px; }
     .msg_part_icon { padding: 0; margin-left: 5px; }
-    .imap_keyword { margin-top: 4px; }
     .msg_headers td { padding-right: 35px; }
     .noselect2 { display: none !important; }
 
@@ -598,7 +591,7 @@
             background-color: var(--bs-body-bg);
         }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 1rem; }
+        #list_controls_menu.show { flex-direction: row; justify-content: center; align-items: center; }
         .msg_text table { word-break: normal; }
         .checkbox_cell { padding-top: 8px !important; }
 
