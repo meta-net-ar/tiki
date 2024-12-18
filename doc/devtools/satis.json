@@ -1989,6 +1989,7 @@
         "fortawesome/font-awesome": "4.5.0||~4.7.0",
         "fullcalendar/fullcalendar": "^3.9",
         "fullcalendar/fullcalendar-scheduler": "^1.9",
+        "garethp/php-ews": ">=0.10.2",
         "gidkom/php-openfire-restapi": ">=1.0.0",
         "google/apiclient": "1.1.6||^2.2.2",
         "hesammousavi/bootstrap-v4-rtl": "dev-master",
