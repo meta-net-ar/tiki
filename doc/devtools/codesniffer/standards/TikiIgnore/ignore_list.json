@@ -1127,6 +1127,9 @@
         "lib\/core\/Search\/Formatter\/Plugin\/SmartyTemplate.php": {
             "class:Search_Formatter_Plugin_SmartyTemplate": true
         },
+        "lib\/core\/Search\/Formatter\/Plugin\/Sublist.php": {
+            "class:Search_Formatter_Plugin_Sublist": true
+        },
         "lib\/core\/Search\/Formatter\/Plugin\/WikiTemplate.php": {
             "class:Search_Formatter_Plugin_WikiTemplate": true
         },
@@ -8968,6 +8971,9 @@
         },
         "lib\/core\/Search\/Formatter\/Plugin\/SmartyTemplate.php": {
             "Search_Formatter_Plugin_SmartyTemplate": true
+        },
+        "lib\/core\/Search\/Formatter\/Plugin\/Sublist.php": {
+            "Search_Formatter_Plugin_Sublist": true
         },
         "lib\/core\/Search\/Formatter\/Plugin\/WikiTemplate.php": {
             "Search_Formatter_Plugin_WikiTemplate": true
