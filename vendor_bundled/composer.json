@@ -6,7 +6,7 @@
 	"minimum-stability": "stable",
 	"require": {
 		"sam152/javascript-equal-height-responsive-rows": "1.0.0",
-		"adodb/adodb-php": "^5.20",
+		"adodb/adodb-php": "^5.22.4",
 		"afarkas/html5shiv": "3.7.3",
 		"ahand/mobileesp": "dev-master",
 		"avianey/jqdoublescroll": ">=1.0.0",

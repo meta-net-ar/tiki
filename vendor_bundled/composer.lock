@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f82f0430a8c9a416484ac5f07ff19fbf",
+    "content-hash": "23980b6af0adf075379482f31207122e",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -37,11 +37,6 @@
                 "phpunit/phpunit": "^8.5"
             },
             "type": "library",
-            "extra": {
-                "patches_applied": {
-                    "Remove the check for ADOdb Extension": "../installer/composer-patches/adodb-php__remove-the-check-if-the-adodb-php_ext-is-enabled.patch"
-                }
-            },
             "autoload": {
                 "files": [
                     "adodb.inc.php"
@@ -4779,45 +4774,6 @@
             "time": "2019-02-05T23:41:09+00:00"
         },
         {
-            "name": "mediumjs/mediumjs",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jakiestfu/Medium.js.git",
-                "reference": "9144a17c135975491ac84ab15e398a1f3a895622"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.tiki.org/dist/mediumjs/mediumjs/mediumjs-mediumjs-9144a17c135975491ac84ab15e398a1f3a895622-zip-291ef5.zip",
-                "reference": "9144a17c135975491ac84ab15e398a1f3a895622",
-                "shasum": "a0b70bd981ac82c38078e535f1b646e9226d3e47"
-            },
-            "require": {
-                "rangy/rangy": ">=1.3",
-                "undojs/undojs": ">=1"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Robert Plummer",
-                    "email": "rplummer@visop-dev.com",
-                    "homepage": "http://visop-dev.com",
-                    "role": "Assistant Developer"
-                },
-                {
-                    "name": "Jacob Kelley",
-                    "email": "jakie8@gmail.com",
-                    "homepage": "http://jakiestfu.com",
-                    "role": "Lead Developer"
-                }
-            ],
-            "time": "2014-12-15T16:35:34+00:00"
-        },
-        {
             "name": "michelf/php-smartypants",
             "version": "1.8.1",
             "source": {
@@ -8828,16 +8784,6 @@
             "time": "2022-07-19T15:13:44+00:00"
         },
         {
-            "name": "undojs/undojs",
-            "version": "1",
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.tiki.org/dist/undojs/undojs/undojs-undojs-1.zip",
-                "shasum": "9e9593f6000809ce8ad9293a97ad5ab6abdbc55d"
-            },
-            "type": "library"
-        },
-        {
             "name": "walkermatt/ol-layerswitcher",
             "version": "3.3.0",
             "dist": {
@@ -11081,9 +11027,9 @@
         "candy-chat/xmpp-prebind-php": 20,
         "erusev/parsedown": 10,
         "hesammousavi/bootstrap-v4-rtl": 20,
+        "montefuscolo/xmpp": 20,
         "npm-asset/html2canvas": 5,
-        "zendframework/zendsearch": 20,
-        "montefuscolo/xmpp": 20
+        "zendframework/zendsearch": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -11100,11 +11046,11 @@
         "ext-iconv": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "ext-ldap": "0",
         "ext-soap": "0",
         "php": "7.2.5"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.6.0"
 }
