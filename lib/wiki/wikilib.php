@@ -1503,7 +1503,6 @@ class WikiLib extends TikiLib
 		$page = $pages->fetchOne('pageSlug', ['pageName' => $page]) ?: $page;
 		$href = "$script_name?page=" . urlencode($page);
 
-
 		if (isset($prefs['feature_wiki_use_date_links']) && $prefs['feature_wiki_use_date_links'] == 'y') {
 			if (isset($_REQUEST['date'])) {
 				$href .= '&date=' . urlencode($_REQUEST['date']);
