@@ -12,9 +12,9 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2024-12-19, the community has:
-  * 682 members on SourceForge.net,
-  * 178 of those people who made at least one code commit
+As of 2025-01-02, the community has:
+  * 683 members on SourceForge.net,
+  * 179 of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
 from subversion repository by the following script:
@@ -76,6 +76,11 @@ Nickname: Bsfez
 First Commit: Sun Aug 18 10:25:16 2019 +0300
 Last Commit: Sun Mar 22 17:40:29 2020 +0200
 Number of Commits: 46
+
+Nickname: Danelif
+First Commit: Mon Dec 23 12:46:17 2024 +0200
+Last Commit: Mon Dec 23 12:22:06 2024 +0200
+Number of Commits: 2
 
 Nickname: Domeshow
 First Commit: Wed Oct 6 18:10:49 2021 +0200
@@ -294,8 +299,8 @@ Number of Commits: 58
 
 Nickname: Rodriguez Nyiringabo
 First Commit: Fri Apr 29 13:46:30 2022 +0000
-Last Commit: Thu Dec 19 17:23:17 2024 +0100
-Number of Commits: 15
+Last Commit: Thu Jan 2 23:03:31 2025 +0200
+Number of Commits: 22
 
 Nickname: Sabiduria
 First Commit: Wed Dec 12 12:39:44 2018 +0200
@@ -304,8 +309,8 @@ Number of Commits: 8
 
 Nickname: Sandeep D
 First Commit: Thu Oct 3 22:47:05 2024 +0000
-Last Commit: Fri Oct 25 00:22:34 2024 +0000
-Number of Commits: 2
+Last Commit: Thu Dec 12 04:50:15 2024 +0000
+Number of Commits: 3
 
 Nickname: Saša Janiška
 First Commit: Thu Jun 13 11:23:30 2019 +0200
@@ -533,7 +538,7 @@ SF Role: Developer
 Nickname: arildb
 First Commit: 2011-09-04
 Last Commit: Sun Oct 29 08:33:55 2017 +0000
-Number of Commits: 475
+Number of Commits: 474
 SF Role: Developer
 
 Nickname: arion92fr
@@ -1842,7 +1847,7 @@ Nickname: lindonb
 Name: lindon
 First Commit: 2009-05-10
 Last Commit: Thu Sep 3 22:47:16 2020 -0400
-Number of Commits: 1748
+Number of Commits: 1743
 SF Role: Admin, Developer
 
 Nickname: llunax
@@ -1874,7 +1879,7 @@ Nickname: lphuberdeau
 Name: Louis-Philippe Huberdeau
 First Commit: 2004-04-10
 Last Commit: Wed Feb 18 17:41:34 2015 +0000
-Number of Commits: 899
+Number of Commits: 893
 SF Role: Developer
 
 Nickname: lrrcenter
@@ -1907,8 +1912,8 @@ SF Role: Developer
 
 Nickname: luci
 First Commit: 2018-05-03
-Last Commit: Mon Nov 23 12:49:35 2020 +0000
-Number of Commits: 13
+Last Commit: Thu Jan 2 20:42:04 2025 +0100
+Number of Commits: 16
 
 Nickname: luciash
 Name: luciash d&#39; being
