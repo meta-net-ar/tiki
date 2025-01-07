@@ -2789,9 +2789,6 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         $style = $do_center ? ' style="text-align: center;"' : '';
-
-                        //var_dump($prefs['wiki_heading_links']); die;
-
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' )) {
                             $smarty = TikiLib::lib('smarty');
                             $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';

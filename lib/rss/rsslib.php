@@ -4,29 +4,26 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\core\RSS\CustomEntryField;
+
 class RSSLib extends TikiDb_Bridge
 {
     private $items;
     private $feeds;
     private $modules;
     private bool $updateArticles = true;
+    private static mixed $cachelib = null;
+    private static string $cache_feed_key = 'rss_feed';
+    private static string $cache_meta_Key = 'rss_feed_meta';
 
     public function __construct()
     {
+        self::$cachelib = $cachelib ?? TikiLib::lib('cache');
         $this->items = $this->table('tiki_rss_items');
         $this->feeds = $this->table('tiki_rss_feeds');
         $this->modules = $this->table('tiki_rss_modules');
     }
 
-    public function enableUpdateArticles()
-    {
-        $this->updateArticles = true;
-    }
-
-    public function disableUpdateArticles()
-    {
-        $this->updateArticles = false;
-    }
 
     // ------------------------------------
     // functions for rss feeds we syndicate
@@ -71,7 +68,7 @@ class RSSLib extends TikiDb_Bridge
     }
 
     /* check for cached rss feed data */
-    public function get_from_cache($uniqueid, $rss_version = "9")
+    public function get_from_cache($uniqueid)
     {
         global $tikilib, $user, $prefs;
 
@@ -383,13 +380,13 @@ class RSSLib extends TikiDb_Bridge
         $refresh = 60 * $refresh;
 
         $data = [
-                'name' => $name,
-                'description' => $description,
-                'refresh' => $refresh,
-                'url' => $url,
-                'showTitle' => $showTitle,
-                'showPubDate' => $showPubDate,
-                ];
+            'name' => $name,
+            'description' => $description,
+            'refresh' => $refresh,
+            'url' => $url,
+            'showTitle' => $showTitle,
+            'showPubDate' => $showPubDate,
+        ];
 
         if ($rssId) {
             $this->modules->update($data, ['rssId' => (int) $rssId,]);
@@ -502,7 +499,6 @@ class RSSLib extends TikiDb_Bridge
     /**
      * @param      $feeds
      * @param bool $force
-     * @param bool $updateArticles
      *
      * @return array
      * @throws Exception
@@ -521,7 +517,7 @@ class RSSLib extends TikiDb_Bridge
         $feedResult['feeds'] = count($result);
         $entryReturn = ['feed' => 0, 'articles' => 0, 'feedData' => []];
         foreach ($result as $row) {
-            $entryResult = $this->update_feed($row['rssId'], $row['url'], $row['actions']);
+            $entryResult = $this->update_feed($row['url'], $row['rssId'], $row['actions']);
             if (! empty($entryResult['feed'])) {
                 $entryReturn['feed'] += $entryResult['feed'];
             }
@@ -544,122 +540,63 @@ class RSSLib extends TikiDb_Bridge
      * @return array
      * @throws Exception
      */
-    private function update_feed($rssId, $url, $actions)
+    private function update_feed($url, $rssId = null, $actions = null): array
     {
         global $tikilib;
-
-        $filter = new DeclFilter();
-        $filter->addStaticKeyFilters(
-            [
-                'url' => 'url',
-                'title' => 'striptags',
-                'author' => 'striptags',
-                'description' => 'striptags',
-                'content' => 'purifier',
-            ]
-        );
-
-        $guidFilter = TikiFilter::get('url');
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => []];
-        $feed = null;
-        try {
-            $content = $tikilib->httprequest($url);
-            if ($content) {
-                $feed = Laminas\Feed\Reader\Reader::importString($content);
-            }
-            if (! $feed) {
-                throw new Laminas\Feed\Exception\RuntimeException('Unreadable feed.');
-            }
-        } catch (Laminas\Feed\Exception\ExceptionInterface $e) {
-            $this->modules->update(
-                [
-                    'lastUpdated' => $tikilib->now,
-                    'sitetitle' => 'N/A',
-                    'siteurl' => '#',
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => []];
+        $filter = $this->createFilter();
+        $feed = $this->fetchFeed($url);
+        if (! $feed) {
+            if ($rssId) {
+                $this->modules->update(
+                    [
+                        'lastUpdated' => $tikilib->now,
+                        'sitetitle' => 'N/A',
+                        'siteurl' => '#',
                     ],
-                ['rssId' => $rssId,]
-            );
+                    ['rssId' => $rssId]
+                );
+            }
             return $success;
         }
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
         $siteUrl = TikiFilter::get('url')->filter($feed->getLink());
-
-        $this->modules->update(
-            [
-                'lastUpdated' => $tikilib->now,
-                'sitetitle' => $siteTitle,
-                'siteurl' => $siteUrl,
+        $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
+        if ($rssId) {
+            $this->modules->update(
+                [
+                    'lastUpdated' => $tikilib->now,
+                    'sitetitle'   => $siteTitle,
+                    'siteurl'     => $siteUrl,
                 ],
-            ['rssId' => $rssId,]
-        );
+                ['rssId' => $rssId,]
+            );
+        }
+        $success['siteMeta'] = ['title' => $siteTitle, 'link' => $siteUrl, 'language' => $siteLanguage];
         $DOM = new DOMDocument();
         foreach ($feed as $entry) { // TODO: optimize. Atom entries have an 'updated' element which can be used to only update updated entries
-            $guid = $guidFilter->filter($entry->getId());
+            $data = $this->processEntries($url, $entry, $filter, $DOM);
+            $success['feedData'][] = $data;
+            if ($rssId) {
+                if (! $this->updateArticles) {
+                    continue;
+                }
 
-            $authors = $entry->getAuthors();
-
-            $categories = $entry->getCategories();
-
-            $link = $entry->getLink();
-            if (! $link) {
-                $link = '';
-            }
-            $description = $entry->getDescription();
-            if (! $description) {
-                $description = '';
-            }
-            $data = $filter->filter(
-                [
-                    'title' => $entry->getTitle(),
-                    'url' => $link,
-                    'description' => $description,
-                    'content' => $entry->getContent(),
-                    'author' => $authors ? implode(', ', $authors->getValues()) : '',
-                    'categories' => $categories ? json_encode($categories->getValues()) : json_encode([]),
-                    'language' => TikiFilter::get('striptags')->filter($feed->getLanguage()),
-                ]
-            );
-
-            $data['guid'] = $guid;
-            if (method_exists($entry, 'getDateCreated') && $createdDate = $entry->getDateCreated()) {
-                $data['publication_date'] = $createdDate->getTimestamp();
-            } else {
-                global $tikilib;
-                $data['publication_date'] = $tikilib->now;
-            }
-
-            $htmlContent = $entry->getContent();
-            if (! empty($htmlContent)) {
-                @$DOM->loadHTML($htmlContent);
-                $rows = $DOM->getElementsByTagName('tr');
-                foreach ($rows as $row) {
-                    $cols = $row->getElementsByTagName('td');
-                    if (isset($cols[0]) && $cols[1]) {
-                        $data[str_replace(' ', '', $cols[0]->textContent)] = $cols[1]->textContent;
+                $count = $this->items->fetchCount(['rssId' => $rssId, 'guid' => $data['guid']]);
+                if (0 == $count) {
+                    $result = $this->insert_item($rssId, $data, $actions);
+                    if (! empty($result['feed'])) {
+                        $success['feed']++;
                     }
-                }
-            }
-
-            array_push($success['feedData'], $data);
-
-            if (! $this->updateArticles) {
-                continue;
-            }
-
-            $count = $this->items->fetchCount(['rssId' => $rssId, 'guid' => $guid]);
-            if (0 == $count) {
-                $result = $this->insert_item($rssId, $data, $actions);
-                if (! empty($result['feed'])) {
-                    $success['feed']++;
-                }
-                if (! empty($result['articles'])) {
-                    $success['articles']++;
-                }
-            } else {
-                $result = $this->update_item($rssId, $data['guid'], $data);
-                if ($result && $result->numrows()) {
-                    $success['feed']++;
-                }
+                    if (! empty($result['articles'])) {
+                        $success['articles']++;
+                    }
+                } else {
+                    $result = $this->update_item($rssId, $data['guid'], $data);
+                    if ($result && $result->numrows()) {
+                        $success['feed']++;
+                    }
+                };
             }
         }
         return $success;
@@ -980,15 +917,15 @@ class RSSLib extends TikiDb_Bridge
         }
 
         $default = [
-                'active' => false,
-                'expiry' => 365,
-                'atype' => 'Article',
-                'topic' => 0,
-                'future_publish' => -1,
-                'categories' => [],
-                'rating' => 5,
-                'feed_name' => $module['name'],
-                ];
+            'active' => false,
+            'expiry' => 365,
+            'atype' => 'Article',
+            'topic' => 0,
+            'future_publish' => -1,
+            'categories' => [],
+            'rating' => 5,
+            'feed_name' => $module['name'],
+        ];
 
         foreach ($actions as $action) {
             if ($action['type'] == 'article') {
@@ -1047,5 +984,133 @@ class RSSLib extends TikiDb_Bridge
         }
 
         return $writer;
+    }
+
+    private function createFilter(array $customFilters = []): DeclFilter
+    {
+        $defaultFilters = [
+            'url'         => 'url',
+            'title'       => 'striptags',
+            'author'      => 'striptags',
+            'description' => 'striptags',
+            'content'     => 'purifier',
+            'categories'     => 'striptags',
+        ];
+        $mergedFilters = array_merge($defaultFilters, $customFilters);
+        $filter = new DeclFilter();
+        $filter->addStaticKeyFilters($mergedFilters);
+        return $filter;
+    }
+
+    private function processEntryData($entry, $filter, $DOM): array
+    {
+        global $tikilib;
+        $guid = TikiFilter::get('url')->filter($entry->getId());
+        $authors = $entry->getAuthors();
+        $categories = $entry->getCategories();
+        $link = $entry->getLink() ?: '';
+        $description = $entry->getDescription() ?: '';
+        $data = $filter->filter(
+            [
+                'title' => $entry->getTitle(),
+                'url' => $link,
+                'description' => $description,
+                'content' => $entry->getContent(),
+                'author' => $authors ? implode(', ', $authors->getValues()) : '',
+                'categories' => $categories ? json_encode($categories->getValues()) : json_encode([]),
+            ]
+        );
+        $data['guid'] = $guid;
+        if (method_exists($entry, 'getDateModified') && $updateDate = $entry->getDateModified()) {
+            $data['publication_date'] = $updateDate->getTimestamp();
+        } elseif (method_exists($entry, 'getDateCreated') && $createdDate = $entry->getDateCreated()) {
+            $data['publication_date'] = $createdDate->getTimestamp();
+        } else {
+            $data['publication_date'] = $tikilib->now;
+        }
+
+        $htmlContent = $entry->getContent();
+        if (! empty($htmlContent)) {
+            @$DOM->loadHTML($htmlContent);
+            $data = array_merge($data, self::extractDataFromHtmlTable($DOM));
+        }
+
+        return $data;
+    }
+
+    private function processEntries($url, $entry, $filter, $DOM): array
+    {
+        if (str_contains($url, 'gitlab')) {
+            return $this->processGitlabEntry($entry, $filter, $DOM);
+        }
+        return $this->processEntryData($entry, $filter, $DOM);
+    }
+
+    private function processGitlabEntry($entry, $filter, $DOM): array
+    {
+        $data = $this->processEntryData($entry, $filter, $DOM);
+        $labels = CustomEntryField::getCustomField($entry, 'labels') ?? json_encode([]);
+        $data['labels'] = TikiFilter::get('striptags')->filter($labels);
+        return  $data;
+    }
+
+    private function fetchFeed(string $url)
+    {
+        global $tikilib;
+        try {
+            $content = $tikilib->httprequest($url);
+            if ($content) {
+                return Laminas\Feed\Reader\Reader::importString($content);
+            }
+            throw new Laminas\Feed\Exception\RuntimeException('Unreadable feed.');
+        } catch (Laminas\Feed\Exception\ExceptionInterface $e) {
+            return null;
+        }
+    }
+
+    private static function extractDataFromHtmlTable(DOMDocument $DOM): array
+    {
+        $data = [];
+        $xpath = new DOMXPath($DOM);
+        $rows = $xpath->query('//tr');
+
+        foreach ($rows as $row) {
+            $cols = $xpath->query('./td', $row);
+            if ($cols->length > 1) {
+                $key = str_replace(' ', '', $cols->item(0)->textContent);
+                $value = $cols->item(1)->textContent;
+                $data[$key] = $value;
+            }
+        }
+        return $data;
+    }
+
+    public function loadRss(array $params): array
+    {
+        global $tikilib;
+
+        $refresh_time = $tikilib->now - $params['refresh'] * 60;
+        $cache_feed_key = self::$cache_feed_key . md5($params['url']);
+        $cache_meta_key = self::$cache_meta_Key . md5($params['url']);
+        $cache_feed_items = self::$cachelib->getSerialized($cache_feed_key, '', $refresh_time);
+        $cache_meta = self::$cachelib->getSerialized($cache_meta_key, '', $refresh_time);
+
+        if ($cache_feed_items || $cache_meta) {
+            $items = $cache_feed_items;
+            $title = $cache_meta;
+        } else {
+            $result = $this->update_feed($params['url']);
+            $items = $result['feedData'];
+            $title = $result['siteMeta'];
+            self::$cachelib->cacheItem($cache_feed_key, serialize($items));
+            self::$cachelib->cacheItem($cache_meta_key, serialize($title));
+        }
+
+        $params = array_merge($params, [
+            'date' => 1,
+            'author' => 1,
+            'ticker' => 1,
+        ]);
+        return ['params' => $params, 'items' => $items, 'meta' => $title];
     }
 }

@@ -2179,7 +2179,7 @@ CREATE TABLE `tiki_rss_modules` (
   `rssId` int(8) NOT NULL auto_increment,
   `name` varchar(30) NOT NULL default '',
   `description` text,
-  `url` varchar(255) NOT NULL default '',
+  `url` text NOT NULL,
   `refresh` int(8) default NULL,
   `lastUpdated` int(14) default NULL,
   `showTitle` char(1) default 'n',
