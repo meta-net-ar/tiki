@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+
 function wikiplugin_bigbluebutton_info()
 {
     return [
@@ -121,6 +123,13 @@ function wikiplugin_bigbluebutton($data, $params)
                 'active' => false,
             ],
         ];
+
+        $pluginInfo = wikiplugin_bigbluebutton_info();
+        foreach ($pluginInfo['params'] as $key => $param) {
+            if (isset($param['default']) && ! isset($params[$key])) {
+                $params[$key] = $param['default'];
+            }
+        }
         $smarty->assign('bbb_params', Tiki_Security::get()->encode($params));
 
         if (! $bigbluebuttonlib->roomExists($meeting)) {
@@ -157,6 +166,8 @@ function wikiplugin_bigbluebutton($data, $params)
 
         // Won't display anything if recordings were not loaded
         return $smarty->fetch('wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl');
+    } catch (ServerSaltKeyException $e) {
+        return WikiParser_PluginOutput::internalError($e->getMessage());
     } catch (Exception $e) {
         return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
     }
