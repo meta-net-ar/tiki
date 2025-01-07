@@ -42,41 +42,47 @@ class Services_Access_Controller
      */
     private function prepareReturn($input)
     {
-        $title = ! empty($input['title']) ? $input['title'] : tra('Please confirm');
-        $confirmButton = ! empty($input['confirmButton']) ? $input['confirmButton'] : tra('OK');
-        $confirmButtonClass = ! empty($input['confirmButtonClass']) ? $input['confirmButtonClass'] : 'btn-primary';
-        $items = $input->asArray('items');
+        // Encode input to neutralize special characters
+        $title = htmlspecialchars(! empty($input['title']) ? $input['title'] : tra('Please confirm'), ENT_QUOTES, 'UTF-8');
+        $confirmButton = htmlspecialchars(! empty($input['confirmButton']) ? $input['confirmButton'] : tra('OK'), ENT_QUOTES, 'UTF-8');
+        $confirmButtonClass = htmlspecialchars(! empty($input['confirmButtonClass']) ? $input['confirmButtonClass'] : 'btn-primary', ENT_QUOTES, 'UTF-8');
+        $items = array_map(function ($item) {
+            return htmlspecialchars($item, ENT_QUOTES, 'UTF-8');
+        }, $input->asArray('items'));
 
-        /*** confirm message ***/
-        $customMsg = ! empty($input['customMsg']) ? $input['customMsg'] : '';
-        $customVerb = ! empty($input['customVerb']) ? $input['customVerb'] : '';
-        $customObject = ! empty($input['customObject']) ? $input['customObject'] : '';
+        // Encode custom message and related parameters
+        $customMsg = htmlspecialchars(! empty($input['customMsg']) ? $input['customMsg'] : '', ENT_QUOTES, 'UTF-8');
+        $customVerb = htmlspecialchars(! empty($input['customVerb']) ? $input['customVerb'] : '', ENT_QUOTES, 'UTF-8');
+        $customObject = htmlspecialchars(! empty($input['customObject']) ? $input['customObject'] : '', ENT_QUOTES, 'UTF-8');
         if (empty($customMsg)) {
             if (! empty($customVerb) && ! empty($customObject)) {
-                $customMsg = tr('Are you sure you want to %0 the following %1?', $customVerb, $customObject);
+                $customMsg = htmlspecialchars(tr('Are you sure you want to %0 the following %1?', $customVerb, $customObject), ENT_QUOTES, 'UTF-8');
             } else {
-                if (count($items) === 1) {
-                    $customMsg = tra('Please confirm your action for the following item:');
-                } else {
-                    $customMsg = tra('Please confirm your action for the following items:');
-                }
+                $customMsg = count($items) === 1
+                    ? htmlspecialchars(tra('Please confirm your action for the following item:'), ENT_QUOTES, 'UTF-8')
+                    : htmlspecialchars(tra('Please confirm your action for the following items:'), ENT_QUOTES, 'UTF-8');
             }
         }
+
         return [
             'items' => $items,
-            'confirmAction' => $input->confirmAction->word(),
-            'confirmController' => $input->confirmController->word(),
-            'extra' => $input->asArray('extra'),
-            'toMsg' => $input->toMsg->xss(),
-            'toList' => $input->asArray('toList'),
-            'ticket' => $input->ticket->striptags(),
+            'confirmAction' => htmlspecialchars($input->confirmAction->word(), ENT_QUOTES, 'UTF-8'),
+            'confirmController' => htmlspecialchars($input->confirmController->word(), ENT_QUOTES, 'UTF-8'),
+            'extra' => array_map(function ($extra) {
+                return htmlspecialchars($extra, ENT_QUOTES, 'UTF-8');
+            }, $input->asArray('extra')),
+            'toMsg' => htmlspecialchars($input->toMsg->xss(), ENT_QUOTES, 'UTF-8'),
+            'toList' => array_map(function ($toListItem) {
+                return htmlspecialchars($toListItem, ENT_QUOTES, 'UTF-8');
+            }, $input->asArray('toList')),
+            'ticket' => htmlspecialchars($input->ticket->striptags(), ENT_QUOTES, 'UTF-8'),
             'title' => $title,
-            'help' => $input->help->xss(),
+            'help' => htmlspecialchars($input->help->xss(), ENT_QUOTES, 'UTF-8'),
             'customMsg' => $customMsg,
             'confirmButton' => $confirmButton,
             'confirmButtonClass' => $confirmButtonClass,
             'modal' => 1,
-            'ajax' => 1
+            'ajax' => 1,
         ];
     }
 }
