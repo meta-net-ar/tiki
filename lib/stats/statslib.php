@@ -205,7 +205,9 @@ class StatsLib extends TikiLib
         $tikilib = TikiLib::lib('tiki');
         $stats = [];
         $rows = $this->getOne("select count(*) from `tiki_pageviews`", []);
-
+        $start = $this->getOne("select min(`registrationDate`) from `users_users`", []);
+        $stats['started'] = $start;
+        $stats['days'] = floor(($tikilib->now - $start) / 86400);
         if ($rows > 0) {
             //get max pageview number
             //sum by day as there are sometimes multiple unixstamps per day
@@ -236,10 +238,9 @@ class StatsLib extends TikiLib
                 " HAVING SUM(`pageviews`) = '$maxvar' OR SUM(`pageviews`) = '$minvar'" .
                 " ORDER BY date ASC"
             );
-
-            $start = $this->getOne("select min(`day`) from `tiki_pageviews`", []);
-            $stats['started'] = $start;
-            $stats['days'] = floor(($tikilib->now - $start) / 86400);
+            $tracking = $this->getOne("select min(`day`) from `tiki_pageviews`", []);
+            $stats['tracking'] = $tracking;
+            $stats['tracking_days'] = floor(($tikilib->now - $tracking) / 86400);
             $stats['pageviews'] = $this->getOne("select sum(`pageviews`) from `tiki_pageviews`");
             $stats['ppd'] = sprintf("%.2f", ($stats['days'] ? $stats['pageviews'] / $stats['days'] : 0));
             $b = 0;
@@ -260,7 +261,7 @@ class StatsLib extends TikiLib
                 }
             }
         } else {
-            $stats['started'] = tra('No pageviews yet');
+            $stats['tracking'] = tra('No pageviews yet');
             $stats['days'] = tra('n/a');
             $stats['pageviews'] = tra('n/a');
             $stats['ppd'] = tra('n/a');

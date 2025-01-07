@@ -48,11 +48,20 @@
             <table class="table table-striped">
                 <tr>
                     <td>{tr}Date of first pageview{/tr}</td>
-                    <td style="text-align:right;">{if $site_stats.started == 'No pageviews yet'}{$site_stats.started}{else}{$site_stats.started|tiki_long_date}{/if}</td>
+                    <td style="text-align:right;">{$site_stats.started|tiki_long_date}</td>
                 </tr>
                 <tr>
                     <td>{tr}Days since first pageview{/tr}</td>
                     <td style="text-align:right;">{$site_stats.days}</td>
+                </tr>
+                <tr>
+                    <td>{tr}Date tracking began{/tr}</td>
+                    <td style="text-align:right;">{if $site_stats.tracking == 'No pageviews yet'}{$site_stats.tracking}{else}{$site_stats.tracking|tiki_long_date}{/if}</td>
+
+                </tr>
+                <tr>
+                    <td>{tr}Days since tracking began{/tr}</td>
+                    <td style="text-align:right;">{$site_stats.tracking_days}</td>
                 </tr>
                 <tr>
                     <td>{tr}Total pageviews{/tr}</td>
