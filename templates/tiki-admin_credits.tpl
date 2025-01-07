@@ -5,7 +5,7 @@
 <form method="get" action="tiki-admin_credits.php" class="row g-3 mb-4 align-items-center">
     <div class="col-auto"><label class="form-label" for="userfilter">{tr}Username:{/tr}</label></div>
     <div class="col-auto"><input class="form-control" type="text" name="userfilter" id="userfilter" value="{$userfilter|escape}"></div>
-    <div class="col-auto"><input  class="btn btn-info" type="submit" value="{tr}Search{/tr}"></div>
+    <div class="col-auto"><input class="btn btn-info" type="submit" value="{tr}Search{/tr}"></div>
 </form>
 
 {if $new_month}{$new_month}{/if}
@@ -13,69 +13,87 @@
 {if $editing}
 <form method="post" action="tiki-admin_credits.php">
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-striped table-hover">
+            <thead>
             <tr>
-                <td></td>
-                <th>{tr}Type{/tr}</th>
-                <th>{tr}Creation Date{/tr}<br>{tr}(YYYY-MM-DD HH:MM:SS){/tr}</th>
-                <th>{tr}Expiration Date{/tr}<br>{tr}(YYYY-MM-DD HH:MM:SS){/tr}</th>
-                <th>{tr}Used{/tr}<br>{tr}(level credits always 0){/tr}</th>
-                <th>{tr}Total{/tr}</th>
+                <th scope="col"></th>
+                <th scope="col">{tr}Type{/tr}</th>
+                <th scope="col">
+                    {tr}Creation Date{/tr}<br>
+                    <small>{tr}(YYYY-MM-DD HH:MM:SS){/tr}</small>
+                </th>
+                <th scope="col">
+                    {tr}Expiration Date{/tr}<br>
+                    <small>{tr}(YYYY-MM-DD HH:MM:SS){/tr}</small>
+                </th>
+                <th scope="col">
+                    {tr}Used{/tr}<br>
+                    <small>{tr}(level credits always 0){/tr}</small>
+                </th>
+                <th scope="col">{tr}Total{/tr}</th>
             </tr>
+            </thead>
+            <tbody>
             {foreach key=id item=data from=$credits}
-            <tr>
-                <td>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="delete[]" value="{$id|escape}">
-                    </div>
-                </td>
-                <td><input class="form-control" type="text" name="credits[{$id|escape}][credit_type]" aria-label="{tr}Type{/tr}" value="{$data.credit_type|escape}" readonly="readonly"></td>
-                <td><input class="form-control" type="text" name="credits[{$id|escape}][creation_date]" aria-label="{tr}Creation Date{/tr}" value="{$data.creation_date|escape}"></td>
-                <td><input class="form-control" type="text" name="credits[{$id|escape}][expiration_date]" aria-label="{tr}Expiration Date{/tr}" value="{$data.expiration_date|escape}"></td>
-                <td><input class="form-control" type="text" name="credits[{$id|escape}][used_amount]" aria-label="{tr}Used{/tr}" value="{$data.used_amount|escape}"></td>
-                <td><input class="form-control" type="text" name="credits[{$id|escape}][total_amount]" aria-label="{tr}Total{/tr}" value="{$data.total_amount|escape}"></td>
-            </tr>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="delete[]" value="{$id|escape}" aria-label="{tr}Select{/tr}">
+                        </div>
+                    </td>
+                    <td><input class="form-control" type="text" name="credits[{$id|escape}][credit_type]" aria-label="{tr}Type{/tr}" value="{$data.credit_type|escape}" readonly></td>
+                    <td><input class="form-control" type="datetime-local" step="1" name="credits[{$id|escape}][creation_date]" aria-label="{tr}Creation Date{/tr}" value="{$data.creation_date|escape}"></td>
+                    <td><input class="form-control" type="datetime-local" step="1" name="credits[{$id|escape}][expiration_date]" aria-label="{tr}Expiration Date{/tr}" value="{$data.expiration_date|escape}"></td>
+                    <td><input class="form-control" style="min-width: 80px;" type="number" step="0.01" min="0" name="credits[{$id|escape}][used_amount]" aria-label="{tr}Used{/tr}" value="{$data.used_amount|escape}"></td>
+                    <td><input class="form-control" style="min-width: 100px;" type="number" step="0.01" min="0" name="credits[{$id|escape}][total_amount]" aria-label="{tr}Total{/tr}" value="{$data.total_amount|escape}"></td>
+                </tr>
             {/foreach}
             <tr>
                 <td><strong>{tr}New{/tr}</strong></td>
                 <td>
-                    <select name="credit_type" class="form-control">
+                    <select name="credit_type" class="form-control" aria-label="{tr}Select Credit Type{/tr}">
                         {foreach key=id item=data from=$credit_types}
-                        <option value="{$id}">{$id|escape}</option>
+                            <option value="{$id}">{$id|escape}</option>
                         {/foreach}
                     </select>
                 </td>
-                <td><input class="form-control" type="text" name="creation_date" aria-label="{tr}Creation Date{/tr}" value="" size="20"></td>
-                <td><input class="form-control" type="text" name="expiration_date" aria-label="{tr}Expiration Date{/tr}" value="" size="20"></td>
-                <td><input class="form-control" type="text" name="used_amount" aria-label="{tr}Used{/tr}" value="0" size="6" readonly="readonly"></td>
-                <td><input class="form-control" type="text" name="total_amount" aria-label="{tr}Total{/tr}" value="" size="6"></td>
+                <td><input class="form-control" type="datetime-local" step="1" name="creation_date" aria-label="{tr}Creation Date{/tr}" value=""></td>
+                <td><input class="form-control" type="datetime-local" step="1" name="expiration_date" aria-label="{tr}Expiration Date{/tr}" value=""></td>
+                <td><input class="form-control" type="number" min="0" name="used_amount" aria-label="{tr}Used{/tr}" value="0" readonly style="min-width: 80px;"></td>
+                <td><input class="form-control" type="number" step="0.01" min="0" name="total_amount" aria-label="{tr}Total{/tr}" value="" style="min-width: 100px;"></td>
             </tr>
-            <tr>
-                <td colspan="5"><input class="btn btn-primary" type="submit" name="save" value="{tr}Save{/tr}" style="display:none;"><input class="btn btn-danger" type="submit" name="confirm" value="{tr}Delete Checked{/tr}"></td>
-                <td colspan="1"><input class="btn btn-primary" type="submit" name="save" value="{tr}Save{/tr}"><input type="hidden" name="userfilter" value="{$userfilter|escape}"></td>
-            </tr>
+            </tbody>
         </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <button class="btn btn-danger" type="submit" name="confirm">
+            {tr}Delete Checked{/tr}
+        </button>
+        <input type="hidden" name="userfilter" value="{$userfilter|escape}">
+        <button class="btn btn-primary" type="submit" name="save">
+            {tr}Save{/tr}
+        </button>
     </div>
 </form>
 
 {include file='include_credits_expiry.tpl' userPlans=$userPlans}
 
 <h2>{tr}Use User Credits{/tr}</h2>
-<form method="post" action="tiki-admin_credits.php">
+<form method="post" action="tiki-admin_credits.php" class="mb-3">
     <label class="form-label" for="use_credit_type">{tr}Use:{/tr}</label>
-    <select class="form-select" name="use_credit_type" id="use_credit_type">
+    <select class="form-select" name="use_credit_type" id="use_credit_type" class="mb-2">
         {foreach key=id item=data from=$credit_types}
             <option value="{$id}">{$id|escape}</option>
         {/foreach}
     </select>
-    <br>
-    <label class="form-label" for="use_credit_amount">{tr}Amount:{/tr}</label> <input class="form-control" type="text" name="use_credit_amount" id="use_credit_amount" value="0" size="8">
+
+    <label class="form-label" for="use_credit_amount">{tr}Amount:{/tr}</label> <input class="form-control mb-2" type="number" step="0.01" min="0" name="use_credit_amount" id="use_credit_amount" value="0" size="8">
     <input type="hidden" name="userfilter" aria-label="{tr}Amount{/tr}" value="{$userfilter|escape}">
     <input class="btn btn-primary" type="submit" name="use_credit" value="{tr}Use{/tr}">
 </form>
 
 <h2>{tr}Restore User Level Credits{/tr}</h2>
-<form method="post" action="tiki-admin_credits.php">
+<form method="post" action="tiki-admin_credits.php" class="mb-3">
     <label class="form-label" for="restore_credit_type">{tr}Restore:{/tr}</label>
     <select class="form-select" name="restore_credit_type" id="restore_credit_type">
         {foreach key=id item=data from=$static_credit_types}
@@ -83,28 +101,28 @@
         {/foreach}
     </select>
     <br>
-    <label class="form-label" for="restore_credit_amount">{tr}Amount:{/tr}</label> <input class="form-control" type="text" name="restore_credit_amount" id="restore_credit_amount" value="0" size="8">
+    <label class="form-label" for="restore_credit_amount">{tr}Amount:{/tr}</label> <input class="form-control mb-3" type="number" step="0.01" min="0" name="restore_credit_amount" id="restore_credit_amount" value="0" size="8">
     <input type="hidden" name="userfilter" value="{$userfilter|escape}">
-    <input type="submit" name="restore_credit" value="{tr}Restore{/tr}">
+    <input class="btn btn-primary" type="submit" name="restore_credit" value="{tr}Restore{/tr}">
 </form>
 
 {include file='include_credits_usage_report.tpl' userfilter=$userfilter consumption_data=$consumption_data credit_types=$credit_types startDate=$startDate endDate=$endDate page='tiki-admin_credits.php'}
 {else}
     {tr}No such user{/tr}
 {/if}
-<hr>
 
-<h1>{tr}Manage Credit Types{/tr}</h1>
+
+<h2>{tr}Manage Credit Types{/tr}</h2>
 <form method="post" action="tiki-admin_credits.php">
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <tr>
-                <td></td>
-                <th>{tr}Type{/tr}</th>
-                <th>{tr}Display Text{/tr}</th>
-                <th>{tr}Unit Text{/tr}</th>
-                <th>{tr}Is Static Level Credit{/tr}</th>
-                <th>{tr}Display Bar Length Scaling Divisor{/tr}</th>
+                <th scope="col" class="sr-only">&nbsp;</th>
+                <th scope="col">{tr}Type{/tr}</th>
+                <th scope="col">{tr}Display Text{/tr}</th>
+                <th scope="col">{tr}Unit Text{/tr}</th>
+                <th scope="col">{tr}Is Static Level Credit{/tr}</th>
+                <th scope="col">{tr}Display Bar Length Scaling Divisor{/tr}</th>
             </tr>
             {foreach key=id item=data from=$credit_types}
             <tr>
@@ -116,7 +134,7 @@
                 <option value='n'>{tr}No{/tr}</option>
                 <option value='y' {if $data.is_static_level == 'y'}selected="selected"{/if}>{tr}Yes{/tr}</option>
                 </select>
-                <td><input class="form-control" type="text" name="credit_types[{$id|escape}][scaling_divisor]" aria-label="scaling_divisor" value="{$data.scaling_divisor|escape}" size="6"></td>
+                <td><input class="form-control" type="number" name="credit_types[{$id|escape}][scaling_divisor]" aria-label="scaling_divisor" value="{$data.scaling_divisor|escape}" size="6"></td>
             </tr>
             {/foreach}
             <tr>
@@ -130,12 +148,13 @@
                     <option value='y'>{tr}Yes{/tr}</option>
                     </select>
                 </td>
-                <td><input class="form-control" type="text" name="scaling_divisor" aria-label="{tr}Scaling Divisor{/tr} value="1" size="6"></td>
-            </tr>
-            <tr>
-                <td colspan="6"><input class="btn btn-primary" type="submit" name="update_types" value="{tr}Save{/tr}"><input type="hidden" name="userfilter" value="{$userfilter|escape}"></td>
+                <td><input class="form-control" type="number" name="scaling_divisor" aria-label="{tr}Scaling Divisor{/tr} value="1" size="6"></td>
             </tr>
         </table>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <input class="btn btn-primary" type="submit" name="update_types" value="{tr}Save{/tr}">
+        <input type="hidden" name="userfilter" value="{$userfilter|escape}">
     </div>
 </form>
 

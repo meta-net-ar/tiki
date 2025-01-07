@@ -113,7 +113,7 @@ class CreditsLib extends TikiLib
             if ($creditTypes[$type]['is_static_level'] == 'y') {
                 $prefName = "credits_level_" . $type;
                 $credits[$type]['used'] = (float) $tikilib->get_user_preference($info['login'], $prefName);
-                $credits[$type]['remain'] = $credits[$type]['total'] - $credits['used'];
+                $credits[$type]['remain'] = $credits[$type]['total'] - $credits[$type]['used'];
             }
         }
 

@@ -96,7 +96,7 @@
                             {tr}Amount remaining:{/tr}
                         </td>
                         <td class="integer">
-                            {$payment_info.amount_original|escape}
+                            {$payment_info.amount_remaining|escape}
                         </td>
                         <td style="font-style: italic; padding-left:3px">
                             {$payment_info.currency|escape}
@@ -186,10 +186,10 @@
                         <div class="table-responsive">
                             <table class="table">
                                 <tr>
-                                    <th>{tr}Credit type{/tr}</th>
-                                    <th>{tr}Credits left{/tr}</th>
-                                    <th>{tr}Amount to pay{/tr}</th>
-                                    <th>{tr}Pay using{/tr}</th>
+                                    <th scope="col">{tr}Credit type{/tr}</th>
+                                    <th scope="col">{tr}Credits left{/tr}</th>
+                                    <th scope="col">{tr}Amount to pay{/tr}</th>
+                                    <th scope="col">{tr}Pay using{/tr}</th>
                                 </tr>
                                 {foreach key=id item=data from=$userpaycredits}
                                 <tr>

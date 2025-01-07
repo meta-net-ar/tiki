@@ -81,9 +81,10 @@ if (isset($_REQUEST['userfilter'])) {
 
         // date values
         list($start_date, $end_date) = getStartDateFromRequest();
-
-        $req_type = $_REQUEST['action_type'];
-        $smarty->assign('act_type', $req_type);
+        if (isset($_REQUEST['action_type'])) {
+            $req_type = $_REQUEST['action_type'];
+            $smarty->assign('act_type', $req_type);
+        }
 
         consumptionData();
 
