@@ -377,6 +377,7 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $weekends->setPriority(1);
         $weekends->setStart(strtotime('2024-12-01'));
         $weekends->setEnd(strtotime('2024-12-01'));
+        $weekends->setStartPeriod(strtotime('2024-12-01'));
         $weekends->setAllday(true);
         $weekends->setWeekly(true);
         $weekends->setWeekdays('SU,SA');
@@ -391,6 +392,7 @@ class Math_Formula_RunnerTest extends TikiTestCase
         $newyear->setPriority(1);
         $newyear->setStart(strtotime('2025-01-01'));
         $newyear->setEnd(strtotime('2025-01-01'));
+        $newyear->setStartPeriod(strtotime('2025-01-01'));
         $newyear->setAllday(true);
         $newyear->setYearly(true);
         $newyear->setNbRecurrences(2);
