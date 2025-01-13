@@ -10,7 +10,7 @@
  * Letter key: ~n~
  *
  */
-class Tracker_Field_Numeric extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
+class Tracker_Field_Numeric extends \Tracker\Field\AbstractField implements \Tracker\Field\SynchronizableInterface, Search_FacetProvider_Interface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
     public static function getTypes()
     {
@@ -139,6 +139,15 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractField implements \Tra
             $baseKey => $typeFactory->numeric($item),
         ];
         return $out;
+    }
+
+    public function getFacets()
+    {
+        $baseKey = $this->getBaseKey();
+        return [
+            Search_Query_Facet_Term::fromField($baseKey)
+                ->setLabel($this->getConfiguration('name'))
+        ];
     }
 
     public function importRemote($value)
