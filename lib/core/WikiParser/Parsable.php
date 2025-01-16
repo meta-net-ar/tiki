@@ -452,6 +452,9 @@ if ( \$('#$id') ) {
         }
 
         $this->parse_wiki_argvariable($data);
+        foreach ($args as &$arg) {
+            $this->parse_wiki_argvariable($arg);
+        }
 
         $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
