@@ -132,7 +132,7 @@ class Schema
 
     public function getEncoding()
     {
-        return $this->config['encoding'];
+        return $this->config['encoding'] ?? '';
     }
 
     public function getFormat()

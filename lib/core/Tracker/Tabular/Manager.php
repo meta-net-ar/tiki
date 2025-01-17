@@ -67,9 +67,9 @@ class Manager
                 'import_transaction' => (int)! empty($config['import_transaction']),
                 'bulk_import' => (int)! empty($config['bulk_import']),
                 'skip_unmodified' => (int)! empty($config['skip_unmodified']),
-                'encoding' => $config['encoding'],
-                'format' => $config['format'],
-                'mapping' => $config['mapping'],
+                'encoding' => $config['encoding'] ?? '',
+                'format' => $config['format'] ?? '',
+                'mapping' => $config['mapping'] ?? '',
             ]),
             'odbc_config' => json_encode($odbc_config),
             'api_config' => json_encode($api_config)
