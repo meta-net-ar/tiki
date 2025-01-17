@@ -220,6 +220,7 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
                 'status' => $info['status'],
                 'fields' => [
                     $field => $value,
+                    'tzname' => TikiLib::lib('tiki')->get_display_timezone(),
                 ],
                 'validate' => ! $ignore_errors,
             ]
