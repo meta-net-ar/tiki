@@ -195,11 +195,11 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
             switch ($property) {
                 case '{DAV:}displayname':
                     $results['by_name'] = TikiLib::lib('user')->get_users(0, -1, 'login_asc', $value);
-                    $results['by_name'] = array_column($results['by_name'], 'login');
+                    $results['by_name'] = array_column($results['by_name']['data'], 'login');
                     break;
                 case '{http://sabredav.org/ns}email-address':
                     $results['by_email'] = TikiLib::lib('user')->get_users(0, -1, 'login_asc', '', '', false, '', $value);
-                    $results['by_email'] = array_column($results['by_email'], 'login');
+                    $results['by_email'] = array_column($results['by_email']['data'], 'login');
                     break;
                 default:
                     // Unsupported property
@@ -207,7 +207,7 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
             }
         }
 
-        if ($test == 'anyof') {
+        if ($test == 'anyof' || count(array_filter($results)) < 2) {
             $results = array_unique($results['by_name'] + $results['by_email']);
         } else {
             $results = array_intersect($results['by_name'], $results['by_email']);

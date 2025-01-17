@@ -4692,6 +4692,7 @@
             "CalendarLib::update_calendar_instance": true,
             "CalendarLib::remove_calendar_instance": true,
             "CalendarLib::get_subscriptions": true,
+            "CalendarLib::get_subscription": true,
             "CalendarLib::create_subscription": true,
             "CalendarLib::update_subscription": true,
             "CalendarLib::delete_subscription": true,

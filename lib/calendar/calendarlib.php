@@ -61,7 +61,12 @@ class CalendarLib extends TikiLib
             $categlib->getSqlJoin($jail, 'calendar', 'tcal.`calendarId`', $join, $mid, $bindvars);
         }
 
-        $query = "select tcal.* from `tiki_calendars` as tcal $join where 1=1 $mid order by tcal." . $this->convertSortMode($sort_mode);
+        $sort = $this->convertSortMode($sort_mode, ['calendarId', 'name', 'customlocations', 'customparticipants', 'customlanguages', 'personal']);
+        if (! empty($sort) && $sort != '1') {
+            $sort = 'tcal.' . $sort;
+        }
+
+        $query = "select tcal.* from `tiki_calendars` as tcal $join where 1=1 $mid order by " . $sort;
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
         $query_cant = "select count(*) from `tiki_calendars` as tcal $join where 1=1 $mid";
         $cant = $this->getOne($query_cant, $bindvars);
@@ -221,6 +226,9 @@ class CalendarLib extends TikiLib
     public function get_calendar($calendarId)
     {
         global $prefs;
+        if (substr($calendarId, 0, 1) === 's') {
+            return $this->get_subscription(substr($calendarId, 1));
+        }
         $res = $this->query("select * from `tiki_calendars` where `calendarId`=?", [(int)$calendarId]);
         $cal = $res->fetchRow();
         $res2 = $this->query("select `optionName`,`value` from `tiki_calendar_options` where `calendarId`=?", [(int)$calendarId]);
@@ -345,6 +353,7 @@ class CalendarLib extends TikiLib
      */
     public function list_raw_items($calIds, $user, $tstart, $tstop, $offset, $maxRecords, $sort_mode = 'start_asc', $find = '', $customs = [])
     {
+        global $prefs;
 
         if (count($calIds) == 0) {
             return [];
@@ -394,6 +403,65 @@ class CalendarLib extends TikiLib
         while ($res = $result->fetchRow()) {
             $ret[] = $this->get_item($res["calitemId"], $customs);
         }
+
+        foreach ($calIds as $calendarId) {
+            if (substr($calendarId, 0, 1) === 's') {
+                $parserlib = TikiLib::lib('parser');
+                $timezone = TikiLib::lib('tiki')->get_display_timezone();
+                $sub = $this->get_subscription(substr($calendarId, 1));
+                $vcalendar = Sabre\VObject\Reader::read($sub['vcalendar']);
+                $expanded = $vcalendar->expand(DateTime::createFromFormat('U', $tstart), DateTime::createFromFormat('U', $tstop), new DateTimeZone($timezone));
+                foreach ($expanded->VEVENT as $component) {
+                    $parsed = Tiki\SabreDav\Utilities::getDenormalizedDataFromComponent($component, $timezone);
+                    $ret[] = [
+                        'calitemId' => 0,
+                        'calendarId' => $calendarId,
+                        'user' => $sub['user'],
+                        'start' => $parsed['start'],
+                        'end' => $parsed['end'],
+                        'calname' => $sub['name'],
+                        'locationId' => intval($parsed['locationId'] ?? 0),
+                        'locationName' => '',
+                        'categoryId' => intval($parsed['categoryId'] ?? 0),
+                        'categoryName' => '',
+                        'priority' => strval($parsed['priority'] ?? 0),
+                        'nlId' => 0,
+                        'uid' => $parsed['uid'],
+                        'uri' => '',
+                        'status' => $parsed['status'] ?? 1,
+                        'url' => strval($parsed['url'] ?? ''),
+                        'lang' => strval($parsed['lang'] ?? ''),
+                        'name' => strval($parsed['name'] ?? ''),
+                        'description' => strval($parsed['description'] ?? ''),
+                        'created' => $parsed['created'] ?? 0,
+                        'lastModif' => $parsed['lastmodif'] ?? 0,
+                        'allday' => $parsed['allday'] ?? 0,
+                        'customlocations' => 'n',
+                        'customcategories' => 'n',
+                        'customlanguages' => 'n',
+                        'custompriorities' => 'n',
+                        'customsubscription' => 'n',
+                        'customparticipants' => 'n',
+                        'recurrenceStart' => null,
+                        'recurrenceUid' => null,
+                        'participants' => $parsed['participants'] ?? [],
+                        'selected_participants' => isset($parsed['participants']) ? array_map(function ($role) {
+                            return $role['username'];
+                        }, $parsed['participants']) : [],
+                        'organizers' => $parsed['organizers'] ?? [],
+                        'date_start' => (int)$parsed['start'],
+                        'date_end' => (int)$parsed['end'],
+                        'duration' => $parsed['end'] - $parsed['start'],
+                        'parsed' => $parserlib->parse_data(
+                            $parsed['description'] ?? '',
+                            ['is_html' => $prefs['calendar_description_is_html'] === 'y']
+                        ),
+                        'parsedName' => $parserlib->parse_data($parsed['name'] ?? ''),
+                    ];
+                }
+            }
+        }
+
         return $ret;
     }
 
@@ -1984,11 +2052,29 @@ class CalendarLib extends TikiLib
     /**
      * Subscription methods
      */
-    public function get_subscriptions($user)
+    public function get_subscriptions($user, $offset = 0, $maxRecords = -1, $sort_mode = 'name_asc', $find = '')
     {
-        $query = "select subscriptionId, calendarId, user, source, name, refresh_rate, `order`, color, strip_todos, strip_alarms, strip_attachments, lastmodif from tiki_calendar_subscriptions where user = ?";
+        $query = "from tiki_calendar_subscriptions where user LIKE ?";
         $bindvars = [$user];
-        return $this->fetchAll($query, $bindvars);
+        if ($find) {
+            $query .= " and (`name` like ? or `source` like ?)";
+            $bindvars[] = '%' . $find . '%';
+            $bindvars[] = '%' . $find . '%';
+        }
+        $query .= ' order by ' . $this->convertSortMode($sort_mode, ['name', 'source', 'subscriptionId']);
+        $query_count = "select count(*) " . $query;
+        $count = $this->getOne($query_count, $bindvars);
+        $query = "select subscriptionId, uri, user, source, name, refresh_rate, `order`, color, strip_todos, strip_alarms, strip_attachments, lastmodif, last_sync " . $query;
+        return [
+            'count' => $count,
+            'data' => $this->fetchAll($query, $bindvars, $maxRecords, $offset)
+        ];
+    }
+
+    public function get_subscription($subscriptionId)
+    {
+        $result = $this->query("select * from tiki_calendar_subscriptions where subscriptionId = ?", $subscriptionId);
+        return $result->fetchRow();
     }
 
     public function create_subscription($data)
@@ -2003,8 +2089,8 @@ class CalendarLib extends TikiLib
     public function update_subscription($subscriptionId, $data)
     {
         $data['lastmodif'] = time();
-        $query = 'update `tiki_calendar_subscriptions` set ' . implode(' = ?, ', array_keys($data)) . ' = ? where subscriptionId = ?';
-        $bindvars = array_values($data) + [$subscriptionId];
+        $query = 'update `tiki_calendar_subscriptions` set `' . implode('` = ?, `', array_keys($data)) . '` = ? where subscriptionId = ?';
+        $bindvars = array_merge(array_values($data), [$subscriptionId]);
         return $this->query($query, $bindvars);
     }
 

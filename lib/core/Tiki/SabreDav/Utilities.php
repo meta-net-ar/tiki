@@ -65,6 +65,29 @@ class Utilities
         return compact('content', 'filesize', 'mime');
     }
 
+
+    public static function getCalendarUri($calendarId)
+    {
+        return 'calendar-' . $calendarId;
+    }
+
+    public static function getCalendarObjectUri($row_or_rec)
+    {
+        if (is_array($row_or_rec)) {
+            if (! empty($row_or_rec['uri'])) {
+                return $row_or_rec['uri'];
+            } else {
+                return 'calendar-object-' . $row_or_rec['calitemId'];
+            }
+        } else {
+            if ($row_or_rec->getUri()) {
+                return $row_or_rec->getUri();
+            } else {
+                return 'calendar-object-r' . $row_or_rec->getId();
+            }
+        }
+    }
+
   /**
    * Parses some information from calendar objects, used for optimized
    * calendar-queries and field mapping to Tiki. RRULE parsing partially
@@ -232,9 +255,17 @@ class Utilities
         if (isset($component->LOCATION)) {
             $result['newloc'] = $component->LOCATION;
         }
+        if (isset($component->{'X-Tiki-LocationId'})) {
+            $result['locationId'] = $component->{'X-Tiki-LocationId'};
+            unset($result['newloc']);
+        }
         if (isset($component->CATEGORIES)) {
             $cats = explode(',', $component->CATEGORIES);
             $result['newcat'] = $cats[0];
+        }
+        if (isset($component->{'X-Tiki-CategoryId'})) {
+            $result['categoryId'] = $component->{'X-Tiki-CategoryId'};
+            unset($result['newcat']);
         }
         if (isset($component->PRIORITY)) {
             $result['priority'] = $component->PRIORITY;
@@ -244,6 +275,30 @@ class Utilities
         }
         if (isset($component->URL)) {
             $result['url'] = $component->URL;
+        }
+        if (isset($component->{'X-Tiki-Allday'})) {
+            $result['allday'] = empty((string)$component->{'X-Tiki-Allday'}) ? 0 : 1;
+            if ($rec) {
+                $rec->setAllday(empty((string)$component->{'X-Tiki-Allday'}) ? 0 : 1);
+            }
+        }
+        if (isset($component->{'X-Tiki-Language'})) {
+            $result['lang'] = $component->{'X-Tiki-Language'};
+            if ($rec) {
+                $rec->setLang($component->{'X-Tiki-Language'});
+            }
+        }
+        if (isset($component->{'X-Tiki-ProcessITip'})) {
+            $result['process_itip'] = $component->{'X-Tiki-ProcessITip'};
+        }
+        if (isset($component->{'X-Tiki-RecurrenceId'})) {
+            $result['recurrenceId'] = $component->{'X-Tiki-RecurrenceId'};
+        }
+        if (isset($component->{'X-Tiki-Changed'})) {
+            $result['changed'] = $component->{'X-Tiki-Changed'};
+        }
+        if (isset($component->{'X-Tiki-UpdateManuallyChangedEvents'})) {
+            $result['updateManuallyChangedEvents'] = intval((string)$component->{'X-Tiki-UpdateManuallyChangedEvents'});
         }
         if (isset($component->ORGANIZER)) {
             $result['organizers'] = [];
@@ -386,6 +441,9 @@ class Utilities
         } elseif (! empty($row['uid'])) {
             $data['UID'] = $row['uid'];
         }
+        if (! empty($row['allday'])) {
+            $data['X-Tiki-Allday'] = $row['allday'];
+        }
         if (! empty($row['description'])) {
             $data['DESCRIPTION'] = $row['description'];
         }
@@ -395,14 +453,38 @@ class Utilities
         if (! empty($row['locationName'])) {
             $data['LOCATION'] = $row['locationName'];
         }
+        if (! empty($row['locationId'])) {
+            $data['X-Tiki-LocationId'] = $row['locationId'];
+        }
+        if (! empty($row['newloc'])) {
+            $data['LOCATION'] = $row['newloc'];
+        }
         if (! empty($row['category'])) {
             $data['CATEGORIES'] = $row['category'];
         }
         if (! empty($row['categoryName'])) {
             $data['CATEGORIES'] = $row['categoryName'];
         }
+        if (! empty($row['categoryId'])) {
+            $data['X-Tiki-CategoryId'] = $row['categoryId'];
+        }
+        if (! empty($row['newcat'])) {
+            $data['CATEGORIES'] = $row['newcat'];
+        }
         if (! empty($row['url'])) {
             $data['URL'] = $row['url'];
+        }
+        if (! empty($row['recurrenceId'])) {
+            $data['X-Tiki-RecurrenceId'] = $row['recurrenceId'];
+        }
+        if (! empty($row['lang'])) {
+            $data['X-Tiki-Language'] = $row['lang'];
+        }
+        if (! empty($row['process_itip'])) {
+            $data['X-Tiki-ProcessITip'] = $row['process_itip'];
+        }
+        if (! empty($row['changed'])) {
+            $data['X-Tiki-Changed'] = $row['changed'];
         }
         if (! empty($row['recurrenceStart'])) {
             $data['RECURRENCE-ID'] = \DateTime::createFromFormat('U', $row['recurrenceStart'])->setTimezone($dtzone);
@@ -423,20 +505,20 @@ class Utilities
         foreach ($organizers as $user) {
             $vevent->add(
                 'ORGANIZER',
-                TikiLib::lib('user')->get_user_email($user),
+                'mailto:' . TikiLib::lib('user')->get_user_email($user),
                 [
-                'CN' => TikiLib::lib('tiki')->get_user_preference($user, 'realName'),
+                    'CN' => TikiLib::lib('tiki')->get_user_preference($user, 'realName'),
                 ]
             );
         }
         foreach ($participants as $par) {
             $vevent->add(
                 'ATTENDEE',
-                $par['email'],
+                'mailto:' . $par['email'],
                 [
-                'CN' => TikiLib::lib('tiki')->get_user_preference($par['username'], 'realName'),
-                'ROLE' => Utilities::mapAttendeeRole($par['role']),
-                'PARTSTAT' => $par['partstat'],
+                    'CN' => TikiLib::lib('tiki')->get_user_preference($par['username'], 'realName'),
+                    'ROLE' => Utilities::mapAttendeeRole($par['role']),
+                    'PARTSTAT' => $par['partstat'],
                 ]
             );
         }
@@ -473,17 +555,17 @@ class Utilities
         $broker = new VObject\ITip\Broker();
         $messages = $broker->parseEvent(
             $vcalendar,
-            TikiLib::lib('user')->get_user_email($args['user']),
+            'mailto:' . TikiLib::lib('user')->get_user_email($args['user']),
             $old_vcalendar
         );
         foreach ($messages as $message) {
             if (! $message->significantChange) {
                 continue;
             }
-            $sender_email = (string)$message->sender;
+            $sender_email = str_replace('mailto:', '', (string)$message->sender);
             $sender_name = (string)$message->senderName;
             $sender = $sender_name ? "$sender_name <$sender_email>" : $sender_email;
-            $recipient_email = (string)$message->recipient;
+            $recipient_email = str_replace('mailto:', '', (string)$message->recipient);
             $recipient_name = (string)$message->recipientName;
             $recipient = $recipient_name ? "$recipient_name <$recipient_email>" : $recipient_email;
             switch ($message->method) {

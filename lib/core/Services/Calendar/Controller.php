@@ -200,11 +200,20 @@ class Services_Calendar_Controller
                 $action = 'view_item';
             }
 
-            $url = TikiLib::lib('service')->getUrl([
-                'controller' => 'calendar',
-                'action'     => $action,
-                'calitemId'  => $event['calitemId'],
-            ]);
+            if ($event['calitemId'] === 0) {
+                $url = TikiLib::lib('service')->getUrl([
+                    'controller' => 'calendar',
+                    'action'     => 'view_item',
+                    'act'        => 'preview',
+                    'calitem'    => $event,
+                ]);
+            } else {
+                $url = TikiLib::lib('service')->getUrl([
+                    'controller' => 'calendar',
+                    'action'     => $action,
+                    'calitemId'  => $event['calitemId'],
+                ]);
+            }
 
             $timezone = new DateTimeZone($prefs['display_timezone']);
             $start = new DateTime('@' . $event['start']);

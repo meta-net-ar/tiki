@@ -106,7 +106,10 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             }
 
             if (empty($row['timezone'])) {
-                $row['timezone'] = TikiLib::lib('tiki')->get_display_timezone($user);
+                $tz = new VObject\Component\VCalendar();
+                $tz->add('VTIMEZONE');
+                $tz->VTIMEZONE->TZID = TikiLib::lib('tiki')->get_display_timezone($user);
+                $row['timezone'] = $tz->serialize();
             }
 
             $calendar = [
@@ -171,24 +174,12 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
 
     protected function getCalendarUri($calendarId)
     {
-        return 'calendar-' . $calendarId;
+        return Utilities::getCalendarUri($calendarId);
     }
 
     protected function getCalendarObjectUri($row_or_rec)
     {
-        if (is_array($row_or_rec)) {
-            if (! empty($row_or_rec['uri'])) {
-                return $row_or_rec['uri'];
-            } else {
-                return 'calendar-object-' . $row_or_rec['calitemId'];
-            }
-        } else {
-            if ($row_or_rec->getUri()) {
-                return $row_or_rec->getUri();
-            } else {
-                return 'calendar-object-r' . $row_or_rec->getId();
-            }
-        }
+        return Utilities::getCalendarObjectUri($row_or_rec);
     }
 
     /**
@@ -745,7 +736,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             foreach ($item['organizers'] as $user) {
                 $vevent->add(
                     'ORGANIZER',
-                    TikiLib::lib('user')->get_user_email($user),
+                    'mailto:' . TikiLib::lib('user')->get_user_email($user),
                     [
                         'CN' => TikiLib::lib('tiki')->get_user_preference($user, 'realName'),
                     ]
@@ -754,7 +745,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             foreach ($item['participants'] as $par) {
                 $vevent->add(
                     'ATTENDEE',
-                    $par['email'],
+                    'mailto:' . $par['email'],
                     [
                         'CN' => TikiLib::lib('tiki')->get_user_preference($par['username'], 'realName'),
                         'ROLE' => Utilities::mapAttendeeRole($par['role']),
@@ -1134,12 +1125,13 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
     public function getSubscriptionsForUser($principalUri)
     {
         $user = PrincipalBackend::mapUriToUser($principalUri);
-        $subscriptions = TikiLib::lib('calendar')->get_subscriptions($user);
+        $subs = TikiLib::lib('calendar')->get_subscriptions($user);
 
-        foreach ($subscriptions as $row) {
+        $subscriptions = [];
+        foreach ($subs['data'] as $row) {
             $subscription = [
                 'id'           => $row['subscriptionId'],
-                'uri'          => $this->getCalendarUri($row['calendarId']),
+                'uri'          => $row['uri'],
                 'principaluri' => PrincipalBackend::mapUserToUri($row['user']),
                 'source'       => $row['source'],
                 'lastmodified' => $row['lastmodif'],
@@ -1173,15 +1165,14 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
     public function createSubscription($principalUri, $uri, array $properties)
     {
         $user = PrincipalBackend::mapUriToUser($principalUri);
-        $calendar = $this->mapCalendarUriToCalendar($uri);
 
         if (! isset($properties['{http://calendarserver.org/ns/}source'])) {
             throw new Forbidden('The {http://calendarserver.org/ns/}source property is required when creating subscriptions');
         }
 
         $data = [
+            'uri' => $uri,
             'user' => $user,
-            'calendarId' => $calendar['calendarId'],
             'source' => $properties['{http://calendarserver.org/ns/}source']->getHref(),
         ];
 
@@ -1192,6 +1183,11 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
 
         $subscriptionId = TikiLib::lib('calendar')->create_subscription($data);
+
+        if ($data['uri'] === 'autogen') {
+            $data['uri'] = 'subscription-' . $subscriptionId;
+            TikiLib::lib('calendar')->update_subscription($subscriptionId, ['uri' => $data['uri']]);
+        }
 
         return $subscriptionId;
     }

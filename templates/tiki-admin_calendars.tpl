@@ -146,6 +146,84 @@
         </table>
         </div>
         {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+
+        <h2>{tr}Calendar Subscriptions{/tr}</h2>
+
+        <div {if $js}class="table-responsive"{/if}>
+        <table class="table table-striped table-hover">
+            <tr>
+                <th>
+                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'subscriptionId_desc'}subscriptionId_asc{else}subscriptionId_desc{/if}">
+                        {tr}ID{/tr}
+                    </a>
+                </th>
+                <th>
+                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">
+                        {tr}Name{/tr}
+                    </a>
+                </th>
+                <th>
+                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'source_desc'}source_asc{else}source_desc{/if}">
+                        {tr}Source URL{/tr}
+                    </a>
+                </th>
+                <th></th>
+            </tr>
+
+            {foreach key=id item=sub from=$subscriptions.data}
+                <tr>
+                    <td class="id">{$sub.subscriptionId}</td>
+                    <td class="text">
+                        <a class="tablename" href="tiki-admin_calendars.php?subscriptionId={$sub.subscriptionId}&cookietab=3" title="{tr}Edit{/tr}">{$sub.name|escape}</a>
+                    </td>
+                    <td class="text">
+                        <a href="{$sub.source}">{$sub.source}</a>
+                    </td>
+                    <td class="action">
+                        {actions}
+                            {strip}
+                                <action>
+                                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;subscriptionId={$sub.subscriptionId}&cookietab=3">
+                                        {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-calendar.php?subIds[]={$sub.subscriptionId}">
+                                        {icon name='view' _menu_text='y' _menu_icon='y' alt="{tr}View{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;sync_subscription={$sub.subscriptionId}">
+                                        {icon name='sync' _menu_text='y' _menu_icon='y' alt="{tr}Synchronize now{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-caldav.php/calendars/{$sub.user}/{$sub.uri}">
+                                        {icon name='sync' _menu_text='y' _menu_icon='y' alt="{tr}Sync via CalDAV{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-caldav.php/calendars/{$sub.user}/{$sub.uri}?export">
+                                        {icon name='export' _menu_text='y' _menu_icon='y' alt="{tr}Export as .ics{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;remove_subscription={$sub.subscriptionId}"
+                                        onclick="confirmPopup('{tr}Delete calendar subscription?{/tr}', '{ticket mode=get}')"
+                                    >
+                                        {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
+                                    </a>
+                                </action>
+                            {/strip}
+                        {/actions}
+                    </td>
+                </tr>
+            {foreachelse}
+                {norecords _colspan=4}
+            {/foreach}
+        </table>
+        </div>
+        {pagination_links cant=$subscriptions.count step=$maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {if $calendarId gt 0}
@@ -498,6 +576,94 @@
                     >
                 </div>
             </fieldset>
+        </form>
+    {/tab}
+
+    {if $subscription.subscriptionId gt 0}
+        {assign var="subtab" value="{tr}Edit Subscription{/tr}"}
+    {else}
+        {assign var="subtab" value="{tr}Create Subscription{/tr}"}
+    {/if}
+    {tab name=$subtab}
+        <h2>{$subtab}</h2>
+
+        <form action="tiki-admin_calendars.php" method="post" role="form">
+            {ticket}
+            <fieldset>
+            <input type="hidden" name="subscription[subscriptionId]" value="{$subscription.subscriptionId|escape}">
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="subscriptionName">
+                    {tr}Name{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="subscription[name]" id="subscriptionName" value="{$subscription.name|escape}" required>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="source">
+                    {tr}Source URL{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="subscription[source]" id="source" value="{$subscription.source|escape}" required>
+                    <span class="form-text">
+                        {tr _0="<a href='tiki-admin_dsn.php'>" _1="</a>"}This can be an address of a CalDAV server or export of .ics calendar URL. If the URL needs authentication, specify it in %0Admin->Content Authentication%1.{/tr}
+                    </span>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="refreshRate">
+                    {tr}Refresh rate{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="subscription[refresh_rate]" id="refreshRate" value="{$subscription.refresh_rate|escape}">
+                    <span class="form-text">
+                        {tr}How often will the calendar contents get refreshed. Example format: P1W once a week or P1H every hour{/tr}
+                    </span>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="order">
+                    {tr}Order{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="subscription[order]" id="order" value="{$subscription.order|escape}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="color">
+                    {tr}Color{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="subscription[color]" id="color" value="{$subscription.color|escape}">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="stripTodos">
+                    {tr}Ignore Todos{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="checkbox" name="subscription[strip_todos]" id="stripTodos" value="1"{if $subscription.strip_todos} checked="checked"{/if}>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="stripAlarms">
+                    {tr}Ignore Alarms{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="checkbox" name="subscription[strip_alarms]" id="stripAlarms" value="1"{if $subscription.strip_alarms} checked="checked"{/if}>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-4 col-form-label" for="stripAttachments">
+                    {tr}Ignore Attachments{/tr}
+                </label>
+                <div class="col-sm-8">
+                    <input type="checkbox" name="subscription[strip_attachments]" id="stripAttachments" value="1"{if $subscription.strip_attachments} checked="checked"{/if}>
+                </div>
+            </div>
+            <div class="mb-3 text-center">
+                <input type="submit" class="btn btn-primary" name="savesub" value="{tr}Save{/tr}">
+            </div>
         </form>
     {/tab}
 {/tabset}

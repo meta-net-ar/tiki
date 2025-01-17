@@ -38,6 +38,12 @@ if (! isset($_REQUEST["calendarId"])) {
         die;
     }
 }
+if (! empty($_REQUEST['subscriptionId'])) {
+    $subscription = $calendarlib->get_subscription($_REQUEST['subscriptionId']);
+    if ($subscription['user'] == $user) {
+        $smarty->assign('subscription', $subscription);
+    }
+}
 if (isset($_REQUEST["drop"]) && $access->checkCsrf(true)) {
     $result = $calendarlib->drop_calendar($_REQUEST['calendarId']);
     if ($result->numRows()) {
@@ -46,6 +52,13 @@ if (isset($_REQUEST["drop"]) && $access->checkCsrf(true)) {
         Feedback::error(tr('Calendar %0 not deleted', (int) $_REQUEST['calendarId']));
     }
     $_REQUEST["calendarId"] = 0;
+}
+if (isset($_REQUEST["remove_subscription"]) && $access->checkCsrf(true)) {
+    $subscription = $calendarlib->get_subscription($_REQUEST['remove_subscription']);
+    if ($subscription['user'] == $user) {
+        TikiLib::lib('calendar')->delete_subscription($_REQUEST['remove_subscription']);
+        Feedback::success(tr('Subscription %0 deleted', (int) $_REQUEST['remove_subscription']));
+    }
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $customflags["customlanguages"] = $_REQUEST["customlanguages"];
@@ -172,6 +185,38 @@ if (isset($_REQUEST['clean']) && isset($_REQUEST['days']) && $access->checkCsrf(
         Feedback::note(tra('No calendar events deleted'));
     } else {
         Feedback::success(tr('%0 calendar events deleted', $result->numRows()));
+    }
+}
+if (isset($_REQUEST["savesub"]) && $access->checkCsrf()) {
+    $subscription = $_REQUEST['subscription'];
+    if (empty($subscription['subscriptionId'])) {
+        $subscription['user'] = $user;
+        $subscriptionId = TikiLib::lib('calendar')->create_subscription($subscription);
+    } else {
+        $existing = $calendarlib->get_subscription($subscription['subscriptionId']);
+        if ($existing['user'] == $user) {
+            $subscription['user'] = $user;
+            TikiLib::lib('calendar')->update_subscription($subscriptionId, $subscription);
+        }
+    }
+    $tasks = TikiLib::lib('scheduler')->get_scheduler(null, null, ['name' => 'System Synchronize Calendars']);
+    if (! $tasks) {
+        TikiLib::lib('scheduler')->set_scheduler('System Synchronize Calendars', 'System task to run calendar subscription synchornization task.', 'ConsoleCommandTask', '{"console_command":"calendar:sync"}', '* * * * *', 'active', 0, 0);
+    }
+    Feedback::success(tra('Calendar subscription saved.'));
+}
+if (! empty($_REQUEST['sync_subscription'])) {
+    $subscriptionInfo = $calendarlib->get_subscription($_REQUEST['sync_subscription']);
+    if (empty($subscriptionInfo)) {
+        Feedback::error(tr('Calendar subscription not found.'));
+    } else {
+        try {
+            $client = new \Tiki\SabreDav\CaldavClient();
+            $client->syncSubscription($subscriptionInfo);
+            Feedback::success(tra('Calendar data synchronized.'));
+        } catch (Exception $e) {
+            Feedback::error(tr('Error synchornizing remote calendar: %0', $e->getMessage()));
+        }
     }
 }
 if ($prefs['feature_categories'] == 'y') {
@@ -318,6 +363,10 @@ foreach (array_keys($calendars["data"]) as $i) {
 }
 $smarty->assign_by_ref('cant', $calendars['cant']);
 $smarty->assign_by_ref('calendars', $calendars["data"]);
+
+$subscriptions = $calendarlib->get_subscriptions($user, $offset, $maxRecords, $sort_mode, $find);
+$smarty->assign_by_ref('subscriptions', $subscriptions);
+
 $days_names = [
     tra("Sunday"),
     tra("Monday"),

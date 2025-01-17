@@ -198,6 +198,7 @@ class ConsoleApplicationBuilder
                 new TranslationPercentageCommand(),
                 new MarkdownConvertCommand(),
                 new SieveFiltersCommand(),
+                new CalendarSyncCommand(),
                 new SchedulerRunCommand(),
                 ],
             ],[

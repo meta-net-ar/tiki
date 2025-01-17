@@ -46,7 +46,11 @@
         </div>
         {if $tiki_p_admin_calendar eq 'y' or $tiki_p_admin eq 'y'}
             {if $displayedcals|@count eq 1}
-                {button href="tiki-admin_calendars.php?calendarId={$displayedcals[0]}" _type="link" _text="{tr}Edit{/tr}" _icon_name="edit"}
+                {if $displayedcals[0]|substr:0:1 eq 's'}
+                    {button href="tiki-admin_calendars.php?subscriptionId={$displayedcals[0]|substr:1}&cookietab=3" _type="link" _text="{tr}Edit{/tr}" _icon_name="edit"}
+                {else}
+                    {button href="tiki-admin_calendars.php?calendarId={$displayedcals[0]}&cookietab=2" _type="link" _text="{tr}Edit{/tr}" _icon_name="edit"}
+                {/if}
             {/if}
             {button href="tiki-admin_calendars.php?cookietab=1" _type="link" _text="{tr}Admin{/tr}" _icon_name="admin"}
         {/if}

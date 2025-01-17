@@ -90,7 +90,7 @@ function tiki_route($path)
     );
 
     tiki_route_attempt(
-        '|^cal(\d+[\d,]*)(\-.*)?$|',
+        '|^cal(s?\d+[\d,]*)(\-.*)?$|',
         'tiki-calendar.php',
         function ($parts) {
             $ids = explode(',', $parts[1]);

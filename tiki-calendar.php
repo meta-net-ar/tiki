@@ -87,6 +87,13 @@ foreach ($rawcals['data'] as $calendar) {
     $canEditAnything = $calendar['perms']->add_events || $calendar['perms']->add_events;
 }
 
+
+$rawsubs = $calendarlib->get_subscriptions($user);
+foreach ($rawsubs['data'] as $sub) {
+    $sub['displayName'] = $sub['name'];
+    $calendars['s' . $sub['subscriptionId']] = $sub;
+}
+
 $smarty->assign('calendars', $calendars);
 $smarty->assign('now', $tikilib->now);
 

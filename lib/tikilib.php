@@ -167,6 +167,49 @@ class TikiLib extends TikiDb_Bridge
         return call_user_func($callback);
     }
 
+    public function matchAuthSource($url, $user = null)
+    {
+        $info = parse_url($url);
+        $info['scheme'] = $info['scheme'] ?? '';
+        $info['host'] = $info['host'] ?? '';
+
+        // Obtain all methods matching the scheme and domain
+        $table = $this->table('tiki_source_auth');
+        $authentications = $table->fetchAll(
+            ['path', 'method', 'arguments'],
+            ['scheme' => $info['scheme'], 'domain' => $info['host'], 'user' => $user]
+        );
+
+        if (! $authentications && $user) {
+            // try system-wide authentications not constrainted to a specific user
+            $authentications = $table->fetchAll(
+                ['path', 'method', 'arguments'],
+                ['scheme' => $info['scheme'], 'domain' => $info['host'], 'user' => null]
+            );
+        }
+
+        // Obtain the method with the longest path matching
+        $max = -1;
+        $method = false;
+        $arguments = false;
+        foreach ($authentications as $auth) {
+            if (0 === strpos($info['path'], $auth['path'])) {
+                $len = strlen($auth['path']);
+                if ($len > $max) {
+                    $max = $len;
+                    $method = $auth['method'];
+                    $arguments = $auth['arguments'];
+                }
+            }
+        }
+
+        if ($arguments) {
+            $arguments = json_decode($arguments, true);
+        }
+
+        return compact('method', 'arguments');
+    }
+
     /**
      * @param bool $url
      * @param array $options
@@ -227,44 +270,12 @@ class TikiLib extends TikiDb_Bridge
      */
     private function prepare_http_client($client, $url, $user = null)
     {
-        $info = parse_url($url);
-        $info['scheme'] = $info['scheme'] ?? '';
-        $info['host'] = $info['host'] ?? '';
-
-        // Obtain all methods matching the scheme and domain
-        $table = $this->table('tiki_source_auth');
-        $authentications = $table->fetchAll(
-            ['path', 'method', 'arguments'],
-            ['scheme' => $info['scheme'], 'domain' => $info['host'], 'user' => $user]
-        );
-
-        if (! $authentications && $user) {
-            // try system-wide authentications not constrainted to a specific user
-            $authentications = $table->fetchAll(
-                ['path', 'method', 'arguments'],
-                ['scheme' => $info['scheme'], 'domain' => $info['host'], 'user' => null]
-            );
-        }
-
-        // Obtain the method with the longest path matching
-        $max = -1;
-        $method = false;
-        $arguments = false;
-        foreach ($authentications as $auth) {
-            if (0 === strpos($info['path'], $auth['path'])) {
-                $len = strlen($auth['path']);
-                if ($len > $max) {
-                    $max = $len;
-                    $method = $auth['method'];
-                    $arguments = $auth['arguments'];
-                }
-            }
-        }
-
+        $result = $this->matchAuthSource($url, $user);
+        $method = $result['method'];
+        $arguments = $result['arguments'];
         if ($method) {
             $functionName = 'prepare_http_auth_' . $method;
             if (method_exists($this, $functionName)) {
-                $arguments = json_decode($arguments, true);
                 return $this->$functionName($client, $arguments);
             }
         } else {
