@@ -830,6 +830,7 @@ class Services_Calendar_Controller
         $recurrence = new CalRecurrence(
             ! empty($input->recurrenceId->int()) ? $input->recurrenceId->int() : -1
         );
+        $calitem = $this->processParticipants($calitem);
         $recurrence->setCalendarId($calitem['calendarId']);
         $tz = date_default_timezone_get();
         date_default_timezone_set('UTC');
@@ -939,6 +940,9 @@ class Services_Calendar_Controller
             $recurrence->setEndPeriod(0);
         }
         $recurrence->setUser($calitem['user']);
+        $recurrence->setOrganizers($calitem['organizers']);
+        $recurrence->setParticipants($calitem['participants']);
+        $recurrence->setProcessItip($calitem['process_itip']);
         if (! empty($calitem['calitemId'])) {
             // store the initial event if it was already created
             $recurrence->setInitialItem($calitem);
