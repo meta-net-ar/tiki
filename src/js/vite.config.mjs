@@ -121,6 +121,7 @@ export default defineConfig(({ command, mode }) => {
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
         "element-plus-ui": resolve(__dirname, "vue-widgets/element-plus-ui/src/element-plus-ui.ce.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
+        comments: resolve(__dirname, "vue-mf/comments/src/comments.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
         styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),

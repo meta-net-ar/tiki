@@ -62,6 +62,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-maps-ol3" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js",
 
                 /* single-spa microfrontends and common files (root and styleguide) */
+                "@vue-mf/comments" => $tikiUrl . JS_ASSETS_PATH . "/comments.js",
                 "@vue-mf/duration-picker" => $tikiUrl . JS_ASSETS_PATH . "/duration-picker.js",
                 "@vue-mf/emoji-picker" => $tikiUrl . JS_ASSETS_PATH . "/emoji-picker.js",
                 "@vue-mf/kanban" => $tikiUrl . JS_ASSETS_PATH . "/kanban.js",
