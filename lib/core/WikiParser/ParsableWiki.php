@@ -153,11 +153,11 @@ class WikiParser_ParsableWiki extends ParserLib
         }
 
         // linebreaks using %%%
-        $pattern = "/\n?(?<![^%]\d)%%%/";
+        $pattern = "/\n?(?<=\d)(%?)%{3}|%{3}/";
         if ($this->option['markdown_conversion']) {
             $data = preg_replace($pattern, "%%%", $data);
         } else {
-            $data = preg_replace($pattern, "<br />", $data);
+            $data = preg_replace($pattern, "$1<br />", $data);
         }
 
         // Close BiDi DIVs if any
