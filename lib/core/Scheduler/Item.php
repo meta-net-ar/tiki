@@ -28,7 +28,7 @@ class Scheduler_Item
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
 
-    public static $availableTasks = [
+    private static $availableTasks = [
         'ConsoleCommandTask' => 'ConsoleCommand',
         'ShellCommandTask' => 'ShellCommand',
         'HTTPGetCommandTask' => 'HTTPGetCommand',
@@ -42,7 +42,12 @@ class Scheduler_Item
 
     public static function getAvailableTasks()
     {
-        return self::$availableTasks;
+        global $prefs;
+        $tasks = self::$availableTasks;
+        if ($prefs['feature_shell_command'] !== 'y') {
+            unset($tasks['ShellCommandTask']);
+        }
+        return $tasks;
     }
 
     /**
