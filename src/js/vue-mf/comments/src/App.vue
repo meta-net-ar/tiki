@@ -17,6 +17,19 @@
                             <p class="lead mt-5"><span class="fw-bold">10</span> comments in <span class="fw-bold">3</span> discussions in the last 3 months</p>
                             <p class="text-muted sub-lead"><span class="fw-bold">1 new comment</span> since your last visit</p>
                             <Threads />
+                            <h5 class="mt-5 mb-3">Start new discussion thread</h5>
+                            <div class="row">
+                                <div class="col-md-6 mx-auto">
+                                    <div class="thread-form">
+                                        <input type="text" class="thread-input form-control" placeholder="Optional:type a title/subject for your new discussion...">
+                                        <div class="thread-textarea">
+                                            <i class="fa fa-question-circle" style="color: #8ca5af;"></i>
+                                            <textarea class="thread-input form-control mt-3" rows="10" placeholder="Type your comment here, in Tiki-flavored MarkDown format."></textarea>
+                                            <input type="submit" class="btn btn-secondary float-end mt-5" value="Preview/Publish">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="tab-pane" id="fill-tabpanel-2" role="tabpanel" aria-labelledby="fill-tab-2">Pinned Content</div>
                     </div>

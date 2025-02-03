@@ -1,5 +1,5 @@
 <script setup>
-import Comment from "./Comment.vue";
+import Comments from "./Comments.vue";
 import store from "../store";
 defineProps({
     comments: {
@@ -11,8 +11,6 @@ defineProps({
 });
 </script>
 <script>
-import store from '../store';
-
 export default {
     name: 'Threads',
 };
@@ -20,8 +18,8 @@ export default {
 
 <template>
     <div class="row">
-        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5' : item.parentId != 0}, 'col-md-12']" v-for="item in comments">
-            <Comment :item=item />
+        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5 thread-replies' : item.parentId != 0}, 'col-md-12 thread-block']" v-for="item in comments">
+            <Comments :item=item />
         </div>
     </div>
 </template>
@@ -36,5 +34,8 @@ export default {
 }
 .card.thread-card:first-of-type {
     margin-top: 0px;
+}
+.thread-block {
+    position: sticky;
 }
 </style>

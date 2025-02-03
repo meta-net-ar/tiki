@@ -1,5 +1,4 @@
 <script setup>
-import Threads from "./Threads.vue";
 
 defineProps({
     item: {
@@ -9,30 +8,13 @@ defineProps({
 });
 </script>
 <script>
-import store from "../store";
-
 export default {
     name: 'Comment',
-    methods: {
-        getMessages: function (threadId) {
-            var arr = store.getters.getThreads;
-            var key = "parentId";
-            var response = [];
-            arr.forEach(item => {
-                if (item[key] === threadId) {
-                    response.push(item);
-                }
-            });
-            return response;
-        }
-    },
 }
-
-
 </script>
 
 <template>
-    <div class="thread-body card-body text-start">
+    <div class="comment-body card-body text-start">
         <p class="small">
             <span class="border rounded-3 p-1 pr-3 bg-light comment-author">
                 <img src="https://as2.ftcdn.net/jpg/00/65/77/27/1000_F_65772719_A1UV5kLi5nCEWI0BNLLiFaBPEkUbv5Fv.webp"/>{{item.author}}
@@ -40,12 +22,13 @@ export default {
             <span class="mx-1 pt-1">on {{item.date}}</span>
             <span class="text-muted pt-1">(17:01 their time)</span>
         </p>
-        <h5 class="card-title thread-title" v-if="item.parentId == 0">{{ item.title }}</h5>
-        <hr v-if="item.parentId == 0" />
+        <div class="thread-border"></div>
+        <h5 class="card-title thread-title ps-2" v-if="item.title != ''">{{ item.title }}</h5>
+        <hr class="ms-2" v-if="item.parentId == 0" />
         <div>
-            <div class="thread-messages">
+            <div class="thread-messages ps-2">
                 <p class="card-text">{{ item.comment }}</p>
-                <div class="message-footer ms-3">
+                <div :class="[{'d-none' : item.parentId != 0}, 'message-footer ms-3']">
                     <i class="icon fa-solid fa-thumbs-up mt-3"></i><span class="like small text-muted mx-1 me-4">6</span>
                     <i class="icon fa-solid fa-thumbs-down mt-3"></i><span class="dislike small text-muted mx-1">1</span>
                     <div class="thread-button-block float-end">
@@ -56,10 +39,9 @@ export default {
                     </div>
                 </div>
             </div>
-            <hr class="bottom-line mt-4" v-if="item.parentId == 0">
+            <hr class="bottom-line mt-4 ms-2" v-if="item.parentId == 0">
         </div>
     </div>
-    <Threads :comments=getMessages(item.threadId) />
 </template>
 
 <style scoped lang="scss">
@@ -81,10 +63,37 @@ export default {
 .bottom-line {
     border-top: 2px dashed black;
 }
-.thread-body p {
-    min-width: 300px;
+.comment-body p {
+    min-width: 400px;
 }
 .thread-title {
     font-weight: bold;
+}
+.thread-border {
+    border-left: 0.01rem solid rgba(167, 167, 167, 0.3);
+    position: absolute;
+    height: -webkit-fill-available;
+    width: 10px;
+    z-index: 9999;
+}
+.thread-border:hover {
+    border-left: 0.01rem solid rgba(0, 0, 0, 1);
+}
+.thread-replies .thread-border:before {
+    content: "";
+    display: block;
+    width: 35px;
+    height: 1px;
+    background: #a7a7a7;
+    left: -36px;
+    top: -28px;
+    position: absolute;
+    z-index: 9999;
+}
+.thread-replies .thread-border:hover::before {
+    background: #000000;
+}
+.comment-body:hover .d-none {
+    display: block;
 }
 </style>
