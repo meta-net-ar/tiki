@@ -19,7 +19,7 @@
                             <Threads />
                             <h5 class="mt-5 mb-3">Start new discussion thread</h5>
                             <div class="row">
-                                <div class="col-md-6 mx-auto">
+                                <div class="col-md-12 mx-auto">
                                     <div class="thread-form">
                                         <input type="text" class="thread-input form-control" placeholder="Optional:type a title/subject for your new discussion...">
                                         <div class="thread-textarea">
