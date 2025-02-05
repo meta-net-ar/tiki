@@ -11,12 +11,13 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 }
 
 use Symfony\Component\Console\Input\ArrayInput;
+use TikiManager\Application\Discovery\LinuxDiscovery;
+use TikiManager\Application\Discovery\WindowsDiscovery;
 use TikiManager\Application\Instance;
 use TikiManager\Application\Tiki\Versions\Fetcher\YamlFetcher;
 use TikiManager\Command\AccessInstanceCommand;
 use TikiManager\Command\ApplyProfileCommand;
 use TikiManager\Command\BackupInstanceCommand;
-use TikiManager\Command\CheckInstanceCommand;
 use TikiManager\Command\CheckoutCommand;
 use TikiManager\Command\CheckRequirementsCommand;
 use TikiManager\Command\ClearCacheCommand;
@@ -27,6 +28,7 @@ use TikiManager\Command\CreateTemporaryUserInstanceCommand;
 use TikiManager\Command\DeleteInstanceCommand;
 use TikiManager\Command\DetectInstanceCommand;
 use TikiManager\Command\EditInstanceCommand;
+use TikiManager\Command\Helper\CommandHelper;
 use TikiManager\Command\MaintenanceInstanceCommand;
 use TikiManager\Command\ManagerInfoCommand;
 use TikiManager\Command\ManagerTestSendEmailCommand;
@@ -37,6 +39,7 @@ use TikiManager\Command\SetupUpdateCommand;
 use TikiManager\Command\SetupWatchManagerCommand;
 use TikiManager\Command\TikiVersionCommand;
 use TikiManager\Command\UpgradeInstanceCommand;
+use TikiManager\Command\VerifyInstanceCommand;
 use TikiManager\Command\WatchInstanceCommand;
 
 /**
@@ -118,7 +121,7 @@ class Services_Manager_Controller
             $availbleInstancesIds = array_map(function ($element) {
                 return $element->id;
             }, $availbleInstances);
-            $instancesToUpdate = $input->instances->array();
+            $instancesToUpdate = $input->asArray('instances');
 
             foreach ($instancesToUpdate as $instanceId) {
                 if (! in_array($instanceId, $availbleInstancesIds)) {
@@ -163,7 +166,7 @@ class Services_Manager_Controller
                                . '<option value="1">True</option>'
                                . '<option value="0">False</option>';
 
-                $instancesIds = new JitFilter(['instancesIds' => [$instanceId]]);
+                $instancesIds = new JitFilter(['instancesIds' => $instanceId]);
                 $versions = $this->action_get_instances_upper_versions($instancesIds);
                 $upperVersions = $versions['upperVersions'];
 
@@ -198,7 +201,7 @@ class Services_Manager_Controller
      */
     public function action_get_instances_upper_versions($input): array
     {
-        $instancesIds = $input->instancesIds->array();
+        $instancesIds = $input->asArray('instancesIds');
         $availableInstances = Instance::getInstances(true);
         $instances = array_filter($availableInstances, function ($i) use ($instancesIds) {
             return in_array($i->id, $instancesIds);
@@ -421,11 +424,16 @@ class Services_Manager_Controller
                 "--db-pass" => $input->db_pass->text(),
                 "--db-prefix" => $input->db_prefix->text(),
                 "--db-name" => $input->db_name->text(),
+                "--phpexec" => $input->php_executable->text()
             ];
 
             if ($input->instance_type->text() == 'blank') {
                 $input_array["--blank"] = true;
                 unset($input_array["--branch"]);
+            }
+
+            if ($input->force_option->text() === 'yes') {
+                $input_array["--force"] = null;
             }
 
             $inputCommand = new ArrayInput($input_array);
@@ -486,8 +494,6 @@ class Services_Manager_Controller
                 'name' => "",
                 'email' => '',
                 'webroot' => '',
-                'branches' => $this->getTikiBranches(),
-                'selected_branch' => "21.x",
                 'default_repository' => "profiles.tiki.org",
                 'temp_dir' => '/tmp/trim_temp',
                 'backup_user' => 'www-data',
@@ -690,7 +696,7 @@ class Services_Manager_Controller
     {
         $result = [
             'php_versions' => [],
-            'available_branches' => $this->getTikiBranches(),
+            'available_branches' => [],
         ];
 
         $source = $input->source->text();
@@ -709,26 +715,9 @@ class Services_Manager_Controller
             }
         }
 
-        if ($selected_php_version) {
-            $available_versions = [];
-            $requirements = (new YamlFetcher())->getRequirements();
-            foreach ($requirements as $requirement) {
-                if ($requirement->getPhpVersion()->isValidVersion($selected_php_version)) {
-                    $available_versions[] = $requirement->getVersion();
-                }
-            }
-            $result['available_branches'] = array_values(array_filter($result['available_branches'], function ($branch) use ($available_versions) {
-                if ($branch == 'master') {
-                    return true;
-                }
-                foreach ($available_versions as $version) {
-                    if (substr($branch, 0, strlen($version)) == $version || preg_match("/$version\.\d+/", $branch)) {
-                        return true;
-                    }
-                }
-                return false;
-            }));
-        }
+        $input = new JitFilter(['php_version' => $selected_php_version]);
+
+        $result['available_branches'] = $this->actionGetAvailableBranches($input);
 
         return $result;
     }
@@ -848,20 +837,48 @@ class Services_Manager_Controller
      *
      * @return array
      */
-    public function action_check($input): array
+    public function actionVerify($input)
     {
-        $cmd = new CheckInstanceCommand();
-        $input = new ArrayInput([
-            'command' => $cmd->getName(),
-            '-i' => $input->instanceId->int()
-        ]);
-        $this->runCommand($cmd, $input);
-        return [
-            'override_action' => 'info',
-            'title' => tr('Tiki Manager Check Instance'),
-            'info' => $this->manager_output->fetch(),
-            'refresh' => true,
-        ];
+        $cmd = new VerifyInstanceCommand();
+        if ($input->verify->text()) {
+            $oldEnvValue = $_ENV['INTERACTIVE'] ?: '';
+            $_ENV['INTERACTIVE'] = false;
+            $input = new ArrayInput([
+                'command' => $cmd->getName(),
+                '-i' => $input->instance->int(),
+                '--update-from' => $input->update_from->text()
+            ]);
+            $this->runCommand($cmd, $input);
+            $_ENV['INTERACTIVE'] = $oldEnvValue;
+            return [
+                'title' => tr('Tiki Manager Verify Instance'),
+                'info' => $this->manager_output->fetch(),
+                'refresh' => true,
+            ];
+        } else {
+            $instanceId = $input->instanceId->int();
+            $instance = Instance::getInstance($instanceId);
+            if ($instance) {
+                $inputValues = [
+                    'instance' => $instanceId,
+                    'update_from' => ['current', 'source', 'skip']
+                ];
+
+                return [
+                    'title' => tr('Verify instance') . " " . $instance->name ?: $instance->id,
+                    'info' => '',
+                    'refresh' => true,
+                    'inputValues' => $inputValues,
+                    'help' => $this->getCommandHelpTexts($cmd),
+                ];
+            } else {
+                return [
+                    'title' => tr('Verify instance (Instance not found)'),
+                    'info' => tr("No Tiki instances available to edit"),
+                    'refresh' => true,
+                ];
+            }
+        }
     }
 
     /**
@@ -1055,7 +1072,7 @@ class Services_Manager_Controller
         $cmd = new SetupWatchManagerCommand();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $exclude = implode(',', $input->exclude->array());
+            $exclude = implode(',', $input->asArray('exclude'));
             $inputCommand = new ArrayInput([
                 'command' => $cmd->getName(),
                 "--email" => $input->email->text(),
@@ -1212,12 +1229,12 @@ class Services_Manager_Controller
                     if (count($input->instance->array()) < 1) {
                         return $this->manager_setup_error($event);
                     }
-                    $input_array['--instances'] = implode(',', $input->instance->array());
+                    $input_array['--instances'] = implode(',', $input->asArray('instance'));
                     break;
 
                 case "backup":
                     if (count($input->instance->array()) > 0) {
-                        $input_array["-x"] = implode(",", $input->instance->array());
+                        $input_array["-x"] = implode(",", $input->asArray('instance'));
                     }
 
                     if ($input->number_backups_to_keep->int()) {
@@ -1494,5 +1511,78 @@ class Services_Manager_Controller
                 ],
             ];
         }
+    }
+
+    public function actionGetHostPHPVersions($input)
+    {
+        $instance = new Instance();
+        $instance->type = $input->type->text();
+        $access = $instance->getBestAccess();
+
+        if ($instance->type === 'ssh') {
+            $access->user = $input->user->text();
+            $access->host = $input->host->text();
+            $access->port = $input->port->int();
+        } elseif ($instance->type === 'ftp') {
+            $access->user = $input->user->text();
+            $access->host = $input->host->text();
+            $access->port = $input->port->int();
+            $access->password = $input->password->text();
+        }
+
+        if (stristr(PHP_OS, 'WIN')) {
+            $discovery = new WindowsDiscovery($instance, $access, ['os' => 'WINDOWS']);
+        } else {
+            $discovery = new LinuxDiscovery($instance, $access, ['os' => 'LINUX']);
+        }
+
+        $detectedBinaries = $discovery->detectPHP();
+        $requirements = (new YamlFetcher())->getRequirements();
+        $valid = [];
+        foreach ($detectedBinaries as $binary) {
+            try {
+                $version = $discovery->detectPHPVersion($binary);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            $formattedVersion = CommandHelper::formatPhpVersion($version);
+            foreach ($requirements as $requirement) {
+                if ($version >= 50300 && $requirement->getPhpVersion()->isValidVersion($formattedVersion)) {
+                    $valid[$formattedVersion] = $binary;
+                    break;
+                }
+            }
+        }
+
+        return $valid;
+    }
+
+    public function actionGetAvailableBranches($input)
+    {
+        $phpVersion = $input->php_version->text();
+        $availableBranches = [];
+        if (! empty($phpVersion)) {
+            $availableVersions = [];
+            $requirements = (new YamlFetcher())->getRequirements();
+            foreach ($requirements as $requirement) {
+                if ($requirement->getPhpVersion()->isValidVersion($phpVersion)) {
+                    $availableVersions[] = $requirement->getVersion();
+                }
+            }
+            $availableBranches = array_values(array_filter($this->getTikiBranches(), function ($branch) use ($availableVersions) {
+                if ($branch == 'master') {
+                    return true;
+                }
+                foreach ($availableVersions as $version) {
+                    if (substr($branch, 0, strlen($version)) == $version || preg_match("/$version\.\d+/", $branch)) {
+                        return true;
+                    }
+                }
+                return false;
+            }));
+        }
+
+        return $availableBranches;
     }
 }

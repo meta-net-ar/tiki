@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import Transfer, { DATA_TEST_ID, DRAG_HANDLER_CLASS } from "../../components/Transfer.vue";
-import { ElAlert, ElTransfer } from "element-plus/dist/index.full.mjs";
+import Transfer, { DATA_TEST_ID, DRAG_HANDLER_CLASS } from "../../components/Transfer/Transfer.vue";
+import { ElAlert, ElTransfer } from "element-plus";
 import { h } from "vue";
 import Sortable from "sortablejs";
+import ConfigWrapper from "../../components/ConfigWrapper.vue";
 
-vi.mock("element-plus/dist/index.full.mjs", async (importOriginal) => {
+vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
@@ -20,7 +21,16 @@ vi.mock("sortablejs", async () => {
     };
 });
 
+vi.mock("../../components/ConfigWrapper.vue", () => {
+    return {
+        default: vi.fn((props, { slots }) => h("div", { ...props, "data-testid": "config-wrapper" }, slots.default ? slots.default() : null)),
+    };
+});
+
 describe("Transfer", () => {
+    const consoleErrorSpy = vi.spyOn(console, "error");
+    const consoleWarnSpy = vi.spyOn(console, "warn");
+
     const props = {
         data: { a: "Item A", b: "Item B", c: "Item C" },
         fieldName: "testField",
@@ -30,6 +40,7 @@ describe("Transfer", () => {
         targetListTitle: "Target List",
         filterPlaceholder: "Filter items",
         ordering: false,
+        language: "en",
     };
 
     afterEach(() => {
@@ -40,7 +51,9 @@ describe("Transfer", () => {
     test("renders correctly with given props", async () => {
         render(Transfer, { props });
 
-        const selectElement = screen.getByTestId(DATA_TEST_ID.HIDDEN_SELECT);
+        const configWrapper = screen.getByTestId("config-wrapper");
+        expect(configWrapper).to.exist;
+        const selectElement = within(configWrapper).getByTestId(DATA_TEST_ID.HIDDEN_SELECT);
         expect(selectElement).to.exist;
         // should be hidden
         expect(selectElement.style).to.have.property("display", "none");
@@ -61,6 +74,16 @@ describe("Transfer", () => {
             }),
             null
         );
+
+        expect(ConfigWrapper).toHaveBeenCalledWith(
+            {
+                language: props.language,
+            },
+            expect.any(Object)
+        );
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test("renders correctly when the given prop data and defaultValue are JSON strings", async () => {
@@ -71,6 +94,9 @@ describe("Transfer", () => {
         const selectElement = screen.getByTestId(DATA_TEST_ID.HIDDEN_SELECT);
         assertSelectElementToHaveOptions(selectElement, props.defaultValue);
         assertElTransferToBeCalledWith(props);
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test("renders correctly when the defaultValue prop is not set", async () => {
@@ -79,6 +105,9 @@ describe("Transfer", () => {
         const selectElement = screen.getByTestId(DATA_TEST_ID.HIDDEN_SELECT);
         assertSelectElementToHaveOptions(selectElement, []);
         assertElTransferToBeCalledWith(props);
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test("renders correctly given the prop isInvalid is true", () => {
@@ -86,6 +115,9 @@ describe("Transfer", () => {
 
         const tranferContainer = screen.getByTestId(DATA_TEST_ID.TRANSFER_CONTAINER);
         expect(tranferContainer.getAttribute("class")).to.include("invalid");
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test.each([
@@ -99,6 +131,9 @@ describe("Transfer", () => {
             }),
             null
         );
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test.each([
@@ -123,6 +158,9 @@ describe("Transfer", () => {
             const helperText = screen.getByTestId(DATA_TEST_ID.HELPER_TEXT);
             expect(helperText).to.exist;
             expect(helperText.textContent).to.equal(expectedMessage);
+
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+            expect(consoleWarnSpy).not.toHaveBeenCalled();
         }
     );
 
@@ -141,13 +179,16 @@ describe("Transfer", () => {
                 handle: "." + DRAG_HANDLER_CLASS,
             })
         );
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test("should keep hidden select in sync with el-transfer and call the given emitValueChange prop when the value changes", async () => {
         props.emitValueChange = vi.fn();
         ElTransfer = {
             props: ["data", "filterable", "filter-placeholder", "titles"],
-            emits: ["update:modelValue"],
+            emits: ["update:modelValue", "change"],
             setup(props, { emit }) {
                 const handleClick = () => emit("change", ["c"]);
                 return () => h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
@@ -165,6 +206,9 @@ describe("Transfer", () => {
         expect(selectElement.options).toHaveLength(1);
         expect(selectElement.options[0].value).to.equal("c");
         expect(props.emitValueChange).toHaveBeenCalledWith(expect.objectContaining({ value: ["c"] }));
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 });
 

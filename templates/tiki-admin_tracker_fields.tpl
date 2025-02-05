@@ -27,11 +27,32 @@
                     {if $prefs.tracker_field_rules eq 'y'}
                         <th id="rulesColumn">{tr}Rules{/tr}</th>
                     {/if}
-                    <th>{tr}List{/tr}</th>
-                    <th>{tr}Title{/tr}</th>
-                    <th>{tr}Search{/tr}</th>
-                    <th>{tr}Public{/tr}</th>
-                    <th>{tr}Mandatory{/tr}</th>
+                    <th>{tr}List{/tr}
+                    <a class="tikihelp text-info tikihelp-prefs" title="{tr}List{/tr}" aria-label="{tr}Help{/tr}" data-bs-original-title="{tr}Description of List{/tr}" data-bs-content="{tr}Make the column visible when listing tracker items{/tr}" data-bs-trigger="hover focus" tabindex="0" data-mobile-tooltip="">
+                        <span class="icon icon-information fas fa-info-circle "></span>
+                    </a>
+                    </th>
+                    <th>{tr}Title{/tr}
+                    <a class="tikihelp text-info tikihelp-prefs" title="{tr}Title{/tr}" aria-label="{tr}Help{/tr}" data-bs-original-title="{tr}Description of Title{/tr}" data-bs-content="{tr}This column's content displays as a link which redirects to the content of the item{/tr}" data-bs-trigger="hover focus" tabindex="0" data-mobile-tooltip="">
+                        <span class="icon icon-information fas fa-info-circle "></span>
+                    </a>
+                    </th>
+                    <th>{tr}Search{/tr}
+                    <a class="tikihelp text-info tikihelp-prefs" title="{tr}Search{/tr}" aria-label="{tr}Help{/tr}" data-bs-original-title="{tr}Description of Search{/tr}" data-bs-content="{tr}Add the ability to search and retrieve specific information from a column in a table{/tr}.<br>
+{tr}Essentially, this means that the data within that column can be easily found using search filters{/tr}.<br>" data-bs-trigger="hover focus" tabindex="0" data-mobile-tooltip="">
+                        <span class="icon icon-information fas fa-info-circle "></span>
+                    </a>
+                    </th>
+                    <th>{tr}Public{/tr}
+                    <a class="tikihelp text-info tikihelp-prefs" title="{tr}Public{/tr}" aria-label="{tr}Help{/tr}" data-bs-original-title="{tr}Description of Public{/tr}" data-bs-content="{tr}Hides or reveals columns displayed using the trackerlist plugin{/tr}" data-bs-trigger="hover focus" tabindex="0" data-mobile-tooltip="">
+                        <span class="icon icon-information fas fa-info-circle "></span>
+                    </a>
+                    </th>
+                    <th>{tr}Mandatory{/tr}
+                    <a class="tikihelp text-info tikihelp-prefs" title="{tr}Mandatory{/tr}" aria-label="{tr}Help{/tr}" data-bs-original-title="{tr}Description of Mandatory{/tr}" data-bs-content="{tr}The field must contain a value when saving an item{/tr}" data-bs-trigger="hover focus" tabindex="0" data-mobile-tooltip="">
+                        <span class="icon icon-information fas fa-info-circle "></span>
+                    </a>
+                    </th>
                     <th>{tr}Actions{/tr}</th>
                 </tr>
             </thead>

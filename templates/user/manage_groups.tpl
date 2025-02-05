@@ -63,7 +63,9 @@ $("input[name=add_remove]").on("change", function () {
             <select name="default_group" size="{$countgrps}" class="form-control" id="default_group">
                 {foreach $all_groups as $group}
                     {if $group != 'Anonymous'}
-                        <option value="{$group|escape}">{$group|escape}</option>
+                        {if in_array($group, json_decode($userGroups, true))}
+                            <option value="{$group|escape}">{$group|escape}</option>
+                        {/if}
                     {/if}
                 {/foreach}
             </select>

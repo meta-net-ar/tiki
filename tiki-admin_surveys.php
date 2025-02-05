@@ -21,7 +21,7 @@ $inputConfiguration = [
             'save'                  => 'bool',               //post
             'status'                => 'striptags',          //post
             'remove'                => 'int',                //post
-            'find'                  => 'word',               //post
+            'find'                  => 'string',             //post
         ],
     ],
 ];

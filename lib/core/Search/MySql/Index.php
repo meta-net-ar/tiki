@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Utilities\Identifiers;
+
 class Search_MySql_Index implements Search_Index_Interface
 {
     private $db;
@@ -108,13 +111,13 @@ class Search_MySql_Index implements Search_Index_Interface
         }
     }
 
-    public function findClosestWord($word)
+    public function findClosestWord($word, $funcName)
     {
         $tikilib = TikiLib::lib('tiki');
 
         $sql = "
             SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(contents, ' ', numbers.n), ' ', -1) AS word,
-            LEVENSHTEIN(SUBSTRING_INDEX(SUBSTRING_INDEX(contents, ' ', numbers.n), ' ', -1), ?) AS distance
+            $funcName(SUBSTRING_INDEX(SUBSTRING_INDEX(contents, ' ', numbers.n), ' ', -1), ?) AS distance
             FROM {$this->table->getTableName()}
             {$this->table->getIndexTablesSqlJoins()}
             JOIN (SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7) numbers
@@ -137,9 +140,10 @@ class Search_MySql_Index implements Search_Index_Interface
         $words = $options['words'];
         $condition = $options['condition'];
         $conditions = $options['conditions'];
+        $levenshteinFunctionName = $options['levenshteinFunctionName'];
 
         foreach ($words as $word) {
-            $correctWord = $this->findClosestWord($word);
+            $correctWord = $this->findClosestWord($word, $levenshteinFunctionName);
             if ($correctWord != $word) {
                 $didYouMean = true;
                 $correctedWords[] = $correctWord;
@@ -201,9 +205,18 @@ class Search_MySql_Index implements Search_Index_Interface
 
             $count = $this->table->fetchCountIndex($conditions);
             if ($query->processDidYouMean() && $count === 0) {
-                $params = compact('words', 'condition', 'conditions');
-                list($didYouMean, $correctKeywords, $count, $conditions) = $this->callSuggestions($params);
-                $scoreCalc = str_replace($words, $correctKeywords, $scoreCalc);
+                // Try to create levenshtein function
+                $levenshteinFunctionName = $this->createLevenshteinFunction();
+                if ($levenshteinFunctionName) {
+                    try {
+                        $params = compact('words', 'condition', 'conditions', 'levenshteinFunctionName');
+                        list($didYouMean, $correctKeywords, $count, $conditions) = $this->callSuggestions($params);
+                        $scoreCalc = str_replace($words, $correctKeywords, $scoreCalc);
+                    } finally {
+                        // Drop the function after use
+                        $this->db->query("DROP FUNCTION $levenshteinFunctionName");
+                    }
+                }
             }
             $entries = $this->table->fetchAllIndex($selectFields, $conditions, $resultCount, $resultStart, $order);
 
@@ -233,6 +246,83 @@ class Search_MySql_Index implements Search_Index_Interface
             $resultSet->errorInQuery = $e->getMessage();
             return $resultSet;
         }
+    }
+
+    private function createLevenshteinFunction()
+    {
+        $uniqueRequestId = Identifiers::getHttpRequestId();
+        $levenshteinFunctionName = "tiki_levenshtein_$uniqueRequestId";
+
+        // Copyright (c) 2015 Felix Zandanel <felix@zandanel.me>
+
+        // Permission is hereby granted, free of charge, to any person
+        // obtaining a copy of this software and associated documentation
+        // files (the "Software"), to deal in the Software without
+        // restriction, including without limitation the rights to use,
+        // copy, modify, merge, publish, distribute, sublicense, and/or sell
+        // Copies of the Software, and to permit persons to whom the
+        // Software is furnished to do so, subject to the following
+        // conditions:
+
+        // The above copyright notice and this permission notice shall be
+        // included in all copies or substantial portions of the Software.
+        // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        // OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        // NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        // OTHER DEALINGS IN THE SOFTWARE.
+
+        $functionQuery = <<<SQL
+CREATE FUNCTION IF NOT EXISTS $levenshteinFunctionName( s1 VARCHAR(255), s2 VARCHAR(255) )
+  RETURNS INT
+  DETERMINISTIC
+  BEGIN
+    DECLARE s1_len, s2_len, i, j, c, c_temp, cost INT;
+    DECLARE s1_char CHAR;
+    -- max strlen=255
+    DECLARE cv0, cv1 VARBINARY(256);
+
+    SET s1_len = CHAR_LENGTH(s1), s2_len = CHAR_LENGTH(s2), cv1 = 0x00, j = 1, i = 1, c = 0;
+
+    IF s1 = s2 THEN
+        RETURN 0;
+    ELSEIF s1_len = 0 THEN
+        RETURN s2_len;
+    ELSEIF s2_len = 0 THEN
+        RETURN s1_len;
+    ELSE
+        WHILE j <= s2_len DO
+            SET cv1 = CONCAT(cv1, UNHEX(HEX(j))), j = j + 1;
+        END WHILE;
+        WHILE i <= s1_len DO
+            SET s1_char = SUBSTRING(s1, i, 1), c = i, cv0 = UNHEX(HEX(i)), j = 1;
+            WHILE j <= s2_len DO
+                SET c = c + 1;
+                IF s1_char = SUBSTRING(s2, j, 1) THEN
+                    SET cost = 0; ELSE SET cost = 1;
+                END IF;
+                SET c_temp = CONV(HEX(SUBSTRING(cv1, j, 1)), 16, 10) + cost;
+                IF c > c_temp THEN SET c = c_temp; END IF;
+                SET c_temp = CONV(HEX(SUBSTRING(cv1, j+1, 1)), 16, 10) + 1;
+                IF c > c_temp THEN
+                    SET c = c_temp;
+                END IF;
+                SET cv0 = CONCAT(cv0, UNHEX(HEX(c))), j = j + 1;
+            END WHILE;
+            SET cv1 = cv0, i = i + 1;
+        END WHILE;
+    END IF;
+    RETURN c;
+  END
+SQL;
+        if ($this->db->query($functionQuery)) {
+            return $levenshteinFunctionName;
+        }
+
+        return null;
     }
 
     public function scroll(Search_Query_Interface $query)

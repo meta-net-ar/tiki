@@ -7,8 +7,7 @@ export default function applySelect() {
                 const selects = $(mutation.target).find("select:not([element-plus-ref])");
                 selects.each(function () {
                     const elementUniqueId = "el-" + Math.random().toString(36).substring(7);
-                    const elementPlusUi = $("<element-plus-ui></element-plus-ui>");
-                    elementPlusUi.attr("component", "Select");
+                    const elementPlusUi = $("<el-select></el-select>");
                     elementPlusUi.attr("placeholder", $(this).attr("placeholder"));
                     elementPlusUi.attr("multiple", $(this).prop("multiple"));
                     elementPlusUi.attr("id", elementUniqueId);

@@ -211,7 +211,8 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                         </div>
                     </fieldset>
                 </form>
-            {elseif $tiki_p_admin eq 'y'}
+            {/if}
+            {if $login_module.can_switch_user eq 'y'}
                 <form action="{$login_module.login_url|escape}" method="post"{if $prefs.desactive_login_autocomplete eq 'y'} autocomplete="off"{/if} id="switchbox-{$module_logo_instance}">
                     {ticket}
                     <fieldset>
@@ -239,7 +240,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                             {if $prefs.feature_help eq 'y'}
                                 {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Enter a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
-                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$tiki_p_admin class='form-control'}
+                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$login_module.can_switch_user class='form-control'}
                         </div>
                         <div class="text-center">
                             <button

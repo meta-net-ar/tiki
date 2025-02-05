@@ -159,6 +159,7 @@
                     {preference name=scheduler_users_to_notify_on_healed}
                 </div>
                 {preference name=scheduler_keep_logs}
+                {preference name=scheduler_last_run_warning_minutes}
             </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>

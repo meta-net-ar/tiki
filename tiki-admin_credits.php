@@ -89,18 +89,18 @@ if (isset($credit_types) && is_array($credit_types)) {
             $values['scaling_divisor']
         );
     }
-
-    if (! empty($_POST['new_credit_type'])) {
-        $creditslib->updateCreditType(
-            $_POST['new_credit_type'],
-            $_POST['display_text'],
-            $_POST['unit_text'],
-            $_POST['is_static_level'],
-            $_POST['scaling_divisor']
-        );
-    }
 }
 
+// Add a new credit type with better validation
+if (! empty($_POST['new_credit_type']) && ! empty($_POST['display_text']) && ! empty($_POST['unit_text']) && isset($_POST['is_static_level'])) {
+    $creditslib->updateCreditType(
+        trim($_POST['new_credit_type']),
+        trim($_POST['display_text']),
+        trim($_POST['unit_text']),
+        $_POST['is_static_level'],
+        (int) ($_POST['scaling_divisor'] ?? 1)
+    );
+}
 list($creditTypes, $staticCreditTypes) = creditTypes();
 
 if (isset($_REQUEST['userfilter'])) {

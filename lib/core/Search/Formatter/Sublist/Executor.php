@@ -80,15 +80,15 @@ class Executor
             $arguments = $filter['arguments'];
             foreach ($arguments as $name => $value) {
                 // Sublist special processing will only happen if parent or root is provided
-                if (preg_match('/\$(parent|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
+                if (preg_match('/\$(parent(\.parent){0,}|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
                     if (! isset($arguments['field'])) {
                         // TODO: consider other filter types as range searches
                         throw new Exception(tr('Filter blocks inside sublist sections in PluginList that use parent element values need field reference.'));
                     }
                     $placeholder = $m[0];
-                    $type = $m[1]; // parent or root
-                    $field = $m[2];
-                    $modifier = $m[3] ?? null;
+                    $type = $m[1]; // parent(.parent...) or root
+                    $field = $m[3];
+                    $modifier = $m[4] ?? null;
                     $values = [];
                     $valueExtractor = function ($val) use ($placeholder, $value, $modifier, &$values) {
                         if ($modifier == 'object_ids') {
@@ -117,18 +117,32 @@ class Executor
                             return $val;
                         }
                     };
-                    if ($type == 'parent') {
-                        foreach ($this->data as $i => $row) {
+                    if (substr($type, 0, 6) === 'parent') {
+                        $record = $this->record;
+                        $subtype = substr($type, 7);
+                        while (substr($subtype, 0, 6) === 'parent') {
+                            $subtype = substr($subtype, 7);
+                            $record = $record->getParent();
+                            if (! $record) {
+                                throw new Exception(tr('Sublist parent requested but no such parent found: %0', $type));
+                            }
+                        }
+                        foreach ($record->getDataset() as $i => $row) {
                             //Row will be an empty array (so no keys to re-map) if the parent sublist didn't match anything.  But we still want to continue executing the sublist as there may be static output in the output block, or the sublist may not refer to anything on it's parent (which has little practical use except debugging, but for some reason doesn't seem to work now) - benoitg - 2024-11-26
                             if ($row) {
-                                if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
+                                if ($record->getParent() && $record->getParent()->isMultiple()) {
                                     // parent sublists might have entries with multiple records per key
                                     foreach ($row as $j => $subrow) {
                                         if (self::checkFieldIsAvailable($field, $subrow)) {
-                                            $this->reverseMapping[$i][$j][] = [
+                                            $map = [
                                                 'value' => $valueExtractor($subrow[$field]),
                                                 'target_field' => $arguments['field'],
                                             ];
+                                            if ($record != $this->record) {
+                                                $this->reverseMapping[$j][$i][] = $map;
+                                            } else {
+                                                $this->reverseMapping[$i][$j][] = $map;
+                                            }
                                         }
                                     }
                                 } else {
@@ -151,7 +165,7 @@ class Executor
                             }
                         }
                     } else {
-                        throw new Exception("This should not be possible");
+                        throw new Exception(tr("Invalid sublist filter type found: %0", $type));
                     }
                     $values = array_unique($values);
                     $arguments[$name] = implode(' OR ', $values);

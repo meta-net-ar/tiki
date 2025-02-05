@@ -689,14 +689,14 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
-        $item = $this->getValue();
-        $label = $this->getItemLabel($item, ['list_mode' => 'csv']);
+        $value = $this->getValue();
+        $label = $this->getItemLabel($value, ['list_mode' => 'csv']);
         $baseKey = $this->getBaseKey();
 
         if ($this->trackerField->getOption('selectMultipleValues')) {
-            $baseValue = $typeFactory->multivalue(is_array($item) ? $item : explode(',', $item));
+            $baseValue = $typeFactory->multivalue(is_array($value) ? $value : explode(',', $value));
         } else {
-            $baseValue = $typeFactory->identifier($item);
+            $baseValue = $typeFactory->identifier($value);
         }
 
         $out = [
@@ -706,11 +706,22 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($item)) {
+        if (count($indexRemote) && is_numeric($value)) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
-            $item = $trklib->get_tracker_item($item);
+            $item = $trklib->get_tracker_item($value);
 
+            if (! $item) {
+                Feedback::error(
+                    tr(
+                        'Remote item %0 not found in ItemLink fieldId: %1 on itemId: %2',
+                        $value,
+                        $this->trackerField->getOption('fieldId'),
+                        $this->getItemId()
+                    )
+                );
+                return $out;
+            }
             $definition = Tracker_Definition::get($trackerId);
             $factory = $definition->getFieldFactory();
             foreach ($indexRemote as $fieldId) {

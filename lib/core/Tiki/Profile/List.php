@@ -91,7 +91,7 @@ class Tiki_Profile_List
 
             $fp = fopen($this->getCacheLocation($s['url']), 'r');
 
-            while (false !== $row = fgetcsv($fp, 200, "\t", escape: "")) {
+            while (false !== $row = fgetcsv($fp, 200, "\t", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) {
                 $c = $row[0];
                 if ($c) {
                     $category_list[] = $c;
@@ -121,7 +121,7 @@ class Tiki_Profile_List
 
             $fp = fopen($this->getCacheLocation($s['url']), 'r');
 
-            while (false !== $row = fgetcsv($fp, 200, "\t", escape: "")) {
+            while (false !== $row = fgetcsv($fp, 200, "\t", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) {
                 if (count($row) != 3) {
                     continue;
                 }

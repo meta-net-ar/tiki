@@ -169,8 +169,8 @@ $navbar-light-hover-bg: red;
 }
 
 :root {
-    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
-    .fc-v-event {
+    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
+    .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
 }

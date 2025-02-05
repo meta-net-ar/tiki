@@ -22,6 +22,7 @@ $inputConfiguration = [
         'page' => 'pagename',
         'returnto' => 'pagename',
         'watch' => 'digits',
+        'cancel_edit' => 'url'
     ] ],
 ];
 
@@ -874,8 +875,6 @@ if (isset($prefs['feature_references']) && $prefs['feature_references'] === 'y')
             } else {
                 $smarty->assign('display', 'block');
             }
-            $smarty->assign('ajaxURL', $GLOBALS['base_url']);
-
             $smarty->assign('libReferencesCant', $lib_references['cant']);
             $smarty->assign('libReferences', $lib_references['data']);
             $smarty->assign('use_references', $use_references);
@@ -885,6 +884,7 @@ if (isset($prefs['feature_references']) && $prefs['feature_references'] === 'y')
         }
     }
 }
+$smarty->assign('ajaxURL', $GLOBALS['base_url']);
 /* Local reference handling */
 
 
@@ -1574,7 +1574,7 @@ if ($prefs['feature_polls'] === 'y' and $prefs['feature_wiki_ratings'] === 'y' &
         $smarty->assign('poll_template', $_REQUEST['poll_template']);
     }
 }
-
+$diff_style = $_REQUEST['diff_style'] ?? $prefs['default_wiki_diff_style'];
 if ($prefs['feature_multilingual'] === 'y') {
     $languages = [];
     $langLib = TikiLib::lib('language');
@@ -1617,6 +1617,9 @@ if ($prefs['feature_multilingual'] === 'y') {
         $smarty->assign('update_translation', 'y');
     }
 }
+$diff_styles = \TikiLib::lib('prefs')->getPreference('default_wiki_diff_style');
+$smarty->assign('diff_styles', $diff_styles);
+$smarty->assign('diff_style', $diff_style);
 $cat_type = 'wiki page';
 $cat_objid = $_REQUEST["page"];
 $cat_lang = $pageLang;
@@ -1791,6 +1794,11 @@ if ($need_lang) {
 
         $smarty->assign('alert_content', $remarksbox);
     }
+    // Loading the InteractJS library
+    // NOTE: This approach may result in multiple loads, which is temporarily ignored.
+    // TODO: A refactor is planned to use ES modules with import-map for optimized and consistent loading.
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
+
     $smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
     $smarty->display('tiki-editpage.tpl');
 }

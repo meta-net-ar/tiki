@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import applyAutocomplete, { TEXT } from "../../utils/applyAutocomplete";
 
 describe("applyAutocomplete", () => {
-    test("given an input element, it create an element-plus-ui element with the Autcomplete component", () => {
+    test("given an input element, it create an el-autocomplete element with the Autcomplete component", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);
         const givenRemoteSourceUrl = "https://foo.bar";
@@ -10,8 +10,7 @@ describe("applyAutocomplete", () => {
         applyAutocomplete(givenInput, givenRemoteSourceUrl);
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
-        expect(expectedAutoCompleteElement.tagName).toBe("ELEMENT-PLUS-UI");
-        expect(expectedAutoCompleteElement.getAttribute("component")).toBe("Autocomplete");
+        expect(expectedAutoCompleteElement.tagName).toBe("EL-AUTOCOMPLETE");
         expect(expectedAutoCompleteElement.getAttribute("remote-source-url")).toBe(givenRemoteSourceUrl);
         expect(expectedAutoCompleteElement.getAttribute("source-list")).toBe("[]");
         expect(givenInput.getAttribute("element-plus-ref")).toBe(expectedAutoCompleteElement.id);

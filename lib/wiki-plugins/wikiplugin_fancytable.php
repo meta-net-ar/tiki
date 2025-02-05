@@ -99,6 +99,14 @@ function wikiplugin_fancytable_info()
                      ['text' => tra('No'), 'value' => 'n'],
                      ['text' => tra('Yes'), 'value' => 'y']
                  ]
+             ],
+             'class' => [
+                 'required' => false,
+                 'name' => tra('CSS Class'),
+                 'description' => tra('Apply custom CSS class to customize the table design'),
+                 'since' => '27.2',
+                 'filter' => 'text',
+                 'default' => '',
              ]
         ],
         $tsparams
@@ -125,7 +133,6 @@ function wikiplugin_fancytable_info()
 function wikiplugin_fancytable($data, $params)
 {
     global $prefs;
-
     // Initialize variables
     $tagremove = [];
     $pluginremove = [];
@@ -186,7 +193,8 @@ function wikiplugin_fancytable($data, $params)
     $style = $sort ? ' style="visibility:hidden"' : '';
     $wret = '<div id="wpfancytable' . $iFancytable . '-div"' . $style
         . ' class="table-responsive ts-wrapperdiv ' . ($sticky ? 'table-sticky' : '') . '">' . "\r\t";
-    $tableClass = 'table table-striped table-hover normal';
+    $class = "table-striped table-hover $class";
+    $tableClass = "table $class normal";
     if (! empty($colwidths)) {
         $tableClass .= ' fixed-layout';
     }
@@ -195,7 +203,7 @@ function wikiplugin_fancytable($data, $params)
     // Process header
     if (isset($head)) {
         $tdhdr = ! empty($headclass) ? "\r\t\t\t" . '<th class="' . $headclass . '"' : "\r\t\t\t<th";
-        //replace tiki tags, plugins and other enclosing characters with hash strings before creating table so that any
+        //replace tiki tags, plugins, and other enclosing characters with hash strings before creating table so that any
         //pipes (| or ~|~) inside aren't mistaken for cell dividers
         if (TikiLib::lib('parser')->option['is_markdown']) {
             $head = TikiLib::lib('parser')->parse_data($head);

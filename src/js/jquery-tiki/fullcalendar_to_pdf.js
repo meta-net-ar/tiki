@@ -19,7 +19,7 @@ $.fn.addFullCalendarPrint = function (buttonId, calendar) {
     $(buttonId).off("click");
     $(buttonId).on("click", function (event) {
         event.preventDefault();
-        var elementToPrint = $(calendarId + " .fc-view");
+        var elementToPrint = $(calendarId + " .ec-view");
         $("html, body").animate({ scrollTop: 0 }, 0);
         setTimeout(function () {
             html2canvas(elementToPrint[0], {

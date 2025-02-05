@@ -17,7 +17,7 @@ $inputConfiguration = [
             'remove'                => 'int',              //post
             'position'              => 'int',              //post
             'type'                  => 'word',             //post
-            'options'               => 'word',             //post
+            'options'               => 'string',           //post
             'sort_mode'             => 'word',             //get
             'offset'                => 'int',              //get
         ],

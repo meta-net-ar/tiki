@@ -5,7 +5,7 @@
 <div class="module_selector mb-3">
     <label for="assign_name">{tr}Module Name{/tr}</label>
     <select id="assign_name" name="assign_name" class="form-control">
-        <option value=""></option>
+        <option value="" disabled selected>{tr}Select Module{/tr}</option>
         {foreach key=name item=info from=$all_modules_info}
             <option value="{$name|escape}" {if $assign_name eq $name || $assign_selected eq $name}selected="selected"{/if}>{$info.name}</option>
         {/foreach}

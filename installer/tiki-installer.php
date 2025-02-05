@@ -296,7 +296,6 @@ if ($max_execution_time != 0) {
 
 // Tiki Database schema version
 $TWV = new TWVersion();
-$tikiVersion = $TWV->getBaseVersion();
 $tikiVersionShort = preg_replace('/^(\d+)\..*$/', '\1', $TWV->version);
 $smarty->assign('tiki_version_name', preg_replace('/^(\d+\.\d+)([^\d])/', '\1 \2', $TWV->version));
 $smarty->assign('tiki_version_short', $tikiVersionShort);
@@ -656,21 +655,6 @@ if ($install_step == '9') {
         initialize_prefs(true);
         TikiLib::lib('unifiedsearch')->rebuild();
         $u = 'tiki-change_password.php?user=admin&oldpass=admin&newuser=y';
-
-        $tikiInstallVersion = '';
-        if ($TWV->svn === 'y') {
-            $tikiInstallVersion = trim(shell_exec('svn info --show-item revision'));
-        }
-        if ($TWV->git === 'y') {
-            $tikiInstallVersion = trim(shell_exec('git log -n 1 --format=%H --date=unix 2>/dev/null'));
-        }
-        if ($TWV->svn !== 'y' && $TWV->git !== 'y') {
-            $tikiInstallVersion = $tikiVersion;
-        }
-
-        require_once 'lib/tikilib.php';
-        $tikilib = new TikiLib();
-        $tikilib->set_preference('tiki_install_version', $tikiInstallVersion);
     } else {
         $u = '';
     }

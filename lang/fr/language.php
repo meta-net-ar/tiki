@@ -9075,6 +9075,7 @@ $lang_current = array(
 "Cell Vertical Align" => "Alignement vertical de cellule",
 // "Table body column vertical alignments, separated by %0. Choices: %1" => "Table body column vertical alignments, separated by %0. Choices: %1",
 "Fancy Table" => "Table enjolivée",
+"Apply custom CSS class to customize the table design" => "Appliquer une classe CSS personnalisée pour personnaliser le design de la table",
 // "Create a formatted table that can be filtered and sorted" => "Create a formatted table that can be filtered and sorted",
 // "Rows separated by %0 in the header; for the table body, one row per line. Cells separated by %1 (since Tiki4) or %2 in both cases" => "Rows separated by %0 in the header; for the table body, one row per line. Cells separated by %1 (since Tiki4) or %2 in both cases",
 // "The jQuery Sortable Tables feature must be activated for the sort feature to work" => "The jQuery Sortable Tables feature must be activated for the sort feature to work",

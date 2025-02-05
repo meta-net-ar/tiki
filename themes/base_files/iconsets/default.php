@@ -2176,6 +2176,9 @@ function iconset_default()
                 'id' => 'k',
                 'prepend' => 'fas fa-',
             ],
+            'kaltura' => [
+                'id' => 'sun'
+            ],
             'kip-sign' => [
                 'id' => 'kip-sign',
                 'prepend' => 'fas fa-',

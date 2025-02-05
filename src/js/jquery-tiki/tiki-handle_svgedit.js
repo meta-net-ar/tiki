@@ -1,4 +1,25 @@
-export function handleDraw(fileId, galleryId, name, imgParams) {
+export async function handleDraw(fileId, galleryId, name, imgParams) {
+    const loadingIndicator = $(`
+        <div class="d-flex justify-content-center">
+            <div class="spinner-grow text-dark" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `);
+    $("#tiki_draw").append(loadingIndicator);
+    try {
+        await import("@jquery-tiki/tiki-svgedit_draw");
+    } catch (error) {
+        const errorElement = $(`
+            <div class="alert alert-danger" role="alert">
+                An error occurred while loading the SVG editor.
+            </div>
+        `);
+        $("#tiki_draw").append(errorElement);
+        return;
+    } finally {
+        loadingIndicator.remove();
+    }
     $("#tiki_draw")
         .loadDraw({
             fileId: fileId,

@@ -69,6 +69,22 @@ function prefs_scheduler_list($partial = false)
             'default' => 0,
             'tags' => ['advanced'],
         ],
+        'scheduler_last_run_warning_minutes' => [
+            'name' => tra('Minutes hold warning message'),
+            'description' => tra('Minutes to hold admin warning message when scheduler was not executed recently, set 0 (zero) to not display the message.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'units' => tra('minutes'),
+            'size' => 3,
+            'default' => 60,
+        ],
+        'scheduler_last_run_timestamp' => [
+            'name' => tra('Timestamp scheduler last run'),
+            'description' => tra('Timestamp when the scheduler run for the last time.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'default' => '',
+        ],
         'scheduler_shell_command' => [
             'name' => tr('Allow shell command execution'),
             'description' => tr('Give the possibility to execute shell commands.'),

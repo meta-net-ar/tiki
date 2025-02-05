@@ -2,7 +2,7 @@
     {if (not isset($translation_mode) or $translation_mode ne 'y') and empty($hide_version_info)}
         <h2>{tr _0=$old.version _1=$new.version}Comparing version %0 with version %1{/tr}</h2>
     {/if}
-    {if $curver.version ne $preview && $object_curver eq 'y'}
+    {if $curver.version|default:null ne $preview && $object_curver eq 'y'}
         {self_link _script="tiki-pagehistory.php" page=$page preview=$curver.version|escape:'url' _title="{tr}Go to current version{/tr}"}{tr}Go to current version{/tr}{/self_link}
     {/if}
     <div class="table-responsive">

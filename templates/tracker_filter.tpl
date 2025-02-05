@@ -2,13 +2,14 @@
     <input type="hidden" name="trackerId" value="{$trackerId|escape}">
     {if $status}<input type="hidden" name="status" value="{$status}">{/if}
     {if $sort_mode}<input type="hidden" name="sort_mode" value="{$sort_mode}">{/if}
+    {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
     <div class="search_container mb-3">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             {foreach key=st item=stdata from=$status_types}
                 <div style="display:inline-block;">
                     <div class="{$stdata.class}">
                         {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
-                        <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
+                        <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $offset}&amp;offset={$offset}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
                             {icon name="{$stdata.iconname}" ititle=":{tr}Toggle{/tr} {$stdata.label}" iclass='tips'}
                         </a>
                     </div>

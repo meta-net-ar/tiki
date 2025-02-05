@@ -8,7 +8,7 @@ use Tiki\Package\VendorHelper;
 
 const AUDIO_ACCEPTED_FORMATS = ['mp3', 'ogg', 'wav', 'aac', 'flac', 'opus'];
 const VIDEO_ACCEPTED_FORMATS = ['mp4', 'ogv', 'webm', '3gp', '3g2', 'mov', 'avi', 'mpg', 'mpeg', 'wmv'];
-const DOCUMENT_ACCEPTED_FORMATS = ['pdf', 'odt', 'ods', 'odp'];
+const DOCUMENT_ACCEPTED_FORMATS = ['pdf', 'odt', 'ods', 'odp', 'txt'];
 $ALL_ACCEPTED_FORMATS = array_merge(AUDIO_ACCEPTED_FORMATS, VIDEO_ACCEPTED_FORMATS, DOCUMENT_ACCEPTED_FORMATS);
 define('ALL_ACCEPTED_FORMATS', $ALL_ACCEPTED_FORMATS);
 
@@ -268,6 +268,91 @@ function wikiplugin_mediaplayer($data, $params)
             if (! empty($sourceLink)) {
                 $htmlViewFile = VendorHelper::getAvailableVendorPath('pdfjsviewer', '/npm-asset/pdfjs-dist-viewer-min/build/minified/web/viewer.html') . '?file=';
                 $sourceLink = $htmlViewFile . urlencode(TikiLib::lib('access')->absoluteUrl($sourceLink));
+            }
+
+            if (strtolower($params['type']) === 'txt') {
+                $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+
+                $filegallib = TikiLib::lib('filegal');
+                $file = $filegallib->get_file_info($fileId);
+
+                if (empty($file)) {
+                    return "<p>" . tr("Error: No file found.") . "</p>";
+                }
+
+                $filename = $file['filename'];
+                $filetype = $file['filetype'];
+
+                if ($filetype != 'text/plain' || (strtolower(substr($filename, -4)) != '.txt')) {
+                    return "<p>" . tr("Error: The file is not a text file.") . "</p>";
+                }
+
+                $fileUrl = TikiLib::lib('access')->absoluteUrl($sourceLink);
+                $text = file_get_contents($fileUrl);
+                $text = html_entity_decode($text);
+
+                if (! empty($text)) {
+                    $headerlibs = TikiLib::lib('header');
+                    $widthValue = ! empty($params['width']) ? $params['width'] : '100%';
+                    $heightValue = ! empty($params['height']) ? $params['height'] : '100%';
+
+                    $headerlibs->add_css('
+                        .iframe-media-wrapper {
+                            width: ' . $widthValue . ';
+                            height: ' . $heightValue . ';
+                            min-width: 480px;
+                            min-height: 420px;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        .iframe-media-wrapper .iframe-text-container {
+                            width: 100%;
+                            height: 100vh;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            background-color: #f1f1f1;
+                            padding: 20px;
+                            box-sizing: border-box;
+                            overflow: hidden;
+                        }
+
+                        .iframe-media-wrapper iframe.word-page {
+                            width: 90%;
+                            height: 100%;
+                            margin-top: auto;
+                            border: 1px solid #ccc;
+                            background-color: white;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            overflow: hidden;
+                            font-family: "Calibri", sans-serif;
+                            font-size: 12pt;
+                            line-height: 1.5;
+                            padding: 40px;
+                        }
+
+                        @media (max-width: 768px) {
+                            .iframe-media-wrapper {
+                                width: 100%;
+                                height: auto;
+                                min-width: unset;
+                                padding: 10px;
+                            }
+                            .iframe-media-wrapper .iframe-text-container {
+                                padding: 10px 10px;
+                            }
+                            .iframe-media-wrapper iframe.word-page {
+                                padding: 20px;
+                            }
+                        }
+                    ');
+
+                    $smarty->assign('content', $text);
+
+                    return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_mediaplayer_text.tpl') . '~/np~';
+                } else {
+                    return "<p>" . tr("Error: No text found.") . "</p>";
+                }
             }
 
             $smarty->assign('source_link', $sourceLink);

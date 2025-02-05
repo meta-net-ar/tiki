@@ -49,7 +49,13 @@ class FileGalLib extends TikiLib
     {
         global $prefs;
 
-        $return = $this->getGalleryId($pageName, $prefs['fgal_root_wiki_attachments_id']);
+        if (mb_strlen($pageName) > 80) {
+            $galName = mb_substr($pageName, 0, 80);
+        } else {
+            $galName = $pageName;
+        }
+
+        $return = $this->getGalleryId($galName, $prefs['fgal_root_wiki_attachments_id']);
 
         // Get the Wiki Attachment Gallery for this wiki page or create it if it does not exist
         if ($create && ! $return) {
@@ -57,7 +63,7 @@ class FileGalLib extends TikiLib
             if ($this->get_page_id_from_name($pageName) > 0) {
                 $return = $this->replace_file_gallery(
                     [
-                        'name' => $pageName,
+                        'name' => $galName,
                         'user' => 'admin',
                         'type' => 'attachments',
                         'public' => 'y',

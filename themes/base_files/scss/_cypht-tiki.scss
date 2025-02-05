@@ -205,7 +205,7 @@
     }
 
     .select2-container { min-width: 150px; margin-bottom: 0; }
-    .combined_sort, .combined_sort + element-plus-ui { display: inline-block; margin-left: 10px; width: 150px; }
+    .combined_sort, .combined_sort + el-select { display: inline-block; margin-left: 10px; width: 150px; }
 
     .folders li, .inner_list li {
         word-break: break-all;
@@ -229,9 +229,17 @@
         width: 100%;
     }
     #imap_filter_form {        
-        .imap_sort + element-plus-ui, .imap_filter + element-plus-ui {
+        .imap_sort + el-select, .imap_filter + el-select {
             width: 120px;
         }
+    }
+    .compose_form .form-floating:last-of-type {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .form-floating el-select + label {
+        transform: unset !important;
+        position: relative !important;
     }
 }
 

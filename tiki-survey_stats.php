@@ -14,7 +14,7 @@ $inputConfiguration = [
         'staticKeyFilters'   => [
         'sort_mode'          => 'word',              //get
         'offset'             => 'int',               //get
-        'find'               => 'word',              //post
+        'find'               => 'string',            //post
         ],
     ],
 ];

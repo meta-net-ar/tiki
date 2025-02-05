@@ -90,7 +90,31 @@ class Services_Menu_Controller
     public function action_edit_icon($input)
     {
         $menuLib = $this->menulib;
-        $menuLib->replace_menu_icon($input->optionid->text(), $input->updatedicon->text());
+        $optionInfo = $menuLib->get_menu_option($input->optionId->int());
+        if (! $optionInfo) {
+            throw new Services_Exception_NotFound(tr('Menu option %0 not found', $input->optionid->int()));
+        }
+        $optionId = $menuLib->replace_menu_option(
+            $optionInfo['menuId'],
+            $optionInfo['optionId'],
+            $optionInfo['name'],
+            $optionInfo['url'],
+            $optionInfo['type'],
+            $optionInfo['position'],
+            $optionInfo['section'],
+            $optionInfo['perm'],
+            $optionInfo['groupname'],
+            $optionInfo['userlevel'],
+            $input->icon->text(),
+            $optionInfo['class']
+        );
+
+        $icon_html = smarty_function_icon(['name' => $input->icon->text()], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+
+        return [
+            'icon_html' => $icon_html,
+            'optionId' => $optionId,
+        ];
     }
 
     public function action_clone($input)

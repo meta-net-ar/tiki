@@ -179,7 +179,11 @@
                         <ul>
                             {foreach item=diff from=$diff_summaries}
                                 <li>
-                                    {tr}Version:{/tr} {$diff.version|escape} - {$diff.comment|escape|default:"<em>{tr}No comment{/tr}</em>"}
+                                    {if is_array($diff)}
+                                        {tr}Version:{/tr} {$diff.version|default:"<em>{tr}No diff yet{/tr}</em>"|escape} - {$diff.comment|default:"<em>{tr}No comment{/tr}</em>"|escape}
+                                    {else}
+                                        {tr}Version:{/tr} <em>{tr}No diff yet{/tr}</em> - <em>{tr}No comment{/tr}</em>
+                                    {/if}
                                     {if count($diff_summaries) gt 1}
                                         {assign var=diff_version value=$diff.version}
                                         {icon name="next" onclick="\$('input[name=oldver]').val($diff_version);\$('#editpageform').trigger('submit');return false;" title=":{tr}View{/tr}" style="cursor: pointer"}
@@ -201,10 +205,14 @@
         <input type="hidden" name="no_bl" value="y">
         {if !empty($smarty.request.returnto)}<input type="hidden" name="returnto" value="{$smarty.request.returnto}">{/if}
         {if isset($diff_style)}
-            <select name="diff_style" class="wikiaction"title="{tr}Edit wiki page{/tr}|{tr}Select the style used to display differences to be translated.{/tr}">
-                <option value="htmldiff"{if isset($diff_style) && $diff_style eq "htmldiff"} selected="selected"{/if}>{tr}html{/tr}</option>
-                <option value="inlinediff"{if isset($diff_style) && $diff_style eq "inlinediff"} selected="selected"{/if} >{tr}text{/tr}</option>
-                <option value="inlinediff-full"{if isset($diff_style) && $diff_style eq "inlinediff-full"} selected="selected"{/if} >{tr}text full{/tr}</option>
+            <select name="diff_style" class="wikiaction" title="{tr}Edit wiki page{/tr}|{tr}Select the style used to display differences to be translated.{/tr}">
+                {foreach  $diff_styles.options as $value => $label}
+                    {if $value eq 'htmldiff' or $value eq 'inlinediff' or $value eq 'inlinediff-full' }
+                        <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                            {tr}{$label}{/tr}
+                        </option>
+                    {/if}
+                {/foreach}
             </select>
             <input type="submit" class="wikiaction tips btn btn-primary" title="{tr}Edit wiki page{/tr}|{tr}Change the style used to display differences to be translated.{/tr}" name="preview" value="{tr}Change diff styles{/tr}" onclick="needToConfirm=false;">
         {/if}
@@ -216,7 +224,7 @@
         {if $add_child}<input type="hidden" name="add_child" value="true">{/if}
         {if $preview or $prefs.wiki_actions_bar eq 'top' or $prefs.wiki_actions_bar eq 'both'}
             <div class='top_actions'>
-                {include file='wiki_edit_actions.tpl' wysiwyg=$wysiwyg}
+                {include file='wiki_edit_actions.tpl' rootPath=$ajaxURL wysiwyg=$wysiwyg}
             </div>
         {/if}
         <div class="mb-3 mx-0">
@@ -807,7 +815,7 @@
                 {/if}
             {/if}{* sandbox *}
             {if $prefs.wiki_actions_bar neq 'top'}
-                {include file='wiki_edit_actions.tpl' wysiwyg=$wysiwyg page_info=$page_info}
+                {include file='wiki_edit_actions.tpl' wysiwyg=$wysiwyg page_info=$page_info rootPath=$ajaxURL}
             {/if}
         </div>
     </form>

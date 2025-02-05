@@ -24,11 +24,11 @@ class Manager
     {
         $info = $this->table->fetchFullRow(['tabularId' => $tabularId]);
 
-        $info['format_descriptor'] = json_decode($info['format_descriptor'], true) ?: [];
-        $info['filter_descriptor'] = json_decode($info['filter_descriptor'], true) ?: [];
-        $info['config'] = json_decode($info['config'], true) ?: [];
-        $info['odbc_config'] = json_decode($info['odbc_config'], true) ?: [];
-        $info['api_config'] = json_decode($info['api_config'] ?? '', true) ?: [];
+        $info['format_descriptor'] = ! empty($info['format_descriptor']) ? json_decode($info['format_descriptor'], true) : [];
+        $info['filter_descriptor'] = ! empty($info['filter_descriptor']) ? json_decode($info['filter_descriptor'], true) : [];
+        $info['config'] = ! empty($info['config']) ? json_decode($info['config'], true) : [];
+        $info['odbc_config'] = ! empty($info['odbc_config']) ? json_decode($info['odbc_config'], true) : [];
+        $info['api_config'] = ! empty($info['api_config']) ? json_decode($info['api_config'], true) : [];
         return $info;
     }
 

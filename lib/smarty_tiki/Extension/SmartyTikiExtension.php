@@ -426,9 +426,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'filegal_manager_url':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalManagerUrl();
                 break;
-            case 'filegal_uploader':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalUploader();
-                break;
             case 'fileinfo':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileInfo();
                 break;
@@ -666,8 +663,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'var_dump':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VarDump();
                 break;
-            case 'vimeo_uploader':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VimeoUploader();
                 break;
             case 'wiki_diff':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\WikiDiff();

@@ -526,8 +526,11 @@ class PdfGenerator
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
                     }
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''));
+                    //Add the header to the first page
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "O");
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "E");
                     $mpdf->AddPage($pdfPage['orientation'], '', $resetPage, '', '', $pdfPage['margin_left'], $pdfPage['margin_right'], $pdfPage['margin_top'], $pdfPage['margin_bottom'], $pdfPage['margin_header'], $pdfPage['margin_footer'], '', '', '', '', '', '', '', '', '', $pdfPage['pagesize']);
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? '')); //Add the header to other pages
                     $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top')); //footer needs to be reset after page content is added
                     //checking watermark on page
                     $mpdf->SetWatermarkText($pdfPage['watermark']);

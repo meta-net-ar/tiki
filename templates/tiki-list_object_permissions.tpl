@@ -17,7 +17,7 @@
             <div class="mb-3 row">
                 <div class="col-lg-6">
                     <select class='form-control' multiple="multiple" id="filterGroup" name="filterGroup[]" size="{$size}">
-                        <option value=""{if empty($filterGroup)}selected="selected"{/if}></option>
+                        <option value=""></option>
                         {foreach from=$all_groups item=gr}
                             <option value="{$gr|escape}" {if in_array($gr, $filterGroup)}selected="selected"{/if}>{$gr|escape}</option>
                         {/foreach}

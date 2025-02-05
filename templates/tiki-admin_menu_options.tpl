@@ -30,6 +30,12 @@
             <ol class="new-option">
                 <li id="node_new" class="new p-2">
                     <div class="options--group-container">
+                        {if $editable_menu_info.use_items_icons eq 'y'}
+                            <div class="label-group">
+                                <input name="menu-icon" class="field-icon form-control" placeholder="Icon" />
+                                {autocomplete type="icon" element=".field-icon"}
+                            </div>
+                        {/if}
                         <div class="label-group">
                             <div class="input-group input-group-sm" style="max-width: 100%">
                                 <span class="input-group-text">{icon name='sort'}</span>
@@ -128,6 +134,12 @@
                                     {$tooltip = "|{tr}separator{/tr}"}
                                 {/if}
 
+                                {if $editable_menu_info.use_items_icons eq 'y'}
+                                    <div class="label-group input-group-sm">
+                                        <input name="menu-icon" class="field-icon form-control" placeholder="Icon" value="{$option.icon}" id="icon-{$option.name}" />
+                                        {autocomplete type="icon" element="#icon-{$option.name}"}
+                                    </div>
+                                {/if}
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">{icon name='sort'}</span>

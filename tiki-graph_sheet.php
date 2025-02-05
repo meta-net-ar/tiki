@@ -24,7 +24,7 @@ $inputConfiguration = [
         'horizontal'                      => 'bool',              //get
         ],
         'staticKeyFiltersForArrays' => [
-            'series'                => 'striptag',
+            'series'                => 'striptags',
         ],
     ],
 ];
@@ -64,15 +64,15 @@ $access->check_feature('feature_jquery_ui');
 
 if (! isset($_REQUEST['sheetId'])) {
     $smarty->assign('msg', tra('No sheet specified.'));
-
     $smarty->display('error.tpl');
     die;
 }
 
-$info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('Incorrect parameter');
-    $smarty->display('error.tpl');
+try {
+    $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    $smarty->assign('msg', tra($e->getMessage()));
+    $smarty->display("error.tpl");
     die;
 }
 

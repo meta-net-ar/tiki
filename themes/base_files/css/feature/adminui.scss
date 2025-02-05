@@ -31,14 +31,6 @@ body.tiki-admin {
     }
 }
 
-//@media (min-width: 1440px) and (max-width: 1675px) {
-//    .tiki-admin.uab #tikifeedback,
-//    .tiki-admin.uab .admin-content,
-//    .tiki-admin.uab .bottom_modules {
-//        padding-left: 320px;
-//    }
-//}
-
 // Provide space for aside toggle button in screens with full-width content
 .tiki-admin.uab:not(.fixed_width) #tikifeedback,
 .tiki-admin.uab:not(.fixed_width) .admin-content {
@@ -58,14 +50,12 @@ body.tiki-admin {
     position: absolute;
     background-color: rgba(255, 255, 255, .5);
     border: inherit;
-//    left: 1rem;
 }
 
 .tiki-admin .container.container-std .col1 {
     padding-left: 0;
 }
-//.tiki-admin .offcanvas.offcanvas-start {
-//    --bs-offcanvas-width: 300px; }
+
 .tiki-admin .top_modules .box-login_box { margin-left: auto; }
 
 @media (min-width: 992px) {
@@ -75,10 +65,6 @@ body.tiki-admin {
 }
 
 .tiki-admin aside.admin-nav > nav {
-    /*height: unset;
-      width: unset !important;
-     overflow-y: auto;
-     overflow-x: hidden; */
     top: var(--tiki-admin-top-modules-height) !important; //50px !important;
 }
 
@@ -87,10 +73,7 @@ body.tiki-admin {
 // has been offset by removing rules not involving color where color classes were unnecessarily used repeatedly, one for light and one for dark.
 
 // Top nav light ------------------------------------------ Fixed-top position, light (background) option
-.tiki-admin header .tiki-top-nav-light,
-//.tiki-admin .top_modules.navbar-light-parent, // These selectors don't seem to be necessary - g_c-l.
-//.tiki-admin .navbar-light-parent .top_modules
-{
+.tiki-admin header .tiki-top-nav-light {
     background: var(--tiki-admin-top-nav-bg);
     border: var(--tiki-admin-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-admin-top-border-width); // For example, 1px, or 0px 0px 4px 0px
@@ -124,10 +107,7 @@ body.tiki-admin {
 }
 
 // Top nav dark ------------------------------------------ Fixed-top position, dark (background) option
-.tiki.tiki-admin .tiki-top-nav-dark,
-//.tiki.tiki-admin .top_modules.navbar-dark-parent, // These selectors don't seem to be necessary - g_c-l.
-//.tiki.tiki-admin .navbar-dark-parent .top_modules
-{
+.tiki.tiki-admin .tiki-top-nav-dark {
     background: var(--tiki-admin-top-nav-bg);
     border: var(--tiki-admin-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-admin-top-border-width); // For example, 1px, or 0px 0px 4px 0px
@@ -192,83 +172,6 @@ body.tiki-admin {
         background: var(--tiki-admin-aside-nav-hover-bg);
     }
 }
-// Unsorted
-
-// make content not be overlapped by the side column nav
-// needs fixing properly in the tpl so we can use the width of .admin-nav
-//.tiki-admin .admin-content {
-//    padding-left: 150px;
-//}
-
-//.tiki-admin.sidebar_collapsed .admin-content {
-//    padding-left: 0;
-//}
-//
-//.tiki-admin.sidebar_collapsed .admin-nav form {
-//    display: none !important;
-//}
-
-
-// Login module dropdown .tiki-admin .top_modules.navbar-light-parent
-//.tiki-admin .top_modules.navbar-light-parent .dropdown-menu .dropdown-item {
-//    color: var(--tiki-admin-navbar-light-color);
-//    background: var(--tiki-admin-navbar-light-bg);
-//    &:hover {
-//        color: var(--tiki-admin-navbar-light-highlight-color);
-//        background: var(--tiki-admin-navbar-light-highlight-bg);
-//    }
-//}
-//.tiki-admin .top_modules.navbar-dark-parent .dropdown-menu .dropdown-item {
-//    color: var(--tiki-admin-navbar-dark-color) !important;
-//    background: var(--tiki-admin-navbar-dark-bg) !important;
-//    &:hover {
-//        color: var(--tiki-admin-navbar-dark-highlight-color) !important;
-//        background: var(--tiki-admin-navbar-dark-highlight-bg) !important;
-//    }
-//}
-
-//.tiki-admin .navbar-light .dropdown-item.active,
-//.tiki-admin .navbar-light .dropdown-item:active,
-//.tiki-admin .navbar-light .dropdown-item:hover,
-//.tiki-admin .navbar-light .dropdown-item:focus,
-//.tiki-admin .top_modules.navbar-light-parent a.dropdown-item:focus,
-//.tiki-admin .top_modules.navbar-light-parent a.dropdown-item:active,
-//.tiki-admin aside.admin-nav .navbar-light .navbar-nav ul .nav-link:hover,
-//.tiki-admin aside.admin-nav .navbar-light .dropdown-item.active {
-//    background-color: var(--tiki-admin-navbar-light-highlight-bg); // $blue !important;
-//    color: var(--tiki-admin-navbar-light-highlight-color); // white !important;
-//}
-
-//.tiki-admin .navbar-dark .dropdown-item.active,
-//.tiki-admin .navbar-dark .dropdown-item:active,
-//.tiki-admin .navbar-dark .dropdown-item:hover,
-//.tiki-admin .navbar-dark .dropdown-item:focus,
-//.tiki-admin .top_modules.navbar-dark-parent a.dropdown-item:focus,
-//.tiki-admin .top_modules.navbar-dark-parent a.dropdown-item:active,
-//.tiki-admin aside.admin-nav .navbar-dark .navbar-nav ul .nav-link:hover {
-//    background-color: var(--tiki-admin-navbar-dark-highlight-bg); // $blue !important;
-//    color: var(--tiki-admin-navbar-dark-highlight-color); // white !important;
-//}
-//
-//
-//.tiki-admin .navbar-nav, .tiki-admin .topbar, .tiki-admin .navbar-nav .nav-link, .tiki-admin .navbar-nav .nav-link:hover, .tiki-admin .navbar-nav .nav-link:focus, .tiki-admin .navbar-collapse, .tiki-admin .nav .open > a {
-//    background: none !important;
-//    border: none;
-//}
-//
-//.tiki-admin .navbar-dark.bg-dark, .tiki-admin .navbar-dark.bg-dark, .tiki-admin .bg-dark, .tiki-admin .bg-light, .tiki-admin nav.top_modules, .tiki-admin #top_modules {
-//    border: none !important;
-//    min-height: unset;
-//}
-
-//.tiki-admin .navbar-nav .nav-link, .tiki-admin .navbar-nav .nav-link:hover, .tiki-admin .navbar-nav .nav-link:focus, .tiki-admin .navbar-collapse {
-//    background-image: none;
-//}
-
-//.tiki-admin.layout_basic nav.top_modules {
-//    margin: unset;
-//    border-radius: unset;
-//}
 
 .tiki-admin aside.admin-nav > nav,
 .tiki-admin .top_modules {
@@ -286,7 +189,6 @@ body.tiki-admin {
 }
 
 .tiki-admin .admin-navbar .form-check-label {
- //   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     letter-spacing: initial;
 }
 
@@ -301,10 +203,6 @@ body.tiki-admin {
     margin-left: auto !important;
 }
 
-//.tiki-admin .box-quickadmin .dropdown-menu.show { -- Sorry but I don't see the point of this when the dropdown is half empty or more. -- g_c-l
-//    height: calc(100vh - 50px);
-//}
-
 .tiki-admin .top_modules .nav .open > a:hover {
     background-color: transparent;
 }
@@ -313,16 +211,11 @@ body.tiki-admin {
     margin-left: initial;
 }
 
-//.tiki-admin .top_modules.navbar-dark-parent .dropdown-menu,
-.tiki-admin .top_modules/*.navbar-light-parent*/ .dropdown-menu {
+.tiki-admin .top_modules .dropdown-menu {
     transform: none !important;
     margin-top: 50px !important;
     overflow: auto;
 }
-
-//.tiki-admin .admin-navbar form { -- Conflicted with inline style 15rem width; commented that out also.
-//    width: unset !important;
-//}
 
 .tiki-admin aside .admin-navbar .dropdown-menu { // limit to aside dropdowns
     border-top-left-radius: unset;
@@ -334,7 +227,7 @@ body.tiki-admin {
     padding: 0 !important;
 }
 
-.tiki-admin /*.page-header*/ .top_modules { //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
+.tiki-admin .top_modules { //  The Classic Bootstrap layout was missing this rule because, in UAB, .top_modules is in #middle_outer, not in .page-header.
     width: 100%;
     height: var(--tiki-admin-top-modules-height); // 50px;
     padding: 0 1.6rem;
@@ -360,7 +253,6 @@ body.tiki-admin {
 }
 
 // Admin menu left
-
 .tiki-admin aside.admin-nav .narrow,
 .tiki-admin aside.admin-nav .narrow .admin-menu-collapser {
     width: 80px !important;
@@ -395,11 +287,6 @@ body.tiki-admin {
     border-bottom: 1px solid $color-light;
 }
 
-//.tiki-admin .admin-wrapper .navbar-nav {
-//    padding: 0;
-//    width: 100%;
-//}
-
 .tiki-admin aside.admin-nav ul .nav-item a, .tiki-admin .admin-wrapper .form-inline {
     padding-left: 1.6rem;
     padding-right: 1.6rem;
@@ -416,10 +303,6 @@ body.tiki-admin {
         border-radius: 0 !important;
     }
 }
-
-//.tiki-admin .form-control {
-//    padding: 0.25rem 0.5rem;
-//}
 
 .tiki-admin .admin-nav .navbar-dark .nav-item .right.nav-link.collapse-toggle[aria-expanded="true"] {
     background-color: $darkestgrey;
@@ -472,7 +355,6 @@ body.tiki-admin {
 @media (max-width: 767.5px) {
 
     // Dropdown when open
-
     .tiki-admin .top_modules .dropdown-menu, .tiki-admin .navbar-collapse {
         width: 100%;
         position: fixed !important;
@@ -483,16 +365,6 @@ body.tiki-admin {
         padding: 1.5rem 0;
         border-radius: 0 !important;
     }
-
-//    .tiki-admin .top_modules .bg-dark-parent .dropdown-menu,
-//    .tiki-admin .bg-dark .navbar-collapse {
-//        background-color: var(--tiki-admin-dropdown-dark-bg) !important; //$darkergrey !important;
-//    }
-//
-//    .tiki-admin .top_modules.navbar-light-parent .dropdown-menu,
-//    .tiki-admin .bg-light .navbar-collapse {
-//        background-color: var(--tiki-admin-dropdown-light-bg) !important; // $lightgrey !important;
-//    }
 
     .tiki-admin .dropdown-item {
         white-space: normal;
@@ -518,7 +390,7 @@ body.tiki-admin {
         margin-top: .5rem !important;
     }
 
-    .tiki-admin /*.bg-light*/ .filter-menu.navbar-nav .dropdown-divider/*, .tiki-admin .bg-dark .filter-menu.navbar-nav .dropdown-divider*/ {
+    .tiki-admin .filter-menu.navbar-nav .dropdown-divider {
         margin-left: 0;
         margin-right: 0;
     }
@@ -536,10 +408,6 @@ body.tiki-admin {
         overflow-y: auto;
     }
 
-//    .tiki-admin .dropdown-menu .dropdown-item, .tiki-admin .navbar-collapse .navbar-nav.mr-auto {
-//        padding: 0.5rem 3rem;
-//    }
-//
     .tiki-admin .filter-menu .dropdown-menu.show .dropdown-item {
         padding: .5rem 1.8rem;
     }
@@ -586,7 +454,6 @@ body.tiki-admin {
         position: relative !important;
         margin: 1rem 0 1rem 0;
         padding: 0;
-   //     background-color: transparent !important;
         transform: none !important;
     }
 
@@ -630,9 +497,9 @@ body.tiki-admin {
         top: .8rem !important;
     }
 
-    .tiki-admin .row.row-middle, .tiki-admin .intertrans.text-center {
- //       margin-left: 60px !important;
-    }
+ //   .tiki-admin .row.row-middle, .tiki-admin .intertrans.text-center {
+ // //      margin-left: 60px !important;
+ //   }
 
     .tiki-admin .filter-menu .nav-item.dropdown {
         padding: 0 !important;
@@ -658,18 +525,14 @@ body.tiki-admin {
     }
 
     // Font in Menu
-    .tiki-admin .top_modules/*.navbar-light-parent*/ .dropdown-item,
-    .tiki-admin /*.navbar-light*/.admin-navbar .navbar-nav .nav-link,
-    //.tiki-admin .top_modules.navbar-dark-parent .dropdown-item,
-    //.tiki-admin .navbar-dark.admin-navbar .navbar-nav .nav-link,
-    .tiki-admin .top_modules/*.navbar-dark-parent*/ .dropdown-menu a,
-    /*.tiki-admin .top_modules.navbar-light-parent .dropdown-menu a*/ {
+    .tiki-admin .top_modules .dropdown-item,
+    .tiki-admin .admin-navbar .navbar-nav .nav-link,
+    .tiki-admin .top_modules .dropdown-menu a {
         font-size: 1.3rem !important;
         line-height: 1.2;
     }
 
-    .tiki-admin /*.bg-light*/ .navbar-collapse .dropdown-item,
-    /*.tiki-admin .bg-dark .navbar-collapse .dropdown-item*/ {
+    .tiki-admin  .navbar-collapse .dropdown-item {
         font-size: 1.1rem !important;
     }
 
@@ -679,8 +542,7 @@ body.tiki-admin {
         color: white !important;
     }
 
-    //.tiki-admin .navbar-light.admin-navbar .navbar-nav .nav-link,
-    .tiki-admin /*.navbar-dark*/.admin-navbar .navbar-nav .nav-link {
+    .tiki-admin .admin-navbar .navbar-nav .nav-link {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -688,8 +550,7 @@ body.tiki-admin {
         padding: .5rem 3rem;
     }
 
-    //.tiki-admin .navbar-light.admin-navbar .navbar-nav .nav-link,
-    .tiki-admin /*.navbar-dark*/.admin-navbar .navbar-nav .nav-link,
+    .tiki-admin .admin-navbar .navbar-nav .nav-link,
     .tiki-admin .navbar-collapse .navbar-nav.mr-auto .dropdown-menu {
         margin-top: .5rem !important;
     }
@@ -716,38 +577,10 @@ body.tiki-admin {
     }
 }
 
-
-//.tiki-admin .top_modules .dropdown-header { -- theme decides
-// //   font-family: "Roboto", sans-serif;
-//    font-weight: 500;
-//    text-shadow: none;
-//    border: none;
-//}
-
 .tiki-admin .top_modules .form-control-sm, .tiki-admin .admin-wrapper .form-control-sm {
     font-size: .875rem;
 }
 
-//.tiki-admin .bg-dark .dropdown-divider, -- Theme decides.
-//.tiki-admin .bg-dark-parent .dropdown-divider {
-//    border-top: .5px solid white !important;
-//}
-//
-//.tiki-admin .bg-light .dropdown-divider,
-//.tiki-admin .bg-light-parent .dropdown-divider {
-//    border-top: .5px solid $color-light !important;
-//}
-//
-//.tiki-admin .dropdown-menu {
-//    border: none;
-//}
-
-
-
-//.tiki-admin .row.row-middle { -- Replaced with padding-top on #col1
-//    margin-top: 6rem;
-//}
-//
 .tiki-admin .top_modules .nav-link {
     margin-top: .9rem;
 }
@@ -760,22 +593,11 @@ body.tiki-admin {
     padding: 0 .6rem;
 }
 
-
-
-//.tiki-admin .top_modules.navbar-dark-parent .dropdown-menu, -- Theme decides.
-//.tiki-admin .top_modules.navbar-light-parent .dropdown-menu {
-//    border: none;
-//    border-radius: unset;
-//    box-shadow: none;
-//}
-
 .tiki-admin .top_modules .login-box .dropdown-menu {
     min-width: unset;
     right: 0;
     margin-top: 3.1rem;
 }
-
-
 
 .tiki-admin .btn-link:hover,
 .tiki-admin .top_modules.navbar-dark-parent .nav-link:hover,
@@ -869,12 +691,7 @@ body.tiki-admin {
     font-size: .9rem;
 }
 
-//.tiki-admin aside.admin-nav .bg-dark {
-//    background-color: var(--tiki-admin-navbar-dark-bg) !important; //$darkgrey !important;
-//}
-
-//.tiki-admin aside.admin-nav .navbar-dark .navbar-nav .nav-link,
-.tiki-admin aside.admin-nav /*.navbar-light*/ .navbar-nav .nav-link {
+.tiki-admin aside.admin-nav .navbar-nav .nav-link {
     display: flex;
     align-items: center;
 }
@@ -891,96 +708,20 @@ body.tiki-admin {
     height: 2.3rem;
 }
 
-//.tiki-admin aside.admin-nav .bg-dark .admin-menu-collapser {
-//    background-color: var(--tiki-admin-dropdown-dark-bg); // $lightgrey-dark;
-//}
-
 .tiki-admin aside.admin-nav .bg-dark .admin-menu-collapser a.btn-link {
     color: var(--tiki-admin-dropdown-dark-color) !important;
 }
-
-//.tiki-admin aside.admin-nav .bg-light .admin-menu-collapser {
-//    background-color: var(--tiki-admin-dropdown-light-bg); // $lightgrey-dark;
-//}
-//.tiki-admin aside.admin-nav .bg-light .admin-menu-collapser a.btn-link {
-//    color: var(--tiki-admin-dropdown-light-color);
-//}
-
-//.tiki-admin aside.admin-nav .narrow ul > li {
-//    position: relative;
-//}
-//
-//.tiki-admin aside.admin-nav .narrow ul > li .collapse {
-//    padding-left: 0;
-//}
-//
-//.tiki-admin aside.admin-nav .narrow > ul > li > a span:not(.icon) {
-//    display: none !important;
-//}
-//
-//.tiki-admin .ui-droppable.modules, .tiki-admin .ui-sortable.modules {
-//    min-height: unset !important;
-//}
 
 .tiki-admin .form-inline .form-check {
     padding-right: .5rem;
 }
 
 // no overflow
-
 .tiki-admin .container {
     overflow: hidden;
 }
 
-//.tiki-admin .container.container-std .col1 {
-//    padding-left: 90px;
-//}
-
-// main content
-//.tiki-admin:not(.fixed_width) .col1 .admin-wrapper { Replaced with above rule
-//    margin-left: 0;
-//}
-
-//.tiki-admin:not(.sidebar_collapsed) #show-errors-button, .tiki-admin:not(.sidebar_collapsed) #errors {
-//    margin-left: 283px;
-//}
-
-//.tiki-admin.sidebar_collapsed #show-errors-button, .tiki-admin.sidebar_collapsed #errors {
-//    margin-left: 75px;
-//}
-
-//@media (max-width: 767.5px) {
-//    .tiki-admin:not(.sidebar_collapsed) #show-errors-button, .tiki-admin:not(.sidebar_collapsed) #errors {
-//        margin-left: 75px;
-//    }
-//}
-//@media (min-width: 767px) and (max-width: 991px) {
-//    .tiki-admin:not(.fixed_width) .col1 .admin-wrapper {
-//    margin-left: 70px;
-//    }
-//}
-//
-//@media (min-width: 992px) {
-//    .tiki-admin:not(.fixed_width) .container.container-std .col1 {
-//        padding-left: 290px;
-//    }
-//
-//    .layout_social.tiki-admin:not(.fixed_width) .middle_outer .main-footer,
-//    .layout_classic.tiki-admin:not(.fixed_width) .main-footer,
-//    .layout_basic.tiki-admin:not(.fixed_width) .container-std .main-footer {
-//       margin-left: 290px;
-//    }
-//}
-
-
-// Filter
-
-//.tiki-admin .admin-wrapper .navbar-nav.filter-menu {
-//    width: auto;
-//}
-
 // Login Button
-
 .tiki-admin .module.box-login_box button {
     background-color: transparent;
     border: none;
@@ -994,8 +735,7 @@ body.tiki-admin {
     background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg xmlns='http://www.w3.org/2000/svg' version='1.1' viewBox='0 0 34 34'%3E%3Cdefs%3E%3Cstyle%3E .cls-1 %7B fill: %237c7c7d; %7D .cls-2 %7B fill: none; stroke: %237c7c7d; stroke-width: 2px; %7D %3C/style%3E%3C/defs%3E%3C!-- Generator: Adobe Illustrator 28.7.1, SVG Export Plug-In . SVG Version: 1.2.0 Build 142) --%3E%3Cg%3E%3Cg id='Ebene_1'%3E%3Cg%3E%3Cpath class='cls-1' d='M20,17h0c-.8.6-1.9,1-3,1s-2.1-.4-3-1h0c-2.2,0-4,1.8-4,4v1c0,.3,0,.7.1,1h13.7c0-.3.1-.7.1-1v-1c0-2.2-1.8-4-4-4Z'/%3E%3Ccircle class='cls-1' cx='17' cy='13' r='4'/%3E%3C/g%3E%3Ccircle class='cls-2' cx='17' cy='17' r='16'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-//.tiki-admin .bg-dark-parent .module.box-login_box button,
-.tiki-admin /*.bg-light-parent*/ .module.box-login_box button {
+.tiki-admin .module.box-login_box button {
     background-repeat: no-repeat;
     background-size: 2rem;
     color: transparent !important;
@@ -1012,7 +752,6 @@ body.tiki-admin {
 }
 
 // Preference bar
-
 .tiki-admin .admin-content nav.admin-navbar {
     background-color: transparent !important;
     background-image: none !important;
@@ -1022,62 +761,24 @@ body.tiki-admin {
     padding-left: 7rem;
     z-index: 9999 !important;
 }
-//
+
 .tiki-admin #col1 {
     z-index: unset !important;
    padding-top: 5rem; // avoid top_modules overlapping page content
 }
-//
-//.tiki-admin .navbar-expand-md .form-inline {
-//    width: auto !important;
-//    margin-top: -.8rem;
-//    position: relative;
-//    top: -.2rem;
-//}
-//
-//.tiki-admin .navbar-expand-md .navbar-nav .nav-link {
-//    padding: 0 .4rem;
-//    font-weight: normal;
-//}
-//
-//.tiki-admin .admin-wrapper .navbar-toggler {
-//    position: absolute;
-//    border: none;
-//    left: 3.5rem;
-//}
-//
-//.tiki-admin .admin-navbar .navbar-toggler-icon {
-//    height: 16px;
-//    background-size: contain;
-//}
-//
-//.tiki-admin .navbar-dark .navbar-toggler-icon {
-//    background-image: url("data:image/svg+xml,%3Csvg%20id%3D%22Ebene_1%22%20data-name%3D%22Ebene%201%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2026%2016%22%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill%3A%23fff%3B%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M1%2C0H25a1%2C1%2C0%2C0%2C1%2C1%2C1h0a1%2C1%2C0%2C0%2C1-1%2C1H1A1%2C1%2C0%2C0%2C1%2C0%2C1H0A1%2C1%2C0%2C0%2C1%2C1%2C0Z%22%2F%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M1%2C14H25a1%2C1%2C0%2C0%2C1%2C1%2C1h0a1%2C1%2C0%2C0%2C1-1%2C1H1a1%2C1%2C0%2C0%2C1-1-1H0A1%2C1%2C0%2C0%2C1%2C1%2C14Z%22%2F%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M1%2C7H25a1%2C1%2C0%2C0%2C1%2C1%2C1h0a1%2C1%2C0%2C0%2C1-1%2C1H1A1%2C1%2C0%2C0%2C1%2C0%2C8H0A1%2C1%2C0%2C0%2C1%2C1%2C7Z%22%2F%3E%3C%2Fsvg%3E");
-//}
-//
-//.tiki-admin .navbar-light .navbar-toggler-icon {
-//    background-image: url("data:image/svg+xml,%3Csvg id='Ebene_1' data-name='Ebene 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 16'%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill:%237c7c7d;%7D%3C/style%3E%3C/defs%3E%3Cpath class='cls-1' d='M1,0H25a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H1A1,1,0,0,1,0,1H0A1,1,0,0,1,1,0Z'/%3E%3Cpath class='cls-1' d='M1,14H25a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H1a1,1,0,0,1-1-1H0A1,1,0,0,1,1,14Z'/%3E%3Cpath class='cls-1' d='M1,7H25a1,1,0,0,1,1,1h0a1,1,0,0,1-1,1H1A1,1,0,0,1,0,8H0A1,1,0,0,1,1,7Z'/%3E%3C/svg%3E");
-//}
-//
-//.tiki-admin .admin-wrapper .navbar-toggler:focus {
-//   box-shadow: none;
-//}
 
 // Popovers
-
 .tiki-admin .popover {
     z-index: 9999;
     max-width: 50vw;
 }
 
 // Toggle interactive translation
-
 .tiki-admin .form-check.intertrans {
     margin-top: 50px;
 }
 
 // scrollbar
-
 // width
 .tiki-admin nav::-webkit-scrollbar {
     width: 1.2rem;
@@ -1105,7 +806,6 @@ body.tiki-admin {
 }
 
 // scrollbar in firefox
-
 .tiki-admin nav.navbar-dark {
     scrollbar-color: var(--tiki-admin-dropdown-dark-bg); // $darkergrey transparent;
     scrollbar-width: thin;
@@ -1130,8 +830,7 @@ body.tiki-admin {
 }
 
 // FIX: make it the same width as the height
-//.tiki-admin .bg-dark-parent .module.box-login_box button,
-.tiki-admin /*.bg-light-parent*/ .module.box-login_box button {
+.tiki-admin .module.box-login_box button {
     width: 2.1rem;
 }
 

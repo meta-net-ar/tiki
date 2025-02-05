@@ -175,7 +175,7 @@
                                 </td>
                                 {if $deep eq 'on'}
                                     <td class="text">
-                                        {$objects[ix].categName|tr_if|escape}
+                                        {$objects[ix].categNames|tr_if|escape}
                                     </td>
                                 {/if}
                             </tr>

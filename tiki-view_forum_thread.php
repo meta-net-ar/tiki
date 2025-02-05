@@ -27,7 +27,6 @@ $inputConfiguration = [
             'comments_reply_threadId' => 'int',     //get
             'lock'                    => 'bool',    //get
             'display'                 => 'word',    //get
-            'topics_offset'           => 'int',     //get
             'archive'                 => 'url',     //post
             'report'                  => 'int',     //get
             'post_reported'           => 'word',    //get

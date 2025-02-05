@@ -8,7 +8,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'save'                        => 'bool',           //post
-            'code'                        => 'word',           //post
+            'code'                        => 'string',         //post
             'value'                       => 'digits',         //post
             'percent'                     => 'word',           //post
             'id'                          => 'digits',         //post

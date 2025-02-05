@@ -52,10 +52,10 @@ class JsTransferList extends Base
             $maxItems = $cardinality['maximum'] ?? '';
         }
 
-        TikiLib::lib('header')->add_js_module("import '@vue-widgets/element-plus-ui';");
+        TikiLib::lib('header')->add_js_module("import '@vue-widgets/el-transfer';");
 
         return "
-        <element-plus-ui component='Transfer' language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' field-name=" . json_encode($params["fieldName"]) . " filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
-        </element-plus-ui>";
+        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' field-name=" . json_encode($params["fieldName"]) . " filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
+        </el-transfer>";
     }
 }

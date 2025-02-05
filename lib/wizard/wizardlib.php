@@ -197,8 +197,6 @@ class WizardLib extends TikiLib
                     // Do not show page, if it doesn't return a boolean
                     if ($show === true) {
                         $template = $pages[$stepNr]->getTemplate();
-                        $showChangesWizard = $this->showChangesWizard();
-                        $smarty->assign('showChangesWizard', $showChangesWizard);
                         $smarty->assign('wizardBody', $smarty->fetch($template));
                         $next = false;
                     }
@@ -230,52 +228,5 @@ class WizardLib extends TikiLib
     {
         $hide = $showOnLogin === 'y' ? 'n' : 'y';
         $this->set_preference('wizard_admin_hide_on_login', $hide);
-    }
-
-    /**
-     * Check if tiki get an upgrade to show changes wizard
-     *
-     * @return bool
-     */
-    private function showChangesWizard()
-    {
-        $tikilib = TikiLib::lib('tiki');
-        $TWV = new TWVersion();
-        $tikiCurrentVersion = (float) $TWV->getBaseVersion();
-        $tikiInstallVersion = $tikilib->get_preference('tiki_install_version');
-        $installCommitDate = ! empty($tikiInstallVersion)
-            ? trim(shell_exec('git show -s --format=%cd --date=unix ' . $tikiInstallVersion . ' --date=unix 2>/dev/null'))
-            : null;
-        $showChangesWizard = false;
-
-        if ($TWV->svn === 'y') {
-            $repoUrl = trim(shell_exec('svn info --show-item repos-root-url'));
-            $repoRevision = trim(shell_exec('svn info --show-item revision'));
-            if (! empty($tikiInstallVersion) && ! empty($repoUrl)) {
-                $installRevision = shell_exec('svn log -r ' . $tikiInstallVersion . ' ' . $repoUrl);
-            }
-            if (empty($tikiInstallVersion) || (isset($installRevision) && $repoRevision > $tikiInstallVersion)) {
-                $showChangesWizard = true;
-                $tikilib->set_preference('tiki_install_version', $repoRevision);
-            }
-        }
-
-        if ($TWV->git === 'y') {
-            $output = shell_exec('git log -n 1 --format=%H-%cd --date=unix 2>/dev/null');
-            $commit = $output ? explode('-', $output) : [];
-            $commitId = ! empty($commit[0]) ? trim($commit[0]) : 0;
-            $commitDate = ! empty($commit[1]) ? trim($commit[1]) : 0;
-            if (! isset($installCommitDate) || $commitDate > $installCommitDate) {
-                $showChangesWizard = true;
-                $tikilib->set_preference('tiki_install_version', $commitId);
-            }
-        }
-
-        if ($TWV->svn !== 'y' && $TWV->git !== 'y' && (empty($tikiInstallVersion) || ! empty($installCommitDate) || $tikiCurrentVersion > (float) $tikiInstallVersion)) {
-            $showChangesWizard = true;
-            $tikilib->set_preference('tiki_install_version', $tikiCurrentVersion);
-        }
-
-        return $showChangesWizard;
     }
 }

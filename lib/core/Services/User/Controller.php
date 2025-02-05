@@ -567,8 +567,15 @@ class Services_User_Controller
                         $customMsg = tra('For this user:');
                         $userGroups = TikiLib::lib('tiki')->get_user_groups($util->items[0]);
                     } else {
+                        $userGroups = [];
                         $customMsg = tra('For these selected users:');
-                        $userGroups = '';
+                        foreach ($util->items as $usr) {
+                            $userInfo = $userlib->get_user_info($usr);
+                            if (! empty($userInfo['groups'])) {
+                                $userGroups = array_merge($userGroups, $userInfo['groups']);
+                            }
+                        }
+                        $userGroups = array_unique($userGroups);
                     }
                     return [
                         'title' => tra('Change group assignments for selected users'),
@@ -606,6 +613,7 @@ class Services_User_Controller
 
             // default group?
             $defaultGroup = $input['default_group'];
+            $groups = [];
 
             //selected users added or removed from selected groups
             if (isset($input['checked_groups'])) {
@@ -613,10 +621,8 @@ class Services_User_Controller
                 $add_remove = $input['add_remove'];
             //single user removed from a particular group
             } elseif (! empty($util->extra['add_remove'])) {
-                $groups[] = $util->extra['group'];
+                $groups = ! empty($util->extra['group']) ? [$util->extra['group']] : $groups;
                 $add_remove = $util->extra['add_remove'];
-            } elseif ($defaultGroup) {
-                $groups = [];
             }
             if (! empty($util->items) && (! empty($groups) || $defaultGroup)) {
                 global $user;
@@ -662,6 +668,19 @@ class Services_User_Controller
                     }
 
                     if ($defaultGroup) {
+                        $userCurrentGroups = TikiLib::lib('tiki')->get_user_groups($assign_user);
+                        if (! in_array($defaultGroup, $userCurrentGroups)) {
+                            $msg = tra('The user %0 is not a member of the group %1. Please add the user to the group before setting it as default.');
+                            $msg = strtr($msg, [
+                            '%0' => $assign_user,
+                            '%1' => $defaultGroup,
+                            ]);
+                            if (TIKI_API) {
+                                throw new Services_Exception($msg);
+                            }
+                            Feedback::error(['mes' => $msg]);
+                            return Services_Utilities::closeModal();
+                        }
                         $this->lib->set_default_group($assign_user, $defaultGroup);
                     }
                 }
@@ -673,25 +692,36 @@ class Services_User_Controller
                     $msg = tra('The following users:');
                     $helper = 'Have';
                 }
-                if ($defaultGroup && empty($groups)) {
-                    $groups[] = $defaultGroup;
+                if ($defaultGroup) {
                     $toMsg = tr('%0 had the following group set as default:', tra($helper));
-                } else {
+                    $feedback = [
+                        'tpl' => 'action',
+                        'mes' => $msg,
+                        'items' => $util->items,
+                        'toMsg' => $toMsg,
+                        'toList' => $defaultGroup,
+                    ];
+                    if (TIKI_API) {
+                        return ['feedback' => $feedback];
+                    }
+                    Feedback::success($feedback);
+                }
+                if ($groups) {
                     $verb = $add_remove == 'add' ? 'added to' : 'removed from';
                     $grpcnt = count($groups) === 1 ? 'group' : 'groups';
                     $toMsg = tr('%0 been %1 the following %2:', tra($helper), tra($verb), tra($grpcnt));
+                    $feedback = [
+                        'tpl' => 'action',
+                        'mes' => $msg,
+                        'items' => $util->items,
+                        'toMsg' => $toMsg,
+                        'toList' => $groups,
+                    ];
+                    if (TIKI_API) {
+                        return ['feedback' => $feedback];
+                    }
+                    Feedback::success($feedback);
                 }
-                $feedback = [
-                    'tpl' => 'action',
-                    'mes' => $msg,
-                    'items' => $util->items,
-                    'toMsg' => $toMsg,
-                    'toList' => $groups,
-                ];
-                if (TIKI_API) {
-                    return ['feedback' => $feedback];
-                }
-                Feedback::success($feedback);
                 //return to page
                 if (! empty($util->extra['anchor'])) {
                     return Services_Utilities::redirect($util->extra['anchor']);

@@ -1,24 +1,10 @@
 {if not empty($item.children)}
     <li class="sm-sub-item {if $item.selected|default:null} active{/if} {$item.class|escape}">
-        <a href="{$item.sefurl|escape}" class="sm-sub-link dropdown-item sm-sub-toggler">
-            {if $prefs.menus_items_icons eq "y"}
-                <span 
-                    data-preset="icon-picker" 
-                    tabindex="0" 
-                    role="button" 
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="focus" 
-                    title="Pick an icon" 
-                    data-icon-for="{$item.optionId}" 
-                    data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                >
-                {* here we display the icon html passed constructed from function.menu.php *}
-                {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                {* Refer to the style section in this file to know how this is done manually*}
-                {$menu_icons_html[$item.optionId]}
-                </span>
+        <a href="{$item.sefurl|escape}" class="sm-sub-link dropdown-item sm-sub-toggler" data-bs-toggle="dropdown">
+            {if $menu_info.use_items_icons eq "y" && $item.icon}
+                <span class="me-2">{icon name=$item.icon}</span>
             {/if}
-            {tr}{$item.name}{/tr}
+            <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
         </a>
         <ul class="sm-sub dropdown-menu">
             {* {if $sub}
@@ -35,45 +21,17 @@
         {if !empty($item.block)}
             {* mega-menu class prevents error (TypeError: Cannot read property 'parentNode' of null - jquery.smartmenus.js:line 664) when block items contains <ul> elements  *}
             <ul class="sm-sub mega-menu block--container">
-                {if $prefs.menus_items_icons eq "y"}
-                    <span 
-                        data-preset="icon-picker" 
-                        tabindex="0" 
-                        role="button" 
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="focus" 
-                        title="Pick an icon" 
-                        data-icon-for="{$item.optionId}" 
-                        data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                    >
-                    {* here we display the icon html passed constructed from function.menu.php *}
-                    {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                    {* Refer to the style section in this file to know how this is done manually*}
-                    {$menu_icons_html[$item.optionId]}
-                    </span>
+                {if $menu_info.use_items_icons eq "y" && $item.icon}
+                    <span class="me-2">{icon name=$item.icon}</span>
                 {/if}
-                {tr}{$item.name}{/tr}
+                <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
             </ul>
         {else}
-            <a class="sm-sub-link{* dropdown-item*}" href="{$item.sefurl|escape}">
-                {if $prefs.menus_items_icons eq "y"}
-                    <span
-                        data-preset="icon-picker" 
-                        tabindex="0" 
-                        role="button" 
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="focus" 
-                        title="Pick an icon" 
-                        data-icon-for="{$item.optionId}" 
-                        data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                    >
-                    {* here we display the icon html passed constructed from function.menu.php *}
-                    {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                    {* Refer to the style section the bootstrap_menu.tpl file to know how this is done manually*}
-                    {$menu_icons_html[$item.optionId]}
-                    </span>
+            <a class="sm-sub-link" href="{$item.sefurl|escape}">
+                {if $menu_info.use_items_icons eq "y" && $item.icon}
+                    <span class="me-2">{icon name=$item.icon}</span>
                 {/if}
-                {tr}{$item.name}{/tr}
+                <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
             </a>
         {/if}
     </li>

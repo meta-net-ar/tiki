@@ -214,7 +214,7 @@
                                     </div>
                                 </td>
                                 <td class="icon">
-                                    <a href="tiki-admin_categories.php?parentId={$parentId}&amp;removeObject={$objects[ix].catObjectId}&amp;fromCateg={$parentId}" class="tips text-danger" title=":{tr}Remove from this category{/tr}" onclick="confirmPopup('{tr}Remove object from category?{/tr}', '{ticket mode=get}')">
+                                    <a href="tiki-admin_categories.php?parentId={$parentId}&amp;removeObject={$objects[ix].objectId}&amp;fromCateg={$parentId}" class="tips text-danger" title=":{tr}Remove from this category{/tr}" onclick="confirmPopup('{tr}Remove object from category?{/tr}', '{ticket mode=get}')">
                                         {icon name='remove'}
                                     </a>
                                 </td>

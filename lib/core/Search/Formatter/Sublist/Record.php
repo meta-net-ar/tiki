@@ -19,6 +19,7 @@ class Record
     /** Array of Record */
     private array $sublists = [];
     private ?self $parent;
+    private $dataset;
 
     private $parser;
 
@@ -133,6 +134,7 @@ class Record
 
     public function executeOverDataset(&$data, &$root_data, Search_Formatter $sf): void
     {
+        $this->dataset = &$data;
         $executor = new Executor($this, $sf);
         try {
             $executor->runOnDataset($data, $root_data);
@@ -172,5 +174,10 @@ class Record
             }
         }
         return $filters;
+    }
+
+    public function getDataset()
+    {
+        return $this->dataset;
     }
 }

@@ -182,9 +182,9 @@
                 {jq}
                 $('#allday').on('change', function() {
                     if ($(this).is(':checked')) {
-                        $('#event-datetime').attr('enable-time-picker', '0');
+                        $('#event-datetime').attr('type', 'daterange');
                     } else {
-                        $('#event-datetime').attr('enable-time-picker', '1');
+                        $('#event-datetime').attr('type', 'datetimerange');
                     }
                 });
                 {/jq}

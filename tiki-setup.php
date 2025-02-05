@@ -215,13 +215,6 @@ if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
 
-// load svgedit CSS file before themes to prevent svgedit CSS from breaking themes CSS
-if ($prefs['feature_draw'] == 'y') {
-    //This should really not be here.  It's gigantic (3MB of javascript, which will be included in every request if the feature is enabled)  Unfortunately, until we have a headerlib.js to generically add javascript to the original page from ajax code, this can't be solved cleanly.  - benoitg - 2024-05-07
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-svgedit_draw";');
-    $headerlib->add_cssfile("themes/base_files/feature_css/svg-edit-draw.css");
-}
-
 require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
@@ -1015,6 +1008,7 @@ if ($prefs['feature_realtime'] == 'y') {
 }
 
 if ($prefs['feature_calendar'] === 'y') {
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/index.css");
     $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
     $headerlib->add_js_module('import "@jquery-tiki/fullcalendar_to_pdf";');
 }
@@ -1032,16 +1026,16 @@ $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
 $headerlib->add_js_module("import { textareaColorpicker } from '@jquery-tiki/ui-utils'; textareaColorpicker();");
 
-// element-plus-ui select, transfer
-$headerlib->add_js_module("import * as elementPlus from '@vue-widgets/element-plus-ui';");
+// element-plus-ui
 if ($prefs['feature_elementplus'] == 'y') {
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/base.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message-box.css');
     if ($prefs['elementplus_select'] == 'y') {
-        $headerlib->add_js_module("elementPlus.applySelect();");
+        $headerlib->add_js_module("import { applySelect } from '@vue-widgets/el-select'; applySelect();");
     }
     if ($prefs['elementplus_autocomplete'] == 'y') {
         $headerlib->add_js_module("import { autocomplete } from '@jquery-tiki/ui-utils'; window.autocomplete = autocomplete;");
-        $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-autocomplete.css');
-        $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/base.css');
     }
 }
 // use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not

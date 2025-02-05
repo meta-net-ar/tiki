@@ -46,12 +46,14 @@ $auto_query_args = [
 $access->check_feature('feature_sheet');
 $access->check_feature('feature_jquery_ui');
 
-$info = $sheetlib->get_sheet_info($_REQUEST['sheetId'] ?? 0);
-
-if (empty($info) && ! isset($_REQUEST['file']) && ! isset($_REQUEST['fileId'])) {
-    $smarty->assign('Incorrect parameter');
-    $smarty->display('error.tpl');
-    die;
+if (! isset($_REQUEST['file']) && ! isset($_REQUEST['fileId'])) {
+    try {
+        $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+    } catch (Exception $e) {
+        $smarty->assign('msg', tra($e->getMessage()));
+        $smarty->display("error.tpl");
+        die;
+    }
 }
 
 $objectperms = Perms::get('sheet', $_REQUEST['sheetId']);

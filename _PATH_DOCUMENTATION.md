@@ -208,7 +208,7 @@ Some generated files will always be in git (ex:  package manager lock files like
 * **package.lock.json**
   * Generated from */package.json using ``npm install``
 * **doc/devtools/codesniffer/standards/TikiIgnore/generate_ignore_list.php**
-  * Generated using `php doc/devtools/codesniffer/standards/TikiIgnore/generate_ignore_list.php`.
+  * Generated using `cd doc/devtools/codesniffer/standards/TikiIgnore/; php generate_ignore_list.php`.
 
 It is useful to list theme here, so developers that hit merge conflicts can regenerate them instead of spending hours resolving conflicts manually.
 

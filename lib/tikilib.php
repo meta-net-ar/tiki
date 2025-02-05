@@ -40,6 +40,8 @@ class TikiLib extends TikiDb_Bridge
 
     public $is_slideshow = false;
 
+    const TIKI_GLOBAL_CSV_ESCAPE_CHAR = '\\';
+
     /**
      * Collection of Tiki libraries.
      * Populated by TikiLib::lib()
@@ -6131,22 +6133,6 @@ class TikiLib extends TikiDb_Bridge
     }
 
     /**
-     * @param $tab
-     * @param $valField1
-     * @param $field1
-     * @param $field2
-     * @return mixed
-     */
-    public function other_value_in_tab_line($tab, $valField1, $field1, $field2)
-    {
-        foreach ($tab as $line) {
-            if ($line[$field1] == $valField1) {
-                return $line[$field2];
-            }
-        }
-    }
-
-    /**
      * @param $file_name
      * @return string
      */
@@ -7132,7 +7118,7 @@ class TikiLib extends TikiDb_Bridge
     public function str_putcsv($arr)
     {
         $fh = fopen('php://temp', 'rw');
-        fputcsv($fh, $arr, escape: "");
+        fputcsv($fh, $arr, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         rewind($fh);
         $csv = stream_get_contents($fh);
         fclose($fh);

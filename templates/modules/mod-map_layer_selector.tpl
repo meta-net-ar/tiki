@@ -15,7 +15,7 @@
     $(function () {
         $('.map-container').one('initialized', function () {
             $('.map-layer-selector').removeClass('map-layer-selector').each(function () {
-                var refreshLayers, map = $(this).closest('.tab, #appframe, body').find('.map-container').first()
+                var refreshLayers, map = $(this).closest('.tab, #appframe, body').find('.map-container').first()[0]
                     , baseLayers = $(this.baseLayers)
                     , optionalLayers = $('.optionalLayers', tr(this)) /* e.g. tr('Editable') to be translatable via lang/../language.js */
                     ;

@@ -15,7 +15,7 @@ $inputConfiguration = [
         'noteId'               => 'int',        //get
         'remove'               => 'int',        //get
         'save'                 => 'bool',       //post
-        'name'                 => 'word',       //post
+        'name'                 => 'string',     //post
         'data'                 => 'none',       //post
         'parse_mode'           => 'string',     //post
         ],

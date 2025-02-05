@@ -132,3 +132,5 @@ themes/**/*.css.map
 /coverage
 
 .DS_Store
+
+sbom.json

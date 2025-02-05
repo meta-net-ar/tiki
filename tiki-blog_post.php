@@ -34,7 +34,7 @@ $inputConfiguration = [
         'freetag_string'           => 'text',              //post
         'save'                     => 'bool',              //post
         'contributions'            => 'text',              //post
-        'title'                    => 'word',              //post
+        'title'                    => 'string',            //post
         'geolocation'              => 'word',              //post
         ],
     ],

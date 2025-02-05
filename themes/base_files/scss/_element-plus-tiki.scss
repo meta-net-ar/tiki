@@ -1,15 +1,11 @@
-.el-autocomplete-suggestion__wrap {
-  max-height: unset !important;
-}
-
-.input-group element-plus-ui {
+.input-group el-select, .input-group el-autocomplete {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
 }
 
-.input-group element-plus-ui ~ .btn {
+.input-group el-select ~ .btn, .input-group el-autocomplete ~ .btn  {
   @extend .btn-sm;
   margin-left: 0.5rem !important;
   border-top-left-radius: var(--bs-btn-border-radius) !important;

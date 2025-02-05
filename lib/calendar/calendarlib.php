@@ -1141,7 +1141,7 @@ class CalendarLib extends TikiLib
         $smarty = TikiLib::lib('smarty');
         $fields = false;
         if (! empty($fname) && ($fhandle = fopen($fname, 'r'))) {
-            $fields = fgetcsv($fhandle, 1000, escape: "");
+            $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         if ($fields === false || ! array_search('name', $fields)) {
             $smarty->assign('msg', tra("The file has incorrect syntax or is not a CSV file"));
@@ -1149,7 +1149,7 @@ class CalendarLib extends TikiLib
             die;
         }
         $nb = 0;
-        while (($data = fgetcsv($fhandle, 1000, escape: "")) !== false) {
+        while (($data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $d = [
                         'calendarId' => $calendarId,
                         'calitemId' => '0',

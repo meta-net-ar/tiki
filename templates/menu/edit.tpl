@@ -58,9 +58,12 @@
         {if $prefs.menus_items_icons eq 'y'}
             <div class="mb-3 row mx-2">
                 <label for="use_items_icons">
-                    <input type="checkbox" id="use_items_icons" name="use_items_icons" {if $info.use_items_icons eq 'y'} checked="checked"{/if} value="1">
                     {tr}Configure icons for menu entries{/tr}
                 </label>
+                <select name="use_items_icons" id="use_items_icons" class="form-select">
+                    <option value="0" {if $info.use_items_icons eq 'n'}selected="selected"{/if}>{tr}No{/tr}</option>
+                    <option value="1" {if $info.use_items_icons eq 'y'}selected="selected"{/if}>{tr}Yes{/tr}</option>
+                </select>
             </div>
         {/if}
         <div class="submit">

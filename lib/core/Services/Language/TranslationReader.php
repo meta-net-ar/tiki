@@ -44,13 +44,13 @@ class TranslationReader
     private function csvRead()
     {
         $handle = fopen($this->filename, 'r');
-        $header = fgetcsv($handle, escape: "");
+        $header = fgetcsv($handle, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         $translations = [];
 
         $source_index = array_search('en', $header) ?: 0;
         $target_index = $source_index > 0 ? 0 : 1;
 
-        while (($row = fgetcsv($handle, escape: ""))) {
+        while (($row = fgetcsv($handle, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR))) {
             $source = $row[ $source_index ];
             $target = $row[ $target_index ];
             $translations[ $source ] = $target;

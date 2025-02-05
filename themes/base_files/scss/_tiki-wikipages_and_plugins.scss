@@ -680,6 +680,7 @@ li .url-group {
     opacity: 1;
     background: $info;
     height: 100% !important;
+    z-index: 5;
 }
 
 #diff_history {

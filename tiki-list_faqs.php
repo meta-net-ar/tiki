@@ -15,12 +15,12 @@ $inputConfiguration = [
         'faqId'                    => 'int',                //post
         'remove'                   => 'int',                //get
         'save'                     => 'bool',               //post
-        'title'                    => 'word',               //post
+        'title'                    => 'string',             //post
         'canSuggest'               => 'bool',               //post
         'description'              => 'xss',                //post
         'sort_mode'                => 'word',               //get
         'offset'                   => 'int',                //get
-        'find'                     => 'word',               //post
+        'find'                     => 'string',             //post
         ],
     ],
 ];

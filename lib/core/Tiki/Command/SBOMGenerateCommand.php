@@ -11,6 +11,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Question\Question;
+use TikiLib;
 
 #[AsCommand(
     name: 'sbom:generate',
@@ -18,8 +20,34 @@ use Symfony\Component\Console\Helper\ProgressBar;
 )]
 class SBOMGenerateCommand extends Command
 {
+    protected function verifyUserPermission(InputInterface $input, OutputInterface $output)
+    {
+        $helper = $this->getHelper('question');
+        $question = new Question('Please enter the username: ');
+        $username = $helper->ask($input, $output, $question);
+
+        $passwordQuestion = new Question('Please enter the password: ');
+        $passwordQuestion->setHidden(true);
+        $passwordQuestion->setHiddenFallback(false);
+        $password = $helper->ask($input, $output, $passwordQuestion);
+
+        $userslib = TikiLib::lib('user');
+
+        $result = $userslib->validate_user($username, $password);
+
+        if ($result[2] !== USER_VALID) {
+            $output->writeln('<error>Permission denied</error>');
+            return false;
+        }
+        return true;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (! $this->verifyUserPermission($input, $output)) {
+            return Command::FAILURE;
+        }
+
         $output->writeln('Generating SBOM...');
 
         $nodeDeps = $this->getNodeDependencies($output);

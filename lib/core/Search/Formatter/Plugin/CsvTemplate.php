@@ -36,9 +36,9 @@ class Search_Formatter_Plugin_CsvTemplate extends Search_Formatter_Plugin_Abstra
         foreach ($this->fields as $field => $arguments) {
             $header[] = ! empty($arguments['label']) ? $arguments['label'] : '';
         }
-        fputcsv($fh, $header, escape: "");
+        fputcsv($fh, $header, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         foreach ($entries as $entry) {
-            fputcsv($fh, $entry, escape: "");
+            fputcsv($fh, $entry, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         rewind($fh);
         $csv = stream_get_contents($fh);

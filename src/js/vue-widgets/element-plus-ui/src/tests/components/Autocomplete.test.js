@@ -1,15 +1,22 @@
-import { fireEvent, render, screen } from "@testing-library/vue";
+import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { h } from "vue";
-import Autocomplete, { DATA_TEST_ID, TEXT } from "../../components/Autocomplete.vue";
-import { ElAutocomplete } from "element-plus/dist/index.full.mjs";
+import Autocomplete, { DATA_TEST_ID, TEXT } from "../../components/Autocomplete/Autocomplete.vue";
+import { ElAutocomplete } from "element-plus";
 import { fetchSuggestions } from "../../helpers/autocomplete/remote";
+import ConfigWrapper from "../../components/ConfigWrapper.vue";
 
-vi.mock("element-plus/dist/index.full.mjs", async (importOriginal) => {
+vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
         ElAutocomplete: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+    };
+});
+
+vi.mock("../../components/ConfigWrapper.vue", () => {
+    return {
+        default: vi.fn((props, { slots }) => h("div", { ...props, "data-testid": "config-wrapper" }, slots.default ? slots.default() : null)),
     };
 });
 
@@ -27,7 +34,6 @@ describe("Autocomplete", () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-        vi.resetAllMocks();
     });
 
     describe("render tests", () => {
@@ -38,7 +44,9 @@ describe("Autocomplete", () => {
 
             render(Autocomplete, { props: givenProps });
 
-            const autocompleteElement = screen.getByTestId(DATA_TEST_ID.AUTOCOMPLETE_ELEMENT);
+            const configWrapper = screen.getByTestId("config-wrapper");
+            expect(configWrapper).to.exist;
+            const autocompleteElement = within(configWrapper).getByTestId(DATA_TEST_ID.AUTOCOMPLETE_ELEMENT);
 
             expect(autocompleteElement).to.exist;
 
@@ -68,15 +76,23 @@ describe("Autocomplete", () => {
                 value: "foo",
                 placeholder: "Search",
                 valueKey: "name",
-                selectCb: () => {},
+                language: "en",
             };
 
             render(Autocomplete, { props: givenProps });
+
+            expect(ConfigWrapper).toHaveBeenCalledWith(
+                {
+                    language: givenProps.language,
+                },
+                expect.any(Object)
+            );
             expect(ElAutocomplete).toHaveBeenCalledWith(
                 expect.objectContaining({
                     modelValue: givenProps.value,
                     debounce: 500,
                     placeholder: givenProps.placeholder,
+                    teleported: false,
                     "trigger-on-focus": false,
                     "value-key": givenProps.valueKey,
                 }),

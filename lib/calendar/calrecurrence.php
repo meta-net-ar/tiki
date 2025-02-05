@@ -51,6 +51,9 @@ class CalRecurrence extends TikiLib
     private $uid;
     private $uri;
     private $recurrenceDstTimezone;
+    private $organizers;
+    private $participants;
+    private $processItip;
 
     /**
      * @param $param
@@ -202,6 +205,15 @@ class CalRecurrence extends TikiLib
         }
         if (isset($data['uid'])) {
             $this->setUid($data['uid']);
+        }
+        if (isset($data['participants'])) {
+            $this->setParticipants($data['participants']);
+        }
+        if (isset($data['organizers'])) {
+            $this->setOrganizers($data['organizers']);
+        }
+        if (isset($data['process_itip'])) {
+            $this->setProcessItip($data['process_itip']);
         }
     }
 
@@ -508,6 +520,9 @@ class CalRecurrence extends TikiLib
                 'allday'       => $this->isAllday(),
                 'recurrenceId' => $this->getId(),
                 'changed'      => 0,
+                'organizers'   => $this->getOrganizers(),
+                'participants' => $this->getParticipants(),
+                'process_itip'  => $this->getProcessItip()
             ];
 
             $initial = $this->getInitialItem();
@@ -562,7 +577,6 @@ class CalRecurrence extends TikiLib
                 }
                 $tx->commit();
             }
-            return;
         }
 
         $vcalendar = $oldRec->constructVCalendar($oldRec->getRecurenceDstTimezone());
@@ -617,6 +631,9 @@ class CalRecurrence extends TikiLib
                     'allday'       => $this->isAllday(),
                     'recurrenceId' => $this->getId(),
                     'changed'      => 0,
+                    'organizers'   => $this->getOrganizers(),
+                    'participants' => $this->getParticipants(),
+                    'process_itip'  => $this->getProcessItip()
                 ];
                 TikiLib::lib('calendar')->set_item($user, null, $data, [], true);
             } elseif ($found['changed'] == 0 || $updateManuallyChangedEvents) {
@@ -631,6 +648,9 @@ class CalRecurrence extends TikiLib
                     if (substr($field, 0, 1) == "_") {
                         $found['start'] = $vevent->DTSTART->getDateTime()->getTimeStamp();
                         $found['end'] = $vevent->DTEND->getDateTime()->getTimeStamp();
+                        $found['organizers'] = $this->getOrganizers();
+                        $found['participants'] = $this->getParticipants();
+                        $found['process_itip'] = $this->getProcessItip();
                         if ($found['changed']) {
                             $found['recurrenceStart'] = $found['start'];
                         }
@@ -902,7 +922,7 @@ class CalRecurrence extends TikiLib
         return null;
     }
 
-    public function constructVCalendar($timezone = null)
+    public function constructVCalendar($timezone = null, $organizers = null, $participants = null)
     {
         if (! $timezone) {
             static $calendar_timezones = [];
@@ -973,6 +993,9 @@ class CalRecurrence extends TikiLib
         if (! empty($this->getLang())) {
             $data['X-Tiki-Language'] = $this->getLang();
         }
+        if (! empty($this->getProcessItip())) {
+            $data['X-Tiki-ProcessITip'] = $this->getProcessItip();
+        }
         if (! empty($this->getRecurenceDstTimezone())) {
             $data['X-Tiki-Dst-Timezone'] = $this->getRecurenceDstTimezone();
         }
@@ -1025,6 +1048,35 @@ class CalRecurrence extends TikiLib
 
         $vcalendar = new Sabre\VObject\Component\VCalendar();
         $vevent = $vcalendar->add('VEVENT', $data);
+
+        if (! empty($organizers) && ! empty($participants)) {
+            foreach ($organizers as $user) {
+                $vevent->add(
+                    'ORGANIZER',
+                    'mailto:' . TikiLib::lib('user')->get_user_email($user),
+                    [
+                        'CN' => TikiLib::lib('tiki')->get_user_preference($user, 'realName'),
+                    ]
+                );
+            }
+            foreach ($participants as $par) {
+                if (! isset($par['role'])) {
+                    $par['role'] = 0;
+                }
+                $attendee = $vevent->add(
+                    'ATTENDEE',
+                    'mailto:' . $par['email'],
+                    [
+                        'CN' => TikiLib::lib('tiki')->get_user_preference($par['username'], 'realName'),
+                        'ROLE' => \Tiki\SabreDav\Utilities::mapAttendeeRole($par['role']),
+                        'PARTSTAT' => $par['partstat'],
+                    ]
+                );
+                if (! empty($par['comment'])) {
+                    $attendee->add('X-COMMENT', $par['comment']);
+                }
+            }
+        }
 
         if ((string)$vevent->UID != $this->getUid()) {
             // save UID for Tiki-generated calendar events as this must not change in the future
@@ -1625,5 +1677,44 @@ class CalRecurrence extends TikiLib
     public function setRecurenceDstTimezone($value)
     {
         $this->recurrenceDstTimezone = $value;
+    }
+
+    public function getOrganizers()
+    {
+        return $this->organizers;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setOrganizers($value)
+    {
+        $this->organizers = $value;
+    }
+
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setParticipants($value)
+    {
+        $this->participants = $value;
+    }
+
+    public function getProcessItip()
+    {
+        return $this->processItip;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setProcessItip($value)
+    {
+        $this->processItip = $value;
     }
 }

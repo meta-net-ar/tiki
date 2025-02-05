@@ -26,7 +26,7 @@
             <label for="" class="{if empty($labelColClass)}col-md-4{else}{$labelColClass}{/if} col-form-label">{tr}Language{/tr}</label>
             <div class="{if empty($inputColClass)}col-md-8{else}{$inputColClass}{/if}">
                 <select name="lang" class="form-control">
-                    <option value="">{tr}All{/tr}</option>
+                    <option value="0" selected>{tr}All{/tr}</option>
                         {section name=ix loop=$languages}
                             <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
                         {/section}

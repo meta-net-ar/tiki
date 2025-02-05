@@ -103,7 +103,11 @@ class PdoClient
             if (! empty($type) && $row['Type'] != $type) {
                 continue;
             }
-            $results[] = $row['Table'];
+            if (isset($row['Table'])) {
+                $results[] = $row['Table'];
+            } elseif (isset($row['Index'])) {
+                $results[] = $row['Index'];
+            }
         }
         return $results;
     }

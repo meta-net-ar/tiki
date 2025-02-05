@@ -811,7 +811,11 @@ class Exif
     {
         if (! is_array($fractionString)) {
             $fraction = explode('/', $fractionString);
-            $ret = $fraction[0] / $fraction[1];
+            if ($fraction[1] != 0) {
+                $ret = $fraction[0] / $fraction[1];
+            } else {
+                $ret = 1;
+            }
         } else {
             foreach ($fractionString as $fs) {
                 $fraction = explode('/', $fs);

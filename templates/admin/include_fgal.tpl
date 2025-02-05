@@ -62,7 +62,6 @@
                 {preference name='fgal_prevent_negative_score'}
 
                 {preference name='fgal_allow_duplicates'}
-                {preference name='file_galleries_use_jquery_upload'}
 
                 {preference name='feature_file_galleries_batch'}
                 <div class="adminoptionboxchild" id="feature_file_galleries_batch_childcontainer">

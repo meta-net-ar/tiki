@@ -25,8 +25,7 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
     }
 
     const elementUniqueId = Math.random().toString(36).substring(7);
-    const elementPlusUi = document.createElement("element-plus-ui");
-    elementPlusUi.setAttribute("component", "Autocomplete");
+    const elementPlusUi = document.createElement("el-autocomplete");
     elementPlusUi.setAttribute("id", elementUniqueId);
     elementPlusUi.setAttribute("remote-source-url", remoteSourceUrl);
     elementPlusUi.setAttribute("source-list", JSON.stringify(sourceList));

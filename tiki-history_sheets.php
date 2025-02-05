@@ -31,10 +31,11 @@ if (! isset($_REQUEST['sheetId'])) {
     die;
 }
 
-$info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('msg', tr('Unable to retrieve sheet id %0', $_REQUEST['sheetId']));
-    $smarty->display('error.tpl');
+try {
+    $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    $smarty->assign('msg', tra($e->getMessage()));
+    $smarty->display("error.tpl");
     die;
 }
 

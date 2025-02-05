@@ -123,17 +123,7 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 
         $params['notBefore'] = $this->getOption('notBefore') ? '#trackerinput_' . $this->getOption('notBefore') : '';
         $params['notAfter']  = $this->getOption('notAfter') ? '#trackerinput_' . $this->getOption('notAfter') : '';
-        if ($this->getOption('customTimezone')) {
-            $params['showtimezone'] = 'y';
-            $params['timezoneFieldname'] = $this->getInsertId() . '_timezone';
-        } else {
-            $params['showtimezone'] = 'n';
-        }
-        if ($this->getOption('datetime') === 'd') {
-            $params['timezone'] = 'UTC';
-        } else {
-            $params['timezone'] = TikiLib::lib('tiki')->get_display_timezone();
-        }
+        $params['timezone'] = TikiLib::lib('tiki')->get_display_timezone();
 
         return smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate());
     }

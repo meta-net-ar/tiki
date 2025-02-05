@@ -147,118 +147,7 @@ class Menu extends Base
             }
 
             $smarty->assign('list', $structured);
-            $menu_icons = $tikilib->fetchAll('SELECT optionId, url, icon FROM tiki_menu_options');
-            $iconset_pref = $prefs['theme_iconset'];
-            $menu_icons_searchable = [];
-            switch ($iconset_pref) {
-                case "bootstrap_icon_font":
-                    //Why is this not handled by IconsetLib?  - benoitg -2024-08-16
-                    break;
-                default:
-                    $iconSet = \TikiLib::lib('iconset')->getIconsetForTheme($prefs['theme_iconset'], "");
-            }
-            foreach ($menu_icons as $key => $value) {
-                $default_icon = "";
-                switch ($iconset_pref) {
-                    case "bootstrap_icon_font":
-                        $default_icon = "<i class='menu-icon bi bi-pencil'></i>";
-                        if ($value['icon']) {
-                            $icoArray = iconset_bootstrap_icon_font();
-                            if (array_key_exists($value['icon'], $icoArray['icons'])) {
-                                $specific_one = $icoArray['icons'][$value['icon']]['id']; #value['icon] is the iconname and id is the icon id to append to bi bi-
-                                $iconForThisMenu = "<i class='menu-icon bi bi-$specific_one' ></i>";
-                            }
-                        }
-                        $menu_icons_searchable[$value['optionId']] = $iconForThisMenu ?? $default_icon;
-                        unset($iconForThisMenu); #unset to detach reflexion on next iteration
-                        break;
-                    case "legacy":
-                        $default_icon = "<img class='menu-icon' src='img/icons/pencil.png'/>"; #get prepend from any icon within the set
-                        $icon = $iconSet->getIcon($value['icon'], true);
-                        if ($icon) {
-                            if (count($icon) == 4) { //legacy icons has 4 meta datas
-                                $icon_html = "<img class='menu-icon' src='" . $icon["prepend"] . $icon["id"] . $icon["append"] . "'/>";
-                            }
-                        }
-                        $menu_icons_searchable[$value['optionId']] = $icon_html ?? $default_icon;
-                        unset($icon_html);
-                        break;
-                    case "theme_specific_iconset":
-                        $default_icon = "<i class='menu-icon fas fa-pencil'></i>";
-                        $icon = $iconSet->getIcon($value['icon'], true);
-                        if ($icon) {
-                            if (count($icon) == 2) {
-                                $icon_html = "<i class='menu-icon " . $icon["prepend"] . $icon["id"] . "'></i>";
-                            }
-                        }
-                        $menu_icons_searchable[$value['optionId']] = $icon_html ?? $default_icon;
-                        unset($icon_html);
-                        break;
-                    case "default": //default is fontwasemome
-                        $default_icon = "<i class='menu-icon fas fa-pencil'></i>";
-                        $icon = $iconSet->getIcon($value['icon'], true);
-                        if ($icon) {
-                            if (count($icon) == 2) {
-                                $icon_html = "<i class='menu-icon " . $icon["prepend"] . $icon["id"] . "'></i>";
-                            }
-                        }
-                        $menu_icons_searchable[$value['optionId']] = $icon_html ?? $default_icon;
-                        unset($icon_html);
-                        break;
-                }
-            }
-            switch ($iconset_pref) {
-                case "bootstrap_icon_font":
-                    $icons = iconset_bootstrap_icon_font();
-                    $icons_html = [];
-                    foreach ($icons['icons'] as $iconName => $meta) {
-                        foreach ($meta as $key => $iconID) {
-                            if ($icons['prepend']) {
-                                array_push($icons_html, [$iconName, "<i class='" . $icons['prepend'] . $iconID . "'></i>"]);
-                            }
-                        }
-                    }
-                    $icons_html_json = json_encode($icons_html);
-                    break;
-                case "legacy":
-                    $icons = $iconSet->icons();
-                    $icons_html = [];
-                    foreach ($icons as $iconName => $meta) {
-                        if ($meta['prepend'] and  $meta['append']) {
-                            array_push($icons_html, [$iconName, "<img src='" . $meta['prepend'] . $meta['id'] . $meta['append'] . "'/>"]);
-                        }
-                    }
-                    $icons_html_json = json_encode($icons_html);
-                    break;
-                case "theme_specific_iconset":
-                    $icons = $iconSet->icons();
-                    $icons_html = [];
-                    foreach ($icons as $iconName => $meta) {
-                        $prepend = $meta['prepend'] ?? "";
-                        if ($prepend) {
-                            array_push($icons_html, [$iconName, "<i class='" . $prepend . $meta['id'] . "'></i>"]);
-                        }
-                    }
-                    $icons_html_json = json_encode($icons_html);
-                    break;
-                case "default": //default is fontwasemome
-                    $icons = $iconSet->icons();
-                    $icons_html = [];
-                    foreach ($icons as $iconName => $meta) {
-                        $prepend = $meta['prepend'] ?? "";
-                        if ($prepend) {
-                            array_push($icons_html, [$iconName, "<i class='" . $prepend . $meta['id'] . "'></i>"]);
-                        }
-                    }
-                    $icons_html_json = json_encode($icons_html);
-                    break;
 
-                default: //when pref is not within the mentionned 4 cases
-                    $icons_html_json = json_encode([]);
-                    break;
-            }
-            $smarty->assign('menu_icons_html', $menu_icons_searchable);
-            $smarty->assign('icon_picker_set', $icons_html_json);
             return $smarty->fetch('bootstrap_menu.tpl');
         }
         if ($params['css'] !== 'n' && $prefs['feature_cssmenus'] == 'y') {
@@ -286,26 +175,6 @@ class Menu extends Base
         $tpl = 'tiki-user_menu.tpl';
         $data = $smarty->fetch($tpl);
         return \MenuLib::clean_menu_html($data);
-    }
-
-    /**
-    * Helper method to get proper link of a given menu item
-    *
-    * @param String $url_from_db The current url saved within the database
-    *
-    * @return String The new parsed link
-    */
-
-    public static function helperFunctionContructMenuUrlFromDb($url_from_db)
-    {
-        if (preg_match('/^\(\(([^()]+)\)\)$/', $url_from_db)) { //as page url are save as ((V-Log)) this should match the regex
-            $match = [];
-            preg_match("/[^()]+/", $url_from_db, $match);
-            $page_name = $match[0];
-            $page_name = str_replace(" ", "-", $page_name);
-            return "tiki-index.php?page=" . $page_name;
-        }
-        return $url_from_db;
     }
 
     public static function compareMenuOptions($a, $b)

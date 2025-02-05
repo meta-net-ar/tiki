@@ -506,6 +506,15 @@ function iconset_legacy()
             'italic' => [
                 'id' => 'text_italic',
             ],
+            'kaltura' => [
+                'id' => 'large/kaltura',
+                'size' => 1,
+                'sizes' => [
+                    3 => [
+                        'id' => 'large/kaltura48x48'
+                    ]
+                ]
+            ],
             'language' => [
                 'id' => 'world',
             ],

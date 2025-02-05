@@ -3,3 +3,4 @@
 | Package | Problem solved | Mechanism |
 |---------|----------------|--------|
 | single-spa | Cypht page handlers are called twice because single-spa fires the `popstate` event when `history.pushState()` is called. | The overwriting of the two methods (`pushState()` and `replaceState()`) in the History API is stopped to prevent the issue.|
+| element-plus | Inability to select an item from the autocomplete element's suggestions. | The Element Plus Tooltip uses the active DOM element to determine whether the autocomplete dropdown should emit a blur event (which cancels the select event from being emitted). A check is performed on this active element to determine whether it is a child of the popper element. However, because Tiki builds these components as custom DOM elements, the active element always resolves to the element fragment, causing the validation to fail. To address this, we reverse the check to be performed on the element fragment against the popper. |

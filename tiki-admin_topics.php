@@ -12,7 +12,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'          => [
             'addtopic'              => 'bool',      //post
-            'name'                  => 'word',      //post
+            'name'                  => 'string',    //post
             'remove'                => 'int',       //get
             'removeall'             => 'int',       //post
             'activate'              => 'int',       //post

@@ -83,7 +83,7 @@ class AttachmentsMigrateCommand extends Command
                     'galleryId' => $galleryId,
                     'description' => $att['comment'],
                     'user' => $att['user'],
-                    'comment' => $att['comment'],
+                    'comment' => mb_substr($att['comment'], 0, 200),
                     'hits' => $att['hits'],
                 ]);
                 $file->setParam('created', $att['created']);
@@ -92,7 +92,12 @@ class AttachmentsMigrateCommand extends Command
                 if (strlen($name) > 40) {
                     $name = substr($name, 0, 18) . '...' . substr($name, -18);
                 }
-                $fileId = $file->replace($data, $att['filetype'], $name, $att['filename']);
+                try {
+                    $fileId = $file->replace($data, $att['filetype'], $name, $att['filename']);
+                } catch (\Throwable $e) {
+                    $output->writeln('<error>' . tr('Failed converting attachment to a file: %0 in %1:%2', $e->getMessage(), $e->getFile(), $e->getLine()) . '</error>');
+                    continue;
+                }
                 // remove wiki attachment row
                 $wikilib->remove_wiki_attachment($att['attId']);
                 // replace attachment usage in wiki page

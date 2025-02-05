@@ -14,12 +14,12 @@ $inputConfiguration = [
         'remove'                 => 'int',                 //get
         'contentId'              => 'int',                 //post
         'save'                   => 'bool',                //post
-        'edit'                   => 'bool',                //post
+        'edit'                   => 'int',                //post
         'description'            => 'xss',                 //post
-        'contentLabel'           => 'word',                //post
+        'contentLabel'           => 'string',              //post
         'sort_mode'              => 'word',                //get
         'offset'                 => 'int',                 //get
-        'find'                   => 'word',                //post
+        'find'                   => 'string',              //post
         ],
     ],
 ];
@@ -39,10 +39,17 @@ $smarty->assign('contentLabel', '');
 $smarty->assign('contentId', 0);
 if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
-    $smarty->assign('description', $_REQUEST["description"]);
-    $smarty->assign('contentLabel', $_REQUEST["contentLabel"]);
-    $id = $dcslib->replace_content($_REQUEST["contentId"], $_REQUEST["description"], $_REQUEST["contentLabel"]);
-    $smarty->assign('contentId', $id);
+    $contentLabel = $_REQUEST["contentLabel"] ?? '';
+    $description = $_REQUEST["description"] ?? '';
+    $smarty->assign('contentLabel', $contentLabel);
+    $smarty->assign('description', $description);
+
+    if (empty(trim($contentLabel))) {
+        Feedback::error('Content Label is required to save the content block.');
+    } else {
+        $id = $dcslib->replace_content($_REQUEST["contentId"], $description, $contentLabel);
+        $smarty->assign('contentId', $id);
+    }
 }
 if (isset($_REQUEST["edit"])) {
     $info = $dcslib->get_content($_REQUEST["edit"]);

@@ -376,17 +376,21 @@ $elFinderInstance.bind("open", function (data) {
     });
 });
 
-window.handleFinderFile = function (file, elfinder) {
-    var hash = "";
-    if (typeof file === "string") {
-        var m = file.match(/target=([^&]*)/);
-        if (!m || m.length < 2) {
-            return false;    // error?
+window.handleFinderFile = function (files, elfinder) {
+    const hashes = [];
+    for (var i = 0; i < files.length; i++) {
+        let file = files[i];
+        if (typeof file === "string") {
+            var m = file.match(/target=([^&]*)/);
+            if (!m || m.length < 2) {
+                return false;    // error?
+            }
+            hashes.push(m[1]);
+        } else {
+            hashes.push(file.hash);
         }
-        hash = m[1];
-    } else {
-        hash = file.hash;
     }
+    
     $.ajax({
         type: 'POST',
         url: $.service('file_finder', 'finder'),
@@ -399,7 +403,7 @@ window.handleFinderFile = function (file, elfinder) {
             {{if !empty($insertion_syntax)}}
                 insertion_syntax: "{{$insertion_syntax}}",
             {{/if}}
-            hash: hash
+            hash: hashes
         },
         success: function (data) {
             {{if !empty($filegals_manager)}}

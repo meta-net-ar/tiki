@@ -94,7 +94,7 @@
             {/if}
         {/if}
     </div>
-    
+
     <div>
         <div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#page-source"><span class="copy_code_tooltiptext copy-html" id='copy_source'>Copy to clipboard</span></div>
         <pre class="codelisting preview-html" data-theme="default" data-wrap="1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" id="page-source">
@@ -165,41 +165,23 @@
                 <div class="input-group">
                     <select class="form-select" name="diff_style">
                         <optgroup label="{tr}Simple{/tr}">
-                            <option value="htmldiff" {if $diff_style == "htmldiff"}selected="selected"{/if}>
-                                {tr}HTML diff{/tr}
-                            </option>
-                            <option value="sidediff" {if $diff_style == "sidediff"}selected="selected"{/if}>
-                                {tr}Side-by-side diff{/tr}
-                            </option>
+                            {foreach  $diff_styles.options as $value => $label}
+                                {if $value == 'htmldiff' || $value == 'sidediff'}
+                                    <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                                        {tr}{$label}{/tr}
+                                    </option>
+                                {/if}
+                            {/foreach}
                         </optgroup>
                         <optgroup label="{tr}Advanced{/tr}">
-                            <option value="sidediff-char" {if $diff_style == "sidediff-char"}selected="selected"{/if}>
-                                {tr}Side-by-side diff by characters{/tr}
-                            </option>
-                            <option value="inlinediff" {if $diff_style == "inlinediff"}selected="selected"{/if}>
-                                {tr}Inline diff{/tr}
-                            </option>
-                            <option value="inlinediff-char" {if $diff_style == "inlinediff-char"}selected="selected"{/if}>
-                                {tr}Inline diff by characters{/tr}
-                            </option>
-                            <option value="sidediff-full" {if $diff_style == "sidediff-full"}selected="selected"{/if}>
-                                {tr}Full side-by-side diff{/tr}
-                            </option>
-                            <option value="sidediff-full-char" {if $diff_style == "sidediff-full-char"}selected="selected"{/if}>
-                                {tr}Full side-by-side diff by characters{/tr}
-                            </option>
-                            <option value="inlinediff-full" {if $diff_style == "inlinediff-full"}selected="selected"{/if}>
-                                {tr}Full inline diff{/tr}
-                            </option>
-                            <option value="inlinediff-full-char" {if $diff_style == "inlinediff-full-char"}selected="selected"{/if}>
-                                {tr}Full inline diff by characters{/tr}
-                            </option>
-                            <option value="unidiff" {if $diff_style == "unidiff"}selected="selected"{/if}>
-                                {tr}Unified diff{/tr}
-                            </option>
-                            <option value="sideview" {if $diff_style == "sideview"}selected="selected"{/if}>
-                                {tr}Side-by-side view{/tr}
-                            </option>
+                            {foreach  $diff_styles.options as $value => $label}
+                                {if $value == 'htmldiff' || $value == 'sidediff'}
+                                    {continue}
+                                {/if}
+                                <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                                    {tr}{$label}{/tr}
+                                </option>
+                            {/foreach}
                         </optgroup>
                     </select>
                         {jq}

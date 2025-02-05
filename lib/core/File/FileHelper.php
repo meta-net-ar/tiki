@@ -188,7 +188,7 @@ class FileHelper
         }
 
         if (! $fileExists) {
-            fputcsv($fileHandler, $headers, escape: "");
+            fputcsv($fileHandler, $headers, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
 
         foreach ($content as $row) {
@@ -196,7 +196,7 @@ class FileHelper
                 return is_array($col) ? json_encode($col) : $col;
             }, $row);
 
-            fputcsv($fileHandler, $row, escape: "");
+            fputcsv($fileHandler, $row, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
 
         fclose($fileHandler);

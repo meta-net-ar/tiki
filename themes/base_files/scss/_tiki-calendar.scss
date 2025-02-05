@@ -30,17 +30,17 @@
 }
 
 .tiki_calendar {
-    .fc-event {
+    .ec-event {
         padding: 5px; 
         border: none; 
         border-radius: 10px; 
     }
 
-    .fc-event .fc-event-time {
+    .ec-event .ec-event-time {
         font-size: 0.7rem;
     }
 
-    .fc-event .fc-event-main-frame {
+    .ec-event .ec-event-main-frame {
         display: flex;
         flex-direction: column;
     }
@@ -48,10 +48,10 @@
 
 @media (max-width: breakpoint-max(sm)) {
     .tiki_calendar {
-        .fc-event .fc-event-time {
+        .ec-event .ec-event-time {
             display: none;
         }
-        .fc-event .fc-event-title {
+        .ec-event .ec-event-title {
             display: "-webkit-box";
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -63,13 +63,19 @@
     }
 }
                    
-.fc-day-today {
-    .fc-daygrid-day-number {
+.ec-today {
+    .ec-day-head {
         background-color: #dfdfdf;
     }
 }
 
-.fc-daygrid-day-number {
+h4.ec-day-head {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ec-day-head {
     height: 1.4rem;
     width: 1.4rem;
     font-size: 0.9rem;
@@ -88,7 +94,7 @@
     }
 }
 
-.fc-semester-view .fc-daygrid-day-number, .fc-quarter-view .fc-daygrid-day-number {
+.ec-semester-view .ec-day-head, .ec-quarter-view .ec-day-head {
     width: fit-content;
     border-radius: 8px;
 }

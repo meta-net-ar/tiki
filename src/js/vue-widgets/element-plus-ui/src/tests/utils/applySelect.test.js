@@ -14,7 +14,7 @@ describe("applySelect", () => {
         global.document = window.document;
     });
 
-    test("transforms select element into element-plus-ui components", async () => {
+    test("transforms select element into el-select components", async () => {
         window.elementPlus = {
             select: {},
         };
@@ -49,8 +49,7 @@ describe("applySelect", () => {
         givenSelects.forEach((select, index) => {
             const elementPlusUi = document.querySelector(`#${select.getAttribute("element-plus-ref")}`);
             expect(elementPlusUi).toBeTruthy();
-            expect(elementPlusUi.tagName).toBe("ELEMENT-PLUS-UI");
-            expect(elementPlusUi.getAttribute("component")).toBe("Select");
+            expect(elementPlusUi.tagName).toBe("EL-SELECT");
             expect(elementPlusUi.getAttribute("placeholder")).toBe(select.getAttribute("placeholder"));
             expect(elementPlusUi.getAttribute("multiple")).toBe(select.multiple ? "multiple" : null);
             expect(elementPlusUi.getAttribute("max")).toBe(select.getAttribute("data-max"));
@@ -66,7 +65,7 @@ describe("applySelect", () => {
     test.each([
         [{ clearable: true, collapseTags: true, maxCollapseTags: 2, filterable: true, allowCreate: true }, "true"],
         [{ clearable: false, collapseTags: false, maxCollapseTags: 0, filterable: false, allowCreate: false }, "false"],
-    ])("applies the right attributes to the element-plus-ui component based on the preferences", async (preferences, expectedBoolean) => {
+    ])("applies the right attributes to the el-select component based on the preferences", async (preferences, expectedBoolean) => {
         window.elementPlus = {
             select: preferences,
         };
@@ -78,7 +77,7 @@ describe("applySelect", () => {
 
         await window.happyDOM.waitUntilComplete();
 
-        const elementPlusUi = document.querySelector("element-plus-ui");
+        const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("clearable")).toBe(expectedBoolean);
         expect(elementPlusUi.getAttribute("collapse-tags")).toBe(expectedBoolean);
         expect(elementPlusUi.getAttribute("max-collapse-tags")).toBe(preferences.maxCollapseTags.toString());

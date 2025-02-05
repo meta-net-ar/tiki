@@ -551,7 +551,7 @@ class MenuLib extends TikiLib
         $options = [];
         $fname = $_FILES['csvfile']['tmp_name'];
         $fhandle = fopen($fname, "r");
-        $fields = fgetcsv($fhandle, 1000, escape: "");
+        $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         if (! $fields[0]) {
             $smarty->assign('msg', tra('The file has incorrect syntax or is not a CSV file'));
             $smarty->display("error.tpl");
@@ -560,7 +560,7 @@ class MenuLib extends TikiLib
         $mismatch_options = [];
         while (! feof($fhandle)) {
             $res = ['optionId' => '', 'type' => '', 'name' => '', 'url' => '', 'position' => 0, 'section' => '', 'perm' => '', 'groupname' => '', 'userlevel' => '', 'class' => '', 'icon' => '', 'remove' => ''];
-            $data = fgetcsv($fhandle, 1000, escape: "");
+            $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
             if (empty($data)) {
                 continue;
             }

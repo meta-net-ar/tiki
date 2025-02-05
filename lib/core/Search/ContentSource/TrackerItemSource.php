@@ -35,8 +35,9 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         $data = [];
 
         $item = $this->trklib->get_tracker_item($objectId);
-
-        if (empty($item)) {
+        // Check that the element is valid and contains a trackerId
+        if (empty($item) || empty($item['trackerId'])) {
+            trigger_error("Invalid item data or missing trackerId for objectId: $objectId");
             return false;
         }
 

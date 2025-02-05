@@ -252,7 +252,7 @@
                 <label class="col-sm-3 col-form-label">{tr}User{/tr}</label>
                 <div class="col-sm-9">
                     <select name="subuser" class="form-control">
-                        <option value="">---</option>
+                        <option value="" selected>---</option>
                         {foreach key=id item=one from=$users}
                             <option value="{$one|escape}">{$one|escape}</option>
                         {/foreach}
@@ -285,7 +285,7 @@
                 <label class="col-sm-3 col-form-label">{tr}Users from group{/tr}</label>
                 <div class="col-sm-9">
                     <select name="group" class="form-control">
-                        <option value="">---</option>
+                        <option value="" selected>---</option>
                         {section name=x loop=$groups}
                             <option value="{$groups[x]|escape}">{$groups[x]|escape}</option>
                         {/section}
@@ -385,7 +385,7 @@
                     <label class="col-sm-3 col-form-label">{tr}Tracker:{/tr}</label>
                     <div class="col-sm-9">
                         <select name="tracker" class="form-control">
-                            <option value="">---</option>
+                            <option value="" selected>---</option>
                             {section name=tracker loop=$listTrackers}
                                 <option value="{$listTrackers[tracker].trackerId|escape}">{$listTrackers[tracker].name|escape}</option>
                             {/section}
@@ -417,7 +417,7 @@
                 <label class="col-sm-3 col-form-label">{tr}Group{/tr}</label>
                 <div class="col-sm-9">
                     <select name="group" class="form-control">
-                        <option value="">---</option>
+                        <option value="" selected>---</option>
                         {section name=x loop=$groups}
                             <option value="{$groups[x]|escape}">{$groups[x]|escape}</option>
                         {/section}
@@ -451,7 +451,7 @@
                 <label class="col-sm-3 col-form-label">{tr}Newsletter:{/tr}</label>
                 <div class="col-sm-9">
                     <select name="included" class="form-control">
-                        <option value="">---</option>
+                        <option value="" selected>---</option>
                         {section name=x loop=$newsletters}
                             {if $nlId ne $newsletters[x].nlId}
                                 <option value="{$newsletters[x].nlId|escape}">{$newsletters[x].name|escape}</option>

@@ -18,13 +18,13 @@
 }
 
 .el-button--primary {
-    --el-button-text-color: var(--bs-emphasis-color);
+    --el-button-text-color: var(--bs-body-bg);
     --el-button-disabled-bg-color: var(--bs-primary);
     --el-button-disabled-border-color: var(--bs-primary);
     --el-button-hover-border-color: var(--bs-primary);
     --el-button-hover-bg-color: var(--bs-primary);
-    --el-button-hover-text-color: var(--bs-emphasis-color);
-    --el-button-disabled-text-color: var(--bs-emphasis-color);
+    --el-button-hover-text-color: var(--bs-body-bg);
+    --el-button-disabled-text-color: var(--bs-body-bg);
 }
 
 .el-button.is-disabled {
@@ -33,29 +33,6 @@
 
 .el-button:hover {
     opacity: 0.8;
-}
-
-.el-transfer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.el-transfer-panel {
-    width: calc(45% - 25px * 2); // Make it take up all the space
-}
-
-.transfer-container {
-    margin-top: 1rem;
-}
-
-.transfer-container.invalid .el-transfer-panel:last-child {
-    & > .el-transfer-panel__body {
-        border-color: var(--bs-danger);
-    }
-    & > .el-transfer-panel__header {
-        border-color: var(--bs-danger) var(--bs-danger) var(--el-border-color) var(--bs-danger);
-    }
 }
 
 .invalid .el-select__wrapper {
@@ -73,7 +50,7 @@
     border-radius: var(--bs-border-radius) !important;
 }
 
-.el-popper.is-pure.is-light { //.el-select__popper .el-select-dropdown {
+.el-popper.is-pure.is-light {
     font-size: 16px !important;
     color: var(--bs-body-color) !important;
     background-color: var(--bs-body-bg) !important;

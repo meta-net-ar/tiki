@@ -105,7 +105,6 @@ foreach ($rawcals['data'] as $calendar) {
     $startOfDayHour = $startOfDayUnix / 3600;
     $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
     $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-
     $endOfDayUnix = (int)($calendar['endday'] ?? 0);
     $endOfDayHour = $endOfDayUnix / 3600;
     $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
@@ -347,7 +346,7 @@ include_once('tiki-section_options.php');
 
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/bootstrap-icons.css');
 // Disable fullcalendar's force events to be one-line tall
-$headerlib->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }');
+$headerlib->add_css('.ec-event > .ec-content { white-space: normal; }');
 if ($canEditAnything) {
     $smarty->assign('minHourOfDay', $minHourOfDay . ':00:00');
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');

@@ -398,6 +398,8 @@ if ($prefs['feature_multilingual'] == 'y' && isset($_REQUEST['show_translation_h
 }
 $smarty->assign_by_ref('translation_sources', $sources);
 $smarty->assign_by_ref('translation_targets', $targets);
+$diff_styles = \TikiLib::lib('prefs')->getPreference('default_wiki_diff_style');
+$smarty->assign('diff_styles', $diff_styles);
 if (isset($_REQUEST["diff2"])) { // previous compatibility
     if ($_REQUEST["diff2"] == '' && isset($rversion)) {
         $_REQUEST["diff2"] = $rversion;

@@ -25,6 +25,13 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             // NOTE: Keep the list alphabetically sorted.
             "imports" => [
                 /* common_externals available in ESM format */
+                "@event-calendar/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/index.js",
+                "@event-calendar/day-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/day-grid/index.js",
+                "@event-calendar/interaction" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/interaction/index.js",
+                "@event-calendar/list" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/list/index.js",
+                "@event-calendar/resource-time-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/resource-time-grid/index.js",
+                "@event-calendar/resource-timeline" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/resource-timeline/index.js",
+                "@event-calendar/time-grid" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@event-calendar/time-grid/index.js",
                 "@kurkle/color" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@kurkle/color/dist/color.esm.js",
                 "@popperjs/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@popperjs/core/dist/esm/index.js",
                 "animejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/anime/dist/anime.es.js",
@@ -72,8 +79,11 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-mf/toolbar-dialogs" => $tikiUrl . JS_ASSETS_PATH . "/toolbar-dialogs.js",
 
                 /* vue widgets */
-                "@vue-widgets/datetime-picker" => $tikiUrl . JS_ASSETS_PATH . "/datetime-picker.js",
-                "@vue-widgets/element-plus-ui" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui.js",
+                "@vue-widgets/el-autocomplete" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/autocomplete.js",
+                "@vue-widgets/el-date-picker" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/datepicker.js",
+                "@vue-widgets/el-file-gal-uploader" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/fileGalUploader.js",
+                "@vue-widgets/el-select" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/select.js",
+                "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
 
                 /* tiki-iot */
                 "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",

@@ -482,6 +482,11 @@ if ($prefs['feature_wiki_attachments'] === 'y' && $prefs['feature_use_fgal_for_w
 $unifiedsearch = \TikiLib::lib('unifiedsearch');
 $smarty->assign('search_index_outdated', $unifiedsearch->isOutdated());
 
+if ($prefs['feature_scheduler'] === 'y') {
+    $schedulerUtils = new \Scheduler_Utils();
+    $smarty->assign('isSchedulerRunConfigured', $schedulerUtils->isSchedulerRunConfigured());
+}
+
 if (! $unifiedsearch->rebuildInProgress()) {
     $searchIndex = [
         'error' => false,
@@ -520,5 +525,6 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
+
 
 $smarty->display('tiki.tpl');

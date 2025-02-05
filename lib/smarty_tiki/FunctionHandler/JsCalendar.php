@@ -9,7 +9,6 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
-use ThemeLib;
 
 /**
  * @param $params
@@ -33,31 +32,67 @@ class JsCalendar extends Base
 {
     public function handle($params, Template $template)
     {
+        global $prefs;
         $tikilib = \TikiLib::lib('tiki');
         $headerlib = \TikiLib::lib('header');
 
-        $headerlib->add_js_module("import '@vue-widgets/datetime-picker';");
-        list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
-        $theme_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
-        // If a non-existent theme option is set, the css file path will be null
-        if (! $theme_css) {
-            $theme_css = ThemeLib::getThemeCssFilePath($theme_active);
-        }
+        $headerlib->add_js_module("import '@vue-widgets/el-date-picker';");
 
         if (! isset($params['showtime'])) {
             $params['showtime'] = 'y';
         }
 
         $fieldName = $params['fieldname'];
-        $enableTimezonePicker = $params['showtimezone'] === 'y' ? 1 : 0;
+        $enableTimezonePicker = $params['showtimezone'] === 'y' ? "true" : "false";
         $enableTimePicker = $params['showtime'] === 'y' ? 1 : 0;
+        $goto = $params['goto'] ?? '';
+        $id = $params['id'] ?? "date-picker-" . uniqid();
+        $endfieldname = $params['endfieldname'] ?? '';
+        $enddate = $params['enddate'] ?? '';
+        $timezoneFieldname = $params['timezoneFieldname'] ?? '';
 
         if (! isset($params['timezone'])) {
             $params['timezone'] = $tikilib->get_display_timezone();
         }
 
-        return "
-        <datetime-picker input-name=\"{$fieldName}\" theme-css=\"{$theme_css}\" id=\"{$params['id']}\" to-input-name=\"{$params['endfieldname']}\" timestamp=\"{$params['date']}\" to-timestamp=\"{$params['enddate']}\" timezone=\"{$params['timezone']}\" timezone-field-name=\"{$params['timezoneFieldname']}\" enable-timezone-picker=\"{$enableTimezonePicker}\" enable-time-picker=\"{$enableTimePicker}\" go-to-url-on-change=\"{$params['goto']}\" language=\"{$tikilib->get_language()}\" cancel-text=\"Cancel\" select-text=\"Select\"></datetime-picker>
-        ";
+        $type = "date";
+        if ($endfieldname && $enableTimePicker) {
+            $type = "datetimerange";
+        } elseif ($endfieldname) {
+            $type = "daterange";
+        } elseif ($enableTimePicker) {
+            $type = "datetime";
+        }
+
+        $headerlib->add_js_module(<<<JS
+            if (typeof handleDatePicker === 'undefined') {
+                import('@jquery-tiki/ui-utils').then(({ handleDatePicker }) => {
+                    handleDatePicker('#{$id}', {
+                        fieldName: '{$fieldName}',
+                        endFieldName: '{$endfieldname}',
+                        date: '{$params['date']}',
+                        endDate: '{$enddate}',
+                        timezoneFieldName: '{$timezoneFieldname}',
+                        goto: '{$goto}',
+                    })
+                });
+            } else {
+                handleDatePicker('#{$id}', {
+                    fieldName: '{$fieldName}',
+                    endFieldName: '{$endfieldname}',
+                    date: '{$params['date']}',
+                    endDate: '{$enddate}',
+                    timezoneFieldName: '{$timezoneFieldname}',
+                    goto: '{$goto}',
+                })
+            }
+        JS);
+
+        $language = $tikilib->get_language();
+        $format = strpos($type, 'time') !== false ? $prefs['short_date_format_js'] . ' ' . $prefs['short_time_format_js'] : $prefs['short_date_format_js'];
+
+        return <<<HTML
+            <el-date-picker type="{$type}" custom-timezone="{$enableTimezonePicker}" id="{$id}" timezone="{$params['timezone']}" language="{$language}" format="{$format}" />
+        HTML;
     }
 }

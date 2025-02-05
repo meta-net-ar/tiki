@@ -945,83 +945,107 @@ class StructLib extends TikiLib
     }
     public function get_next_page($page_ref_id, $deep = true)
     {
-        // If we have children then get the first child
+        // If we have children, get the first child
         if ($deep) {
-            $query  = 'select `page_ref_id` ';
-            $query .= 'from `tiki_structures` ts ';
-            $query .= 'where `parent_id`=? ';
-            $query .= 'order by ' . $this->convertSortMode('pos_asc');
-            $result1 = $this->query($query, [(int) $page_ref_id]);
-            if ($result1->numRows()) {
-                $res = $result1->fetchRow();
-                return $res['page_ref_id'];
+            $child_id = $this->getFirstChild($page_ref_id);
+            if ($child_id) {
+                return $child_id;
             }
         }
-        // Try to get the next page with the same parent as this
+
+        // Get the next page with the same parent
+        return $this->getSiblingOrParent($page_ref_id, 'next');
+    }
+
+    public function get_prev_page($page_ref_id, $deep = false)
+    {
+        // Drill down to the last child for this tree node
+        if ($deep) {
+            $child_id = $this->getLastChild($page_ref_id);
+            if ($child_id) {
+                return $this->get_prev_page($child_id, true);
+            }
+        }
+
+        // Get the previous page with the same parent
+        return $this->getSiblingOrParent($page_ref_id, 'prev');
+    }
+
+    public function getNextSibling($page_ref_id)
+    {
+        return $this->getSibling($page_ref_id, '>', 'pos_asc');
+    }
+
+    public function getPrevSibling($page_ref_id)
+    {
+        return $this->getSibling($page_ref_id, '<', 'pos_desc');
+    }
+
+    private function getSibling($page_ref_id, $operator, $order)
+    {
         $page_info = $this->s_get_page_info($page_ref_id);
         $parent_id = $page_info['parent_id'];
-        $page_pos = $page_info['pos'];
+        $pos = $page_info['pos'];
+
         if (! $parent_id) {
             return null;
         }
-        $query  = 'select `page_ref_id` ';
-        $query .= 'from `tiki_structures` ts ';
-        $query .= 'where `parent_id`=? and `pos`>? ';
-        $query .= 'order by ' . $this->convertSortMode('pos_asc');
-        $result2 = $this->query($query, [(int) $parent_id, (int) $page_pos]);
-        if ($result2->numRows()) {
-            $res = $result2->fetchRow();
-            return $res['page_ref_id'];
-        } else {
-            return $this->get_next_page($parent_id, false);
-        }
+
+        $query = 'SELECT `page_ref_id` FROM `tiki_structures` WHERE `parent_id`=? AND `pos` ' . $operator . ' ? ORDER BY ' . $this->convertSortMode($order);
+        $result = $this->query($query, [(int)$parent_id, (int)$pos]);
+
+        return $result->numRows() ? $result->fetchRow()['page_ref_id'] : null;
     }
-    public function get_prev_page($page_ref_id, $deep = false)
+
+    private function getFirstChild($page_ref_id)
     {
-        //Drill down to last child for this tree node
-        if ($deep) {
-            $query  = 'select `page_ref_id` ';
-            $query .= 'from `tiki_structures` ts ';
-            $query .= 'where `parent_id`=? ';
-            $query .= 'order by ' . $this->convertSortMode('pos_desc');
-            $result = $this->query($query, [$page_ref_id]);
-            if ($result->numRows()) {
-                //There are more children
-                $res = $result->fetchRow();
-                $page_ref_id = $this->get_prev_page($res['page_ref_id'], true);
-            }
-            return $page_ref_id;
-        }
-        // Try to get the previous page with the same parent as this
+        return $this->getChild($page_ref_id, 'pos_asc');
+    }
+
+    private function getLastChild($page_ref_id)
+    {
+        return $this->getChild($page_ref_id, 'pos_desc');
+    }
+
+    private function getChild($page_ref_id, $order)
+    {
+        $query = 'SELECT `page_ref_id` FROM `tiki_structures` WHERE `parent_id`=? ORDER BY ' . $this->convertSortMode($order);
+        $result = $this->query($query, [(int)$page_ref_id]);
+
+        return $result->numRows() ? $result->fetchRow()['page_ref_id'] : null;
+    }
+
+    private function getSiblingOrParent($page_ref_id, $direction)
+    {
         $page_info = $this->s_get_page_info($page_ref_id);
         $parent_id = $page_info['parent_id'];
-        $pos       = $page_info['pos'];
-        //At the top of the tree
-        if (empty($parent_id)) {
+        $page_pos = $page_info['pos'];
+
+        if (! $parent_id) {
             return null;
         }
-        $query  = 'select `page_ref_id` ';
-        $query .= 'from `tiki_structures` ts ';
-        $query .= 'where `parent_id`=? and `pos`<? ';
-        $query .= 'order by ' . $this->convertSortMode('pos_desc');
-        $result = $this->query($query, [(int) $parent_id, (int) $pos]);
+
+        $operator = $direction === 'next' ? '>' : '<';
+        $query = 'SELECT `page_ref_id` FROM `tiki_structures` WHERE `parent_id`=? AND `pos` ' . $operator . ' ? ORDER BY ' . $this->convertSortMode($direction === 'next' ? 'pos_asc' : 'pos_desc');
+        $result = $this->query($query, [(int)$parent_id, (int)$page_pos]);
+
         if ($result->numRows()) {
-            //There is a previous sibling
             $res = $result->fetchRow();
-            $page_ref_id = $this->get_prev_page($res['page_ref_id'], true);
+            return $direction === 'next' ? $res['page_ref_id'] : $this->get_prev_page($res['page_ref_id'], true);
         } else {
-            //No previous siblings, just the parent
-            $page_ref_id = $parent_id;
+            return $direction === 'next' ? $this->get_next_page($parent_id, false) : $parent_id;
         }
-        return $page_ref_id;
     }
+
     public function get_navigation_info($page_ref_id)
     {
-        $struct_nav_pages = [
-            'prev'   => $this->get_neighbor_info($page_ref_id, 'get_prev_page'),
-            'next'   => $this->get_neighbor_info($page_ref_id, 'get_next_page'),
+        return [
+            'prev' => $this->get_neighbor_info($page_ref_id, 'get_prev_page'),
+            'next' => $this->get_neighbor_info($page_ref_id, 'get_next_page'),
+            'prevsibling' => $this->get_neighbor_info($page_ref_id, 'get_prev_sibling'),
+            'nextsibling' => $this->get_neighbor_info($page_ref_id, 'get_next_sibling'),
             'parent' => $this->get_neighbor_info($page_ref_id, 's_get_parent_info'),
-            'home'   => $this->s_get_structure_info($page_ref_id),
+            'home' => $this->s_get_structure_info($page_ref_id),
         ];
 
          return $struct_nav_pages;

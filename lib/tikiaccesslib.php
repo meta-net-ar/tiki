@@ -175,13 +175,16 @@ class TikiAccessLib extends TikiLib
     public function getOriginUrl()
     {
         global $base_uri;
-
         $gobackto = '';
         if (! empty($base_uri)) {
             $pathInfo = parse_url($base_uri);
-            $pathData = explode('/', $pathInfo["path"]);
-            $gobackto = end($pathData);
-
+            // Ensure "path" is set and not null
+            $path = $pathInfo["path"] ?? '';
+            if ($path) {
+                $pathData = explode('/', $path);
+                $gobackto = end($pathData);
+            }
+            // Append the query if present
             if (! empty($pathInfo['query'])) {
                 $gobackto .= '?' . $pathInfo['query'];
             }

@@ -63,33 +63,30 @@
                 <input type="submit" class="btn btn-info" name="continue" value="{tr}Start Configuration Wizard{/tr}" />
             </div>
         </div>
+        <div class="d-flex mb-5">
+            <span class="flex-shrink-0 fa-stack fa-lg me-1" alt="{tr}Changes Wizard{/tr}" title="Changes Wizard">
+                {icon name='arrow-circle-up' iclass='fa-stack-2x text-success'}
+                {icon name='magic' iclass='fa-flip-horizontal fa-stack-1x ms-4 mt-4'}
+            </span>
+            <div class="flex-grow-1 ms-3">
+                <legend>{tr}Changes Wizard{/tr}</legend>
+                <p>
+                    {tr _0="<b>" _1="</b>"}Or you may use the %0Changes Wizard%1{/tr}.
+                    {tr}This will guide you through the most common new settings and informations in order to upgrade your site.{/tr}
+                    <a href="http://doc.tiki.org/Upgrade+Wizard" target="tikihelp" class="tikihelp text-success" title="{tr}Changes Wizard:{/tr}
+                        {tr}Use this wizard if you are upgrading from previous versions of Tiki, specially if you come from the previous Long-Term Support (LTS) version.{/tr}</p>
 
-        {if $showChangesWizard}
-            <div class="d-flex mb-5">
-                <span class="flex-shrink-0 fa-stack fa-lg me-1" alt="{tr}Changes Wizard{/tr}" title="Changes Wizard">
-                    <i class="fas fa-arrow-circle-up fa-stack-2x text-success"></i>
-                    <i class="fas fa-flip-horizontal fa-magic fa-stack-1x ms-4 mt-4"></i>
-                </span>
-                <div class="flex-grow-1 ms-3">
-                    <legend>{tr}Changes Wizard{/tr}</legend>
-                    <p>
-                        {tr _0="<b>" _1="</b>"}Or you may use the %0Changes Wizard%1{/tr}.
-                        {tr}This will guide you through the most common new settings and informations in order to upgrade your site.{/tr}
-                        <a href="http://doc.tiki.org/Upgrade+Wizard" target="tikihelp" class="tikihelp text-success" title="{tr}Changes Wizard:{/tr}
-                            {tr}Use this wizard if you are upgrading from previous versions of Tiki, specially if you come from the previous Long-Term Support (LTS) version.{/tr}</p>
+                        <p>{tr}Some of these settings are also available through the Configuration Wizard, and all of them are available through Control Panels{/tr}.
+                        {tr}But this wizard will let you learn about them as well as enable/disable them easily according to your needs and interests for your site{/tr}."
+                    >
+                        {icon name="help"}
+                    </a>
+                </p>
 
-                            <p>{tr}Some of these settings are also available through the Configuration Wizard, and all of them are available through Control Panels{/tr}.
-                            {tr}But this wizard will let you learn about them as well as enable/disable them easily according to your needs and interests for your site{/tr}."
-                        >
-                            {icon name="help"}
-                        </a>
-                    </p>
                     <input type="submit" class="btn btn-success" name="use-changes-wizard" value="{tr}Start Changes Wizard{/tr}" />
-                </div>
             </div>
-            <hr>
-        {/if}
-
+        </div>
+        <hr>
         <div class="d-flex mb-5">
             <span class="flex-shrink-0 fa-stack fa-lg me-1" alt="{tr}Control Panels{/tr}" title="Control Panels">
                 {icon name='sliders' iclass='fa-stack-2x text-primary'}

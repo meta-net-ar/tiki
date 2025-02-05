@@ -890,7 +890,7 @@ class TikiSheetCSVHandler extends TikiSheetDataHandler
     {
         $rows = explode("\n", $this->data);
         for ($i = 0; $i < count($rows) && $i < $this->maxrows; $i++) {
-            $cols = str_getcsv($rows[$i], escape: "");
+            $cols = str_getcsv($rows[$i], escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 
             for ($j = 0; $j < count($cols) && $j < $this->maxcols; $j++) {
                 $sheet->initCell($i, $j);

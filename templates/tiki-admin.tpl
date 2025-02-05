@@ -128,6 +128,16 @@
                 {/remarksbox}
             {/if}
 
+            {if !$isSchedulerRunConfigured}
+                {remarksbox type="warning" title="{tr}The Scheduler does not seem to have been executed recently.{/tr}"}
+                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background{/tr}
+                    {tr}Find out more about the Scheduler at{/tr}
+                    <a href="https://doc.tiki.org/Scheduler" class="link" target="_blank">
+                        https://doc.tiki.org/Scheduler
+                    </a>
+                {/remarksbox}
+            {/if}
+
             {if $searchIndex['error']}
                 {remarksbox type="error" title="{tr}Search index failure{/tr}"}
                     {if !$searchIndex['connectionError']}

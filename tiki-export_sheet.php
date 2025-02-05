@@ -19,10 +19,17 @@ $auto_query_args = [
 
 $access->check_feature('feature_sheet');
 
-$info = TikiLib::lib("sheet")->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('msg', tra('Incorrect parameter'));
+if (! isset($_REQUEST['sheetId'])) {
+    $smarty->assign('msg', tra('Missing parameter "sheetId"'));
     $smarty->display('error.tpl');
+    die;
+}
+
+try {
+    $info = TikiLib::lib("sheet")->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    $smarty->assign('msg', tra($e->getMessage()));
+    $smarty->display("error.tpl");
     die;
 }
 

@@ -207,6 +207,11 @@ class Services_File_Controller
         $_REQUEST["cat_categorize"] = 'on';
         include('categorize.php');
 
+        $filegallib = TikiLib::lib('filegal');
+        $info = $filegallib->get_file_info($fileId);
+        // when stored in the database the file contents is here and should not be sent back to the client
+        $info['data'] = null;
+
         $util->setTicket();
         return [
             'size' => $size,
@@ -217,12 +222,14 @@ class Services_File_Controller
             'fileId' => $fileId,
             'galleryId' => $gal_info['galleryId'],
             'md5sum' => md5($data),
-            'ticket' => $util->getTicket()
+            'ticket' => $util->getTicket(),
+            'syntax' => $filegallib->getWikiSyntax($gal_info['galleryId'], $info, $input->asArray()),
+            'info' => $info,
         ];
     }
 
     /**
-     * Uploads several files at once, currently from jquery_upload when file_galleries_use_jquery_upload pref is enabled
+     * Uploads several files at once
      *
      * @param JitFilter $input
      * @return array
@@ -278,13 +285,6 @@ class Services_File_Controller
 
                     // do the actual upload
                     $file = $this->action_upload($input);
-
-                    if (! empty($file['fileId'])) {
-                        $file['info'] = $filegallib->get_file_info($file['fileId']);
-                        // when stored in the database the file contents is here and should not be sent back to the client
-                        $file['info']['data'] = null;
-                        $file['syntax'] = $filegallib->getWikiSyntax($file['galleryId'], $file['info'], $input->asArray());
-                    }
 
                     if (! empty($input->asArray('isbatch')) && $input->isbatch->word() && stripos($_FILES['data']['type'], 'zip') !== false) {
                         $errors = [];

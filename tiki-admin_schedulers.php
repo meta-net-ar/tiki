@@ -10,8 +10,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'               => [
             'scheduler'                  => 'word',           //post
-            'scheduler_name'             => 'word',           //post
-            'scheduler_description'      => 'word',           //post
+            'scheduler_name'             => 'string',         //post
+            'scheduler_description'      => 'string',         //post
             'scheduler_task'             => 'string',         //post
             'scheduler_status'           => 'string',         //post
             'scheduler_rerun'            => 'bool',           //post

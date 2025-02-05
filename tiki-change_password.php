@@ -15,7 +15,7 @@ $inputConfiguration = [
         'pass' => 'none',
         'passAgain' => 'none',
         'oldpass' => 'none',
-        'change' => null,
+        'change' => 'text',
     ],
     ]
 ];
@@ -96,7 +96,7 @@ if (isset($_REQUEST["change"])) {
 
     $res = $userlib->change_user_password($_REQUEST["user"], $_REQUEST["pass"]);
     //If the password is successfully changed
-    if ($res) {
+    if ($res && $prefs['pass_history_management'] === 'y') {
         // Add new password to history
         $userlib->addPasswordHistory($_REQUEST["user"], $_REQUEST["pass"]);
     }

@@ -50,6 +50,7 @@
                     {preference name=wiki_encourage_contribution}
                     {preference name=feature_wiki_show_hide_before}
                     {preference name=wiki_actions_bar}
+                    {preference name=wiki_collapse_expand_all_headings}
                     {preference name=wiki_page_navigation_bar}
                     {preference name=wiki_topline_position}
                     {preference name=page_bar_position}

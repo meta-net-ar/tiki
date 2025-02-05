@@ -37,7 +37,7 @@ $inputConfiguration = [
         'expire_Meridian'          => 'digits',          //post
         'expire_Hour'              => 'digits',          //post
         'save'                     => 'bool',            //post
-        'name'                     => 'word',            //post
+        'name'                     => 'string',          //post
         'description'              => 'xss',             //post
         ],
     ],

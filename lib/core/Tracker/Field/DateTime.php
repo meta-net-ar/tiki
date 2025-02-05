@@ -34,20 +34,6 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 0,
                     ],
-                    'customTimezone' => [
-                        'name' => tr('Show timezone picker'),
-                        'description' => tr('Allow to use a custom timezone for this field'),
-                        'filter' => 'int',
-                        'options' => [
-                            0 => tr('No'),
-                            1 => tr('Yes'),
-                        ],
-                        'depends' => [
-                            'field' => 'datetime',
-                            'value' => 'dt',
-                        ],
-                        'default' => '0',
-                    ],
                     'startyear' => [
                         'name' => tr('Start year'),
                         'description' => tr('Year to allow selecting from'),

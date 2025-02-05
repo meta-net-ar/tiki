@@ -10,7 +10,14 @@ function prefs_captcha_list()
         'captcha_wordLen' => [
             'name' => tra('CAPTCHA image word length'),
             'description' => tra('Number of characters the CAPTCHA will display.'),
-            'type' => 'text',
+            'type' => 'list',
+            'options' => [
+                2 => 2,
+                4 => 4,
+                6 => 6,
+                8 => 8,
+                10 => 10,
+            ],
             'default' => 6,
             'units' => tra('characters'),
         ],

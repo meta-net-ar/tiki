@@ -199,6 +199,7 @@ $(function () {
                 position: null,
                 name: $(el).find("input.field-label").val(),
                 url: $(el).find("input.field-url").val(),
+                icon: $(el).find("input.field-icon").val(),
                 sectionLevel: null,
                 type: null,
             };

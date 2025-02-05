@@ -9,7 +9,7 @@
         <label class="col-sm-2 col-form-label" for="broadcast-group">{tr}Group{/tr}</label>
         <div class="col-sm-10">
             <select name="groupbr" id="broadcast-group" class="form-select">
-                <option value=""{if $groupbr eq ''} selected="selected"{/if} />
+                <option value="" {if $groupbr eq ''} selected="selected"{/if} disabled>{tr}Select Group{/tr}</option>
                 {if $tiki_p_broadcast_all eq 'y'}
                     <option value="all"{if $groupbr eq 'All'} selected="selected"{/if}>{tr}All users{/tr}</option>
                 {/if}

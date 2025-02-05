@@ -11,10 +11,10 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'name'                  => 'word',             //post
+            'name'                  => 'string',           //post
             'lang'                  => 'lang',             //post
             'rremove'               => 'int',              //post
-            'find'                  => 'word',             //post
+            'find'                  => 'string',           //post
             'page'                  => 'pagename',         //post
             'tree'                  => 'xss',              //post
         ],

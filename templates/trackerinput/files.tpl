@@ -344,24 +344,28 @@
                 }
             });
 
-            window.handleFinderFile = function (file, elfinder) {
-                var hash = "";
-                if (typeof file === "string") {
-                    var m = file.match(/target=([^&]*)/);
-                    if (!m || m.length < 2) {
-                        return false;    // error?
+            window.handleFinderFile = function (files, elfinder) {
+                var hashes = [];
+                for (var i = 0; i < files.length; i++) {
+                    let file = files[i];
+                    if (typeof file === "string") {
+                        var m = file.match(/target=([^&]*)/);
+                        if (!m || m.length < 2) {
+                            return false;    // error?
+                        }
+                        hashes.push(m[1]);
+                    } else {
+                        hashes.push(file.hash);
                     }
-                    hash = m[1];
-                } else {
-                    hash = file.hash;
                 }
+
                 $.ajax({
                     type: 'GET',
                     url: $.service('file_finder', 'finder'),
                     dataType: 'json',
                     data: {
                         cmd: "tikiFileFromHash",
-                        hash: hash
+                        hash: hashes
                     },
                     success: function (data) {
                         var eventOrigin = $("body").data("eventOrigin");
@@ -371,7 +375,9 @@
                             $files = $(".current-list", $ff);
                         }
 
-        addFile(data.fileId, data.filetype, data.name);
+                        for (var i = 0; i < data.length; i++) {
+                            addFile(data[i].fileId, data[i].filetype, data[i].name);
+                        }
                     },
                     error: function (jqxhr) {
                     },

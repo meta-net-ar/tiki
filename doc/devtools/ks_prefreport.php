@@ -73,10 +73,10 @@ $ourFileHandle = fopen($ourFileName, 'w+') or die("can't open file");
 
 
 // Output results
-fputcsv($ourFileHandle, array_keys($fields), '|', escape: "");
+fputcsv($ourFileHandle, array_keys($fields), '|', escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 
 foreach ($data as $values) {
-    fputcsv($ourFileHandle, array_values($values), '|', escape: "");
+    fputcsv($ourFileHandle, array_values($values), '|', escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 }
 
 fclose($ourFileHandle);

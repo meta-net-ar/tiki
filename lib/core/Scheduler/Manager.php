@@ -70,6 +70,10 @@ class Scheduler_Manager
             }
         }
 
+        if (count($activeSchedulers) > 0) {
+            $tikilib->set_preference('scheduler_last_run_timestamp', time());
+        }
+
         foreach ($activeSchedulers as $schedulerTask) {
             try {
                 if ($this->shouldRun($schedulerTask)) {

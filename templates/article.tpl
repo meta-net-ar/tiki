@@ -12,7 +12,7 @@
         {/if}
 
         <span class="titleb">
-            {if $show_author eq 'y' && ($authorName or $author)} {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {if $authorName}{$authorName|escape}{else}{$author|username}{/if}
+            {if $show_author eq 'y' && ($authorName or $author)} {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"}{if $authorName}{$authorName|escape}{else}{$author|username}{/if}
                 {if $show_pubdate eq 'y' || $show_expdate eq 'y' || $show_reads eq 'y'} - {/if}
             {/if}
             {if $show_pubdate eq 'y' && $publishDate}{$publishDate|tiki_short_datetime}
@@ -49,16 +49,11 @@
         {rating_result id=$articleId type=article}
     {/if}
 
-{*    {if $prefs.art_trailer_pos ne 'between'}{include file='article_trailer.tpl'}{/if} *}
-
-    <div class="articleheading {if $isfloat neq 'y'}d-md-flex{/if} clearfix"> {* No flex in sm screen, to prevent skinny text column *}
+    <div class="articleheading{if $isfloat neq 'y'}d-md-flex{/if} clearfix"> {* No flex in sm screen, to prevent skinny text column *}
 
         <div class="{if $isfloat eq 'y'}float-start me-3{else}flex-shrink-0 me-2 ms-2{/if}">
             {capture name=imgTitle}{if $show_image_caption eq 'y' and $image_caption}{$image_caption|escape}{elseif isset($topicName)}{tr}{$topicName}{/tr}{/if}{/capture}
             {assign var="big_image" value=$prefs.art_header_text_pos eq 'below' && $list_image_x > 0}
-        {*    {if $big_image}
-            <div class="imgbox" style="{if $isfloat eq 'y'}width:{$width}px{/if}">
-            {/if} *}
 
             {* Show either a topic name, image OR a custom image (if there is a custom image or a topic). If a topic is set, link to it even if we show a custom image. *}
             {if $topicId}
@@ -79,37 +74,31 @@
                 {$topicName|escape}
                 {/if}
             {elseif $topicId}
-                {if $topics[$topicId].image_size > 0}
-                <img
-                    {* {if $big_image}class="cboxElement"{/if} *}
-                    alt="{tr}{$topicName}{/tr}"
-                    class="article-image img-thumbnail topic-image"
-                    src="article_image.php?image_type=topic&amp;id={$topicId}"
-                >
-                {else}
-                    {tr}{$topics[$topicId].name|escape}{/tr}
-                {/if}
+                {foreach from=$topics item=topic}
+                    {if $topic.topicId == $topicId}
+                        {if $topic.image_size > 0}
+                            <img
+                                    alt="{tr}{$topicName}{/tr}"
+                                    class="article-image img-thumbnail topic-image"
+                                    src="article_image.php?image_type=topic&amp;id={$topicId}"
+                            >
+                        {else}
+                            {tr}{$topics[$topicId].name|escape}{/tr}
+                        {/if}
+                        {break}
+                    {/if}
+                {/foreach}
             {/if}
             {if $topicId}</a>{/if}
 
-        {*    {if $big_image}
-                {if $show_image_caption eq 'y' and $image_caption || $image_x > 0}
-                    <div class="mx-auto thumbcaption">
-                        {if $image_x > 0}<div class="magnify"><a class="internal cboxElement" data-box="box" href="article_image.php?image_type=article&amp;id={$articleId}">{icon name='view' title=$smarty.capture.imgTitle}</a></div>{/if}
-                        {if $show_image_caption eq 'y' and $image_caption}{$image_caption|escape}{else}&nbsp;{/if}
-                    </div>
-                {/if}
-            </div> {* class="imgbox" *}
-        {*    {/if} *}
         </div>
             {if $prefs.art_header_text_pos eq 'below' && $list_image_x > 0}
         <div style="width: 100%; float: left;">
             {elseif $isfloat eq 'n' and isset($topics[$topicId].image_size) and $topics[$topicId].image_size > 0}
         <div class="flex-grow-1 ms-3">
             {else}
-        <div class="articleheadingtext {if $isfloat eq 'n'}flex-grow-1 ms-3{/if}"{*{if $isfloat eq 'y'}style="display: inline;"{/if}*}>
+        <div class="articleheadingtext{if $isfloat eq 'n'}flex-grow-1 ms-3{/if}">
             {/if}
-            {* <div class="articleheadingtext flex-grow-1 ms-3" {if $isfloat eq 'y'}style="display: inline;"{/if}> *}
                 {if $article_attributes}
                     <div class="articleattributes">
                         {foreach from=$article_attributes key=attname item=attvalue}

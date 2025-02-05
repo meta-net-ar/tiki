@@ -33,20 +33,20 @@ echo "# Running PHPCS ...." . PHP_EOL;
 // run PHPCS (we need to remove the ignore file while we execute phpcs, so we can generate all entries)
 if ($ignoreExists) {
     if (file_exists($ignoreFileBackup)) {
-        unlink($ignoreFileBackup);
+        if (! unlink($ignoreFileBackup)) {
+            throw new Error(`Unable to delete $ignoreFileBackup`);
+        };
     }
-    rename($ignoreFileOriginal, $ignoreFileBackup);
+    if (! rename($ignoreFileOriginal, $ignoreFileBackup)) {
+        throw new Error(`Unable to backup $ignoreFileOriginal to $ignoreFileBackup`);
+    };
 }
 
 system(
     'php -d memory_limit=-1 vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs'
-    . ' -s --runtime-set ignore_warnings_on_exit true --cache=phpcs.cache --parallel=8'
-    . ' --report=json --report-file=' . $jsonReport
+        . ' -s --runtime-set ignore_warnings_on_exit true --cache=phpcs.cache --parallel=1' //Do NOT try to enable multiprocessing, it will make the order of the file non-repeatable - benoitg - 2025-01-24
+        . ' --report=json --report-file=' . $jsonReport
 );
-
-if ($ignoreExists) {
-    rename($ignoreFileBackup, $ignoreFileOriginal);
-}
 
 // Processors (we need one for each sniff we want to process)
 $process = [

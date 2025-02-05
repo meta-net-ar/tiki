@@ -5,8 +5,15 @@
     </div>
 
     <fieldset>
-        <legend class="h3">{tr}PDF settings{/tr}</legend>
-        {preference name=print_pdf_from_url}
+        <legend class="h3">{tr}General Preferences{/tr}</legend>
+        <div class="adminoptionboxchild">
+            {preference name=feature_wiki_print}
+            {preference name=print_wiki_authors}
+            {preference name=feature_print_indexed}
+            {preference name=print_original_url_wiki}
+            {preference name=feature_cms_print}
+            {preference name=print_pdf_mpdf_pagetitle}
+        </div>
         <div class="adminoptionboxchild print_pdf_from_url_childcontainer webkit">
             {preference name=print_pdf_webkit_path}
         </div>
@@ -16,6 +23,26 @@
         <div class="adminoptionboxchild print_pdf_from_url_childcontainer webservice">
             {preference name=print_pdf_webservice_url}
         </div>
+    </fieldset>
+
+    <fieldset>
+        <legend class="h3">{tr}Print Preferences{/tr}</legend>
+        <div class="adminoptionboxchild">
+            {preference name=print_pdf_modules}
+        </div>
+        <div class="adminoptionboxchild" id="feature_wiki_print_childcontainer">
+            {preference name=feature_wiki_multiprint}
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend class="h3">{tr}PDF Preferences{/tr}</legend>
+        <div class="adminoptionboxchild">
+            {preference name=print_pdf_from_url}
+            {preference name=allocate_memory_print_pdf}
+            {preference name=allocate_time_print_pdf}
+            {preference name=feature_slideshow_pdfexport}
+        </div>
         <div class="adminoptionboxchild print_pdf_from_url_childcontainer mpdf">
             {preference name=print_pdf_mpdf_orientation}
             {preference name=print_pdf_mpdf_size}
@@ -24,7 +51,6 @@
             {preference name=print_pdf_mpdf_toclinks}
             {preference name=print_pdf_mpdf_tocheading}
             {preference name=print_pdf_mpdf_toclevels}
-            {preference name=print_pdf_mpdf_pagetitle}
             {preference name=print_pdf_mpdf_header}
             {preference name=print_pdf_mpdf_footer}
             {preference name=print_pdf_mpdf_margin_left}
@@ -47,34 +73,14 @@
             {preference name=print_pdf_mpdf_coverpage_image_settings}
             {preference name=print_pdf_mpdf_allow_unsafe_ssl_requests}
         </div>
-        {preference name=allocate_memory_print_pdf}
-        {preference name=allocate_time_print_pdf}
-        {preference name=feature_slideshow_pdfexport}
-
-        {preference name=print_pdf_modules}
     </fieldset>
 
     <fieldset>
-        <legend class="h3">{tr}Wiki print version{/tr}</legend>
-        {preference name=print_wiki_authors}
-        {preference name=feature_wiki_print}
-        <div class="adminoptionboxchild" id="feature_wiki_print_childcontainer">
-            {preference name=feature_wiki_multiprint}
+        <legend class="h3">{tr}Other Preferences{/tr}</legend>
+        <div class="adminoptionboxchild">
+            {preference name=print_original_url_tracker}
+            {preference name=print_original_url_forum}
         </div>
-        {preference name=feature_print_indexed}
-        {preference name=print_original_url_wiki}
-    </fieldset>
-
-    <fieldset>
-        <legend class="h3">{tr}Articles{/tr}</legend>
-        {preference name=feature_cms_print}
-    </fieldset>
-
-    <fieldset>
-        <legend class="h3">{tr}Other features{/tr}</legend>
-        {preference name=print_original_url_tracker}
-        {preference name=print_original_url_forum}
-
     </fieldset>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

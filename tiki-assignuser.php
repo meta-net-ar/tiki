@@ -22,7 +22,7 @@ $inputConfiguration = [
             'save'                        => 'bool',      //post
             'sort_mode'                   => 'word',      //post
             'offset'                      => 'int',       //get
-            'find'                        => 'word',      //post
+            'find'                        => 'string',    //post
             'maxRecords'                  => 'int',       //post
         ],
     ]

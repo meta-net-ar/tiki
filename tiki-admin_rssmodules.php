@@ -12,7 +12,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
             'rssId'            => 'int',      //post
-            'name'             => 'word',        //post
+            'name'             => 'string',      //post
             'url'              => 'url',         //post
             'description'      => 'xss',         //post
             'refreshMinutes'   => 'digits',      //post

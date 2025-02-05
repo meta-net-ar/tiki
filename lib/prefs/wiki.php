@@ -148,6 +148,12 @@ function prefs_wiki_list($partial = false)
             ],
             'default' => 'bottom',
         ],
+        'wiki_collapse_expand_all_headings' => [
+            'name' => tra('Collapse/expand all collapsible heading buttons'),
+            'description' => tra('Enable the button allowing to collapse or expand all collapsible headings.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'wiki_page_navigation_bar' => [
             'name' => tra('Wiki navigation bar location'),
             'description' => tra('When using the ...page... page break wiki syntax'),

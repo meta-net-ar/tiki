@@ -37,7 +37,7 @@ try {
     if ($prefs['twoFactorAuth'] === 'y' && $create2FaCodeNormalLogin === 'y' && ! empty($_REQUEST['tiki_username'])) {
         $tikiUserName = urldecode($_REQUEST['tiki_username']);
         $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
-        $isTokenGenerated = $twoFactorAuth->generateCode($tikiUserName, false);
+        $isTokenGenerated = $twoFactorAuth->generateCode($tikiUserName);
         if ($prefs['twoFactorAuthType'] === TwoFactorAuth::EMAIL_2FA && ! empty($isTokenGenerated)) {
             $message = tr("2FA token generated successfully and sent to your email");
             Feedback::success($message);

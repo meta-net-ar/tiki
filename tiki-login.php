@@ -105,11 +105,10 @@ if (! isset($_SESSION['loginfrom']) && isset($_SERVER['HTTP_REFERER']) && ! preg
 }
 if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
     $loginlib = TikiLib::lib('login');
-
     if ($loginlib->isSwitched() && $_REQUEST['su'] == 'revert') {
         $loginlib->revertSwitch();
         $access->redirect($_SESSION['loginfrom']);
-    } elseif ($tiki_p_admin == 'y') {
+    } else {
         if (empty($_REQUEST['username'])) {
             $smarty->assign('msg', tra('Username field cannot be empty. Please go back and try again.'));
             $smarty->display('error.tpl');

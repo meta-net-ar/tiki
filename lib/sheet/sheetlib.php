@@ -17,31 +17,31 @@ class SheetLib extends TikiLib
 {
     private $setup_jQuery_sheet_files;
 
-    public function get_sheet_info($sheetId) // {{{2
+    public function get_sheet_info($sheetId)
     {
         $result = $this->query("SELECT * FROM `tiki_sheets` WHERE `sheetId` = ?", [$sheetId]);
         $result = $result->fetchRow();
-
-        if (! empty($result)) {
-            $result['tiki_p_edit_sheet'] = $this->user_can_edit($sheetId);
-            $ids = $this->get_related_sheet_ids($sheetId, true);
-            $lastId = end($ids);
-            $result['parentSheetId'] = $lastId;
-            $result['childSheetIds'] = $this->get_related_sheet_ids($sheetId);
-            $result['childTrackerIds'] = $this->get_related_tracker_ids($sheetId);
-            $result['childFileIds'] = $this->get_related_file_ids($sheetId);
-            $result['created'] = $this->get_sheet_created($result['sheetId']);
-            $result['lastModif'] = $this->get_lastModif($result['sheetId']);
-            if (! $result['lastModif']) {
-                if ($this->get_sheet_lastModif($result['sheetId'])) {
-                    $result['lastModif'] = $this->get_sheet_lastModif($result['sheetId']);
-                } else {
-                    $result['lastModif'] = $result['created'];
-                }
-            }
-
-            return $result;
+        if (empty($result)) {
+            throw new Exception(tra('Spreadsheet not found'));
         }
+
+        $result['tiki_p_edit_sheet'] = $this->user_can_edit($sheetId);
+        $ids = $this->get_related_sheet_ids($sheetId, true);
+        $lastId = end($ids);
+        $result['parentSheetId'] = $lastId;
+        $result['childSheetIds'] = $this->get_related_sheet_ids($sheetId);
+        $result['childTrackerIds'] = $this->get_related_tracker_ids($sheetId);
+        $result['childFileIds'] = $this->get_related_file_ids($sheetId);
+        $result['created'] = $this->get_sheet_created($result['sheetId']);
+        $result['lastModif'] = $this->get_lastModif($result['sheetId']);
+        if (! $result['lastModif']) {
+            if ($this->get_sheet_lastModif($result['sheetId'])) {
+                $result['lastModif'] = $this->get_sheet_lastModif($result['sheetId']);
+            } else {
+                $result['lastModif'] = $result['created'];
+            }
+        }
+        return $result;
     }
 
     public function get_sheet_layout($sheetId) // {{{2

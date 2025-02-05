@@ -332,7 +332,7 @@
                             <label for="article_language" class="col-form-label col-sm-3">{tr}Language{/tr}</label>
                             <div class="col-sm-9">
                                 <select id="article_language" name="a_lang" class="form-control">
-                                    <option value="">{tr}Not set{/tr}</option>
+                                    <option value="0" selected>{tr}Not set{/tr}</option>
                                     {section name=ix loop=$languages}
                                         <option value="{$languages[ix].value|escape}"{if $articleConfig.a_lang|escape eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
                                     {/section}
@@ -363,7 +363,7 @@
                                     </td>
                                     <td>
                                         <select name="custom_atype[{$sourcecat|escape}]">
-                                            <option value="">{tr}Default{/tr}</option>
+                                            <option value="" selected>{tr}Default{/tr}</option>
                                             {foreach from=$types item=t}
                                                 <option value="{$t.type|escape}"{if $t.type eq $article_custom_info[$sourcecat].atype} selected="selected"{/if}>{$t.type|escape}</option>
                                             {/foreach}
@@ -371,7 +371,7 @@
                                     </td>
                                     <td>
                                         <select name="custom_topic[{$sourcecat|escape}]">
-                                            <option value="">{tr}Default{/tr}</option>
+                                            <option value="" selected>{tr}Default{/tr}</option>
                                             <option value="0" {if $article_custom_info[$sourcecat].topic === "0"} selected="selected"{/if}>{tr}None{/tr}</option>
                                             {foreach from=$topics item=t}
                                                 <option value="{$t.topicId|escape}"{if $t.topicId eq $article_custom_info[$sourcecat].topic} selected="selected"{/if}>{$t.name|escape}</option>
@@ -380,7 +380,7 @@
                                     </td>
                                     <td>
                                         <select name="custom_rating[{$sourcecat|escape}]">
-                                            <option value="">{tr}Default{/tr}</option>
+                                            <option value="" selected>{tr}Default{/tr}</option>
                                             {foreach from=$ratingOptions item=v}
                                                 <option value="{$v|escape}"{if $v === $article_custom_info[$sourcecat].rating} selected="selected"{/if}>{$v|escape}</option>
                                             {/foreach}

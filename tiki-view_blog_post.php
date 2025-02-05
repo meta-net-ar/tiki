@@ -17,7 +17,7 @@ $inputConfiguration = [
             'watch_action'      => 'word',     //get
             'offset'            => 'int',      //get
             'sort_mode'         => 'word',     //get
-            'find'              => 'word',     //get
+            'find'              => 'string',   //get
             'page'              => 'int',      //get
             'savenotepad'       => 'none',     //get
         ]

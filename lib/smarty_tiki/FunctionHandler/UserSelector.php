@@ -169,7 +169,7 @@ class UserSelector extends Base
 
             asort($users, SORT_NATURAL | SORT_FLAG_CASE);
 
-            if ($params['inputtype'] === 't') {
+            if (! empty($params['inputtype']) && $params['inputtype'] === 't') {
                 return smarty_function_jstransfer_list([
                     'fieldName' => $params['name'] . '[]',
                     'data' => $users,

@@ -19,7 +19,7 @@ $inputConfiguration = [
         'find'                     => 'word',            //post
         ],
         'staticKeyFiltersForArrays' => [
-            'types'                    => 'word',        //post
+            'types'                    => 'string',      //post
             'types_section'            => 'word',        //post
             'checked'                  => 'int',         //post
         ],

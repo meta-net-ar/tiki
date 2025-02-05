@@ -62,7 +62,7 @@ class CaldavClient
         } else {
             $uri = Utilities::getCalendarObjectUri($calRecurrence);
         }
-        $vcal = $calRecurrence->constructVCalendar();
+        $vcal = $calRecurrence->constructVCalendar(null, $calRecurrence->getOrganizers(), $calRecurrence->getParticipants());
         $vcal->VEVENT->{'X-Tiki-UpdateManuallyChangedEvents'} = intval($updateManuallyChangedEvents);
         // TODO: Sabredav validation fails when multiple events reside in the same calendar, so we can only send one event per request
         // foreach ($calRecurrence->getOverrides(1) as $calitem) {

@@ -19,7 +19,7 @@ function wikiplugin_poll_info()
             'pollId' => [
                 'required' => true,
                 'name' => tra('Poll'),
-                'description' => tra('Numeric value representing the poll ID'),
+                'description' => tra('Select the poll to display'),
                 'since' => '1',
                 'default' => '',
                 'filter' => 'digits',

@@ -174,7 +174,7 @@
         <div>
             <div class="col-lg-9 input-group">
                 <select id="submit_mult_action" name="submit_mult">
-                    <option value="">{tr}Select action to perform with checked...{/tr}</option>
+                    <option value="" selected disabled>{tr}Select action to perform with checked...{/tr}</option>
                     {if $tiki_p_remove_submission eq 'y'}<option id="remove" value="remove_subs" >{tr}Remove{/tr}</option>{/if}
                     {if $tiki_p_approve_submission eq 'y'}<option id="approve" value="approve_subs" >{tr}Approve{/tr}</option>{/if}
                 </select>

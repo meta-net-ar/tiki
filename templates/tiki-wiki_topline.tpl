@@ -142,6 +142,11 @@
                             {tr}Page actions{/tr}
                         </h6>
                         <div class="dropdown-divider"></div>
+                        {if $prefs.wiki_collapse_expand_all_headings eq 'y'}
+                            <a class="dropdown-item" id="expandCollapseCollapsibleHeadings" href="#" data-action="expand">
+                                {icon name="heading"} <span>{tr}Expand all collapsible headings{/tr}</span>
+                            </a>
+                        {/if}
                         {if $pdf_export eq 'y' and $pdf_warning eq 'n' and $prefs["feature_wiki_print"] eq 'y'}
                             <a class="dropdown-item generate-pdf" href="tiki-print.php?{query _keepall='y' display="pdf" page=$page}">
                                 {icon name="pdf"} {tr} PDF{/tr}

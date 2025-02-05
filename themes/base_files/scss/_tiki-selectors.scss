@@ -40,12 +40,12 @@ $imagePathToImgDir: "../../../img/";
 .module h3.card-title { font-size: $tiki-module-h3-card-title-font-size; }
 
 //fullcalendar.js
-a.fc-event:hover {
+a.ec-event:hover {
     color: $tooltip-color;
 }
 
 // Full Calendar table header needs to have color mode compatible body bg color
-.fc-media-screen {
+.ec-media-screen {
     --fc-page-bg-color: var(--bs-body-bg);
 }
 

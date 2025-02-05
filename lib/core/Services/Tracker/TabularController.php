@@ -53,7 +53,11 @@ class Services_Tracker_TabularController
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $lib = TikiLib::lib('tabular');
-            $lib->remove($tabularId);
+            $result = $lib->remove($tabularId);
+
+            if ($result->numRows() > 0) {
+                Feedback::success(tr('Import-Export Tracker was deleted successfully.'));
+            }
         }
 
         return [

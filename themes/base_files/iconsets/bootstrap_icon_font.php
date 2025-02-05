@@ -298,6 +298,9 @@ function iconset_bootstrap_icon_font()
             'italic' => [
                 'id' => 'type-italic',
             ],
+            'kaltura' => [
+                'id' => 'brightness-high',
+            ],
             'link-external' => [
                 'id' => 'box-arrow-up-right',
             ],

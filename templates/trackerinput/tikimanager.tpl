@@ -35,8 +35,8 @@
                             </a>
                         {/if}
                         {if in_array('check', $field.available_actions)}
-                            <a class="dropdown-item" href="{bootstrap_modal controller=manager action=check instanceId=$instance->id}">
-                                {icon name=check _menu_text='y' _menu_icon='y' alt="{tr}Check{/tr}"}
+                            <a class="dropdown-item" href="{bootstrap_modal controller=manager action=verify instanceId=$instance->id}">
+                                {icon name=check _menu_text='y' _menu_icon='y' alt="{tr}Verify{/tr}"}
                             </a>
                         {/if}
                         {if in_array('checkout', $field.available_actions)}

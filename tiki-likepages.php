@@ -13,7 +13,7 @@ $section_class = "tiki_wiki_page manage";   // This will be body class instead o
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'page'                            => 'word',               //get
+        'page'                            => 'string',             //get
         ],
     ],
 ];

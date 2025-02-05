@@ -17,7 +17,7 @@ $inputConfiguration = [
              'subuser'                => 'username',       //post
              'group'                  => 'groupname',      //post
              'included'               => 'int',            //post
-             'action'                 => 'alpha',          //post
+             'action'                 => 'alnumdash',          //post
              'valid'                  => 'int',            //post
              'addgroup'               => 'bool',           //post
              'addincluded'            => 'bool',           //post
@@ -44,7 +44,7 @@ $inputConfiguration = [
              'export'                => 'bool',            //post
         ],
         'staticKeyFiltersForArrays' => [
-            'checked'                => 'bool',            //post
+            'checked'                => 'string',            //post
         ],
     ],
 ];
@@ -67,262 +67,266 @@ $nlId = 0;
 $offset = 0;
 
 if (! isset($_REQUEST["nlId"])) {
-    Feedback::error(tr('No newsletter indicated'));
-} else {
-    $nlId = (int) $_REQUEST["nlId"];
+    $smarty->assign('msg', tr('No newsletter indicated'));
+    $smarty->display('error.tpl');
+    die;
+}
+    $nlId = (int)$_REQUEST["nlId"];
     $info = $nllib->get_newsletter($nlId);
     $tikilib->get_perm_object($nlId, 'newsletter');
 
-    if (empty($info)) {
-        Feedback::error(tr('Newsletter does not exist'));
-    } else {
+if (empty($info)) {
+    $smarty->assign('msg', tr('Newsletter does not exist'));
+    $smarty->display('error.tpl');
+    die;
+}
+$access->check_permission('tiki_p_admin_newsletters');
+
         $smarty->assign('nl_info', $info);
-        if (isset($_REQUEST["remove"]) && $access->checkCsrf(true)) {
+if (isset($_REQUEST["remove"]) && $access->checkCsrf(true)) {
             $result = false;
-            if (isset($_REQUEST["email"])) {
+    if (isset($_REQUEST["email"])) {
                 $result = $nllib->remove_newsletter_subscription($_REQUEST["remove"], $_REQUEST["email"], "n");
-            } elseif (isset($_REQUEST["subuser"])) {
+    } elseif (isset($_REQUEST["subuser"])) {
                 $result = $nllib->remove_newsletter_subscription($_REQUEST["remove"], $_REQUEST["subuser"], "y");
-            } elseif (isset($_REQUEST["group"])) {
+    } elseif (isset($_REQUEST["group"])) {
                 $result = $nllib->remove_newsletter_group($_REQUEST["remove"], $_REQUEST["group"]);
-            } elseif (isset($_REQUEST["included"])) {
+    } elseif (isset($_REQUEST["included"])) {
                 $result = $nllib->remove_newsletter_included($_REQUEST["remove"], $_REQUEST["included"]);
-            } elseif (isset($_REQUEST['page'])) {
+    } elseif (isset($_REQUEST['page'])) {
                 $result = $nllib->remove_newsletter_page($_REQUEST['remove'], $_REQUEST['page']);
-            }
-            if ($result && $result->numRows()) {
-                Feedback::success(tr('Subscription removed', $i));
-            } else {
+    }
+    if ($result && $result->numRows()) {
+                Feedback::success(tr('Subscription removed'));
+    } else {
                 Feedback::error(tr('Subscription not removed'));
-            }
-        }
+    }
+}
 
-        $access->check_permission('tiki_p_admin_newsletters');
-
-        if (
+if (
             isset($_REQUEST['action'])
             && $_REQUEST['action'] === 'delsel_x'
             && isset($_REQUEST['checked'])
             && $access->checkCsrf(true)
-        ) {
+) {
             $i = 0;
-            foreach ($_REQUEST['checked'] as $check) {
+    foreach ($_REQUEST['checked'] as $check) {
                 $result = $nllib->remove_newsletter_subscription_code($check);
-                if ($result && $result->numRows()) {
+        if ($result && $result->numRows()) {
                     $i += $result->numRows();
-                }
-            }
-            if ($i) {
+        }
+    }
+    if ($i) {
                 $word = $i === 1 ? tr('subscription') : tr('subscriptions');
                 Feedback::success(tr("%0 $word removed", $i));
-            } else {
+    } else {
                 Feedback::error(tr('No subscriptions removed'));
-            }
-        }
+    }
+}
 
-        if (isset($_REQUEST["valid"]) && $access->checkCsrf(true)) {
-            if (isset($_REQUEST["email"])) {
+if (isset($_REQUEST["valid"]) && $access->checkCsrf(true)) {
+    if (isset($_REQUEST["email"])) {
                 $result = $nllib->valid_subscription($_REQUEST["valid"], $_REQUEST["email"], "n");
-                if ($result && $result->numRows()) {
+        if ($result && $result->numRows()) {
                     Feedback::success(tr('Subscription marked as valid'));
-                } else {
+        } else {
                     Feedback::error(tr('Subscription not marked as valid'));
-                }
-            } elseif (isset($_REQUEST["subuser"])) {
+        }
+    } elseif (isset($_REQUEST["subuser"])) {
                 $result = $nllib->valid_subscription($_REQUEST["valid"], $_REQUEST["subuser"], "y");
-                if ($result && $result->numRows()) {
+        if ($result && $result->numRows()) {
                     Feedback::success(tr('Subscription marked as valid'));
-                } else {
+        } else {
                     Feedback::error(tr('Subscription not marked as valid'));
-                }
-            } else {
+        }
+    } else {
                 Feedback::error(tr('Subscription not marked as valid'));
-            }
-        }
+    }
+}
 
-        if (isset($_REQUEST["confirmEmail"]) && $_REQUEST["confirmEmail"] == "on") {
+if (isset($_REQUEST["confirmEmail"]) && $_REQUEST["confirmEmail"] == "on") {
             $confirmEmail = "n";
-        } else {
+} else {
             $confirmEmail = $info["validateAddr"];
-        }
+}
 
-        if (isset($_REQUEST["addemail"]) && $_REQUEST["addemail"] == "y") {
+if (isset($_REQUEST["addemail"]) && $_REQUEST["addemail"] == "y") {
             $addEmail = "y";
-        } else {
+} else {
             $addEmail = "n";
-        }
+}
 
         $successCount = 0;
         $errorCount = 0;
-        if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
-            if (isset($_REQUEST["email"]) && $_REQUEST["email"] != "") {
-                if (strpos($_REQUEST["email"], ',')) {
+if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
+    if (isset($_REQUEST["email"]) && $_REQUEST["email"] != "") {
+        if (strpos($_REQUEST["email"], ',')) {
                     $emails = explode(',', $_REQUEST["email"]);
-                    foreach ($emails as $e) {
-                        if ($userlib->user_exists(trim($e))) {
+            foreach ($emails as $e) {
+                if ($userlib->user_exists(trim($e))) {
                             $result = $nllib->newsletter_subscribe($nlId, trim($e), "y", $confirmEmail, $addEmail);
-                        } else {
+                } else {
                             $result = $nllib->newsletter_subscribe($nlId, trim($e), "n", $confirmEmail, "");
-                        }
-                    }
-                } else {
+                }
+            }
+        } else {
                     $result = $nllib->newsletter_subscribe($nlId, trim($_REQUEST["email"]), "n", $confirmEmail, "");
-                }
-                if ($result) {
+        }
+        if ($result) {
                     $successCount++;
-                } else {
+        } else {
                     $errorCount++;
-                }
-            }
-            if (isset($_REQUEST['subuser']) && $_REQUEST['subuser'] != "") {
+        }
+    }
+    if (isset($_REQUEST['subuser']) && $_REQUEST['subuser'] != "") {
                 $sid = $nllib->newsletter_subscribe($nlId, $_REQUEST["subuser"], "y", $confirmEmail, $addEmail);
-                if ($sid) {
+        if ($sid) {
                     $successCount++;
-                } else {
+        } else {
                     $errorCount++;
-                }
-            }
-            if (isset($_REQUEST["addall"]) && $_REQUEST["addall"] == "on") {
+        }
+    }
+    if (isset($_REQUEST["addall"]) && $_REQUEST["addall"] == "on") {
                 $result = $nllib->add_all_users($nlId, $confirmEmail, $addEmail);
-                if ($result) {
+        if ($result) {
                     $successCount++;
-                } else {
+        } else {
                     $errorCount++;
-                }
-            }
-            if (isset($_REQUEST['group']) && $_REQUEST['group'] != "") {
+        }
+    }
+    if (isset($_REQUEST['group']) && $_REQUEST['group'] != "") {
                 $result = $nllib->add_group_users(
                     $nlId,
                     $_REQUEST['group'],
                     $confirmEmail,
                     $addEmail
                 );
-                if ($result) {
+        if ($result) {
                     $successCount++;
-                } else {
+        } else {
                     $errorCount++;
-                }
-            }
-            if ($errorCount) {
+        }
+    }
+    if ($errorCount) {
                 Feedback::error(tr('Errors encountered when attempting to add subscription'));
-            } elseif ($successCount) {
+    } elseif ($successCount) {
                 Feedback::success(tr('Subscription added'));
-            }
-        }
+    }
+}
 
-        if ($errorCount) {
+if ($errorCount) {
             Feedback::error(tr('Errors encountered when attempting to add subscription'));
-        } elseif ($successCount) {
+} elseif ($successCount) {
             Feedback::success(tr('Subscription added'));
-        }
+}
 
-        if (
+if (
             ((isset($_REQUEST["addbatch"]) && isset($_FILES['batch_subscription']))
                 || (isset($_REQUEST['importPage']) && ! empty($_REQUEST['wikiPageName']))
                 || (isset($_REQUEST['tracker']))) && $tiki_p_batch_subscribe_email == 'y' && $tiki_p_subscribe_email == 'y'
-        ) {
+) {
             $success = '';
             $error = '';
             $successCount = 0;
             $errorCount = 0;
-            if (isset($_REQUEST["addbatch"]) && $access->checkCsrf()) {
-                if (! $emails = file($_FILES['batch_subscription']['tmp_name'])) {
+    if (isset($_REQUEST["addbatch"]) && $access->checkCsrf()) {
+        if (! $emails = file($_FILES['batch_subscription']['tmp_name'])) {
                     $error = tr('Error opening uploaded file');
-                } else {
+        } else {
                     $success = tr('File uploaded');
-                }
-            } elseif (isset($_REQUEST["importPage"]) && $access->checkCsrf()) {
+        }
+    } elseif (isset($_REQUEST["importPage"]) && $access->checkCsrf()) {
                 $emails = $nllib->get_emails_from_page($_REQUEST['wikiPageName']);
-                if (! $emails) {
+        if (! $emails) {
                     $error = tr('Error importing from wiki page "%0"', htmlspecialchars($_REQUEST['wikiPageName']));
-                } else {
+        } else {
                     $success = tr('Wiki page "%0" imported', htmlspecialchars($_REQUEST['wikiPageName']));
-                }
-            } elseif (isset($_REQUEST['tracker']) && $access->checkCsrf()) {
+        }
+    } elseif (isset($_REQUEST['tracker']) && $access->checkCsrf()) {
                 $emails = $nllib->get_emails_from_tracker($_REQUEST['tracker']);
-                if (! $emails) {
+        if (! $emails) {
                     $error = tr('Error importing from tracker ID %0', (int) $_REQUEST['tracker']);
-                } else {
+        } else {
                     $success = tr('Tracker ID %0 imported', (int) ($_REQUEST['tracker']));
-                }
-            }
+        }
+    }
 
-            foreach ($emails as $email) {
+    foreach ($emails as $email) {
                 $email = trim($email);
-                if (empty($email)) {
+        if (empty($email)) {
                     continue;
-                }
-                if ($nllib->newsletter_subscribe($nlId, $email, 'n', $confirmEmail, 'y')) {
+        }
+        if ($nllib->newsletter_subscribe($nlId, $email, 'n', $confirmEmail, 'y')) {
                     $successCount++;
-                } else {
+        } else {
                     $errorCount++;
-                }
-            }
-            if (! empty($error)) {
+        }
+    }
+    if (! empty($error)) {
                 Feedback::error($error);
-            } else {
+    } else {
                 $msg = '';
-                if (! empty($success)) {
+        if (! empty($success)) {
                     $msg = $success;
-                }
-                if ($errorCount) {
-                    if ($successCount) {
+        }
+        if ($errorCount) {
+            if ($successCount) {
                         $msg .= '. ' . tr('Not all subscriptions created.');
-                    } else {
-                        $msg = tr('Subscriptions not created.');
-                    }
-                    Feedback::error($msg);
-                } elseif ($successCount) {
-                    Feedback::success($msg . '. ' . tr('Subscriptions created.'));
-                }
-            }
-        }
-
-        if (isset($_REQUEST["addgroup"]) && isset($_REQUEST['group']) && $_REQUEST['group'] != "" && $access->checkCsrf()) {
-            $result = $nllib->add_group($nlId, $_REQUEST['group'], isset($_REQUEST['include_groups']) ? 'y' : 'n');
-            if ($result && $result->numRows()) {
-                Feedback::success(tr('Group "%0" subscribed', htmlspecialchars($_REQUEST['group'])));
             } else {
-                Feedback::error(tr('Group "%0" not subscribed', htmlspecialchars($_REQUEST['group'])));
+                        $msg = tr('Subscriptions not created.');
             }
+                    Feedback::error($msg);
+        } elseif ($successCount) {
+                    Feedback::success($msg . '. ' . tr('Subscriptions created.'));
         }
+    }
+}
 
-        if (
+if (isset($_REQUEST["addgroup"]) && isset($_REQUEST['group']) && $_REQUEST['group'] != "" && $access->checkCsrf()) {
+            $result = $nllib->add_group($nlId, $_REQUEST['group'], isset($_REQUEST['include_groups']) ? 'y' : 'n');
+    if ($result && $result->numRows()) {
+                Feedback::success(tr('Group "%0" subscribed', htmlspecialchars($_REQUEST['group'])));
+    } else {
+                Feedback::error(tr('Group "%0" not subscribed', htmlspecialchars($_REQUEST['group'])));
+    }
+}
+
+if (
             isset($_REQUEST["addincluded"]) && isset($_REQUEST['included']) && $_REQUEST['included'] != ""
             && $access->checkCsrf()
-        ) {
+) {
             $result = $nllib->add_included($nlId, $_REQUEST['included']);
-            if ($result) {
+    if ($result) {
                 Feedback::success(tr('Subscribers added'));
-            } else {
+    } else {
                 Feedback::error(tr('Subscribers not added'));
-            }
-        }
+    }
+}
 
-        if (isset($_REQUEST["addPage"]) && ! empty($_REQUEST['wikiPageName']) && $access->checkCsrf()) {
+if (isset($_REQUEST["addPage"]) && ! empty($_REQUEST['wikiPageName']) && $access->checkCsrf()) {
             $result = $nllib->add_page($nlId, $_REQUEST['wikiPageName'], empty($_REQUEST['noConfirmEmail']) ? 'y' : 'n', empty($_REQUEST['noSubscribeEmail']) ? 'y' : 'n');
-            if ($result && $result->numRows()) {
+    if ($result && $result->numRows()) {
                 Feedback::success(tr('Emails from wiki page "%0" subscribed', htmlspecialchars($_REQUEST['wikiPageName'])));
-            } else {
+    } else {
                 Feedback::error(tr('Emails from wiki page "%0" not subscribed', htmlspecialchars($_REQUEST['wikiPageName'])));
-            }
-        }
+    }
+}
 
-        if (
-            isset($_REQUEST["addPage"]) || isset($_REQUEST["addPage"]) || isset($_REQUEST["addincluded"]) ||
+if (
+            isset($_REQUEST["addPage"]) || isset($_REQUEST["addincluded"]) ||
                 isset($_REQUEST["addgroup"]) || isset($_REQUEST["addbatch"]) || isset($_REQUEST["add"])
-        ) {
+) {
             $cookietab = 1;
-        }
+}
 
-        if (isset($_REQUEST['export'])) {
+if (isset($_REQUEST['export'])) {
             $users = $nllib->get_all_subscribers($nlId, 'y');
             $data = "email\n";
-            foreach ($users as $u) {
-                if (! empty($u['email'])) {
+    foreach ($users as $u) {
+        if (! empty($u['email'])) {
                     $data .= $u['email'] . "\n";
-                }
-            }
+        }
+    }
             header('Content-type: text/plain');
             header('Content-Disposition: attachment; filename=' . $info['name'] . '.csv');
             header('Expires: 0');
@@ -330,23 +334,19 @@ if (! isset($_REQUEST["nlId"])) {
             header('Pragma: public');
             echo $data;
             die;
-        }
+}
 
-        if (! isset($_REQUEST["sort_mode"])) {
+if (! isset($_REQUEST["sort_mode"])) {
             $sort_mode = 'subscribed_desc';
-        } else {
+} else {
             $sort_mode = $_REQUEST["sort_mode"];
-        }
+}
 
-        if (isset($_REQUEST["offset"])) {
+if (isset($_REQUEST["offset"])) {
             $offset = $_REQUEST["offset"];
-        }
+}
 
-        if (isset($_REQUEST["find"])) {
-            $find = $_REQUEST["find"];
-        } else {
-            $find = '';
-        }
+        $find = $_REQUEST["find"] ?? '';
 
         $smarty->assign('find', $find);
         $smarty->assign_by_ref('sort_mode', $sort_mode);
@@ -364,17 +364,17 @@ if (! isset($_REQUEST["nlId"])) {
         $smarty->assign_by_ref('cant_pages_g', $cant_pages_g);
         $smarty->assign('actual_page_g', 1 + ($offset_g / $maxRecords));
 
-        if ($groups_g["cant"] > ($offset_g + $maxRecords)) {
+if ($groups_g["cant"] > ($offset_g + $maxRecords)) {
             $smarty->assign('next_offset_g', $offset_g + $maxRecords);
-        } else {
+} else {
             $smarty->assign('next_offset_g', -1);
-        }
+}
 
-        if ($offset_g > 0) {
+if ($offset_g > 0) {
             $smarty->assign('prev_offset_g', $offset_g - $maxRecords);
-        } else {
+} else {
             $smarty->assign('prev_offset_g', -1);
-        }
+}
 
         $smarty->assign_by_ref('groups_g', $groups_g["data"]);
         $smarty->assign("nb_groups", $groups_g["cant"]);
@@ -388,23 +388,21 @@ if (! isset($_REQUEST["nlId"])) {
         $groups = $userlib->list_all_groups();
         $smarty->assign_by_ref('groups', $groups);
         $users = $userlib->list_all_users();
-        foreach ($channels['data'] as $aUser) {
-            foreach ($users as $iId => $sEmail) {
-                if ($aUser['email'] === $sEmail) {
+foreach ($channels['data'] as $aUser) {
+    foreach ($users as $iId => $sEmail) {
+        if ($aUser['email'] === $sEmail) {
                     unset($users[$iId]);
-                }
-            }
         }
+    }
+}
         $smarty->assign_by_ref('users', $users);
         $newsletters = $nllib->list_newsletters(0, -1, "created_desc", false, '', '', 'n');
         $smarty->assign_by_ref('newsletters', $newsletters['data']);
 
-        if (isset($tiki_p_admin_trackers) && $tiki_p_admin_trackers == 'y') {
+if (isset($tiki_p_admin_trackers) && $tiki_p_admin_trackers == 'y') {
             $trklib = TikiLib::lib('trk');
             $listTrackers = $trklib->list_trackers();
             $smarty->assign_by_ref('listTrackers', $listTrackers['data']);
-        }
-    }
 }
 
 $smarty->assign('nlId', $nlId);

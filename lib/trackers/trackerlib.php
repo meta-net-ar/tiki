@@ -2466,7 +2466,7 @@ class TrackerLib extends TikiLib
         $itemFields = $this->itemFields();
 
         $tracker_info = $this->get_tracker_options($trackerId);
-        if (($header = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: "")) === false) {
+        if (($header = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) === false) {
             return 'Illegal first line';
         }
         if ($encoding == 'UTF-8') {
@@ -2516,7 +2516,7 @@ class TrackerLib extends TikiLib
         $definition = Tracker_Definition::get($trackerId);
         $line = 0;
         $errors = [];
-        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: "")) !== false) {
+        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $line++;
             if ($encoding == 'ISO-8859-1') {
                 for ($i = 0; $i < $max; $i++) {
@@ -2555,9 +2555,9 @@ class TrackerLib extends TikiLib
 
         // back to first row excluding header
         fseek($csvHandle, 0);
-        fgetcsv($csvHandle, 100000, $csvDelimiter, escape: "");
+        fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 
-        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: "")) !== false) {
+        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $status = 'o';
             $itemId = 0;
             $created = $tikilib->now;
@@ -4145,61 +4145,31 @@ class TrackerLib extends TikiLib
     {
         global $prefs;
 
-        $query = "select tif.`value` from `tiki_tracker_item_fields` tif, `tiki_tracker_items` i, `tiki_tracker_fields` tf where i.`itemId`=? and i.`itemId`=tif.`itemId` and tf.`fieldId`=tif.`fieldId` and tf.`isMain`=? ORDER BY tf.`position`";
-        $queryResult = $this->getOne($query, [ (int) $itemId, "y"]);
-        $result = $queryResult;
-        if (! $trackerId) {
-            $trackerId = (int) $this->table('tiki_tracker_items')->fetchOne('trackerId', ['itemId' => $itemId]);
-        }
+        $query = "SELECT tif.`value`, tf.`type` 
+                FROM `tiki_tracker_item_fields` tif
+                JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
+                JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
+                WHERE i.`itemId` = ? AND tf.`isMain` = ?
+                ORDER BY tf.`position`";
+        $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
 
-        try {
-            $definition = Tracker_Definition::get($trackerId);
-        } catch (InvalidArgumentException $e) {
-            trigger_error(
-                tr(
-                    'Requested main tracker item field value of item %0 but tracker %1 not found.',
-                    $itemId,
-                    $trackerId
-                ),
-                E_USER_WARNING
-            );
-            return '';
-        }
-        $mainFieldId = $definition->getMainFieldId();
-        if ($mainFieldId) {
-            $field = $definition->getFieldInfoFromFieldId($mainFieldId);
-            $main_field_type = $field['type'];
-            // for TextArea, ItemLink, AutoIncrement, UserPref and Category fields use the proper output method
-            if (in_array($main_field_type, ['a', 'r', 'q', 'p', 'e'])) {
-                $item = $this->get_tracker_item($itemId);
-                $handler = $this->get_field_handler($field, $item);
-                // when called from \ObjectLib::get_title Category fields need to have getFieldData run before the category name can be rendered
-                if ($handler) {
-                    $field = array_merge($field, $handler->getFieldData());
-                    $handler = $this->get_field_handler($field, $item);
-                    if ($main_field_type == 'a') {
-                        $result = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
-                    } else {
-                        $result = $handler->renderOutput(['list_mode' => 'csv']);
-                    }
-                }
+        $titles = [];
+        $item = $this->get_tracker_item($itemId);
+        foreach ($queryResult as $row) {
+            $value = $row['value'];
+            $field = ['type' => $row['type'], 'value' => $value];
+            $handler = $this->get_field_handler($field, $item);
+
+            if ($handler) {
+                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+            }
+
+            if (! empty($value)) {
+                $titles[] = $value;
             }
         }
-
-        if (is_string($result) && strlen($result) && $result[0] === '{') {
-            $decoded = json_decode($result, true);
-            if ($decoded !== null) {     // might start with a "{" but may not be a json_encoded value
-                if (isset($decoded[$prefs['language']])) {
-                    return $decoded[$prefs['language']];
-                } elseif (is_array($decoded)) {
-                    return reset($decoded);
-                }
-            }
-        }
-
-        return (string) $result;
+        return implode(' ', $titles);
     }
-
     /**
      * @param int $itemId
      *
@@ -6871,7 +6841,7 @@ class TrackerLib extends TikiLib
         return array_filter(
             array_map(function ($user) {
                 return trim($user ?? '');
-            }, is_array($value) ? $value : str_getcsv($value ?? '', escape: "")),
+            }, is_array($value) ? $value : str_getcsv($value ?? '', escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)),
         );
     }
 

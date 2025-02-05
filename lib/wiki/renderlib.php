@@ -132,7 +132,9 @@ class WikiRenderer
         $this->smartyassign('page_info', $this->structureInfo);
         $navigation_info = $structlib->get_navigation_info($this->structureInfo['page_ref_id']);
         $this->smartyassign('next_info', $navigation_info['next']);
+        $this->smartyassign('nextsibling_info', $navigation_info['nextsibling']);
         $this->smartyassign('prev_info', $navigation_info['prev']);
+        $this->smartyassign('prevsibling_info', $navigation_info['prevsibling']);
         $this->smartyassign('parent_info', $navigation_info['parent']);
         $this->smartyassign('home_info', $navigation_info['home']);
         $structure_path = $structlib->get_structure_path($this->structureInfo['page_ref_id']);
@@ -140,6 +142,7 @@ class WikiRenderer
         // Need to have showstructs when in more than one struct - for usability reasons
         $structs = $structlib->get_page_structures($this->page);
         $structs_with_perm = [];
+        $children = $structlib->s_get_pages($this->page);
         foreach ($structs as $t_structs) {
             if ($tikilib->user_has_perm_on_object($this->user, $t_structs['pageName'] ?? null, 'wiki page', 'tiki_p_view')) {
                 $structs_with_perm[] = $t_structs;

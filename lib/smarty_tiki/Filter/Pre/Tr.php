@@ -16,8 +16,7 @@ class Tr implements \Smarty\Filter\FilterInterface
     public function filter($source, \Smarty\Template $template)
     {
         // The preg_replace() takes away the Smarty comments ({* *}) in case they have tr tags
-        $return = preg_replace_callback('/(?s)\{tr\}(.+?)\{\/tr\}/', [$this, 'translateLang'], preg_replace('/(?s)\{\*.*?\*\}/', '', $source));
-        return $return;
+        return preg_replace_callback('/(?s)\{tr\}(.+?)\{\/tr\}/', [$this, 'translateLang'], preg_replace('/(?s)\{\*.*?\*\}/', '', $source));
     }
 
     private function translateLang($matches)

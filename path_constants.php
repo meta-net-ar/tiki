@@ -168,7 +168,6 @@ const GENERATED_ICONSET_PATH = 'public/generated/iconsets';
 
 
 /* BEGIN - VENDOR ASSETS SECTION */
-const BLUEIMP_FILE_UPLOAD_ASSETS_PATH = 'public/generated/js/vendor_dist/blueimp-file-upload';
 const BOOTSTRAP_ICONS_FONT_PATH = 'public/generated/js/vendor_dist/bootstrap-icons/font';
 const BOOTSTRAP_TOUR_DIST_PATH = 'vendor_bundled/vendor/sorich87/bootstrap-tour/build';
 const CODEMIRROR_DIST_PATH = 'public/generated/js/vendor_dist/codemirror';

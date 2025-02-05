@@ -147,6 +147,9 @@ class Services_Edit_PluginController
             ];
         } else {        // render the form
             $info = $parserlib->plugin_info($type, $pluginArgs);
+            if (! $info) {
+                throw new Services_Exception_NotFound(tr('Plugin not found'));
+            }
             $info['advancedParams'] = [];
             $validationRules = [];
             $objectlib = TikiLib::lib('object');

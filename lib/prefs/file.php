@@ -26,16 +26,6 @@ function prefs_file_list()
             ],
             'default' => 'points_desc',
         ],
-        'file_galleries_use_jquery_upload' => [
-            'name' => tra('Use jQuery upload'),
-            'description' => tra('Use the improved Tiki 15+ upload page'),
-            'type' => 'flag',
-            'default' => 'y',
-            'dependencies' => [
-                'feature_file_galleries',
-                'feature_jquery_ui',
-            ],
-        ],
         'file_galleries_redirect_from_image_gallery' => [
             'name' => tra('Redirect migrated image gallery files to file galleries'),
             'description' => tra('If enabled, redirect all requests to images that were migrated from the image gallery to the corresponding file in the file gallery'),

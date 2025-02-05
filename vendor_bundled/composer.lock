@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "befd6deaf97b6fcac1a78085784b39b3",
+    "content-hash": "9066c29a79d2978bafd2c87449641a13",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -2319,13 +2319,13 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "0e8bec31a5930d0ea125f1fc22dcf90256d58b3c"
+                "reference": "dedcfb7dfb571a1db79db839e4a787cc9a082680"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-0e8bec31a5930d0ea125f1fc22dcf90256d58b3c-zip-2b154a.zip",
-                "reference": "0e8bec31a5930d0ea125f1fc22dcf90256d58b3c",
-                "shasum": "9f8912f4c19cf583e356738eeba4d1601e87cc48"
+                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-dedcfb7dfb571a1db79db839e4a787cc9a082680-zip-2f46c7.zip",
+                "reference": "dedcfb7dfb571a1db79db839e4a787cc9a082680",
+                "shasum": "d8507413f23b120b65ee1f0a1a892c1cceb52d76"
             },
             "require": {
                 "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
@@ -2393,7 +2393,7 @@
                 "webmail",
                 "webmail-client"
             ],
-            "time": "2024-12-21T16:14:14+00:00"
+            "time": "2025-01-30T16:01:42+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -5246,6 +5246,83 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
+        },
+        {
+            "name": "maestroerror/heif-converter",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MaestroError/heif-converter-image.git",
+                "reference": "714f3e6c2c18f85ffe3495057874cb01ca89ce63"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://composer.tiki.org/dist/maestroerror/heif-converter/maestroerror-heif-converter-714f3e6c2c18f85ffe3495057874cb01ca89ce63-zip-2b84ce.zip",
+                "reference": "714f3e6c2c18f85ffe3495057874cb01ca89ce63",
+                "shasum": "e505d4ff335fcb21a6f84ff836ae0b654f2f842b"
+            },
+            "bin": [
+                "bin/heif-converter-linux",
+                "bin/heif-converter-windows",
+                "bin/heif-converter-macos"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "maestroerror",
+                    "email": "revaz.gh@gmail.com"
+                }
+            ],
+            "description": "versatile command-line application, along with a Docker image, that offers an easy and efficient way to convert HEIC (and AVIF) images to other common formats like JPEG and PNG",
+            "time": "2023-06-23T18:10:40+00:00"
+        },
+        {
+            "name": "maestroerror/php-heic-to-jpg",
+            "version": "v1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MaestroError/php-heic-to-jpg.git",
+                "reference": "cebe7319dcecbcb8bb03102151a82c9e235080e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://composer.tiki.org/dist/maestroerror/php-heic-to-jpg/maestroerror-php-heic-to-jpg-cebe7319dcecbcb8bb03102151a82c9e235080e4-zip-0f90a0.zip",
+                "reference": "cebe7319dcecbcb8bb03102151a82c9e235080e4",
+                "shasum": "6596d4b4d5d4984aa0093045bfd93eeb951edca2"
+            },
+            "require": {
+                "maestroerror/heif-converter": "0.2",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "pestphp/pest": "2.x-dev"
+            },
+            "bin": [
+                "bin/heicToJpg",
+                "bin/heicToJpgWin"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Maestroerror\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "maestroerror",
+                    "email": "revaz.gh@gmail.com"
+                }
+            ],
+            "description": "Converts HEIC/HEIF image to JPG type, without any dependencies",
+            "time": "2024-03-22T23:33:26+00:00"
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
@@ -17108,9 +17185,9 @@
         "garethp/php-ews": 20,
         "jason-munro/cypht": 20,
         "montefuscolo/xmpp": 20,
-        "rubix/extras": 10,
         "phpcompatibility/php-compatibility": 20,
-        "phpcsstandards/phpcsutils": 15
+        "phpcsstandards/phpcsutils": 15,
+        "rubix/extras": 10
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -17127,7 +17204,7 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",

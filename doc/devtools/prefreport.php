@@ -64,10 +64,10 @@ $index = [
 update_search_flag($data, $index, $stopWords);
 
 // Output results
-fputcsv(STDOUT, array_keys($fields), escape: "");
+fputcsv(STDOUT, array_keys($fields), escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 
 foreach ($data as $values) {
-    fputcsv(STDOUT, array_values($values), escape: "");
+    fputcsv(STDOUT, array_values($values), escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 }
 
 /**

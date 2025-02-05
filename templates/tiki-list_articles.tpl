@@ -240,7 +240,7 @@
         <div>
             <div class="col-lg-9 input-group">
                 <select name="submit_mult" class="form-select">
-                    <option value="">{tr}Select action to perform with checked...{/tr}</option>
+                    <option value="" selected disabled>{tr}Select action to perform with checked...{/tr}</option>
                     <option value="remove_articles">{tr}Remove{/tr}</option>
                 </select>
                 <input id="submit_mult" type="submit" class="btn btn-warning" value="{tr}OK{/tr}">

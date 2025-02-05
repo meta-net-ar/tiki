@@ -87,7 +87,7 @@ function module_login_box_info()
  */
 function module_login_box($mod_reference, &$module_params)
 {
-    global $prefs, $base_url_https, $base_url;
+    global $prefs, $base_url_https, $base_url, $user_cookie_site;
     $smarty = TikiLib::lib('smarty');
     $tikilib = \TikiLib::lib('tiki');
     static $module_logo_instance = 0;
@@ -105,11 +105,26 @@ function module_login_box($mod_reference, &$module_params)
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
     $smarty->assign('registration', 'n');   // stops the openid form appearing in the module, only on tiki-login_scr.php
+    $can_switch_user = 'y';
+    $perms = Perms::get();
+    if (! $perms->admin) {
+        $previous_username = $_SESSION[$user_cookie_site . '_previous'] ?? null;
+        if ($previous_username) {
+            $permsContext = new Perms_Context($previous_username);
+            $permsPrevious = Perms::get();
+            if (! $permsPrevious->admin) {
+                $can_switch_user = 'n';
+            }
+        } else {
+            $can_switch_user = 'n';
+        }
+    }
     $smarty->assign(
         'login_module',
         [
             'login_url' => $urlPrefix . $prefs['login_url'],
             'can_revert' => TikiLib::lib('login')->isSwitched(),
+            'can_switch_user' => $can_switch_user,
         ]
     );
 

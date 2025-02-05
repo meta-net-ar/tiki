@@ -73,9 +73,10 @@
     left: 0px;
     z-index: 1;
 }
-// Icon to toggle table formatting
+// Icon to toggle table formatting for small devices
 .toggle-table-wrap .btn {
     font-family: 'Font Awesome 6 Free';
+    font-weight: 600;
     font-size: 1.25rem;
 }
 

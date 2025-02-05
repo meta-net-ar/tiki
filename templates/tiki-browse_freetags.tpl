@@ -15,55 +15,93 @@
             </div>
         </div>
         <div class="col-sm-2">
-            {button _class="btn-link tips" _onclick="clearTags(); return false;" _text="{tr}Clear{/tr}" _title=":{tr}Clear tags{/tr}"}
+            {button _class="btn-link tips" _onclick="clearTags(); return false;" _text="{tr}Clear tags{/tr}"}
         </div>
     </div>
     <div class="form-check">
-        <input class="form-check-input radio" {if $prefs.freetags_browse_show_cloud eq 'y'}onclick="load();"{/if} type="radio" name="broaden" id="stopb1" value="n"{if $broaden eq 'n'} checked="checked"{/if}>
+        <input class="form-check-input radio" type="radio" name="broaden" id="stopb1" value="n"{if $broaden eq 'n'} checked="checked"{/if}>
         <label class="form-check-label" for="stopb1">{tr}With all selected tags{/tr}</label>
     </div>
     <div class="form-check">
-        <input class="form-check-input radio" {if $prefs.freetags_browse_show_cloud eq 'y'}onclick="load();"{/if} type="radio" name="broaden" id="stopb2" value="y"{if $broaden eq 'y'} checked="checked"{/if}>
+        <input class="form-check-input radio" type="radio" name="broaden" id="stopb2" value="y"{if $broaden eq 'y'} checked="checked"{/if}>
         <label class="form-check-label" for="stopb2">{tr}With one selected tag{/tr}</label>
     </div>
 
     {if $prefs.freetags_browse_show_cloud eq 'y'}
-        {if $broaden eq 'y'}
-            {jq notonready=true}
-                function addTag(tag) {
-                    if (tag.search(/ /) >= 0) tag = '"' + tag + '"';
+        {jq notonready=true}
+            function addTag(tag) {
+                var currentTags = document.getElementById('tagBox').value;
+                if (tag.search(/ /) >= 0) tag = '"' + tag + '"';
+                
+                if ($('#stopb2').is(':checked')) {
                     if (document.getElementById('tagBox').value != tag) {
                         document.getElementById('tagBox').value = tag;
                         load();
                     }
-
+                } else {
+                    var tags = currentTags.split(' ').filter(function(t) { return t.length > 0; });
+                    if (!tags.includes(tag)) {
+                        if (currentTags.length > 0) {
+                            document.getElementById('tagBox').value = currentTags + ' ' + tag;
+                        } else {
+                            document.getElementById('tagBox').value = tag;
+                        }
+                        load();
+                    }
                 }
-            {/jq}
-        {else}
-            {jq notonready=true}
-                function addTag(tag) {
-                    if (tag.search(/ /) >= 0) tag = '"' + tag + '"';
-                    document.getElementById('tagBox').value = document.getElementById('tagBox').value + ' ' + tag;
-                    load();
-                }
-            {/jq}
-        {/if}
+            }
 
-        {jq notonready=true}
             function clearTags() {
                 document.getElementById('tagBox').value = '';
+                load();
             }
+
+            function scrollToResults() {
+                if ($('.freetagresult').length) {
+                    $('html, body').animate({
+                        scrollTop: $('.freetagresult').offset().top - 100
+                    }, 500);
+                }
+            }
+
             function load() {
+                var currentTags = $('#tagBox').val();
                 document.my_form.submit();
+                $(window).on('load', function() {
+                    if ($('.freetagresult .table').length) {
+                        setTimeout(scrollToResults, 300);
+                        if ($('#stopb1').is(':checked')) {
+                            $('#tagBox').val(currentTags);
+                        }
+                    }
+                });
             }
+            $(document).ready(function() {
+                $('.form-check-input.radio').on('change', function() {
+                    if (document.getElementById('tagBox').value !== '') {
+                        load();
+                    }
+                });
+                $('form.freetagsearch').on('submit', function() {
+                    setTimeout(scrollToResults, 300);
+                });
+                if ($('.freetagresult .table').length && window.location.search.indexOf('tag=') > -1) {
+                    scrollToResults();
+                }
+            });
         {/jq}
 
         <div class="card mb-4">
             <div class="card-body freetaglist mb-4">
                 {foreach from=$most_popular_tags item=popular_tag}
                     {capture name=tagurl}{if (strstr($popular_tag.tag, ' '))}"{$popular_tag.tag}"{else}{$popular_tag.tag}{/if}{/capture}
-
-                    <a class="freetag_{$popular_tag.size}{if $tag eq $popular_tag.tag|escape} selectedtag{/if}" href="tiki-browse_freetags.php?tag={$smarty.capture.tagurl|escape:'url'}{if $broaden eq 'y'}&amp;broaden=y{/if}" onclick="javascript:addTag('{$popular_tag.tag|escape:'javascript'}');return false;" ondblclick="location.href=this.href;"{if !empty($popular_tag.color)} style="color:{$popular_tag.color}"{/if}>{$popular_tag.tag|escape}</a>
+                    <a class="freetag_{$popular_tag.size}{if $tag eq $popular_tag.tag|escape} selectedtag{/if}" 
+                        href="tiki-browse_freetags.php?tag={$smarty.capture.tagurl|escape:'url'}{if $broaden eq 'y'}&amp;broaden=y{/if}" 
+                        onclick="javascript:addTag('{$popular_tag.tag|escape:'javascript'}');return false;" 
+                        ondblclick="location.href=this.href;"
+                        {if !empty($popular_tag.color)} style="color:{$popular_tag.color}"{/if}>
+                        {$popular_tag.tag|escape}
+                    </a>
                 {/foreach}
             </div>
             <div class="freetagsort card-footer">
@@ -74,7 +112,10 @@
                     <a class='more' href="{$smarty.server.SCRIPT_NAME}?{query maxPopular=$maxPopular tagString=$tagString}">{tr}More Popular Tags{/tr}</a>
                 </div>
                 <div class="text-center">
-                    <a href="{$smarty.server.SCRIPT_NAME}?{query tsort_mode=tag_asc}">{tr}Alphabetically{/tr}</a> | <a href="{$smarty.server.SCRIPT_NAME}?{query tsort_mode=count_desc tagString=$tagString}">{tr}By Size{/tr}</a> | <a href="{$smarty.server.SCRIPT_NAME}?{query mode=c tagString=$tagString}">{tr}Cloud{/tr}</a> | <a href="{$smarty.server.SCRIPT_NAME}?{query mode=l tagString=$tagString}">{tr}List{/tr}</a>
+                    <a href="{$smarty.server.SCRIPT_NAME}?{query tsort_mode=tag_asc}">{tr}Alphabetically{/tr}</a> | 
+                    <a href="{$smarty.server.SCRIPT_NAME}?{query tsort_mode=count_desc tagString=$tagString}">{tr}By Size{/tr}</a> | 
+                    <a href="{$smarty.server.SCRIPT_NAME}?{query mode=c tagString=$tagString}">{tr}Cloud{/tr}</a> | 
+                    <a href="{$smarty.server.SCRIPT_NAME}?{query mode=l tagString=$tagString}">{tr}List{/tr}</a>
                 </div>
             </div>
         </div>
@@ -161,10 +202,12 @@
             {/if}
         </div>
     {/capture}
+
     {if $cpt > 1}
         <div class="freetagsbrowse">{$smarty.capture.browse}</div>
     {/if}
 </form>
+
 <div class="freetagresult">
     {if $tagString}
         <h4>{tr}Results{/tr} <span class="badge bg-secondary">{$cantobjects}</span></h4>
@@ -173,7 +216,7 @@
         <table class="table table-hover">
             <tbody>
                 {section name=ix loop=$objects}
-                    <tr class="{cycle} freetagitemlist" >
+                    <tr class="{cycle} freetagitemlist">
                         <td>
                             <span class="label label-info">
                                 {tr}{$objects[ix].type|replace:"wiki page":"Wiki"|replace:"article":"Article"|regex_replace:"/tracker [0-9]*/":"tracker item"}{/tr}
@@ -190,7 +233,9 @@
                         </td>
                         {if $tiki_p_unassign_freetags eq 'y' or $tiki_p_admin eq 'y'}
                             <td>
-                                <a href="tiki-browse_freetags.php?del=1&amp;tag={$tag}{if $type}&amp;type={$type|escape:'url'}{/if}&amp;typeit={$objects[ix].type|escape:'url'}&amp;itemit={$objects[ix].name|escape:'url'}" title=":{tr}Delete Tag{/tr}" class="tips text-danger">
+                                <a href="tiki-browse_freetags.php?del=1&amp;tag={$tag}{if $type}&amp;type={$type|escape:'url'}{/if}&amp;typeit={$objects[ix].type|escape:'url'}&amp;itemit={$objects[ix].name|escape:'url'}" 
+                                    title=":{tr}Delete Tag{/tr}" 
+                                    class="tips text-danger">
                                     {icon name="delete"}
                                 </a>
                             </td>

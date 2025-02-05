@@ -408,6 +408,7 @@ class TWVersion
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
+                '28.0',
             ];
     }
 

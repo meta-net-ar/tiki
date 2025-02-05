@@ -185,6 +185,7 @@
                     {preference name=elementplus_select_filterable}
                     {preference name=elementplus_select_allow_create}
                     {preference name=elementplus_select_sortable}
+                    {preference name=elementplus_upload}
                 </div>
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">

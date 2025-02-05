@@ -70,7 +70,7 @@
         });
         $selector.val(selected).trigger("change.select2");
         const fieldName = "{{$field.html_name}}";
-        const elementPlusTransfer = document.querySelector("element-plus-ui[field-name=\'" + fieldName + "\']");
+        const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + fieldName + "\']");
         if (elementPlusTransfer?.shadowRoot) {
             const selectedOptions = elementPlusTransfer.shadowRoot.querySelector("select[name=\'" + fieldName + "\']").selectedOptions;
             const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);

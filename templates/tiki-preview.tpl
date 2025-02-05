@@ -11,8 +11,11 @@
             <div>
                 <select name="diff_style" id="preview_diff_style" class="form-select">
                     <option value="" {if empty($diff_style)}selected="selected"{/if}>{tr}Preview{/tr}</option>
-                    <option value="htmldiff" {if isset($diff_style) && $diff_style == "htmldiff"}selected="selected"{/if}>{tr}HTML diff{/tr}</option>
-                    <option value="sidediff" {if isset($diff_style) && $diff_style == "sidediff"}selected="selected"{/if}>{tr}Side-by-side diff{/tr}</option>
+                     {foreach  $diff_styles.options as $value => $label}
+                     {if $value eq 'htmldiff' or $value eq 'sidediff' }
+                     <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>{tr}{$label}{/tr}</option>
+                     {/if}
+                     {/foreach}
                 </select>
             </div>
             {jq}

@@ -16,11 +16,13 @@
                     {/foreach}
                 </select>
             </div>
-            {if preg_match('/desc$/',$sort_mode)}
-                {icon name='sort-down' class='sort_invert' title="{tr}Sort direction{/tr}" href='#'}
-            {else}
-                {icon name='sort-up' class='sort_invert' title="{tr}Sort direction{/tr}" href='#'}
-            {/if}
+            <div class="col-sm-1 my-auto">
+                {if preg_match('/desc$/',$sort_mode)}
+                    {icon name='sort-down' class='sort_invert' title="{tr}Sort direction{/tr}" href='#'}
+                {else}
+                    {icon name='sort-up' class='sort_invert' title="{tr}Sort direction{/tr}" href='#'}
+                {/if}
+            </div>
         </div>
     {else}
         <input type="hidden" name="sort_mode" value="{$sort_mode}">
@@ -30,7 +32,7 @@
                 <label class="col-sm-2 col-form-label" for="filter-type">{tr}Type{/tr}</label>
                 <div class="col-sm-4">
                     <select name="filter~type" id="filter-type" class="form-control">
-                        <option value="">{tr}Any{/tr}</option>
+                        <option value="0" selected>{tr}Any{/tr}</option>
                         {foreach from=$filter_types key=k item=t}
                             <option value="{$k|escape}"{if $k eq $filter_type} selected="selected"{/if}>{$t|escape}</option>
                         {/foreach}
@@ -94,7 +96,7 @@
                     <label class="col-sm-2 col-form-label" for="filter-language">{tr}Language{/tr}</label>
                     <div class="col-sm-4">
                         <select name="filter~language" class="form-control" id="filter-language">
-                            <option value="">{tr}Any{/tr}</option>
+                            <option value="0" selected>{tr}Any{/tr}</option>
                             {foreach from=$filter_languages item=l}
                                 <option value="{$l.value|escape}"{if $filter_language eq $l.value} selected="selected"{/if}>{$l.name|escape}</option>
                             {/foreach}

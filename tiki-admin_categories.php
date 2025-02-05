@@ -292,7 +292,7 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
     if (! $fhandle) {
         Feedback::error(tr("The file has incorrect syntax or is not a CSV file"));
     } else {
-        $fields = fgetcsv($fhandle, 1000, escape: "");
+        $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         if (! $fields[0]) {
             Feedback::error(tr("The file has incorrect syntax or is not a CSV file"));
         } else {
@@ -302,7 +302,7 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
             } else {
                 while (! feof($fhandle)) {
                     $success = false;
-                    $data = fgetcsv($fhandle, 1000, escape: "");
+                    $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
                     if (! empty($data)) {
                         $temp_max = count($fields);
                         $getCategory = true;

@@ -379,7 +379,7 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
 if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $access->checkCsrf()) {
     $fname = $_FILES['csvlist']['tmp_name'];
     $fhandle = fopen($fname, 'r');
-    $fields = fgetcsv($fhandle, 1000, escape: "");
+    $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
     if (! $fields[0]) {
         Feedback::error(tr('The file has incorrect syntax or is not a CSV file'));
         $cookietab = 5; // import/export members tab
@@ -389,7 +389,7 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && ! empty($_FILES
     } else {
         $successes = [];
         $errors = [];
-        $data = @fgetcsv($fhandle, 1000, escape: "");
+        $data = @fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         while ($data != false) {
             if (function_exists("mb_detect_encoding") && mb_detect_encoding($data[0], "ASCII, UTF-8, ISO-8859-1") == "ISO-8859-1") {
                 $data[0] = mb_convert_encoding($data[0], 'UTF-8', 'ISO-8859-1');
@@ -403,7 +403,7 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && ! empty($_FILES
                     $successes[] = $data[0];
                 }
             }
-            $data = fgetcsv($fhandle, 1000, escape: "");
+            $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         // feedback
         if (! empty($successes)) {

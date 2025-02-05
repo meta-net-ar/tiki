@@ -7,6 +7,7 @@ import { glob } from "glob";
 import path from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import postcssRootToHost from "./postcssRootToHost";
 /*
 
@@ -116,10 +117,13 @@ export default defineConfig(({ command, mode }) => {
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
         "color-picker": resolve("node_modules/@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"),
-        "datetime-picker": resolve(__dirname, "vue-widgets/datetime-picker/src/datetime-picker.ce.js"),
         "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
-        "element-plus-ui": resolve(__dirname, "vue-widgets/element-plus-ui/src/element-plus-ui.ce.js"),
+        "element-plus-ui/autocomplete": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/autocomplete.js"),
+        "element-plus-ui/datepicker": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
+        "element-plus-ui/fileGalUploader": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
+        "element-plus-ui/select": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),
+        "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         comments: resolve(__dirname, "vue-mf/comments/src/comments.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
@@ -134,9 +138,9 @@ export default defineConfig(({ command, mode }) => {
         base: "/public/generated/js", //This must NOT have a trailing slash
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
         resolve: {
-            /*alias: {
-            "@vue-mf/styleguide": resolve(__dirname, "vue-mf/styleguide/src/main.js"),
-        },*/
+            alias: {
+                "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
+            }
         },
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
@@ -149,6 +153,7 @@ export default defineConfig(({ command, mode }) => {
             target: "es2022", //https://caniuse.com/?search=es2022 Who cares about IE these days...
             optimizeDeps: {
                 disabled: false,
+                include: ['@event-calendar/core'],
                 //If you ever need to debug a dependency and see your changes do this (ref: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7):
                 //exclude: ["svelte"],
             },
@@ -157,6 +162,7 @@ export default defineConfig(({ command, mode }) => {
                 external: [
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
+                    /^@jquery-tiki\/.+/,
                     "@popperjs/core",
                     "bootstrap",
                     "clipboard",
@@ -272,6 +278,10 @@ export default defineConfig(({ command, mode }) => {
 
                     /* jquery_tiki */
                     {
+                        src: "node_modules/@event-calendar/*",
+                        dest: "vendor_dist/@event-calendar",
+                    },
+                    {
                         src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
                         dest: "vendor_dist/bootstrap/dist/css",
                     },
@@ -310,20 +320,12 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/element-plus/dist/locale/*.min.mjs",
                         dest: "vendor_dist/element-plus/dist/locale",
                     },
-                    /*
-                    NOTE: The following two css files are necessary for the autocomplete popper to be themed,
-                    because it's teleported by default to the body, hindering it from inhering the styles of the custom element.
-                    Altough, element-plus provides an option to plug it into the custom element context,
-                    it shows a blocking bug that I'm still unable to fix after several hours of digging into the source code.
-                    The bug is that the option becomes unclickable when the popper is placed inside the custom element.
-                    Hopefully, we can fix this in the future and remove these two css files. - @mercihabam - 2024-10-18
-                    */
                     {
-                        src: "node_modules/element-plus/theme-chalk/el-autocomplete.css",
-                        dest: "vendor_dist/element-plus/css",
-                    },
-                    {
-                        src: "node_modules/element-plus/theme-chalk/base.css",
+                        src: [
+                            "node_modules/element-plus/theme-chalk/base.css",
+                            "node_modules/element-plus/theme-chalk/el-message.css",
+                            "node_modules/element-plus/theme-chalk/el-message-box.css",
+                        ],
                         dest: "vendor_dist/element-plus/css",
                     },
                     /* common_externals */
@@ -340,22 +342,6 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/animejs/lib/anime.es.js",
                         dest: "vendor_dist/anime/dist",
                     },
-                    {
-                        src: "node_modules/blueimp-file-upload/js/*.js",
-                        dest: "vendor_dist/blueimp-file-upload/js",
-                    },
-                    {
-                        src: ["node_modules/blueimp-file-upload/css/jquery.fileupload.css","node_modules/blueimp-file-upload/css/jquery.fileupload-ui.css"],
-                        dest: "vendor_dist/blueimp-file-upload/css",
-                    },
-                    {
-                        src: "node_modules/blueimp-load-image/js/load-image.all.min.js",
-                        dest: "vendor_dist/blueimp-load-image/js",
-                    },
-                    {
-                        src: "node_modules/blueimp-canvas-to-blob/js/canvas-to-blob.js",
-                        dest: "vendor_dist/blueimp-canvas-to-blob/js"
-                      },
                     {
                         src: "node_modules/chart.js/dist/chart.js*",
                         dest: "vendor_dist/chart.js/dist",
@@ -599,29 +585,10 @@ export default defineConfig(({ command, mode }) => {
                 ],
             }),
             AutoImport({
-                // We don't use https://github.com/unplugin/unplugin-vue-components/resolvers because of https://github.com/vitest-dev/vitest/issues/1402 raised during the execution of the tests
-                resolvers: [
-                    (componentName) => {
-                        if (componentName.startsWith("El")) {
-                            return {
-                                name: componentName,
-                                from: `element-plus/dist/index.full.js`,
-                            };
-                        }
-                    },
-                ],
+                resolvers: [ElementPlusResolver()],
             }),
             Components({
-                resolvers: [
-                    (componentName) => {
-                        if (componentName.startsWith("El")) {
-                            return {
-                                name: componentName,
-                                from: `element-plus/dist/index.full.mjs`,
-                            };
-                        }
-                    },
-                ],
+                resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */
             //visualizer({ filename: "temp/dev/stats.html", open: true, gzipSize: false }),
@@ -633,13 +600,18 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         test: {
-            include: ["src/js/vue-widgets/**/tests/**/*.test.js"],
+            include: ["src/js/**/tests/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
             coverage: {
-                include: ["src/js/vue-widgets/**/*.{vue,js}"],
-                exclude: ["**/*.ce.js", "**/*.test.js"],
+                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/jquery-tiki/ui-utils/handleDatePicker.js"],
+                exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
                 provider: 'istanbul'
+            },
+            server: {
+                deps: {
+                    inline: [/element-plus/],
+                }
             },
         },
     };
