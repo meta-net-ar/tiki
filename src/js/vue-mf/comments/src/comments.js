@@ -2,7 +2,7 @@ import singleSpaVue from "single-spa-vue";
 import singleSpaCss from "single-spa-css";
 import { createApp, h } from "vue";
 import App from "./App.vue";
-import store from "./store"
+import store from "./store";
 import "../custom.scss";
 
 const vueLifecycles = singleSpaVue({
