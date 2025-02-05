@@ -14,118 +14,118 @@ export default createStore({
     state: {
         threads: [
             {
-                title: 'There should be no titles in replies, only for the thread',
+                title: "There should be no titles in replies, only for the thread",
                 commentId: 1,
                 parentId: 0,
                 author: "Jeff Fortin",
                 comment: comment1,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: 'This is a reply title',
+                title: "This is a reply title",
                 commentId: 2,
                 parentId: 1,
                 author: "Marc Laporte",
                 comment: comment2,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 3,
                 parentId: 2,
                 author: "BenoitG",
                 comment: comment3,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: 'This is a reply title',
+                title: "This is a reply title",
                 commentId: 4,
                 parentId: 3,
                 author: "JM Kadimba",
                 comment: comment4,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 5,
                 parentId: 4,
                 author: "BenoitG",
                 comment: comment5,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: 'This is a reply title',
+                title: "This is a reply title",
                 commentId: 6,
                 parentId: 4,
                 author: "BenoitG",
                 comment: comment6,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 7,
                 parentId: 5,
                 author: "BenoitG",
                 comment: comment7,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 8,
                 parentId: 1,
                 author: "unknown",
                 comment: comment8,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 9,
                 parentId: 1,
                 author: "unknown",
                 comment: comment9,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: 'There should be no titles in replies, only for the thread',
+                title: "There should be no titles in replies, only for the thread",
                 commentId: 10,
                 parentId: 0,
                 author: "Jeff Fortin",
                 comment: comment1,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 11,
                 parentId: 10,
                 author: "Marc Laporte",
                 comment: comment2,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 12,
                 parentId: 11,
                 author: "BenoitG",
                 comment: comment3,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 13,
                 parentId: 10,
                 author: "JM Kadimba",
                 comment: comment4,
-                date: "2024-07-3, 15:01"
+                date: "2024-07-3, 15:01",
             },
             {
-                title: '',
+                title: "",
                 commentId: 14,
                 parentId: 10,
                 author: "BenoitG",
                 comment: comment5,
-                date: "2024-07-3, 15:01"
-            }
-        ]
+                date: "2024-07-3, 15:01",
+            },
+        ],
     },
     getters: {
         getThreads(state) {
@@ -135,12 +135,12 @@ export default createStore({
             var arr = state.threads;
             var key = "parentId";
             var response = [];
-            arr.forEach(item => {
+            arr.forEach((item) => {
                 if (item[key] === 0) {
                     response.push(item);
                 }
             });
-            return response
-        }
+            return response;
+        },
     },
 });
