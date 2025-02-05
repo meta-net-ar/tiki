@@ -1,7 +1,9 @@
 import { createStore } from "vuex";
 
-var comment1 = "We could enforce the title field only for the first post in new top-level threads, but not for follow-up replies. Otherwise, when you enforce that, people just make up random/inconsequential titles, or split their message into two sentence halves that are started by the title and completed by the comment, which is counterproductive. Having more titles than strictly needed adds visual noise and uses precious vertical space, which means more scrolling across long threads.";
-var comment2 = "Not being forced to write a title everytime is refreshing. Why did we subject ourselves to that for so many years? Good thing you're around to make those hard decisions!";
+var comment1 =
+    "We could enforce the title field only for the first post in new top-level threads, but not for follow-up replies. Otherwise, when you enforce that, people just make up random/inconsequential titles, or split their message into two sentence halves that are started by the title and completed by the comment, which is counterproductive. Having more titles than strictly needed adds visual noise and uses precious vertical space, which means more scrolling across long threads.";
+var comment2 =
+    "Not being forced to write a title everytime is refreshing. Why did we subject ourselves to that for so many years? Good thing you're around to make those hard decisions!";
 var comment3 = "I must inform you that we will need nested threading for comments (though we can flatten linear branches)";
 var comment4 = "People don't like long threads.";
 var comment5 = "Yeah, until they need them. But they can be flattened.";
