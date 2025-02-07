@@ -8,9 +8,9 @@ var comment3 = "I must inform you that we will need nested threading for comment
 var comment4 = "People don't like long threads.";
 var comment5 = "Yeah, until they need them. But they can be flattened.";
 var comment6 = "But I feel the urge to talk about cute cats for some reason.";
-var comment7 = "Yeah, I forgot to taly about the possibility of someone branching in the middle of a (may or may not be a thread drift)";
+var comment7 = "Yeah, I forgot to tally about the possibility of someone branching in the middle of a (may or may not be a thread drift)";
 var comment8 = "@RyanGosling @accounting_dept: This is the IRS. We’ve been trying to reach you about your car’s extended warranty";
-var comment9 = "I need attention so I am subcouciously trying to get more by top posting.";
+var comment9 = "I need attention so I am subconsciously trying to get more by top posting.";
 
 export default createStore({
     state: {

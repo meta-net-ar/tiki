@@ -1,7 +1,6 @@
 // vue3-perfect-scrollbar
 .search, .thread-textarea{
     position: relative;
-    box-shadow: 0 0 40px rgba(51, 51, 51, .1);
 }
 .search input, .search input:focus{
     height: 40px;
@@ -36,4 +35,73 @@
     position: absolute;
     bottom: 14px;
     right: 16px;
+}
+
+/* comment.vue */
+.comment-author {
+    color:#066399 !important;
+}
+.comment-author img {
+    width: 25px;
+    margin-top: -5px;
+    margin-right: 12px;
+}
+.message-footer .btn {
+    box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.1);
+}
+.message-footer .icon {
+    color: #ffdb5e;
+    font-size: 20px;
+}
+.bottom-line {
+    border-top: 2px dashed black;
+}
+.comment-body p {
+    min-width: 400px;
+}
+.thread-title {
+    font-weight: bold;
+}
+.thread-border {
+    border-left: 0.01rem solid rgba(167, 167, 167, 0.3);
+    position: absolute;
+    height: -webkit-fill-available;
+    width: 10px;
+    z-index: 9999;
+}
+.thread-border:hover {
+    border-left: 0.01rem solid rgba(0, 0, 0, 1);
+}
+.thread-replies .thread-border:before {
+    content: "";
+    display: block;
+    width: 35px;
+    height: 1px;
+    background: #a7a7a7;
+    left: -36px;
+    top: -28px;
+    position: absolute;
+    z-index: 9999;
+}
+.thread-replies .thread-border:hover::before {
+    background: #000000;
+}
+.comment-body:hover .message-footer {
+    display: block;
+}
+
+div[id^="reply-block-"] {
+    display: none;
+}
+
+div[id^="comment-"]:target div[id^="reply-block-"] {
+    display: block;
+}
+
+.d-message-footer {
+    display: none;
+}
+
+div[id^="comment-"]:target .d-message-footer {
+    display: block;
 }

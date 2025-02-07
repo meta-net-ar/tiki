@@ -19,15 +19,8 @@
                             <Threads />
                             <h5 class="mt-5 mb-3">Start new discussion thread</h5>
                             <div class="row">
-                                <div class="col-md-12 mx-auto">
-                                    <div class="thread-form">
-                                        <input type="text" class="thread-input form-control" placeholder="Optional:type a title/subject for your new discussion...">
-                                        <div class="thread-textarea">
-                                            <i class="fa fa-question-circle" style="color: #8ca5af;"></i>
-                                            <textarea class="thread-input form-control mt-3" rows="10" placeholder="Type your comment here, in Tiki-flavored MarkDown format."></textarea>
-                                            <input type="submit" class="btn btn-secondary float-end mt-5" value="Preview/Publish">
-                                        </div>
-                                    </div>
+                                <div class="col-md-8 mx-auto">
+                                    <CommentForm />
                                 </div>
                             </div>
                         </div>
@@ -42,6 +35,10 @@
 <script setup>
     import Threads from "./components/Threads.vue";
     import SearchBar from "./components/SearchBar.vue";
+    import CommentForm from "./components/CommentForm.vue";
+    import {provide} from "vue";
+
+    provide('tr', tr)
 </script>
 
 <style scoped>

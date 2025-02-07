@@ -17,7 +17,19 @@ $headerlib = TikiLib::lib('header');
 $headerlib->add_js_module('
         import "@vue-mf/comments";
     ');
-
+$headerlib->add_jq_onready('
+        window.registerApplication({
+            name: "@vue-mf/comments",
+            app: () => importShim("@vue-mf/comments"),
+            activeWhen: (location) => {
+                let condition = true;
+                return condition;
+            }
+        });
+        onDOMElementRemoved("single-spa-application:@vue-mf/comments", function () {
+            window.unregisterApplication("@vue-mf/comments");
+        });
+');
 
 $smarty->assign('mid', 'tiki-comments.tpl');
 $smarty->display("tiki.tpl");
