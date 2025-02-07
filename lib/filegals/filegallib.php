@@ -1164,7 +1164,7 @@ class FileGalLib extends TikiLib
     {
         return $this->get_files($offset, $maxRecords, $sort_mode, $find, $fileId, true, false, false, true, false, false, false, false, '', false, true);
     }
-    public function duplicate_file_gallery($galleryId, $name, $description = '')
+    public function duplicate_file_gallery($galleryId, $name, $description = '', $parentId = null)
     {
         global $user;
         $info = $this->get_file_gallery_info($galleryId);
@@ -1172,6 +1172,9 @@ class FileGalLib extends TikiLib
         $info['galleryId'] = 0;
         $info['description'] = $description;
         $info['name'] = $name;
+        if (! is_null($parentId)) {
+            $info['parentId'] = $parentId;
+        }
         $newGalleryId = $this->replace_file_gallery($info);
         return $newGalleryId;
     }

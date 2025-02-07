@@ -40,4 +40,36 @@ class Services_File_Utilities
         $filegallib = TikiLib::lib('filegal');
         return $filegallib->update_single_file($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title);
     }
+
+    /**
+     * Used by directory drop function to automatically create subdirectories (child file galleries)
+     * where the files will be uploaded to.
+     */
+    public function findOrCreateDirectoryHierarchy(int $parentGalleryId, string $directory): array
+    {
+        global $prefs;
+
+        $filegallib = TikiLib::lib('filegal');
+
+        $dirs = [];
+        while (basename($directory)) {
+            $dirs[] = basename($directory);
+            $directory = dirname($directory);
+        }
+
+        $dirs = array_reverse($dirs);
+        foreach ($dirs as $dir) {
+            $galleryId = $filegallib->getGalleryId($dir, $parentGalleryId);
+            if (! $galleryId) {
+                if ($parentGalleryId == $prefs['fgal_root_id']) {
+                    $galleryId = $filegallib->replace_file_gallery(['name' => $dir]);
+                } else {
+                    $galleryId = $filegallib->duplicate_file_gallery($parentGalleryId, $dir, '', $parentGalleryId);
+                }
+            }
+            $parentGalleryId = $galleryId;
+        }
+
+        return $this->checkTargetGallery($parentGalleryId);
+    }
 }
