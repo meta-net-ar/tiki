@@ -37,11 +37,11 @@
     right: 16px;
 }
 
-/* comment.vue */
-.comment-author {
+/* message.vue */
+.message-author {
     color:#066399 !important;
 }
-.comment-author img {
+.message-author img {
     width: 25px;
     margin-top: -5px;
     margin-right: 12px;
@@ -56,7 +56,7 @@
 .bottom-line {
     border-top: 2px dashed black;
 }
-.comment-body p {
+.message-body p {
     min-width: 400px;
 }
 .thread-title {
@@ -86,7 +86,7 @@
 .thread-replies .thread-border:hover::before {
     background: #000000;
 }
-.comment-body:hover .message-footer {
+.message-body:hover .message-footer {
     display: block;
 }
 
@@ -94,7 +94,7 @@ div[id^="reply-block-"] {
     display: none;
 }
 
-div[id^="comment-"]:target div[id^="reply-block-"] {
+div[id^="message-"]:target div[id^="reply-block-"] {
     display: block;
 }
 
@@ -102,6 +102,6 @@ div[id^="comment-"]:target div[id^="reply-block-"] {
     display: none;
 }
 
-div[id^="comment-"]:target .d-message-footer {
+div[id^="message-"]:target .d-message-footer {
     display: block;
 }

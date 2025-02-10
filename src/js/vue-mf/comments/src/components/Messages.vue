@@ -1,6 +1,6 @@
 <script setup>
 import Threads from "./Threads.vue";
-import Comment from "./Comment.vue";
+import Message from "./Message.vue";
 
 defineProps({
     item: {
@@ -13,7 +13,7 @@ defineProps({
 import store from "../store";
 
 export default {
-    name: 'Comments',
+    name: 'Messages',
     methods: {
         getDescendants: function (threadId) {
             var arr = store.getters.getThreads;
@@ -33,8 +33,8 @@ export default {
 </script>
 
 <template>
-    <Comment :item=item />
-    <Threads :comments=getDescendants(item.commentId) />
+    <Message :item=item />
+    <Threads :messages=getDescendants(item.messageId) />
 </template>
 
 <style scoped lang="scss">

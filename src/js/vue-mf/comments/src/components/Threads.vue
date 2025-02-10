@@ -1,8 +1,8 @@
 <script setup>
-import Comments from "./Comments.vue";
+import Messages from "./Messages.vue";
 import store from "../store";
 defineProps({
-    comments: {
+    messages: {
         type: Object,
         default() {
             return store.getters.getParentMessages;
@@ -18,8 +18,8 @@ export default {
 
 <template>
     <div class="row">
-        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5 thread-replies' : item.parentId != 0}, 'col-md-12 thread-block']" v-for="item in comments">
-            <Comments :item=item />
+        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5 thread-replies' : item.parentId != 0}, 'col-md-12 thread-block']" v-for="item in messages">
+            <Messages :item=item />
         </div>
     </div>
 </template>

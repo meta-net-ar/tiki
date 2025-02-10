@@ -1,6 +1,6 @@
 <script setup>
 
-import CommentForm from "./CommentForm.vue";
+import MessageForm from "./MessageForm.vue";
 import {inject} from "vue";
 
 const tr = inject('tr')
@@ -13,14 +13,14 @@ defineProps({
 </script>
 <script>
 export default {
-    name: 'Comment',
+    name: 'Message',
 }
 </script>
 
 <template>
-    <div class="comment-body card-body text-start">
+    <div class="message-body card-body text-start">
         <p class="small">
-            <span class="border rounded-3 p-1 pr-3 bg-light comment-author">
+            <span class="border rounded-3 p-1 pr-3 bg-light message-author">
                 <img src="/img/icons/user.png"/>{{item.author}}
             </span>
             <span class="mx-1 pt-1">on {{item.date}}</span>
@@ -30,8 +30,8 @@ export default {
         <h5 class="card-title thread-title ps-2" v-if="item.title != ''">{{ item.title }}</h5>
         <hr class="ms-2" v-if="item.parentId == 0" />
         <div>
-            <div :id="'comment-'+item.commentId" class="thread-messages ps-2">
-                <p class="card-text">{{ item.comment }}</p>
+            <div :id="'message-'+item.messageId" class="thread-messages ps-2">
+                <p class="card-text">{{ item.message }}</p>
                 <div :class="[{'d-message-footer' : item.parentId != 0}, 'message-footer ms-3']">
                     <i class="icon fa-solid fa-thumbs-up mt-3"></i><span class="like small text-muted mx-1 me-4">6</span>
                     <i class="icon fa-solid fa-thumbs-down mt-3"></i><span class="dislike small text-muted mx-1">1</span>
@@ -39,10 +39,10 @@ export default {
                         <a href="#" class="btn btn-primary m-1" v-if="item.parentId == 0">{{ tr('Mark as resolved') }}</a>
                         <a href="#" class="btn btn-primary m-1">{{ tr('Pin') }}</a>
                         <a href="#" class="btn btn-primary m-1">{{ tr('Edit') }}</a>
-                        <a :href="'#comment-'+item.commentId" class="btn btn-primary m-1">{{ tr('Reply') }}</a>
+                        <a :href="'#message-'+item.messageId" class="btn btn-primary m-1">{{ tr('Reply') }}</a>
                     </div>
-                    <div :id="'reply-block-'+item.commentId" class="col-md-8 mt-5 mb-5 mx-auto">
-                        <CommentForm />
+                    <div :id="'reply-block-'+item.massageId" class="col-md-8 mt-5 mb-5 mx-auto">
+                        <MessageForm />
                     </div>
                 </div>
             </div>

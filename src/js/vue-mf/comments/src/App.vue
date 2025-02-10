@@ -20,7 +20,7 @@
                             <h5 class="mt-5 mb-3">Start new discussion thread</h5>
                             <div class="row">
                                 <div class="col-md-8 mx-auto">
-                                    <CommentForm />
+                                    <MessageForm />
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
 <script setup>
     import Threads from "./components/Threads.vue";
     import SearchBar from "./components/SearchBar.vue";
-    import CommentForm from "./components/CommentForm.vue";
+    import MessageForm from "./components/MessageForm.vue";
     import {provide} from "vue";
 
     provide('tr', tr)
