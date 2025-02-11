@@ -9726,6 +9726,7 @@ $lang_current = array(
 // "Sticky Headers for the table when scrolling top" => "Sticky Headers for the table when scrolling top",
 // "Default value: No" => "Default value: No",
 "Fancy Table" => "Table enjolivée",
+"Apply custom CSS class to customize the table design" => "Appliquer une classe CSS personnalisée pour personnaliser le design de la table",
 // "Create a formatted table that can be filtered and sorted" => "Create a formatted table that can be filtered and sorted",
 // "Rows separated by %0 in the header; for the table body, one row per line. Cells separated by %1 (since Tiki4) or %2 in both cases" => "Rows separated by %0 in the header; for the table body, one row per line. Cells separated by %1 (since Tiki4) or %2 in both cases",
 // "Unable to load the jQuery Sortable Tables feature" => "Unable to load the jQuery Sortable Tables feature",
