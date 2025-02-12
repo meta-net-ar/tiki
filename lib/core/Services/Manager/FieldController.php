@@ -45,7 +45,7 @@ class Services_Manager_FieldController
         $db_prefix = $handler->getOption('newInstanceDbPrefix');
 
         if ($db_prefix) {
-            $db_prefix .= 'item' . $itemId . 'field' . $fieldId;
+            $db_prefix .= 'item' . $input->itemId->int() . 'field' . $input->fieldId->int();
         }
 
         // TODO: see if some other validation is needed (note that most of the valiation is in the actual create command and that error output is already passed to the user)
