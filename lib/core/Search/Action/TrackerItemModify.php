@@ -186,6 +186,7 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
             if (is_string($value)) {
                 $value = ['ins_' . $fieldInfo['fieldId'] => $value];
             }
+            $value['tzname'] = TikiLib::lib('tiki')->get_display_timezone();
             $data = $handler->getFieldData($value);
             $value = $data['value'];
 
