@@ -166,6 +166,7 @@ class Icon extends \Smarty\FunctionHandler\Base
             if (($pos = strrpos($params['_id'], '.')) !== false) {
                 $icons_extension = preg_quote(substr($params['_id'], $pos), '/');
             }
+            $icons_extension = str_replace('\\.', '.', $icons_extension);
 
             $params['_id'] = preg_replace(
                 '/^' . $icons_basedir_quoted . '|' . $icons_extension . '$/',

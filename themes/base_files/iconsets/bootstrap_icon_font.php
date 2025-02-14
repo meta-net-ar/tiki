@@ -211,8 +211,8 @@ function iconset_bootstrap_icon_font()
             'bold' => [
                 'id' => 'type-bold',
             ],
-            'minus-circle' => [
-                'id' => 'dash-circle-fill',
+            'circle-half' => [
+                'id' => 'circle-half',
             ],
             'clipboard-list' => [
                 'id' => 'card-checklist',
@@ -238,11 +238,11 @@ function iconset_bootstrap_icon_font()
             'cubes' => [
                 'id' => 'boxes',
             ],
-            'delete' => [
-                'id' => 'x',
-            ],
             'database' => [
                 'id' => 'database-fill',
+            ],
+            'delete' => [
+                'id' => 'x',
             ],
             'directory' => [
                 'id' => 'list-ul',
@@ -258,6 +258,9 @@ function iconset_bootstrap_icon_font()
             ],
             'file-archive' => [
                 'id' => 'file-arrow-up-fill',
+            ],
+            'groupedit' => [
+                'id' => 'people-fill',
             ],
             'help' => [
                 'id' => 'question-circle',
@@ -303,6 +306,15 @@ function iconset_bootstrap_icon_font()
             ],
             'manage' => [
                 'id' => 'controller',
+            ],
+            'message' => [
+                'id' => 'chat-dots-fill',
+            ],
+            'minus-circle' => [
+                'id' => 'dash-circle-fill',
+            ],
+            'monitor' => [
+                'id' => 'display',
             ],
             'notepad' => [
                 'id' => 'journal-medical',
@@ -379,6 +391,9 @@ function iconset_bootstrap_icon_font()
             'th-list' => [
                 'id' => 'list-columns-reverse',
             ],
+            'tikimanager' => [
+                'id' => 'wrench-adjustable-circle',
+            ],
             'toggle-left' => [
                 'id' => 'chevron-left',
             ],
@@ -411,9 +426,6 @@ function iconset_bootstrap_icon_font()
             ],
             'zip' => [
                 'id' => 'file-zip',
-            ],
-            'circle-half' => [
-                'id' => 'circle-half'
             ]
         ] + $bs_generated_icons,
         'defaults'    => [
