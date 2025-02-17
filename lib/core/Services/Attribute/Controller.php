@@ -43,4 +43,86 @@ class Services_Attribute_Controller
             'value' => $value,
         ];
     }
+
+    public function action_set($input)
+    {
+        $type = $input->type->text();
+        $itemId = $input->itemId->text();
+        $value = $input->value->text();
+        $comment = $input->comment->text();
+        $attribute = $input->attribute->text();
+
+        // Check if info are passed to the service
+        if (! $type || ! $itemId || ! $attribute || ! $value) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check view permissions of requested object
+        $perms = Perms::get($type, $itemId);
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+
+        $attributeLib = TikiLib::lib('attribute');
+        $attributeLib->set_attribute(
+            $type,
+            $itemId,
+            $attribute,
+            $value,
+            $comment
+        );
+    }
+
+    public function action_find_objects_with($input): array
+    {
+        $attribute = $input->attribute->text();
+        $value = $input->value->text();
+
+        // Check if info are passed to the service
+        if (! $attribute || ! $value) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check global view permissions for requested objects
+        $perms = Perms::get();
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+        $attributeLib = TikiLib::lib('attribute');
+        $ojects = $attributeLib->find_objects_with(
+            $attribute,
+            $value
+        );
+
+        return [
+            'objects' => $ojects,
+        ];
+    }
+
+    public function action_get_attribute($input)
+    {
+        $type = $input->type->text();
+        $itemId = $input->itemId->text();
+        $attribute = $input->attribute->text();
+
+        // Check if info are passed to the service
+        if (! $type || ! $itemId || ! $attribute) {
+            throw new Services_Exception(tr('Invalid input'), 400);
+        }
+
+        // Check view permissions of request object
+        $perms = Perms::get($type, $itemId);
+        if (! $perms->view) {
+            throw new Services_Exception(tr('Permission denied'), 403);
+        }
+
+        $attributeLib = TikiLib::lib('attribute');
+        $result = $attributeLib->get_attribute(
+            $type,
+            $itemId,
+            $attribute
+        );
+
+        return $result;
+    }
 }

@@ -5039,7 +5039,10 @@
             "Services_Article_Controller::action_create_from_url": true
         },
         "lib\/core\/Services\/Attribute\/Controller.php": {
-            "Services_Attribute_Controller::action_get": true
+            "Services_Attribute_Controller::action_get": true,
+            "Services_Attribute_Controller::action_set": true,
+            "Services_Attribute_Controller::action_find_objects_with": true,
+            "Services_Attribute_Controller::action_get_attribute": true
         },
         "lib\/core\/Services\/AuthSource\/Controller.php": {
             "Services_AuthSource_Controller::action_list": true,

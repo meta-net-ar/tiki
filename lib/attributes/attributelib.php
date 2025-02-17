@@ -129,7 +129,7 @@ class AttributeLib extends TikiDb_Bridge
         $attribute = $this->get_valid($attribute);
 
         return $this->attributes->fetchAll(
-            ['type', 'itemId'],
+            ['type', 'itemId', 'comment'],
             ['attribute' => $attribute, 'value' => $value,]
         );
     }
