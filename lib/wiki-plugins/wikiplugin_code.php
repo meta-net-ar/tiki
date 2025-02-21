@@ -12,8 +12,22 @@ function wikiplugin_code_info()
     $themes = [
         ['text' => tr('default'), 'value' => 'default',],
     ];
+    $colors = [
+        ['text' => '', 'value' => '']
+    ];
     $themes_folder = rtrim($tikipath ?? '', '/') . '/' . CODEMIRROR_DIST_PATH . '/theme';
-
+    $meta_mode_path = rtrim($tikipath ?? '', '/') . '/' . CODEMIRROR_DIST_PATH . '/mode';
+    if (is_dir($meta_mode_path)) {
+        foreach (scandir($meta_mode_path) as $dir) {
+            if ($dir == '.' || $dir == '..') {
+                continue;
+            }
+            $colors[] = [
+                'text' => $dir,
+                'value' => $dir
+            ];
+        }
+    }
     if (is_dir($themes_folder)) {
         foreach (scandir($themes_folder) as $file) {
             $match = null;
@@ -61,9 +75,10 @@ function wikiplugin_code_info()
             'colors' => [
                 'required' => false,
                 'name' => tra('Colors'),
-                'description' => tra('Any supported language listed at http://codemirror.net/mode/.  Pref feature_syntax_highlighter must be true for this to have any effect'),
+                'description' => tra('Any supported language listed at http://codemirror.net/mode  Pref feature_syntax_highlighter must be true for this to have any effect'),
                 'since' => '17',
                 'filter' => 'text',
+                'options' => $colors,
                 'advanced' => false,
             ],
             'ln' => [
@@ -132,6 +147,7 @@ function wikiplugin_code($data, $params)
     $params = array_merge($defaults, $params);
 
     extract($params, EXTR_SKIP);
+
     $code = trim($data);
     if ($mediawiki == '1') {
         return "<code>$code</code>";
