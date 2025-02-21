@@ -21,6 +21,7 @@ function wikiplugin_fancytable_info()
                  'required' => false,
                  'name' => tra('Heading Row'),
                  'description' => tr('Header rows of the table. Use %0 to separate multiple rows.', '<code>>></code>'),
+                 'default' => '',
                  'since' => '1'
              ],
              'headclass' => [
@@ -143,6 +144,9 @@ function wikiplugin_fancytable($data, $params)
     // Initialize variables
     $tagremove = [];
     $pluginremove = [];
+
+    $params = WikiPlugin_Helper::applyParamsDefaults($params, wikiplugin_fancytable_info());
+
     static $iFancytable = 0;
     ++$iFancytable;
     $msg = '';

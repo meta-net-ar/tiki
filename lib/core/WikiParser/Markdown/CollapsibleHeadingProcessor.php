@@ -6,23 +6,22 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\WikiParser\Markdown;
 
+use Exception;
 use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Node\NodeIterator;
-use League\CommonMark\Node\RawMarkupContainerInterface;
-use League\CommonMark\Node\StringContainerHelper;
-use League\CommonMark\Normalizer\TextNormalizerInterface;
-use League\Config\ConfigurationInterface;
-use League\Config\Exception\InvalidConfigurationException;
 use Tiki\WikiParser\Markdown\Node\CollapsibleHeading;
 use Tiki\WikiParser\Markdown\Node\CollapsibleContainer;
 use Tiki\WikiParser\Markdown\Node\CollapsibleLink;
 
 /**
  * Searches the Document for CollapsibleHeading elements, adds a [+]/[-] link and
- * surrounds next block element with special collapsible div
+ *  surrounds the next block element with special collapsible div
  */
 class CollapsibleHeadingProcessor
 {
+    /**
+     * @throws Exception
+     */
     public function __invoke(DocumentParsedEvent $e): void
     {
         global $page;

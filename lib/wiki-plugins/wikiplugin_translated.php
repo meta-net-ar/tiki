@@ -51,7 +51,7 @@ function wikiplugin_translated($data, $params)
         }
     }
     if (in_array($flag, $avflags)) {
-        $img = "<img src='img/flags/{$escapedFlag}.png' alt='{$escapedLang}' style='width:18px; height:13px; margin:0 3px 0 0; vertical-align:baseline;' />";
+        $img = "<img src='img/flags/$flag.png' alt='$flag' style='width:18px; height:13px; margin:0 3px 0 0; vertical-align:baseline;' />";
     }
 
     if (! $img) {
