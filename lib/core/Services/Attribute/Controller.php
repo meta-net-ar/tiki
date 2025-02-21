@@ -52,8 +52,8 @@ class Services_Attribute_Controller
         $comment = $input->comment->text();
         $attribute = $input->attribute->text();
 
-        // Check if info are passed to the service
-        if (! $type || ! $itemId || ! $attribute || ! $value) {
+        // Check if required infos are passed to the service
+        if (! $type || ! $itemId || ! $attribute) {
             throw new Services_Exception(tr('Invalid input'), 400);
         }
 
