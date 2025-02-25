@@ -303,7 +303,7 @@ $comments_vars = [
 $comments_prefix_var = 'forum:';
 $comments_objectId = $comments_prefix_var . $forumId;
 //$comments_object_var = 'forumId';
-if (! empty($forum_info["inbound_pop_server"])) {
+if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info["inbound_pop_server"])) {
     $commentslib->process_inbound_mail($forumId);
 }
 
