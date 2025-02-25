@@ -1407,7 +1407,7 @@ class WikiLib extends TikiLib
     //Set the last modified item (wiki page or tracker item)
     public function getBacklinkLastModif($page)
     {
-        $trackerlib = self::lib('trk');        
+        $trackerlib = self::lib('trk');
         $tikilib = self::lib('tiki');
         $lastModif = 'lastModif';
         $query = "select `fromPage` from `tiki_links` where `toPage` = ?";
@@ -1422,7 +1422,7 @@ class WikiLib extends TikiLib
                 $wikiLastModif = (int) $tikilib->get_page_info($frompage)[$lastModif];
                 $tikilib->query($updateQuery, [ $wikiLastModif, $frompage, $page ]);
             } else {
-                $itemId = (int) (substr($frompage,28,1));
+                $itemId = (int) (substr($frompage, 28, 1));
                 $trackerItemLastModif = (int) $trackerlib->get_tracker_item($itemId)[$lastModif];
                 $tikilib->query($updateQuery, [ $trackerItemLastModif , $frompage, $page ]);
             }

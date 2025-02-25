@@ -75,7 +75,7 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
     {
         global $smarty;
         $smarty->loadPlugin('smarty_modifier_sefurl');
-        if (!$this->get('msg_sent')) {
+        if (! $this->get('msg_sent')) {
             return;
         }
         $path = $this->request->post['compose_msg_path'];
@@ -120,7 +120,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
 
             $headers = $imap->get_message_headers($form['imap_msg_uid']);
             if (! empty($headers['Flags'])) {
-                $msg = "Flags: ".$headers['Flags']."\r\n".$msg;
+                $msg = "Flags: " . $headers['Flags'] . "\r\n" . $msg;
             }
 
             // ensure file was saved before removing it from remote mailbox
@@ -195,7 +195,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         }
 
         if ($this->session->get('page_id')) {
-            $msg = "X-Tiki-Source: ".$this->session->get('page_id')."\r\n".$msg;
+            $msg = "X-Tiki-Source: " . $this->session->get('page_id') . "\r\n" . $msg;
         }
 
         $field['value'] = [
@@ -451,11 +451,13 @@ class Hm_Handler_tiki_archive_message extends Hm_Handler_Module
  * Flag a message
  * @subpackage tiki/handler
  */
-class Hm_Handler_flag_tiki_message extends Hm_Handler_Module {
+class Hm_Handler_flag_tiki_message extends Hm_Handler_Module
+{
     /**
      * Use IMAP to flag the selected message uid
      */
-    public function process() {
+    public function process()
+    {
         list($success, $form) = $this->process_form(array('imap_msg_uid', 'list_path'));
         if ($success) {
             $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
@@ -473,8 +475,10 @@ class Hm_Handler_flag_tiki_message extends Hm_Handler_Module {
  * Perform an action against a Tiki stored message
  * @subpackage imap/handler
  */
-class Hm_Handler_tiki_message_action extends Hm_Handler_Module {
-    public function process() {
+class Hm_Handler_tiki_message_action extends Hm_Handler_Module
+{
+    public function process()
+    {
         list($success, $form) = $this->process_form(array('action_type', 'imap_msg_uid', 'list_path'));
         if ($success) {
             $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
@@ -705,7 +709,7 @@ class Hm_Output_add_move_to_trackers extends Hm_Output_Module
             if ($handler->getOption('useFolders')) {
                 $folder_list = [];
                 foreach ($handler->getFolders() as $folder => $folderName) {
-                    $folder_list[] = "<div><a href='#' class='object_selector_trigger' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='".htmlspecialchars($folder)."'>{$folderName}</a></div>";
+                    $folder_list[] = "<div><a href='#' class='object_selector_trigger' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='" . htmlspecialchars($folder) . "'>{$folderName}</a></div>";
                 }
                 $field_list[] = "<a href='#' class='tiki_folder_trigger'>{$tracker['name']} - {$field['name']}</a>"
                     . "<div class='tiki_folder_container' style='display: none'>" . implode("\n", $folder_list) . "</div>";

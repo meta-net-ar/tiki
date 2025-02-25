@@ -2564,9 +2564,9 @@ class UsersLib extends TikiLib
 
     public function get_groups_for_permissions()
     {
-        $query = "SELECT * from users_groups 
-                    where isTplGroup <> 'y' and groupName not in (select groupName 
-                    from  tiki_group_inclusion where includeGroup in (SELECT groupName 
+        $query = "SELECT * from users_groups
+                    where isTplGroup <> 'y' and groupName not in (select groupName
+                    from  tiki_group_inclusion where includeGroup in (SELECT groupName
                     from users_groups where isTplGroup = 'y')) order by id asc;";
         $ret = $this->fetchAll($query);
         $retval = [];
@@ -2577,7 +2577,7 @@ class UsersLib extends TikiLib
 
     public function get_template_groups_containers()
     {
-        $query = "SELECT * from users_groups 
+        $query = "SELECT * from users_groups
                     where isTplGroup = 'y' order by id asc;";
         $ret = $this->fetchAll($query);
         $retval = [];
@@ -7430,6 +7430,62 @@ class UsersLib extends TikiLib
         return $result;
     }
 
+    public function forceTwoFactorAuth($user): bool
+    {
+        global $prefs;
+        $force = false;
+
+        //Do not force user (admin) to enable 2FA
+        if ($user == 'admin') {
+            return false;
+        }
+        //Force all users to enable 2FA
+        if ($prefs['twoFactorAuthAllUsers'] == 'y') {
+            $force = true;
+        }
+        //Force users in the specific groups to enable 2FA
+        if (! empty($prefs['twoFactorAuthIncludedGroup'])) {
+            //get list of group names
+            $groups = $prefs['twoFactorAuthIncludedGroup'];
+            foreach ($groups as $groupName) {
+                $userIsInGroup = $this->user_is_in_group($user, $groupName);
+                if ($userIsInGroup) {
+                    $force = true;
+                    break;
+                }
+            }
+        }
+        //Force specific users to enable 2FA
+        if (! empty($prefs['twoFactorAuthIncludedUsers'])) {
+            //get list of usernames
+            $users = $prefs['twoFactorAuthIncludedUsers'];
+            if (in_array($user, $users)) {
+                $force = true;
+            }
+        }
+        //Do not force users in the specific groups to enable 2FA
+        if (! empty($prefs['twoFactorAuthExcludedGroup'])) {
+            //get list of group names
+            $groups = $prefs['twoFactorAuthExcludedGroup'];
+            foreach ($groups as $groupName) {
+                $userIsInGroup = $this->user_is_in_group($user, $groupName);
+                if ($userIsInGroup) {
+                    $force = false;
+                    break;
+                }
+            }
+        }
+        //Do not force specific users to enable 2FA
+        if (! empty($prefs['twoFactorAuthExcludedUsers'])) {
+            //get list of usernames
+            $users = $prefs['twoFactorAuthExcludedUsers'];
+            if (in_array($user, $users)) {
+                $force = false;
+            }
+        }
+        return $force;
+    }
+
     public function change_user_password($user, $pass, $pass_first_login = false)
     {
 
@@ -7846,7 +7902,7 @@ class UsersLib extends TikiLib
                 INNER JOIN `tiki_history` p2 ON ( p1.`pageName` = p2.`pageName` )
                 INNER JOIN `users_users` u2 ON ( u2.`login` = p2.`user` )
                 WHERE u2.`login` = ? AND u1.`login` <> ?
-                GROUP BY p1.`pageName`, u1.`login` 
+                GROUP BY p1.`pageName`, u1.`login`
                 ORDER BY quantity DESC
                 ';
         } else {
@@ -8919,14 +8975,11 @@ class UsersLib extends TikiLib
 
         $query = 'update `users_users` set `waiting`= ? where  `userId`= ?';
         $this->query($query, [ $user_lock_update, $userId ]);
-        
         $cachelib->invalidate('userslist');
-        
         // Notify user
         Scheduler_Manager::queueJob('Notify lock status to user', 'UserLockMailerCommandTask', ['user_login' => $user, 'lock_status' => $lock_status]);
 
         TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
-                
         return true;
     }
 
@@ -8940,18 +8993,15 @@ class UsersLib extends TikiLib
 
         include_once('lib/webmail/tikimaillib.php');
         $languageEmail = $this->get_user_preference($user, 'language', $prefs['site_language']);
-        
         $smarty->assign('lock_status', $lock_status);
         $smarty->assign('user_name', $user);
-        $smarty->assign('mail_site',  $this_site);
-
+        $smarty->assign('mail_site', $this_site);
         $mail = new TikiMail();
-        $mail_data = $smarty->fetchLang($languageEmail, "mail/". $tpl ."_subject.tpl");
+        $mail_data = $smarty->fetchLang($languageEmail, "mail/" . $tpl . "_subject.tpl");
         $mail_data = sprintf($mail_data, $this_site);
         $mail->setSubject($mail_data);
         $mail_data = $smarty->fetchLang($languageEmail, "mail/" . $tpl . ".tpl");
         $mail->setText($mail_data);
-        
         $email = $this->get_user_email($user);
         $mail->send([$email]);
     }
@@ -8962,14 +9012,12 @@ class UsersLib extends TikiLib
         $now = time();
 
         if ($prefs['users_admin_auto_lock_user'] === 'y') {
-
             $before_account_get_locked = $prefs['users_admin_auto_lock_user_days_before_lock'];
             $days_ago_before_lock = $now - ($before_account_get_locked * 24 * 60 * 60);
             // Exclude already locked accounts
             $query = "select `login` from `users_users` where `waiting` <> ? and `lastLogin` < ?";
             $results = $this->query($query, ['l', $days_ago_before_lock]);
             $users = $results->result;
-            
             foreach ($users as $user) {
                 $this->update_user_lock_status($user['login'], 'lock');
             }

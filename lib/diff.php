@@ -44,8 +44,8 @@ class _WikiDiffEngine
     public $edits;    // List of editing operation to convert XV to YV.
     public $xv = [];
     public $yv = [];
-    public $xchanged;
-    public $ychanged;
+    public $xchanged = [];
+    public $ychanged = [];
 
     /**
      * @param $from_lines

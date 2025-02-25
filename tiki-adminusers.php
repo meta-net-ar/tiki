@@ -368,7 +368,6 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
     } else {
         $cookietab = 2;
     }
-
 } elseif (isset($_REQUEST['action'])) {
     if ($_REQUEST['action'] == 'email_due' && isset($_REQUEST['user']) && $access->checkCsrf()) {
         $result = $userlib->reset_email_due($_REQUEST['user']);

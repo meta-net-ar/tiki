@@ -588,7 +588,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             http_response_code(400);
             $error = tra("There is more than one user account with this email. Please contact the administrator.");
             break;
-        
+
         case ACCOUNT_LOCKED:
             http_response_code(403);
             $error = tra("Account is locked. Please contact the administrator.");

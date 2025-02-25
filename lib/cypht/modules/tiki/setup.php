@@ -161,7 +161,7 @@ add_handler('ajax_tiki_move_copy_action', 'tiki_process_move', true);
 add_handler('ajax_tiki_move_copy_action', 'save_imap_cache', true, 'imap');
 add_handler('ajax_tiki_move_copy_action', 'close_session_early', true, 'core');
 setup_base_ajax_page('ajax_tiki_flag_message', 'core');
-add_handler('ajax_tiki_flag_message', 'close_session_early',  true, 'core');
+add_handler('ajax_tiki_flag_message', 'close_session_early', true, 'core');
 add_handler('ajax_tiki_flag_message', 'flag_tiki_message', true);
 add_output('ajax_tiki_flag_message', 'forward_variables', true);
 setup_base_ajax_page('ajax_tiki_message_action', 'core');

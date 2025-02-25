@@ -174,6 +174,12 @@
         <type>warning</type>
         <severity>6</severity>
     </rule>
+    <!-- Change severity of PSR2.Methods.MethodDeclaration.Underscore to warning -->
+    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
+        <message>Tiki PSR2 Relaxed: Method name "%s" must not be prefixed with an underscore</message>
+        <type>warning</type>
+        <severity>6</severity>
+    </rule>
     <!-- ~ PSR -->
 
     <!-- Relax ZF Coding Standards -->

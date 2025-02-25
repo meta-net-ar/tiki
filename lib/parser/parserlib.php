@@ -1987,7 +1987,9 @@ class ParserLib extends TikiDb_Bridge
                                 $value = '';
                                 break;
                             }
+                        // phpcs:disable PSR2.ControlStructures.SwitchDeclaration.TerminatingComment
                         case 'currentVersion':
+                            // Fall-through intentional to allow further processing
                             if (isset($_REQUEST['preview'])) {
                                 $value = (int)$_REQUEST["preview"];
                                 break;

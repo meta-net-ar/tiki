@@ -204,6 +204,59 @@ function prefs_global_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
+        'twoFactorAuthAllUsers' => [
+            'name' => tra('Force all users to use 2FA'),
+            'description' => tra('This will force all users to activate 2FA.'),
+            'type' => 'flag',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => 'n',
+        ],
+        'twoFactorAuthIncludedGroup' => [
+            'name' => tra('Force users in the indicated groups to enable 2FA'),
+            'description' => tra('List of group names.'),
+            'separator' => ';',
+            'filter' => 'groupname',
+            'profile_reference' => 'group',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => [],
+        ],
+        'twoFactorAuthIncludedUsers' => [
+            'name' => tra('Force indicated users to enable 2FA'),
+            'description' => tra('List of usernames.'),
+            'separator' => ';',
+            'filter' => 'username',
+            'profile_reference' => 'user',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => [],
+        ],
+        'twoFactorAuthExcludedGroup' => [
+            'name' => tra('Do not force users in the indicated groups to enable 2FA'),
+            'description' => tra('List of group names.'),
+            'separator' => ';',
+            'filter' => 'groupname',
+            'profile_reference' => 'group',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => [],
+        ],
+        'twoFactorAuthExcludedUsers' => [
+            'name' => tra('Do not force indicated users to enable 2FA'),
+            'description' => tra('List of usernames.'),
+            'separator' => ';',
+            'filter' => 'username',
+            'profile_reference' => 'user',
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => [],
+        ],
         'useGroupTheme' => [
             'name' => tra('Group theme'),
             'description' => tra('Enable groups to each have their own visual theme.'),

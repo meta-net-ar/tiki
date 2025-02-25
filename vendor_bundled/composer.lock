@@ -681,7 +681,7 @@
             "version": "5.15.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/FortAwesome/Font-Awesome.git",
+                "url": "git@github.com:FortAwesome/Font-Awesome.git",
                 "reference": "7d3d774145ac38663f6d1effc6def0334b68ab7e"
             },
             "dist": {
@@ -5914,14 +5914,14 @@
         },
         {
             "name": "npm-asset/babel--parser",
-            "version": "7.26.7",
+            "version": "7.25.3",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/npm-asset/babel--parser/npm-asset-babel--parser-7.26.7.zip",
-                "shasum": "a3fea72dea9943b29bce10e8c3b65dcc996875de"
+                "url": "https://composer.tiki.org/dist/npm-asset/babel--parser/npm-asset-babel--parser-7.25.3.zip",
+                "shasum": "57ef76e7fdb5369d3c042de128d3d3f4ba1d49f7"
             },
             "require": {
-                "npm-asset/babel--types": ">=7.26.7,<8.0.0"
+                "npm-asset/babel--types": ">=7.25.2,<8.0.0"
             },
             "type": "npm-asset",
             "license": [
@@ -5930,11 +5930,11 @@
         },
         {
             "name": "npm-asset/babel--types",
-            "version": "7.26.7",
+            "version": "7.26.8",
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/npm-asset/babel--types/npm-asset-babel--types-7.26.7.zip",
-                "shasum": "0166a2b08d62991925a9cc0e01ebc11630490adb"
+                "url": "https://composer.tiki.org/dist/npm-asset/babel--types/npm-asset-babel--types-7.26.8.zip",
+                "shasum": "5cfb3c8ca6e4e2b8b47223e9c21d014bbdf80808"
             },
             "require": {
                 "npm-asset/babel--helper-string-parser": ">=7.25.9,<8.0.0",

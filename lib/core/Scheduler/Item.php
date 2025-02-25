@@ -11,7 +11,6 @@ use Tiki\Lib\core\Scheduler\Output\SchedulerRunOutput;
 
 class Scheduler_Item
 {
-
     public $id;
     public $name;
     public $description;

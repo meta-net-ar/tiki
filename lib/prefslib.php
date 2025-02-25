@@ -346,7 +346,7 @@ class PreferencesLib
         /**
          * If the unified index is enabled, replace simple object selection preferences with object selectors
          */
-        if ($info['type'] == 'text' && ! empty($info['profile_reference']) && $prefs['feature_search'] == 'y') {
+        if (! empty($info['profile_reference']) && $prefs['feature_search'] == 'y') {
             $objectlib = TikiLib::lib('object');
             $type = $objectlib->getSelectorType($info['profile_reference']);
 

@@ -49,7 +49,7 @@ class WikiPluginPluginManager extends PluginsLib
         if (empty($helpurl)) {
             $helpurl = 'http://doc.tiki.org/';
         }
-        if(empty($sourceurl)) {
+        if (empty($sourceurl)) {
             $sourceurl = 'https://gitlab.com/tikiwiki/tiki/-/blob/master/lib/wiki-plugins/';
         }
 
@@ -176,9 +176,9 @@ class WikiPluginPluginManager extends PluginsLib
                 }
                 if (in_array('sourcecode', $info)) {
                     if ($numparams > 1) {
-                        $aData[$sPlugin]['sourcecode']['onekey'] = '[' . $sourceurl.$sPluginFile . '|'.tra('Go to the source code').']';
+                        $aData[$sPlugin]['sourcecode']['onekey'] = '[' . $sourceurl . $sPluginFile . '|' . tra('Go to the source code') . ']';
                     } else {
-                        $aData[$sPlugin]['sourcecode'] = '[' . $sourceurl.$sPluginFile . '|'.tra('Go to the source code').']';
+                        $aData[$sPlugin]['sourcecode'] = '[' . $sourceurl . $sPluginFile . '|' . tra('Go to the source code') . ']';
                     }
                 }
                 if (in_array('parameters', $info)) {
@@ -224,7 +224,7 @@ class WikiPluginPluginManager extends PluginsLib
             //Replicates a documentation table for parameters for a single plugin or module
             //Not using plugin lib table to avoid making custom modifications
             global $sPlugin, $numparams;
-            $sourcecode = $sourceurl.$aPlugins[0];
+            $sourcecode = $sourceurl . $aPlugins[0];
             if ($mod) {
                 $infoPlugin = get_module_params($aPlugins[0]);
                 $namepath = $sPlugin;
@@ -369,7 +369,7 @@ class WikiPluginPluginManager extends PluginsLib
                 . tra('Preferences required:') . '</em> ' . implode(', ', $infoPlugin['prefs']) . '<br/>' : '';
             $title .= isset($infoPlugin['introduced']) && $params['showtopinfo'] !== 'n' ? '<em>' .
                 tr('Introduced in %0', 'Tiki ' . $infoPlugin['introduced']) . '.</em>' : '';
-            $link .= '[' . $sourcecode . '|'.tra('Go to the source code').']';
+                $link .= '[' . $sourcecode . '|' . tra('Go to the source code') . ']';
             $required = ! empty($filteredparams) ? array_column($filteredparams, 'required') : false;
             $bold = in_array(true, $required) > 0 ? '<em> ' . tr(
                 'Required parameters are in%0 %1bold%2',
@@ -377,7 +377,7 @@ class WikiPluginPluginManager extends PluginsLib
                 '<strong><code>',
                 '</code></strong>.'
             ) : '';
-            $sOutput = $title . $bold . '<br>' .  $link . '<br>' . $pluginprefs . '<br> <div class="table-responsive">' .
+            $sOutput = $title . $bold . '<br>' . $link . '<br>' . $pluginprefs . '<br> <div class="table-responsive">' .
                 '<table class="table table-striped table-hover">' . $header . $rows . '</table></div>' . "\n";
             return $sOutput;
         }

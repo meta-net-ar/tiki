@@ -107,6 +107,23 @@ if (isset($_SERVER['REQUEST_URI'])) {
     $requestUri = "";
 }
 
+//The value returned allows to check if the user has already enabled 2FA
+$twoFactorSecret = $userlib->get_2_factor_secret($user);
+//Check if user is forced to enable 2FA
+$force2FA = $userlib->forceTwoFactorAuth($user);
+//Check if 2FA is required for a user and if it not yet enabled
+if ($prefs['twoFactorAuth'] == 'y' && empty($twoFactorSecret) && $force2FA && ! empty($user)) {
+    $accesslib = TikiLib::lib('access');
+    //URL to send user who has not yet enabled 2FA
+    $accessibleUrl = $base_url . 'tiki-user_preferences.php';
+    $pageUrl = $url_scheme . "://" . $host . $requestUri;
+    //Do not redirect the user if it is a logout action
+    if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
+        header('location: tiki-user_preferences.php');
+        exit();
+    }
+}
+
 if ($prefs['tiki_domain_prefix'] == 'strip' && substr($host, 0, 4) == 'www.') {
     $domain_map[$host] = substr($host, 4);
 } elseif ($prefs['tiki_domain_prefix'] == 'force' && substr($host, 0, 4) != 'www.') {
@@ -608,7 +625,7 @@ if ($prefs['feature_jquery_tablesorter'] == 'y') {
     $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-grouping.js');
     $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-math.js');
     $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-pager.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-output.js');	// APTITUDE NEEDS THIS
+    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-output.js');    // APTITUDE NEEDS THIS
     //currently only working when ajax is not used
     $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-sort2Hash.js');
     $headerlib->add_jsfile('lib/jquery_tiki/tablesorter.js');
@@ -813,8 +830,7 @@ annotatorContent.annotator("addPlugin", "Permissions", {
     userAuthorize: function(action, annotation, user) {
         return annotation.permissions[action];
     }
-});'
-            );
+});');
         // handling for extra info
         if ($prefs['comments_inline_annotator_with_info'] === 'y') {
             $headerlib->add_jq_onready(

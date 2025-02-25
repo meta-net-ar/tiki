@@ -419,6 +419,12 @@ if (
     unset($_SESSION['tfaSecret']);
 }
 
+$force2FA = false;
+$twoFactorSecret = $userlib->get_2_factor_secret($userwatch);
+$force2FA = $userlib->forceTwoFactorAuth($userwatch);
+$smarty->assign('force2FA', $force2FA);
+$smarty->assign('twoFactorSecret', $twoFactorSecret);
+
 $userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
 if ($prefs['twoFactorAuth'] == 'y' && $generate) {

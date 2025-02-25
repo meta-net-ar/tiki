@@ -639,8 +639,8 @@ class TikiLib extends TikiDb_Bridge
                 if ($prefs['feature_banning_email'] === 'y') {
                     $info = TikiLib::lib('user')->get_user_info($user);
                     if (preg_match($pattern, $info['email'])) {
-                       return $res['message'];
-                   }
+                        return $res['message'];
+                    }
                 }
             } else {
                 // check ip
@@ -2596,7 +2596,16 @@ class TikiLib extends TikiDb_Bridge
         return $links;
     }
 
-    /**
+    public function sanitizeForCsv($input)
+    {
+        // Check if the input starts with characters that can trigger CSV injection
+        if (preg_match('/^[=+\-@]/', $input)) {
+            $input = "'" . $input; // Prefix with a single quote
+        }
+        return $input;
+    }
+
+   /**
      * Convert internal links from absolute to relative
      *
      * @param string $data
@@ -4224,7 +4233,7 @@ class TikiLib extends TikiDb_Bridge
         $preferences = [];
         if ($exact_match) {
             if (is_array($names)) {
-                $this->_get_values('tiki_preferences', 'name', $names, $prefs);
+                $this->get_values('tiki_preferences', 'name', $names, $prefs);
                 if (! $no_return) {
                     foreach ($names as $name) {
                         $preferences[$name] = $prefs[$name];
@@ -4349,7 +4358,7 @@ class TikiLib extends TikiDb_Bridge
      * @param null $bindvars
      * @return bool
      */
-    public function _get_values($table, $field_name, $var_names = null, &$global_ref = [], $query_cond = '', $bindvars = null)
+    public function get_values($table, $field_name, $var_names = null, &$global_ref = [], $query_cond = '', $bindvars = null)
     {
         if (empty($table) || empty($field_name)) {
             return false;
@@ -4444,7 +4453,7 @@ class TikiLib extends TikiDb_Bridge
             $user_preferences[$my_user] = [];
         }
         $global_ref =& $user_preferences[$my_user];
-        $return = $this->_get_values('tiki_user_preferences', 'prefName', $names, $global_ref, '`user`=?', [$my_user]);
+        $return = $this->get_values('tiki_user_preferences', 'prefName', $names, $global_ref, '`user`=?', [$my_user]);
 
         // Handle special display_timezone values
         if (
@@ -6216,7 +6225,7 @@ class TikiLib extends TikiDb_Bridge
         global $prefs;
         $tmp_dest = $prefs['tmpDir'] . "/" . $file_name . ".tmp";
         if (! is_writable(dirname($tmp_dest))) {
-            return ["ok" => false, "error" => tra('Temporary directory destination not writable: '.dirname($tmp_dest))];
+            return ["ok" => false, "error" => tra('Temporary directory destination not writable: ' . dirname($tmp_dest))];
         }
         if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
             return ["ok" => false, "error" => tra('Unable to move uploaded file to temporary destination.')];

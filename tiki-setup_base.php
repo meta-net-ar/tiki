@@ -518,7 +518,8 @@ if (TIKI_API) {
     $login_cookie_value = $_COOKIE["$user_cookie_site"] ?? '';
     // if remember me is enabled, check for cookie where auth hash is stored
     // user gets logged in as the first user in the db with a matching hash
-    if ($prefs['rememberme'] !== 'disabled' &&
+    if (
+        $prefs['rememberme'] !== 'disabled' &&
         ! empty($login_cookie_value) &&
         empty($user) &&
         empty($_SESSION["$user_cookie_site"])

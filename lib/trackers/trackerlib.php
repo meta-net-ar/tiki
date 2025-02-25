@@ -32,7 +32,6 @@
  */
 class TrackerLib extends TikiLib
 {
-
     public $trackerinfo_cache;
     private $sectionFormats = [];
 
@@ -2847,7 +2846,6 @@ class TrackerLib extends TikiLib
         $mandatory_fields = [];
         $erroneous_values = [];
         if (isset($ins_fields) && isset($ins_fields['data'])) {
-
             $fields = [];   // make a copy of $ins_fields['data'] where the field id is the array key
             foreach ($ins_fields['data'] as $f) {
                 $fields[$f['fieldId']] = $f;

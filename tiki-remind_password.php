@@ -30,14 +30,21 @@ if (isset($_REQUEST["user"])) {
 }
 if (isset($_REQUEST["remind"])) {
     if (! empty($_REQUEST['name'])) {
+        $emailResetMessage = tra("An email with a link to reset your password has been sent to the address on record if you have one, if you do not receive one shortly, please contact the administrator.");
+
         if (! $userlib->user_exists($_REQUEST['name'])) {
             $showmsg = 'e';
-            $smarty->assign('msg', tra('Invalid or unknown username') . ': ' . $_REQUEST['name']);
+
+
+            $smarty->assign('showmsg', 'y');
+            $smarty->assign('showfrm', 'n');
+
+            $smarty->assign('msg', $emailResetMessage);
         } else {
             $info = $userlib->get_user_info($_REQUEST["name"]);
             if (empty($info['email'])) { //only renew if i can mail the pass
                 $showmsg = 'e';
-                $smarty->assign('msg', tra('Unable to send mail. User has not configured email'));
+                $smarty->assign('msg', $emailResetMessage);
             } elseif (! empty($info['valid']) && ($prefs['validateRegistration'] == 'y' || $prefs['validateUsers'] == 'y')) {
                 $showmsg = 'e';
                 $userlib->send_validation_email($_REQUEST["name"], $info['valid'], $info['email'], 'y');
@@ -48,7 +55,11 @@ if (isset($_REQUEST["remind"])) {
     } elseif (! empty($_REQUEST['email'])) {
         if (! ($_REQUEST['name'] = $userlib->get_user_by_email($_REQUEST['email']))) {
             $showmsg = 'e';
-            $smarty->assign('msg', tra('Invalid or unknown email address') . ': ' . $_REQUEST['email']);
+
+            $smarty->assign('showmsg', 'y');
+            $smarty->assign('showfrm', 'n');
+
+            $smarty->assign('msg', $emailResetMessage);
         }
     } else {
         $showmsg = 'e';
@@ -89,16 +100,7 @@ if (isset($_REQUEST["remind"])) {
         $smarty->assign('showmsg', 'y');
         $smarty->assign('showfrm', 'n');
 
-        $tmp = tra("An email with a link to reset your password has been sent ");
-
-        if ($prefs['login_is_email'] == 'y') {
-            $tmp .= tra("to the email");
-        } else {
-            $tmp .= tra("to the registered email address for");
-        }
-        $tmp .= " " . $name . ". ";
-        $tmp .= tra('Please contact the Administrator if you do not get the email, or if there is an issue with resetting the password.');
-        $smarty->assign('msg', $tmp);
+        $smarty->assign('msg', $emailResetMessage);
     }
 }
 // disallow robots to index page:

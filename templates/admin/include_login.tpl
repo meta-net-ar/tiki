@@ -193,6 +193,13 @@
                 <legend>{tr}Password{/tr}</legend>
                 {preference name=forgotPass}
                 {preference name=twoFactorAuth}
+                <div class="adminoptionboxchild" id="twoFactorAuth_childcontainer">
+                    {preference name=twoFactorAuthAllUsers}
+                    {preference name=twoFactorAuthIncludedGroup}
+                    {preference name=twoFactorAuthIncludedUsers}
+                    {preference name=twoFactorAuthExcludedGroup}
+                    {preference name=twoFactorAuthExcludedUsers}
+                </div>
                 {preference name=change_password}
                 {preference name=pass_chr_num}
                 {preference name=pass_chr_case}

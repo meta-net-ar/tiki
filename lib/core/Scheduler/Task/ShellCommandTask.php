@@ -11,7 +11,6 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class Scheduler_Task_ShellCommandTask extends Scheduler_Task_CommandTask
 {
-
     public function execute($params = null)
     {
         global $prefs;

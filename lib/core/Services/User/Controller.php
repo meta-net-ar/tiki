@@ -1165,7 +1165,6 @@ class Services_User_Controller
         return true;
     }
 
-    
     public function action_set_user_lock_status($input)
     {
         Services_Exception_Denied::checkGlobal('admin_users');
@@ -1188,16 +1187,15 @@ class Services_User_Controller
         //after confirm submit - perform action and return success feedback
         } elseif ($util->checkCsrf()) {
             $util->setVars($input, $this->filters, 'items');
-            // lock or unlock the user            
+            // lock or unlock the user
             $lock_status_updated = $this->updateUserLockStatus($util->items, $status_to_set);
-
             if ($lock_status_updated) {
                 //prepare feedback
                 if ($util->itemsCount === 1) {
                     $msg = tr('The following user has been %0ed:', $status_to_set);
                     $toMsg = tra('Submit form below to ban this user.');
                 } else {
-                    $msg = tr('The following users have been %0ed:',$status_to_set);
+                    $msg = tr('The following users have been %0ed:', $status_to_set);
                     $toMsg = tra('Submit form below to ban these users.');
                 }
                 $feedback = [
@@ -1224,7 +1222,7 @@ class Services_User_Controller
             }
         }
     }
-    
+
     private function updateUserLockStatus($users, $newLockStatus, $referer = false)
     {
         global $user;

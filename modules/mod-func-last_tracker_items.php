@@ -79,13 +79,18 @@ function module_last_tracker_items($mod_reference, $module_params)
                 $module_params['sort_mode'] = 'created_desc';
             }
             $modLastItems = [];
-            //list_items filters the fieldId if hidden...
-            $tmp = $trklib->list_items($module_params['trackerId'], 0, $mod_reference["rows"], $module_params['sort_mode'], [$module_params['fieldId'] => $field_info], '', '', $module_params['status']);
-            foreach ($tmp['data'] as $data) {
-                if (! empty($data['field_values'][0]['value'])) {
-                    $data['subject'] = $data['field_values'][0]['value'];
-                    $modLastItems[] = $data;
+            try {
+                $tmp = $trklib->list_items($module_params['trackerId'], 0, $mod_reference["rows"], $module_params['sort_mode'], [$module_params['fieldId'] => $field_info], '', '', $module_params['status']);
+                if (isset($tmp['data']) && is_array($tmp['data'])) {
+                    foreach ($tmp['data'] as $data) {
+                        if (! empty($data['field_values'][0]['value'])) {
+                            $data['subject'] = $data['field_values'][0]['value'];
+                            $modLastItems[] = $data;
+                        }
+                    }
                 }
+            } catch (Exception $e) {
+                $smarty->assign('module_error', tra('Error retrieving tracker items: ') . $e->getMessage());
             }
             $smarty->assign_by_ref('modLastItems', $modLastItems);
         }

@@ -63,7 +63,7 @@ function module_quick_search($mod_reference, $module_params)
         }
     }
 
-    if (isset($module_params['filter_category']) && $prefs['feature_categories'] == 'y') {
+    if (isset($module_params['filter_category']) && is_array($module_params['filter_category']) && $prefs['feature_categories'] == 'y') {
         foreach ($module_params['filter_category'] as $categId) {
             if (Perms::get('category', $categId)->view_category) {
                 $categories[$categId] = $categlib->get_category_name($categId);
