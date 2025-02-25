@@ -151,6 +151,7 @@
                 {preference name=unsuccessful_logins_invalid}
                 {preference name=eponymousGroups}
                 {preference name=desactive_login_autocomplete}
+                {preference name=desactive_login_placeholders}
                 {preference name=permission_denied_login_box}
                 {preference name=login_text_explanation}
                 {preference name=login_multiple_forbidden}

@@ -222,7 +222,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 {/if}
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
-                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if}/>
+                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}/>
                 {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
@@ -230,7 +230,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         </div>
         <div class="pass my-2 {if $mode eq 'header'}mx-2{/if}">
             <label class="form-label" for="login-pass_{$module_logo_instance}">{tr}Password{/tr}</label>
-            <input onkeypress="capLock(event, this)" type="password" name="pass" class="form-control" id="login-pass_{$module_logo_instance}" autocomplete="{if $prefs.desactive_login_autocomplete eq 'y'}new-password{else}current-password{/if}">
+            <input onkeypress="capLock(event, this)" type="password" name="pass" class="form-control" id="login-pass_{$module_logo_instance}" autocomplete="{if $prefs.desactive_login_autocomplete eq 'y'}new-password{else}current-password{/if}" {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Password{/tr}"{/if}>
             {if $module_params.show_forgot eq 'y' && $prefs.forgotPass eq 'y'}
                 <a class="mt-1 d-block" href="tiki-remind_password.php" title="{tr}Click here if you've forgotten your password{/tr}">{tr}I forgot my password{/tr}</a>
             {/if}
