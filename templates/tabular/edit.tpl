@@ -52,6 +52,28 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Remote Permanent Values{/tr}
+                        <a class="tikihelp text-info" title="{tr}Remote Field Values:{/tr} {tr}Used to work with a subset of the remote data set. Specify in JSON format remote_field => value pairs where only matching remote records will be imported and all exported records will have these values set.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" type="text" name="odbc[permanent_values]">{if $odbc_config.permanent_values}{$odbc_config.permanent_values|json_encode}{/if}</textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Field Value Mappings{/tr}
+                        <a class="tikihelp text-info" title="{tr}Field Value Mappings:{/tr} {tr}When local field values differ from remote ones but you have a mapping table, specify here in JSON format: remote_field => { hash with remote => local pairs }.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" type="text" name="odbc[value_mappings]">{if $odbc_config.value_mappings}{$odbc_config.value_mappings|json_encode}{/if}</textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <label class="col-form-label col-sm-2 offset-sm-1">{tr}Sync deletes{/tr}</label>
                     <div class="col-sm-9">
                         <input class="form-check-input" type="checkbox" name="odbc[sync_deletes]" {if !empty($odbc_config.sync_deletes)}checked{/if} value="1">

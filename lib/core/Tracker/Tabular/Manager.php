@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Tabular;
 
+use Exception;
+use Feedback;
+
 class Manager
 {
     private $table;
@@ -34,6 +37,7 @@ class Manager
 
     public function create($name, $trackerId, $odbc_config = [])
     {
+        $this->validateOdbcConfig($odbc_config);
         return $this->table->insert([
             'name' => $name,
             'trackerId' => $trackerId,
@@ -56,6 +60,7 @@ class Manager
 
     public function update($tabularId, $name, array $fields, array $filters, array $config, array $odbc_config = [], array $api_config = [])
     {
+        $this->validateOdbcConfig($odbc_config);
         return $this->table->update([
             'name' => $name,
             'format_descriptor' => json_encode($fields),
@@ -94,7 +99,7 @@ class Manager
         }
         $tabular = $this->getInfo($tabularId);
         if (empty($tabular['tabularId'])) {
-            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
             return;
         }
         $trklib = \TikiLib::lib('trk');
@@ -128,11 +133,11 @@ class Manager
                 $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
                 $result = $writer->write($source);
                 if (! empty($result['errors'])) {
-                    throw new \Exception($result['errors'][0]);
+                    throw new Exception($result['errors'][0]);
                 }
             }
-        } catch (\Exception $e) {
-            \Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
+        } catch (Exception $e) {
+            Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
         }
     }
 
@@ -149,7 +154,7 @@ class Manager
         }
         $tabular = $this->getInfo($tabularId);
         if (empty($tabular['tabularId'])) {
-            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
             return;
         }
 
@@ -167,8 +172,8 @@ class Manager
                         try {
                             $writer = new Writer\ODBCWriter($tabular['odbc_config']);
                             $writer->delete($column->getRemoteField(), $id);
-                        } catch (\Exception $e) {
-                            \Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
+                        } catch (Exception $e) {
+                            Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
                         }
                         break;
                     }
@@ -185,7 +190,7 @@ class Manager
             $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
             $result = $writer->write($source, 'delete');
             if (! empty($result['errors'])) {
-                throw new \Exception($result['errors'][0]);
+                throw new Exception($result['errors'][0]);
             }
         }
     }
@@ -208,7 +213,7 @@ class Manager
 
         $tabular = $this->getInfo($tabularId);
         if (empty($tabular['tabularId'])) {
-            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
             return;
         }
 
@@ -239,7 +244,7 @@ class Manager
 
         $tabular = $this->getInfo($tabularId);
         if (empty($tabular['tabularId'])) {
-            \Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
             return;
         }
 
@@ -266,19 +271,19 @@ class Manager
     {
         $definition = \Tracker_Definition::get($trackerId);
         if (! $definition) {
-            \Feedback::error(tr("Tracker not found: %0", $trackerId));
+            Feedback::error(tr("Tracker not found: %0", $trackerId));
             return true;
         }
 
         $tabularId = $definition->getConfiguration('tabularSync', 0);
         if (! $tabularId) {
-            \Feedback::error(tr("Tracker not configured for remote synchronization: %0", $trackerId));
+            Feedback::error(tr("Tracker not configured for remote synchronization: %0", $trackerId));
             return true;
         }
 
         $tabular = $this->getInfo($tabularId);
         if (empty($tabular['tabularId'])) {
-            \Feedback::error(tr("Import-Export not found: %0", $tabularId));
+            Feedback::error(tr("Import-Export not found: %0", $tabularId));
             return true;
         }
 
@@ -307,8 +312,49 @@ class Manager
             } else {
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return tr("Failed ensuring remote item is up to date with local data. Please check remote server connectivity and try again. Error: %0", $e->getMessage());
+        }
+    }
+
+    protected function validateOdbcConfig(&$odbc_config): void
+    {
+        try {
+            if (! empty($odbc_config['permanent_values'])) {
+                $odbc_config['permanent_values'] = json_decode($odbc_config['permanent_values'], true, 512, JSON_THROW_ON_ERROR);
+                if (! is_array($odbc_config['permanent_values'])) {
+                    throw new Exception('invalid format');
+                }
+                foreach ($odbc_config['permanent_values'] as $key => $val) {
+                    if (! is_string($key) || ! is_scalar($val)) {
+                        throw new Exception('invalid format');
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            Feedback::error(tr("Failed parsing Remote Permanent Values field: %0", $e->getMessage()));
+            $odbc_config['permanent_values'] = [];
+        }
+        try {
+            if (! empty($odbc_config['value_mappings'])) {
+                $odbc_config['value_mappings'] = @json_decode($odbc_config['value_mappings'], true, 512, JSON_THROW_ON_ERROR);
+                if (! is_array($odbc_config['value_mappings'])) {
+                    throw new Exception('invalid format');
+                }
+                foreach ($odbc_config['value_mappings'] as $field => $mapping) {
+                    if (! is_string($field) || ! is_array($mapping)) {
+                        throw new Exception('invalid format');
+                    }
+                    foreach ($mapping as $remote => $local) {
+                        if (! is_scalar($remote) || ! is_scalar($local)) {
+                            throw new Exception('invalid format');
+                        }
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            Feedback::error(tr("Failed parsing Field Value Mappings field: %0", $e->getMessage()));
+            $odbc_config['value_mappings'] = [];
         }
     }
 }
