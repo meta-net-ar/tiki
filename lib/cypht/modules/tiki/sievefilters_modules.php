@@ -121,8 +121,8 @@ class Hm_Handler_tiki_sieve_get_mailboxes_script extends Hm_Handler_Module
         foreach ($search_servers as $imap_server_id => $m) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
             $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (imap_authed($imap)) {
-                foreach ($imap->get_mailbox_list() as $mailbox) {
+            if ($imap->authed()) {
+                foreach ($imap->get_folders() as $mailbox) {
                     if ($server_id != $imap_server_id) {
                         $mailboxes[$m['name']][] = 'imap_' . $imap_server_id . '_' . $mailbox['name'];
                     } else {

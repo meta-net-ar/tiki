@@ -51,6 +51,15 @@ class PatchCypht
             mkdir($fixDS('temp/cypht/users'), 0777);
         }
 
+        // copy assets
+        $publicPath = realpath(__DIR__ . $fixDS('/../../../../public/generated'));
+        $assetsPath = $publicPath . '/assets';
+        if (! is_dir($assetsPath)) {
+            mkdir($assetsPath, 0755);
+        }
+        $fs->copy($vendors . $fixDS('jason-munro/cypht/assets'), $assetsPath);
+
+
         // generate Cypht config
         $php_binary = preg_replace("/(?<!\\\) /", '\ ', PHP_BINARY);
         $cypthFolder = $fixDS('jason-munro/cypht');

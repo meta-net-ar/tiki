@@ -331,7 +331,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
 
         // try to connect
         $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (! smtp_authed($smtp)) {
+        if (! $smtp->authed()) {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             return false;
         }
@@ -402,14 +402,14 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
  * @return string array message and headers
  */
 if (! hm_exists('get_message_data')) {
-    function get_message_data($imap, $msg_id)
+    function get_message_data($imap, $folder, $msg_id)
     {
         $msg = $imap->get_message_content($msg_id, 0);
         $msg = str_replace("\r\n", "\n", $msg);
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg) . "\r\n";
 
-        $headers = $imap->get_message_headers($msg_id);
+        $headers = $imap->get_message_headers($folder, $msg_id);
         if (! empty($headers['Flags'])) {
             $msg = "Flags: " . $headers['Flags'] . "\r\n" . $msg;
         }
@@ -431,8 +431,8 @@ if (! hm_exists('bind_tracker_item_update_event')) {
             $old = $args['old_values'][$form['tracker_field_id']];
             $new = $args['values'][$form['tracker_field_id']];
             if (substr_count($old, ',') != substr_count($new, ',')) {
-                $imap->message_action('DELETE', $args['msg_ids']);
-                $imap->message_action('EXPUNGE', $args['msg_ids']);
+                $imap->get_connection()->message_action('DELETE', $args['msg_ids']);
+                $imap->get_connection()->message_action('EXPUNGE', $args['msg_ids']);
             }
         }, ['imap' => $imap, 'form' => $form, 'msg_ids' => $msg_ids]);
     }

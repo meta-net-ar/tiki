@@ -206,6 +206,7 @@ add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_men
 
 /* sieve filters */
 add_handler('sieve_filters', 'tiki_add_sieve_config_host', true, 'tiki', 'load_imap_servers_from_config', 'after');
+add_handler('sieve_filters', 'settings_load_imap', true);
 add_output('sieve_filters', 'tiki_filters_cron', true, 'tiki', 'sievefilters_settings_start', 'after');
 
 setup_base_ajax_page('ajax_tiki_sieve_get_mailboxes', 'core');

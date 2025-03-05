@@ -110,18 +110,18 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
             $folder = hex2bin($matches[2]);
             $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
             $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (! imap_authed($imap)) {
+            if (! $imap->authed()) {
                 Hm_Msgs::add('ERRCould not authenticate with mail server');
                 return;
             }
-            if (! $imap->select_mailbox($folder)) {
+            if (! $imap->select_folder($folder)) {
                 Hm_Msgs::add('ERRMailbox not found');
                 return;
             }
 
 
             foreach ($msg_ids as $msg_id) {
-                list($msgs[], $headers_array[]) = get_message_data($imap, $msg_id);
+                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $msg_id);
             }
 
             bind_tracker_item_update_event($imap, $form, $msg_ids);
@@ -180,7 +180,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                     $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
                     $imap_data = Hm_IMAP_List::connect($imap_server_id, $cache);
 
-                    if (! imap_authed($imap_data)) {
+                    if (! $imap_data->authed()) {
                         $errors++;
                         continue;
                     }
@@ -189,12 +189,12 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                 }
 
                 $imap = $imaps[$imap_server_id];
-                if (! $imap->select_mailbox($folder)) {
+                if (! $imap->select_folder($folder)) {
                     $errors++;
                     continue;
                 }
 
-                list($msgs[], $headers_array[]) = get_message_data($imap, $full_path[2]);
+                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $full_path[2]);
                 $ids[] = $full_path[2];
             }
             if (count($ids)) {
@@ -356,6 +356,9 @@ class Hm_Handler_tiki_presave_draft extends Hm_Handler_Module
 {
     public function process()
     {
+        if (! array_key_exists('list_path', $this->request->get)) {
+            return;
+        }
         $path = $this->request->get['list_path'];
         if (strstr($path, 'tracker_folder_')) {
             $this->out('save_draft_to_imap', false);
@@ -897,7 +900,7 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
                         $cache = Hm_IMAP_List::get_cache($this->cache, $msg['server_id']);
                         $imap = Hm_IMAP_List::connect($msg['server_id'], $cache);
 
-                        if (imap_authed($imap)) {
+                        if ($imap->authed()) {
                             foreach ($filters as $filter) {
                                 $filterData = Tiki_Hm_Functions::processFilter($filter, $imap, $msg);
                                 if ($filterData['pass']) {
