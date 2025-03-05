@@ -48,6 +48,10 @@ class DateHelper
                 return date($format, $unix);
             },
             function (&$info, $value) use ($permName, $format) {
+                if (is_null($value)) {
+                    $info['fields'][$permName] = $value;
+                    return;
+                }
                 $date = date_create_from_format($format, $value);
                 if (! $date) {
                     $date = date_create_from_format($format . '.v', $value);
