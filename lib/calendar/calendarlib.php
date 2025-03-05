@@ -85,12 +85,16 @@ class CalendarLib extends TikiLib
                     $eventstatus = json_decode($r2['value']);
                     $r[$r2['optionName']] = $eventstatus;
                     //add translation tag to statuses for display
-                    $r["eventstatusoutput"] = array_map(
-                        function ($status) {
-                            return tra($status);
-                        },
-                        $eventstatus
-                    );
+                    if (is_array($eventstatus)) {
+                        $r["eventstatusoutput"] = array_map(
+                            function ($status) {
+                                return tra($status);
+                            },
+                            $eventstatus
+                        );
+                    } else {
+                        $r["eventstatusoutput"] = [];
+                    }
                 } else {
                     $r[$r2['optionName']] = $r2['value'];
                 }

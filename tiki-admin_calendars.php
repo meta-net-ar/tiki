@@ -139,7 +139,11 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     } else {
         // if it is an update
         if (isset($info)) {
-            $options["eventstatus"] = $info["eventstatus"];
+            if (! empty($info["eventstatus"])) {
+                $options["eventstatus"] = $info["eventstatus"];
+            } else {
+                $options["eventstatus"] = $defaultstatus;
+            }
         } else {
             $options["eventstatus"] = $defaultstatus;
         }
