@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Tabular;
 
+use TikiLib;
+
 class ODBCManager
 {
     public $orig_handler;
@@ -58,6 +60,9 @@ class ODBCManager
     {
         $this->handleErrors();
         $conn = $this->getConnection();
+        if (! empty($this->config['value_mappings'])) {
+            $fields = array_merge($fields, array_keys($this->config['value_mappings']));
+        }
         $select = implode('", "', $fields);
         $sql = "SELECT \"{$select}\" FROM {$this->config['table']} WHERE 1=1";
         $bind = [];
@@ -77,9 +82,11 @@ class ODBCManager
         } else {
             $rs = odbc_exec($conn, $sql);
         }
-        while ($row = odbc_fetch_array($rs)) {
-            $row = $this->reverseMapFieldsFromConfig($row);
-            yield $row;
+        if ($rs) {
+            while ($row = odbc_fetch_array($rs)) {
+                $row = $this->reverseMapFieldsFromConfig($row);
+                yield $row;
+            }
         }
         $this->stopErrorHandler();
     }
@@ -251,7 +258,7 @@ class ODBCManager
     private function handleErrors()
     {
         $this->orig_handler = set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            $this->errors[] = $errstr;
+            $this->errors[] = "$errstr on line $errline of $errfile";
         });
     }
 
@@ -271,14 +278,69 @@ class ODBCManager
             }
         }
         if (! empty($this->config['value_mappings'])) {
+            $found = [];
             foreach ($this->config['value_mappings'] as $field => $mapping) {
-                if (! isset($row[$field])) {
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $login = $row[$field];
+                    if (! $login) {
+                        continue;
+                    }
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['loginField']}\" = ?");
+                    if ($rs) {
+                        $id = null;
+                        odbc_execute($rs, [$login]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $id = $result[$mapping['valueField']] ?? null;
+                        }
+                        if (! $id) {
+                            $rs = odbc_prepare($conn, "INSERT INTO {$mapping['table']} (\"{$mapping['loginField']}\", \"{$mapping['realnameField']}\") values (?, ?)");
+                            if ($rs) {
+                                $name = TikiLib::lib('tiki')->get_user_preference($login, 'realName', '');
+                                odbc_execute($rs, [$login, $name]);
+                                $rs = odbc_exec($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = @@IDENTITY");
+                                if ($result = odbc_fetch_array($rs)) {
+                                    $id = $result[$mapping['valueField']] ?? null;
+                                }
+                            }
+                        }
+                        $row[$field] = $id;
+                    }
                     continue;
                 }
+                if (isset($mapping['~replace~']) && ! isset($found[$mapping['~replace~']])) {
+                    $found[$mapping['~replace~']] = false;
+                }
                 foreach ($mapping as $remote => $local) {
-                    if ($row[$field] === $local) {
+                    if (isset($row[$field]) && $row[$field] == $local) {
                         $row[$field] = $remote;
+                        $found[$field] = true;
                         break;
+                    }
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $row[$mapping['~replace~']] == $local) {
+                        $row[$field] = $remote;
+                        $row[$mapping['~replace~']] = '';
+                        $found[$mapping['~replace~']] = true;
+                        break;
+                    }
+                }
+                if (! isset($row[$field])) {
+                    $row[$field] = '';
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if ($exists) {
+                    continue;
+                }
+                foreach ($this->config['value_mappings'] as $field => $mapping) {
+                    if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
+                        foreach ($mapping as $remote => $local) {
+                            if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                                $row[$m[1]] = $row[$orig_field];
+                                $row[$field] = $remote;
+                                $row[$orig_field] = '';
+                            }
+                        }
                     }
                 }
             }
@@ -288,14 +350,40 @@ class ODBCManager
 
     private function reverseMapFieldsFromConfig(array $row): array
     {
+        $userslib = TikiLib::lib('user');
         if (! empty($this->config['value_mappings'])) {
             foreach ($this->config['value_mappings'] as $field => $mapping) {
                 if (! isset($row[$field])) {
                     continue;
                 }
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = ?");
+                    if ($rs) {
+                        odbc_execute($rs, [$row[$field]]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $login = $result[$mapping['loginField']] ?? null;
+                            $name = $result[$mapping['realnameField']] ?? '';
+                            if ($login && ! $userslib->user_exists($login)) {
+                                $pass = TikiLib::lib('tiki')->genPass();
+                                $userslib->add_user($login, $pass, '');
+                                $userslib->set_user_preference($login, 'realName', $name);
+                            }
+                            $row[$field] = $login;
+                        }
+                    }
+                    continue;
+                }
                 foreach ($mapping as $remote => $local) {
-                    if ($row[$field] === $remote) {
-                        $row[$field] = $local;
+                    if ($row[$field] == $remote) {
+                        if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                            $local = $row[$m[1]];
+                        }
+                        if (! empty($mapping['~replace~'])) {
+                            $row[$mapping['~replace~']] = $local;
+                        } else {
+                            $row[$field] = $local;
+                        }
                         break;
                     }
                 }
