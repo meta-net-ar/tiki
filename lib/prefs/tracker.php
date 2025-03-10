@@ -164,6 +164,13 @@ function prefs_tracker_list()
             'default' => 'y',
             'dependencies' => ['feature_trackers','feature_sefurl', 'feature_sefurl_tracker_prefixalias'],
         ],
+        'tracker_adminonlyviewedititem_by_default' => [
+            'name' => tr('All new trackers are restricted to wiki page access only by default'),
+            'description' => tr('Option "Restrict non admins to wiki page access only" is not checked by default.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => ['feature_trackers'],
+        ],
         'tracker_report_resize_button' => [
             'name' => tr('Tracker report resize button'),
             'description' => tr('Add a button to resize long tracker reports.'),
