@@ -43,6 +43,12 @@ function module_login_box_info()
                 'description' => tra('Show the register link') . ' (y/n)',
                 'filter' => 'alpha',
             ],
+            'register_page' => [
+                'name' => tra('Register Page'),
+                'description' => tra('Page to redirect when the register link is clicked. If not given, the default register page is used.'),
+                'filter' => 'pagename',
+                'profile_reference' => 'wiki_page',
+            ],
             'forgot' => [
                 'name' => tra('Show I Forgot'),
                 'description' => tra('Show the "I forgot my password" link') . ' (y/n)',
