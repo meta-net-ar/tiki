@@ -200,6 +200,16 @@
 
             <h2>{tr}Groups{/tr}</h2>
 
+            {if $prefs.eponymousGroups eq 'y'}
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <label for="show_eponymous">{tr}Show eponymous groups in this list{/tr}</label>
+                        <input type="hidden" name="show_eponymous" value="n">
+                        <input class="form-check-input" type="checkbox" name="show_eponymous" id="show_eponymous" value="y" {if $show_eponymous eq 'y'} checked="checked"{/if} onclick="this.form.submit()">
+                    </div>
+                </div>
+            {/if}
+
             <div>
             {treetable _data=$groups _checkbox="group_filter" _checkboxTitles="{tr}Select all{/tr}"
                     _checkboxColumnIndex="in_group_filter" _valueColumnIndex="id"

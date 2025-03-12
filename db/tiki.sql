@@ -2936,6 +2936,7 @@ CREATE TABLE `users_groups` (
   `prorateInterval` varchar(255) default '',
   `isRole` char(1) DEFAULT 'n',
   `isTplGroup` char(1) DEFAULT 'n',
+  `isEponymousGroup` CHAR(1) NOT NULL DEFAULT 'n',
   PRIMARY KEY (`id`),
   UNIQUE KEY `groupName` (`groupName` (191)),
   KEY `expireAfter` (`expireAfter`)

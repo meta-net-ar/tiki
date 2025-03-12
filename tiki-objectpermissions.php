@@ -30,6 +30,7 @@ $inputConfiguration = [
         'used_groups'            => 'bool',       //post
         'show_disabled_features' => 'bool',       //post
         'filegals_manager'       => 'word',       //post
+        'show_eponymous'         => 'word',
         ],
         'staticKeyFiltersForArrays' => [
         'feature_filter'            => 'bool',       //post
@@ -186,8 +187,21 @@ if (isset($_REQUEST['group_select'])) {
 
 $group_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_groups') ?? "");
 
+if ($prefs['eponymousGroups'] === 'y') {
+    $show_eponymous = $_SESSION['show_eponymous'];
+    if (! empty($_REQUEST['show_eponymous'])) {
+        $show_eponymous = $_SESSION['show_eponymous'] = $_REQUEST['show_eponymous'];
+    }
+    if (empty($show_eponymous)) {
+        $show_eponymous = 'y';
+    }
+    $smarty->assign('show_eponymous', $show_eponymous);
+} else {
+    $show_eponymous = null;
+}
+
 // Get a list of groups
-$groups = $userlib->get_groups_for_permissions();
+$groups = $userlib->get_groups_for_permissions($show_eponymous);
 $smarty->assign_by_ref('groups', $groups['data']);
 
 $OBJECTPERM_ADMIN_MAX_GROUPS = 4;

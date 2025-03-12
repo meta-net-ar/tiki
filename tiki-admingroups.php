@@ -34,6 +34,8 @@ $inputConfiguration = [
             'initial'                   => 'alpha',
             'find'                      => 'groupname',
             'group'                     => 'groupname',
+            'create_epoynmous_groups'   => 'text',
+            'show_eponymous'            => 'word',
         ],
     ]
 ];
@@ -118,6 +120,40 @@ if (isset($_REQUEST['clean']) && $access->checkCsrf()) {
     $cachelib->invalidate('groupIdlist');
     Feedback::success(tr('Group cache cleared'));
 }
+
+if ($prefs['eponymousGroups'] === 'y') {
+    if (! empty($_REQUEST['create_epoynmous_groups'])) {
+        $perms = Perms::get();
+        if (! $perms->admin) {
+            Feedback::error(tr('Insufficient permissions to execute the requested action.'));
+        } else {
+            $created = 0;
+            $groups = array_map('strtolower', $userlib->list_all_groups());
+            foreach ($userlib->list_all_users() as $login) {
+                if (! in_array(strtolower($login), $groups)) {
+                    $userlib->createEponymousGroup($login);
+                    $created++;
+                }
+            }
+            $cachelib = TikiLib::lib('cache');
+            $cachelib->invalidate('grouplist');
+            $cachelib->invalidate('groupIdlist');
+            Feedback::success(tr('Created eponymous groups: %0', $created));
+        }
+    }
+
+    $show_eponymous = $_SESSION['show_eponymous'];
+    if (! empty($_REQUEST['show_eponymous'])) {
+        $show_eponymous = $_SESSION['show_eponymous'] = $_REQUEST['show_eponymous'];
+    }
+    if (empty($show_eponymous)) {
+        $show_eponymous = 'y';
+    }
+    $smarty->assign('show_eponymous', $show_eponymous);
+} else {
+    $show_eponymous = null;
+}
+
 if (! isset($_REQUEST['maxRecords'])) {
     $numrows = $maxRecords;
 } else {
@@ -148,7 +184,7 @@ if (isset($_REQUEST["find"])) {
     $find = '';
 }
 $smarty->assign('find', $find);
-$users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial);
+$users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial, show_eponymous: $show_eponymous);
 
 //add tablesorter sorting and filtering for main group list
 $ts = Table_Check::setVars('admingroups', true);
