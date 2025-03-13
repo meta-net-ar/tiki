@@ -790,7 +790,7 @@ class BlogLib extends TikiDb_Bridge
      * @access public
      * @return int postId
      */
-    public function blog_post(int $blogId, string $data, string $excerpt, string $user, string $title = '', string $contributions = '', string $priv = 'n', $created = 0, bool $is_wysiwyg = false)
+    public function blog_post(int $blogId, string $data, string $excerpt, string $user, string $title = '', $contributions = '', string $priv = 'n', $created = 0, bool $is_wysiwyg = false)
     {
         // update tiki_blogs and call activity functions
         global $prefs;
@@ -946,7 +946,15 @@ class BlogLib extends TikiDb_Bridge
             if ($blogId) {
                 $param .= "&amp;del=" . strlen($res['data']);
             }
-            $logslib->add_action('Removed', $blogId, 'blog', $param);
+            $removedActionId = $logslib->add_action('Removed', $blogId, 'blog', $param);
+            $getActions = $logslib->getActionLogDetails('Posted', $blogId, 'blog');
+            if (! empty($getActions['actionId']) && $removedActionId) {
+                $createdActionId = $getActions['actionId'];
+                $getContribIds = $logslib->get_action_params($createdActionId, 'contribution');
+                if (count($getContribIds) > 0) {
+                    $logslib->insert_params($removedActionId, 'contribution', $getContribIds);
+                }
+            }
         }
         if ($blogId) {
             $tikilib->remove_object('post', (int)$postId);
@@ -1262,10 +1270,7 @@ class BlogLib extends TikiDb_Bridge
         $smarty = TikiLib::lib('smarty');
 
         if (! $this->blog_exists($blogId)) {
-            $msg = tra('Blog cannot be found');
-            $smarty->assign('msg', $msg);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Blog cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
         }
     }
 

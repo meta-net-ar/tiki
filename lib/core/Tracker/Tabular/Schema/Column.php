@@ -44,6 +44,12 @@ class Column implements \JsonSerializable
         return $this;
     }
 
+    public function setPermName($permName)
+    {
+        $this->permName = $permName;
+        return $this;
+    }
+
     public function getRemoteFields()
     {
         return preg_split('/\s*,\s*/', $this->remoteField);

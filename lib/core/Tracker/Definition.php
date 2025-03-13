@@ -176,6 +176,28 @@ class Tracker_Definition
         return $this->fieldRows;
     }
 
+    /**
+     * Checks if the permanent name has already been used
+     * @param $permName string The permanent name
+     * @return array|false
+     */
+    public static function permNameExists(string $permName): array|false
+    {
+        global $tikilib;
+        $table = AbstractTrackerField::DB_TABLE_NAME;
+        $query = "SELECT * from `$table` WHERE `permName`=?";
+
+        if ($values = $tikilib->fetchAll($query, [$permName])) {
+            $trackerIds = [];
+            foreach ($values as $value) {
+                $trackerIds[] = $value['trackerId'];
+            }
+            return $trackerIds;
+        } else {
+            return false;
+        }
+    }
+
     public function getFieldInstance(int $id): AbstractTrackerField
     {
         $fields = $this->getAllFieldInstances();

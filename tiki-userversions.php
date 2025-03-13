@@ -16,14 +16,10 @@ $access->check_permission('tiki_p_admin');
 
 // We have to get the variable ruser as the user to check
 if (! isset($_REQUEST["ruser"])) {
-    $smarty->assign('msg', tra("No user indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No user indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if (! user_exists($_REQUEST["ruser"])) {
-    $smarty->assign('msg', tra("Non-existent user"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Non-existent user"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign_by_ref('ruser', $_REQUEST["ruser"]);
 $smarty->assign('preview', false);

@@ -106,6 +106,15 @@ class AuthTokens
         }
 
         global $prefs, $tikiroot;       // $full defined in route.php
+        $slugmanager = TikiLib::lib('slugmanager');
+        $skip_params = false;
+        $stored_entry = $data['entry'];
+        $storedParams = (array) json_decode($data['parameters'], true);
+        if (str_starts_with($stored_entry, $tikiroot)) {
+            $stored_entry = substr($stored_entry, strlen($tikiroot));
+        }
+        $stored_entry = ltrim($stored_entry, '/'); // Remove leading slash
+        $page = $parameters['page'] ?? '';
         if ($prefs['feature_sefurl'] === 'y' && strpos($entry, 'tiki-autologin.php') === false) {
             $sefurlTypeMap = $this->getSefurlTypeMap();
             $keys = array_keys($_GET);
@@ -124,32 +133,70 @@ class AuthTokens
             if (empty($key)) {  // missing object type?
                 return null;
             }
-
-            $sefurl = $tikiroot . smarty_modifier_sefurl($_GET[$key], $seftype);
-
-            // add an extra conversion to prevent false positives due to url encoding
-            // e.g. in cases of "/tikiroot/My Page" vs "/tikiroot/My+Page"
-            $entry_no_tikiroot = substr($data['entry'], strlen($tikiroot));
-            $entry_encoded_no_tikiroot = urlencode($entry_no_tikiroot);
-            $full_entry_encoded = $tikiroot . $entry_encoded_no_tikiroot;
-
-            $convertedSefurl = ! empty($GLOBALS['path']) ? $tikiroot . $GLOBALS['path'] : '';
-
-            if ($data['entry'] !== $sefurl && $full_entry_encoded !== $sefurl && $convertedSefurl !== $sefurl) {
-                return null;    // entry doesn't match
+            if ($key == 'page') {
+                // Decode and normalize the stored entry and current path (e.g., '/tiki28/apple' -> 'apple')
+                $current_path = $GLOBALS['path'] ?? '';
+                $convertedSefurl = '';
+                if (! empty($current_path)) {
+                    if (str_starts_with($current_path, $tikiroot)) {
+                        $current_path = substr($current_path, strlen($tikiroot));
+                    }
+                    $convertedSefurl = $tikiroot . $current_path;
+                    $current_path = smarty_modifier_sefurl($current_path, $seftype);
+                }
+                $stored_entry = smarty_modifier_sefurl($stored_entry, $seftype);
+                // Case 1: Direct match after normalization (e.g., "apple" vs "apple")
+                if ($slugmanager->normalizeToDash($stored_entry) === $slugmanager->normalizeToDash($current_path)) {
+                    // Paths match; proceed
+                } else { // Case 2: Handle standard mode tokens (e.g., stored entry is "tiki-index.php")
+                    if (empty($current_path)) {
+                        // Token belongs to SEF URL, but accessed via standard URL
+                        // Generate SEF path from query parameters (e.g., 'page=apple' -> 'apple')
+                        $current_sef_path = smarty_modifier_sefurl($page, $seftype);
+                        // If the stored entry doesn't match the generated SEF path, and the token doesn't belong to standard mode, return null
+                        if (
+                            $slugmanager->normalizeToDash($stored_entry) !== $slugmanager->normalizeToDash($current_sef_path)
+                            && ! isset($storedParams[$key])
+                        ) {
+                            return null; // Paths don't match
+                        }
+                    } elseif (isset($storedParams[$key])) {
+                        // Token belongs to standard URL, but accessed via SEF URL
+                        // Generate SEF path from stored parameters (e.g., 'page=apple' -> 'apple')
+                        $generatedSefPath = smarty_modifier_sefurl($storedParams[$key], $seftype);
+                        if ($slugmanager->normalizeToDash($generatedSefPath) !== $slugmanager->normalizeToDash($current_path)) {
+                            return null; // Generated path doesn't match current path
+                        }
+                    } else {
+                        return null; // No parameter to generate SEF path
+                    }
+                }
             }
-        } elseif (! isset($data['entry']) || $data['entry'] != $entry) {
-            return null;    // entry doesn't match
+        } elseif (! isset($data['entry']) || ! str_contains($entry, $data['entry'])) {
+               // Token belongs to SEF URL, but accessed via standard URL
+            if (! empty($page)) {
+                // Generate SEF path from query parameters (e.g., 'page=apple' -> 'apple')
+                $current_sef_path = smarty_modifier_sefurl($page);
+                $stored_entry = smarty_modifier_sefurl($stored_entry);
+                $path = parse_url($current_sef_path, PHP_URL_PATH);
+                $script = basename($path);
+                // If the stored entry doesn't match the generated SEF path, and the token doesn't belong to standard mode, return null
+                if (
+                    $slugmanager->normalizeToDash($stored_entry) != $slugmanager->normalizeToDash($current_sef_path)
+                    || ! str_contains($entry, $script)
+                ) {
+                    return null; // Paths don't match
+                } else {
+                    $skip_params = true;
+                }
+            }
         }
-
-        $registered = (array) json_decode($data['parameters'], true);
-
         // If sefurl is in use, do not compare page or fileId params
         if ($prefs['feature_sefurl'] === 'y' && ! empty($key)) {
-            unset($registered[$key]);
+            unset($storedParams[$key]);
         }
 
-        if (! $this->allPresent($registered, $parameters) || ! $this->allPresent($parameters, $registered)) {
+        if (! $skip_params && (! $this->allPresent($storedParams, $parameters) || ! $this->allPresent($parameters, $storedParams))) {
             return null;
         }
 
@@ -184,8 +231,13 @@ class AuthTokens
 
     private function allPresent($a, $b)
     {
+        $slugmanager = TikiLib::lib('slugmanager');
         foreach ($a as $key => $value) {
-            if (! isset($b[$key]) || $value != $b[$key]) {
+            $value2 = $b[$key] ?? '';
+            if (! empty($value2) || $value != $value2) {
+                if ($key == 'page' && $slugmanager->normalizeToDash($value) == $slugmanager->normalizeToDash($value2)) {
+                    continue;
+                }
                 return false;
             }
         }
@@ -217,6 +269,57 @@ class AuthTokens
             'userId'    => 'user',
             'calIds'    => 'calendar',
         ];
+    }
+
+    private function getSefurlPatterns(): array
+    {
+        return  [
+            '/^blog\d+/' => 'blog',
+            '/^blogpost\d+/' => 'blogpost',
+            '/^cal\d+/' => 'calendar',
+            '/^calevent\d+/' => 'calendar event',
+            '/^article\d+/' => 'article',
+            '/^(display|thumbnail|preview)\d+/' => 'file',
+            '/^forum\d+/' => 'forum',
+            '/^forumthread\d+/' => 'forumthread',
+            '/^sheet\d+/' => 'sheet',
+            '/^cat\d+/' => 'category',
+        ];
+    }
+
+    public function convertToStandardUrl(string $url): ?string
+    {
+        global $prefs;
+
+        if ($prefs['feature_sefurl'] === 'y') {
+            return $url;
+        }
+
+        $parsedUrl = parse_url($url, PHP_URL_PATH);
+        $pathSegments = explode('/', trim($parsedUrl, '/'));
+
+        // Extract the last part of the URL path (e.g., '/blogpost45-New-Tech-Updates' -> 'blogpost45')
+        if (! empty($pathSegments)) {
+            $lastSegment = $pathSegments[count($pathSegments) - 1];
+            if (str_contains($lastSegment, 'tiki')) {
+                return $url;
+            }
+            if (str_contains($lastSegment, '-')) {
+                $lastSegment = explode('-', $lastSegment, 2)[0];
+            }
+
+            // Match the segment against regex patterns to determine the type
+            foreach ($this->getSefurlPatterns() as $pattern => $type) {
+                if (preg_match($pattern, $lastSegment, $matches)) {
+                    // Extract numeric ID (e.g., 'blogpost45' -> '45')
+                    $id = preg_replace('/[^0-9]/', '', $lastSegment);
+
+                    return smarty_modifier_sefurl($id, $type);
+                }
+            }
+            return smarty_modifier_sefurl($lastSegment); // Return 'wiki' type and page name (last segment)
+        }
+        return $url;
     }
 
     public function createToken($entry, array $parameters, array $groups, array $arguments = [])

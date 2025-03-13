@@ -44,7 +44,8 @@ class TikiDb_Initializer_Pdo
         $this->setupSSL($pdo_options);
 
         try {
-            $dbTiki = new PDO("mysql:$db_hoststring;dbname={$credentials['dbs']}", $credentials['user'], $credentials['pass'], $pdo_options);
+            $db_dbname_string = empty($credentials['dbs']) ? '' : ";dbname={$credentials['dbs']}";
+            $dbTiki = new PDO("mysql:$db_hoststring$db_dbname_string", $credentials['user'], $credentials['pass'], $pdo_options);
 
             $dbTiki->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
             $dbTiki->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);

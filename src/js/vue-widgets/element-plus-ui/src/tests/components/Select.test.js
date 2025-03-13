@@ -1,12 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { describe, expect, test, vi } from "vitest";
 import { h } from "vue";
-import Select, { DATA_TEST_ID } from "../../components/Select.vue";
-import { ElOption, ElSelect } from "element-plus/dist/index.full.mjs";
+import Select, { DATA_TEST_ID } from "../../components/Select/Select.vue";
+import { ElOption, ElSelect } from "element-plus";
 import * as SortableHelper from "../../helpers/select/sortable";
 import Sortable from "sortablejs";
+import ConfigWrapper from "../../components/ConfigWrapper.vue";
 
-vi.mock("element-plus/dist/index.full.mjs", async (importOriginal) => {
+vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
@@ -27,7 +28,16 @@ vi.mock("../../helpers/select/sortable", async () => {
     };
 });
 
+vi.mock("../../components/ConfigWrapper.vue", () => {
+    return {
+        default: vi.fn((props, { slots }) => h("div", { ...props, "data-testid": "config-wrapper" }, slots.default ? slots.default() : null)),
+    };
+});
+
 describe("Select", () => {
+    const consoleErrorSpy = vi.spyOn(console, "error");
+    const consoleWarnSpy = vi.spyOn(console, "warn");
+
     const basicProps = {
         options: JSON.stringify([
             { value: "foo", label: "Foo" },
@@ -45,7 +55,10 @@ describe("Select", () => {
     test("renders correctly with some basic props", () => {
         render(Select, { props: basicProps });
 
-        const selectWrapper = screen.getByTestId(DATA_TEST_ID.SELECT_WRAPPER);
+        const configWrapper = screen.getByTestId("config-wrapper");
+        expect(configWrapper).to.exist;
+
+        const selectWrapper = within(configWrapper).getByTestId(DATA_TEST_ID.SELECT_WRAPPER);
         expect(selectWrapper).to.exist;
 
         const select = within(selectWrapper).getByTestId(DATA_TEST_ID.SELECT_ELEMENT);
@@ -58,6 +71,9 @@ describe("Select", () => {
         });
 
         expect(ElSelect).toHaveBeenCalledWith(expect.objectContaining({ modelValue: JSON.parse(basicProps.value) }), expect.any(Object));
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     test("renders correctly with some advanced props", () => {
@@ -70,22 +86,72 @@ describe("Select", () => {
             collapseTags: "true",
             maxCollapseTags: "2",
             max: "2",
+            language: "en",
+            size: "small",
         };
 
         render(Select, { props: givenProps });
+
+        expect(ConfigWrapper).toHaveBeenCalledWith(
+            {
+                language: givenProps.language,
+            },
+            expect.any(Object)
+        );
 
         expect(ElSelect).toHaveBeenCalledWith(
             expect.objectContaining({
                 clearable: true,
                 filterable: true,
                 multiple: givenProps.multiple,
+                size: "small",
                 "allow-create": true,
                 "collapse-tags": true,
-                "max-collapse-tags": givenProps.maxCollapseTags,
-                "multiple-limit": givenProps.max,
+                "max-collapse-tags": parseInt(givenProps.maxCollapseTags),
+                "multiple-limit": parseInt(givenProps.max),
             }),
             expect.any(Object)
         );
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+    });
+
+    test("renders correctly grouped options", () => {
+        const givenProps = {
+            ...basicProps,
+            options: JSON.stringify([
+                { value: "foo", label: "Foo", group: "Group 1" },
+                { value: "bar", label: "Bar", group: "Group 1" },
+                { value: "foo 2", label: "Foo 2", group: "Group 2" },
+                { value: "bar 2", label: "Bar 2", group: "Group 2" },
+            ]),
+            group: "true",
+        };
+
+        render(Select, { props: givenProps });
+
+        const selectWrapper = screen.getByTestId(DATA_TEST_ID.SELECT_WRAPPER);
+        expect(selectWrapper).to.exist;
+
+        const select = within(selectWrapper).getByTestId(DATA_TEST_ID.SELECT_ELEMENT);
+        expect(select).to.exist;
+        const selectOptGroups = within(select).getAllByTestId(DATA_TEST_ID.SELECT_OPTION_GROUP);
+        expect(selectOptGroups).toHaveLength(2);
+        selectOptGroups.forEach((selectOptGroup, index) => {
+            expect(selectOptGroup.textContent).toBe("Group " + (index + 1));
+            const options = within(selectOptGroup).getAllByTestId(DATA_TEST_ID.SELECT_OPTION);
+            expect(options).toHaveLength(2);
+            const givenGroupOptions = JSON.parse(givenProps.options).filter((option) => option.group === selectOptGroup.textContent);
+            options.forEach((_, optionIndex) => {
+                const option = givenGroupOptions[optionIndex];
+                delete option.group;
+                expect(ElOption).toHaveBeenCalledWith(expect.objectContaining(option), null);
+            });
+        });
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
     describe("Behavior", () => {

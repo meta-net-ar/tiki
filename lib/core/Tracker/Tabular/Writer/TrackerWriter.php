@@ -68,16 +68,21 @@ class TrackerWriter
                 return $result;
             }
 
-            $resultUpdated = array_column($result, 'update');
-            $resultCreated = array_column($result, 'create');
+            $resultError = array_column($result, 'error', 'line');
+            $resultUpdated = array_column($result, 'update', 'line');
+            $resultCreated = array_column($result, 'create', 'line');
             $result = array_merge($resultUpdated, $resultCreated);
+
+            foreach ($resultError as $line => $error) {
+                \Feedback::error(tr('Error importing record %0: %1', $line + 1, $error));
+            }
 
             $feedback = [];
             if (! empty($resultCreated)) {
-                $feedback[] = count($resultCreated) . ' ' . tr('new tracker(s) item(s) created');
+                $feedback[] = count(array_filter($resultCreated)) . ' ' . tr('new tracker(s) item(s) created');
             }
             if (! empty($resultUpdated)) {
-                $feedback[] = count($resultUpdated) . ' ' . tr('tracker(s) item(s) updated');
+                $feedback[] = count(array_filter($resultUpdated)) . ' ' . tr('tracker(s) item(s) updated');
             }
             if (! empty($feedback)) {
                 \Feedback::success(implode('<br>', $feedback));
@@ -128,45 +133,50 @@ class TrackerWriter
         $definition = $schema->getDefinition();
 
         $iterate(function ($line, $info, $columns) use ($utilities, $definition, $schema) {
-            if (! isset($info['status'])) {
-                $info['status'] = '';
-            }
-            if ($info['itemId']) {
-                if ($schema->isSkipUnmodified()) {
-                    $currentItem = $utilities->getItem($definition->getConfiguration('trackerId'), $info['itemId']);
-                    if (isset($info['bulk_import'])) {
-                        $currentItem['bulk_import'] = $info['bulk_import'];
+            try {
+                if (! isset($info['status'])) {
+                    $info['status'] = '';
+                }
+                if ($info['itemId']) {
+                    if ($schema->isSkipUnmodified()) {
+                        $currentItem = $utilities->getItem($definition->getConfiguration('trackerId'), $info['itemId']);
+                        if (isset($info['bulk_import'])) {
+                            $currentItem['bulk_import'] = $info['bulk_import'];
+                        }
+
+                        $diff = array_diff_assoc(
+                            array_filter($info, function ($item) {
+                                return is_string($item);
+                            }),
+                            array_filter($currentItem, function ($item) {
+                                return is_string($item);
+                            })
+                        );
+                        if (! $diff) {
+                            $diff = array_diff_assoc($info['fields'], $currentItem['fields']);
+                            if (! $diff) {
+                                return true;
+                            }
+                        }
                     }
 
-                    $diff = array_diff_assoc(
-                        array_filter($info, function ($item) {
-                            return is_string($item);
-                        }),
-                        array_filter($currentItem, function ($item) {
-                            return is_string($item);
-                        })
-                    );
-                    if (! $diff) {
-                        $diff = array_diff_assoc($info['fields'], $currentItem['fields']);
-                        if (! $diff) {
-                            return true;
+                    $success = $utilities->updateItem($definition, $info);
+                    $result['update'] = $success;
+                } else {
+                    $success = $utilities->insertItem($definition, $info);
+                    $result['create'] = $success;
+                }
+                if (! empty($info['postprocess'])) {
+                    foreach ((array) $info['postprocess'] as $postprocess) {
+                        if (is_callable($postprocess)) {
+                            $postprocess($success);
                         }
                     }
                 }
-
-                $success = $utilities->updateItem($definition, $info);
-                $result['update'] = $success;
-            } else {
-                $success = $utilities->insertItem($definition, $info);
-                $result['create'] = $success;
+            } catch (\Throwable $e) {
+                $result['error'] = tr("%0 on line %1 of %2", $e->getMessage(), $e->getLine(), $e->getFile());
             }
-            if (! empty($info['postprocess'])) {
-                foreach ((array) $info['postprocess'] as $postprocess) {
-                    if (is_callable($postprocess)) {
-                        $postprocess($success);
-                    }
-                }
-            }
+            $result['line'] = $line;
             return $result;
         });
 

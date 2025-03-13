@@ -21,7 +21,7 @@
             <label for="csvfile" class="me-2">
                 {tr}File{/tr}
             </label>
-            <input name="csvfile" type="file" required="required" class="form-control">
+            <input name="csvfile" type="file" accept=".csv" required="required" class="form-control">
             <div class="submit">
                 {ticket mode=confirm}
                 <input type="submit" class="btn btn-primary" name="import" value="{tr}Import{/tr}">

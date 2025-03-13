@@ -103,7 +103,12 @@
                         <div class="card-header">{tr}Preference List{/tr}</div>
                         <div class="card-body mb-4">
                             {foreach from=$perspective_info.preferences key=name item=val}
-                                {preference name=$name source=$perspective_info.preferences}
+                                <div class="d-flex justify-content-between align-items-center wrapper">
+                                    <div class="w-100">
+                                    {preference name=$name source=$perspective_info.preferences}
+                                    </div>
+                                    <button type="button" class="btn btn-link text-danger" onclick="$('.{$name}').closest('.wrapper').remove()">{icon name='delete'}</button>
+                                </div>
                             {/foreach}
                     </fieldset>
                 </div>
@@ -132,40 +137,20 @@
                 </div>
             </form>
             {jq}
-                $('#preferences')
-                    .droppable( {
-                        activeClass: 'ui-state-highlight',
-                        drop: function( e, ui ) {
-                            $('#preferences').append( ui.draggable );
-                            $(ui.draggable)
-                                .draggable('destroy')
-                                .draggable( {
-                                    distance: 50,
-                                    handle: 'label',
-                                    axis: 'x',
-                                    stop: function( e, ui ) {
-                                        $(this).remove();
-                                    }
-                                } );
-                        }
-                    } )
-                    .find('div.adminoptionbox').draggable( {
-                        distance: 50,
-                        handle: 'label',
-                        axis: 'x',
-                        stop: function( e, ui ) {
-                            $(this).remove();
-                        }
-                    } );
+                Sortable.create($('#preferences .card-body')[0], {
+                    group: 'preferences',
+                    animation: 150,
+                    sort: false
+                });
                 $('#searchform').on("submit", function(e) {
                     e.preventDefault();
                     if (typeof ajaxLoadingShow == 'function') { ajaxLoadingShow('resultzone'); }
                     $('#resultzone').load( this.action, $(this).serialize(), function() {
-                        $('#resultzone div.adminoptionbox').draggable( {
-                            scroll: true,
-                            cursor: 'move',
-                            helper: 'clone'
-                        } );
+                         Sortable.create($('#resultzone')[0], {
+                            group: 'preferences',
+                            animation: 150,
+                            sort: false
+                         });
                         $(this).tiki_popover();
                         if (typeof ajaxLoadingHide == 'function') { ajaxLoadingHide(); }
                     } );

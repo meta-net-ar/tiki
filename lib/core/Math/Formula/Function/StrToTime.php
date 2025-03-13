@@ -6,6 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Math_Formula_Function_StrToTime extends Math_Formula_Function
 {
+    protected $calendarlib;
+
+    public function setCalenarLibForTests($calendarlib)
+    {
+        $this->calendarlib = $calendarlib;
+    }
+
     public function evaluate($args)
     {
         $elements = [];
@@ -35,7 +42,15 @@ class Math_Formula_Function_StrToTime extends Math_Formula_Function
             $now = time();  // Seconds since the Unix Epoch (January 1 1970 00:00:00 GMT)
         }
 
-        $newTime = strtotime($time, $now);
+        if (! empty($time) && preg_match('/(work(ing)|business) (days?)/', $time, $m)) {
+            $time = str_replace($m[0], $m[3], $time);
+            $newTime = strtotime($time, $now);
+            if (is_numeric($newTime)) {
+                $newTime = TikiLib::lib('calendar')->skipNonWorkingDays($newTime, $now);
+            }
+        } else {
+            $newTime = strtotime($time, $now);
+        }
 
         date_default_timezone_set($oldTz);
 

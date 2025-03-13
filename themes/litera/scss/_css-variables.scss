@@ -21,7 +21,7 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: #fff;
+    --tiki-top-bg: #F8F9FA;
     --tiki-top-color: rgba(0, 0, 0, 0.55);
     --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-top-text-color: rgba(0, 0, 0, 0.7);
@@ -31,7 +31,7 @@
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: #fff;
+    --tiki-topbar-bg: #F8F9FA;
     --tiki-topbar-color: rgba(0, 0, 0, 0.55);
     --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-topbar-text-color: rgba(0, 0, 0, 0.7);
@@ -79,8 +79,8 @@
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: #fff;
-    --tiki-admin-navbar-bg: #fff;
+    --tiki-admin-top-nav-bg: #F8F9FA;
+    --tiki-admin-navbar-bg: #F8F9FA;
     --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.55);
     --tiki-admin-top-nav-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-admin-top-nav-hover-bg: none ;
@@ -91,7 +91,7 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -110,7 +110,7 @@
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
     --tiki-admin-dropdown-link-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }

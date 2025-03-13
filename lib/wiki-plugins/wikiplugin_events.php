@@ -97,6 +97,19 @@ function wikiplugin_events_info()
                     ['text' => tra('No'), 'value' => 'n']
                 ],
             ],
+            'attendees' => [
+                'required' => false,
+                'name' => tra('attendees'),
+                'description' => tr('This parameter allows listing the participants of the event.'),
+                'since' => '28.0',
+                'filter' => 'alpha',
+                'default' => 'n',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ],
+            ],
         ],
     ];
 }
@@ -136,6 +149,11 @@ function wikiplugin_events($data, $params)
     }
     if (! isset($usePagination)) {
         $usePagination = 'n';
+    }
+
+    // attendees
+    if (! isset($attendees)) {
+        $attendees = 'n';
     }
 
     // Pagination
@@ -246,9 +264,18 @@ function wikiplugin_events($data, $params)
         $smarty->assign_by_ref('cant', $events['cant']);
     }
 
+    // attendees
+    if ($attendees == 'y') {
+        $attendees = 'y';
+    }
+
+    $listAttendees = $calendarlib->getAttendees();
+
     $smarty->assign('usePagination', $usePagination ?? 'n');
     $smarty->assign_by_ref('events', $events['data']);
     $smarty->assign_by_ref('actions', $actions);
+    $smarty->assign('attendees', $attendees);
+    $smarty->assign('listAttendees', $listAttendees);
 
 
     return '~np~' . $smarty->fetch('wiki-plugins/wikiplugin_events.tpl') . '~/np~';

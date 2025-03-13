@@ -30,11 +30,15 @@ export function syncSelectOptions(elementPlusSelect, select) {
                 value: $(this).val(),
                 label: $(this).text(),
                 disabled: $(this).prop("disabled"),
+                group: $(this).parent("optgroup").attr("label"),
             };
         })
         .get();
     $(elementPlusSelect).attr("options", JSON.stringify(options));
     $(elementPlusSelect).attr("value", JSON.stringify($(select).val()));
+    if (options.find((option) => option.group)) {
+        $(elementPlusSelect).attr("group", true);
+    }
 }
 
 export function attachChangeEventHandler(elementPlusSelect, select) {

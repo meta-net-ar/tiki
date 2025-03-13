@@ -1,0 +1,13 @@
+diff --git a/node_modules/element-plus/es/components/tooltip/src/content.mjs b/node_modules/element-plus/es/components/tooltip/src/content.mjs
+index 51dc1f7..3708c07 100644
+--- a/node_modules/element-plus/es/components/tooltip/src/content.mjs
++++ b/node_modules/element-plus/es/components/tooltip/src/content.mjs
+@@ -112,7 +112,7 @@ const _sfc_main = /* @__PURE__ */ defineComponent({
+       var _a;
+       const popperContent = (_a = contentRef.value) == null ? void 0 : _a.popperContentRef;
+       const activeElement = (event == null ? void 0 : event.relatedTarget) || document.activeElement;
+-      return popperContent == null ? void 0 : popperContent.contains(activeElement);
++      return popperContent && activeElement?.shadowRoot?.contains(popperContent);
+     };
+     watch(() => unref(open), (val) => {
+       if (!val) {

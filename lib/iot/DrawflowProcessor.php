@@ -1,9 +1,9 @@
 <?php
 
-namespace Tiki\Lib\Iot;
+namespace Tiki\Lib\iot;
 
 use Exception;
-use Tiki\Lib\Iot\DrawflowNodeType;
+use Tiki\Lib\iot\DrawflowNodeType;
 
 /**
  * TODO Fix the processor for flow with complex paths & node inter connexions

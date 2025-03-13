@@ -840,7 +840,11 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
     private function canChangeValue()
     {
         $groupsCanChangeValue = $this->getOption('canChangeGroupIds');
-        if ($groupsCanChangeValue) {
+
+        if (is_string($groupsCanChangeValue)) {
+            $groupsCanChangeValue = [$groupsCanChangeValue];
+        }
+        if ($groupsCanChangeValue && is_array($groupsCanChangeValue)) {
             global $user;
 
             foreach ($groupsCanChangeValue as $groupId) {

@@ -11,6 +11,7 @@
 // application to display an image from the database with
 // option to resize the image dynamically creating a thumbnail on the fly.
 require_once('tiki-setup.php');
+TikiLib::lib('header')->setXRobotsTag($robots);
 if (! isset($_REQUEST["id"])) {
     die;
 }

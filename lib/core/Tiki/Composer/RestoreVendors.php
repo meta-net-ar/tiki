@@ -25,12 +25,5 @@ class RestoreVendors
         if (! file_exists($vendors . 'plotly/plotly.js/dist/plotly-basic.min.js') && ! empty($package[0])) {
             $repoManager->removePackage($package[0]);
         }
-
-        // get back previously "cleaned" widget-output.js for tablesorter export
-        $package = $repoManager->findPackages('mottie/tablesorter');
-
-        if (! file_exists($vendors . 'mottie/tablesorter/js/widgets/widget-output.js') && ! empty($package[0])) {
-            $repoManager->removePackage($package[0]);
-        }
     }
 }

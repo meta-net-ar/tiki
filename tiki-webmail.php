@@ -75,9 +75,9 @@ if (! empty($_SESSION['cypht']['user_data']['debug_mode_setting'])) {
 
 $out = str_replace("<th></th>", "<th><pre>     <pre></th>", $dispatcher->output);
 
-$smarty->assign('output_data', '<div class="inline-cypht"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
+$smarty->assign('output_data', '<div class="inline-cypht"><div class="app-container"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
     . $out
-    . "</div>");
+    . "</div></div>");
 $smarty->assign('mid', 'tiki-webmail.tpl');
 
 //handle message priting
@@ -112,7 +112,7 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
             $header_cc = $_POST['header_cc'];
         }
 
-        $contentpage = createPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc);
+        $contentpage = createWebPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc);
         $filename = $header_from . '_' . $header_subject;
         $params = [
         'page' => 'messsage',
@@ -132,16 +132,19 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
+        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
     }
 }
+
+$headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
 
 $smarty->display('tiki.tpl');
 
 /**
  * creates the HTML page to be print.
  */
-function createPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc)
+function createWebPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc)
 {
     if (empty($header_cc)) {
         $headerCcRow = '';

@@ -7,7 +7,7 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'msg'                             => 'word',              //get
+        'msg'                             => 'string',              //get
         'show_history_back_link'          => 'bool',              //get
         ],
     ],

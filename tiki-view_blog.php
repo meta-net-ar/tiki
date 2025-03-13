@@ -48,9 +48,7 @@ if (isset($_REQUEST["blogTitle"])) {
     }
 }
 if (! isset($_REQUEST["blogId"])) {
-    $smarty->assign('msg', tra("No blog indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No blog indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $tikilib->get_perm_object($_REQUEST["blogId"], 'blog');
 
@@ -64,9 +62,7 @@ if ($user && $user == $blog_data["user"]) {
 }
 $smarty->assign('ownsblog', $ownsblog);
 if (! $blog_data) {
-    $smarty->assign('msg', tra("Blog not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Blog not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 // We need to figure out in which section and theme we are before any call to tiki-modules.php

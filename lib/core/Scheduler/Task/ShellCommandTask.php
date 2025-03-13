@@ -11,6 +11,12 @@ class Scheduler_Task_ShellCommandTask extends Scheduler_Task_CommandTask
 {
     public function execute($params = null)
     {
+        global $prefs;
+        if ($prefs['scheduler_shell_command'] !== 'y') {
+            $this->errorMessage = tra('Shell command execution is disabled.');
+            return false;
+        }
+
         if (empty($params['shell_command'])) {
             $this->errorMessage = tra('Missing shell command to execute.');
             return false;

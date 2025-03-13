@@ -97,4 +97,9 @@ class Search_Index_AbstractIndexDecorator implements Search_Index_Interface
             return $this->parent->getFieldMappings();
         }
     }
+
+    public function callSuggestions(array $options): array
+    {
+        return [];
+    }
 }

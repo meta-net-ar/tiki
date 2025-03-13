@@ -164,7 +164,12 @@
             <div class="row mt-md-3 mb-3 date">
                 <label class="col-form-label col-sm-3">{tr}Start - End{/tr}</label>
                 <div class="col-sm-7 start">
-                    {jscalendar id="start" date=$calitem.start enddate=$calitem.end fieldname="calitem[start]" showtime='y' endfieldname="calitem[end]" showtimezone="n" timezone=$displayTimezone}
+                    {if $calitem.allday}
+                        {assign var="showtime" value="n"}
+                    {else}
+                        {assign var="showtime" value="y"}
+                    {/if}
+                    {jscalendar id="event-datetime" date=$calitem.start enddate=$calitem.end fieldname="calitem[start]" showtime=$showtime endfieldname="calitem[end]" showtimezone="n" timezone=$displayTimezone}
                 </div>
                 <div class="col-sm-2">
                     <div class="form-check">
@@ -174,6 +179,15 @@
                         </label>
                     </div>
                 </div>
+                {jq}
+                $('#allday').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#event-datetime').attr('type', 'daterange');
+                    } else {
+                        $('#event-datetime').attr('type', 'datetimerange');
+                    }
+                });
+                {/jq}
             </div> {* / .mb-3 *}
             <div class="row mt-md-3 mb-3 date">
                 {if $impossibleDates}
@@ -339,6 +353,7 @@
                                         <th>{tr}Invitee{/tr}</th>
                                         <th>{tr}Status{/tr}</th>
                                         <th>{tr}Role{/tr}</th>
+                                        <th>{tr}Note{/tr}</th>
                                         <th></th>
                                     </tr>
                                     <tr class="d-none" id="participant-template-row">
@@ -382,6 +397,8 @@
                                                     <option value="3" {if $ppl.role eq '3'}selected{/if}>{tr}non-participant{/tr}</option>
                                                 </select>
                                             </td>
+                                            <td class="w-25">
+                                                <input type="text" name="calitem[participant_comment][{$ppl.username}]" value="{$ppl.comment|escape}" class="form-control">
                                             <td>
                                                 <a href="#" class="delete-participant"><span class="icon icon-remove fas fa-times"></span></a>
                                             </td>

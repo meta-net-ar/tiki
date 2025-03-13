@@ -147,6 +147,15 @@
             {/remarksbox}
         </div>
     </div>
+    {if $schedulerinfo.task == 'ConsoleCommandTask' and empty($prefs.fallbackBaseUrl) }
+        <div class="row">
+           <div class="offset-sm-2 col-sm-10">
+               {remarksbox type="warning" title="{tr}Warning{/tr}"}
+               <tr>{tr}Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the <a target="_blank" href="tiki-admin.php?page=general">admin</a>.{/tr}</tr>
+               {/remarksbox}
+           </div>
+       </div>
+       {/if}
     <form class="form" action="tiki-admin_schedulers.php" method="post"
             enctype="multipart/form-data" name="RegForm" autocomplete="off">
         {ticket}

@@ -37,9 +37,7 @@ $smarty->assign('file', $file);
 if (! empty($_REQUEST['edit'])) {
     $access->checkCsrf();
     if (($data = file_get_contents($file)) === false) {
-        $smarty->assign('msg', tra('The specified file does not exist'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('The specified file does not exist'), \Laminas\Http\Response::STATUS_CODE_500);
     }
     $action = 'edit';
 } elseif (! empty($_REQUEST['save']) || ! empty($_REQUEST['save_and_view'])) {
@@ -52,9 +50,7 @@ if (! empty($_REQUEST['edit'])) {
     }
     $fp = fopen($file, "w");
     if (! $fp) {
-        $smarty->assign('msg', tra("You do not have permission to write the css file") . " $file");
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to write the css file"), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     fwrite($fp, $_REQUEST['data']);

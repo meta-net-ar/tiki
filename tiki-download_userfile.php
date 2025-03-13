@@ -10,6 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 $force_no_compression = true;
 require_once('tiki-setup.php');
+TikiLib::lib('header')->setXRobotsTag($robots);
 
 include_once('lib/userfiles/userfileslib.php');
 

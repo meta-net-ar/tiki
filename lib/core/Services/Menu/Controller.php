@@ -90,7 +90,31 @@ class Services_Menu_Controller
     public function action_edit_icon($input)
     {
         $menuLib = $this->menulib;
-        $menuLib->replace_menu_icon($input->optionid->text(), $input->updatedicon->text());
+        $optionInfo = $menuLib->get_menu_option($input->optionId->int());
+        if (! $optionInfo) {
+            throw new Services_Exception_NotFound(tr('Menu option %0 not found', $input->optionid->int()));
+        }
+        $optionId = $menuLib->replace_menu_option(
+            $optionInfo['menuId'],
+            $optionInfo['optionId'],
+            $optionInfo['name'],
+            $optionInfo['url'],
+            $optionInfo['type'],
+            $optionInfo['position'],
+            $optionInfo['section'],
+            $optionInfo['perm'],
+            $optionInfo['groupname'],
+            $optionInfo['userlevel'],
+            $input->icon->text(),
+            $optionInfo['class']
+        );
+
+        $icon_html = smarty_function_icon(['name' => $input->icon->text()], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+
+        return [
+            'icon_html' => $icon_html,
+            'optionId' => $optionId,
+        ];
     }
 
     public function action_clone($input)
@@ -308,14 +332,6 @@ class Services_Menu_Controller
         $menuLib = $this->menulib;
         $menuLib->export_menu_options($menuId, $encoding);
         return [];
-
-        //No confirm popup needed as there are no options that can be set currently
-/*      return [
-            'title' => tr('Export Menu Options'),
-            'menuId' => $menuId,
-            'menuInfo' => $menuDetails["info"],
-            'menuSymbol' => $menuDetails["symbol"],
-        ];*/
     }
 
     /**
@@ -326,7 +342,7 @@ class Services_Menu_Controller
      * @throws Services_Exception_Denied
      * @throws Services_Exception_NotFound
      */
-    public function action_import_menu_options($input)
+    public function action_import_menu_options($input, $importAsNew = false)
     {
         //get menu details
         $menuId = $input->menuId->int();
@@ -348,20 +364,49 @@ class Services_Menu_Controller
         if ($util->isConfirmPost()) {
             $menuId = $input->menuId->int();
             $menuLib = $this->menulib;
-            $menuLib->import_menu_options($menuId);
+            $menuLib->import_menu_options($menuId, $importAsNew);
             global $base_url;
             $redirect = $base_url . 'tiki-admin_menu_options.php?menuId=' . $menuId;
             Feedback::success(tr('Your menu options have been imported'));
-            Services_Utilities::sendFeedback($redirect);
         }
 
-        //information for the import menu screen
         return [
             'title' => tr('Import Menu Options'),
             'menuId' => $menuId,
             'menuInfo' => $menuDetails["info"],
             'menuSymbol' => $menuDetails["symbol"],
             'FORWARD' => $redirect,
+        ];
+    }
+
+    /**
+     * @param JitFilter $request
+     *
+     * @return array
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     * @throws Services_Exception_NotFound
+     */
+    public function actionImportMismatchedOptions(JitFilter $request): array
+    {
+        return $this->action_import_menu_options($request, true);
+    }
+
+    /**
+     * @param JitFilter $request
+     *
+     * @return array
+     */
+    public function actionMismatchImport(JitFilter $request): array
+    {
+        $mismatch_options = $request['mismatch_options'];
+        $menuId = $request['menuId'];
+        $title = $request['title'];
+
+        return [
+            'mismatch_options' => $mismatch_options,
+            'menuId' => $menuId,
+            'title' => $title,
         ];
     }
 
@@ -466,7 +511,7 @@ class Services_Menu_Controller
                         'groupname' => '',
                         'userlevel' => 0,
                         'icon' => '',
-                        'class' => ''
+                        'class' => '',
                     ];
                 }
 
@@ -487,19 +532,6 @@ class Services_Menu_Controller
                     $option['class']
                 );
             }
-
-            // $optionsToRemove = array_filter($oldOptions['data'], function ($item) use ($options) {
-            //  foreach ($options as $option) {
-            //      if ($option['optionId'] == $item['optionId']) {
-            //          return false;    // still here
-            //      }
-            //  }
-            //  return true;    // gone
-            // });
-
-            // foreach ($optionsToRemove as $item) {
-            //  $this->menulib->remove_menu_option($item['optionId']);
-            // }
         }
 
         return ['menuId' => $menuId];
@@ -551,7 +583,7 @@ class Services_Menu_Controller
                     'customMsg' => tr('Delete the %0 menu?', $menuDetails['info']['name']),
                     'confirmButton' => tra('Delete'),
                     'extra' => ['menuId' => $menuId],
-                ]
+                ],
             ];
         }
     }

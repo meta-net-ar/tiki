@@ -1,14 +1,15 @@
-<form action="#" method="get" class="d-flex flex-row flex-wrap align-items-center">
+<form action="#" method="get">
     <input type="hidden" name="trackerId" value="{$trackerId|escape}">
     {if $status}<input type="hidden" name="status" value="{$status}">{/if}
     {if $sort_mode}<input type="hidden" name="sort_mode" value="{$sort_mode}">{/if}
-    <div class="search_container mb-3">
+    {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
+    <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             {foreach key=st item=stdata from=$status_types}
-                <div style="display:inline-block;">
+                <div>
                     <div class="{$stdata.class}">
                         {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
-                        <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
+                        <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $offset}&amp;offset={$offset}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
                             {icon name="{$stdata.iconname}" ititle=":{tr}Toggle{/tr} {$stdata.label}" iclass='tips'}
                         </a>
                     </div>
@@ -16,7 +17,7 @@
             {/foreach}
         {/if}
 
-        <div style="display:inline-block;padding: 4px 10px;vertical-align:middle">
+        <div class="w-25">
             {if $show_filters eq 'y'}
                 {jq}
                     fields = [];
@@ -28,7 +29,7 @@
                         {/if}
                     {/foreach}}
                 {/jq}
-                <select name="filterfield" class="form-select" data-placeholder="{tr}Choose a filter{/tr}" onchange="this.form.submit(); {literal}showit = 'show_filterbutton'; if(this.selectedIndex == 0){document.getElementById('filterbutton').style.display = 'none';setSessionVar(showit,'n');}else{ document.getElementById('filterbutton').style.display = 'block'; setSessionVar(showit,'y');}{/literal}">
+                <select name="filterfield" class="form-select" placeholder="{tr}Choose a filter{/tr}" onchange="this.form.submit(); {literal}showit = 'show_filterbutton'; if(this.selectedIndex == 0){document.getElementById('filterbutton').style.display = 'none';setSessionVar(showit,'n');}else{ document.getElementById('filterbutton').style.display = 'block'; setSessionVar(showit,'y');}{/literal}">
                     <option value="">{tr}Choose a filter{/tr}</option>
                     {foreach key=fid item=field from=$listfields}
                         {if $field.isSearchable eq 'y' and $field.type ne 'f' and $field.type ne 'j' and $field.type ne 'i' and ($field.isHidden ne 'y' or $tiki_p_admin_trackers eq 'y')}
@@ -39,7 +40,7 @@
                 </select>
             {/if}
         </div>
-        <div style="display:inline-block" class="mb-3 row">
+        <div class="d-flex gap-2">
             {assign var=cnt value=0}
             {foreach key=fid item=field from=$listfields}
                 {if $field.isSearchable eq 'y' and $field.type ne 'f' and $field.type ne 'j' and $field.type ne 'i'}
@@ -126,7 +127,7 @@
             {/foreach}
         </div>
         {if isset($filter_button) && $filter_button eq 'y'}
-            <div style="display:inline-block" class="mb-3 row">
+            <div>
                 <input id="filterbutton" type="submit" class="btn btn-primary" name="filter" value="{tr}Filter{/tr}" style="display:{if $filterfield}inline{else}none{/if}">
             </div>
         {/if}

@@ -15,7 +15,17 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     private $pdo_client;
     private $index;
     private $indexer;
+    // list of fields and their types from Manticore
     private $providedMappings = [];
+    // stored conversion of Manticore field names to Tiki field names
+    private $fieldMapping = [];
+    // stored list of date-only fields as Manticore stores all datetime types as timestamp
+    private $dateFields = [];
+    // correct mapping back to Tiki field names (possibly come from Manticore server desc statement)
+    private $providedMappingsCorrectName = [];
+
+    // has index been modified? we need to store mappings in the preferences
+    private bool $dirty = false;
 
     private $facetCount = 10;
 
@@ -31,6 +41,35 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         $this->index = $index;
         $this->indexer = null;
         $this->providedMappings = $this->pdo_client->describe($index);
+        $this->fieldMapping = $this->getUnifiedFieldMapping();
+        $this->dateFields = $this->getUnifiedDateFields();
+        $this->providedMappingsCorrectName = array_flip(array_map(function ($field) {
+            return $this->fieldMapping[$field] ?? $field;
+        }, array_keys($this->providedMappings)));
+        $this->dirty = false;
+    }
+
+    public function __destruct()
+    {
+        global $prefs;
+
+        if (! $this->dirty) {
+            return;
+        }
+
+        if (empty($this->index) || strstr($this->index, 'pref_')) {
+            return;
+        }
+
+        $fieldMapping = json_encode($this->fieldMapping);
+        if (empty($prefs['unified_field_mapping']) || $prefs['unified_field_mapping'] != $fieldMapping) {
+            TikiLib::lib('tiki')->set_preference('unified_field_mapping', $fieldMapping);
+        }
+
+        $dateFields = json_encode($this->dateFields);
+        if (empty($prefs['unified_date_fields']) || $prefs['unified_date_fields'] != $dateFields) {
+            TikiLib::lib('tiki')->set_preference('unified_date_fields', $dateFields);
+        }
     }
 
     public function getClient()
@@ -53,6 +92,10 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         if ($this->pdo_client->deleteIndex($this->index)) {
             $this->pdo_client->deleteIndex($this->index . 'pq');
             $this->providedMappings = [];
+            $this->fieldMapping = [];
+            $this->dateFields = [];
+            $this->providedMappingsCorrectName = [];
+            $this->dirty = false;
             $stopwords_file = $this->getStopwordsFilePath();
             if (file_exists($stopwords_file)) {
                 @unlink($stopwords_file);
@@ -104,21 +147,10 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     {
         global $prefs;
 
-        // stored conversion of manticore field names to tiki field names
-        $fieldMapping = $this->getUnifiedFieldMapping();
-
-        // stored list of date-only fields as Manticore stores all datetime types as timestamp
-        $dateFields = $this->getUnifiedDateFields();
-
-        // correct mapping back to tiki field names (possibly come from manticore server desc statement)
-        $providedMappingsCorrectName = array_flip(array_map(function ($field) use ($fieldMapping) {
-            return $fieldMapping[$field] ?? $field;
-        }, array_keys($this->providedMappings)));
-
-        // extract the difference of the new data only and convert to manticore types
+        // extract the difference of the new data only and convert to Manticore types
         $mapping = array_map(
             [$this, 'convertToManticoreType'],
-            array_diff_key($data, $providedMappingsCorrectName)
+            array_diff_key($data, $this->providedMappingsCorrectName)
         );
 
         // observe 256 full-text fields index limit - convert the rest to string attributes
@@ -137,7 +169,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         foreach ($mapping as $field => $type) {
             if (! empty($type['dateonly'])) {
                 unset($mapping[$field]['dateonly']);
-                $dateFields[] = $field;
+                $this->dateFields[] = $field;
             }
         }
 
@@ -166,7 +198,8 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
                 'types' => $type['type'] == 'text' ? ['text', 'string'] : [$type['type']],
                 'options' => $type['options'] ?? [],
             ];
-            $fieldMapping[strtolower($field)] = $field;
+            $this->fieldMapping[strtolower($field)] = $field;
+            $this->providedMappingsCorrectName[$field] = 1;
         }
 
         if ($prefs['storedsearch_enabled'] == 'y' && $mapping) {
@@ -181,14 +214,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $this->updatePercolateIndex($this->index, $pq_mapping);
         }
 
-        $fieldMapping = json_encode($fieldMapping);
-        if (empty($prefs['unified_field_mapping']) || $prefs['unified_field_mapping'] != $fieldMapping) {
-            TikiLib::lib('tiki')->set_preference('unified_field_mapping', $fieldMapping);
-        }
-        $dateFields = json_encode($dateFields);
-        if (empty($prefs['unified_date_fields']) || $prefs['unified_date_fields'] != $dateFields) {
-            TikiLib::lib('tiki')->set_preference('unified_date_fields', $dateFields);
-        }
+        $this->dirty = true;
     }
 
     private function updatePercolateIndex($index, $mapping)
@@ -377,6 +403,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $search;
     }
 
+    public function getIndexTableName()
+    {
+        return $this->index;
+    }
+
     public function find(\Search_Query_Interface $query, $resultStart, $resultCount)
     {
         $builder = new QueryBuilder($this);
@@ -413,7 +444,8 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
         $result = $this->pdo_client->fetchAllRowsets($selectFields, $selectExpressions, $table, $condition, $order, $resultStart, $resultCount, $facets, array_keys($this->providedMappings));
         if ($query->processDidYouMean() && $result['total'] === 0) {
-            list($suggestionResult, $didYouMean, $correctKeywords) = $this->callSuggestions($table, $meta, $resultStart, $resultCount);
+            $params = compact('table', 'resultStart', 'resultCount', 'selectFields', 'selectExpressions');
+            list($suggestionResult, $didYouMean, $correctKeywords) = $this->callSuggestions($params);
             if ($suggestionResult) {
                 $result = $suggestionResult;
             }
@@ -493,8 +525,10 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         $resultSet = new ResultSet($entries, $totalCount, $resultStart, $resultCount);
         if (! empty($didYouMean)) {
             $resultSet->setDidYouMean(implode(' ', $correctKeywords));
+            $words = $correctKeywords;
+        } else {
+            $words = $query->getWords();
         }
-        $words = $this->getWords($query->getExpr());
         $resultSet->setHighlightHelper(new \Search_MySql_HighlightHelper($words));
 
         $reader = new FacetReader($facets);
@@ -506,11 +540,19 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $resultSet;
     }
 
-    public function callSuggestions($table, $meta, $resultStart, $resultCount)
+    public function callSuggestions(array $options): array
     {
+        $table = $options['table'];
+        $resultStart = $options['resultStart'];
+        $resultCount = $options['resultCount'];
+        $selectFields = $options['selectFields'];
+        $selectExpressions = $options['selectExpressions'];
         $didYouMean = false;
         $correctKeywords = [];
         $result = null;
+
+        $meta = $this->pdo_client->fetchAll('SHOW META');
+
         foreach ($meta as $m) {
             if (preg_match('/keyword\[\d+]/', $m['Variable_name'])) {
                 preg_match('/\d+/', $m['Variable_name'], $key);
@@ -540,7 +582,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $correctKeywords[] = end($didYouMeanQuery);
         }
         if ($didYouMean == true) {
-            $result = $this->pdo_client->fetchAllRowsets([], $table, "MATCH('" . implode(" ", $didYouMeanQuery) . "')", null, $resultStart, $resultCount, null, array_keys($this->providedMappings));
+            $result = $this->pdo_client->fetchAllRowsets($selectFields, $selectExpressions, $table, "MATCH('" . implode(" ", $didYouMeanQuery) . "')", null, $resultStart, $resultCount, null, array_keys($this->providedMappings));
         }
 
         return [$result, $didYouMean, $correctKeywords];

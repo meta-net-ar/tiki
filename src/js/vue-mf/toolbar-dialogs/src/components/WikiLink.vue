@@ -1,6 +1,6 @@
 <script setup>
 import DialogInput from "./DialogInput.vue";
-import { onMounted, defineProps, defineExpose, ref } from "vue";
+import { ref, useTemplateRef, computed, onMounted } from "vue";
 
 const props = defineProps({
     toolbarObject: {
@@ -9,21 +9,19 @@ const props = defineProps({
     },
 });
 
-const labelInputElement = ref();
-const pageInputElement = ref();
-const toolbarObject = ref(props.toolbarObject);
-
 const labelInput = ref("");
 const pageInput = ref("");
 const relationInput = ref("");
 
+const pageInputRef = useTemplateRef('pageInputElement');
+
+const toolbarObject = computed(() => props.toolbarObject);
+
 onMounted(() => {
-    $(labelInputElement.value.$el)
-        .parents(".modal").first()
-        .on("show.bs.modal", (event) => {
-            _shown(event);
-            $(this).find('[data-bs-toggle="tooltip"]').tooltip();
-        });
+    _shown();
+    $(toolbarObject.value.modalElement)
+    .find('[data-bs-toggle="tooltip"]')
+    .tooltip();
 });
 
 function _shown() {
@@ -31,7 +29,7 @@ function _shown() {
     const textArea = document.getElementById(toolbarObject.value.domElementId);
     const selection = getTASelection(textArea);
 
-    $(pageInputElement.value.$el).tiki("autocomplete", "pagename");
+    $(pageInputRef.value.$el).tiki("autocomplete", "pagename");
 
     let parts = selection.match(/\((.*?)\((.*?)\|(.*?)\)\)/);
     if (! parts) {
@@ -51,14 +49,13 @@ function _shown() {
 
 function _insert() {
     let output = "";
-
     // pageInput.value doesn't get updated by tiki=>autocomplete yet
-    if (pageInputElement.value.$el.value) {
+    if (pageInputRef.value.$el.value) {
         output += "(";
         if (relationInput.value) {
             output += relationInput.value;
         }
-        output += `(${pageInputElement.value.$el.value}`;
+        output += `(${pageInputRef.value.$el.value}`;
         if (labelInput.value) {
             output += `|${labelInput.value}`;
         }
@@ -74,10 +71,10 @@ defineExpose({ execute: _insert, shown: _shown });
 </script>
 
 <template>
-    <DialogInput ref="labelInputElement" v-model="labelInput" label="Label" class="mb-2" />
+    <DialogInput v-model="labelInput" label="Label" class="mb-2" />
     <DialogInput ref="pageInputElement" v-model="pageInput" label="Page" class="mb-2" />
     <div class="input-group input-group-sm">
-        <DialogInput ref="tdgRelation" v-model="relationInput" label="Semantic Relation" />
+        <DialogInput v-model="relationInput" label="Semantic Relation" />
         <span class="input-group-text" data-bs-toggle="tooltip" title="Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.">
             <span class="fa fa-circle-info"></span>
         </span>

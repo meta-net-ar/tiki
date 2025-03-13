@@ -6,7 +6,7 @@
 <body{html_body_attributes}>
 
 {* Index we display a wiki page here *}
-{if $prefs.feature_bidi eq 'y'}
+{if Language::isRTL()}
 <div dir="rtl">
 {/if}
 {if $prefs.feature_ajax eq 'y'}
@@ -58,7 +58,7 @@
         </div>
     </div>
 {/if}
-{if $prefs.feature_bidi eq 'y'}
+{if Language::isRTL()}
     </div>
 {/if}
 {include file='footer.tpl'}

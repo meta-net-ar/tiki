@@ -83,7 +83,7 @@ class TextArea extends Base
             } else {
                 $params['syntax'] = 'tiki';
             }// to pick the editor
-            if (isset($syntaxPluginResult['editor'])) {
+            if (isset($syntaxPluginResult['editor']) && empty($content) && empty($params['_wysiwyg'])) {
                 $params['_wysiwyg'] = $syntaxPluginResult['editor'] === 'wysiwyg' ? 'y' : 'n';
             }
         }
@@ -181,35 +181,16 @@ class TextArea extends Base
                 $html .= '<input type="hidden" name="' . $params['name'] . '" id="' . $as_id . '" value="' . htmlspecialchars($content) . '" />';
                 $html .= '<div id="' . $as_id . '_editor"></div>';
             } else {
-                // legacy tiki/ckeditor wysiwyg
+                $params['_is_html'] = true;
+                $parsedContent = TikiLib::lib('edit')->parseToWysiwyg($content, false, false, ['wysiwyg' => true, 'html_editor' => true]);
+                $html .= <<<HTML
+                <textarea class="wikiedit d-none" name="{$params['name']}" id="{$as_id}">
+                    {$parsedContent}
+                </textarea>
+                <input type="hidden" name="wysiwyg" value="y" />
+                HTML;
 
-                $ckoptions = $wysiwyglib->setUpEditor($params['_is_html'], $as_id, $params, $auto_save_referrer);
-
-                $html .= '<input type="hidden" name="wysiwyg" value="y" />';
-                $html .= '<textarea class="wikiedit" name="' . $params['name'] . '" id="' . $as_id . '" style="visibility:hidden;'; // missing closing quotes, closed in condition
-
-                $smarty->assign('textarea_id', $params['id']);
-
-                if (empty($params['cols'])) {
-                    $html .= 'width:100%;' . (empty($params['rows']) ? 'height:500px;' : '') . '"';
-                } else {
-                    $html .= '" cols="' . $params['cols'] . '"';
-                }
-                if (! empty($params['rows'])) {
-                    $html .= ' rows="' . $params['rows'] . '"';
-                }
-                $html .= '>' . htmlspecialchars($content) . '</textarea>';
-
-                $headerlib->add_jq_onready(
-                    '
-    CKEDITOR.replace( "' . $as_id . '",' . $ckoptions . ');
-    CKEDITOR.on("instanceReady", function(event) {
-    if (typeof ajaxLoadingHide == "function") { ajaxLoadingHide(); }
-    this.instances.' . $as_id . '.resetDirty();
-    });
-        ',
-                    20
-                );  // after dialog tools init (10)
+                $wysiwyglib->setUpEditor($as_id, $params);
             }
         } else {
             // end of if ( $params['_wysiwyg'] == 'y' && $params['_simple'] == 'n')
@@ -310,15 +291,6 @@ class TextArea extends Base
             $js_editconfirm .= "
     \$(window).on('beforeunload', function(e) {
         if (window.needToConfirm) {
-            if (typeof CKEDITOR === 'object') {
-                for(var ed in CKEDITOR.instances ) {
-                    if (CKEDITOR.instances.hasOwnProperty(ed)) {
-                        if ( CKEDITOR.instances[ed].checkDirty()) {
-                            editorDirty = true;
-                        }
-                    }
-                }
-            }
             if (editorDirty) {
                 var msg = '" . addslashes(tra('You are about to leave this page. Changes since your last save may be lost. Are you sure you want to exit this page?')) . "';
                 if (e) {

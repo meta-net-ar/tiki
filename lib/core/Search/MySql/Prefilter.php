@@ -20,7 +20,7 @@ class Search_MySql_Prefilter
                 if ($field == 'ignored_fields') {
                     return false;
                 }
-                if (! empty($entry[$field])) {
+                if (! empty($entry[$field]) && is_string($entry[$field])) {
                     return preg_match('/token[a-z]{20,}/', $entry[$field]);
                 }
                 return true;

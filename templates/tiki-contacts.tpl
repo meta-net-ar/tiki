@@ -306,7 +306,7 @@
 {/literal}
 
 {foreach from=$exts item=ext key=k}
-    extmenu_add('{$k|escape}', '{$ext.tra|escape}', '{$info.ext[$ext.id]|escape:quotes}', '{$ext.public|escape}');
+    extmenu_add('{$k|escape}', '{$ext.tra|escape}', '{$ext.art|escape}', '{$ext.public|escape}');
 {/foreach}
 
 {literal}

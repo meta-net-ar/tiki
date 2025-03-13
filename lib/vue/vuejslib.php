@@ -53,86 +53,48 @@ class VueJsLib
         }
         libxml_clear_errors();
 
-        $script = $dom->getElementsByTagName('script');
-        $template = $dom->getElementsByTagName('template');
-        $style = $dom->getElementsByTagName('style');
-        $scopedStyleIdentifier = false;
-
         if (! $name && $app) {
             $name = 'App';
         }
 
-        if ($style->length) {
-            $styleElement = $style[0];
-            $styleValue = $styleElement->nodeValue;
+        $name = str_replace(' ', '', $name);
 
-            if ($styleElement->hasAttribute('scoped')) {
-                $scopedStyleIdentifier = \Tiki\Utilities\Identifiers::generateRandomVueIdentifier();
-                $styleValue = "[$scopedStyleIdentifier] $styleValue";
-            }
-
-            TikiLib::lib('header')->add_css($styleValue);
-        }
-
-        if ($script->length) {    // required
-            $javascript = $script[0]->nodeValue;
-            preg_match('/export default {(.*)}/ms', $javascript, $match);
-
-            if ($match) {
-                $originalExport = $export = $match[1];
-                if ($template->length) {
-                    $templateNode = $template[0];
-                    $export .= ', template: `' . $this->getInnerHtml($templateNode) . '`';
-                    $javascript = str_replace($originalExport, $export, $javascript);
-                }
-                //$headerlib->add_js_module($javascript);
-                // embedded modules cannot export apparently, also can't be found by import fns
-            }
+        // check if the string contains vuejs script or template tags
+        if ($dom->getElementsByTagName('script')->length || $dom->getElementsByTagName('template')->length) {
             global $tikidomainslash;
             $tempDir = './temp/public/' . $tikidomainslash;
-            $hash = $name ? $name : md5(serialize($javascript));
+            $hash = $name ? $name : md5(serialize($str));
 
-            $file = $tempDir . "vue_" . $hash . ".js";
+            $file = $tempDir . "vue_" . $hash . ".vue";
             if ($minify) {
-                $minifier = new MatthiasMullie\Minify\JS($javascript);
+                $minifier = new MatthiasMullie\Minify\JS($str);
                 $minifier->minify($file);
             } else {
-                file_put_contents($file, $javascript);
+                file_put_contents($file, $str);
             }
             chmod($file, 0644);
 
             if ($app) {
                 $data = json_encode($data);
-                $headerlib->add_js_module(
-                    "
-import $name from \"$file\";
 
-var vm = new Vue({
-      render: h => h($name),
-      data: function () { return $data; },
-    }).\$mount(`#$name`);
-observeVueApp(vm);
-addScopedStyleIdentifier(vm, \"$scopedStyleIdentifier\");
+                /**
+                 * TEMPORARY FIX: Currently, `headerlib` native JS modules do not have isolated namespaces.
+                 * Creating an import alias for the `mountApp` function to avoid the following error when multiple Vue apps are loaded:
+                 * Error: Identifier 'mountApp' has already been declared.
+                 */
+                $importAlias = 'mountApp' . $name;
 
-"
+                $headerlib->add_js_module(<<<JS
+                    import { mountApp as $importAlias } from '@tiki-vue-sfc-loader';
+                    $importAlias('$name', '$file', $data);
+                JS
                 );
+
                 return "<div id=\"$name\"></div>";
             }
         }
 
         return '';
-    }
-
-    // thanks dpetroff https://www.php.net/manual/en/class.domelement.php#101243
-    private function getInnerHtml($node)
-    {
-        $innerHTML = '';
-        $children = $node->childNodes;
-        foreach ($children as $child) {
-            $innerHTML .= $child->ownerDocument->saveXML($child);
-        }
-
-        return str_replace('&#13;', "\r", $innerHTML);
     }
 
     /**

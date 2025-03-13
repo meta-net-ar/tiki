@@ -9,7 +9,7 @@
 </div>
 
 <h2>
-    {tr}Create/edit questions for quiz:{/tr} <a href="tiki-edit_quiz.php?quizId={$quiz_info.quizId}" class="pageTitle">{$quiz_info.name}</a>
+    {tr}Create/edit questions for quiz:{/tr} <a href="tiki-edit_quiz.php?quizId={$quiz_info.quizId}#contentedit_quiz1-2" class="pageTitle">{$quiz_info.name}</a>
 </h2>
 
 <form action="tiki-edit_quiz_results.php" method="post">
@@ -19,13 +19,13 @@
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label">{tr}From Points{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="fromPoints" value="{$fromPoints|escape}" class="form-control">
+            <input type="number" name="fromPoints" value="{$fromPoints|escape}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label">{tr}To Points{/tr}</label>
         <div class="col-sm-7">
-            <input type="text" name="toPoints" value="{$toPoints|escape}" class="form-control">
+            <input type="number" name="toPoints" value="{$toPoints|escape}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">

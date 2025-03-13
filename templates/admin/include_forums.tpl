@@ -20,6 +20,7 @@
                     {tr}Features{/tr}
                 </legend>
                 {preference name=feature_forum_rankings}
+                {preference name=feature_forum_process_inbound_mail_in_cron}
                 {preference name=feature_forum_parse}
                 <div class="adminoptionboxchild" id="feature_forum_parse_childcontainer">
                     {if $prefs.feature_wysiwyg eq 'y' and $prefs.wysiwyg_default eq 'y' and $prefs.wysiwyg_htmltowiki neq 'y'}

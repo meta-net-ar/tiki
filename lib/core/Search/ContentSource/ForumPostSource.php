@@ -57,7 +57,7 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
 
         $lastModification = $comment['commentDate'];
         $content = $comment['data'];
-        $snippet = TikiLib::lib('tiki')->get_snippet($content);
+        $snippet = TikiLib::lib('tiki')->get_snippet($content, '', ['indexing' => true]);
         $author = [$comment['userName']];
 
         $thread = $commentslib->get_comments($comment['objectType'] . ':' . $comment['object'], $objectId, 0, 0);

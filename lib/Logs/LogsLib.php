@@ -17,9 +17,10 @@ use function mb_convert_encoding;
 
 class LogsLib extends TikiLib
 {
-    public function add_log($type, $message, $who = '', $ip = '', $client = '', $time = '')
+    public function add_log($type, $message, $who = '', $ip = '', $client = '', $time = '', $log = '')
     {
-        global $user;
+        global $user, $prefs;
+
         if (empty($who)) {
             if (! empty($user)) {
                 $who = $user;
@@ -40,7 +41,12 @@ class LogsLib extends TikiLib
         if (empty($time)) {
             $time = $this->now;
         }
-        $this->add_action($type, 'system', 'system', $message, $who, $ip, $client, $time);
+
+        $this->add_action($type, 'system', 'system', $message, $who, $ip, $client, $time, '', '', $log);
+
+        if (! empty($prefs['log_file_path'])) {
+            $this->addFileLog($time, $who, $message);
+        }
     }
 
     public function list_logs($type = '', $user = '', $offset = 0, $maxRecords = -1, $sort_mode = 'lastModif_desc', $find = '', $min = 0, $max = 0)
@@ -114,6 +120,28 @@ class LogsLib extends TikiLib
     {
         $query = "delete from `tiki_actionlog` where `objectType`='system' and `lastModif`<=?";
         return $this->query($query, [(int)$date]);
+    }
+
+    /**
+     * Delete logs keep entries with given count
+     * @param $date
+     * @return \TikiDb_Pdo_Result
+     */
+    public function cleanWithCount($count)
+    {
+        $query = "delete from `tiki_actionlog` where `objectType`='system' order by `lastModif` asc limit ?";
+        return $this->query($query, [(int) $count]);
+    }
+
+    /**
+     * Delete logs older than a specific date
+     * @param $date
+     * @return \TikiDb_Pdo_Result
+     */
+    public function logsCount()
+    {
+        $query = "select count(*) from `tiki_actionlog` where `objectType`='system'";
+        return (int) $this->getOne($query);
     }
 
     public function add_action(
@@ -260,6 +288,34 @@ class LogsLib extends TikiLib
         }
 
         return isset($actions[0]) ? $actions[0] : 0;
+    }
+
+    /**
+     * Add log into file using date and log itself.
+     * @param $date
+     * @param $param
+     * @return bool
+     * @throws \Exception
+     */
+    public function addFileLog($date, $user, $param): bool
+    {
+        global $prefs;
+
+        $path = $prefs['log_file_path'];
+
+        $file = fopen($path, 'a');
+
+        if (! $file) {
+            Feedback::warning(['mes' => tr('It was not possible to create the log file (%0). Make sure the path exists and right permissions are set.', $path), 'title' => tr('Log entry was not created.')]);
+            return false;
+        }
+
+        $date = date('Y-m-d H:i:s', $date);
+
+        $result = fwrite($file, "\n[$date] $user - $param");
+        fclose($file);
+
+        return $result !== false;
     }
 
     /**
@@ -451,6 +507,13 @@ class LogsLib extends TikiLib
         return explode('_', str_replace('0', ' ', $string));
     }
 
+    public function getActionLogDetails($action, $object, $objectType)
+    {
+        $query = "select actionId from `tiki_actionlog` where `action`=? and `object`=? and `objectType`=? order by `lastModif` desc limit 1";
+        $result = $this->query($query, [$action, $object, $objectType]);
+        return $result->fetchRow();
+    }
+
     public function list_actions(
         $action = '',
         $objectType = '',
@@ -561,7 +624,7 @@ class LogsLib extends TikiLib
             if (
                 $prefs['feature_contribution'] == 'y'
                 && ($res['action'] == 'Created' || $res['action'] == 'Updated' || $res['action'] == 'Posted'
-                    || $res['action'] == 'Replied')
+                    || $res['action'] == 'Replied' || $res['action'] == 'Removed')
             ) {
                 if ($res['objectType'] == 'wiki page') {
                     $res['contributions'] = $this->get_action_contributions($res['actionId']);
@@ -1242,7 +1305,7 @@ class LogsLib extends TikiLib
                 $previousAction = $action;
 
                 foreach ($action['contributions'] as $contrib) {
-                    if (empty($tab[$action['user']]) or empty($tab[$action['user']]['stat'][$contrib['contributionId']])) {
+                    if (empty($tab[$action['user']]) or empty($tab[$action['user']][$contrib['contributionId']]['stat'])) {
                         $tab[$action['user']][$contrib['contributionId']]['name'] = $contrib['name'];
                         $tab[$action['user']][$contrib['contributionId']]['stat']['add'] = 0;
                         $tab[$action['user']][$contrib['contributionId']]['stat']['del'] = 0;
@@ -1256,16 +1319,12 @@ class LogsLib extends TikiLib
                         if (! $action['contributorDel']) {
                             ++$tab[$action['user']][$contrib['contributionId']]['stat']['nbAdd'];
                         }
-                    }
-
-                    if ($action['contributorDel']) {
+                    } elseif ($action['contributorDel']) {
                         $tab[$action['user']][$contrib['contributionId']]['stat']['del'] += $action['contributorDel'];
                         if (! $action['contributorAdd']) {
                             ++$tab[$action['user']][$contrib['contributionId']]['stat']['nbDel'];
                         }
-                    }
-
-                    if ($action['contributorAdd'] && $action['contributorDel']) {
+                    } elseif ($action['contributorAdd'] && $action['contributorDel']) {
                         ++$tab[$action['user']][$contrib['contributionId']]['stat']['nbUpdate'];
                     }
                 }

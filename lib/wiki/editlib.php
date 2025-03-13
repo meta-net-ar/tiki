@@ -725,7 +725,7 @@ class EditLib
     }
 
     /**
-     * Function to take html from ckeditor and parse back to wiki markup
+     * Function to take html from the wysiwyg editor and parse back to wiki markup
      * Used by "switch editor" and when saving in wysiwyg_htmltowiki mode
      * When saving in mixed "html" mode the "unparsing" is done in JavaScript client-side
      *
@@ -775,13 +775,13 @@ class EditLib
     }
 
     /**
-     * Render html to send to ckeditor, including parsing plugins for wysiwyg editing
+     * Render html to send to the wysiwyg editor, including parsing plugins for wysiwyg editing
      * From both wiki page source (for wysiwyg_htmltowiki) and "html" modes
      *
      * @param $inData string    page data, can be wiki or mixed html/wiki
      * @param bool $fromWiki    set if converting from wiki page using "switch editor"
      * @param bool $isHtml      true if $inData is HTML, false if wiki
-     * @return string           html to send to ckeditor
+     * @return string           html to send to wysiwyg editor
      */
 
     public function parseToWysiwyg($inData, $fromWiki = false, $isHtml = false, $options = [])
@@ -1315,15 +1315,12 @@ class EditLib
         // Read compiled (serialized) grammar
         $grammarfile = TIKI_PATH . '/lib/htmlparser/htmlgrammar.cmp';
         if (! $fp = @fopen($grammarfile, 'r')) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('msg', tra("Can't parse HTML data - no grammar file"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Can't parse HTML data - no grammar file"), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $grammar = unserialize(fread($fp, filesize($grammarfile)));
         fclose($fp);
 
-        // process a few ckeditor artifacts
+        // process a few html editor artifacts
         $inHtml = str_replace('<p></p>', '', $inHtml);  // empty p tags are invisible
 
         // create parser object, insert html code and parse it

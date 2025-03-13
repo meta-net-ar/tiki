@@ -64,7 +64,7 @@ abstract class ToolbarItem
         //we detect sheet first because it has unique buttons
         if ($section == 'sheet' && $tag = ToolbarSheet::fromName($tagName)) {
             return $tag;
-        } elseif ($wysiwyg && $tag = ToolbarCkOnly::fromName($tagName, $is_html, $is_markdown)) {
+        } elseif ($wysiwyg && $tag = ToolbarSummernoteOnly::fromName($tagName, $is_html, $is_markdown)) {
             return $tag;
         } elseif ($tag = ToolbarItem::getCustomTool($tagName)) {
             return $tag;
@@ -349,8 +349,8 @@ abstract class ToolbarItem
             case 'Spacer':
                 $tag = new ToolbarSpacer();
                 break;
-            case 'CkOnly':
-                $tag = new ToolbarCkOnly($tagName);
+            case 'SummernoteOnly':
+                $tag = new ToolbarSummernoteOnly($tagName);
                 break;
             case 'Fullscreen':
                 $tag = new ToolbarFullscreen();
@@ -436,7 +436,7 @@ abstract class ToolbarItem
         }
     }
 
-    abstract protected function getOnClick(): string;
+    abstract public function getOnClick(): string;
 
     protected function getOnClickMarkdown(): string
     {
@@ -517,6 +517,11 @@ abstract class ToolbarItem
         return $this->getWysiwygToken();
     }
 
+    public function getWysiwygRenderCallback(): string
+    {
+        return '';
+    }
+
     public function setMarkdownWysiwyg($markdown_wysiwyg)
     {
         $this->markdown_wysiwyg = $markdown_wysiwyg;
@@ -587,38 +592,5 @@ abstract class ToolbarItem
             $params['_menu_icon'] = 'y';
         }
         return smarty_block_self_link($params, $content, $smarty->getEmptyInternalTemplate());
-    }
-
-    protected function setupCKEditorTool(string $js): void
-    {
-        if (empty($this->label)) {
-            $this->label = $this->wysiwyg;
-        }
-        $this->label = addcslashes($this->label, "'");
-        TikiLib::lib('header')->add_js(
-            <<< JS
-if (typeof window.CKEDITOR !== "undefined" && !window.CKEDITOR.plugins.get("{$this->wysiwyg}")) {
-    window.CKEDITOR.config.extraPlugins += (window.CKEDITOR.config.extraPlugins ? ',{$this->wysiwyg}' : '{$this->wysiwyg}' );
-    window.CKEDITOR.plugins.add( '{$this->wysiwyg}', {
-        init : function( editor ) {
-            var command = editor.addCommand( '{$this->wysiwyg}', new window.CKEDITOR.command( editor , {
-                modes: { wysiwyg:1 },
-                exec: function (editor, data) {
-                    {$js}
-                },
-                canUndo: false
-            }));
-            editor.ui.addButton( '{$this->wysiwyg}', {
-                label : '{$this->label}',
-                command : '{$this->wysiwyg}',
-                icon: editor.config._TikiRoot + '{$this->icon}'
-            });
-        }
-    });
-}
-JS
-            ,
-            10
-        );
     }
 }

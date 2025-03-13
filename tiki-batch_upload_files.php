@@ -37,9 +37,7 @@ if (empty($prefs['fgal_batch_dir']) or ! is_dir($prefs['fgal_batch_dir'])) {
     } else {
         $msg .= tra("Please contact the website administrator.");
     }
-    $smarty->assign('msg', $msg);
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_500);
 }
 
 if (isset($_REQUEST['batch_upload']) and isset($_REQUEST['files']) and is_array($_REQUEST['files'])) {

@@ -412,7 +412,7 @@ class VCSUpdateCommand extends Command
         $progress::setFormatDefinition('custom', ' %current%/%max% [%bar%] -- %message%');
         $progress->setFormat('custom');
 
-
+        $output->writeln('');
         $progress->setMessage('Pre-update checks');
         $progress->start();
 
@@ -432,12 +432,15 @@ class VCSUpdateCommand extends Command
             $raw = $this->execCommand("svn merge --dry-run -r BASE:$rev . 2>&1");
 
             if (strpos($raw, 'E155035:')) {
-                $progress->setMessage('Working copy currently conflicted. Update Aborted.');
+                $output->writeln('');
+                $progress->setMessage('Working copy currently conflicted.');
+                $output->writeln('');
+                $progress->setMessage('Update Aborted.');
                 if ($email) {
-                    mail($email, 'Svn Up Aborted', wordwrap('Working copy currency conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
+                    mail($email, 'Svn Up Aborted', wordwrap('Working copy currently conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
                 }
                 if (! $noDb) {
-                    $logslib->add_action($action, "Working copy currency conflicted. Update Aborted. r$startRev", 'system');
+                    $logslib->add_action($action, "Working copy currently conflicted. Update Aborted. r$startRev", 'system');
                 }
                 if ($noHttps) {
                     // Revert composer https changes
@@ -450,6 +453,7 @@ class VCSUpdateCommand extends Command
 
             //  Check if working from from mixed revision, this happens when a commit is made and causes merges to fail.
             if (strpos($raw, 'E195020:')) {
+                $output->writeln('');
                 $progress->setMessage('Updating mixed revision working copy to single reversion');
                 preg_match('/\[\d*:(\d*)]/', $raw, $mixedRev);
                 $mixedRev = $mixedRev[1];
@@ -459,7 +463,10 @@ class VCSUpdateCommand extends Command
                 $raw = $this->execCommand('svn update --accept postpone --revision ' . $mixedRev . ' 2>&1');
                 $this->OutputErrors($logger, $raw, 'Problem with svn up, check for conflicts.', $errors, ! $noDb);
                 if ($logger->hasErrored()) {
-                    $progress->setMessage('Preexisting local conflicts exist. Update Aborted.');
+                    $output->writeln('');
+                    $progress->setMessage('Preexisting local conflicts exist.');
+                    $output->writeln('');
+                    $progress->setMessage('Update Aborted.');
                     if ($email) {
                         echo mail($email, 'Svn Up Aborted', wordwrap('Preexisting local conflicts exist. Update Aborted. ' . __FILE__, 70, "\r\n"));
                     }
@@ -477,7 +484,10 @@ class VCSUpdateCommand extends Command
                 $raw = $this->execCommand("svn merge --dry-run -r BASE:$rev .  2>&1");
             }
             if (strpos($raw, "\nC    ") !== false) {
-                $progress->setMessage('Conflicts exist between working copy and repository. Update Aborted.');
+                $output->writeln('');
+                $progress->setMessage('Conflicts exist between working copy and repository.');
+                $output->writeln('');
+                $progress->setMessage('Update Aborted.');
                 if ($email) {
                     echo mail($email, 'Svn Up Aborted', wordwrap('Conflicts exist between working copy and repository. Update Aborted. ' . __FILE__, 70, "\r\n"));
                 }
@@ -500,12 +510,15 @@ class VCSUpdateCommand extends Command
             $raw = $this->gitUpdate($rev, $conflict, false);
 
             if (preg_match('/(Automatic merge failed|Aborting$|error:|fatal:)/', $raw)) {
-                $progress->setMessage('Working copy currently conflicted. Update Aborted.');
+                $output->writeln('');
+                $progress->setMessage('Working copy currently conflicted.');
+                $output->writeln('');
+                $progress->setMessage('Update Aborted.');
                 if ($email) {
-                    mail($email, 'Git update aborted', wordwrap('Working copy currency conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
+                    mail($email, 'Git update aborted', wordwrap('Working copy currently conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
                 }
                 if (! $noDb) {
-                    $logslib->add_action($action, "Working copy currency conflicted. Update Aborted. $startRev", 'system');
+                    $logslib->add_action($action, "Working copy currently conflicted. Update Aborted. $startRev", 'system');
                 }
                 if ($noHttps) {
                     // Revert composer https changes
@@ -522,6 +535,7 @@ class VCSUpdateCommand extends Command
         }
 
         $update = $isGit ? 'GIT' : 'SVN';
+        $output->writeln('');
         $progress->setMessage('Updating ' . $update);
         $progress->advance();
 
@@ -545,11 +559,12 @@ class VCSUpdateCommand extends Command
 
         if (! $noDb) {
             $cacheLib = new \Cachelib();
+            $output->writeln('');
             $progress->setMessage('Clearing all caches');
             $progress->advance();
             $cacheLib->empty_cache();
         }
-
+        $output->writeln('');
         $progress->setMessage('Updating dependencies & setting file permissions');
         $progress->advance();
         $errors = ['', 'Please provide an existing command', 'you are behind a proxy', 'Composer failed', 'Wrong PHP version'];
@@ -578,6 +593,7 @@ class VCSUpdateCommand extends Command
         if (! $noDb) {
             // generate a secdb database so when database:update is run, it also gets updated.
             if (! $input->getOption('no-secdb')) {
+                $output->writeln('');
                 $progress->setMessage('Updating secdb');
                 $progress->advance();
 
@@ -589,6 +605,7 @@ class VCSUpdateCommand extends Command
             }
 
             // note: running database update also clears the cache
+            $output->writeln('');
             $progress->setMessage('Updating database');
             $progress->advance();
             try {
@@ -601,6 +618,7 @@ class VCSUpdateCommand extends Command
 
             // rebuild tiki index. Since this could take a while, make it optional.
             if (! $input->getOption('no-reindex')) {
+                $output->writeln('');
                 $progress->setMessage('Rebuilding search index');
                 $progress->advance();
                 $errors = ['', 'Fatal error'];
@@ -616,6 +634,7 @@ class VCSUpdateCommand extends Command
 
             /* generate caches */
             if (! $input->getOption('no-generate')) {
+                $output->writeln('');
                 $progress->setMessage('Generating caches');
                 $progress->advance();
                 try {
@@ -635,11 +654,14 @@ class VCSUpdateCommand extends Command
             if ($email) {
                 echo mail($email, $action . ' Aborted', wordwrap("Automatic update completed with errors, " . $prefix . $startRev . " -> " . $prefix . $endRev . ", Try again or debug." . __FILE__, 70, "\r\n"));
             }
+            $output->writeln('');
             $progress->setMessage("Automatic update completed with errors, " . $prefix . $startRev . " -> " . $prefix . $endRev . ", Try again or ensure update functioning.");
         } elseif ($noDb) {
+            $output->writeln('');
             $progress->setMessage("<comment>Automatic update completed in no-db mode, " . $prefix . $startRev . " -> " . $prefix . $endRev . ", Database not updated.</comment>");
         } else {
             $logslib->add_action($action, "Automatic update completed, " . $prefix . $startRev . " -> " . $prefix . $endRev, 'system');
+            $output->writeln('');
             $progress->setMessage("<comment>Automatic update completed " . $prefix . $startRev . " -> " . $prefix . $endRev . "</comment>");
         }
 

@@ -281,6 +281,19 @@ function wikiplugin_listpages_info()
                 'separator' => '|',
                 'profile_reference' => 'wiki_page',
             ],
+            'noheader' => [
+                'required' => false,
+                'name' => tra('No Header'),
+                'description' => tr('Set to Yes (%0) to have no header for the list results.', '<code>1</code>'),
+                'since' => '24.1',
+                'filter' => 'digits',
+                'default' => 0,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 1],
+                    ['text' => tra('No'), 'value' => 0]
+                ]
+            ],
         ]
     ];
 }
@@ -319,6 +332,7 @@ function wikiplugin_listpages($data, $params)
         'for_list_pages' => 'y',
         'pagination' => 'n',
         'exclude_pages' => '',
+        'noheader' => 0,
     ];
     $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
@@ -456,7 +470,7 @@ function wikiplugin_listpages($data, $params)
 
     if (! empty($start) || ! empty($end) || $length > 0) {
         foreach ($listpages['data'] as $i => $page) {
-            $listpages['data'][$i]['snippet'] = $tikilib->get_snippet($page['data'], $page['outputType'], ! empty($page['is_html']), '', $length, $start, $end);
+            $listpages['data'][$i]['snippet'] = $tikilib->get_snippet($page['data'], $page['outputType'], ['is_html' => ! empty($page['is_html'])], '', $length, $start, $end);
         }
     }
     if (isset($_REQUEST["page"])) {
@@ -468,6 +482,7 @@ function wikiplugin_listpages($data, $params)
     // The following two are for tiki-listpages_content.tpl (pagination)
     $smarty->assign("pluginlistpages", 'y');
     $smarty->assign("pagination", $pagination);
+    $smarty->assign("noheader", isset($noheader) ? $noheader : 0);
     if ($pagination == 'y') {
         // Show only x=$MaxRecords number of page entries on this page.
         for ($x = $offset_pagination; $x < ($offset_pagination + $GLOBALS['maxRecords']) && $x < count($listpages['data']); $x++) {
@@ -482,9 +497,7 @@ function wikiplugin_listpages($data, $params)
 
     // Display an error message if the $showNameAndDescriptionOnly and $showNameOnly options are all entered at the same time
     if (isset($showNameAndDescriptionOnly) && $showNameAndDescriptionOnly == 'y' && isset($showNameOnly) && $showNameOnly == 'y') {
-        $smarty->assign('msg', tra("You cannot specify the showNameOnly and showNameAndDescriptionOnly options simultaneously, You must choose one of them."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You cannot specify the showNameOnly and showNameAndDescriptionOnly options simultaneously, You must choose one of them."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (isset($showNameOnly) && $showNameOnly == 'y') {

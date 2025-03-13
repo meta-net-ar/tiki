@@ -11,40 +11,40 @@
         <fieldset>
             <legend>{tr}Account properties{/tr}</legend>
             <div class="mb-3 row">
-                <label class="col-form-label col-md-4">{tr}Account number{/tr} <span class="text-danger">*</span></label>
+                <label for="newAccountId" class="col-form-label col-md-4">{tr}Account number{/tr} <span class="text-danger">*</span></label>
                 <div class="col-md-8">
-                    <input class="form-control" class="form-control" type="text" name="newAccountId" id="newAccountId" {if !$account.changeable}readonly{/if} value="{$account.accountId}">
+                    <input class="form-control" class="form-control" type="number" name="newAccountId" id="newAccountId" {if !$account.changeable}readonly{/if} value="{$account.accountId}">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-form-label col-md-4">{tr}Account name{/tr} <span class="text-danger">*</span></label>
-                <div class="col-md-8">
+                <label for="accountName" class="col-form-label col-md-4">{tr}Account name{/tr} <span class="text-danger">*</span></label>
+                <div  class="col-md-8">
                     <input class="form-control" type="text" name="accountName" id="accountName" value="{$account.accountName}">
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-form-label col-md-4">{tr}Notes{/tr}</label>
+                <label for="accountNotes" class="col-form-label col-md-4">{tr}Notes{/tr}</label>
                 <div class="col-md-8">
                     <textarea class="form-control" name="accountNotes" id="accountNotes" cols="40" rows="3">{$account.accountNotes}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-form-label col-md-4">{tr}Budget{/tr} <span class="text-danger">*</span></label>
+                <label for="accountBudget" class="col-form-label col-md-4">{tr}Budget{/tr} <span class="text-danger">*</span></label>
                 <div class="col-md-8">
-                    <input class="form-control" type="text" name="accountBudget" id="accountBudget" value="{$account.accountBudget}">
+                    <input class="form-control" type="number" name="accountBudget" id="accountBudget" value="{$account.accountBudget}">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-form-label col-md-4">{tr}Locked{/tr}</label>
                 <div class="col-md-8">
                     <div class="radio">
-                        <label>
+                        <label for="accountLocked">
                             <input type="radio" name="accountLocked" id="accountLocked" {if $account.accountLocked==1}checked="checked"{/if} value="1">
                             {tr}Yes{/tr}
                         </label>
                     </div>
                     <div class="radio">
-                        <label>
+                        <label for="accountUnlocked">
                             <input type="radio" name="accountLocked" id="accountUnlocked" {if $account.accountLocked!=1}checked="checked"{/if} value="0">
                             {tr}No{/tr}
                         </label>

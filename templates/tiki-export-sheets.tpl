@@ -59,7 +59,6 @@
             <label class="col-form-label col-sm-3">{tr}Charset encoding:{/tr}</label>
             <div class="col-sm-6">
                 <select name="encoding" class="form-control">
-                    {*<option value="">{tr}Autodetect{/tr}</option>*}
                 {section name=key loop=$charsets}
                     <option value="{$charsets[key]}">{$charsets[key]}</option>
                 {/section}

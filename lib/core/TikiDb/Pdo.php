@@ -61,6 +61,16 @@ class TikiDb_Pdo_Result
 
 class TikiDb_Pdo extends TikiDb
 {
+    /**
+     * @var array track queries that needs logging
+     */
+    protected static $queryLog = [];
+
+    /**
+     * @var bool control to avoid setting up the shutdown handler multiple times
+     */
+    protected static $queryLogHandlerInstalled = false;
+
     /** @var $db PDO */
     private $db;
     /** @var $rowCount int*/
@@ -127,7 +137,6 @@ class TikiDb_Pdo extends TikiDb
             }
         }
 
-        $tracer = $base_url;
         if ($values) {
             if (! is_array($values)) {
                 $values = [$values];
@@ -152,12 +161,11 @@ class TikiDb_Pdo extends TikiDb
         }
 
         DatabaseQueryLog::logEnd($logHandle);
-        $this->stopTimer($starttime);
+        $queryElapsed = $this->stopTimer($starttime);
 
-        $tracer .= htmlspecialchars($_SERVER['PHP_SELF']);
-
-        if (isset($prefs['log_sql']) && $prefs['log_sql'] == 'y' && ($elapsed_in_db * 1000) > $prefs['log_sql_perf_min']) {
-            $this->pdoLogSQL($query, $elapsed_in_db, $tracer, $values);
+        if (isset($prefs['log_sql'], $prefs['log_sql_perf_min']) && $prefs['log_sql'] === 'y' && $queryElapsed > (float)$prefs['log_sql_perf_min']) {
+            $tracer = $base_url . '/' . htmlspecialchars($_SERVER['PHP_SELF']);
+            $this->pdoLogSQL($query, $queryElapsed, $tracer, $values);
         }
 
         if ($result === false) {
@@ -236,9 +244,35 @@ class TikiDb_Pdo extends TikiDb
         if (! $query) {
             return;
         }
-        $logQuery = "INSERT INTO tiki_sql_query_logs (`sql_query`, `query_duration`, `query_params`, `tracer`) VALUES (?, ?, ?, ?)";
-        $logStmt = $this->db->prepare($logQuery);
-        $logStmt->execute([$query, $duration,  json_encode($params), $tracer]);
-        $logStmt->closeCursor();
+
+        self::$queryLog[] = [
+            $query,
+            $duration,
+            json_encode($params),
+            $tracer,
+            date('Y-m-d H:i:s')
+        ];
+
+        // Defer inserting into the DB until tiki.process.shutdown not to cause issues with
+        // lastInsertedId reporting SQL log inserted ids instead of the main object lastInsertedId.
+        //
+        // Also, this limits performance impact during the request, deferring DB writing to after the
+        // response is sent back.
+
+        if (self::$queryLogHandlerInstalled) {
+            return; // Only register the handler once
+        }
+
+        $db = $this->db;
+        TikiLib::lib('events')->bind('tiki.process.shutdown', function () use ($db) {
+            $logQuery = "INSERT INTO tiki_sql_query_logs (`sql_query`, `query_duration`, `query_params`, `tracer`, `executed_at`) VALUES (?, ?, ?, ?, ?)";
+            $logStmt = $db->prepare($logQuery);
+
+            while ($params = array_shift(self::$queryLog)) {
+                $logStmt->execute($params);
+            }
+        });
+
+        self::$queryLogHandlerInstalled = true;
     }
 }

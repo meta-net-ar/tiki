@@ -8,5 +8,5 @@
 function smarty_block_textarea($params, $content, \Smarty\Template $template, $repeat)
 {
     $smartyBlockTextAreaHandler = new \SmartyTiki\BlockHandler\TextArea();
-    return $$smartyBlockTextAreaHandler->handle($params, $content, $template, $repeat);
+    return $smartyBlockTextAreaHandler->handle($params, $content, $template, $repeat);
 }

@@ -48,7 +48,11 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
     public function getDistantTrackerId(): ?int
     {
         $filter = $this->getParsedFilter();
-        $distantTrackerId = $filter['tracker_id'];
+        if ($filter) {
+            $distantTrackerId = $filter['tracker_id'];
+        } else {
+            $distantTrackerId = null;
+        }
         return $distantTrackerId;
     }
 
@@ -96,7 +100,7 @@ class TrackerFieldRelation extends AbstractTrackerFieldRelational
             $distantTracker = Tracker_Definition::get($distantTrackerId);
         } else {
             //While editing the relationship, the distant tracker may not yet have been set
-            var_dump($this->getRelationId());
+            $this->getRelationId();
             return null;
         }
 

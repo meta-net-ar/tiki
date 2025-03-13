@@ -46,9 +46,7 @@ $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
 
 if ($tiki_p_admin_users != 'y') {
-    $smarty->assign('msg', tra('You do not have the permission that is needed to use this feature'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have the permission that is needed to use this feature'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (isset($_REQUEST['use_credit']) && $use_credit_userid = $tikilib->get_user_id($_POST['userfilter'])) {
@@ -89,18 +87,18 @@ if (isset($credit_types) && is_array($credit_types)) {
             $values['scaling_divisor']
         );
     }
-
-    if (! empty($_POST['new_credit_type'])) {
-        $creditslib->updateCreditType(
-            $_POST['new_credit_type'],
-            $_POST['display_text'],
-            $_POST['unit_text'],
-            $_POST['is_static_level'],
-            $_POST['scaling_divisor']
-        );
-    }
 }
 
+// Add a new credit type with better validation
+if (! empty($_POST['new_credit_type']) && ! empty($_POST['display_text']) && ! empty($_POST['unit_text']) && isset($_POST['is_static_level'])) {
+    $creditslib->updateCreditType(
+        trim($_POST['new_credit_type']),
+        trim($_POST['display_text']),
+        trim($_POST['unit_text']),
+        $_POST['is_static_level'],
+        (int) ($_POST['scaling_divisor'] ?? 1)
+    );
+}
 list($creditTypes, $staticCreditTypes) = creditTypes();
 
 if (isset($_REQUEST['userfilter'])) {
@@ -113,9 +111,10 @@ if (isset($_REQUEST['userfilter'])) {
 
         // date values
         list($start_date, $end_date) = getStartDateFromRequest();
-
-        $req_type = $_REQUEST['action_type'];
-        $smarty->assign('act_type', $req_type);
+        if (isset($_REQUEST['action_type'])) {
+            $req_type = $_REQUEST['action_type'];
+            $smarty->assign('act_type', $req_type);
+        }
 
         consumptionData();
 

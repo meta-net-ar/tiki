@@ -1,7 +1,5 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="trackerhelp" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
-    {if $prefs.feature_jquery_autocomplete eq 'y'}
-        {jq}$(".trackername").tiki("autocomplete", "trackername");{/jq}
-    {/if}
+    {autocomplete element=".trackername" type="trackername"}
     <form method="post">
         <div class="mb-3 row mx-0">
             <label class="col-sm-3 col-form-label" for="trackerhelp_name">{tr}Tracker name:{/tr}</label>

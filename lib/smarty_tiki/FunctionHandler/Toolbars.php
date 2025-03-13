@@ -25,6 +25,7 @@ class Toolbars extends Base
             'section' => $section,
             'syntax' => $prefs['markdown_default'],
         ];
+        $params = array_merge($default, $params);
         // filters some tools here depending on section
         $hidden = [];
         $switchableWysiwygSections = ['wiki page', 'blogs', 'newsletters', 'cms', 'webmail'];
@@ -41,6 +42,10 @@ class Toolbars extends Base
 
         if (! isset($params['area_id'])) {
             $params['area_id'] = 'editwiki';
+        }
+
+        if (isset($params['inline']) && $params['inline']) {
+            $hidden = array_merge($hidden, ['switcheditor', 'admintoolbar', 'autosave', 'source']);
         }
 
         $list = ToolbarsList::fromPreference($params, $hidden);

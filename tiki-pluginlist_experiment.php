@@ -22,10 +22,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 
 if ($tiki_p_edit !== 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You need permission to edit pages in order to experiment on plugin LIST."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You need permission to edit pages in order to experiment on plugin LIST."), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $editwiki = $_REQUEST['editwiki'] ?? '';

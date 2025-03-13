@@ -198,7 +198,7 @@ class Services_ApiBridge
     {
         global $base_url;
         $smarty = TikiLib::lib('smarty');
-        $smarty->assign('asset_path', $base_url . 'vendor_bundled/vendor/swagger-api/swagger-ui/dist/');
+        $smarty->assign('asset_path', $base_url . SWAGGER_UI_DIST_PATH . '/');
         echo $smarty->fetch('api/docs.tpl');
     }
 

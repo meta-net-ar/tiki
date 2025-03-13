@@ -8,16 +8,31 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
 {
     private $template;
     private $format;
+    private string $editable;
+    private string $editableId;
+    private ?string $context;
 
     public function __construct($template)
     {
         $this->template = WikiParser_PluginMatcher::match($template);
         $this->format = self::FORMAT_WIKI;
+        $this->editable = '';
     }
 
     public function setRaw($isRaw)
     {
         $this->format = $isRaw ? self::FORMAT_HTML : self::FORMAT_WIKI;
+    }
+
+    public function setEditable(string $editable, string $id)
+    {
+        $this->editable = $editable;
+        $this->editableId = $id;
+    }
+
+    public function setContext(?string $context)
+    {
+        $this->context = $context;
     }
 
     public function getFormat()
@@ -72,11 +87,38 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
 
     public function renderEntries(Search_ResultSet $entries)
     {
+        if ($this->editable && isset($_REQUEST[$this->editableId])) {
+            return $this->wrapEditableByContext($_REQUEST[$this->editableId]);
+        }
+
         $out = '';
         foreach ($entries as $entry) {
             $out .= $entry;
         }
-        return $out;
+        if ($this->editable) {
+            return $this->wrapEditableByContext($out);
+        } else {
+            return $out;
+        }
+    }
+
+    private function wrapEditableByContext($content)
+    {
+        if ($this->context !== 'actions') {
+            return new Tiki_Render_Editable(
+                $content,
+                [
+                    'layout' => $this->editable,
+                    'field' => [
+                        'id' => $this->editableId,
+                        'type' => 'form',
+                        'wysiwyg' => false,
+                    ],
+                ],
+            );
+        } else {
+            return $content;
+        }
     }
 
     private function processDisplay($valueFormatter, $body, $arguments)

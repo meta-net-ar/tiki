@@ -99,6 +99,22 @@ function wikiplugin_fancytable_info()
                      ['text' => tra('No'), 'value' => 'n'],
                      ['text' => tra('Yes'), 'value' => 'y']
                  ]
+             ],
+             'class' => [
+                 'required' => false,
+                 'name' => tra('CSS Class'),
+                 'description' => tra('Apply custom CSS class to customize the table design'),
+                 'since' => '27.2',
+                 'filter' => 'text',
+                 'default' => '',
+             ],
+             'desc' => [
+                'required' => false,
+                'name' => tra('Description'),
+                'since' => '27.2',
+                'filter' => 'text',
+                'description' => tr('Table description.'),
+                'default' => ''
              ]
         ],
         $tsparams
@@ -125,7 +141,6 @@ function wikiplugin_fancytable_info()
 function wikiplugin_fancytable($data, $params)
 {
     global $prefs;
-
     // Initialize variables
     $tagremove = [];
     $pluginremove = [];
@@ -133,11 +148,16 @@ function wikiplugin_fancytable($data, $params)
     ++$iFancytable;
     extract($params, EXTR_SKIP);
     $msg = '';
+    $class = $params['class'] ?? '';
+    $desc = $params['desc'] ?? '';
 
-    // Check for sortable
-    $sort = isset($sortable) && $sortable != 'n';
+    // Check if sorting is desired
+    $sortDesired = isset($sortable) && $sortable != 'n';
 
-    if ($sort && Table_Check::isEnabled()) {
+    if ($sortDesired && Table_Check::isEnabled()) {
+        // Enable sorting, may become false if building table fails
+        $sort = true;
+
         // If sortable and table plugin is enabled
         $ts = new Table_Plugin();
         $ts->setSettings(
@@ -168,7 +188,7 @@ function wikiplugin_fancytable($data, $params)
         $sort = false;
     }
     // Check if sort is disabled or failed to build
-    if (! $sort) {
+    if (! $sort && $sortDesired) {
         if ($prefs['feature_jquery_tablesorter'] === 'n') {
             $msg = '<em>' . tra('The jQuery Sortable Tables feature must be activated for the sort feature to work.')
                 . '</em>';
@@ -176,13 +196,16 @@ function wikiplugin_fancytable($data, $params)
             $msg = '<em>' . tra('Unable to load the jQuery Sortable Tables feature.') . '</em>';
         }
     }
-
+    if (isset($desc) && ! empty($desc)) {
+        $desc = '<caption>' . $desc . '</caption>';
+    }
     // Prepare table attributes
     $sticky = isset($allowStickyHeaders) && $allowStickyHeaders == 'y';
     $style = $sort ? ' style="visibility:hidden"' : '';
     $wret = '<div id="wpfancytable' . $iFancytable . '-div"' . $style
         . ' class="table-responsive ts-wrapperdiv ' . ($sticky ? 'table-sticky' : '') . '">' . "\r\t";
-    $tableClass = 'table table-striped table-hover normal';
+    $class = "table-striped table-hover $class";
+    $tableClass = "table $class normal";
     if (! empty($colwidths)) {
         $tableClass .= ' fixed-layout';
     }
@@ -249,7 +272,7 @@ function wikiplugin_fancytable($data, $params)
         }
     }
     // Finalize table output
-    $wret .= "\r" . '</table></div>' . "\r" . $msg;
+    $wret .= "\r" . '</table></div>' . "\r" . $desc . $msg;
     return $wret;
 }
 

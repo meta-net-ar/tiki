@@ -94,16 +94,13 @@
             {/if}
         {/if}
     </div>
-    
+
     <div>
         <div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#page-source"><span class="copy_code_tooltiptext copy-html" id='copy_source'>Copy to clipboard</span></div>
         <pre class="codelisting preview-html" data-theme="default" data-wrap="1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" id="page-source">
             {$sourced|escape}
         </pre>
-    </div>   
-    
-    
-{if $prefs.feature_jquery_ui eq "y" && $prefs.feature_syntax_highlighter neq "y"}{jq}$("#page_source").resizable();{/jq}{/if}
+    </div>
 {/if}
 
 {if (isset($flaggedrev_approval) and $flaggedrev_approval) and $tiki_p_wiki_approve eq 'y' and $flaggedrev_compare_approve}
@@ -130,28 +127,26 @@
         <input type="hidden" name="page" value="{$page|escape}">
         <input type="hidden" name="history_offset" value="{$history_offset}">
 
-        <div class="multi mb-4">
-                    {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
+        <div class="multi mb-4 d-flex align-items-end justify-content-between flex-wrap gap-2">
+            {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
+                <div class="translation w-50">
+                    <label for="tra_lang" class="form-label">{tr}Translation{/tr}</label>
+                    <select name="tra_lang" class="form-select">
+                        {section name=ix loop=$languages}
+                            <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
+                        {/section}
+                    </select>
+                </div>
 
-                    <div class="input-group">
-                        <div class="input-group-text">
-                            {icon name='admin_i18n' class='tips' title=":{tr}Translation{/tr}"}
-                        </div>
-                        <select name="tra_lang" class="form-select">
-                            {section name=ix loop=$languages}
-                                <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
-                            {/section}
-                        </select>
-                        <div class="input-group-text ms-4">
-                            <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
-                            {if $show_translation_history}
-                                <input type="hidden" name="show_translation_history" value="1">
-                                {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info ms-1"}
-                            {else}
-                                {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info ms-1"}
-                            {/if}
-                        </div>
-                    </div>
+                <div class="d-flex flex-grow-0 gap-2">
+                    <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
+                    {if $show_translation_history}
+                        <input type="hidden" name="show_translation_history" value="1">
+                        {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}
+                    {else}
+                        {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info"}
+                    {/if}
+                </div>
 
             {/if}
         </div>
@@ -168,50 +163,27 @@
             <div class="col-sm-6">
             {if ($prefs.default_wiki_diff_style ne "old") and $history}
                 <div class="input-group">
-                    <select class="form-select" name="diff_style" id="diff_style_all" style="display: none">
-                        <option value="htmldiff" {if $diff_style == "htmldiff"}selected="selected"{/if}>
-                            {tr}HTML diff{/tr}
-                        </option>
-                        <option value="sidediff" {if $diff_style == "sidediff"}selected="selected"{/if}>
-                            {tr}Side-by-side diff{/tr}
-                        </option>
-                        <option value="sidediff-char" {if $diff_style == "sidediff-char"}selected="selected"{/if}>
-                            {tr}Side-by-side diff by characters{/tr}
-                        </option>
-                        <option value="inlinediff" {if $diff_style == "inlinediff"}selected="selected"{/if}>
-                            {tr}Inline diff{/tr}
-                        </option>
-                        <option value="inlinediff-char" {if $diff_style == "inlinediff-char"}selected="selected"{/if}>
-                            {tr}Inline diff by characters{/tr}
-                        </option>
-                        <option value="sidediff-full" {if $diff_style == "sidediff-full"}selected="selected"{/if}>
-                            {tr}Full side-by-side diff{/tr}
-                        </option>
-                        <option value="sidediff-full-char" {if $diff_style == "sidediff-full-char"}selected="selected"{/if}>
-                            {tr}Full side-by-side diff by characters{/tr}
-                        </option>
-                        <option value="inlinediff-full" {if $diff_style == "inlinediff-full"}selected="selected"{/if}>
-                            {tr}Full inline diff{/tr}
-                        </option>
-                        <option value="inlinediff-full-char" {if $diff_style == "inlinediff-full-char"}selected="selected"{/if}>
-                            {tr}Full inline diff by characters{/tr}
-                        </option>
-                        <option value="unidiff" {if $diff_style == "unidiff"}selected="selected"{/if}>
-                            {tr}Unified diff{/tr}
-                        </option>
-                        <option value="sideview" {if $diff_style == "sideview"}selected="selected"{/if}>
-                            {tr}Side-by-side view{/tr}
-                        </option>
+                    <select class="form-select" name="diff_style">
+                        <optgroup label="{tr}Simple{/tr}">
+                            {foreach  $diff_styles.options as $value => $label}
+                                {if $value == 'htmldiff' || $value == 'sidediff'}
+                                    <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                                        {tr}{$label}{/tr}
+                                    </option>
+                                {/if}
+                            {/foreach}
+                        </optgroup>
+                        <optgroup label="{tr}Advanced{/tr}">
+                            {foreach  $diff_styles.options as $value => $label}
+                                {if $value == 'htmldiff' || $value == 'sidediff'}
+                                    {continue}
+                                {/if}
+                                <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
+                                    {tr}{$label}{/tr}
+                                </option>
+                            {/foreach}
+                        </optgroup>
                     </select>
-                    <select class="form-select" name="diff_style" id="diff_style_simple">
-                        <option value="htmldiff" {if $diff_style == "htmldiff"}selected="selected"{/if}>
-                                {tr}HTML diff{/tr}
-                        </option>
-                        <option value="sidediff" {if $diff_style == "sidediff"}selected="selected"{/if}>
-                                {tr}Side-by-side diff{/tr}
-                        </option>
-                    </select>
-                    {button _text="{tr}Advanced{/tr}" _id="toggle_diffs" _ajax="n" _class="btn btn-secondary"}
                         {jq}
     $("form#pagehistory")
         .each(function store_original_values(i, form){
@@ -237,41 +209,6 @@
                 }
             });
         });
-
-    $("a#toggle_diffs").on("click", function(e){
-        if ($(this).text() == "{tr}Advanced{/tr}") {
-            $(this).text("{tr}Simple{/tr}");
-            if (jqueryTiki.select2) {
-                $("#diff_style_all").next(".select2-container").show();
-                $("#diff_style_simple").next(".select2-container").hide();
-                $("#diff_style_all").attr("name", "diff_style");
-                $("#diff_style_simple").attr("name", "");
-            } else {
-                $("#diff_style_all").show().attr("name", "diff_style");
-                $("#diff_style_simple").hide().attr("name", "");
-            }
-        } else {
-            $(this).text("{tr}Advanced{/tr}");
-            if (jqueryTiki.select2) {
-                $("#diff_style_all").next(".select2-container").hide();
-                $("#diff_style_simple").next(".select2-container").show();
-                $("#diff_style_all").attr("name", "");
-                $("#diff_style_simple").attr("name", "diff_style");
-            } else {
-                $("#diff_style_all").hide().attr("name", "");
-                $("#diff_style_simple").show().attr("name", "diff_style");
-            }
-        }
-        return false;
-    });
-    if (jqueryTiki.select2) {
-        if ($("#diff_style_simple").html().indexOf("{{$diff_style}}") > -1) {
-            $("#diff_style_all").next(".select2-container").hide().attr("name", "");
-        } else {
-            $("#diff_style_simple").next(".select2-container").hide();
-        }
-    }
-    {{if $diff_style neq "htmldiff" and $diff_style neq "sidediff"}$("#toggle_diffs a").trigger("click");{/if}}
                         {/jq}
                 </div>
                 <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
@@ -544,7 +481,7 @@
                     type="submit"
                     form="pagehistory"
                     formaction="{bootstrap_modal controller=wiki}"
-                    class="btn btn-warning"
+                    class="btn btn-primary"
                     onclick="confirmPopup()"
                 >
                     {tr}OK{/tr}

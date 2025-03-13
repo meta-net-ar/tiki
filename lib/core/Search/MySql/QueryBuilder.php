@@ -72,7 +72,13 @@ class Search_MySql_QueryBuilder
                 // $query contains the token string to compare against $fields[0] in the unified search table
                 // $fields[0] can be i.e  'allowed_users', 'allowed_groups'
                 $query = $this->fieldBuilder->build($node, $this->factory);
-                $str = $this->db->qstr($query);
+                if ($node instanceof MoreLikeThis) {
+                    $type = $node->getObjectType();
+                    $object = $node->getObjectId();
+                    $str = $node->getContent() ?: $this->getDocumentContent($type, $object);
+                } else {
+                    $str = $this->db->qstr($query);
+                }
                 $this->requireIndex($fields[0], 'fulltext', $node->getWeight());
                 $type = $this->fieldBuilder->isInverted()
                     ? 'NOT MATCH'
@@ -172,5 +178,16 @@ class Search_MySql_QueryBuilder
     private function getRaw($node)
     {
         return $node->getValue($this->factory)->getValue();
+    }
+
+    private function getDocumentContent($type, $object)
+    {
+        $results = $this->table->fetchAllIndex(['contents'], ['object_type' => $type, 'object_id' => $object]);
+
+        if (! empty($results[0]['contents'])) {
+            return $this->db->qstr($results[0]['contents']);
+        }
+
+        return '';
     }
 }

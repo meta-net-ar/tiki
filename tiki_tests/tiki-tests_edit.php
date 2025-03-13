@@ -8,15 +8,11 @@ require_once('../tiki-setup.php');
 require_once('lib/diff/difflib.php');
 
 if ($prefs['feature_tikitests'] != 'y') {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_tikitests');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_edit_tikitests != 'y') {
-    $smarty->assign('msg', tra('You do not have permission to do that'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $smarty->assign("tidy", extension_loaded("tidy"));
@@ -142,16 +138,12 @@ if (isset($_REQUEST['filename'])) {
 $xml = file_get_contents(TIKI_TESTS_PATH . "/" . basename($_REQUEST['filename']));
 
 if ($xml == '' or $xml == false) {
-    $smarty->assign('msg', tra("The TikiTests Replay File is Empty"));
-    $smarty->display("error.tpl");
-    die();
+    Feedback::errorAndDie(tra("The TikiTests Replay File is Empty"), \Laminas\Http\Response::STATUS_CODE_409);
 } else {
     $dom = DOMDocument::loadXML($xml);
     $element_test = $dom->getElementsByTagName('test')->item(0);
     if ($element_test == null) {
-        $smarty->assign('msg', tra("The TikiTests Replay File has an error"));
-        $smarty->display("error.tpl");
-        die();
+        Feedback::errorAndDie(tra("The TikiTests Replay File has an error"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 

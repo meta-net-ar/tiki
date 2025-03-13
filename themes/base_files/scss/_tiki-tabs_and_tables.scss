@@ -116,7 +116,7 @@ td.url{
     }
 }
 
-@media only screen and (max-width: breakpoint-max(sm)) {
+@media only screen and (max-width: 991.98px) {
     .btn.table-expand-toggle,
     .btn.tracker-resize-expand,
     .btn.tracker-resize-compress { display: none; }
@@ -124,8 +124,9 @@ td.url{
         width: 100%; text-align: right;
         .btn-link {
             padding: 0; padding-left: 0.75rem;
-            font-weight: 600; font-size: 1.8em; text-decoration: none !important;
+            text-decoration: none !important;
         }
+        &.d-md-none { display: none !important; }
     }
 
     .tiki #col1 .table-responsive {

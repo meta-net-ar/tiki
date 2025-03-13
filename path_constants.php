@@ -72,13 +72,15 @@ const STORAGE_PREFSDOC_PATH = 'storage/prefsdoc';
 /** File gallery default storage path. This is only the default value of the preference, so will not change with this constant */
 const FILE_GALLERY_DEFAULT_STORAGE_PATH = 'storage/fgal';
 const DEPRECATED_H5P_STORAGE_SUFFIX = 'public/h5p';
-/** This is not correct id tikidomains are used.  A new STORAGE_PUBLIC_H5P_PATH should be created with a different handling of tikidomain */
+/** This is not correct if tikidomains are used. A new STORAGE_PUBLIC_H5P_PATH should be created with a different handling of tikidomain */
 const DEPRECATED_STORAGE_PUBLIC_H5P_PATH = 'storage/public/h5p';
 const SMARTY_COMPILED_TEMPLATES_PATH = 'temp/templates_c';
-/** Currently this is both the top level template path and the relative template path in themes and packages.  Needs to be separated if moved */
+/** Currently this is both the top level template path and the relative template path in themes and packages. Needs to be separated if moved */
 const SMARTY_TEMPLATES_PATH = 'templates';
 const SMARTY_BASE_LAYOUTS_PATH = 'templates/layouts';
-/** Where are templates are looked for in multitiki sites, etc. */
+/** What is the default layout template in Tiki */
+const SMARTY_DEFAULT_LAYOUT = 'social';
+/** Where are templates looked for in multitiki sites, etc. */
 const SMARTY_TEMPLATES_PATH_FRAGMENT = 'templates';
 
 /** Path to store temporary files.  Use one of the more specific path if possible */
@@ -166,20 +168,27 @@ const GENERATED_ICONSET_PATH = 'public/generated/iconsets';
 
 
 /* BEGIN - VENDOR ASSETS SECTION */
+/** we need this to generate the icons json before js build is done */
+const BOOTSTRAP_ICONS_FONT_SRC_PATH = 'node_modules/bootstrap-icons/font';
+
 const BOOTSTRAP_ICONS_FONT_PATH = 'public/generated/js/vendor_dist/bootstrap-icons/font';
 const BOOTSTRAP_TOUR_DIST_PATH = 'vendor_bundled/vendor/sorich87/bootstrap-tour/build';
 const CODEMIRROR_DIST_PATH = 'public/generated/js/vendor_dist/codemirror';
 const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
-const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome';
-const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/webfonts';
+/** we need this to generate the icons json before js build is done */
+const FONTAWESOME_CSS_SRC_PATH = 'node_modules/@fortawesome/fontawesome-free/css';
+const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css';
+const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/webfonts';
 const MERMAID_DIST_PATH = 'public/generated/js/vendor_dist/mermaid/dist';
-const MINICART_DIST_PATH = 'vendor_bundled/vendor/jquery/minicart/dist';
-const NESTEDSORTABLE_ASSETS_PATH = 'vendor_bundled/vendor/jquery-plugins/nestedsortable';
+const MINICART_DIST_PATH = 'public/generated/js/vendor_dist/minicart/dist';
+const OL_PATH = 'public/generated/js/vendor_dist/ol'; // 'ol' was formerly called 'openlayers'
+const OL_LAYERSWITCHER_DIST_PATH = 'public/generated/js/vendor_dist/ol-layerswitcher/dist';
 const PIVOTTABLE_DIST_PATH = 'public/generated/js/vendor_dist/pivottable/dist';
 const PLOTLYJS_DIST_PATH = 'public/generated/js/vendor_dist/plotly.js/dist';
-const REVEALJS_ASSETS_PATH = 'vendor_bundled/vendor/npm-asset/reveal.js';
+const REVEALJS_DIST_PATH = 'public/generated/js/vendor_dist/reveal.js/dist';
 const SUBTOTAL_DIST_PATH = 'public/generated/js/vendor_dist/subtotal/dist';
-const SIGNATURE_PAD_DIST_PATH = 'vendor_bundled/vendor/npm-asset/signature_pad/dist';
+const SIGNATURE_PAD_DIST_PATH = 'public/generated/js/vendor_dist/signature_pad/dist';
+const SWAGGER_UI_DIST_PATH = 'public/generated/js/vendor_dist/swagger-ui-dist';
 const SWIPER_DIST_PATH = 'vendor_bundled/vendor/nolimits4web/swiper/dist';
 const ZXING_DIST_PATH = 'public/generated/js/vendor_dist/@zxing/library';
 

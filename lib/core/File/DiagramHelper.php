@@ -12,6 +12,8 @@ use Tiki\FileGallery\File;
 use Tiki\Package\VendorHelper;
 use Tiki\Process\Process;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Tiki\HeadlessBrowser\Exception\HeadlessException;
+use Tiki\HeadlessBrowser\HeadlessBrowserFactory;
 use TikiLib;
 use WikiParser_PluginArgumentParser;
 use WikiParser_PluginMatcher;
@@ -37,12 +39,13 @@ class DiagramHelper
         $fileIdentifier = md5($diagramContent);
         $content = $cachelib->getCached($fileIdentifier, 'diagram');
 
-        if (
-            ! $content
-            && $prefs['fgal_use_casperjs_to_export_images'] === 'y'
-            && class_exists('CasperJsInstaller\Installer')
-        ) {
-            $content = self::getDiagramAsImageUsingCasperJs('<mxfile>' . $diagramContent . '</mxfile>', $fileIdentifier);
+        if (! $content && $prefs['fgal_use_casperjs_to_export_images'] === 'y') {
+            try {
+                $browser = HeadlessBrowserFactory::getHeadlessBrowser();
+                $content = $browser->getDiagramAsImage('<mxfile>' . $diagramContent . '</mxfile>');
+            } catch (HeadlessException $e) {
+                throw $e;
+            }
         }
 
         if (! $content && $prefs['fgal_use_drawio_services_to_export_images'] === 'y') {

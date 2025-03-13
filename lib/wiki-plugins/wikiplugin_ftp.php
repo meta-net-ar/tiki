@@ -88,9 +88,7 @@ function wikiplugin_ftp($data, $params)
 
         // Check if the file exists on the FTP server before processing the download to avaoid errors due to missing files
         if (ftp_size($conn_id, $data) === -1) {
-            $smarty->assign('msg', tra("The file you are trying to download was not found on the server or you may not have permissions to access it!"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file you are trying to download was not found on the server or you may not have permissions to access it!"), \Laminas\Http\Response::STATUS_CODE_404);
         }
 
         $local = "temp/$data";

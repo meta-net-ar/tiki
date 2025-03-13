@@ -1,6 +1,6 @@
 <?php
 
-namespace Tiki\Lib\Iot;
+namespace Tiki\Lib\iot;
 
 use TikiDb;
 use Tiki\Realtime\IotDashboardNotifier;

@@ -184,6 +184,7 @@ CREATE TABLE `tiki_articles` (
   `useImage` char(1) default NULL,
   `image_name` varchar(80) default NULL,
   `image_caption` text default NULL,
+  `image_alt` text default NULL,
   `image_type` varchar(80) default NULL,
   `image_size` int(14) default NULL,
   `image_x` int(4) default NULL,
@@ -192,7 +193,6 @@ CREATE TABLE `tiki_articles` (
   `list_image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `heading` text,
   `body` text,
@@ -212,7 +212,6 @@ CREATE TABLE `tiki_articles` (
   KEY `author` (`author`(32)),
   KEY `topicId` (`topicId`),
   KEY `publishDate` (`publishDate`),
-  KEY `expireDate` (`expireDate`),
   KEY `type` (`type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -221,14 +220,12 @@ CREATE TABLE `tiki_article_types` (
   `type` varchar(50) NOT NULL,
   `use_ratings` varchar(1) default NULL,
   `show_pre_publ` varchar(1) default NULL,
-  `show_post_expire` varchar(1) default 'y',
   `heading_only` varchar(1) default NULL,
   `allow_comments` varchar(1) default 'y',
   `show_image` varchar(1) default 'y',
   `show_avatar` varchar(1) default NULL,
   `show_author` varchar(1) default 'y',
   `show_pubdate` varchar(1) default 'y',
-  `show_expdate` varchar(1) default NULL,
   `show_reads` varchar(1) default 'y',
   `show_size` varchar(1) default 'n',
   `show_topline` varchar(1) default 'n',
@@ -238,14 +235,13 @@ CREATE TABLE `tiki_article_types` (
   `creator_edit` varchar(1) default NULL,
   `comment_can_rate_article` char(1) default NULL,
   PRIMARY KEY (`type`),
-  KEY `show_pre_publ` (`show_pre_publ`),
-  KEY `show_post_expire` (`show_post_expire`)
+  KEY `show_pre_publ` (`show_pre_publ`)
 ) ENGINE=MyISAM ;
 
 INSERT IGNORE INTO tiki_article_types(type) VALUES ('Article');
 INSERT IGNORE INTO tiki_article_types(type,use_ratings) VALUES ('Review','y');
-INSERT IGNORE INTO tiki_article_types(type,show_post_expire) VALUES ('Event','n');
-INSERT IGNORE INTO tiki_article_types(type,show_post_expire,heading_only,allow_comments) VALUES ('Classified','n','y','n');
+INSERT IGNORE INTO tiki_article_types(type) VALUES ('Event');
+INSERT IGNORE INTO tiki_article_types(type,heading_only,allow_comments) VALUES ('Classified','y','n');
 
 DROP TABLE IF EXISTS `tiki_banners`;
 CREATE TABLE `tiki_banners` (
@@ -471,7 +467,8 @@ CREATE TABLE `tiki_calendar_items` (
   `uid` varchar(200),
   `uri` varchar(200),
   PRIMARY KEY (`calitemId`),
-  KEY `calendarId` (`calendarId`)
+  KEY `calendarId` (`calendarId`),
+  KEY `idx_lastmodif` (`lastmodif`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_calendar_locations`;
@@ -490,6 +487,7 @@ CREATE TABLE `tiki_calendar_roles` (
   `username` varchar(200) NOT NULL default '',
   `role` enum('0','1','2','3','6') NOT NULL default '0',
   `partstat` VARCHAR(30) NULL DEFAULT NULL,
+  `comment` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`calitemId`,`username`(16),`role`)
 ) ENGINE=MyISAM;
 
@@ -971,6 +969,7 @@ CREATE TABLE `tiki_file_galleries` (
 INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('1','File Galleries', 'system', '', 'y', 'admin', 'y', -1);
 INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('2','Users File Galleries', 'system', '', 'y', 'admin', 'y', -1);
 INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('3','Wiki Attachments', 'system', '', 'y', 'admin', 'y', -1);
+INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('4','Trash Files', 'system', '', 'y', 'admin', 'y', -1);
 
 
 DROP TABLE IF EXISTS `tiki_files`;
@@ -1920,7 +1919,7 @@ CREATE TABLE `tiki_pages` (
   `pageSlug` varchar(160) NULL,
   `hits` int(8) default NULL,
   `data` mediumtext,
-  `description` varchar(200) default NULL,
+  `description` MEDIUMTEXT default NULL,
   `lastModif` int(14) default NULL,
   `comment` MEDIUMTEXT default NULL,
   `version` int(8) NOT NULL default '0',
@@ -2127,7 +2126,6 @@ CREATE TABLE `tiki_received_articles` (
   `image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `heading` text,
   `body` longblob,
@@ -2180,7 +2178,7 @@ CREATE TABLE `tiki_rss_modules` (
   `rssId` int(8) NOT NULL auto_increment,
   `name` varchar(30) NOT NULL default '',
   `description` text,
-  `url` varchar(255) NOT NULL default '',
+  `url` text NOT NULL,
   `refresh` int(8) default NULL,
   `lastUpdated` int(14) default NULL,
   `showTitle` char(1) default 'n',
@@ -2362,13 +2360,13 @@ CREATE TABLE `tiki_submissions` (
   `useImage` char(1) default NULL,
   `image_name` varchar(80) default NULL,
   `image_caption` text default NULL,
+  `image_alt` text default NULL,
   `image_type` varchar(80) default NULL,
   `image_size` int(14) default NULL,
   `image_x` int(4) default NULL,
   `image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `bibliographical_references` text,
   `resume` text,
@@ -2573,7 +2571,8 @@ CREATE TABLE `tiki_tracker_items` (
   `lastModif` int(14) default NULL,
   `lastModifBy` varchar(200) default NULL,
   PRIMARY KEY (`itemId`),
-  INDEX `trackerId` (`trackerId`)
+  INDEX `trackerId` (`trackerId`),
+  INDEX `idx_lastModif` (`lastModif`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_tracker_options`;
@@ -2995,6 +2994,7 @@ CREATE TABLE `users_users` (
   `unsuccessful_logins` int(14) default 0,
   `waiting` char(1) default NULL,
   `twoFactorSecret` varchar(16) default NULL,
+  `last_mfa_date` bigint DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
   KEY `registrationDate` (`registrationDate`)
@@ -3228,6 +3228,7 @@ INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES 
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Sync', 'file gallery', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('CRSF Error', 'system', 'y');
 INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('api', 'system', 'y');
+INSERT IGNORE INTO tiki_actionlog_conf(`action`, `objectType`, `status`) VALUES ('Email', 'system', 'y');
 
 DROP TABLE IF EXISTS `tiki_freetags`;
 CREATE TABLE `tiki_freetags` (
@@ -3438,7 +3439,7 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES(
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_blog_post.php\\?postId=(\\d+)', 'blogpost$1', 'blogpost', 'feature_blogs');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-directory_browse.php\\?parent=(\\d+)', 'directory$1', 'directory', 'feature_directory');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_faq.php\\?faqId=(\\d+)', 'faq$1', 'faq', 'feature_faqs');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'dl$1', 'file', 'feature_file_galleries', 10);
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'display$1', 'file', 'feature_file_galleries', 10);
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;thumbnail', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;display', 'display$1', 'display', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)&amp;preview', 'preview$1', 'preview', 'feature_file_galleries');
@@ -3650,7 +3651,7 @@ CREATE TABLE `tiki_discount` (
 DROP TABLE IF EXISTS `tiki_translations_in_progress`;
 CREATE TABLE `tiki_translations_in_progress` (
    `page_id` int(14) NOT NULL,
-   `language` char(2) NOT NULL,
+   `language` varchar(249) NOT NULL,
    KEY `page_id` (`page_id`),
    KEY `language` (`language`),
    UNIQUE (`page_id`, `language`)
@@ -4207,6 +4208,16 @@ CREATE TABLE `tiki_custom_color_modes` (
 
 INSERT INTO `tiki_custom_color_modes` (`name`, `icon`) VALUES ('light', 'sun'), ('dark','moon'), ('auto', 'circle-half');
 
+DROP TABLE IF EXISTS `tiki_2fa_email_tokens`;
+CREATE TABLE `tiki_2fa_email_tokens` (
+  `userId` INT(8) NOT NULL,
+  `type` VARCHAR(10) NOT NULL,
+  `token` VARCHAR(60) NOT NULL,
+  `attempts` INT NOT NULL DEFAULT 0,
+  `created` bigint NOT NULL,
+  PRIMARY KEY (`userId`)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_iot_apps`;
 CREATE TABLE `tiki_iot_apps` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -4223,6 +4234,7 @@ CREATE TABLE `tiki_iot_apps` (
 	PRIMARY KEY (`id`),
   UNIQUE INDEX (`app_uuid`)
 ) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_sql_query_logs`;
 CREATE TABLE `tiki_sql_query_logs` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -4240,4 +4252,13 @@ CREATE TABLE `tiki_iot_apps_actions_logs` (
 	`action_message` LONGTEXT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `tiki_user_passwords_history`;
+CREATE TABLE `tiki_user_passwords_history` (
+  `passId` int(8) NOT NULL auto_increment,
+  `user` varchar(200) NOT NULL default '',
+  `hash` varchar(60) default NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY(`passId`)
 ) ENGINE=MyISAM;

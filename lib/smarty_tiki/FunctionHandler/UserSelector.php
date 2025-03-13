@@ -54,7 +54,7 @@ class UserSelector extends Base
             'style' => '',
             'editable' => $tiki_p_admin,
             'user_selector_threshold' => $prefs['user_selector_threshold'],
-            'allowNone' => 'n',
+            'allowNone' => 'y',
             'noneLabel' => 'None',
             'realnames' => 'y',
             'class' => 'form-control',
@@ -169,7 +169,7 @@ class UserSelector extends Base
 
             asort($users, SORT_NATURAL | SORT_FLAG_CASE);
 
-            if ($params['inputtype'] === 't') {
+            if (! empty($params['inputtype']) && $params['inputtype'] === 't') {
                 return smarty_function_jstransfer_list([
                     'fieldName' => $params['name'] . '[]',
                     'data' => $users,

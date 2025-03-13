@@ -29,9 +29,7 @@
         {/if}
         <input type="submit" class="btn btn-primary btn-sm" value="{tr}Continue{/tr}">
     </p>
-    {jq}
-        $('#user{{$wp_member_offset|escape}}').tiki("autocomplete", "username", {multiple: true, multipleSeparator: "|"});
-    {/jq}
+    {autocomplete element="#user{$wp_member_offset|escape}" type="username" options="multiple: true, multipleSeparator: '|'"}
 </form>
 {else}
     {payment id=$wp_member_paymentid returnurl=$returnurl}

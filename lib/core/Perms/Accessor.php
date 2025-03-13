@@ -16,6 +16,7 @@ class Perms_Accessor implements ArrayAccess
 {
     private $resolver;
     private $prefix = '';
+    private $permissions = [];
     private $context = [];
     private $groups = [];
     private $checkSequence = null;
@@ -53,6 +54,11 @@ class Perms_Accessor implements ArrayAccess
     public function from()
     {
         return $this->resolver->from();
+    }
+
+    public function setPermission($key, $value)
+    {
+        $this->permissions[$key] = $value;
     }
 
     public function setContext(array $context)

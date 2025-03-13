@@ -3,7 +3,7 @@
 {modules_list list=$modLastItems nonums=$nonums}
     {section name=ix loop=$modLastItems}
         <li>
-            <a class="linkmodule" href="tiki-view_tracker_item.php?itemId={$modLastItems[ix].itemId}">
+            <a class="linkmodule" href="{$modLastItems[ix].sefurl}">
                 {$modLastItems[ix].subject|escape}
             </a>
         </li>

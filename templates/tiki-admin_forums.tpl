@@ -374,6 +374,12 @@
                             </div>
                         </div>
                         <div class="tiki-form-group row">
+                            <label class="col-sm-4 col-form-label" for="inbound_pop_port">{tr}POP3 port{/tr}</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="inbound_pop_port" id="inbound_pop_port" class="form-control" value="{$inbound_pop_port|escape}">
+                            </div>
+                        </div>
+                        <div class="tiki-form-group row">
                             <label class="col-sm-4 col-form-label" for="inbound_pop_user">{tr}User{/tr}</label>
                             <div class="col-sm-8">
                                 <input type="text" name="inbound_pop_user" id="inbound_pop_user" class="form-control" value="{$inbound_pop_user|escape}" autocomplete="off">

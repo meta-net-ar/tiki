@@ -72,26 +72,40 @@
                 }
             } ).trigger("change");
 
-            $('#transition-group-auto')
-                .tiki('autocomplete','groupname')
-                .keypress( function( e ) {
-                    if( e.which !== 13 ) {
-                        return;
+            if (elementPlus?.autocomplete) {
+                autocomplete($('#transition-group-auto')[0], 'groupname', {
+                    onEnter: (value) => {
+                        if (value) {
+                            $('#transition-group-list').append(
+                                $('<li/>').text(value)
+                                    .append( $('<input type="hidden" name="groups[]">').val(value) )
+                                    .append( $('{{icon name=remove class=removeitem}}') )
+                            );
+                        }
                     }
-                    e.preventDefault();
-                    if( $(this).val() === '' ) {
-                        return;
-                    }
-                    $('#transition-group-list').append(
-                        $('<li/>').text( $(this).val() )
-                            .append( $('<input type="hidden" name="groups[]">').val( $(this).val() ) )
-                            .append( $('{{icon name=remove class=removeitem}}') )
-                    );
-                    $(this).val('');
+                });
+            } else {
+                $('#transition-group-auto')
+                    .tiki('autocomplete','groupname')
+                    .keypress( function( e ) {
+                        if( e.which !== 13 ) {
+                            return;
+                        }
+                        e.preventDefault();
+                        if( $(this).val() === '' ) {
+                            return;
+                        }
+                        $('#transition-group-list').append(
+                            $('<li/>').text( $(this).val() )
+                                .append( $('<input type="hidden" name="groups[]">').val( $(this).val() ) )
+                                .append( $('{{icon name=remove class=removeitem}}') )
+                        );
+                        $(this).val('');
+                    } );
+                $('#transition-group-list .removeitem').on( 'click', function( e ) {
+                    $(this).parent().remove();
                 } );
-            $('#transition-group-list .removeitem').on( 'click', function( e ) {
-                $(this).parent().remove();
-            } );
+            }
         {/jq}
     {/tab}
 

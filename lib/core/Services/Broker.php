@@ -36,7 +36,7 @@ class Services_Broker
                         $output['FORWARD']
                     );
                 } else {
-                    $output['FORWARD'] = null;
+                    $output['FORWARD'] = (is_string($output['FORWARD']) && ! empty($output['FORWARD'])) ? $output['FORWARD'] : null;
                 }
             }
 

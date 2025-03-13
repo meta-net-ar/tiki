@@ -17,15 +17,11 @@ $access->check_permission('tiki_p_messages');
 
 if ($prefs['allowmsg_is_optional'] == 'y') {
     if ($tikilib->get_user_preference($user, 'allowMsgs', 'y') != 'y') {
-        $smarty->assign('msg', tra("You have to be able to receive messages in order to send them. Goto your user preferences and enable 'Allow messages from other users'"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You have to be able to receive messages in order to send them. Goto your user preferences and enable 'Allow messages from other users'"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 if (($prefs['messu_sent_size'] > 0) && ($messulib->count_messages($user, 'sent') >= $prefs['messu_sent_size'])) {
-    $smarty->assign('msg', tra('Sent box is full. Archive or delete some sent messages first if you want to send more messages.'));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Sent box is full. Archive or delete some sent messages first if you want to send more messages."), \Laminas\Http\Response::STATUS_CODE_507);
 }
 if (! isset($_REQUEST['to'])) {
     $_REQUEST['to'] = '';

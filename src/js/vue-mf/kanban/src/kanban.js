@@ -3,7 +3,7 @@ import singleSpaVue from "single-spa-vue";
 import singleSpaCss from "single-spa-css";
 
 import { createApp, h } from "vue";
-import { PerfectScrollbar } from "vue3-perfect-scrollbar";
+import { PerfectScrollbarPlugin } from "vue3-perfect-scrollbar";
 //import { SetupCalendar, DatePicker } from "v-calendar";
 import Toast from "vue-toastification";
 import { defineRule } from "vee-validate";
@@ -50,7 +50,7 @@ const vueLifecycles = singleSpaVue({
             },
         });
         app.use(store);
-        app.use(PerfectScrollbar);
+        app.use(PerfectScrollbarPlugin);
         //app.use(SetupCalendar, {}).component("DatePicker", DatePicker);
         app.use(Toast, {
             timeout: 4000,

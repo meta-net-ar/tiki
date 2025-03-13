@@ -18,9 +18,7 @@
 
                 </form>
             </div>
-            {jq}
-                $(':text[name=addtags]').tiki('autocomplete', 'tag', {multiple: true, multipleSeparator: " "} );
-            {/jq}
+            {autocomplete element=":text[name=addtags]" type="tag" options="multiple: true, multipleSeparator: ' ';"}
         {/if}
     {/tikimodule}
 {/if}

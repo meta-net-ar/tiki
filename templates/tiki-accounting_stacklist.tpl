@@ -6,15 +6,17 @@
 </a>
 <div class="table-responsive">
     <table class="table">
+        <thead>
         <tr>
-            <th rowspan="2">{tr}Id{/tr}</th>
-            <th rowspan="2">{tr}Date{/tr}</th>
-            <th rowspan="2">{tr}Description{/tr}</th>
+            <th colspan="3"></th>
             <th colspan="3">{tr}Debit{/tr}</th>
             <th colspan="3">{tr}Credit{/tr}</th>
             <th rowspan="2">&nbsp;</th>
         </tr>
         <tr>
+            <th>{tr}Id{/tr}</th>
+            <th>{tr}Date{/tr}</th>
+            <th>{tr}Description{/tr}</th>
             <th>{tr}Account{/tr}</th>
             <th>{tr}Amount{/tr}</th>
             <th>{tr}Text{/tr}</th>
@@ -22,6 +24,8 @@
             <th>{tr}Amount{/tr}</th>
             <th>{tr}Text{/tr}</th>
         </tr>
+        </thead>
+        <tbody>
         {foreach from=$stack item=s}{cycle values="odd,even" assign="style"}
             <tr class="{$style}">
                 <td class="journal"{if $s.maxcount>1} rowspan="{$s.maxcount}"{/if} style="text-align:right">
@@ -85,5 +89,6 @@
         {foreachelse}
             {norecords _colspan=10}
         {/foreach}
+        </tbody>
     </table>
 </div>

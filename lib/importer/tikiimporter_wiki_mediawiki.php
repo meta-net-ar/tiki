@@ -103,8 +103,11 @@ class TikiImporter_Wiki_Mediawiki extends TikiImporter_Wiki
 
         $this->saveAndDisplayLog("Loading and validating the XML file\n");
 
+        $xmlContent = file_get_contents($filePath);
+        $xmlContent = $this->sanitizeXml($xmlContent);
+
         $this->dom = new DOMDocument();
-        $this->dom->load($filePath);
+        $this->dom->loadXML($xmlContent);
 
         $this->configureParser();
 
@@ -113,6 +116,27 @@ class TikiImporter_Wiki_Mediawiki extends TikiImporter_Wiki
         }
 
         parent::import();
+    }
+
+    private function sanitizeXml($xmlContent)
+    {
+        // Sanitize <text> tag(s) from XML content
+        $xmlContent = preg_replace_callback(
+            '/<text[^>]*>(.*?)<\/text>/s',
+            function ($matches) {
+                $text = $matches[1];
+                // Escape <!----> to prevent misinterpretation as <strike>
+                $text = preg_replace('/<!--(.*?)-->/', '', $text);
+                // Escape invalid XML characters only, while leaving MediaWiki syntax intact
+                $text = preg_replace('/&(?!amp;|lt;|gt;|quot;|apos;|#[0-9]+;)/', '&amp;', $text);
+                // Escape angle brackets
+                $text = str_replace(['<', '>'], ['&lt;', '&gt;'], $text);
+                return '<text>' . $text . '</text>';
+            },
+            $xmlContent
+        );
+
+        return $xmlContent;
     }
 
     /**

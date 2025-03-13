@@ -515,10 +515,14 @@ class DirLib extends TikiLib
         if ($siteId) {
             $query = "update `tiki_directory_sites` set `name`=?, `description`=?, `url`=?, `country`=?, `isValid`=?, `lastModif`=?  where `siteId`=?";
             $this->query($query, [$name,$description,$url,$country,$isValid,(int)$this->now,(int)$siteId]);
+            $feedback = sprintf(tra('Site directory %s was updated.'), $name);
+            Feedback::success($feedback);
         } else {
             $query = "insert into `tiki_directory_sites`(`name`,`description`,`url`,`country`,`isValid`,`hits`,`created`,`lastModif`) values(?,?,?,?,?,?,?,?)";
             $this->query($query, [$name,$description,$url,$country,$isValid,0,(int)$this->now,(int)$this->now]);
             $siteId = $this->getOne("select max(siteId) from `tiki_directory_sites` where `created`=? and `name`=?", [(int)$this->now,$name]);
+            $feedback = sprintf(tra('Site directory %s was created.'), $name);
+            Feedback::success($feedback);
 
             if ($prefs['cachepages'] == 'y') {
                 $this->cache_url($url);
@@ -550,10 +554,14 @@ class DirLib extends TikiLib
         if ($categId) {
             $query = "update `tiki_directory_categories` set `name`=?, `parent`=?, `description`=?, `childrenType`=?, `viewableChildren`=?, `allowSites`=?, `showCount`=?, `editorGroup`=?  where `categId`=?";
             $this->query($query, [$name,(int)$parent,$description,$childrenType,(int)$viewableChildren,$allowSites,$showCount,$editorGroup,(int)$categId]);
+            $feedback = sprintf(tra('Category %s was updated.'), $name);
+            Feedback::success($feedback);
         } else {
             $query = "insert into `tiki_directory_categories`(`parent`,`hits`,`name`,`description`,`childrenType`,`viewableChildren`,`allowSites`,`showCount`,`editorGroup`,`sites`) values(?,?,?,?,?,?,?,?,?,?)";
             $this->query($query, [(int)$parent,0,$name,$description,$childrenType,(int)$viewableChildren,$allowSites,$showCount,$editorGroup,0]);
             $categId = $this->getOne("select max(`categId`) from `tiki_directory_categories` where `name`=?", [$name]);
+            $feedback = sprintf(tra('Category %s was created.'), $name);
+            Feedback::success($feedback);
         }
 
         require_once('lib/search/refresh-functions.php');

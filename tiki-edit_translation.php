@@ -32,9 +32,7 @@ execute_module_translation();
 $access->check_feature('feature_multilingual');
 
 if (! (isset($_REQUEST['page']) && $_REQUEST['page']) && ! (isset($_REQUEST['id']) && $_REQUEST['id'])) {
-    $smarty->assign('msg', tra("No object indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No object indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 if (isset($_REQUEST['type'], $_REQUEST['id']) && $_REQUEST['type'] == 'wiki page') {
@@ -51,9 +49,7 @@ if ((! isset($_REQUEST['type']) || $_REQUEST['type'] == 'wiki page' || $_REQUEST
         TikiLib::lib('wiki')->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
         // If after cleaning the url, the page does not exist then display an error
-        $smarty->assign('msg', tra("Page cannot be found"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Page cannot be found"), \Laminas\Http\Response::STATUS_CODE_404);
     }
     $name = $_REQUEST['page'];
     $type = "wiki page";
@@ -71,9 +67,7 @@ if ((! isset($_REQUEST['type']) || $_REQUEST['type'] == 'wiki page' || $_REQUEST
         $smarty->assign('translate_message', '{BOX(class="text-bg-light")}' . tra("Translation of this page is incomplete.") . '{BOX}\n\n');
     }
 } elseif ($_REQUEST['id']) {
-    $smarty->assign('msg', tra("Only wiki pages are supported."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Only wiki pages are supported."), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $smarty->assign('name', $name);
@@ -102,10 +96,7 @@ $smarty->assign('langpage', $langpage);
 if ($type == "wiki page") {
     $tikilib->get_perm_object($name, 'wiki page', $info, true);
     if (! ($tiki_p_edit == 'y' || ($prefs['wiki_creator_admin'] == 'y' && $user && $info['creator'] == $user) )) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this page."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
     }
 }
 

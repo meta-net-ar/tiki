@@ -184,4 +184,5 @@ if ($output["data"] == "EMPTY") {
     $changes = null;
 }
 header("Content-type: " . $output["content-type"]);
+TikiLib::lib('header')->setXRobotsTag($robots);
 print $output["data"];

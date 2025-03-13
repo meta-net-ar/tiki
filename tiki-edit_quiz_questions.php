@@ -22,7 +22,7 @@ $inputConfiguration = [
             'input_data'                  => 'text',           //post
             'useQuestion'                 => 'bool',           //post
             'usequestionid'               => 'int',            //post
-            'sort_mode'                   => 'alpha',          //get
+            'sort_mode'                   => 'text',          //get
             'offset'                      => 'int',            //get
             'find'                        => 'alpha',          //post
         ],
@@ -35,10 +35,7 @@ $auto_query_args = ['quizId', 'questionId', 'sort_mode', 'offset', 'find'];
 $access->check_feature('feature_quizzes');
 
 if (! isset($_REQUEST['quizId'])) {
-    $smarty->assign('msg', tra('No quiz indicated'));
-
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No quiz indicated'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $tikilib->get_perm_object($_REQUEST['quizId'], 'quiz');
@@ -50,6 +47,9 @@ $smarty->assign('quizId', $_REQUEST['quizId']);
 $smarty->assign('individual', 'n');
 
 $quiz_info = $quizlib->get_quiz($_REQUEST['quizId']);
+if (! $quiz_info) {
+    Feedback::errorAndDie(tra("The requested quiz was not found. Please check the quiz ID and try again."), \Laminas\Http\Response::STATUS_CODE_404);
+}
 $smarty->assign('quiz_info', $quiz_info);
 
 if (! isset($_REQUEST['questionId'])) {
@@ -58,14 +58,19 @@ if (! isset($_REQUEST['questionId'])) {
 
 $smarty->assign('questionId', $_REQUEST['questionId']);
 
-if ($_REQUEST['questionId']) {
-    $info = $quizlib->get_quiz_question($_REQUEST['questionId']);
-} else {
+$result = $quizlib->get_quiz_question($_REQUEST['questionId']);
+if ($_REQUEST['questionId'] > 0 && ! $result) {
+    Feedback::error(tra("The question you are trying to edit was not found. Please verify the question ID or create a new one."));
+}
+
+if (! $result) {
     $info = [];
 
     $info['question'] = '';
     $info['type'] = '';
     $info['position'] = '';
+} else {
+    $info = $result;
 }
 
 $smarty->assign('question', $info['question']);
@@ -74,19 +79,22 @@ $smarty->assign('position', $info['position']);
 
 if (isset($_REQUEST['remove']) && $access->checkCsrf()) {
     $quizlib->remove_quiz_question($_REQUEST['remove']);
+    Feedback::success(tr('The question has been successfully deleted'));
 }
 
 if (isset($_REQUEST['save'])) {
     $access->checkCsrf();
 
-    $quizlib->replace_quiz_question(
+    $result = $quizlib->replace_quiz_question(
         $_REQUEST['questionId'],
         $_REQUEST['question'],
         $_REQUEST['questionType'],
         $_REQUEST['quizId'],
         $_REQUEST['position']
     );
-
+    if (is_numeric($result) && $result > 0) {
+        Feedback::success(tr('The question has been saved successfully'));
+    }
     $smarty->assign('question', '');
     $smarty->assign('questionId', 0);
 }

@@ -12833,7 +12833,7 @@ $lang_current = array(
 "Simple search controls for the map" => "Simple search controls for the map",
 "Menu" => "Menu",
 "Displays a menu or a structure as a menu" => "Displays a menu or a structure as a menu",
-"Identifier of the menu (from tiki-admin_menus.php) " => "Identifier of the menu (from tiki-admin_menus.php) ",
+"Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1) " => "Používa ID menu (na úpravu/pridanie nového menu prejdite na %0Správa menu%1)",
 "Structure" => "Štruktúra",
 "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)" => "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)",
 "Orientation of menu: horiz or vert (default vert) " => "Orientation of menu: horiz or vert (default vert) ",
@@ -15367,7 +15367,7 @@ $lang_current = array(
 "Switch User" => "Prepnúť používateľa",
 "Email address or " => "E-mailová adresa alebo",
 "User account ID" => "ID používateľského účtu",
-"Enter a username and click 'Switch'.<br>Useful for testing permissions" => "Enter a username and click 'Switch'.<br>Useful for testing permissions",
+"Select a username and click 'Switch'.<br>Useful for testing permissions" => "Select a username and click 'Switch'.<br>Useful for testing permissions",
 "Toggle Dropdown" => "Toggle Dropdown",
 "My Account" => "Môj účet",
 "{\$user|username|escape|replace:'&amp;':'&'}" => "{\$user|username|escape|replace:'&amp;':'&'}",
@@ -17482,7 +17482,7 @@ $lang_current = array(
 "~tc~ Tiki Comment ~/tc~ makes a Tiki comment. It will be completely removed from the display, but saved in the file for future reference. ~hc~ HTML Comment ~/hc~ makes an HTML comment. It will be inserted as a comment in the output HTML; these are not normally displayed in browsers, but can be seen using \"View Source\" or similar" => "~tc~ Komentár Tiki ~/tc~ pridá komentár. Bude odstránený zo zobrazenia, ale uloží sa do súboru pre budúce použitie. ~hc~ HTML komentár ~/hc~ vytvorí HTML komentár. Vloží sa ako komentár do výstupného HTML kódu; tieto sa bežne nezobrazujú v prehliadačoch, ale možno ich zobraziť pomocou „Zobraziť zdroj“ alebo inak",
 "Block Preformatting" => "Block Preformatting",
 "Indent text with any number of spaces to change it to a monospaced block that still follows other Wiki formatting instructions. It will be indented with the same number of spaces that are used. Note that this mode does not preserve exact spacing and line breaks; use ~pp~...~/pp~ for that" => "Indent text with any number of spaces to change it to a monospaced block that still follows other Wiki formatting instructions. It will be indented with the same number of spaces that are used. Note that this mode does not preserve exact spacing and line breaks; use ~pp~...~/pp~ for that",
-"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for langages as Arabic and Hebrew" => "Vloží s ohľadom na smer textu sprava doľava a zľava doprava značku DIV (až po koniec textu) a značky pre jazyky ako arabčina a hebrejčina ",
+"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for languages as Arabic and Hebrew" => "Vloží s ohľadom na smer textu sprava doľava a zľava doprava značku DIV (až po koniec textu) a značky pre jazyky ako arabčina a hebrejčina ",
 "Special characters" => "Special characters",
 "hard space" => "tvrdá medzera",
 "numeric between ~ for HTML numeric characters entity" => "číslo medzi ~ ako HTML kód znaku",
@@ -19072,8 +19072,8 @@ $lang_current = array(
 "Leave \"New password\" and \"Confirm new password\" fields blank to keep current password" => "Pokiaľ chcete ponechať aktuálne heslo, polia „Nové heslo“ a „Potvrdiť nové heslo“ nechajte prázdne ",
 "Current password (required)" => "Aktuálne heslo (povinné)",
 "Two-Factor Authentication" => "Two-Factor Authentication",
-// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®",
-"Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation" => "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation",
+// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app",
+"Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation" => "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation",
 "Enable Two-Factor Auth" => "Enable Two-Factor Auth",
 "Disable Two-Factor Auth" => "Disable Two-Factor Auth",
 "Regenerate Two-Factor Auth" => "Regenerate Two-Factor Auth",
@@ -19946,10 +19946,10 @@ $lang_current = array(
 "Subscription confirmed" => "Subscription confirmed",
 "Subscribe to the newsletter" => "Subscribe to the newsletter",
 "Show QRCode" => "Show QRCode",
-"Install Google Authenticator® app on your device and open it" => "Install Google Authenticator® app on your device and open it",
+"Install an authenticator app on your device and open it" => "Install an authenticator app on your device and open it",
 "Tap “Scan a barcode”" => "Tap “Scan a barcode”",
 "Scan the QR code that is open in your browser" => "Scan the QR code that is open in your browser",
-"Done, Google Authenticator® is now generating codes" => "Done, Google Authenticator® is now generating codes",
+"Done, the authenticator app is now generating codes" => "Done, the authenticator app is now generating codes",
 "Add new application" => "Add new application",
 "End tour" => "End tour",
 "-- Choose an option --" => "-- Choose an option --",
@@ -21939,3 +21939,8 @@ $lang_current = array(
 "You need to check out the recorded box for each action type we may be interested to have some report later. To see a report of some action types, select the reported checkboxes of these action types, goto the Report tab and select additional filters. The report will only contains the actions that occurred since the action type has been set to recorded." => "Pre každý typ akcie, ktorý Vás zaujíma, si označte začiarkávacie políčko \"Zaznamenávať\", aby ste neskôr videli príslušný záznam. Ak chcete zobraziť prehľad niektorých typov akcií, označte začiarkávacie políčka \"Nahlasovať\" pre dané typy akcií a prejdite na kartu Prehľad kde zvoľte ďalšie filtre. Výsledná správa bude obsahovať iba akcie, ktoré sa vyskytli až odkedy bol typ akcie nastavený na zaznamenávanie.",
 );
 $lang = array_replace($lang, $lang_current);
+
+
+
+
+

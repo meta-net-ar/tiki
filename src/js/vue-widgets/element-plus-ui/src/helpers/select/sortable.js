@@ -15,7 +15,7 @@ export function sortOptions(wrapperElement, options) {
         const label = tag.textContent;
         const item = options.find((item) => item.label === label);
         const option = select.querySelector(`option[value="${item.value}"]`);
+        select.options.add(option.cloneNode(true), index);
         option.remove();
-        select.options.add(option, index);
     });
 }

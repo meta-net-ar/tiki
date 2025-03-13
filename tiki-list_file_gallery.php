@@ -18,11 +18,10 @@ $inputConfiguration = [
         'parentId'                     => 'int',               //post
         'view'                         => 'word',              //get
         'fileId'                       => 'int',               //post
-        'movesel'                      => 'bool',              //post
-        'moveto'                       => 'bool',              //post
-        'file'                         => 'string',            //post
+        'movesel'                      => 'word',              //post
+        'moveto'                       => 'int',               //post
+        'file'                         => 'int',               //post
         'subgal'                       => 'int',               //get
-        'fgal_actions'                 => 'string',            //get
         'groups'                       => 'groupname',         //post
         'lock'                         => 'bool',              //post
         'validate'                     => 'bool',              //post
@@ -42,7 +41,7 @@ $inputConfiguration = [
         'fdescription'                 => 'xss',               //post
         'data'                         => 'none',              //get
         'quota'                        => 'int',               //post
-        'name'                         => 'word',              //post
+        'name'                         => 'string',            //post
         'description'                  => 'xss',               //post
         'maxRows'                      => 'int',               //post
         'fgal_show_explorer'           => 'bool',              //post
@@ -90,12 +89,11 @@ $inputConfiguration = [
         'find_creator'                 => 'word',              //post
         'find_lastModif'               => 'word',              //post
         'find_lastModif_unit'          => 'word',              //post
-        'find_lastModif'               => 'word',              //post
         'find_lastDownload'            => 'word',              //post
         'find_lastDownload_unit'       => 'word',              //post
         'find_fileType'                => 'word',              //post
         'allowedMimeTypes'             => 'bool',              //get
-        'find'                         => 'word',              //post
+        'find'                         => 'string',            //post
         'categId'                      => 'int',               //get
         'find_orphans'                 => 'word',              //get
         'slideshow_noclose'            => 'bool',              //get
@@ -573,8 +571,12 @@ if (! empty($_REQUEST['remove']) && $access->checkCsrf(true)) {
         [
             'fileId' => $_REQUEST['remove'],
             'draft' => (! empty($_REQUEST['draft'])),
+            'detach' => ! empty($_REQUEST['detach'])
         ]
     );
+    if (! (empty($_SERVER['HTTP_REFERER']) && empty($_REQUEST['detach']))) {
+        $access->redirect($_SERVER['HTTP_REFERER']);
+    }
     if ($result && $result->numRows()) {
         Feedback::success(tr('File deleted'));
     } else {
@@ -1224,7 +1226,7 @@ if (isset($_GET['slideshow'])) {
                 $galleryId,
                 $with_archive,
                 $with_subgals,
-                ($view === 'list' && $gal_info['show_size'] !== 'n'),
+                ($view !== 'admin' && $gal_info['show_size'] !== 'n'),
                 true,
                 false,
                 false,

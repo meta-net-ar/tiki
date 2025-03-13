@@ -96,7 +96,7 @@
                             {tr}Amount remaining:{/tr}
                         </td>
                         <td class="integer">
-                            {$payment_info.amount_original|escape}
+                            {$payment_info.amount_remaining|escape}
                         </td>
                         <td style="font-style: italic; padding-left:3px">
                             {$payment_info.currency|escape}
@@ -186,10 +186,10 @@
                         <div class="table-responsive">
                             <table class="table">
                                 <tr>
-                                    <th>{tr}Credit type{/tr}</th>
-                                    <th>{tr}Credits left{/tr}</th>
-                                    <th>{tr}Amount to pay{/tr}</th>
-                                    <th>{tr}Pay using{/tr}</th>
+                                    <th scope="col">{tr}Credit type{/tr}</th>
+                                    <th scope="col">{tr}Credits left{/tr}</th>
+                                    <th scope="col">{tr}Amount to pay{/tr}</th>
+                                    <th scope="col">{tr}Pay using{/tr}</th>
                                 </tr>
                                 {foreach key=id item=data from=$userpaycredits}
                                 <tr>
@@ -259,20 +259,36 @@
             {permission type=payment object={$payment_info.paymentRequestId} name=payment_manual}
                 <form method="post" action="tiki-payment.php">
                     <fieldset>
-                        <legend style="font-style: italic; padding-top: 20px; margin-bottom: 5px">{tr}Enter a Manual Payment{/tr}</legend>
-
-                        <p>
-                            <input type="text" name="manual_amount" class="text-end">&nbsp;<span style="font-style: italic">{$payment_info.currency|escape}</span>
-                        </p>
-                        <p>
-                            <label for="payment-note" style="font-style: italic">{tr}Note{/tr}</label>
-                            <textarea id="payment-note" name="note" style="width: 98%;" rows="6"></textarea>
-                        </p>
-                        <p>
+                        <div class="tiki-form-group row">
+                            <label class="col-sm-3 col-form-label text-end" for="manual_amount">
+                                {tr}Enter a Manual Payment{/tr}
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <input type="number" step="0.01" min="0" id="manual_amount" name="manual_amount" class="form-control text-end">
+                                    <span class="input-group-text">
+                                    {$payment_info.currency|escape}
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tiki-form-group row">
+                            <label class="col-sm-3 col-form-label text-end" for="payment-note">
+                                {tr}Note{/tr}
+                            </label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" id="payment-note" name="note"  rows="6"></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-sm-8 offset-sm-3 text-end">
+                                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Enter payment{/tr}">
+                            </div>
+                        </div>
+                        <div>
                             <input type="hidden" name="returnurl" value="{$payment_info.returnurl|escape}">
-                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Enter payment{/tr}">
                             <input type="hidden" name="invoice" value="{$payment_info.paymentRequestId|escape}">
-                        </p>
+                        </div>
                     </fieldset>
                 </form>
             {/permission}

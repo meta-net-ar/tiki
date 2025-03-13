@@ -49,6 +49,20 @@ function wikiplugin_trackercalendar_info()
                 'required' => true,
                 'filter' => 'word',
             ],
+            'title' => [
+                'name' => tr('Title Field'),
+                'description' => tr('Permanent name of the field to use for event title'),
+                'since' => '29.0',
+                'required' => false,
+                'filter' => 'word',
+            ],
+            'description' => [
+                'name' => tr('Description Field'),
+                'description' => tr('Permanent name of the field to use for event description'),
+                'since' => '29.0',
+                'required' => false,
+                'filter' => 'word',
+            ],
             'resource' => [
                 'name' => tr('Resource Descriptor Field'),
                 'description' => tr('Permanent name of the field to use as the resource indicator'),
@@ -406,25 +420,13 @@ function wikiplugin_trackercalendar($data, $params)
 
     static $id = 0;
     $headerlib = TikiLib::lib('header');
-    $vendorPath = VendorHelper::getAvailableVendorPath('fullcalendarscheduler', 'npm-asset/fullcalendar-scheduler/main.min.js', false);
-
-    if (! $vendorPath) {
-        $errorMessage = tr('To view Tracker Calendar Tiki needs the latest npm-asset/fullcalendar-scheduler package.');
-        if (Perms::get()->admin) {
-            $errorMessage .= '<br>' . tr('Use the Package Manager to install it %0here%1.', '<a href="tiki-admin.php?page=packages" class="alert-link">', '</a>');
-        } else {
-            $errorMessage .= '<br>' . tr('Contact the site administrator.');
-        }
-
-        return WikiParser_PluginOutput::internalError($errorMessage);
-    }
 
     // Disable fullcalendar's force events to be one-line tall
-    $headerlib->add_css('.fc-day-grid-event > .fc-content, .fc-timeline-event > .fc-content { white-space: normal; }');
+    $headerlib->add_css('.ec-day-grid > .ec-content, .ec-timeline > .ec-content { white-space: normal; }');
 
-    $headerlib->add_cssfile($vendorPath . '/npm-asset/fullcalendar-scheduler/main.css');
+    //$headerlib->add_cssfile($vendorPath . '/npm-asset/fullcalendar-scheduler/main.css');
     // Disable fullcalendar's force events to be one-line tall
-    $headerlib->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }');
+    $headerlib->add_css('.ec-day-grid > .ec-content { white-space: normal; }');
     $headerlib->add_js_module('import "@jquery-tiki/wikiplugin-trackercalendar";');
 
     $jit = new JitFilter($params);
@@ -557,7 +559,6 @@ function wikiplugin_trackercalendar($data, $params)
         [
             'id' => 'trackercalendar' . ++$id,
             'trackerId' => $jit->trackerId->int(),
-            'colormap' => base64_encode($jit->colormap->none()),
             'begin' => $jit->begin->word(),
             'end' => $jit->end->word(),
             'resource' => $resourceField,
@@ -572,6 +573,8 @@ function wikiplugin_trackercalendar($data, $params)
             'maxHourOfDay' => $maxHourOfDay,
             'slotDuration' => $slotDuration,
             'addTitle' => tr('Insert'),
+            'title' => $jit->title->word(),
+            'description' => $jit->description->word(),
             'canInsert' => $itemObject->canModify(),
             'dView' => $dView,
             'eventOverlap' => $eventOverlap,

@@ -151,6 +151,7 @@
                 {preference name=unsuccessful_logins_invalid}
                 {preference name=eponymousGroups}
                 {preference name=desactive_login_autocomplete}
+                {preference name=login_placeholders_enable}
                 {preference name=permission_denied_login_box}
                 {preference name=login_text_explanation}
                 {preference name=login_multiple_forbidden}
@@ -222,7 +223,19 @@
                 <legend class="h3">{tr}Password{/tr}</legend>
                 {preference name=forgotPass}
                 {preference name=twoFactorAuth}
+                <div class="adminoptionboxchild" id="twoFactorAuth_childcontainer">
+                    {preference name=twoFactorAuthIntervalDays}
+                    {preference name=twoFactorAuthType}
+                    {preference name=twoFactorAuthEmailTokenLength}
+                    {preference name=twoFactorAuthEmailTokenTTL}
+                    {preference name=twoFactorAuthAllUsers}
+                    {preference name=twoFactorAuthIncludedGroup}
+                    {preference name=twoFactorAuthIncludedUsers}
+                    {preference name=twoFactorAuthExcludedGroup}
+                    {preference name=twoFactorAuthExcludedUsers}
+                </div>
                 {preference name=change_password}
+                {preference name=pass_show_rules}
                 {preference name=pass_chr_num}
                 {preference name=pass_chr_case}
                 {preference name=pass_chr_special}
@@ -231,6 +244,10 @@
                 {preference name=pass_diff_username}
                 {preference name=min_pass_length}
                 {preference name=pass_due}
+                {preference name=pass_history_management}
+                <div class="adminoptionboxchild" id="passHistoryManagment_childcontainer">
+                    {preference name=pass_history_number}
+                </div>
             </fieldset>
             <fieldset>
                 <div class="mb-3 row">

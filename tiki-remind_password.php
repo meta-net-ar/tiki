@@ -21,9 +21,7 @@ if (isset($_REQUEST["user"])) {
             header("location: tiki-change_password.php?user=" . urlencode($_REQUEST["user"]) . "&oldpass=" . $oldPass);
             die;
         }
-        $smarty->assign('msg', tra("Invalid username or activation code. Maybe this code has already been used."));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Invalid username or activation code. Maybe this code has already been used."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 if (isset($_REQUEST["remind"])) {
@@ -91,9 +89,7 @@ if (isset($_REQUEST["remind"])) {
         $mail->setHeader('X-Password-Reset-From', $tikilib->get_ip_address());
 
         if (! $mail->send([$_REQUEST['email']])) {
-            $smarty->assign('msg', tra("The mail can't be sent. Contact the administrator"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The mail can't be sent. Contact the administrator"), \Laminas\Http\Response::STATUS_CODE_500);
         }
         // Just show "success" message and no form
         $smarty->assign('showmsg', 'y');

@@ -31,9 +31,7 @@ $filegallib = TikiLib::lib('filegal');
 $access->check_feature('feature_file_galleries');
 
 if (empty($_REQUEST['fileId']) || ! ($fileInfo = $filegallib->get_file_info($_REQUEST['fileId']))) {
-    $smarty->assign('msg', tra("Incorrect param"));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $gal_info = $filegallib->get_file_gallery($fileInfo['galleryId']);
@@ -41,10 +39,7 @@ $gal_info = $filegallib->get_file_gallery($fileInfo['galleryId']);
 $tikilib->get_perm_object($fileInfo['galleryId'], 'file gallery', $gal_info, true);
 
 if (! ($tiki_p_admin_file_galleries == 'y' || $tiki_p_view_file_gallery == 'y')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to edit this file"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to edit this file"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $auto_query_args = ['fileId','offset','find','sort_mode','filegals_manager','maxRecords'];
@@ -52,15 +47,10 @@ $auto_query_args = ['fileId','offset','find','sort_mode','filegals_manager','max
 if (! empty($_REQUEST['remove'])) {
     $access->checkCsrf();
     if (! ($removeInfo = $filegallib->get_file_info($_REQUEST['remove']))) {
-        $smarty->assign('msg', tra("Incorrect param"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if (! ($tiki_p_admin_file_galleries == 'y' || ($user && ($user == $gal_info['user'] || $user == $removeInfo['user'])))) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to remove files from this gallery"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to remove files from this gallery"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $access->checkCsrf(($removeInfo['archiveId'] ? tra('Remove archive: ') : tra('Remove file gallery: ')) . (! empty($removeInfo['name']) ? $removeInfo['name'] . ' - ' : '') . $removeInfo['filename']);
     $filegallib->remove_file($removeInfo, $gal_info);
@@ -70,9 +60,7 @@ if (isset($_REQUEST['fgal_actions'])) {
         $access->checkCsrf();
         foreach (array_values($_REQUEST['file']) as $fileId) {
             if (! ($removeInfo = $filegallib->get_file_info($fileId))) {
-                $smarty->assign('msg', tra("Incorrect param"));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
             }
             $filegallib->remove_file($removeInfo, $gal_info);
         }

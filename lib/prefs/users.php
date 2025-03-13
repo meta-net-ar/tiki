@@ -258,6 +258,12 @@ function prefs_users_list()
             'type' => 'flag',
             'default' => 'n',
         ],
+        'users_prefs_switch_user_notification' => [
+            'name' => tra('Notify user when switched to their account'),
+            'description' => tra('Send a notification to the user when an admin switches to their account.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'users_prefs_xmpp_jid' => [
             'name' => tra('XMPP account JID or username'),
             'description' => tra('XMPP account JID or username'),

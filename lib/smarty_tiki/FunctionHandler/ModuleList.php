@@ -74,29 +74,28 @@ class ModuleList extends Base
                         $device_classes = '';
 
                         if (isset($devices) && is_array($devices) && ! empty($devices)) {
-                            if (! in_array('TABLET', $devices)) {
-                                $device_classes .= ' no_display_on_tablet';
+                            $device_map = [
+                                'MOBILE' => 'd-xs-none d-sm-block',
+                                'TABLET' => 'd-sm-none d-md-none d-lg-block',
+                                'LAPTOP' => 'd-lg-none d-xl-none d-xxl-block',
+                                'DESKTOP' => 'd-xxl-none',
+                                'PRINT' => 'd-print-none'
+                            ];
+
+                            $device_classes = [];
+
+                            foreach ($device_map as $device => $class) {
+                                if (! in_array($device, $devices)) {
+                                    $device_classes[] = $class;
+                                }
                             }
 
-                            if (! in_array('MOBILE', $devices)) {
-                                $device_classes .= ' no_display_on_mobile';
-                            }
-
-                            if (! in_array('LAPTOP', $devices)) {
-                                $device_classes .= ' no_display_on_laptop';
-                            }
-
-                            if (! in_array('DESKTOP', $devices)) {
-                                $device_classes .= ' no_display_on_desktop';
-                            }
-
-                            if (! in_array('PRINT', $devices)) {
-                                $device_classes .= ' no_display_on_print';
-                            }
+                            $device_classes = implode(' ', $device_classes);
                         } else {
-                            $device_classes .= ' display_on_print';
+                            $device_classes = ' d-print-block';
                         }
-                        $moduleContent = preg_replace('/ class=\"module ([^\"]+)/', ' class="module $1' . $device_classes, $moduleContent);
+
+                        $moduleContent = preg_replace('/ class="([^"]*\bmodule\b[^"]*)"/', ' class="$1 ' . $device_classes . '"', $moduleContent);
                         return $moduleContent;
                     },
                     $moduleZones[$key]

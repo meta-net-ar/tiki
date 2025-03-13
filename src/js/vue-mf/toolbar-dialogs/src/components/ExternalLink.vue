@@ -1,6 +1,6 @@
 <script setup>
 import DialogInput from "./DialogInput.vue";
-import { onMounted, defineProps, defineExpose, ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const props = defineProps({
     toolbarObject: {
@@ -9,20 +9,17 @@ const props = defineProps({
     },
 });
 
-const tdgLabel = ref();
-const toolbarObject = ref(props.toolbarObject);
-
 const labelInput = ref("");
 const urlInput = ref("");
 const relationInput = ref("");
 
+const toolbarObject = computed(() => props.toolbarObject);
+
 onMounted(() => {
-    $(tdgLabel.value.$el)
-        .parents(".modal").first()
-        .on("show.bs.modal", (event) => {
-            _shown(event);
-            $(this).find('[data-bs-toggle="tooltip"]').tooltip();
-        });
+    _shown();
+    $(toolbarObject.value.modalElement)
+    .find('[data-bs-toggle="tooltip"]')
+    .tooltip();
 });
 
 function _shown() {
@@ -91,10 +88,10 @@ defineExpose({ execute: _insert, shown: _shown });
 </script>
 
 <template>
-    <DialogInput ref="tdgLabel" v-model="labelInput" label="Label" class="mb-2" />
-    <DialogInput ref="tdgUrl" v-model="urlInput" label="URL" class="mb-2" />
+    <DialogInput v-model="labelInput" label="Label" class="mb-2" />
+    <DialogInput v-model="urlInput" label="URL" class="mb-2" />
     <div class="input-group mr-sm-2" v-if="! toolbarObject.editor.isMarkdown">
-        <DialogInput ref="tdgRelation" v-model="relationInput" label="Relation" />
+        <DialogInput v-model="relationInput" label="Relation" />
         <div class="input-group-text" data-bs-toggle="tooltip" title="Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.">
             <span class="fa fa-circle-info"></span>
         </div>

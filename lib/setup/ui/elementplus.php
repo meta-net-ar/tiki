@@ -10,13 +10,15 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 $elementPlus = [
     'select' => [
+        'enabled' => $prefs['elementplus_select'] === 'y',
         'clearable' => $prefs['elementplus_select_clearable'] === 'y',
         'collapseTags' => $prefs['elementplus_select_collapse_tags'] === 'y',
         'maxCollapseTags' => (int) $prefs['elementplus_select_max_collapse_tags'],
         'filterable' => $prefs['elementplus_select_filterable'] === 'y',
         'allowCreate' => $prefs['elementplus_select_allow_create'] === 'y',
         'ordering' => $prefs['elementplus_select_sortable'] === 'y'
-    ]
+    ],
+    'autocomplete' => $prefs['elementplus_autocomplete'] === 'y',
 ];
 
 $headerlib->add_js_config('window.elementPlus = ' . json_encode($elementPlus) . ';');

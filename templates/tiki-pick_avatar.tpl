@@ -114,7 +114,7 @@
             <label class="col-sm-3 col-form-label">{tr}Select your profile picture{/tr}</label>
             <div class="col-sm-7">
                 <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
-                <input id="userfile1" name="userfile1" type="file">
+                <input id="userfile1" name="userfile1" type="file" accept="image/*">
                 <div class="form-text">
                     {if $prefs.user_store_file_gallery_picture neq 'y'}{tr}File (only .gif, .jpg and .png images approximately 45px × 45px){/tr}{else}{tr}File (only .gif, .jpg and .png images){/tr}{/if}:
                 </div>

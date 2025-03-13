@@ -5,7 +5,7 @@
 <div class="module_selector mb-3">
     <label for="assign_name">{tr}Module Name{/tr}</label>
     <select id="assign_name" name="assign_name" class="form-control">
-        <option value=""></option>
+        <option value="" disabled selected>{tr}Select Module{/tr}</option>
         {foreach key=name item=info from=$all_modules_info}
             <option value="{$name|escape}" {if $assign_name eq $name || $assign_selected eq $name}selected="selected"{/if}>{$info.name}</option>
         {/foreach}
@@ -47,7 +47,7 @@
                 {/if}
                 <div class="admin2cols adminoptionbox clearfix">
                     <label for="groups">{tr}Groups{/tr}</label>
-                    <select multiple="multiple" id="groups" name="groups[]" class="form-control mb-4 resize-vertical">
+                    <select multiple="multiple" id="groups" name="groups[]" class="form-control mb-4 resize-vertical" style="width:100%;">
                         {section name=ix loop=$groups}
                             <option value="{$groups[ix].groupName|escape}" {if $groups[ix].selected eq 'y'}selected="selected"{/if}>{$groups[ix].groupName|escape}</option>
                         {/section}
@@ -93,7 +93,18 @@
                             {foreach from=$params key=name item=param}
                                 <div class="admin2cols adminoptionbox clearfix">
                                     <label for="assign_params[{$name|escape}]">{$param.name|escape}{if !empty($param.required)} <span class="attention">({tr}required{/tr})</span>{/if}</label>
-                                    {if isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
+                                    {if isset($name) and $name eq 'id' and $assign_info.name eq 'Menu'}
+                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control" aria-label="{tr}Select Menu{/tr}">
+                                            <option value="" disabled {if !isset($param.value)}selected{/if}>{tr}Select Menu{/tr}</option>
+                                            {foreach from=$channels item=channel}
+                                                {assign var="menuId" value=$channel.menuId}
+                                                {assign var="truncatedDescription" value=$channel.description|truncate:30:"..."}
+                                                <option value="{$menuId|escape}" {if isset($param.value) && $param.value eq $menuId}selected="selected"{/if}>
+                                                    {$channel.name|escape} ({$menuId|escape}){if $channel.description} - {$truncatedDescription|escape}{/if}
+                                                </option>
+                                            {/foreach}
+                                        </select>
+                                    {elseif isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
                                         <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control">
                                             <option value="horiz" {if isset($param.value) && $param.value eq 'horiz'}selected="selected"{/if}>horiz</option>
                                             <option value="vert" {if isset($param.value) && $param.value eq 'vert'}selected="selected"{/if}>vert</option>
@@ -113,7 +124,7 @@
                                         <input type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" value="{$param.value|escape}"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>
                                     {/if}
                                     <div class="description mb-3">
-                                        {$param.description|escape}
+                                        {$param.description}
                                         {if !empty($param.default)} - {tr}Default:{/tr} {$param.default|escape}{/if}
                                     </div>
                                 </div>

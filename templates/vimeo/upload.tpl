@@ -21,7 +21,7 @@
     {/if}
 {/if}
 <form class="simple no-ajax vimeo_upload" id="form{$ticket.ticket_id|escape}">
-{vimeo_uploader url=$ticket.upload_link_secure maxmegabytes=$availableMB}
+    <tiki-el-file-gal-uploader accept="video/*" max-size="{$availableMB * 1000000}" max-files="1" vimeo-url="{$ticket.upload_link_secure}" />
 </form>
 
 {jq}
@@ -50,29 +50,27 @@ function updateProgressBar() {
     console.log(progress);
     $('#progress').find('.progress-bar').css('width', Math.round(progress) + '%');
 }
-function completeVimeoUpload() {
+function completeVimeoUpload(file) {
     var ticket = '{{$ticket.ticket_id|escape}}';
     var $form = $('#form' + ticket);
     var completeUri = {{$ticket.complete_uri|json_encode}};
     var galleryId = {{$galleryId|json_encode}};
     var fieldId = {{$fieldId|json_encode}};
     var itemId = {{$itemId|json_encode}};
-    var $file = $('input[type=file]', $form);
     var $title = $('input[name=title]', $form);
 
-    if ($file.val()) {
+    if (file) {
         var updata = {
             title: $title.val(),
             galleryId: galleryId,
             completeUri: completeUri,
-            file: $file.val(),
+            file: file,
             fieldId: fieldId,
             itemId: itemId
         };
         if (updata.file.indexOf("C:\\fakepath\\") === 0) {
             updata.file = updata.file.substr(12);    // webkit fakepath?
         }
-        $file.val("");    // empty file value so it doesn't get added twice (mainly in webkit)
         $.post($.service('vimeo', 'complete'), updata, function(data) {
             $form.parents(".ui-dialog").tikiModal();
             if (data.err) {

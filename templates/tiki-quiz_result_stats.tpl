@@ -38,7 +38,15 @@
 <br>
 {tr}Answer:{/tr}
 
-<div class="quizanswer">{$result.answer}</div>
+<div class="quizanswer">
+    {if isset($result.answer)}
+        {$result.answer}
+    {else}
+        {remarksbox type="warning" title="{tr}Information{/tr}"}
+        {tr}Result not found{/tr}
+        {/remarksbox}
+    {/if}
+</div>
 
 <h2>{tr}User answers{/tr}</h2>
 <div class="table-responsive">

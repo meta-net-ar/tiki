@@ -76,6 +76,7 @@ class ConsoleApplicationBuilder
             'condition' => 'checkVendorsLoaded',
             'actions'   => [UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_PUBLISHED,],
             'commands'  => [
+                new CacheClearCommand(),
                 new ConfigureCommand(),
                 new InstallerLockCommand(),
                 new InstallerUnlockCommand(),
@@ -107,7 +108,6 @@ class ConsoleApplicationBuilder
                     UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_AVAILABLE,
                 ],
             'commands'  => [
-                new CacheClearCommand(),
                 new CacheGenerateCommand(),
                 new BackupDBCommand(),
                 new BackupFilesCommand(),
@@ -118,6 +118,7 @@ class ConsoleApplicationBuilder
                 new PluginRefreshRunCommand(),
                 new PatchCommand(),
                 new UpdateCommand(),
+                new DatabaseEngineConvertCommand()
                 ],
             ],[
             'condition' => 'checkTikiSetupComplete',
@@ -130,6 +131,7 @@ class ConsoleApplicationBuilder
                 new PreferencesSetCommand(),
                 new PreferencesDeleteCommand(),
                 new PreferencesExportCommand(),
+                new SBOMGenerateCommand(),
                 ],
             ],[
             'condition' => 'checkDatabaseUpToDate',
@@ -155,6 +157,7 @@ class ConsoleApplicationBuilder
                 new FilesMoveCommand(),
                 new IndexRebuildCommand(),
                 new IndexOptimizeCommand(),
+                new IndexCleanupCommand(),
                 new IndexCatchUpCommand(),
                 new IndexCompareEnginesCommand(),
                 new ListExecuteCommand(),
@@ -188,6 +191,7 @@ class ConsoleApplicationBuilder
                 new TrackerClearCommand(),
                 new AdminIndexRebuildCommand(),
                 new UserCreateCommand(),
+                new LogDeleteCommand(),
                 new UserUnlockCommand(),
                 new UsersListCommand(),
                 new UsersPasswordCommand(),
@@ -204,6 +208,8 @@ class ConsoleApplicationBuilder
                 new SchedulerRunCommand(),
                 new WebmailUnreadPagesCommand(),
                 new WebmailUnreadGlobalCommand(),
+                new Disable2FACommand(),
+                new ForumProcessInboundMail(),
                 ],
             ],[
             'condition' => 'checkIsOCRAvailable',
@@ -624,7 +630,7 @@ class ConsoleApplicationBuilder
                         }
                         $console->add($cmd);
                     }
-                } catch (ReflectionException $e) {
+                } catch (\ReflectionException $e) {
                 }
             }
         }

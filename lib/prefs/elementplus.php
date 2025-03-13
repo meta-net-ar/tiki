@@ -7,13 +7,34 @@
 function prefs_elementplus_list()
 {
     return [
+        'elementplus_autocomplete' => [
+            'name' => tra('Element Plus Autocomplete'),
+            'description' => tra('Provides various dropdown menus on many text input boxes for page names, user names, groups, tags, etc.'),
+            'type' => 'flag',
+            'default' => 'y',
+            'dependencies' => [
+                'feature_elementplus'
+            ],
+            'conflicts' => [
+                'feature_jquery_autocomplete'
+            ]
+        ],
+        'elementplus_select' => [
+            'name' => tra('Element Plus Select'),
+            'description' => tra('Provides a more advanced select input with features like clearable, collapsible tags, filterable, allow create, and sortable.'),
+            'type' => 'flag',
+            'default' => 'y',
+            'dependencies' => [
+                'feature_elementplus'
+            ]
+        ],
         'elementplus_select_clearable' => [
             'name' => tra('Clearable Select'),
             'description' => tra('whether select can be cleared'),
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
-                'feature_elementplus'
+                'elementplus_select'
             ]
         ],
         'elementplus_select_collapse_tags' => [
@@ -22,7 +43,7 @@ function prefs_elementplus_list()
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
-                'feature_elementplus'
+                'elementplus_select'
             ]
         ],
         'elementplus_select_max_collapse_tags' => [
@@ -32,16 +53,16 @@ function prefs_elementplus_list()
             'default' => '3',
             'dependencies' => [
                 'elementplus_select_collapse_tags',
-                'feature_elementplus'
+                'elementplus_select'
             ]
         ],
         'elementplus_select_filterable' => [
             'name' => tra('Filterable Select'),
             'description' => tra('whether select can be filtered'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'dependencies' => [
-                'feature_elementplus'
+                'elementplus_select'
             ]
         ],
         'elementplus_select_allow_create' => [
@@ -51,7 +72,7 @@ function prefs_elementplus_list()
             'default' => 'n',
             'dependencies' => [
                 'elementplus_select_filterable',
-                'feature_elementplus'
+                'elementplus_select'
             ],
         ],
         'elementplus_select_sortable' => [
@@ -60,7 +81,17 @@ function prefs_elementplus_list()
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
-                'feature_elementplus'
+                'elementplus_select'
+            ]
+        ],
+        'elementplus_upload' => [
+            'name' => tra('Element Plus Upload'),
+            'description' => tra('Provides a more advanced upload component for the file gallery with features like drag and drop, upload progress, preview, and more.'),
+            'type' => 'flag',
+            'default' => 'y',
+            'dependencies' => [
+                'feature_elementplus',
+                'feature_file_galleries'
             ]
         ]
     ];

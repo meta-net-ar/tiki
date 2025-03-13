@@ -8,17 +8,17 @@ function setAmount() {
 
 function splitDebit() {
     document.getElementById('Row_SplitCredit').style.display = "none";
-    var tbl = document.getElementById('tbl_debit');
-    var lastRow = tbl.rows.length;
-    var row = tbl.insertRow(lastRow-1);
+    const tbl = document.getElementById('tbl_debit');
+    const lastRow = tbl.rows.length;
+    const row = tbl.insertRow(lastRow - 1);
     row.innerHTML=document.getElementById('Row_StartDebit').innerHTML;
 }
 
 function splitCredit() {
     document.getElementById('Row_SplitDebit').style.display = "none";
-    var tbl = document.getElementById('tbl_credit');
-    var lastRow = tbl.rows.length;
-    var row = tbl.insertRow(lastRow-1);
+    const tbl = document.getElementById("tbl_credit");
+    const lastRow = tbl.rows.length;
+    const row = tbl.insertRow(lastRow - 1);
     row.innerHTML=document.getElementById('Row_StartCredit').innerHTML;
 }
 
@@ -84,11 +84,14 @@ var account='';
         <fieldset>
             <legend>{tr}Debit{/tr}</legend>
             <table id="tbl_debit" class="table">
+                <thead>
                 <tr>
                     <th>{tr}Text{/tr}</th>
                     <th>{tr}Account{/tr} <span class="text-danger">*</span></th>
                     <th>{tr}Amount{/tr} <span class="text-danger">*</span></th>
                 </tr>
+                </thead>
+                <tbody>
                 {section name=debit loop=$debitAccount}{assign var='i' value=$smarty.section.debit.iteration-1}
                     <tr {if $i==0}id="Row_StartDebit" {/if}>
                         <td>
@@ -96,13 +99,13 @@ var account='';
                         </td>
                         <td>
                             <select class="form-select" name="debitAccount[]" style="width:180px" onfocus="account=this">
-                            {foreach from=$accounts item=a}
-                                <option value="{$a.accountId}"{if $a.accountId==$debitAccount[$i]} selected="selected"{/if}>{$a.accountId} {$a.accountName}</option>
-                            {/foreach}
+                                {foreach from=$accounts item=a}
+                                    <option value="{$a.accountId}"{if $a.accountId==$debitAccount[$i]} selected="selected"{/if}>{$a.accountId} {$a.accountName}</option>
+                                {/foreach}
                             </select>
                         </td>
                         <td>
-                            <input class="form-control" name="debitAmount[]" {if $i==0}id="debitAmount" {/if}size="10" value="{$debitAmount[$i]}">
+                            <input type="number" class="form-control" name="debitAmount[]" {if $i==0}id="debitAmount" {/if}size="10" value="{$debitAmount[$i]}">
                         </td>
                     </tr>
                 {/section}
@@ -111,16 +114,20 @@ var account='';
                         <input class="btn btn-primary btn-sm float-sm-end" type="button" value="{tr}Add entry{/tr}" id="SplitDebit" onclick="javascript:splitDebit()">
                     </td>
                 </tr>
+                </tbody>
             </table>
         </fieldset>
         <fieldset>
             <legend>{tr}Credit{/tr}</legend>
             <table id="tbl_credit" class="table">
+                <thead>
                 <tr>
                     <th>{tr}Text{/tr}</th>
                     <th>{tr}Account{/tr} <span class="text-danger">*</span></th>
                     <th>{tr}Amount{/tr} <span class="text-danger">*</span></th>
                 </tr>
+                </thead>
+                <tbody>
                 {section name=credit loop=$creditAccount}{assign var='i' value=$smarty.section.credit.iteration-1}
                     <tr {if $i==0}id="Row_StartCredit" {/if}>
                         <td>
@@ -134,15 +141,16 @@ var account='';
                             </select>
                         </td>
                         <td>
-                            <input class="form-control" name="creditAmount[]" {if $i==0}id="creditAmount" {/if}size="10" value="{$creditAmount[$i]}">
+                            <input type="number" class="form-control" name="creditAmount[]" {if $i==0}id="creditAmount" {/if}size="10" value="{$creditAmount[$i]}">
                         </td>
                     </tr>
                 {/section}
                 <tr id="Row_SplitCredit"{if ! empty($creditAccount) && count($creditAccount)>1} style="display:none;"{/if}>
                     <td colspan="3">
-                        <input class="btn btn-primary btn-sm" type="button" value="{tr}Add entry{/tr}" id="SplitCredit" onclick="javascript:splitCredit()">
+                        <input class="btn btn-primary btn-sm float-sm-end" type="button" value="{tr}Add entry{/tr}" id="SplitCredit" onclick="javascript:splitCredit()">
                     </td>
                 </tr>
+                </tbody>
             </table>
         </fieldset>
         <input

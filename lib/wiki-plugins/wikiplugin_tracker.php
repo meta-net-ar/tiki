@@ -2040,6 +2040,8 @@ function wikiplugin_tracker($data, $params)
         foreach ($flds['data'] as $i => $f) { // collect additional infos
             if (in_array($f['fieldId'], $outf)) {
                 $flds['data'][$i]['ins_id'] = ($f['type'] == 'e') ? 'ins_' . $f['fieldId'] : $fields_prefix . $f['fieldId'];
+                $handler = $factory->getHandler($f);
+                $flds['data'][$i]['html_name'] = $handler->getHTMLFieldName();
                 if (($f['isHidden'] == 'c' || $f['isHidden'] == 'p' || $f['isHidden'] == 'a') && ! empty($itemId) && ! isset($item['creators'])) {
                     $item['creators'] = $trklib->get_item_creators($trackerId, $itemId);
                 }

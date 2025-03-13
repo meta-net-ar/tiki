@@ -699,9 +699,7 @@ class UsersLib extends TikiLib
 
                         $errmsg = $errmsg . '). For further information on this error goto the ((ShibReg)) Page';
 
-                        $smarty->assign('msg', $errmsg);
-                        $smarty->display('error.tpl');
-                        exit;
+                        Feedback::errorAndDie($errmsg, \Laminas\Http\Response::STATUS_CODE_409);
                     } else {
                         if ($validafil) {
                             // Create the user
@@ -740,16 +738,11 @@ class UsersLib extends TikiLib
                                                 '<BR/><BR/>You must have one of the following affiliations to get into this wiki.<BR/><BR/>' .
                                                 '<B>' . $vaffils . '</B><BR><BR/><BR/>' .
                                                 'For further information on this error goto the <a href="./tiki-index.php?page=ShibReg">Shibreg</a> Page';
-
-                            $smarty->assign('msg', $errmsg);
-                            $smarty->display('error.tpl');
-                            exit;
+                            Feedback::errorAndDie($errmsg, \Laminas\Http\Response::STATUS_CODE_401);
                         }
                     }
                 } else {
-                    $smarty->assign('msg', 'The user [ ' . $user . ' ] is not registered with this wiki.');
-                    $smarty->display('error.tpl');
-                    exit;
+                    Feedback::errorAndDie(tra('The user [ ' . $user . ' ] is not registered with this wiki.'), \Laminas\Http\Response::STATUS_CODE_401);
                 }
             }
         } elseif ($auth_saml) {
@@ -2003,6 +1996,34 @@ class UsersLib extends TikiLib
         return [PASSWORD_INCORRECT, $user];
     }
 
+    public function checkUserPasswordHistory($user, $pass): int
+    {
+        //First, select all password resets performed by the user
+        $userUpper = TikiLib::strtoupper($user);
+        $query = 'select * from `tiki_user_passwords_history` where upper(`user`) = ?';
+        $result = $this->fetchAll($query, [$userUpper]);
+        $line = [];
+        $numberOfResets = -1;
+        //Check those matching the new password and select the most recent one.
+        foreach ($result as $res) {
+            if ($res['hash'][0] == '$') {
+                if (password_verify($pass, $res['hash'])) {
+                    $line = $res;
+                }
+            }
+        }
+
+        if (! empty($line)) {
+            //Count the number of reset passwords recorded after the last reset (the one the user wants to set as new password).
+            $query = 'SELECT COUNT(`passId`) as resets FROM `tiki_user_passwords_history`
+                            WHERE `user` = ? AND `created_at` > ?;';
+            $result = $this->query($query, [$userUpper, $line['created_at']]);
+            $res = $result->fetchRow();
+            $numberOfResets = $res['resets'];
+        }
+        return $numberOfResets;
+    }
+
     public function handleUnsuccessfulLogin($user)
     {
         global $prefs, $base_url;
@@ -2012,6 +2033,10 @@ class UsersLib extends TikiLib
         $this->set_unsuccessful_logins($user, $nb_bad_logins);
 
         $smarty = TikiLib::lib('smarty');
+
+        if (($prefs['log_failed_logins'] ?? 'n') === 'y') {
+            TikiLib::lib('logs')->add_log('login', tr('Failed login attempt for: %0. Number of attempts: %1.', $user, $nb_bad_logins));
+        }
 
         if ($prefs['unsuccessful_logins_invalid'] > 0 && ($nb_bad_logins >= $prefs['unsuccessful_logins_invalid'])) {
             $info = $this->get_user_info($user);
@@ -2701,12 +2726,16 @@ class UsersLib extends TikiLib
         return $retval;
     }
 
-    public function list_all_users()
+    public function list_all_users($group = null)
     {
-        global $tiki_p_list_users, $tiki_p_admin;
         $cachelib = TikiLib::lib('cache');
-
-        if ($tiki_p_list_users !== 'y' && $tiki_p_admin != 'y') {
+        $perms = Perms::get();
+        $has_permission = $perms->list_users || $perms->admin;
+        if (! $has_permission && ! empty($group)) {
+            $perms = Perms::get(['type' => 'group', 'object' => $_REQUEST['group']]);
+            $has_permission = $perms->group_add_member || $perms->group_remove_member;
+        }
+        if (! $has_permission) {
             return [];
         }
 
@@ -3252,6 +3281,7 @@ class UsersLib extends TikiLib
 
         return $ret;
     }
+
 
     public function get_recur_group_users($group, $recur = 0, $what = 'login')
     {
@@ -7047,11 +7077,7 @@ class UsersLib extends TikiLib
                 // is already created, for example in the 2nd pass in the registration process. To silently exit.
                 return false;
             }
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('We were unable to create your account because this email is already in use.'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('We were unable to create your account because this email is already in use.'), \Laminas\Http\Response::STATUS_CODE_409);
         }
 
         $userexists_cache[$user] = null;
@@ -7168,11 +7194,7 @@ class UsersLib extends TikiLib
     {
         global $prefs;
         if ($prefs['user_unique_email'] == 'y' && $this->other_user_has_email($user, $email)) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('Email cannot be set because this email is already in use by another user.'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Email cannot be set because this email is already in use by another user.'), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $query = 'update `users_users` set `email`=? where binary `login`=?';
         $result = $this->query($query, [$email, $user]);
@@ -7182,11 +7204,7 @@ class UsersLib extends TikiLib
     {
         global $prefs;
         if ($prefs['user_unique_email'] == 'y' && $this->other_user_has_email($user, $email)) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('Email cannot be set because this email is already in use by another user.'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Email cannot be set because this email is already in use by another user.'), \Laminas\Http\Response::STATUS_CODE_409);
         }
 
         // Need to change the email-address for notifications, too
@@ -7428,6 +7446,7 @@ class UsersLib extends TikiLib
     public function check_password_policy($pass)
     {
         global $prefs, $user;
+        $userlib = TikiLib::lib('user');
         $errors = [];
 
         // Validate password here
@@ -7465,7 +7484,7 @@ class UsersLib extends TikiLib
 
         if ($prefs['pass_chr_special'] == 'y') {
             if (preg_match_all('/^[0-9a-z]+$/', $pass) > 0) {
-                $errors[] = tra('Password must contain at least one special character in lower case like " / $ % ? & * ( ) _ + ...');
+                $errors[] = tra('Password must contain at least one special character case like " / $ % ? & * ( ) _ + ...');
             }
         }
 
@@ -7484,6 +7503,15 @@ class UsersLib extends TikiLib
             }
         }
 
+        //Check password history
+        if ($prefs['pass_history_management'] === 'y') {
+            $numberOfResets = $userlib->checkUserPasswordHistory($user, $pass);
+            if ($numberOfResets !== -1) {
+                if ($prefs['pass_history_number'] > $numberOfResets) {
+                    $errors[] = tra('You cannot use this password because you have used the same password in the past.');
+                }
+            }
+        }
 
         return empty($errors) ? '' : implode(' ', $errors);
     }
@@ -7511,7 +7539,63 @@ class UsersLib extends TikiLib
         return $result;
     }
 
-    public function change_user_password($user, $pass, $pass_first_login = false)
+    public function forceTwoFactorAuth($user): bool
+    {
+        global $prefs;
+        $force = false;
+
+        //Do not force user (admin) to enable 2FA
+        if ($user == 'admin') {
+            return false;
+        }
+        //Force all users to enable 2FA
+        if ($prefs['twoFactorAuthAllUsers'] == 'y') {
+            $force = true;
+        }
+        //Force users in the specific groups to enable 2FA
+        if (! empty($prefs['twoFactorAuthIncludedGroup'])) {
+            //get list of group names
+            $groups = $prefs['twoFactorAuthIncludedGroup'];
+            foreach ($groups as $groupName) {
+                $userIsInGroup = $this->user_is_in_group($user, $groupName);
+                if ($userIsInGroup) {
+                    $force = true;
+                    break;
+                }
+            }
+        }
+        //Force specific users to enable 2FA
+        if (! empty($prefs['twoFactorAuthIncludedUsers'])) {
+            //get list of usernames
+            $users = $prefs['twoFactorAuthIncludedUsers'];
+            if (in_array($user, $users)) {
+                $force = true;
+            }
+        }
+        //Do not force users in the specific groups to enable 2FA
+        if (! empty($prefs['twoFactorAuthExcludedGroup'])) {
+            //get list of group names
+            $groups = $prefs['twoFactorAuthExcludedGroup'];
+            foreach ($groups as $groupName) {
+                $userIsInGroup = $this->user_is_in_group($user, $groupName);
+                if ($userIsInGroup) {
+                    $force = false;
+                    break;
+                }
+            }
+        }
+        //Do not force specific users to enable 2FA
+        if (! empty($prefs['twoFactorAuthExcludedUsers'])) {
+            //get list of usernames
+            $users = $prefs['twoFactorAuthExcludedUsers'];
+            if (in_array($user, $users)) {
+                $force = false;
+            }
+        }
+        return $force;
+    }
+
+    public function change_user_password($user, $pass, $pass_first_login = false): bool
     {
 
         $hash = password_hash($pass, PASSWORD_DEFAULT);
@@ -7520,22 +7604,34 @@ class UsersLib extends TikiLib
         if ($pass_first_login) {                    // if true, set pass_confirm to force passord change upon next login
             if (! empty($pass)) {
                 $query = 'update `users_users` set `hash`=? , `provpass`=?, `pass_confirm`=? where binary `login`=?';
-                $this->query($query, [$hash, $pass, 0, $user]);
+                $result = $this->query($query, [$hash, $pass, 0, $user]);
             } else {
                 $query = 'update `users_users` set `pass_confirm`=? where binary `login`=?';
-                $this->query($query, [0, $user]);
+                $result = $this->query($query, [0, $user]);
             }
         } else {
             $query = 'update `users_users` set `hash`=? ,`pass_confirm`=?, `provpass`=? where binary `login`=?';
-            $this->query($query, [$hash, $new_pass_confirm, '', $user]);
+            $result = $this->query($query, [$hash, $new_pass_confirm, '', $user]);
         }
-        // invalidate the cache so that after a fresh install, the admin (who has no user details at the install) can log in
-        $cachelib = TikiLib::lib('cache');
-        $cachelib->invalidate('user_details_' . $user);
 
-        TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
+        if ($result && $result->numRows() === 1) {
+            // invalidate the cache so that after a fresh install, the admin (who has no user details at the install) can log in
+            $cachelib = TikiLib::lib('cache');
+            $cachelib->invalidate('user_details_' . $user);
 
-        return true;
+            TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
+            return true;
+        } else {
+            throw new Exception(tr('An error occurred while updating the password.'));
+        }
+    }
+
+    public function addPasswordHistory($user, $pass)
+    {
+        $hash = password_hash($pass, PASSWORD_DEFAULT);
+
+        $query = 'insert into `tiki_user_passwords_history`(`user`,`hash`) values(?,?)';
+        $result = $this->query($query, [$user, $hash]);
     }
 
     public function add_group(
@@ -7831,11 +7927,7 @@ class UsersLib extends TikiLib
 
         if (isset($u['email'])) {
             if ($prefs['user_unique_email'] == 'y' && $this->other_user_has_email($u['login'], $u['email'])) {
-                $smarty = TikiLib::lib('smarty');
-                $smarty->assign('errortype', 'login');
-                $smarty->assign('msg', tra('Email cannot be set because this email is already in use by another user.'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('Email cannot be set because this email is already in use by another user.'), \Laminas\Http\Response::STATUS_CODE_409);
             }
             $q[] = '`email` = ?';
             $bindvars[] = strip_tags($u['email']);
@@ -8955,7 +9047,7 @@ class UsersLib extends TikiLib
 
         $userId = $this->getOne('select `userId` from `users_users` where `login` = ?', [$user]);
         // Added a waiting status / flag 'l' for locked
-        $user_lock_update = $lock_status == 'lock' ? 'l' : 'NULL';
+        $user_lock_update = $lock_status == 'lock' ? 'l' : null;
 
         $query = 'update `users_users` set `waiting`= ? where  `userId`= ?';
         $this->query($query, [ $user_lock_update, $userId ]);
@@ -9013,6 +9105,12 @@ class UsersLib extends TikiLib
                 $this->update_user_lock_status($user['login'], 'lock');
             }
         }
+    }
+
+    public function updateLastMFADate($username)
+    {
+        $query = "update `users_users` set `last_mfa_date` = ? WHERE `login` = ?";
+        $this->query($query, [time(), $username]);
     }
 }
 

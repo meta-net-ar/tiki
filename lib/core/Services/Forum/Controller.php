@@ -508,7 +508,7 @@ class Services_Forum_Controller
             if (! empty($info['title'])) {
                 $ret[(int) $id] = $info['title'];
             } else {
-                $ret[(int) $id] = TikiLib::lib('tiki')->get_snippet($info['data'], "", false, "", 60);
+                $ret[(int) $id] = TikiLib::lib('tiki')->get_snippet($info['data'], "", ['is_html' => false], "", 60);
             }
         }
         return $ret;

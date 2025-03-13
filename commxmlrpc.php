@@ -137,7 +137,6 @@ function sendArticle($params)
     // Get the page and store it in received_pages
     global $commlib, $prefs;
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
 
     $pp = $params->getParam(0);
     $site = $pp->scalarval();
@@ -168,7 +167,6 @@ function sendArticle($params)
     $pp = $params->getParam(13);
     $publishDate = $pp->scalarval();
     $pp = $params->getParam(14);
-    $expireDate = $pp->scalarval();
     $pp = $params->getParam(15);
     $created = $pp->scalarval();
     $pp = $params->getParam(16);
@@ -219,7 +217,6 @@ function sendArticle($params)
         $image_y,
         $image_data,
         $publishDate,
-        $expireDate,
         $created,
         $heading,
         $body,

@@ -78,13 +78,14 @@ $inputConfiguration = [
             'outbound_address'                 => 'text',        //post
             'outbound_from'                    => 'text',        //post
             'inbound_pop_server'               => 'text',        //post
+            'inbound_pop_port'                 => 'text',        //post
             'inbound_pop_user'                 => 'text',        //post
             'inbound_pop_password'             => 'password',    //post
             'save'                             => 'bool',        //post
         ],
     ],
 ];
-$section = 'forums';
+$section = 'admin';
 require_once('tiki-setup.php');
 if (! isset($_REQUEST['forumId'])) {
     $_REQUEST['forumId'] = 0;
@@ -205,7 +206,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             'vote_threads' => $_REQUEST['vote_threads'] ?? 'n',
             'show_description' => $_REQUEST['show_description'] ?? 'n',
             'inbound_pop_server' => $_REQUEST['inbound_pop_server'] ?? '',
-            'inbound_pop_port' => 110,
+            'inbound_pop_port' => $_REQUEST['inbound_pop_port'] ?? 110,
             'inbound_pop_user' => $_REQUEST['inbound_pop_user'] ?? '',
             'inbound_pop_password' => $_REQUEST['inbound_pop_password'] ?? '',
             'outbound_address' => trim($_REQUEST['outbound_address']) ?? '',

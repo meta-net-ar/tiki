@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_translations_in_progress` MODIFY `language` varchar(249) NOT NULL;

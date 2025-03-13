@@ -129,17 +129,13 @@ if (empty($_REQUEST['url']) && ! empty($_SERVER['HTTP_REFERER'])) {
     $u = parse_url($_SERVER['HTTP_REFERER']);
 
     if ($u['host'] != $_SERVER['SERVER_NAME']) {
-        $smarty->assign('msg', tra('Incorrect param'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $_REQUEST['url'] = $_REQUEST['HTTP_REFERER'];
 }
 
 if (empty($_REQUEST['url'])) {
-    $smarty->assign('msg', tra('missing parameters'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('missing parameters'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $_REQUEST['url'] = urldecode($_REQUEST['url']);

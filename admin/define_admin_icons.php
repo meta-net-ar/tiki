@@ -29,12 +29,6 @@ if ($prefs['theme_unified_admin_backend'] === 'y') {
                     'description' => tr('Switches for major features'),
                     'help'        => 'Features-Admin',
                 ],
-                'wizard' => [
-                    'title'       => tr('Wizards'),
-                    'description' => tr('Wizards to help you set up your site'),
-                    'help'        => 'Admin-Wizards',
-                    'url'         => 'tiki-wizard_admin.php',
-                ],
                 'look'     => [
                     'title'       => tr('Look & Feel'),
                     'description' => tr('Theme selection, layout settings and UI effect controls'),

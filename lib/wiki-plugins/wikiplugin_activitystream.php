@@ -41,6 +41,11 @@ function wikiplugin_activitystream_info()
 
 function wikiplugin_activitystream($data, $params)
 {
+    global $prefs;
+    if ($prefs['activity_stream_disable_indexing'] === 'y') {
+        return WikiParser_PluginOutput::disabled('wikiplugin_activitystream', ['activity_stream_disable_indexing'])->toHtml();
+    }
+
     $encoded = Tiki_Security::get()->encode([
         'body' => $data,
     ]);

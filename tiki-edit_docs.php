@@ -71,19 +71,14 @@ $supportedTypes = array_map(
 );
 
 if (! in_array($extension, $supportedExtensions) && ! in_array($fileType, $supportedTypes)) {
-    $smarty->assign('msg', tr('Wrong file type, expected one of %0', implode(', ', $supportedTypes)));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tr('Wrong file type, expected one of %0', implode(', ', $supportedTypes)), \Laminas\Http\Response::STATUS_CODE_500);
 }
 
 $globalperms = Perms::get([ 'type' => 'file', 'object' => $fileInfo['fileId'] ]);
 
 //check permissions
 if (! ($globalperms->admin_file_galleries == 'y' || $globalperms->view_file_gallery == 'y')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view/edit this file'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view/edit this file'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! empty($_REQUEST['name']) || ! empty($fileInfo['name'])) {

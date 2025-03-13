@@ -18,6 +18,11 @@
                     <a class="dropdown-item" href="tiki-searchindex.php?tabularId=1&amp;filter~tracker_id={$tabularId}">
                         {icon name=export} {tr}Export Custom{/tr}
                     </a>
+                    {if isset($config['simple_headers']) && $config['simple_headers'] == 1}
+                        <a class="dropdown-item" href="{service controller=tabular action=export_simple_headers tabularId=$tabularId}">
+                            {icon name=export} {tr}Export Headers Only{/tr}
+                        </a>
+                    {/if}
                 </div>
             </div>
         {/permission}

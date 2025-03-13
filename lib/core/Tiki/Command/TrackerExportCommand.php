@@ -87,7 +87,7 @@ class TrackerExportCommand extends Command
             $source = new \Tracker\Tabular\Source\QuerySource($schema, $query);
         } else {
             // this will throw exceptions and not return if there's a problem
-            $source = new \Tracker\Tabular\Source\TrackerSource($schema, $tracker);
+            $source = $schema->getDefaultFilterSource();
         }
 
         if (! empty($fileName)) {

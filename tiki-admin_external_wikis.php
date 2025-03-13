@@ -16,7 +16,6 @@ $inputConfiguration = [
             'save'            => 'bool',       //post
             'remove'          => 'int',       //post
             'extwiki'         => 'text',       //post
-            'save'            => 'bool',       //post
             'find'            => 'text',       //post
             'sort_mode'       => 'text',       //get
             'offset'          => 'digits',     //get

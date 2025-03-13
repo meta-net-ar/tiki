@@ -253,10 +253,6 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
                 $editUrl = 'tiki-ajax_services.php?controller=calendar&action=edit_item&modal=1&trackerItemId=' . $itemId . '&calendarId=' . $this->getOption('calendarId');
             }
             $headerlib = TikiLib::lib('header');
-
-            $headerlib->add_js_config('window.CKEDITOR_BASEPATH = "' . $tikiroot . 'vendor_bundled/vendor/ckeditor/ckeditor/";')
-                ->add_jsfile('vendor_bundled/vendor/ckeditor/ckeditor/ckeditor.js', true)
-                ->add_js('window.dialogData = [];', 1);
         } else {
             $editUrl = '';
         }

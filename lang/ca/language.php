@@ -12838,7 +12838,7 @@ $lang_current = array(
 "Simple search controls for the map" => "Controls de cerca simples per al mapa",
 "Menu" => "Menú",
 "Displays a menu or a structure as a menu" => "Mostra un menú o una estructura de menú",
-"Identifier of the menu (from tiki-admin_menus.php) " => "Identificador d'un menú (de tiki-admin_menus.php)",
+"Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1) " => "Utilitza la ID del menú (per editar/afegir un nou menú, ves a %0Menús d'Administrador%1)",
 "Structure" => "Estructura",
 "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)" => "Identificador d'una estructura de pàgines wiki (nom o número del tiki-admin_structures.php)",
 "Orientation of menu: horiz or vert (default vert) " => "Mode de menú: horiz o vert (per omissió vert)",
@@ -15398,7 +15398,7 @@ $lang_current = array(
 "Email:" => "Correu-e:",
 // "Email address or " => "Email address or ",
 // "User account ID" => "User account ID",
-"Enter a username and click 'Switch'.<br>Useful for testing permissions" => "Escriu el nom d'usuari i fes clic a 'Canvia'. <br>Útil per comprovar permisos",
+"Select a username and click 'Switch'.<br>Useful for testing permissions" => "Escriu el nom d'usuari i fes clic a 'Canvia'. <br>Útil per comprovar permisos",
 // "Toggle Dropdown" => "Toggle Dropdown",
 "My Account" => "ElmeuTiki",
 // "{\$user|username|escape|replace:'&amp;':'&'}" => "{\$user|username|escape|replace:'&amp;':'&'}",
@@ -17520,7 +17520,7 @@ $lang_current = array(
 "~tc~ Tiki Comment ~/tc~ makes a Tiki comment. It will be completely removed from the display, but saved in the file for future reference. ~hc~ HTML Comment ~/hc~ makes an HTML comment. It will be inserted as a comment in the output HTML; these are not normally displayed in browsers, but can be seen using \"View Source\" or similar." => "~tc~ Comentari Tiki ~/tc~ fa un comentari a Tiki.  Serà eliminat completament del text mostrat, però es desarà en l'arxiu per a referències futures i és visible pels editors de les pàgines.  ~hc~ Comentari HTML ~/hc~ fa un comentari HTML.  Serà  insertat com a comentari en l'HTML produït; aquests no es mostraran en navegadors web, però poden ser vistos en mostrar el codi font de la pàgina del navegador o formes similar.",
 "Block Preformatting" => "Preformatat de Block",
 "Indent text with any number of spaces to change it to a monospaced block that still follows other Wiki formatting instructions. It will be indented with the same number of spaces that are used. Note that this mode does not preserve exact spacing and line breaks; use ~pp~...~/pp~ for that." => "Sagna (inserta espais al principi per alinear el paràgraf més a la dreta) el text amb qualsevol nombre d'espais per convertir-lo en un bloc monoespaiat que encara segŭeix altres instruccions de format Wiki. Serà sagnat amb el mateix nombre d'espais que has emprat. Nota que d'aquesta forma no es preseva ni l'espaiat exacte ni els salts de línia; empra ~pp~...~/pp~ per això.",
-"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for langages as Arabic and Hebrew" => "Inseriu resp. text de dreta a esquerra i d'esquerra a dreta direcció DIV (fins al final del text) i marcadors per Langages com àrab o hebreu",
+"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for languages as Arabic and Hebrew" => "Inseriu resp. text de dreta a esquerra i d'esquerra a dreta direcció DIV (fins al final del text) i marcadors per Langages com àrab o hebreu",
 "Special characters" => "Caràcters especials",
 "hard space" => "espai rigid (no permet que es trenqui la línia)",
 "numeric between ~ for HTML numeric characters entity" => "numeric entre ~ per a entitats html de caràcters numèrics",
@@ -19121,8 +19121,8 @@ $lang_current = array(
 "Leave \"New password\" and \"Confirm new password\" fields blank to keep current password" => "Deixa els camps \"Contrasenya nova\" i \"Confirma contrasenya nova\" en blanc per mantenir la contrasenya actual",
 "Current password (required)" => "Contrasenya actual (requerida)",
 // "Two-Factor Authentication" => "Two-Factor Authentication",
-// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®",
-// "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation" => "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation",
+// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app",
+// "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation" => "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation",
 // "Enable Two-Factor Auth" => "Enable Two-Factor Auth",
 // "Disable Two-Factor Auth" => "Disable Two-Factor Auth",
 // "Regenerate Two-Factor Auth" => "Regenerate Two-Factor Auth",
@@ -19999,10 +19999,10 @@ $lang_current = array(
 "Subscription confirmed!" => "Subscripció confirmada!",
 "Subscribe to the newsletter" => "Subscriu-te al butlletí",
 // "Show QRCode" => "Show QRCode",
-// "Install Google Authenticator® app on your device and open it" => "Install Google Authenticator® app on your device and open it",
+// "Install an authenticator app on your device and open it" => "Install an authenticator app on your device and open it",
 // "Tap “Scan a barcode”" => "Tap “Scan a barcode”",
 // "Scan the QR code that is open in your browser" => "Scan the QR code that is open in your browser",
-// "Done, Google Authenticator® is now generating codes" => "Done, Google Authenticator® is now generating codes",
+// "Done, the authenticator app is now generating codes" => "Done, the authenticator app is now generating codes",
 // "Add new application" => "Add new application",
 // "End tour" => "End tour",
 "Before:" => "Abans:",
@@ -21972,3 +21972,8 @@ $lang_current = array(
 // "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine" => "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine",
 );
 $lang = array_replace($lang, $lang_current);
+
+
+
+
+

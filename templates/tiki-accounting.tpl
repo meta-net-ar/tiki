@@ -47,9 +47,6 @@
         <h2>{tr}Accounts{/tr}</h2>
         {include file="tiki-accounting_account_list.tpl"}
     {/tab}
-    {*{tab name="{tr}Bank accounts{/tr}"}*}
-        {*<h2>{tr}Bank accounts{/tr}</h2>*}
-    {*{/tab}*}
     {tab name="{tr}Journal{/tr}"}
         <h2>{tr}Journal{/tr}</h2>
         <div style="max-height: 80%; overflow: scroll;">

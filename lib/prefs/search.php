@@ -177,5 +177,12 @@ now/m,now+1m/m,Next Month
                 'search_use_facets',
             ],
         ],
+        'search_did_you_mean' => [
+            'name' => tra('Did you mean'),
+            'description' => tra('The "Did you mean" feature suggests corrected or alternative search terms when a user\'s query has spelling errors or unclear phrasing, improving search accuracy and user experience.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced'],
+        ],
     ];
 }

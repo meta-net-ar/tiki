@@ -16,7 +16,7 @@ $inputConfiguration = [
         'page'                     => 'pagename',            //get
         'printpages'               => 'string',              //get
         'printstructures'          => 'string',              //get
-        'find'                     => 'word',                //post
+        'find'                     => 'string',              //post
         'addpage'                  => 'bool',                //post
         'removepage'               => 'bool',                //post
         'clearpages'               => 'bool',                //post
@@ -70,19 +70,27 @@ if (isset($_REQUEST["find"])) {
 }
 $smarty->assign('find', $find);
 if (isset($_REQUEST["addpage"])) {
-    if (! in_array($_REQUEST["pageName"], $printpages)) {
-        foreach ($_REQUEST['pageName'] as $value) {
-            $printpages[] = $value;
+    if (! isset($_REQUEST["pageName"])) {
+        Feedback::error(tra('Please select at least one page'));
+    } else {
+        if (! in_array($_REQUEST["pageName"], $printpages)) {
+            foreach ($_REQUEST['pageName'] as $value) {
+                $printpages[] = $value;
+            }
         }
     }
     $printstructures = [];
     $cookietab = 2;
 }
 if (isset($_REQUEST["removepage"])) {
-    foreach ($_REQUEST['selectedpages'] as $value) {
-        unset($printpages[$value]);
+    if (! isset($_REQUEST["selectedpages"])) {
+        Feedback::warning(tra('Please select page to remove'));
+    } else {
+        foreach ($_REQUEST['selectedpages'] as $value) {
+            unset($printpages[$value]);
+        }
     }
-        $printpages = array_merge($printpages);
+    $printpages = array_merge($printpages);
     $cookietab = 2;
 }
 if (isset($_REQUEST["clearpages"])) {
@@ -93,13 +101,17 @@ if (isset($_REQUEST["clearstructures"])) {
     $printstructures = [];
 }
 if (isset($_REQUEST['addstructurepages'])) {
-    $struct = $structlib->get_subtree($_REQUEST["structureId"]);
-    foreach ($struct as $struct_page) {
-        // Handle dummy last entry
-        if ($struct_page["pos"] != '' && $struct_page["last"] == 1) {
-            continue;
+    if (! isset($_REQUEST["structureId"])) {
+        Feedback::error(tra('Please select a structure'));
+    } else {
+        $struct = $structlib->get_subtree($_REQUEST["structureId"]);
+        foreach ($struct as $struct_page) {
+            // Handle dummy last entry
+            if ($struct_page["pos"] != '' && $struct_page["last"] == 1) {
+                continue;
+            }
+            $printpages[] = $struct_page["pageName"];
         }
-        $printpages[] = $struct_page["pageName"];
     }
     $cookietab = 2;
 }

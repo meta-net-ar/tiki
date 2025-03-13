@@ -67,9 +67,7 @@ if (! isset($_REQUEST["nlId"])) {
 $smarty->assign('nlId', $_REQUEST["nlId"]);
 $newsletters = $nllib->list_newsletters(0, -1, 'created_desc', '', '', ["tiki_p_admin_newsletters", "tiki_p_send_newsletters"], 'n');
 if (! $newsletters['cant']) {
-    $smarty->assign('msg', tra("No newsletters available."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No newsletters available."), \Laminas\Http\Response::STATUS_CODE_404);
 }
 if (isset($_REQUEST['cancel'])) {
     unset($_REQUEST['editionId']);

@@ -75,6 +75,14 @@ class TikiMail
     {
     }
 
+    public function setSender($email, $name = null)
+    {
+        if (! $name) {
+            $name = null;
+        }
+        $this->mail->setSender($email, $name);
+    }
+
     public function setFrom($email, $name = null)
     {
         if (! $name) {
@@ -270,10 +278,36 @@ class TikiMail
         return $this->mail;
     }
 
+    public function setLaminasMessageBody($mail)
+    {
+        $emailBody = $mail->getBody();
+        if ($emailBody instanceof \Laminas\Mime\Message) {
+            foreach ($emailBody->getParts() as $part) {
+                if ($part->getType() == \Laminas\Mime\Mime::TYPE_HTML) {
+                    $this->setHtml($part->getContent());
+                } elseif ($part->getType() == \Laminas\Mime\Mime::TYPE_TEXT) {
+                    $this->setText($part->getContent());
+                } else {
+                    $this->addPart($part->getContent(), $part->getType());
+                }
+            }
+        } else {
+            $this->setText($emailBody);
+        }
+    }
+
     public function send($recipients, $type = 'mail')
     {
         global $tikilib, $prefs;
         $logslib = TikiLib::lib('logs');
+
+        $logEmailRes = [];
+        $logEmailRes['subject'] = trim($this->mail->getSubject());
+        foreach ($this->mail->getFrom() as $address) {
+            $logEmailRes['from_email'] = $address->getEmail();
+            $logEmailRes['from_name'] = $address->getName();
+            break;
+        }
 
         $this->mail->getHeaders()->removeHeader('to');
         foreach ((array) $recipients as $to) {
@@ -284,7 +318,10 @@ class TikiMail
                 $error = $e->getMessage();
                 $this->errors[] = $error;
                 $error = ' [' . $error . ']';
-                $logslib->add_log($title, $to . '/' . $this->mail->getSubject() . $error);
+                $logEmailRes['to'] = $to;
+                $logEmailRes['error'] = $error;
+                $logslib->add_log('Email', $to . '/' . $this->mail->getSubject() . $error, '', '', '', '', $logEmailRes);
+                unset($logEmailRes['error']);
             }
         }
 
@@ -334,7 +371,10 @@ class TikiMail
 
             if ($title == 'mail error' || $prefs['log_mail'] == 'y') {
                 foreach ((array) $recipients as $u) {
-                    $logslib->add_log($title, $u . '/' . $this->mail->getSubject() . $error);
+                    $emailStatus = empty($error) ? 'success' : 'error';
+                    $logEmailRes['to'] = $u;
+                    $logEmailRes[$emailStatus] = empty($error) ? 'Email has been sent' : $error;
+                    $logslib->add_log('Email', $u . '/' . $this->mail->getSubject() . $error, '', '', '', '', $logEmailRes);
                 }
             }
         }

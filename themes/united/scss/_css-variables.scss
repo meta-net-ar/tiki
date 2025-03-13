@@ -83,7 +83,7 @@
     --tiki-admin-dropdown-link-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     .accordion-item.search-preferences,
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -106,7 +106,7 @@
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     .accordion-item.search-preferences,
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }

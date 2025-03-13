@@ -25,7 +25,7 @@ if ($prefs['feature_file_galleries'] == 'y' && $prefs['file_galleries_redirect_f
 
     if ($fileInfo) {
         include_once($tikipath . 'tiki-sefurl.php');
-        $newUrl = filter_out_sefurl('tiki-download_file.php?fileId=' . $fileInfo['itemId'] . '&display');
+        $newUrl = filter_out_sefurl('tiki-download_file.php?fileId=' . $fileInfo['itemId']);
 
         if ($tiki_p_admin === 'y') {
             Feedback::warning(tr(

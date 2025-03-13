@@ -16,11 +16,11 @@ if (isset($_GET['ipn'])) {
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
-            'amount' => 'text',
-            'manual_amount' => 'text',
+            'amount' => 'float',
+            'manual_amount' => 'float',
             'description' => 'text',
             'request' => 'alpha',
-            'payable' => 'digits',
+            'payable' => 'int',
             'offset_outstanding' => 'digits',
             'offset_overdue' => 'digits',
             'offset_past' => 'digits',
@@ -206,7 +206,7 @@ if (isset($_POST['request']) && $globalperms->request_payment) {
             $_POST['description'],
             $_POST['amount'],
             (int)$_POST['payable'],
-            $_POST['detail']
+            isset($_POST['detail']) ? $_POST['detail'] : ''
         );
 
         if ($prefs['feature_categories'] == 'y') {

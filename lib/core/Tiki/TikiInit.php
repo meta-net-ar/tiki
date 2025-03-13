@@ -127,6 +127,10 @@ class TikiInit
             )
         );
 
+        if (TikiDb::isAvailable()) {
+            $container->set('tiki.lib.db', TikiDb::get());
+        }
+
         return $container;
     }
 

@@ -66,10 +66,6 @@
                     {assign var=numbercol value=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate'}{tr}Publish Date{/tr}{/self_link}</th>
                 {/if}
-                {if $prefs.art_list_expire eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
-                    <th>{self_link _sort_arg='sort_mode' _sort_field='expireDate'}{tr}Expiry Date{/tr}{/self_link}</th>
-                {/if}
                 {if $prefs.art_list_visible eq 'y'}
                     {assign var=numbercol value=$numbercol+1}
                     <th><span>{tr}Visible{/tr}</span></th>
@@ -154,9 +150,6 @@
                     {if $prefs.art_list_date eq 'y'}
                         <td class="date">{$listpages[changes].publishDate|tiki_short_date}</td>
                     {/if}
-                    {if $prefs.art_list_expire eq 'y'}
-                        <td class="date">{$listpages[changes].expireDate|tiki_short_date}</td>
-                    {/if}
                     {if $prefs.art_list_visible eq 'y'}
                         <td class="text">{tr}{$listpages[changes].disp_article}{/tr}</td>
                     {/if}
@@ -240,7 +233,7 @@
         <div>
             <div class="col-lg-9 input-group">
                 <select name="submit_mult" class="form-select">
-                    <option value="">{tr}Select action to perform with checked...{/tr}</option>
+                    <option value="" selected disabled>{tr}Select action to perform with checked...{/tr}</option>
                     <option value="remove_articles">{tr}Remove{/tr}</option>
                 </select>
                 <input id="submit_mult" type="submit" class="btn btn-warning" value="{tr}OK{/tr}">

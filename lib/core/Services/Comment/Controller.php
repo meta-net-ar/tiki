@@ -134,7 +134,7 @@ class Services_Comment_Controller
 
         $errors = [];
 
-        $title = trim($input->title->text());
+        $title = trim($input->title->xss());
         $data = trim($input->data->wikicontent());
 
         $tikilib = TikiLib::lib('tiki');
@@ -357,7 +357,7 @@ class Services_Comment_Controller
         $errors = [];
 
         if ($input->edit->int()) {
-            $title = trim($input->title->text());
+            $title = trim($input->title->xss());
             $data = trim($input->data->wikicontent());
 
             $tikilib = TikiLib::lib('tiki');

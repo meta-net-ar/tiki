@@ -1,32 +1,36 @@
 <script setup>
-import { ref } from "vue";
+import { ref, useTemplateRef, onMounted, defineAsyncComponent } from "vue";
 import BootstrapModal from "./BootstrapModal.vue";
-import ExternalLink from "./ExternalLink.vue";
-import WikiLink from "./WikiLink.vue";
-import TableBuilder from "./table/Table.vue";
-import Find from "./FindAndReplace.vue";
 
 const props = defineProps({
     toolbarObject: {
         type: Object,
         required: true,
     },
+    syntax: {
+        type: String,
+        required: false,
+    },
 });
 
 const toolbarObject = ref(props.toolbarObject);
+// usefull to mount the dynamically imported component only when the modal is shown
+const modalLoaded = ref(false);
 
-// hopefully these refs could be automated somehow
-const bootstrapModalRef = ref(null);
-const link = ref(null);
-const tikilink = ref(null);
-const table = ref(null);
-const find = ref(null);
+const bootstrapModalRef = useTemplateRef('bootstrapModalElement');
+const resolvedComponentRef = useTemplateRef('resolvedComponent');
 
-toolbarObject.value.bootstrapModalRef = bootstrapModalRef;
+// loading the components asynchronously on demand
+const toolbarComponents = {
+    link: defineAsyncComponent(() => import('./ExternalLink.vue')),
+    tikilink: defineAsyncComponent(() => import('./WikiLink.vue')),
+    table: defineAsyncComponent(() => import('./table/Table.vue')),
+    find: defineAsyncComponent(() => import('./FindAndReplace.vue')),
+    replace: defineAsyncComponent(() => import('./FindAndReplace.vue')),
+}
 
 function showModal() {
-    // cheat with jQuery - get the DOM element from the "ref" object
-    const $modal = $(bootstrapModalRef.value.$el);
+    const $modal = $(toolbarObject.value.modalElement);
     if ($modal.parent("body").length === 0) {
         // bootstrap modal divs need to be on the root of body to appear in front of the backdrop
         $modal.appendTo("body");
@@ -36,32 +40,24 @@ function showModal() {
 
 function execute() {
 
-    switch (toolbarObject.value.name) {
-        case "link":
-            link.value.execute();
-            break;
-        case "tikilink":
-            tikilink.value.execute();
-            break;
-        case "table":
-            table.value.execute();
-            break;
-        case "find":
-        case "replace":
-            find.value.execute();
-            break;
-    }
+    resolvedComponentRef.value?.execute();
+
     switch (toolbarObject.value.name) {
         case "find":
         case "replace":
-            setTimeout(function () {
+            const tm = setTimeout(function () {
                 document.getElementById(toolbarObject.value.domElementId).focus();
+                clearTimeout(tm);
             }, 1000);
             return;
         default:
             bootstrapModalRef.value.close();
     }
 }
+onMounted(() => {
+    toolbarObject.value.bootstrapModalRef = bootstrapModalRef;
+    toolbarObject.value.modalElement = bootstrapModalRef.value.modalElement;
+});
 </script>
 
 <template>
@@ -71,12 +67,14 @@ function execute() {
         </a>
     </template>
     <span v-else @click="showModal()">{{ toolbarObject.labelText }}</span>
-    <BootstrapModal ref="bootstrapModalRef" :title="toolbarObject.label" :size="toolbarObject.name === 'table' ? ' modal-lg' : ''">
+    <BootstrapModal 
+        @shown="modalLoaded = true" 
+        @hidden="modalLoaded = false" 
+        ref="bootstrapModalElement" 
+        :title="toolbarObject.label" 
+        :size="toolbarObject.name === 'table' ? ' modal-lg' : ''">
         <template #body>
-            <ExternalLink v-if="toolbarObject.name === 'link'" ref="link" :toolbar-object="toolbarObject" />
-            <WikiLink v-if="toolbarObject.name === 'tikilink'" ref="tikilink" :toolbar-object="toolbarObject" />
-            <TableBuilder v-if="toolbarObject.name === 'table'" ref="table" :toolbar-object="toolbarObject" />
-            <Find v-if="toolbarObject.name === 'find' || toolbarObject.name === 'replace'" ref="find" :toolbar-object="toolbarObject" />
+            <component v-if="modalLoaded" :is="toolbarComponents[toolbarObject.name]" ref="resolvedComponent" :toolbar-object="toolbarObject"></component>
         </template>
         <template #footer>
             <button class="btn btn-primary btn-sm" @click="execute()">Apply</button>

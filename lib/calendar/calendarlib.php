@@ -96,12 +96,16 @@ class CalendarLib extends TikiLib
                     $eventstatus = json_decode($r2['value']);
                     $r[$r2['optionName']] = $eventstatus;
                     //add translation tag to statuses for display
-                    $r["eventstatusoutput"] = array_map(
-                        function ($status) {
-                            return tra($status);
-                        },
-                        $eventstatus
-                    );
+                    if (is_array($eventstatus)) {
+                        $r["eventstatusoutput"] = array_map(
+                            function ($status) {
+                                return tra($status);
+                            },
+                            $eventstatus
+                        );
+                    } else {
+                        $r["eventstatusoutput"] = [];
+                    }
                 } else {
                     $r[$r2['optionName']] = $r2['value'];
                 }
@@ -649,7 +653,7 @@ class CalendarLib extends TikiLib
 
         if ($res) {
             $query
-                = "select `username`, `role`, `partstat` from `tiki_calendar_roles` where `calitemId`=? order by `role`";
+                = "select `username`, `role`, `partstat`, `comment` from `tiki_calendar_roles` where `calitemId`=? order by `role`";
             $rezult = $this->query($query, [(int)$calitemId]);
             $ppl = [];
             $org = [];
@@ -665,7 +669,8 @@ class CalendarLib extends TikiLib
                         'username' => $rez["username"],
                         'email' => $email,
                         'role' => $rez["role"],
-                        'partstat' => $rez['partstat']
+                        'partstat' => $rez['partstat'],
+                        'comment' => $rez['comment']
                     ];
                 }
             }
@@ -937,8 +942,8 @@ class CalendarLib extends TikiLib
                         }
                     }
                 }
-                $query = "insert into `tiki_calendar_roles` (`calitemId`,`username`,`role`,`partstat`) values (?,?,?,?)";
-                $this->query($query, [(int)$calitemId, $role['username'], $role['role'] ?? 0, $role['partstat'] ?? null]);
+                $query = "insert into `tiki_calendar_roles` (`calitemId`,`username`,`role`,`partstat`, `comment`) values (?,?,?,?,?)";
+                $this->query($query, [(int)$calitemId, $role['username'], $role['role'] ?? 0, $role['partstat'] ?? null, $role['comment'] ?? null]);
             }
         }
 
@@ -1140,15 +1145,13 @@ class CalendarLib extends TikiLib
         $smarty = TikiLib::lib('smarty');
         $fields = false;
         if (! empty($fname) && ($fhandle = fopen($fname, 'r'))) {
-            $fields = fgetcsv($fhandle, 1000);
+            $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         if ($fields === false || ! array_search('name', $fields)) {
-            $smarty->assign('msg', tra("The file has incorrect syntax or is not a CSV file"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file has incorrect syntax or is not a CSV file"), \Laminas\Http\Response::STATUS_CODE_400);
         }
         $nb = 0;
-        while (($data = fgetcsv($fhandle, 1000)) !== false) {
+        while (($data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $d = [
                         'calendarId' => $calendarId,
                         'calitemId' => '0',
@@ -1442,7 +1445,7 @@ class CalendarLib extends TikiLib
 
     public function get_participant_by_event_uid($uid)
     {
-        $query = "select i.`calitemId`,i.`username`,i.`role`,i.`partstat` from `tiki_calendar_roles` i join `tiki_calendar_items` c on i.`calitemId` = c.`calitemId` where c.`uid` = ?";
+        $query = "select i.`calitemId`,i.`username`,i.`role`,i.`partstat`i.`comment` from `tiki_calendar_roles` i join `tiki_calendar_items` c on i.`calitemId` = c.`calitemId` where c.`uid` = ?";
         $bindvars = [$uid];
         $result = $this->fetchAll($query, $bindvars);
 
@@ -2266,6 +2269,15 @@ class CalendarLib extends TikiLib
         return $list;
     }
 
+    // get attendees
+    public function getAttendees()
+    {
+        $query = "select * from tiki_calendar_roles";
+        $result = $this->fetchAll($query);
+
+        return $result;
+    }
+
     /**
      * Helper method to check if user can admin the calendar info object passed.
      * Should either have global calendar admin permission or ability to admin
@@ -2289,5 +2301,43 @@ class CalendarLib extends TikiLib
         }
 
         return false;
+    }
+
+    /**
+     * Skip the non-working days between 2 dates via this algorithm:
+     * 1. extend the new time with the number of non-working days between start/end time
+     * 2. check if there are more non-working days added by this extension
+     * 3. go to step 1 to repeat the extension until there are no more non-working days to add
+     * @param int $ts1 unix timestamp
+     * @param int $ts2 unix timestamp
+     */
+    public function skipNonWorkingDays($ts1, $ts2)
+    {
+        $inc = $ts1 < $ts2 ? -1 : 1;
+        $tempTS = $ts1;
+        $nonWorking = $this->countNonWorkingDaysBetweenDates($ts2, $tempTS);
+        while (($tempTS - $ts2) * $inc != ($ts1 + $inc * $nonWorking * 86400 - $ts2) * $inc) {
+            $tempTS = $ts1 + $inc * $nonWorking * 86400;
+            $nonWorking = $this->countNonWorkingDaysBetweenDates($ts2, $tempTS);
+        }
+        return $tempTS;
+    }
+
+    public function countNonWorkingDaysBetweenDates($ts1, $ts2)
+    {
+        global $prefs;
+        if (empty($prefs['calendar_holidays'])) {
+            return 0;
+        }
+        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2));
+        $dates = [];
+        foreach ($events as $event) {
+            $start = $event['start'];
+            while ($start <= $event['end']) {
+                $dates[] = date('Y-m-d', $start);
+                $start = strtotime('+1 day', $start);
+            }
+        }
+        return count(array_unique($dates));
     }
 }

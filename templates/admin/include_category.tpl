@@ -75,7 +75,6 @@
         </div>
         {preference name=search_show_category_filter}
         {preference name=category_jail}
-        {preference name=category_jail_root}
         {preference name=category_defaults}
         <div class="mb-3 row">
             <div class="col-sm-8 offset-sm-4">

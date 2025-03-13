@@ -1,4 +1,6 @@
-// This file contains rules for colors, consolidated from the tiki_base less files. They're moved here so that theme variables can provide values for them.
+// This file, which is imported by each theme, is for CSS rules containing SCSS variables for the themes to provide values for.
+// CSS rules that are global and themes don't need to provide values for should go into _tiki-miscellaneous_global.scss or one of the more-specific SCSS files.
+
 //@import "_bs3-bs4-transition.scss";
 //@import "_tiki-variables.scss";
 @use "sass:color";
@@ -38,12 +40,12 @@ $imagePathToImgDir: "../../../img/";
 .module h3.card-title { font-size: $tiki-module-h3-card-title-font-size; }
 
 //fullcalendar.js
-a.fc-event:hover {
+a.ec-event:hover {
     color: $tooltip-color;
 }
 
 // Full Calendar table header needs to have color mode compatible body bg color
-.fc-media-screen {
+.ec-media-screen {
     --fc-page-bg-color: var(--bs-body-bg);
 }
 
@@ -629,18 +631,6 @@ ul.all_languages > li {
     border-left: 1px dotted $gray-500;
 }
 
-// /* Inline CkEditor */
-.cke_editable:hover {
-    outline: $gray-500 dotted 1px;
-}
-
-// /* Background for CKEditor */
-.tiki .cke_wysiwyg_frame,
-.tiki .cke_wysiwyg_div {
-    background: $tiki-editor-bg; // $body-bg;
-    color: $tiki-editor-text-color; // $body-color;
-}
-
 .tiki_plugin {
     background-color: transparent; // /* was #f8f8f8; */
     border: 1px solid $gray-300;
@@ -685,12 +675,6 @@ ul.all_languages > li {
     border: solid 2px var(--bs-body-color);
 }
 
-// /* CKeditor contrast */
-body.wikitext {
-    background: var(--bs-body-bg);
-    color: var(--bs-body-color);
-}
-
 .editable-inline {
     padding-right: 20px;
     display: inline-block;
@@ -701,6 +685,7 @@ body.wikitext {
 }
 
 .editable-inline.loaded {
+    width: 100%;
     background: $popover-bg;
     padding: 6px;
     border: 1px solid #eee;
@@ -1172,4 +1157,200 @@ blockquote {
 }
 .profile-tab-content h2{
     margin-top:0;
+}
+
+// Smartmenus
+:root {
+    --bs-dropdown-item-padding-y: 10px;
+    --sm-collapsible-navbar-border-width: var(--bs-border-width);
+    --sm-collapsible-navbar-border-style: var(--bs-border-style);
+    --sm-collapsible-navbar-border-color: var(--bs-border-color);
+    --sm-collapsible-navbar-padding-y: var(--bs-dropdown-item-padding-y);
+    --sm-collapsible-navbar-padding-x: var(--bs-dropdown-item-padding-x);
+    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
+    --sm-collapsible-navbar-color: var(--bs-dropdown-color);
+    --sm-collapsible-navbar-text-shadow: ;
+    --sm-collapsible-navbar-box-shadow: ;
+    --sm-dropdowns-sub-toggler-icon-size: 0.45rem;
+    --sm-dropdowns-sub-toggler-icon-spacing:0.4rem ;
+    --sm-dropdowns-sub-toggler-split-icon-spacing: 0.4rem;
+
+    --sm-collapsible-nav-link-padding-y: var(--bs-dropdown-item-padding-y);
+    --sm-collapsible-nav-link-padding-x: 12px;
+    --sm-collapsible-nav-link-border-radius: ;
+    --sm-collapsible-nav-link-bg: ;
+    --sm-line-height: ;
+
+    --sm-collapsible-sub-toggler-icon-size: 0.6rem;
+    --sm-collapsible-sub-toggler-icon-spacing: 0.45rem;
+    --sm-collapsible-sub-toggler-color: currentcolor;
+    --sm-collapsible-sub-toggler-opacity: 0.7;
+}
+
+:root .sm-nav-link {
+    --sm-dropdowns-nav-link-font-weight: var(--bs-nav-link-font-weight);
+    --sm-font-family: var(--bs-body-font-family);
+    --sm-dropdowns-nav-link-padding-y: 0.5rem;
+    --sm-dropdowns-nav-link-padding-x: 0.5rem;
+}
+
+.sm-toggler-anchor {
+    display: block;
+    color: currentcolor !important;
+}
+
+.sm-toggler-anchor--hide {
+    display: none;
+}
+
+.sm-toggler {
+    display: inline-block;
+    position: relative;
+}
+
+.sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
+    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
+}
+
+.sm-sub-toggler::after {
+    --sm-sub-toggler-icon-size: 0.7rem;
+    --sm-sub-toggler-icon-spacing: 0.4rem;
+    --sm-sub-toggler-split-icon-spacing: 0px;
+    content: "+";
+    display: inline-block;
+    margin-left: var(--sm-sub-toggler-icon-spacing);
+    width: var(--sm-sub-toggler-icon-size);
+    height: var(--sm-sub-toggler-icon-size);
+    line-height: var(--sm-sub-toggler-icon-size);
+    text-align: center;
+}
+
+.sm-navbar--vertical.sm-navbar--dropdowns-only .sm-sub--mega {
+    left: auto;
+    right: auto;
+    top: 0;
+    bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+    .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-toggler-anchor {
+        padding: var(--sm-collapsible-nav-link-padding-y) var(--sm-collapsible-nav-link-padding-x);
+        line-height: var(--sm-line-height);
+        text-shadow: none;
+    }
+    .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-sub-toggler::after {
+        --sm-sub-toggler-icon-size: var(--sm-collapsible-sub-toggler-icon-size);
+        content: "" !important;
+        margin: 0 var(--sm-collapsible-sub-toggler-icon-spacing) !important;
+        margin-top: calc(-0.5* var(--sm-collapsible-sub-toggler-icon-size)) !important;
+        border-style: solid;
+        border-width: 0 0 2px 2px;
+        border-color: var(--sm-collapsible-sub-toggler-color);
+        opacity: var(--sm-collapsible-sub-toggler-opacity);
+        transform: rotate(-45deg);
+    }
+    .sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
+        border-width: var(--sm-collapsible-navbar-border-width);
+        border-style: var(--sm-collapsible-navbar-border-style);
+        border-color: var(--sm-collapsible-navbar-border-color);
+        padding: var(--sm-collapsible-navbar-padding-y) var(--sm-collapsible-navbar-padding-x);
+        background: var(--sm-collapsible-navbar-bg);
+        color: var(--sm-collapsible-navbar-color);
+        text-shadow: var(--sm-collapsible-navbar-text-shadow);
+        box-shadow: var(--sm-collapsible-navbar-box-shadow);
+        --sm-navbar-sidebar-centered-padding-x: var(--sm-collapsible-navbar-padding-x);
+    }
+    .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-expanded.sm-sub-toggler::after {
+        margin-top: calc(0.5* var(--sm-collapsible-sub-toggler-icon-size)) !important;
+        transform: rotate(-225deg);
+    }
+    .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-nav-link {
+        grid-area: link / link / link / link-split-toggler;
+        border-radius: var(--sm-collapsible-nav-link-border-radius);
+        padding: var(--sm-collapsible-nav-link-padding-y) var(--sm-collapsible-nav-link-padding-x);
+        background: var(--sm-collapsible-nav-link-bg);
+        color: var(--sm-collapsible-nav-link-color);
+        font-family: var(--sm-font-family);
+        font-size: var(--sm-font-size);
+        font-weight: var(--sm-collapsible-nav-link-font-weight);
+        line-height: var(--sm-line-height);
+        text-decoration: none;
+    }
+    .sm-navbar:not(.sm-navbar--dropdowns-only) .sm-sub-toggler::after {
+        --sm-sub-toggler-icon-size: var(--sm-collapsible-sub-toggler-icon-size);
+        content: "" !important;
+        margin: 0 var(--sm-collapsible-sub-toggler-icon-spacing) !important;
+        margin-top: calc(-0.5* var(--sm-collapsible-sub-toggler-icon-size)) !important;
+        border-style: solid;
+        border-width: 0 0 2px 2px;
+        border-color: var(--sm-collapsible-sub-toggler-color);
+        opacity: var(--sm-collapsible-sub-toggler-opacity);
+        transform: rotate(-45deg);
+    }
+}
+
+@media (min-width: 768px) {
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub .sm-sub-toggler::after, .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--vertical .sm-sub-toggler::after {
+        margin-top: 0;
+        transform: rotate(225deg);
+    }
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-sub-toggler::after {
+        --sm-sub-toggler-icon-size: var(--sm-dropdowns-sub-toggler-icon-size);
+        --sm-sub-toggler-icon-spacing: var(--sm-dropdowns-sub-toggler-icon-spacing);
+        --sm-sub-toggler-split-icon-spacing: var(--sm-dropdowns-sub-toggler-split-icon-spacing);
+        content: "" !important;
+        margin-top: calc(-0.5* var(--sm-dropdowns-sub-toggler-icon-size));
+        border-style: solid;
+        border-width: 0 0 2px 2px;
+        border-color: var(--sm-dropdowns-sub-toggler-color);
+        opacity: var(--sm-dropdowns-sub-toggler-opacity);
+        transform: rotate(-45deg);
+    }
+    .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--drop-reverse-y:not(.sm-navbar--vertical) .sm-nav-item:not([data-sm-drop-reverse-y]) .sm-nav-link.sm-sub-toggler::after {
+        margin-top: calc(0.5* var(--sm-dropdowns-sub-toggler-icon-size));
+        transform: rotate(-225deg);
+    }
+    .sm-navbar:not(.sm-navbar--collapsible-only).sm-navbar--drop-reverse-y:not(.sm-navbar--vertical) .sm-nav-item:not([data-sm-drop-reverse-y]) .sm-nav-link.sm-sub-toggler::after {
+        margin-top: calc(0.5* var(--sm-dropdowns-sub-toggler-icon-size));
+        transform: rotate(-225deg);
+    }
+    .sm-navbar--vertical .sm-sub--mega {
+        left: auto;
+        right: auto;
+        top: 0;
+        bottom: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
+        /*     grid-area: link / link / link / link-split-toggler;
+             border-radius: var(--sm-dropdowns-nav-link-border-radius);
+             padding: var(--sm-dropdowns-nav-link-padding-y) var(--sm-dropdowns-nav-link-padding-x);
+             background: var(--sm-dropdowns-nav-link-bg);
+             color: var(--sm-dropdowns-nav-link-color);
+             font-family: var(--sm-font-family);
+             font-size: var(--sm-font-size);
+             font-weight: var(--sm-dropdowns-nav-link-font-weight);
+             line-height: var(--sm-line-height);
+             text-decoration: none; */
+    }
+}
+
+
+[data-bs-theme=dark] .sm-navbar {
+    --sm-dropdowns-navbar-bg: var(--bs-tertiary-bg);
+    --sm-collapsible-nav-link-color: var(--bs-link-color);
+    --sm-collapsible-sub-first-level-bg: #000;
+ //   .sm-sub-link dropdown-item sm-sub-toggler sm-has-sub
+    --sm-collapsible-sub-link-color: var(--bs-link-color);
+    --sm-dropdowns-sub-bg: var(--bs-body-bg);
+}
+
+
+
+// -------------
+
+:root {
+    --tiki-navbar-dark-color: #{$navbar-dark-color}; // The Bootstrap variable wasn't being defined.
 }

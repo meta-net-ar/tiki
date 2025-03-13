@@ -69,10 +69,7 @@ if (empty($rawcals['data'])) {
     } else {
         $message = tra('No calendars found');
     }
-    $smarty->assign('errortype', 404);
-    $smarty->assign('msg', $message);
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $rawcals['data'] = Perms::filter(
@@ -84,10 +81,7 @@ $rawcals['data'] = Perms::filter(
 );
 
 if (empty($rawcals['data'])) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to view the calendar"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $minHourOfDay = 12;
@@ -105,7 +99,6 @@ foreach ($rawcals['data'] as $calendar) {
     $startOfDayHour = $startOfDayUnix / 3600;
     $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
     $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-
     $endOfDayUnix = (int)($calendar['endday'] ?? 0);
     $endOfDayHour = $endOfDayUnix / 3600;
     $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
@@ -345,9 +338,9 @@ if ($prefs['feature_theme_control'] == 'y'  and isset($_REQUEST['calIds'])) {
 }
 include_once('tiki-section_options.php');
 
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/bootstrap-icons.css');
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
 // Disable fullcalendar's force events to be one-line tall
-$headerlib->add_css('.fc-day-grid-event > .fc-content { white-space: normal; }');
+$headerlib->add_css('.ec-event > .ec-content { white-space: normal; }');
 if ($canEditAnything) {
     $smarty->assign('minHourOfDay', $minHourOfDay . ':00:00');
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');

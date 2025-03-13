@@ -38,21 +38,15 @@ require_once('tiki-setup.php');
 
 // Feature available?
 if ($prefs['feature_accounting'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_accounting");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_accounting", \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (! isset($_REQUEST['bookId'])) {
-    $smarty->assign('msg', tra("Missing book id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing book id"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 if (! isset($_REQUEST['what'])) {
-    $smarty->assign('msg', tra("Don't know what to export"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Don't know what to export"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $bookId = $_REQUEST['bookId'];
 $smarty->assign('bookId', $bookId);
@@ -62,9 +56,7 @@ $smarty->assign('what', $what);
 $globalperms = Perms::get();
 $objectperms = Perms::get([ 'type' => 'accounting book', 'object' => $bookId ]);
 if (! ($globalperms->acct_view or $objectperms->acct_view)) {
-    $smarty->assign('msg', tra("You do not have the right export/view this data"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have the right export/view this data"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $accountinglib = TikiLib::lib('accounting');

@@ -5,7 +5,7 @@
             {foreach from=$filterFields item=field}
                 <div class="col-lg-6 col-12 mb-3">
                     <div class="list_filter_label">
-                        <label for="{$filter.id|escape}">{$field.name|tr_if}</label>
+                        <label for="{$field.id|escape}">{$field.name|tr_if}</label>
                         {if !empty($field.textInput)}
                             {if $field.type == 'f'}
                                 <a href="#" class="tikihelp" title="{tr}Date selector : Apply a range of time between two dates{/tr}.">

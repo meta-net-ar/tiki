@@ -11,6 +11,7 @@ class Search_Action_Sequence
     private $fields = [];
     private $requiredGroup;
     private $default;
+    private $inputType;
 
     public function __construct($name, $default)
     {
@@ -46,6 +47,7 @@ class Search_Action_Sequence
     {
         $this->steps[] = $step;
         $this->fields = array_merge($this->fields, $step->getFields());
+        $this->inputType = $step->getAction()->inputType();
     }
 
     public function execute(array $entry)
@@ -65,6 +67,11 @@ class Search_Action_Sequence
         }
 
         return $success;
+    }
+
+    public function inputType()
+    {
+        return $this->inputType;
     }
 
     public function requiresInput()

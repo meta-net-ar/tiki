@@ -5,31 +5,38 @@
 {tabset name="admin_actionlog"}
 
     {tab name="{tr}Report{/tr}"}
-        <h2>{tr}Report{/tr}</h2>
+        <h2>{tr}Report Filter{/tr}</h2>
         <form method="get" action="tiki-admin_actionlog.php#List">
             {* no ticket needed as this form doesn't change the database *}
-            <h2>{tr}Filter{/tr}</h2>
             {if empty($nbViewedConfs)}
                 {button _text="{tr}Please select some actions to be reported.{/tr}" href="#" _onclick="showTab(2); return true;"}
             {else}
                 <fieldset>
                     <legend>{tr}Date{/tr}</legend>
-                    <div class="mb-3 row">
+                    <div class="mb-1 row">
                         <label class="col-sm-2 col-form-label" for="">{tr}Start{/tr}</label>
 
-                        <div class="col-sm-8">
-                            <div class="">
-                                {html_select_date time=$startDate prefix="startDate_" start_year="-10" field_order=$prefs.display_field_order} {html_select_time use_24_hours=true time=$startDate}
-                            </div>
+                        <div class="col-sm-6">
+                            {if ($prefs.feature_jscalendar) == 'y'}
+                                {jscalendar showtime="y" fieldname="startDate" date=$startDate}
+                            {else}
+                                <div class="">
+                                    {html_select_date time=$startDate prefix="startDate_" start_year="-10" field_order=$prefs.display_field_order} {html_select_time use_24_hours=true time=$startDate}
+                                </div>
+                            {/if}
                         </div>
                     </div>
-                    <div class="mb-3 row">
+                    <div class="mb-1 row">
                         <label class="col-sm-2 col-form-label" for="">{tr}End{/tr}</label>
 
-                        <div class="col-sm-8">
-                            <div class="">
-                                {html_select_date time=$endDate prefix="endDate_" start_year="-10" field_order=$prefs.display_field_order} {html_select_time use_24_hours=true time=$endDate prefix="end_"}
-                            </div>
+                        <div class="col-sm-6">
+                            {if ($prefs.feature_jscalendar) == 'y'}
+                                {jscalendar showtime="y" fieldname="endDate" date=$endDate}
+                            {else}
+                                <div class="">
+                                    {html_select_date time=$endDate prefix="endDate_" start_year="-10" field_order=$prefs.display_field_order} {html_select_time use_24_hours=true time=$endDate prefix="end_"}
+                                </div>
+                            {/if}
                         </div>
                     </div>
                 </fieldset>
@@ -40,7 +47,7 @@
                             <label class="col-sm-2 col-form-label" for="selectedUsers">{tr}User{/tr}</label>
 
                             <div class="col-sm-6">
-                                <select multiple="multiple"
+                                <select style="width: 100%;" multiple="multiple"
                                         size="{if $users|@count > 5}5{else}{math equation="x + y" x=$users|@count y=2}{/if}"
                                         name="selectedUsers[]" id="selectedUsers" class="form-control">
                                     <option value="">{tr}All{/tr}</option>
@@ -61,7 +68,7 @@
                             <label class="col-sm-2 col-form-label" for="selectedGroups">{tr}Group{/tr}</label>
 
                             <div class="col-sm-6">
-                                <select multiple="multiple"
+                                <select style="width: 100%;" multiple="multiple"
                                         size="{if $groups|@count > 5}5{else}{math equation="x + y" x=$groups|@count y=1}{/if}"
                                         name="selectedGroups[]" id="selectedGroups" class="form-control">
                                     <option value="">{tr}All{/tr}</option>
@@ -95,38 +102,43 @@
                 <fieldset>
                     <legend>{tr}Misc.{/tr}</legend>
 
-                    <div class="col-sm-11 offset-sm-1 d-flex flex-row flex-wrap align-items-center">
-                        <div class="mb-3 col-sm-10">
-                            <div class="col-sm-4">
-                                <label>{tr}Units{/tr}</label>
-                            </div>
-                            <div class="mb-3 col-sm-4 offset-sm-1">
-                                <label>{tr}bytes{/tr}</label>
-                                <input class="radio" type="radio" name="unit"
-                                    value="bytes"{if $unit ne 'kb'} checked="checked"{/if}>
-                                <label>{tr}kb{/tr}</label>
-                                <input type="radio" name="unit" value="kb"{if $unit eq 'kb'} checked="checked"{/if}>
+                    <div class="col-sm-11 d-flex flex-row flex-wrap align-items-center">
+                        <div class="mb-1 col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label>{tr}Units{/tr}</label>
+                                </div>
+                                <div class="mb-3 col-sm-4">
+                                    <label>{tr}bytes{/tr}</label>
+                                    <input class="radio" type="radio" name="unit"
+                                        value="bytes"{if $unit ne 'kb'} checked="checked"{/if}>
+                                    <label class="offset-sm-1">{tr}kb{/tr}</label>
+                                    <input type="radio" name="unit" value="kb"{if $unit eq 'kb'} checked="checked"{/if}>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-sm-11 offset-sm-1 d-flex flex-row flex-wrap align-items-center">
+                    <div class="col-sm-11 d-flex flex-row flex-wrap align-items-center">
                         <div class="mb-3 col-sm-10">
-                            <div class="col-sm-4">
-                                <label>{tr}Contribution Time{/tr}</label>
-                            </div>
-                            <div class="mb-3 col-sm-4 offset-sm-1">
-                                <label>{tr}Week{/tr}</label>
-                                <input type="radio" name="contribTime" value="w"{if $contribTime ne 'd'} checked="checked"{/if}>
-                                <label>{tr}Day{/tr}</label>
-                                <input type="radio" name="contribTime" value="d"{if $contribTime eq 'd'} checked="checked"{/if}>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label>{tr}Contribution Time{/tr}</label>
+                                </div>
+                                <div class="mb-3 col-sm-4">
+                                    <label>{tr}Week{/tr}</label>
+                                    <input type="radio" name="contribTime" value="w"{if $contribTime ne 'd'} checked="checked"{/if}>
+                                    <label class="offset-sm-1">{tr}Day{/tr}</label>
+                                    <input type="radio" name="contribTime" value="d"{if $contribTime eq 'd'} checked="checked"{/if}>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <legend>{tr}Search{/tr}</legend>
                     <div class="mb-3 row">
                         <label class="col-sm-2 col-form-label" for="">{tr}Search{/tr}</label>
 
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                             <input class="form-control" type="text" name="find" value="{$find}">
                         </div>
                     </div>
@@ -165,11 +177,11 @@
                 </fieldset>
                 <input type="hidden" name="max" value="{$maxRecords}">
                 <span class="input_submit_container">
-                    <input type="submit" class="btn btn-primary btn-sm" name="list" value="{tr}Report{/tr}">
+                    <input type="submit" class="btn btn-primary btn-sm mb-3" name="list" value="{tr}Report{/tr}">
                 </span>
                 {if $tiki_p_admin eq 'y'}
                     <span class="input_submit_container">
-                        <input type="submit" class="btn btn-primary btn-sm" name="export" value="{tr}Export{/tr}">
+                        <input type="submit" class="btn btn-primary btn-sm mb-3" name="export" value="{tr}Export{/tr}">
                     </span>
                 {/if}
 
@@ -204,7 +216,7 @@
             {else}
                 {self_link max=$prefs.maxRecords}{tr}Pagination{/tr}{/self_link}
             {/if}
-            {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links cant=$cant step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
             {tr}Records:{/tr} {$cant}
             {if !empty($actionlogs)}
                 <a href="#Statistics">{tr}See Statistics{/tr}</a><br/>
@@ -214,6 +226,7 @@
                 {query _type='form_input'}
                 <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                     <table class="table table-striped table-hover">
+                        <thead>
                         <tr>
                             {if $prefs.feature_banning eq 'y'}
                                 <th>
@@ -242,10 +255,10 @@
                                 </th>
                             {/if}
                             <th>{tr}IP{/tr}</th>
-                            <th>
+                            <th style="white-space: nowrap;">
                                 <a href="tiki-admin_actionlog.php?startDate={$startDate}&amp;endDate={$endDate}&amp;sort_mode=add_{if $sort_mode eq 'add_desc'}asc{else}desc{/if}{$url}">+{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if}</a>
                             </th>
-                            <th>
+                            <th style="white-space: nowrap;">
                                 <a href="tiki-admin_actionlog.php?startDate={$startDate}&amp;endDate={$endDate}&amp;sort_mode=del_{if $sort_mode eq 'del_desc'}asc{else}desc{/if}{$url}">-{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if}</a>
                             </th>
                             {if $prefs.feature_contribution eq 'y'}
@@ -258,7 +271,8 @@
                                 <th></th>
                             {/if}
                         </tr>
-
+                        <thead>
+                        <tbody>
                         {foreach from=$actionlogs item=actionlog}
                             <tr>
                                 {if $prefs.feature_banning eq 'y'}
@@ -267,7 +281,7 @@
                                     </td>
                                 {/if}
                                 <td class="username">{if !empty($actionlog.user)}{$actionlog.user|username}{else}{tr}Anonymous{/tr}{/if}</td>
-                                <td class="date">{$actionlog.lastModif|tiki_short_datetime}</td>
+                                <td class="date">{$actionlog.lastModif|tiki_date_format:"%Y-%m-%d %H:%M:%S":true}</td>
                                 <td class="text">
                                     {if $actionlog.object === 'system'}
                                         {tr}{$actionlog.comment|escape}{/tr}
@@ -328,9 +342,10 @@
                                 {/if}
                             </tr>
                         {/foreach}
+                        </tbody>
                     </table>
                 </div>
-                {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+                {pagination_links cant=$cant step=$maxRecords offset_arg="startDate=$startDate&endDate=$endDate&offset" offset=$offset}{/pagination_links}
                 {if $prefs.feature_banning eq 'y'}
                     <div class="input-group col-sm-8">
                         <select class="form-select" name="action">
@@ -451,14 +466,14 @@
 
             {if $showCateg eq 'y' and $volCateg|@count ne 0 and $tiki_p_admin eq 'y'}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Volume per category{/tr}</caption>
                         <tr>
                             <th>{tr}Category{/tr}</th>
                             {foreach item=type from=$typeVol}
-                                <th>{$type} (+{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
-                                <th>{$type} (-{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
-                                <th>{$type} ({if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} (+{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} (-{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} ({if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
                             {/foreach}
                         </tr>
                         {foreach key=categId item=vol from=$volCateg}
@@ -477,15 +492,15 @@
 
             {if $showCateg eq 'y' and $volUserCateg|@count ne 0}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Volume per category and per user{/tr}</caption>
                         <tr>
                             <th>{tr}Category{/tr}</th>
                             <th>{tr}User{/tr}</th>
                             {foreach item=type from=$typeVol}
-                                <th>{$type} (+{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
-                                <th>{$type} (-{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
-                                <th>{$type} ({if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} (+{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} (-{if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
+                                <th style="white-space: nowrap;">{$type} ({if $unit eq 'kb'}{tr}kb{/tr}{else}{tr}bytes{/tr}{/if})</th>
                             {/foreach}
                         </tr>
                         {foreach key=categId item=vol from=$volUserCateg}
@@ -505,7 +520,7 @@
 
             {if $userActions|@count ne 0}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Number of actions per user{/tr}</caption>
                         <tr>
                             <th>{tr}User{/tr}</th>
@@ -520,7 +535,7 @@
                                 <td class="username">{$stat.user|username}</td>
                                 {foreach key=a item=nb from=$stat}
                                     {if $a ne 'user'}
-                                        <td class="integer">{$nb}</td>
+                                        <td>{$nb}</td>
                                     {/if}
                                 {/foreach}
                             </tr>
@@ -532,7 +547,7 @@
 
             {if $objectActions|@count ne 0}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Number of actions per object{/tr}</caption>
                         <tr>
                             <th>{tr}Object{/tr}</th>
@@ -552,7 +567,7 @@
                                 </td>
                                 {foreach key=a item=nb from=$stat}
                                     {if $a ne 'object' and $a ne 'link'}
-                                        <td class="integer">{$nb}</td>
+                                        <td>{$nb}</td>
                                     {/if}
                                 {/foreach}
                             </tr>
@@ -601,7 +616,7 @@
 
             {if $showCateg eq 'y' and $tiki_p_admin eq 'y'}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Number of actions per category{/tr}</caption>
                         <tr>
                             <th>{tr}Category{/tr}</th>
@@ -616,7 +631,7 @@
                                 <td class="text">{$stat.category|escape}</td>
                                 {foreach key=a item=nb from=$statCateg[$categId]}
                                     {if $a ne 'category'}
-                                        <td class="integer">{$nb}</td>
+                                        <td>{$nb}</td>
                                     {/if}
                                 {/foreach}
                                 {* {cycle} *}
@@ -645,7 +660,7 @@
                                 <td class="username">{$stat.user|username}</td>
                                 {foreach key=a item=nb from=$stat}
                                     {if $a ne 'category' and $a ne 'user'}
-                                        <td class="integer">{$nb}</td>
+                                        <td>{$nb}</td>
                                     {/if}
                                 {/foreach}
                             </tr>
@@ -656,7 +671,7 @@
 
             {if $prefs.feature_contribution eq 'y' && isset($groupContributions) && $groupContributions|@count >= 1}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>
                             {if $selectedUsers}
                                 {tr}Volume per the users' group and per contribution{/tr}
@@ -675,8 +690,8 @@
                                 <tr>
                                     <td class="text">{$group|escape}</td>
                                     <td class="text">{$contribution|escape}</td>
-                                    <td class="integer">{$stat.add}</td>
-                                    <td class="integer">{$stat.del}</td>
+                                    <td>{$stat.add}</td>
+                                    <td>{$stat.del}</td>
                                 </tr>
                             {/foreach}
                         {/foreach}
@@ -686,7 +701,7 @@
 
             {if $prefs.feature_contribution eq 'y' && isset($userContributions) && $userContributions|@count >= 1}
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <caption>{tr}Volume per user and per contribution{/tr}</caption>
                         <tr>
                             <th>{tr}User{/tr}</th>
@@ -699,8 +714,8 @@
                                 <tr>
                                     <td class="username">{$user|username}</td>
                                     <td class="text">{$stat.name|escape}</td>
-                                    <td class="integer">{$stat.stat.add}</td>
-                                    <td class="integer">{$stat.stat.del}</td>
+                                    <td>{$stat.stat.add}</td>
+                                    <td>{$stat.stat.del}</td>
                                 </tr>
                             {/foreach}
                         {/foreach}

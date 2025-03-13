@@ -12,10 +12,10 @@
                     <div class="col-md-6 align-content-center">
                         <div class="d-flex align-items-center" style="height: 100%">
                             <ol>
-                                <li>{tr}Install Google Authenticator® app on your device and open it{/tr}.</li>
-                                <li>{tr}Tap “Scan a barcode”{/tr}.</li>
+                                <li>{tr}Install an authenticator app on your device and open it{/tr}.</li>
+                                <li>{tr}Tap “Scan a barcode” or a similar option in the app{/tr}.</li>
                                 <li>{tr}Scan the QR code that is open in your browser{/tr}.</li>
-                                <li>{tr}Done, Google Authenticator® is now generating codes{/tr}.</li>
+                                <li>{tr}Done, the authenticator app is now generating codes{/tr}.</li>
                             </ol>
                         </div>
 

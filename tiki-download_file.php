@@ -10,6 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\PDFHelper;
 use Tiki\Lib\Image\Image;
+use Tiki\Lib\Image\ImageFileHandler;
 
 $force_no_compression = true;
 $skip = false;
@@ -141,6 +142,8 @@ if (! $skip) {
     }
 }
 
+TikiLib::lib('header')->setXRobotsTag($robots);
+
 //if the file is remote, display, and don't cache
 $attributelib = TikiLib::lib('attribute');
 $attributes = $attributelib->get_attributes('file', $info['fileId']);
@@ -204,12 +207,10 @@ $last_modified = $file->lastModif;
 if ($zip) {
     $filepath = '';
     $content = $info['data'];
-} elseif ($wrapper->isFileLocal()) {
-    $filepath = $wrapper->getReadableFile();
-    $content = '';
 } else {
-    $filepath = '';
-    $content = $wrapper->getContents();
+    $imageFileHandler = new ImageFileHandler();
+    $content = $imageFileHandler->processFile($info, $wrapper);
+    $filepath = $wrapper->isFileLocal() ? $wrapper->getReadableFile() : '';
 }
 
 $scale = 0;

@@ -142,118 +142,7 @@ class CleanVendors
                 'jquery-ui-timepicker-addon.min.js'
             ]
         );
-        self::remove($vendors . 'jquery/minicart', 'src');
-        self::remove(
-            $vendors . 'jquery-plugins/anythingslider',
-            [
-                'anythingslider.jquery.json',
-                'expand.html',
-                'simple.html',
-                'video.html',
-                'css3.html',
-            ]
-        );
-        self::remove(
-            $vendors . 'jquery-plugins/galleriffic',
-            [
-                'js/jquery-1.3.2.js',
-                'js/jquery.history.js',
-                'js/jush.js',
-                'example-1.html',
-                'example-2.html',
-                'example-3.html',
-                'example-4.html',
-                'example-5.html',
-            ]
-        );
-        self::remove($vendors . 'jquery-plugins/infinitecarousel', 'jquery.infinitecarousel3.min.js');
         self::remove($vendors . 'jquery-plugins/reflection-jquery', 'src');
-        self::remove(
-            $vendors . 'mottie/tablesorter',
-            [
-                'addons',
-                'beta-testing',
-                'css',
-                'dist',
-                'bower.json',
-                'example.json',
-                'Gruntfile.js',
-                'package.json',
-                'tablesorter.jquery.json',
-                'js/extras',
-                'js/jquery.tablesorter.js',
-                'js/jquery.tablesorter.widgets.js',
-                'js/parsers/parser-date.js',
-                'js/parsers/parser-date-extract.js',
-                'js/parsers/parser-date-iso8601.js',
-                'js/parsers/parser-date-month.js',
-                'js/parsers/parser-date-range.js',
-                'js/parsers/parser-date-two-digit-year.js',
-                'js/parsers/parser-date-weekday.js',
-                'js/parsers/parser-duration.js',
-                'js/parsers/parser-feet-inch-fraction.js',
-                'js/parsers/parser-file-type.js',
-                'js/parsers/parser-globalize.js',
-                'js/parsers/parser-huge-numbers.js',
-                'js/parsers/parser-ignore-articles.js',
-                'js/parsers/parser-image.js',
-                'js/parsers/parser-leading-zeros.js',
-                'js/parsers/parser-metric.js',
-                'js/parsers/parser-named-numbers.js',
-                'js/parsers/parser-network.js',
-                'js/parsers/parser-roman.js',
-                'js/widgets/widget-alignChar.js',
-                'js/widgets/widget-build-table.js',
-                'js/widgets/widget-chart.js',
-                'js/widgets/widget-cssStickyHeaders.js',
-                'js/widgets/widget-columns.js',                 //in jquery.tablesorter.combined.js
-                'js/widgets/widget-editable.js',
-                'js/widgets/widget-filter.js',                  //in jquery.tablesorter.combined.js
-                'js/widgets/widget-filter-formatter-html5.js',
-                'js/widgets/widget-filter-formatter-select2.js',
-                'js/widgets/widget-filter-type-insideRange.js',
-                'js/widgets/widget-formatter.js',
-                'js/widgets/widget-headerTitles.js',
-                'js/widgets/widget-lazyload.js',
-                'js/widgets/widget-mark.js',
-                'js/widgets/widget-print.js',
-                'js/widgets/widget-reflow.js',
-                'js/widgets/widget-repeatheaders.js',
-                'js/widgets/widget-resizable.js',               //in jquery.tablesorter.combined.js
-                'js/widgets/widget-saveSort.js',                //in jquery.tablesorter.combined.js
-                'js/widgets/widget-scroller.js',
-                'js/widgets/widget-sortTbodies.js',
-                'js/widgets/widget-staticRow.js',
-                'js/widgets/widget-stickyHeaders.js',           //in jquery.tablesorter.combined.js
-                'js/widgets/widget-storage.js',                 //in jquery.tablesorter.combined.js
-                'js/widgets/widget-toggle.js',
-                'js/widgets/widget-uitheme.js',                 //in jquery.tablesorter.combined.js
-                'js/widgets/widget-vertical-group.js',
-                'js/widgets/widget-view.js'
-            ]
-        );
-        self::remove(
-            $vendors . 'jquery-plugins/treetable',
-            [
-                'stylesheets/jquery.treetable.theme.default.css',
-                'stylesheets/screen.css',
-                'treetable.jquery.json'
-            ]
-        );
-        self::remove(
-            $vendors . 'rangy/rangy',
-            [
-                'uncompressed/rangy-highlighter.js',
-                'uncompressed/rangy-serializer.js',
-                'uncompressed/rangy-textrange.js',
-                'rangy-core.js',
-                'rangy-cssclassapplier.js',
-                'rangy-highlighter.js',
-                'rangy-selectionsaverestore.js',
-                'rangy-serializer.js',
-                'rangy-textrange.js',
-            ]
-        );
         self::remove(
             $vendors . 'studio-42/elfinder',
             [
@@ -299,13 +188,6 @@ class CleanVendors
             'fonts',
             'img',
             'minify'
-            ]
-        );
-        self::remove(
-            $vendors . 'ckeditor/ckeditor',
-            [
-                '.npm',
-                'plugins/codesnippet/lib/highlight/README.ru.md ',
             ]
         );
         self::remove(
@@ -368,8 +250,6 @@ class CleanVendors
         // remove entire packages
         $fs = new FileSystem();
 
-        //duplicate with mottie/tablesorter
-        $fs->remove($vendors . 'components/tablesorter');
         // duplicate with rmm5t/jquery-timeago
         $fs->remove($vendors . 'components/jquery-timeago');
         // duplicate with moment/moment
@@ -392,6 +272,7 @@ class CleanVendors
         $excludeDirs = [
             'rector/rector',  //It breaks rector, and it's a devtool, so won't be bundled anyway.
             'phpseclib/phpseclib/phpseclib/Crypt', //it breaks phpseclib as it thinks there are classes called index due to the index files
+            'phpunit/phpunit/schema', //It breaks phpunit as it thinks there are classes called index due to the index files
         ];
         // add index file if needed
         $index = glob($path . '[iI][nN][dD][eE][xX].[pP][hH][pP]'); // index.php case-insensitive

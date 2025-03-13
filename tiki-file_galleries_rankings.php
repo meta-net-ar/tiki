@@ -21,10 +21,7 @@ include_once('lib/rankings/ranklib.php');
 $access->check_feature(['feature_file_galleries','feature_file_galleries_rankings']);
 
 if ((isset($tiki_p_list_file_galleries) && $tiki_p_list_file_galleries != 'y') || (! isset($tiki_p_list_file_galleries) && $tiki_p_view_file_gallery != 'y')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You do not have permission to view this section"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have permission to view this section"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $allrankings = [

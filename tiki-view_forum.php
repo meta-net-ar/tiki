@@ -14,7 +14,7 @@ $inputConfiguration = [
         'staticKeyFilters'               => [
             'forumId'                    => 'int',     //post
             'comments_threadId'          => 'int',     //post
-            'comments_title'             => 'word',     //post
+            'comments_title'             => 'xss',   //post
             'openpost'                   => 'word',     //post
             'sort_mode'                  => 'word',    //get
             'report'                     => 'int',     //get
@@ -70,10 +70,7 @@ $auto_query_args = [
 $commentslib = TikiLib::lib('comments');
 
 if (! isset($_REQUEST['forumId']) || ! ($forum_info = $commentslib->get_forum($_REQUEST['forumId']))) {
-    $smarty->assign('errortype', 'no_redirect_login');
-    $smarty->assign('msg', tra('No forum indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('No forum indicated'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if (isset($_REQUEST['comments_postCancel'])) {
@@ -163,7 +160,7 @@ $comments_vars = ['forumId'];
 $comments_prefix_var = 'forum:';
 $comments_object_var = 'forumId';
 
-if (isset($forum_info['inbound_pop_server']) && ! empty($forum_info['inbound_pop_server'])) {
+if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info['inbound_pop_server'])) {
     $commentslib->process_inbound_mail($_REQUEST['forumId']);
 }
 
@@ -263,10 +260,7 @@ if (isset($_REQUEST['comments_remove']) && isset($_REQUEST['comments_threadId'])
         $commentslib->remove_comment($_REQUEST['comments_threadId']);
         $commentslib->register_remove_post($_REQUEST['forumId'], 0);
     } else { // user can't edit this post
-        $smarty->assign('msg', tra('You do not have permission to remove someone else\'s post!'));
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You do not have permission to remove someone else\'s post!'), \Laminas\Http\Response::STATUS_CODE_401);
     }
     unset($_REQUEST['comments_threadId']);
     $smarty->assign('comments_threadId', 0);

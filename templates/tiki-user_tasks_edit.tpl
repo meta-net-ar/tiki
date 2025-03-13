@@ -9,6 +9,7 @@
     <input type="hidden" name="date_Hour" value="{$date_Hour|escape}">
     <input type="hidden" name="date_Minute" value="{$date_Minute|escape}">
     <input type="hidden" name="creator" value="{$info.creator|escape}">
+    <input type="hidden" name="created" value="{$info.created|escape}">
 
     {if ($tiki_view_mode eq 'view')}
         <span class="tabbut">

@@ -34,10 +34,7 @@ if (isset($_FILES['userfile1'])) {
         try {
             $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
         } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
         }
         $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
         $data = '';
@@ -46,9 +43,7 @@ if (isset($_FILES['userfile1'])) {
         }
         fclose($fp);
         if (strlen($data) > 1000000) {
-            $smarty->assign('msg', tra("The file is too large"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file is too large"), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $size = $_FILES['userfile1']['size'];
         $name = $_FILES['userfile1']['name'];
@@ -63,9 +58,7 @@ if (isset($_REQUEST["merge"])) {
     $merge = '';
     $first = true;
     if (! isset($_REQUEST["note"])) {
-        $smarty->assign('msg', tra("No item indicated"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("No item indicated"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     foreach (array_keys($_REQUEST["note"]) as $note) {
         $data_c = $notepadlib->get_note($user, $note);

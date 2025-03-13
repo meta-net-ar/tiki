@@ -16,7 +16,12 @@ class Services_ActivityStream_Controller
 
     public function action_render(JitFilter $request)
     {
-        global $user;
+        global $user, $prefs;
+
+        if ($prefs['activity_stream_disable_indexing'] === 'y') {
+            throw new Services_Exception_Enabled('activity_stream_disable_indexing');
+        }
+
         $loginlib = TikiLib::lib('login');
         $encoded = $request->stream->none();
         $page = $request->page->int() ?: 1;

@@ -17,7 +17,7 @@ $inputConfiguration = [
             'typeit'                      => 'word',     //post
             'tag'                         => 'word',     //post
             'sort_mode'                   => 'int',      //post
-            'find'                        => 'word',     //post
+            'find'                        => 'string',   //post
             'type'                        => 'word',     //post
             'old_type'                    => 'word',     //post
             'user_only'                   => 'bool',     //post
@@ -37,18 +37,13 @@ if (isset($_REQUEST['del'])) {
     if ($tiki_p_admin == 'y' || $tiki_p_unassign_freetags == 'y') {
         $freetaglib->delete_object_tag($_REQUEST['itemit'], $_REQUEST['typeit'], $_REQUEST['tag']);
     } else {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra('Permission denied'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
 $smarty->assign('metatag_robots', 'NOINDEX, FOLLOW');
 
 if ($freetaglib->count_tags() == 0) {
-    $smarty->assign('msg', tra("Nothing tagged yet") . '.');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Nothing tagged yet") . '.', \Laminas\Http\Response::STATUS_CODE_400);
 }
 if (! isset($_REQUEST['tag']) && $prefs['freetags_preload_random_search'] == 'y') {
     $tag = $freetaglib->get_tag_suggestion('', 1);
@@ -148,9 +143,13 @@ if (! empty($prefs['freetags_cloud_colors'])) {
 $smarty->assign('most_popular_tags', $most_popular_tags);
 if ($broaden == 'y') {
     $broaden = 'n';
-    $tagArray = [
-        $tagArray[count($tagArray) - 1]
-    ];
+    if (! empty($tagArray)) {
+        $tagArray = [
+            $tagArray[count($tagArray) - 1]
+        ];
+    } else {
+        $tagArray = [];
+    }
 }
 $objects = $freetaglib->get_objects_with_tag_combo($tagArray, $type, $view_user, $offset, $maxRecords, $query_sort_mode, $find, $broaden, $objectId);
 

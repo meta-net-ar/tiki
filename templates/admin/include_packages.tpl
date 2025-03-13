@@ -48,6 +48,17 @@
     {/remarksbox}
 {/if}
 
+{if count($installedDeprecatedPackages)}
+    {remarksbox type="warning" title="{tr}Attention! Deprecated packages installed{/tr}"}
+        {tr}The following packages are deprecated. Is recommended that you remove them from your Tiki installation:{/tr}
+        <ul>
+            {foreach item=entry from=$installedDeprecatedPackages}
+                <li>{$entry}</li>
+            {/foreach}
+        </ul>
+    {/remarksbox}
+{/if}
+
 {tabset name='tabs_admin-packages'}
     {tab name="{tr}Packages{/tr}"}
         {if ! $composer_phar_exists}

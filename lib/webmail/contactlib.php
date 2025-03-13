@@ -438,6 +438,7 @@ class ContactLib extends TikiLib
     public function modify_ext($user, $fieldId, $new_values)
     {
         if (is_array($new_values)) {
+            $query = '';
             foreach ($new_values as $f => $v) {
                 if ($query != '') {
                     $query .= ', ';

@@ -464,7 +464,8 @@ if (! empty($multiprint_pages)) {
     }
 
     if ($access->is_serializable_request()) {
-        if (isset($_REQUEST['listonly']) && ($prefs['feature_jquery'] == 'y' && $prefs['feature_jquery_autocomplete'] == 'y')) {
+        $autocomplete_is_enabled = $prefs['feature_jquery_autocomplete'] == 'y' || $prefs['elementplus_autocomplete'] == 'y';
+        if (isset($_REQUEST['listonly']) && ($prefs['feature_jquery'] == 'y' && $autocomplete_is_enabled)) {
             $pages = [];
             foreach ($listpages['data'] as $page) {
                 if (isset($_REQUEST['nonamespace'])) {

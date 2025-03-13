@@ -32,31 +32,30 @@ $inputConfiguration = [
             'accountName' => 'text',    //post
             'accountNotes' => 'text',   //post
             'accountBudget' => 'float', //post
-            'accountLocked' => 'bool',  //post
-            'accountTax' => 'float',    //post
+            'accountLocked' => 'int',  //post
         ],
     ],
 ];
 $section = 'accounting';
 require_once('tiki-setup.php');
-
 // Feature available?
 if ($prefs['feature_accounting'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_accounting");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_accounting", \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (! isset($_REQUEST['bookId'])) {
-    $smarty->assign('msg', tra("Missing book id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing book id"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $bookId = $_REQUEST['bookId'];
-$smarty->assign('bookId', $bookId);
-
 $accountinglib = TikiLib::lib('accounting');
-$book = $accountinglib->getBook($bookId);
+
+try {
+    $book = $accountinglib->getBook($bookId);
+} catch (Exception $e) {
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
+}
+
+$smarty->assign('bookId', $bookId);
 $smarty->assign('book', $book);
 
 $globalperms = Perms::get();
@@ -67,34 +66,36 @@ if (! isset($_REQUEST['action'])) {
 }
 
 if ($_REQUEST['action'] != 'new' and ! isset($_REQUEST['accountId'])) {
-    $smarty->assign('msg', tra("Missing account id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing account id"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $smarty->assign('action', $_REQUEST['action']);
+
 if ($_REQUEST['action'] == '' or $_REQUEST['action'] == 'view') {
     if (
         ! ($globalperms->acct_view or $objectperms->acct_view or
-          $globalperms->acct_book or $objectperms->acct_book)
+            $globalperms->acct_book or $objectperms->acct_book)
     ) {
-        $smarty->assign('msg', tra("You do not have the rights to view this account"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have the rights to view this account"), \Laminas\Http\Response::STATUS_CODE_403);
     }
 } else {
     if (! ($globalperms->acct_manage_accounts or $objectperms->acct_manage_accounts)) {
-        $smarty->assign('msg', tra("You do not have the rights to manage accounts"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have the rights to manage accounts"), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
-$accountId = $_REQUEST['accountId'];
-$smarty->assign('accountId', $accountId);
+if (! empty($_REQUEST['accountId'])) {
+    $accountId = $_REQUEST['accountId'];
+    try {
+        $account = $accountinglib->getAccount($bookId, $accountId);
+    } catch (Exception $e) {
+        Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 
-$journal = $accountinglib->getJournal($bookId, $accountId);
-$smarty->assign('journal', $journal);
-
+    $smarty->assign('accountId', $accountId);
+    $journal = $accountinglib->getJournal($bookId, $accountId);
+    $smarty->assign('journal', $journal);
+}
+$template = "tiki-accounting_account_view.tpl";
 if (! empty($_REQUEST['action'])) {
     /***
      * Account Notes
@@ -130,49 +131,52 @@ if (! empty($_REQUEST['action'])) {
                     ));
                 }
             }
-            $account = $accountinglib->getAccount($bookId, $accountId, true);
+            try {
+                $account = $accountinglib->getAccount($bookId, $accountId);
+            } catch (Exception $e) {
+                Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
+            }
             $smarty->assign('account', $account);
             break;
         case 'new':
             $template = "tiki-accounting_account_form.tpl";
-            if (isset($_POST['accountName']) && $access->checkCsrf()) {
-                $result = $accountinglib->createAccount(
-                    $bookId,
-                    $_POST['newAccountId'],
-                    $_POST['accountName'],
-                    $_POST['accountNotes'],
-                    $_POST['accountBudget'],
-                    $_POST['accountLocked'],
-                    0 /*$_REQUEST['accountTax'] */
-                );
-                if ($result !== true) {
-                    Feedback::error(['mes' => $result]);
-                } else {
-                    $smarty->assign('action', 'view');
-                    $template = "tiki-accounting_account_view.tpl";
-                    Feedback::success(tr(
-                        '%0 account created for book %1',
+            $account = ['changeable' => true];
+            try {
+                if (isset($_POST['accountName']) && $access->checkCsrf()) {
+                    $result = $accountinglib->createAccount(
+                        $bookId,
+                        $_POST['newAccountId'],
                         $_POST['accountName'],
-                        $bookId
-                    ));
+                        $_POST['accountNotes'],
+                        $_POST['accountBudget'],
+                        $_POST['accountLocked'],
+                    );
+                    if ($result === true) {
+                        $smarty->assign('action', 'view');
+                        $template = "tiki-accounting_account_view.tpl";
+                        Feedback::success(tr(
+                            '%0 account created for book %1',
+                            $_POST['accountName'],
+                            $book["bookName"]
+                        ));
+                        // Set account details after successful creation
+                        $account = [
+                            'accountBookId' => $bookId,
+                            'accountId' => $_POST['newAccountId'],
+                            'accountName' => $_POST['accountName'],
+                            'accountNotes' => $_POST['accountNotes'],
+                            'accountBudget' => $_POST['accountBudget'],
+                            'accountLocked' => $_POST['accountLocked'],
+                            'changeable' => true // still changeable as it's newly created
+                        ];
+                    }
                 }
-                $account = [
-                    'accountBookId' => $bookId,
-                    'accountId' => $_POST['newAccountId'],
-                    'accountName' => $_POST['accountName'],
-                    'accountNotes' => $_POST['accountNotes'],
-                    'accountBudget' => $_POST['accountBudget'],
-                    'accountLocked' => $_POST['accountLocked'],
-                    'accountTax' => $_POST['accountTax'],
-                    'changeable' => true
-                ];
-            } else {
-                $account = ['changeable' => true];
+            } catch (Exception $e) {
+                Feedback::error(['mes' => $e->getMessage()]);
             }
             $smarty->assign('account', $account);
             break;
         case 'lock':
-            $account = $accountinglib->getAccount($bookId, $accountId, true);
             if ($account['accountLocked']) {
                 $successMsg = tr('Account %0 in book %1 unlocked', $account['accountName'], $bookId);
                 $errorMsg = tr('Account %0 in book %1 not unlocked', $account['accountName'], $bookId);
@@ -192,34 +196,25 @@ if (! empty($_REQUEST['action'])) {
             $template = "tiki-accounting_account_view.tpl";
             break;
         case 'delete':
-            $account = $accountinglib->getAccount($bookId, $accountId, true);
-            $smarty->assign('account', $account);
-            if ($access->checkCsrf(true)) {
-                $result = $accountinglib->deleteAccount($bookId, $accountId);
-            } else {
-                $result = false;
-            }
-            if ($result === true) {
-                Feedback::success(tr(
-                    '%0 account deleted from book %1',
-                    $account['accountName'],
-                    $bookId
-                ));
+            try {
+                $smarty->assign('account', $account);
+                if (! $access->checkCsrf(true)) {
+                    throw new Exception(tr("CSRF check failed. Operation not allowed."));
+                }
+                $accountinglib->deleteAccount($bookId, $accountId);
+                Feedback::success(tr('%0 account deleted from book %1', $account['accountName'], $book["bookName"]));
                 $template = "tiki-accounting.tpl";
-            } else {
-                Feedback::error(['mes' => $result]);
-                $account = $accountinglib->getAccount($bookId, $accountId, true);
+                $accounts = $accountinglib->getExtendedAccounts($bookId, true);
+                $smarty->assign('accounts', $accounts);
+            } catch (Exception $e) {
+                Feedback::error(['mes' => $e->getMessage()]);
+                $smarty->assign('action', 'new');
                 $smarty->assign('account', $account);
                 $template = "tiki-accounting_account_form.tpl";
             }
             break;
     }
-} else {
-    $account = $accountinglib->getAccount($bookId, $accountId, true);
 }
 $smarty->assign('account', $account);
-if (! $template) {
-    $template = "tiki-accounting_account_view.tpl";
-}
 $smarty->assign('mid', $template);
 $smarty->display("tiki.tpl");

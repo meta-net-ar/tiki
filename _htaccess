@@ -38,6 +38,9 @@
     </IfModule>
 </FilesMatch>
 
+# -- Prevent browsing of .git and node_modules content -- #
+RedirectMatch 403 /(?:\.git|node_modules)/.*$
+
 <IfModule mod_dir.c>
     # -- Home Page Feature -- #
     # Option 1: (recommended) Not using home page feature.

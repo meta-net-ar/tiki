@@ -46,6 +46,8 @@ if (isset($_REQUEST['ext_remove'])) {
 if (isset($_REQUEST['ext_add'])) {
     $contactlib->add_ext($user, $_REQUEST['ext_add']);
     $cookietab = 2;
+    $feedback = sprintf(tra('Field %s was added.'), $_REQUEST['ext_add']);
+    Feedback::success($feedback);
 }
 if (isset($_REQUEST['ext_show'])) {
     $contactlib->modify_ext($user, $_REQUEST['ext_show'], ['show' => 'y']);

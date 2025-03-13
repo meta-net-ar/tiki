@@ -62,15 +62,15 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-    --tiki-nav-link-border-left-color: #fff;
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//    --tiki-nav-link-border-left-color: #fff;
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -87,7 +87,7 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
         font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
@@ -110,7 +110,7 @@
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
         font-family: Avenir, Montserrat, Corbel, "URW Gothic", source-sans-pro, sans-serif;
@@ -120,6 +120,9 @@
     }
     .accordion-button::after {
         background-image:  url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23669fcc'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    .accordion-item .nav-pills .nav-link {
+        color: var(--tiki-admin-top-nav-color) !important;
     }
 }
 

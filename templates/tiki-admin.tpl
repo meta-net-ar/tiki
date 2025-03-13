@@ -1,4 +1,4 @@
-<div class="admin-wrapper highlightable {* {if $prefs.theme_unified_admin_backend eq 'y'}overflow-auto{/if} *}">
+<div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
             {include file='admin/include_anchors.tpl'}
@@ -125,6 +125,16 @@
             {if ! $wiki_attachments_migrated}
                 {remarksbox type="warning" title="{tr}Wiki attachments not migrated{/tr}"}
                 {tr}Wiki attachments storage is set to use File Galleries but attachments:migrate console command hasn't been run to convert existing wiki attachments to Tiki Files.{/tr}
+                {/remarksbox}
+            {/if}
+
+            {if !$isSchedulerRunConfigured}
+                {remarksbox type="warning" title="{tr}The Scheduler does not seem to have been executed recently.{/tr}"}
+                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background{/tr}
+                    {tr}Find out more about the Scheduler at{/tr}
+                    <a href="https://doc.tiki.org/Scheduler" class="link" target="_blank">
+                        https://doc.tiki.org/Scheduler
+                    </a>
                 {/remarksbox}
             {/if}
 

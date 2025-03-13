@@ -43,11 +43,11 @@
 }
 
 .tiki-top-nav-light {
-    @include top-nav-dark;
+    @include top-nav-light;
 }
 
 .tiki-topbar-nav-light {
-    @include topbar-nav-dark;
+    @include topbar-nav-light;
 }
 
 .tiki-top-nav-dark {
@@ -69,14 +69,14 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
     --tiki-top-border-width: 1px;
@@ -86,7 +86,7 @@
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 // These mixins have the same content - Todo: refactor
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: linear-gradient(#25282c, #292c30 40%, #2b2f32);
+    --tiki-admin-top-nav-bg: rgb(233, 236, 239); // linear-gradient(#25282c, #292c30 40%, #2b2f32);
     --tiki-admin-top-nav-color: rgba(255, 255, 255, 0.55);
     --tiki-admin-top-nav-hover-color: #fff;
     --tiki-admin-top-nav-hover-bg: linear-gradient(#25282c, #292c30 40%, #2b2f32);
@@ -157,8 +157,8 @@
 }
 
 :root {
-    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
-    .fc-v-event {
+    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
+    .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
 }

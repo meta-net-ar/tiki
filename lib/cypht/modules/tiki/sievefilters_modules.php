@@ -62,6 +62,33 @@ class Hm_Handler_tiki_sieve_placeholder extends Hm_Handler_Module
     }
 }
 
+/**
+ * Adds a sieve config host if storage is tiki
+ * @subpackage tiki/output
+ */
+class Hm_Handler_tiki_add_sieve_config_host extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $factory = get_sieve_client_factory($this->config);
+        $imap_servers = $this->user_config->get('imap_servers', []);
+        foreach ($imap_servers as $imap_server) {
+            if (isset($imap_server['sieve_config_host'])) {
+                continue;
+            }
+            try {
+                $client = $factory->init($this->user_config, $imap_server);
+                if (method_exists($client, 'isTikiStorage') && $client->isTikiStorage()) {
+                    $imap_server['sieve_config_host'] = 'localhost';
+                    Hm_IMAP_List::edit($imap_server['id'], $imap_server);
+                }
+            } catch (Exception $e) {
+                // Nothing to do
+            }
+        }
+    }
+}
+
 
 /**
  * @subpackage sievefilters/handler
@@ -94,8 +121,8 @@ class Hm_Handler_tiki_sieve_get_mailboxes_script extends Hm_Handler_Module
         foreach ($search_servers as $imap_server_id => $m) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
             $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (imap_authed($imap)) {
-                foreach ($imap->get_mailbox_list() as $mailbox) {
+            if ($imap->authed()) {
+                foreach ($imap->get_folders() as $mailbox) {
                     if ($server_id != $imap_server_id) {
                         $mailboxes[$m['name']][] = 'imap_' . $imap_server_id . '_' . $mailbox['name'];
                     } else {

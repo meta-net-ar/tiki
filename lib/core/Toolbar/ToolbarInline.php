@@ -14,7 +14,7 @@ class ToolbarInline extends ToolbarItem
                 $label = tra('Bold');
                 $icon = tra('img/icons/text_bold.png');
                 $iconname = 'bold';
-                $wysiwyg = 'Bold';
+                $wysiwyg = 'bold';
                 $syntax = '__text__';
                 $markdown = '__text__';
                 $markdown_wysiwyg = 'bold';
@@ -23,7 +23,7 @@ class ToolbarInline extends ToolbarItem
                 $label = tra('Italic');
                 $icon = tra('img/icons/text_italic.png');
                 $iconname = 'italic';
-                $wysiwyg = 'Italic';
+                $wysiwyg = 'italic';
                 $syntax = "''text''";
                 $markdown = '_text_';
                 $markdown_wysiwyg = 'italic';
@@ -32,14 +32,14 @@ class ToolbarInline extends ToolbarItem
                 $label = tra('Underline');
                 $icon = tra('img/icons/text_underline.png');
                 $iconname = 'underline';
-                $wysiwyg = 'Underline';
+                $wysiwyg = 'underline';
                 $syntax = "===text===";
                 break;
             case 'strike':
                 $label = tra('Strikethrough');
                 $icon = tra('img/icons/text_strikethrough.png');
                 $iconname = 'strikethrough';
-                $wysiwyg = 'Strike';
+                $wysiwyg = 'strikethrough';
                 $syntax = '--text--';
                 $markdown = '~~text~~';
                 $markdown_wysiwyg = 'strike';
@@ -48,7 +48,7 @@ class ToolbarInline extends ToolbarItem
                 $label = tra('Inline Code');
                 $icon = tra('img/icons/page_white_code.png');
                 $iconname = 'code';
-                $wysiwyg = 'Code';
+                $wysiwyg = 'code';
                 $syntax = '-+text+-';
                 $markdown = '`text`';
                 $markdown_wysiwyg = 'code';

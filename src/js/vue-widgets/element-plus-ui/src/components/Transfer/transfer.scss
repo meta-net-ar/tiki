@@ -1,0 +1,30 @@
+@use 'element-plus/theme-chalk/el-transfer.css';
+@use 'element-plus/theme-chalk/el-checkbox.css';
+@use 'element-plus/theme-chalk/el-button.css';
+@use 'element-plus/theme-chalk/el-icon.css';
+@use 'element-plus/theme-chalk/el-input.css';
+@use 'element-plus/theme-chalk/el-alert.css';
+@use '../all.scss';
+
+.el-transfer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.el-transfer-panel {
+    width: calc(45% - 25px * 2); // Make it take up all the space
+}
+
+.transfer-container {
+    margin-top: 1rem;
+}
+
+.transfer-container.invalid .el-transfer-panel:last-child {
+    & > .el-transfer-panel__body {
+        border-color: var(--bs-danger);
+    }
+    & > .el-transfer-panel__header {
+        border-color: var(--bs-danger) var(--bs-danger) var(--el-border-color) var(--bs-danger);
+    }
+}

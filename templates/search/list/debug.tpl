@@ -23,6 +23,6 @@ $results-&gt;getEstimate() | {$results->getEstimate()} | which is the estimate o
 <br><code>{literal}{foreach from=$results item=result}&lt;pre&gt;{$result|@debug_print_var}&lt;/pre&gt;&lt;hr&gt;{/foreach}{/literal}</code>
 {foreach from=$results item=result}
 <pre>
-{$result|@debug_print_var}
+{$result|@debug_print_tree}
 </pre>
 {/foreach}

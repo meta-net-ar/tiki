@@ -20,7 +20,7 @@
 <div class="object-list">
     <span class="h3">{tr}Object list result{/tr}</span>
     <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label col-form-label-sm" for="id_{$filterString}">Filters applied</label>
+        <label class="col-sm-2 col-form-label col-form-label-sm" for="id_{$filterString}">{tr}Filters applied{/tr}</label>
         <div class="col-sm-8">
             <input class="form-control form-control-sm" disabled="disabled" id="id_{$filterString}" value="{$filterString}">
         </div>

@@ -26,6 +26,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $prefs['feature_wiki_paragraph_formatting'] = 'n';
         $prefs['pass_chr_special'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
+        $prefs['feature_jquery'] = 'y';
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
@@ -39,10 +40,11 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['%%%%%%', "<br /><br /><br />"], // Two line breaks (forced)
             ['%%% %%%', "<br /> <br /><br />"], // Two line breaks (forced) with a space in between
             ['bar: 100%%%%', "bar: 100%<br /><br />"], // Line break after 100% string at the end of the line
+            ['Line one ending in number 42%%%Line two', "Line one ending in number 42<br />Line two<br />"], // Line break (forced) after a number at the end of the line
 
             ["''foo''", '<em>foo</em>' . "<br />"],
 
-            ['__foo__', "<strong>foo</strong><br />"],   // bold
+            ['__foo__', "<strong>foo</strong><br />"],   // bold`
             ['__ foo __', "<strong> foo </strong><br />"],   // bold
 
             ['===foo===', '<u>foo</u>' . "<br />"], // underline

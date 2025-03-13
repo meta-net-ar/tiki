@@ -40,6 +40,8 @@ class TikiLib extends TikiDb_Bridge
 
     public $is_slideshow = false;
 
+    public const TIKI_GLOBAL_CSV_ESCAPE_CHAR = '\\';
+
     /**
      * Collection of Tiki libraries.
      * Populated by TikiLib::lib()
@@ -248,6 +250,7 @@ class TikiLib extends TikiDb_Bridge
             $config['sslverifypeer'] = true;
         } else {
             $config['sslverifypeer'] = false;
+            $config['sslverifypeername'] = false;
         }
 
 
@@ -1741,24 +1744,53 @@ class TikiLib extends TikiDb_Bridge
      */
     public function get_news_from_last_visit($user)
     {
-        if (! $user) {
+        if (empty($user)) {
             return false;
         }
 
         $last = $this->table('users_users')->fetchOne('lastLogin', ['login' => $user]);
-
-        $ret = [];
         if (! $last) {
             $last = time();
         }
-        $ret["lastVisit"] = $last;
-        $ret["pages"] = $this->getOne("select count(*) from `tiki_pages` where `lastModif`>?", [(int)$last]);
-        $ret["files"] = $this->getOne("select count(*) from `tiki_files` where `created`>?", [(int)$last]);
-        $ret["comments"] = $this->getOne("select count(*) from `tiki_comments` where `commentDate`>?", [(int)$last]);
-        $ret["users"] = $this->getOne("select count(*) from `users_users` where `registrationDate`>? and `provpass`=?", [(int)$last, '']);
-        $ret["trackers"] = $this->getOne("select count(*) from `tiki_tracker_items` where `lastModif`>?", [(int)$last]);
-        $ret["calendar"] = $this->getOne("select count(*) from `tiki_calendar_items` where `lastmodif`>?", [(int)$last]);
-        return $ret;
+
+        // Combined query using subqueries
+        $query = "
+            SELECT 
+                ? as lastVisit,
+                (SELECT COUNT(*) FROM `tiki_pages` WHERE `lastModif` > ?) as pages,
+                (SELECT COUNT(*) FROM `tiki_files` WHERE `created` > ?) as files,
+                (SELECT COUNT(*) FROM `tiki_comments` WHERE `commentDate` > ?) as comments,
+                (SELECT COUNT(*) FROM `users_users` WHERE `registrationDate` > ? AND `provpass` = '') as users,
+                (SELECT COUNT(*) FROM `tiki_tracker_items` WHERE `lastModif` > ?) as trackers,
+                (SELECT COUNT(*) FROM `tiki_calendar_items` WHERE `lastmodif` > ?) as calendar
+        ";
+
+        $result = $this->query($query, [
+            (int)$last,     // lastVisit
+            (int)$last,     // pages
+            (int)$last,     // files
+            (int)$last,     // comments
+            (int)$last,     // users
+            (int)$last,     // trackers
+            (int)$last      // calendar
+        ]);
+
+        if ($result) {
+            $row = $result->fetchRow();
+            if ($row) {
+                return $row;
+            }
+        }
+
+        return [
+            "lastVisit" => $last,
+            "pages" => 0,
+            "files" => 0,
+            "comments" => 0,
+            "users" => 0,
+            "trackers" => 0,
+            "calendar" => 0
+        ];
     }
 
     /**
@@ -2644,7 +2676,16 @@ class TikiLib extends TikiDb_Bridge
         return $links;
     }
 
-    /**
+    public function sanitizeForCsv($input)
+    {
+        // Check if the input starts with characters that can trigger CSV injection
+        if (preg_match('/^[=+\-@]/', $input)) {
+            $input = "'" . $input; // Prefix with a single quote
+        }
+        return $input;
+    }
+
+   /**
      * Convert internal links from absolute to relative
      *
      * @param string $data
@@ -2971,7 +3012,7 @@ class TikiLib extends TikiDb_Bridge
                     $itemId = substr($slug, 4);
                     $trklib = TikiLib::lib('trk');
                     $trackerItem = Tracker_Item::fromId($itemId);
-                    $objectLink = ! empty($trackerItem) ? '[' . $uri . '|' . $slug . ']' : '';
+                    $objectLink = ! empty($trackerItem) ? '[' . $uri . ']' : ''; // keep the full URL
                     break;
                 case substr($slug, 0, 3) === 'int':
                     $repID = substr($slug, 3);
@@ -3197,11 +3238,13 @@ class TikiLib extends TikiDb_Bridge
      */
     public function getPageBySlug($slug)
     {
-        global $prefs;
+        $slug_variations = TikiLib::lib('slugmanager')->generateSlugsVariations($slug);
+        $bindvars = array_values($slug_variations);
+        $placeholders = implode(', ', array_fill(0, count($bindvars), '?'));
 
-        $pages = TikiDb::get()->table('tiki_pages');
-        $found = $pages->fetchOne('pageName', ['pageSlug' => $slug]);
+        $query = "SELECT `pageName` FROM `tiki_pages` WHERE pageSlug IN ($placeholders)";
 
+        $found = $this->getOne($query, $bindvars);
         return ! empty($found) ? $found : '';
     }
 
@@ -3538,7 +3581,16 @@ class TikiLib extends TikiDb_Bridge
         $this->table('tiki_history')->deleteMultiple(['pageName' => $page]);
         $this->table('tiki_links')->deleteMultiple(['fromPage' => $page]);
         $logslib = TikiLib::lib('logs');
-        $logslib->add_action('Removed', $page, 'wiki page', $params);
+        $removedActionId = $logslib->add_action('Removed', $page, 'wiki page', $params);
+        $getActions = $logslib->getActionLogDetails('Created', $page, 'wiki page');
+        if (! empty($getActions['actionId']) && $removedActionId) {
+            $createdActionId = $getActions['actionId'];
+            $getContribIds = $logslib->get_action_params($createdActionId, 'contribution');
+            if (count($getContribIds) > 0) {
+                $logslib->insert_params($removedActionId, 'contribution', $getContribIds);
+            }
+        }
+
         //get_strings tra("Removed");
         $this->table('users_groups')->updateMultiple(['groupHome' => null], ['groupHome' => $page]);
 
@@ -4381,7 +4433,7 @@ class TikiLib extends TikiDb_Bridge
         $preferences->insertOrUpdate(['value' => is_array($value) ? serialize($value) : $value], ['name' => $name]);
 
         if (isset($prefs)) {
-            if (in_array($name, $user_overrider_prefs)) {
+            if (isset($user_overrider_prefs) && in_array($name, $user_overrider_prefs)) {
                 $prefs['site_' . $name] = $value;
             } elseif (isset($user_preferences[$user][$name])) {
                 $prefs[$name] = $user_preferences[$user][$name];
@@ -5028,13 +5080,19 @@ class TikiLib extends TikiDb_Bridge
         ) {
             return $this->cache_page_info[$pageNameEncode];
         }
+        $slugManager = TikiLib::lib('slugmanager');
+        $slug_variations = array_values($slugManager->generateSlugsVariations($pageName));
+
+        $placeholders = implode(',', array_fill(0, count($slug_variations), '?'));
 
         if ($retrieve_datas) {
-            $query = "SELECT * FROM `tiki_pages` WHERE `pageName`=?";
+            $query = "SELECT * FROM `tiki_pages` WHERE `pageName`=? OR `pageSlug` IN ($placeholders)";
         } else {
-            $query = "SELECT `page_id`, `pageName`, `hits`, `description`, `lastModif`, `comment`, `version`, `version_minor`, `user`, `ip`, `flag`, `points`, `votes`, `wiki_cache`, `cache_timestamp`, `pageRank`, `creator`, `page_size`, `lang`, `lockedby`, `is_html`, `created`, `wysiwyg`, `wiki_authors_style`, `comments_enabled` FROM `tiki_pages` WHERE `pageName`=?";
+            $query = "SELECT `page_id`, `pageName`, `hits`, `description`, `lastModif`, `comment`, `version`, `version_minor`, `user`, `ip`, `flag`, `points`, `votes`, `wiki_cache`, `cache_timestamp`, `pageRank`, `creator`, `page_size`, `lang`, `lockedby`, `is_html`, `created`, `wysiwyg`, `wiki_authors_style`, `comments_enabled` FROM `tiki_pages` WHERE `pageName`=? OR `pageSlug` IN ($placeholders)";
         }
-        $result = $this->query($query, [$pageName]);
+        $params = array_merge([$pageName], $slug_variations);
+
+        $result = $this->query($query, $params);
 
         if (! $result->numRows()) {
             return false;
@@ -6122,22 +6180,6 @@ class TikiLib extends TikiDb_Bridge
     }
 
     /**
-     * @param $tab
-     * @param $valField1
-     * @param $field1
-     * @param $field2
-     * @return mixed
-     */
-    public function other_value_in_tab_line($tab, $valField1, $field1, $field2)
-    {
-        foreach ($tab as $line) {
-            if ($line[$field1] == $valField1) {
-                return $line[$field2];
-            }
-        }
-    }
-
-    /**
      * @param $file_name
      * @return string
      */
@@ -6406,24 +6448,32 @@ class TikiLib extends TikiDb_Bridge
         $result = strip_tags($result);
         return $result;
     }
+
     /**
-     * @param $data
+     * @param        $data
      * @param string $outputType
-     * @param boolean $is_html
+     * @param array  $options ['indexing' => false, 'is_html' => false]
      * @param string $highlight
-     * @param int $length
+     * @param int    $length
      * @param string $start
      * @param string $end
+     *
      * @return string
+     * @throws Exception
      */
-    public function get_snippet($data, $outputType = '', $is_html = false, $highlight = '', $length = 240, $start = '', $end = '')
+    public function get_snippet($data, $outputType = '', $options = [], $highlight = '', $length = 240, $start = '', $end = '')
     {
         global $prefs;
+
+        // Define default options and merge with provided options
+        $defaultOptions = ['indexing' => false, 'is_html' => false];
+        $options = array_merge($defaultOptions, $options);
+
         if ($prefs['search_parsed_snippet'] == 'y') {
             $data = preg_replace('/{(:?make)?toc[^}]*}/', '', $data);
 
             $_REQUEST['redirectpage'] = 'y'; //do not interpret redirect
-            $data = TikiLib::lib('parser')->parse_data($data, ['is_html' => $is_html, 'stripplugins' => true, 'parsetoc' => true]);
+            $data = TikiLib::lib('parser')->parse_data($data, ['is_html' => $options['is_html'], 'stripplugins' => true, 'parsetoc' => true, 'indexing' => $options['indexing']]);
         }
 
 
@@ -7123,7 +7173,7 @@ class TikiLib extends TikiDb_Bridge
     public function str_putcsv($arr)
     {
         $fh = fopen('php://temp', 'rw');
-        fputcsv($fh, $arr);
+        fputcsv($fh, $arr, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         rewind($fh);
         $csv = stream_get_contents($fh);
         fclose($fh);
@@ -7185,33 +7235,34 @@ class TikiLib extends TikiDb_Bridge
 
         return $group_ids;
     }
+
+/**
+     * function to check if a file or directory is in the path
+     * returns FALSE if incorrect
+     * returns the canonicalized absolute pathname otherwise
+     *
+     * @param $file
+     * @param $dir
+     * @return bool|string
+     */
+    public function safeFileExistsInPath($file, $dir)
+    {
+        $realfile = realpath($file);
+        $realdir = realpath($dir);
+        if (! $realfile) {
+            return (false);
+        }
+        if (! $realdir) {
+            return (false);
+        }
+        if (substr($realfile, 0, strlen($realdir)) != $realdir) {
+            return(false);
+        } else {
+            return($realfile);
+        }
+    }
 }
 // end of class ------------------------------------------------------
-
-// function to check if a file or directory is in the path
-// returns FALSE if incorrect
-// returns the canonicalized absolute pathname otherwise
-/**
- * @param $file
- * @param $dir
- * @return bool|string
- */
-function inpath($file, $dir)
-{
-    $realfile = realpath($file);
-    $realdir = realpath($dir);
-    if (! $realfile) {
-        return (false);
-    }
-    if (! $realdir) {
-        return (false);
-    }
-    if (substr($realfile, 0, strlen($realdir)) != $realdir) {
-        return(false);
-    } else {
-        return($realfile);
-    }
-}
 
 /**
  * @param $ar1

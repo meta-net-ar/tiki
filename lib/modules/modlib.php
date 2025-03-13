@@ -265,10 +265,13 @@ class ModLib extends TikiLib
             $section_initial = $section_map[$zone];
             foreach ($contents as $index => $moduleId) {
                 if ($moduleId) {
+                    $module = $all_modules[$zone][$index] ?? null;
                     if (
-                        $all_modules[$zone][$index]['moduleId'] != $moduleId
-                        || ($all_modules[$zone][$index]['ord'] != $index + 1
-                        || $all_modules[$zone][$index]['position'] != $section_initial)
+                        $module && (
+                            $module['moduleId'] != $moduleId ||
+                            $module['ord'] != $index + 1 ||
+                            $module['position'] != $section_initial
+                        )
                     ) {
                         $bindvars = [
                             $index + 1,
@@ -518,6 +521,12 @@ class ModLib extends TikiLib
         global $section, $page, $prefs, $user;
         $tikilib = TikiLib::lib('tiki');
 
+        if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
+            if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
+                return true;
+            }
+        }
+        // TODO: Check this if it behaves well on other "Admin" pages when UAB is enabled
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
@@ -862,7 +871,7 @@ class ModLib extends TikiLib
         $info_func = "module_{$moduleName}_info";
         $info = [];
 
-        if (file_exists($phpfuncfile)) {
+        if ($phpfuncfile = $this->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             include_once $phpfuncfile;
 
             if (function_exists($info_func)) {

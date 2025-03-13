@@ -15,6 +15,7 @@ class PreferencesLib
         'smarty_security_dirs',
         'tiki_allow_trust_input',
         'feature_create_webhelp',
+        'scheduler_shell_command',
     ];
 
     private $data = [];
@@ -117,6 +118,8 @@ class PreferencesLib
             'help' => '',
             'adminurl' => 'tiki-admin.php?lm_criteria=' . urlencode($name) . '&amp;exact',
             'dependencies' => [],
+            'conflicts' => [],
+            'notices' => [],
             'packages_required' => [],
             'extensions' => [],
             'dbfeatures' => [],
@@ -137,7 +140,7 @@ class PreferencesLib
             'public' => false,
             'translatable' => false,
         ];
-        if ($data[$name]['type'] === 'textarea') {
+        if (isset($data[$name]['type']) && $data[$name]['type'] === 'textarea') {
             $defaults['size'] = 10;
         }
 
@@ -165,6 +168,14 @@ class PreferencesLib
             $info['value'] = $value;
         }
 
+        $value = (string) $info['value'];
+        if ($info['notices'][$value]) {
+            Feedback::warning([
+                'title' => "The preference '{$name}' is set to '{$info['value']}'",
+                'mes' => $info['notices'][$value]
+            ]);
+        }
+
         if (! isset($info['tags'])) {
             $info['tags'] = ['advanced'];
         }
@@ -189,12 +200,22 @@ class PreferencesLib
             }
         }
 
+        $info['available'] = true;
+
         /* FIXME: Dependencies are not enforced currently. TODO: Activate disabled code below to enforce dependencies
         // The value element is deprecated. Use either "configuredValue" or "effectiveValue"  instead.
         $info['configuredValue'] = $info['effectiveValue'] = $info['value'];
         */
-        if ($deps && isset($info['dependencies'])) {
-            $info['dependencies'] = $this->getDependencies($info['dependencies']);
+        if ($deps) {
+            if (isset($info['dependencies'])) {
+                $info['dependencies'] = $this->getDependencies($info['dependencies']);
+            }
+            if (isset($info['conflicts'])) {
+                $info['conflicts'] = $this->getConflicts($info['conflicts']);
+                if (count($info['conflicts']['active']) && $info['value'] != 'y') {
+                    $info['available'] = false;
+                }
+            }
             /* TODO: test
             if ($info['type'] == 'flag' &&
                 $info['effectiveValue'] = 'y' && // Optimization
@@ -209,8 +230,6 @@ class PreferencesLib
         if ($deps && isset($info['packages_required']) && ! empty($info['packages_required'])) {
             $info['packages_required'] = $this->getPackagesRequired($info['packages_required']);
         }
-
-        $info['available'] = true;
 
         if (! $this->checkExtensions($info['extensions'])) {
             $info['available'] = false;
@@ -345,7 +364,7 @@ class PreferencesLib
         /**
          * If the unified index is enabled, replace simple object selection preferences with object selectors
          */
-        if ($info['type'] == 'text' && ! empty($info['profile_reference']) && $prefs['feature_search'] == 'y') {
+        if (! empty($info['profile_reference']) && $prefs['feature_search'] == 'y') {
             $objectlib = TikiLib::lib('object');
             $type = $objectlib->getSelectorType($info['profile_reference']);
 
@@ -778,6 +797,7 @@ class PreferencesLib
     private function getDependencies($dependencies)
     {
         $out = [];
+        $installer = new Tiki_Profile_Installer();
 
         foreach ((array) $dependencies as $key => $dep) {
             $info = $this->getPreference($dep, false);
@@ -801,15 +821,46 @@ class PreferencesLib
                         'label' => $profile,
                         'type' => 'profile',
                         'link' => 'tiki-admin.php?page=profiles&list=List&profile=' . urlencode($profile),
-                        'met' => // FIXME: $info is false, the following surely won't behave as intended. This should indicate whether the profile was applied.
-                        ( $info['type'] == 'flag' && $info['value'] == 'y' )
-                            || ( $info['type'] != 'flag' && ! empty($info['value']) )
+                        'met' => $installer->isInstalled($profile) ? true : false
                     ];
                 }
             }
         }
 
         return $out;
+    }
+
+    private function getConflicts($conflicts)
+    {
+        $active = [];
+        $inactive = [];
+
+        foreach ((array) $conflicts as $pref) {
+            $info = $this->getPreference($pref, false);
+            if (! $info) {
+                continue;
+            }
+            $name = isset($info['name']) ? $info['name'] : '';
+            $link = isset($info['adminurl']) ? $info['adminurl'] : '';
+            if ($info['value'] == 'y') {
+                $active[] = [
+                    'name' => $pref,
+                    'label' => $name,
+                    'link' => $link,
+                ];
+            } else {
+                $inactive[] = [
+                    'name' => $pref,
+                    'label' => $name,
+                    'link' => $link,
+                ];
+            }
+        }
+
+        return [
+            'active' => $active,
+            'inactive' => $inactive,
+        ];
     }
 
     private function getPackagesRequired($packages)
@@ -863,7 +914,7 @@ class PreferencesLib
 
             foreach ($data as $pref => $info) {
                 $prefInfo = $this->getPreference($pref);
-                if (! empty($prefInfo['hide'])) {
+                if (empty($prefInfo) || ! empty($prefInfo['hide'])) {
                     continue;   // hidden prefs have had their info removed, so no point indexing them
                 }
                 if ($prefInfo) {
@@ -950,7 +1001,22 @@ class PreferencesLib
                 preg_match('/^include_(.*)\.tpl$/', $f, $m);
                 if (count($m) > 0) {
                     $page = $m[1];
-                    $c = file_get_contents(TEMPLATES_ADMIN_PATH . '/' . $f);
+                    $filePath = TEMPLATES_ADMIN_PATH . '/' . $f;
+                    $c = file_get_contents($filePath);
+
+                    // Replace {include file='admin/template.tpl'} with the content of the file
+                    $c = preg_replace_callback(
+                        '/\{include file=[\'"]([^\'"]+)[\'"]\}/i',
+                        function ($matches) {
+                            $includeFile = TEMPLATES_ADMIN_PATH . '/' . ltrim($matches[1], 'admin/');
+                            if (file_exists($includeFile)) {
+                                return file_get_contents($includeFile);
+                            }
+                            return '';
+                        },
+                        $c
+                    );
+
                     preg_match_all('/{preference.*name=[\'"]?(\w*)[\'"]?.*}/i', $c, $m2, PREG_OFFSET_CAPTURE);
                     if (count($m2[1]) > 0) {
                         // count number of tabs in front of each found pref

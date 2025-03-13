@@ -164,6 +164,26 @@ function prefs_tracker_list()
             'default' => 'y',
             'dependencies' => ['feature_trackers','feature_sefurl', 'feature_sefurl_tracker_prefixalias'],
         ],
+        'tracker_adminonlyviewedititem_by_default' => [
+            'name' => tr('All new trackers are restricted to wiki page access only by default'),
+            'description' => tr('Option "Restrict non admins to wiki page access only" is not checked by default.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => ['feature_trackers'],
+        ],
+        'tracker_display_categories' => [
+            'name' => tr('Display categories in trackers list'),
+            'description' => tr('Add a new column with tracker categories in the admin trackers list.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => ['feature_categories'],
+        ],
+        'tracker_display_wiki_only_status' => [
+            'name' => tr('Display Wiki-Only status in trackers list'),
+            'description' => tr('Show whether trackers are restricted to wiki page access for non-admin users.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'tracker_report_resize_button' => [
             'name' => tr('Tracker report resize button'),
             'description' => tr('Add a button to resize long tracker reports.'),
@@ -209,7 +229,6 @@ function prefs_tracker_list()
             'default' => 'y',
             'dependencies' => [
                 'feature_trackers',
-                'vuejs_enable',
                 'feature_jquery_validation',
             ],
             'tags' => [ 'experimental' ],
@@ -373,5 +392,15 @@ function prefs_tracker_list()
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
         ],
+        'tracker_item_select_feature' => [
+            'name' => tr('Toggle selection option for all tracker field types that let us pick multiple options'),
+            'description' => tr('Show select all/invert selection when there is more than this number of items'),
+            'type' => 'text',
+            'size' => '50',
+            'units' => tra('items'),
+            'default' => 5,
+            'filter' => 'int',
+            'dependencies' => ['feature_trackers'],
+        ]
     ];
 }

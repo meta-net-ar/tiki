@@ -683,7 +683,7 @@ class CategLib extends ObjectLib
         }
 
         // Fetch all results as was done before, but only do it once
-        $query = "SELECT o.*, GROUP_CONCAT(c.catObjectId) as category_ids";
+        $query = "SELECT o.*, GROUP_CONCAT(c.categId) as category_ids";
         $query .= " FROM `tiki_objects` o";
         // I don't understand what the tiki_categorized_objects table does.  It looks like just a cache of objects part of tiki_category_object.  It's lone catObjectId column matches tiki_category_objects.objectId and tiki_objects.objectId, so it doesn't help the join but makes it fail if it's not present!?!?!? - benoitg- 2024-01-31
 
@@ -722,7 +722,7 @@ class CategLib extends ObjectLib
     }
 
     /**
-     * @param array $result object list
+     * @param array $result (object list) resulting from the join of table tiki_objects that have columns objectId, type, itemId, description, name, href and tiki_category_objects having category_ids concatenation of column categId
      * @param int $count size of list
      * @param int $offset start of list
      * @param int $maxRecords size of page - NB: -1 will check perms etc on every object and can be very slow
@@ -732,11 +732,18 @@ class CategLib extends ObjectLib
     {
         global $user, $prefs;
         $permMap = TikiLib::lib('object')->map_object_type_to_permission();
-        $groupList = $this->get_user_groups($user);
 
         // Filter based on permissions
         $contextMap = ['type' => 'type', 'object' => 'itemId'];
         $contextMapMap = array_fill_keys(array_keys($permMap), $contextMap);
+
+        $expected_keys = ['objectId', 'type', 'itemId', 'description', 'name', 'href', 'category_ids'];
+        foreach ($result as $res) {
+            // Make sure all keys are present
+            if (count(array_intersect_key(array_flip($expected_keys), $res)) !== count($expected_keys)) {
+                throw new Exception(tr("One or more object keys missing"));
+            }
+        }
 
         if ($maxRecords == -1) {
             $requiredResult = $result;
@@ -746,7 +753,7 @@ class CategLib extends ObjectLib
 
         $invalidTypes = [];
         // Get valid object types from the context map
-        $validObjectTypes = array_keys($contextMap);
+        $validObjectTypes = array_keys($contextMapMap);
         // Filter $requiredResult based on valid object types
         $requiredResult = array_filter($requiredResult, function ($res) use ($validObjectTypes, &$invalidTypes) {
             $check = in_array($res['type'], $validObjectTypes);
@@ -771,11 +778,13 @@ class CategLib extends ObjectLib
             $count = count($requiredResult);
         }
 
+        $result = $requiredResult;
+
         $ret = [];
         $objs = [];
 
         foreach ($result as $res) {
-            if (isset($res['catObjectId'], $res['categId']) && ! in_array($res['catObjectId'] . '-' . $res['categId'], $objs)) { // same object and same category
+            if (! in_array($res['objectId'] . '-' . $res['category_ids'], $objs)) { // same object and same categories
                 if (preg_match('/trackeritem/', $res['type']) && $res['description'] == '') {
                     $trklib = TikiLib::lib('trk');
                     //This is a performance optimisation, but we can't rely on trackerId being present - benoitg - 2024-03-18
@@ -797,7 +806,7 @@ class CategLib extends ObjectLib
                     $res['name'] = '#' . $res['itemId'];
                 }
                 $ret[] = $res;
-                $objs[] = $res['catObjectId'] . '-' . $res['categId'];
+                $objs[] = $res['objectId'] . '-' . $res['category_ids'];
             }
         }
 
@@ -821,28 +830,6 @@ class CategLib extends ObjectLib
             "data" => $ret,
             "cant" => $count,
         ];
-    }
-
-    public function list_orphan_objects($offset, $maxRecords, $sort_mode)
-    {
-        $orderClause = $this->convertSortMode($sort_mode);
-
-        $common = "
-            FROM
-                tiki_objects
-                LEFT JOIN tiki_category_objects ON objectId = catObjectId
-            WHERE
-                catObjectId IS NULL
-            ORDER BY $orderClause
-            ";
-
-        $query = "SELECT objectId catObjectId, 0 categId, type, itemId, name, href $common";
-        $queryCount = "SELECT COUNT(*) $common";
-
-        $result = $this->fetchAll($query, [], $maxRecords, $offset);
-        $count = $this->getOne($queryCount);
-
-        return $this->filter_object_list($result, $count, $offset, $maxRecords);
     }
 
     // get specific object types that are not categorised
@@ -2188,41 +2175,6 @@ class CategLib extends ObjectLib
             $ret[] = $res["catObjectId"];
         }
         return $ret;
-    }
-
-    // unassign all objects from a category
-    public function unassign_all_objects($categId)
-    {
-        $query = 'delete from  `tiki_category_objects` where `categId`=?';
-        return $this->query($query, [(int)$categId]);
-    }
-    //
-
-    /**
-     * Move all objects from one category to another
-     *
-     * @param $from
-     * @param $to
-     * @return TikiDb_Pdo_Result
-     */
-    public function move_all_objects($from, $to)
-    {
-        $query = 'update ignore `tiki_category_objects` set `categId`=? where `categId`=?';
-        return $this->query($query, [(int)$to, (int)$from]);
-    }
-
-
-    /**
-     * Assign all objects in a category to another category
-     *
-     * @param $from
-     * @param $to
-     * @return TikiDb_Pdo_Result
-     */
-    public function assign_all_objects($from, $to)
-    {
-        $query = 'insert ignore `tiki_category_objects` (`catObjectId`, `categId`) select `catObjectId`, ? from `tiki_category_objects` where `categId`=?';
-        return $this->query($query, [(int)$to, (int)$from]);
     }
 
     // generate category tree for use in various places (like categorize_list.php)

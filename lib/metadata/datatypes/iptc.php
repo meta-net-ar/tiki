@@ -630,7 +630,7 @@ class Iptc
                 }
 
                 //get option labels for fields that are option values
-                if (isset($this->specs[$group][$name]['options'])) {
+                if (isset($this->specs[$group][$name]['options']) && is_scalar($iptc[$group][$name]['rawval'])) {
                     $iptc[$group][$name]['newval'] = $this->specs[$group][$name]['options'][$iptc[$group][$name]['rawval']];
                 } else {
                     $iptc[$group][$name]['newval'] = $iptc[$group][$name]['rawval'];

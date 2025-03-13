@@ -34,7 +34,7 @@
 <div>
 <ul class="searchresults">
     {if $results->didYouMean}
-        <i>{tr}Found results for:{/tr} {$results->didYouMean}</i>
+        <i>{tr}Found results for:{/tr} <b>{$results->didYouMean}</b></i>
     {/if}
     {foreach item=result from=$results}
     <li>

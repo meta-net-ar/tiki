@@ -29,10 +29,20 @@ function wikiplugin_listexecute_info()
 
 function wikiplugin_listexecute($data, $params)
 {
+    global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
     static $iListExecute = 0;
     $iListExecute++;
 
+    if (isset($_REQUEST['iListExecute'])) {
+        $iListExecute = $_REQUEST['iListExecute'];
+    }
+
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+
+    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/wikiplugin-listexecute.js', true);
+
+    $meta = TikiLib::lib('parser')->plugin_info('listexecute', $params);
+    $fingerprint = TikiLib::lib('parser')->plugin_fingerprint('listexecute', $meta, $data, $params);
 
     $actions = [];
 
@@ -51,6 +61,7 @@ function wikiplugin_listexecute($data, $params)
             'tracker_item_modify' => 'Search_Action_TrackerItemModify',
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
+            'categorize_object' => 'Search_Action_CategorizeObjectAction'
         ]
     );
 
@@ -94,7 +105,6 @@ function wikiplugin_listexecute($data, $params)
     }
 
     $customOutput = false;
-
     foreach ($matches as $match) {
         $name = $match->getName();
 
@@ -130,6 +140,7 @@ function wikiplugin_listexecute($data, $params)
     $dataSource = $unifiedsearchlib->getDataSource();
     $builder = new Search_Formatter_Builder();
     $builder->setPaginationArguments($paginationArguments);
+    $builder->setAdditionalOutputData(['fingerprint' => $fingerprint]);
     $builder->setActions($actions);
     $builder->setId('wplistexecute-' . $iListExecute);
     $builder->setCount($result->count());
@@ -148,8 +159,24 @@ function wikiplugin_listexecute($data, $params)
 
         $pluginData = [
             'actions' => $actions,
-            'iListExecute' => $iListExecute
+            'iListExecute' => $iListExecute,
+            'fingerprint' => $fingerprint,
         ];
+
+        if ($prefs['feature_categories'] == 'y') {
+            $categlib = TikiLib::lib('categ');
+            $categories = $categlib->getCategories();
+
+            foreach ($categories as &$category) {
+                $category['canchange'] = 'y';
+            }
+            // Get the categories tree for display
+            $cat_tree = $categlib->generate_cat_tree($categories);
+            $pluginData['categories'] = $categories;
+            $pluginData['cat_tree'] = $cat_tree;
+            $pluginData['tiki_p_modify_object_categories'] = $tiki_p_modify_object_categories;
+            $pluginData['tiki_p_admin_categories'] = $tiki_p_admin_categories;
+        }
 
         $page = $_GET['page'] ?? null;
 
@@ -203,13 +230,20 @@ function wikiplugin_listexecute($data, $params)
 
             $action = $actions[$action];
             $numGood = 0;
+            $formatter->setContext('actions');
             $list = $formatter->getPopulatedList($result);
+            $formatter->setContext(null);
 
             foreach ($list as $entry) {
+                $entry['object_type'] = str_replace(['~/np~', '~np~'], '', $entry['object_type']); // Remove ~/np~~np~ from object type
                 $identifier = "{$entry['object_type']}:{$entry['object_id']}";
                 if (in_array($identifier, $selectedObjects) || in_array('ALL', $selectedObjects)) {
                     if (isset($_POST['list_input'])) {
                         $entry['value'] = $_POST['list_input'];
+                    }
+                    // If it is a categorization action
+                    if (isset($_POST['cat_categories'])) {
+                        $entry['category'] = $_POST['cat_categories'];
                     }
 
                     try {

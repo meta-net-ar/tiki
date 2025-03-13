@@ -72,7 +72,7 @@ class WikiParser_OutputLink
         $this->anchor = $anchor;
     }
 
-    public function getHtml($ck_editor = false)
+    public function getHtml($html_editor = false)
     {
         $page = $this->identifier;
         $description = $this->identifier;
@@ -88,7 +88,7 @@ class WikiParser_OutputLink
                         'class' => $class,
                 ]
             );
-        } elseif ($this->namespace && (($info = $this->findWikiPage("{$this->namespace}{$this->namespaceSeparator}$pageId")) || $ck_editor)) {
+        } elseif ($this->namespace && (($info = $this->findWikiPage("{$this->namespace}{$this->namespaceSeparator}$pageId")) || $html_editor)) {
             // When currently displayed page is in a namespace, interpret links as within namespace as a priority
             if (! empty($info['pageName'])) {
                 $page = $info['pageName'];
@@ -114,7 +114,7 @@ class WikiParser_OutputLink
                     'class' => 'wiki wiki_page',
                 ]
             );
-        } elseif (($info = $this->findWikiPage($pageId)) || $ck_editor) {
+        } elseif (($info = $this->findWikiPage($pageId)) || $html_editor) {
             if (! empty($info['pageName'])) {
                 $page = $info['pageName'];
                 $pageId = substr($page, 0, 158);

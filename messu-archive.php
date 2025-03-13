@@ -18,6 +18,7 @@ $inputConfiguration = [[
         'download'  => 'alpha',
         'filter'    => 'alpha',
         'find'      => 'text',
+        'flags'     => 'text',
         'flag'      => 'alnumdash',
         'flagval'   => 'alnumdash',
         'offset'    => 'digits',
@@ -109,6 +110,9 @@ if (isset($_POST["unarchive"])) {
 }
 
 if (isset($_REQUEST['filter'])) {
+    if (empty($_REQUEST['find']) && empty($_REQUEST['flags']) && empty($_REQUEST['priority'])) {
+        Feedback::warning(tra('Please specify at least one search criterion: Contain, Message status or Priority!'));
+    }
     if ($_REQUEST['flags'] != '') {
         $parts = explode('_', $_REQUEST['flags']);
         $flag = $parts[0];

@@ -43,6 +43,12 @@ function module_login_box_info()
                 'description' => tra('Show the register link') . ' (y/n)',
                 'filter' => 'alpha',
             ],
+            'register_page' => [
+                'name' => tra('Register Page'),
+                'description' => tra('Page to redirect when the register link is clicked. If not given, the default register page is used.'),
+                'filter' => 'pagename',
+                'profile_reference' => 'wiki_page',
+            ],
             'forgot' => [
                 'name' => tra('Show I Forgot'),
                 'description' => tra('Show the "I forgot my password" link') . ' (y/n)',
@@ -51,6 +57,11 @@ function module_login_box_info()
             'remember' => [
                 'name' => tra('Show Remember me'),
                 'description' => tra('Show the "Remember me" checkbox') . ' (y/n)',
+                'filter' => 'alpha',
+            ],
+            'allowNone' => [
+                'name' => tra('Allow None'),
+                'description' => tra('Allow user selection field to be empty (without any users selected) when enabled.') . ' (y/n)',
                 'filter' => 'alpha',
             ],
             'show_user_avatar' => [
@@ -87,7 +98,7 @@ function module_login_box_info()
  */
 function module_login_box($mod_reference, &$module_params)
 {
-    global $prefs, $base_url_https, $base_url;
+    global $prefs, $base_url_https, $base_url, $user_cookie_site;
     $smarty = TikiLib::lib('smarty');
     $tikilib = \TikiLib::lib('tiki');
     static $module_logo_instance = 0;
@@ -105,11 +116,26 @@ function module_login_box($mod_reference, &$module_params)
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
     $smarty->assign('registration', 'n');   // stops the openid form appearing in the module, only on tiki-login_scr.php
+    $can_switch_user = 'y';
+    $perms = Perms::get();
+    if (! $perms->admin) {
+        $previous_username = $_SESSION[$user_cookie_site . '_previous'] ?? null;
+        if ($previous_username) {
+            $permsContext = new Perms_Context($previous_username);
+            $permsPrevious = Perms::get();
+            if (! $permsPrevious->admin) {
+                $can_switch_user = 'n';
+            }
+        } else {
+            $can_switch_user = 'n';
+        }
+    }
     $smarty->assign(
         'login_module',
         [
             'login_url' => $urlPrefix . $prefs['login_url'],
             'can_revert' => TikiLib::lib('login')->isSwitched(),
+            'can_switch_user' => $can_switch_user,
         ]
     );
 
@@ -138,5 +164,8 @@ function module_login_box($mod_reference, &$module_params)
     }
     if (! isset($module_params['groups'])) {
         $module_params['groups'] = '';
+    }
+    if (! isset($module_params['allowNone'])) {
+        $module_params['allowNone'] = 'y';
     }
 }

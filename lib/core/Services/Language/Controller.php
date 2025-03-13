@@ -113,9 +113,7 @@ class Services_Language_Controller
                 global $prefs;
                 $stats = $export_language->writeLanguageFile($prefs['lang_control_contribution'] == 'y' && ! $input->offsetExists('all'));
             } catch (Exception $e) { //TODO: this is messy
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
             }
             //TODO: expose expmsg properly
             $expmsg = sprintf(tra('Wrote %d new strings and updated %d to lang/%s/language.php'), $stats['new'], $stats['modif'], $export_language->lang);

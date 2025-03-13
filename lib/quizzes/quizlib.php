@@ -10,21 +10,21 @@
 class QuizLib extends TikiLib
 {
     /**
-     * @param $quizId
-     * @return bool
+     * @param int $quizId
+     *
+     * @return array|null
      */
-    public function get_quiz($quizId)
+    public function get_quiz(int $quizId): ?array
     {
         $query = "select * from `tiki_quizzes` where `quizId`=?";
 
         $result = $this->query($query, [(int) $quizId]);
 
         if (! $result->numRows()) {
-            return false;
+            return null;
         }
 
-        $res = $result->fetchRow();
-        return $res;
+        return $result->fetchRow();
     }
 
     public function compute_quiz_stats()
@@ -119,21 +119,21 @@ class QuizLib extends TikiLib
     }
 
     /**
-     * @param $userResultId
-     * @return bool
+     * @param int $userResultId
+     *
+     * @return array|null
      */
-    public function get_user_quiz_result($userResultId)
+    public function get_user_quiz_result(int $userResultId): ?array
     {
         $query = "select * from `tiki_user_quizzes` where `userResultId`=?";
 
         $result = $this->query($query, [$userResultId]);
 
         if (! $result->numRows()) {
-            return false;
+            return null;
         }
 
-        $res = $result->fetchRow();
-        return $res;
+        return $result->fetchRow();
     }
 
     /**
@@ -487,18 +487,19 @@ class QuizLib extends TikiLib
     }
 
     /**
-     * @param $quizId
-     * @param $points
-     * @return int
+     * @param int $quizId
+     * @param int $points
+     *
+     * @return array|null
      */
-    public function calculate_quiz_result($quizId, $points)
+    public function calculate_quiz_result(int $quizId, int $points): ?array
     {
         $query = "select * from `tiki_quiz_results` where `fromPoints`<=? and `toPoints`>=? and `quizId`=?";
 
         $result = $this->query($query, [(int) $points, (int) $points, (int) $quizId]);
 
         if (! $result->numRows()) {
-            return 0;
+            return null;
         }
 
         $res = $result->fetchRow();
@@ -560,7 +561,7 @@ class QuizLib extends TikiLib
 
     /**
      * @param $resultId
-     * @return bool
+     * @return array|null
      */
     public function get_quiz_result($resultId)
     {
@@ -569,11 +570,10 @@ class QuizLib extends TikiLib
         $result = $this->query($query, [(int) $resultId]);
 
         if (! $result->numRows()) {
-            return false;
+            return null;
         }
 
-        $res = $result->fetchRow();
-        return $res;
+        return $result->fetchRow();
     }
 
     /**
@@ -1091,11 +1091,7 @@ function NextBlank($text)
  */
 function quizlib_error_exit($s)
 {
-    $smarty = TikiLib::lib('smarty');
-    $smarty->assign('msg', $s);
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie($s, \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 // Called by tiki-edit_quiz_questions.php

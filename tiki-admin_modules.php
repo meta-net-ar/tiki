@@ -55,6 +55,7 @@ $polllib = TikiLib::lib('poll');
 $structlib = TikiLib::lib('struct');
 $modlib = TikiLib::lib('mod');
 $menulib = TikiLib::lib('menu');
+$tikilib = TikiLib::lib('tiki');
 
 $userHasAssignedModules = $prefs['user_assigned_modules'] === 'y'
     && TikiLib::lib('usermodules')->user_has_assigned_modules($user);
@@ -76,9 +77,6 @@ if (! empty($prefs['module_file'])) {
         )
     );
 }
-
-
-$access->check_feature(['feature_jquery_ui']);
 
 // Values for the user_module edit/create form
 $smarty->assign('um_tgt_module', '');
@@ -294,32 +292,30 @@ if (isset($_REQUEST['preview'])) {
         try {
             $data = $smarty->fetch('modules/user_module.tpl');
         } catch (Exception $e) {
-            $smarty->assign(
-                'msg',
+            Feedback::errorAndDie(
                 tr(
                     'There is a problem with your custom module "%0": ' . '<br><br><em>' . $e->getMessage()
                     . '</em><br><br>' . '<span class="button"><a href="tiki-admin_modules.php?um_edit='
                     . $_REQUEST['assign_name'] . '&cookietab=2#editcreate">' . tr('Click here to edit the module')
                     . '</a></span>',
                     $_REQUEST['assign_name']
-                )
+                ),
+                \Laminas\Http\Response::STATUS_CODE_409
             );
-            $smarty->display('error.tpl');
-            die;
         }
     } else {
         $phpfile = 'modules/mod-' . $_REQUEST['assign_name'] . '.php';
         $phpfuncfile = 'modules/mod-func-' . $_REQUEST['assign_name'] . '.php';
         $template = 'modules/mod-' . $_REQUEST['assign_name'] . '.tpl';
-        if (file_exists($phpfile)) {
-            include($phpfile);
-        } elseif (file_exists($phpfuncfile)) {
+        if ($file = $tikilib->safeFileExistsInPath($phpfile, MODULES_PATH)) {
+            include($file);
+        } elseif ($file = $tikilib->safeFileExistsInPath($phpfuncfile, MODULES_PATH)) {
             if (isset($_REQUEST['assign_params']['rows'])) {
                 $module_rows = $_REQUEST['assign_params']['rows'];
             } else {
                 $module_rows = 10;
             }
-            include_once($phpfuncfile);
+            include_once($file);
             $function = 'module_' . $_REQUEST['assign_name'];
             $assign_param = $_REQUEST['assign_params'] ?? [];
             if (function_exists($function)) {
@@ -336,8 +332,8 @@ if (isset($_REQUEST['preview'])) {
             }
         }
 
-        if (file_exists('templates/' . $template)) {
-            $data = $smarty->fetch($template);
+        if ($file = $tikilib->safeFileExistsInPath('templates/' . $template, TEMPLATES_MODULES_PATH)) {
+            $data = $smarty->fetch($file);
         } else {
             $data = '';
         }
@@ -583,6 +579,27 @@ $sameurl_elements = ['offset', 'sort_mode', 'where', 'find'];
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+
+if (! isset($_REQUEST['sort_mode'])) {
+    $sort_mode = 'name_desc';
+} else {
+    $sort_mode = $_REQUEST['sort_mode'];
+}
+
+if (isset($_REQUEST['find'])) {
+    $find = $_REQUEST['find'];
+} else {
+    $find = '';
+}
+
+$channels = $menulib->list_menus($offset, $maxRecords, $sort_mode, $find);
+foreach ($channels['data'] as $i => $channel) {
+    if ($userlib->object_has_one_permission($channel['menuId'], 'menus')) {
+        $channels['data'][$i]['individual'] = 'y';
+    }
+}
+
+$smarty->assign('channels', $channels['data']);
 
 if (! empty($_REQUEST['edit_module'])) {    // pick up ajax calls
     // the strings below are used to display the tab titles in the edit module box

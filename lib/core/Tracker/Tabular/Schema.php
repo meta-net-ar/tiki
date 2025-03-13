@@ -132,7 +132,7 @@ class Schema
 
     public function getEncoding()
     {
-        return $this->config['encoding'];
+        return $this->config['encoding'] ?? '';
     }
 
     public function getFormat()
@@ -151,6 +151,17 @@ class Schema
                 continue;
             } catch (Exception\ModeNotSupported $e) {
                 \Feedback::error($e->getMessage());
+                continue;
+            } catch (\Exception $e) {
+                // TODO make error message appear when exporting
+                \Feedback::error(
+                    tr(
+                        'Error on field %0 mode "%1"<br>&nbsp;&nbsp;',
+                        $column['field'],
+                        $column['mode']
+                    ) .
+                    $e->getMessage()
+                );
                 continue;
             }
             $col->setExportOnly(! empty($column['isExportOnly']));
@@ -188,6 +199,49 @@ class Schema
         return $this->filters;
     }
 
+    /**
+     * If we have default filters configured with a value, return a QuerySource with configured
+     * query to filter only those records. Otherwise, we use a normal TrackerSource to fetch
+     * all tracker items for that tracker.
+     */
+    public function getDefaultFilterSource(): Source\SourceInterface
+    {
+        $query = $this->getDefaultFilterQuery();
+        if ($query) {
+            $source = new Source\QuerySource($this, $query);
+        } else {
+            $source = new Source\TrackerSource($this, $this->getDefinition());
+        }
+        return $source;
+    }
+
+    /**
+     * If we have default filters configured with a value, return a query to filter only those records.
+     */
+    public function getDefaultFilterQuery()
+    {
+        $has_default_filter = false;
+        $collection = $this->getFilterCollection();
+        $collection->applyInput(new \JitFilter([]), true);
+        foreach ($collection->getFilters() as $filter) {
+            if ($filter->getPosition() === 'default' && $filter->getControl()->hasValue()) {
+                $has_default_filter = true;
+                break;
+            }
+        }
+        if ($has_default_filter) {
+            $search = \TikiLib::lib('unifiedsearch');
+            $query = $search->buildQuery([
+                'type' => 'trackeritem',
+                'tracker_id' => $this->getDefinition()->getId(),
+            ]);
+            $collection->applyConditions($query);
+            return $query;
+        } else {
+            return null;
+        }
+    }
+
     public function getFormatDescriptor()
     {
         return array_map(function ($column) {
@@ -222,6 +276,12 @@ class Schema
         $column = $partial->lookupMode($permName, $mode);
         $this->columns[] = $column;
 
+        return $column;
+    }
+
+    public function addActualColumn(Schema\Column $column)
+    {
+        $this->columns[] = $column;
         return $column;
     }
 

@@ -3,11 +3,11 @@ import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import copy from "@guanghechen/rollup-plugin-copy";
 import { glob } from "glob";
 import path from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import postcssRootToHost from "./postcssRootToHost";
 /*
 
@@ -102,7 +102,7 @@ export default defineConfig(({ command, mode }) => {
     Object.assign(
         rollupInput,
         Object.fromEntries(
-            glob.sync("src/js/jquery-tiki/**/*.js").map((file) => {
+            glob.sync("src/js/jquery-tiki/**/*.js", { ignore: ["**/node_modules/**", "**/*.test.js"] }).map((file) => {
                 //console.log(path.relative(__dirname, file));
                 return [
                     // This remove `src/js/jquery-tiki` as well as the file extension from each
@@ -117,10 +117,13 @@ export default defineConfig(({ command, mode }) => {
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
         "color-picker": resolve("node_modules/@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"),
-        "datetime-picker": resolve(__dirname, "vue-widgets/datetime-picker/src/datetime-picker.ce.js"),
         "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
-        "element-plus-ui": resolve(__dirname, "vue-widgets/element-plus-ui/src/element-plus-ui.ce.js"),
+        "element-plus-ui/autocomplete": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/autocomplete.js"),
+        "element-plus-ui/datepicker": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
+        "element-plus-ui/fileGalUploader": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
+        "element-plus-ui/select": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),
+        "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
         styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
@@ -128,14 +131,15 @@ export default defineConfig(({ command, mode }) => {
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
+        "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
         resolve: {
-            /*alias: {
-            "@vue-mf/styleguide": resolve(__dirname, "vue-mf/styleguide/src/main.js"),
-        },*/
+            alias: {
+                "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
+            }
         },
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
@@ -148,6 +152,7 @@ export default defineConfig(({ command, mode }) => {
             target: "es2022", //https://caniuse.com/?search=es2022 Who cares about IE these days...
             optimizeDeps: {
                 disabled: false,
+                include: ['@event-calendar/core'],
                 //If you ever need to debug a dependency and see your changes do this (ref: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7):
                 //exclude: ["svelte"],
             },
@@ -156,6 +161,7 @@ export default defineConfig(({ command, mode }) => {
                 external: [
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
+                    /^@jquery-tiki\/.+/,
                     "@popperjs/core",
                     "bootstrap",
                     "clipboard",
@@ -168,8 +174,10 @@ export default defineConfig(({ command, mode }) => {
                     /^moment\/.+/,
                     "select2",
                     "pivottablejs",
+                    "reveal.js",
                     "sortablejs",
                     "subtotal",
+                    "summernote",
                     "vue",
                 ],
                 input: rollupInput,
@@ -204,6 +212,33 @@ export default defineConfig(({ command, mode }) => {
             postcss: {
                 plugins: [postcssRootToHost()],
             },
+            /**
+             * This workaround suppresses warnings from Sass about mixed declarations
+             * after nested rules. The issue originates from Bootstrap (twbs) and is
+             * tracked here: https://github.com/twbs/bootstrap/issues/40621.
+             *
+             * The fix involves configuring the `scss` preprocessor to silence the specific
+             * deprecation warnings (`mixed-decls`). This is implemented using the `silenceDeprecations`
+             * option with the value `['mixed-decls']`.
+             *
+             * IMPORTANT: This workaround can be removed once Bootstrap is updated to
+             * version 5.3.4 (or later), which includes the resolution to this issue
+             * (see: https://github.com/twbs/bootstrap/pull/40623).
+             *
+             * Original suppressed warning:
+             * DEPRECATION WARNING: Sass's behavior for declarations that appear after nested rules
+             * will change in future versions.
+             *
+             * Future developers should verify whether the workaround is still required
+             * by consulting the linked issue and confirming that the fix is included in the
+             * version of Bootstrap used by the project.
+             */
+             preprocessorOptions: {
+                scss: {
+                    api: 'modern-compiler', // or "modern", "legacy"
+                    silenceDeprecations: ['mixed-decls'],
+                },
+            }
         },
         plugins: [
             vue({
@@ -238,10 +273,14 @@ export default defineConfig(({ command, mode }) => {
                             src: "node_modules/module-name/dist/*",",
                             dest: "vendor_dist/module-name/dist",
                         },
-                    But make sure to look into the dist folder, so we don't add a bunch of useless stiff, but don't miss required support files (such as language files)
+                    But make sure to look into the dist folder, so we don't add a bunch of useless stuff, but don't miss required support files (such as language files)
                     */
 
                     /* jquery_tiki */
+                    {
+                        src: "node_modules/@event-calendar/*",
+                        dest: "vendor_dist/@event-calendar",
+                    },
                     {
                         src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
                         dest: "vendor_dist/bootstrap/dist/css",
@@ -266,11 +305,11 @@ export default defineConfig(({ command, mode }) => {
                     /* tiki_themes */
                     {
                         src: "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                        dest: "vendor_dist/@fortawesome/fontawesome",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/css",
                     },
                     {
                         src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
-                        dest: "vendor_dist/@fortawesome/webfonts",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/webfonts",
                     },
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
@@ -280,6 +319,14 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/element-plus/dist/locale/*.min.mjs",
                         dest: "vendor_dist/element-plus/dist/locale",
+                    },
+                    {
+                        src: [
+                            "node_modules/element-plus/theme-chalk/base.css",
+                            "node_modules/element-plus/theme-chalk/el-message.css",
+                            "node_modules/element-plus/theme-chalk/el-message-box.css",
+                        ],
+                        dest: "vendor_dist/element-plus/css",
                     },
                     /* common_externals */
                     {
@@ -348,6 +395,14 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/converse.js/dist",
                     },
                     {
+                        src: "node_modules/recordrtc/RecordRTC.js",
+                        dest: "vendor_dist/recordrtc",
+                    },
+                    {
+                        src : "node_modules/interactjs/dist/*",
+                        dest : "vendor_dist/interactjs/dist",
+                    },
+                    {
                         src: "node_modules/dompurify/dist/purify.(es|min)*",
                         dest: "vendor_dist/dompurify/dist",
                     },
@@ -368,6 +423,10 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/fitvids/dist",
                     },
                     {
+                        src: "node_modules/html2canvas-pro/dist/html2canvas-pro.min.js",
+                        dest: "vendor_dist/html2canvas-pro/dist",
+                    },
+                    {
                         src: "node_modules/interactjs/dist/*",
                         dest: "vendor_dist/interactjs/dist",
                     },
@@ -378,6 +437,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/jqdoublescroll/jquery.doubleScroll.js",
                         dest: "vendor_dist/jqdoublescroll",
+                    },
+                    {
+                        src: ["node_modules/jquery-treetable/css/jquery.treetable.css", "node_modules/jquery-treetable/jquery.treetable.js"],
+                        dest: "vendor_dist/jquery-treetable",
                     },
                     {
                         src: "node_modules/jquery-zoom/(icon.png|jquery.zoom.js)",
@@ -420,8 +483,24 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/mermaid/dist",
                     },
                     {
+                        src: "node_modules/minicart/dist/*.js",
+                        dest: "vendor_dist/minicart/dist",
+                    },
+                    {
                         src: "node_modules/moment/dist/*",
                         dest: "vendor_dist/moment/dist",
+                    },
+                    {
+                        src: "node_modules/ol/dist/ol.js",
+                        dest: "vendor_dist/ol/dist",
+                    },
+                    {
+                        src: "node_modules/ol/ol.css",
+                        dest: "vendor_dist/ol",
+                    },
+                    {
+                        src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js","node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
+                        dest: "vendor_dist/ol-layerswitcher/dist",
                     },
                     {
                         src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/*.min.js"],
@@ -448,6 +527,10 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/plotly.js/dist",
                     },
                     {
+                        src: "node_modules/reveal.js/dist/*",
+                        dest: "vendor_dist/reveal.js/dist"
+                    },
+                    {
                         src: "node_modules/select2/dist/js/select2.min.js",
                         dest: "vendor_dist/select2/dist",
                     },
@@ -457,7 +540,15 @@ export default defineConfig(({ command, mode }) => {
                     },
                     {
                         src: "node_modules/select2-bootstrap-5-theme/dist/*.min.css",
-                        dest: "vendor_dist/select2-bootstrap-theme/dist",
+                        dest: "vendor_dist/select2-bootstrap-5-theme/dist",
+                    },
+                    {
+                        src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
+                        dest: "vendor_dist/signature_pad/dist",
+                    },
+                    {
+                        src: "node_modules/smartmenus/dist/*",
+                        dest: "vendor_dist/smartmenus/dist",
                     },
                     {
                         src: "node_modules/sortablejs/modular/*",
@@ -472,56 +563,47 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/svg-pan-zoom/dist",
                     },
                     {
-                        src: "node_modules/vue/dist/vue.esm-browser.prod.js",
+                        src: ["node_modules/swagger-ui-dist/swagger-ui-bundle.js","node_modules/swagger-ui-dist/swagger-ui.css","node_modules/swagger-ui-dist/favicon-16x16.png","node_modules/swagger-ui-dist/favicon-32x32.png"],
+                        dest: "vendor_dist/swagger-ui-dist",
+                    },
+                    {
+                        src: "node_modules/tablesorter/dist/js/jquery.tablesorter.combined.js",
+                        dest: "vendor_dist/tablesorter/dist/js",
+                    },
+                    {
+                        src: "node_modules/tablesorter/dist/js/parsers/parser-input-select.min.js",
+                        dest: "vendor_dist/tablesorter/dist/js/parsers",
+                    },
+                    {
+                        src: ["node_modules/tablesorter/dist/js/widgets/widget-columnSelector.min.js", "node_modules/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js", "node_modules/tablesorter/dist/js/widgets/widget-grouping.min.js", "node_modules/tablesorter/dist/js/widgets/widget-math.min.js", "node_modules/tablesorter/dist/js/widgets/widget-pager.min.js", "node_modules/tablesorter/dist/js/widgets/widget-output.min.js", "node_modules/tablesorter/dist/js/widgets/widget-sort2Hash.min.js"],
+                        dest: "vendor_dist/tablesorter/dist/js/widgets",
+                    },
+                    {
+                        src: "node_modules/vue/dist/vue.esm-browser.js",
                         dest: "vendor_dist/vue/dist",
                     },
-                ],
-            }),
-            copy({
-                targets: [
                     {
-                        //Theme assets
-                        src: "_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}",
-                        dest: "public/generated/_custom",
-                        flatten: false,
-                        verbose: true,
+                        src: [
+                            "node_modules/summernote/dist/summernote-bs5.min.js",
+                            "node_modules/summernote/dist/summernote-bs5.min.css"
+                        ],
+                        dest: "vendor_dist/summernote/dist",
                     },
-                    //lang/ and js/ javascripts
                     {
-                        src: "_custom/**/{lang,js}/**/*.{js,mjs}",
-                        dest: "public/generated/_custom",
-                        flatten: false,
-                        verbose: true,
+                        src: "node_modules/summernote/dist/font/*",
+                        dest: "vendor_dist/summernote/dist/font",
                     },
+                    {
+                        src: "node_modules/summernote/dist/lang/*.min.js",
+                        dest: "vendor_dist/summernote/dist/lang",
+                    }
                 ],
-                //baseDir: "../../",
-                silent: false,
-                onWatch: true,
             }),
             AutoImport({
-                // We don't use https://github.com/unplugin/unplugin-vue-components/resolvers because of https://github.com/vitest-dev/vitest/issues/1402 raised during the execution of the tests
-                resolvers: [
-                    (componentName) => {
-                        if (componentName.startsWith("El")) {
-                            return {
-                                name: componentName,
-                                from: `element-plus/dist/index.full.js`,
-                            };
-                        }
-                    },
-                ],
+                resolvers: [ElementPlusResolver()],
             }),
             Components({
-                resolvers: [
-                    (componentName) => {
-                        if (componentName.startsWith("El")) {
-                            return {
-                                name: componentName,
-                                from: `element-plus/dist/index.full.mjs`,
-                            };
-                        }
-                    },
-                ],
+                resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */
             //visualizer({ filename: "temp/dev/stats.html", open: true, gzipSize: false }),
@@ -533,12 +615,18 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         test: {
-            include: ["src/js/vue-widgets/**/tests/**/*.test.js"],
+            include: ["src/js/**/tests/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
             coverage: {
-                include: ["src/js/{vue-widgets,vue-mf}/**/*.{vue,js}"],
-                exclude: ["**/*.ce.js"],
+                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/jquery-tiki/wysiwyg/**/*.js", "src/js/jquery-tiki/ui-utils/handleDatePicker.js", "src/js/jquery-tiki/ui-utils/handleTransferList.js"],
+                exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
+                provider: 'istanbul'
+            },
+            server: {
+                deps: {
+                    inline: [/element-plus/],
+                }
             },
         },
     };

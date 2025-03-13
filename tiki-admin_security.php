@@ -115,6 +115,13 @@ if ($prefs['https_login'] != 'required') {
         'message' => tra('To the extent secure logins are not required, data transmitted between the browser and server is not private.')
     ];
 }
+if ($prefs['scheduler_shell_command'] == 'y') {
+    $tikisettings['scheduler_shell_command'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => tra('The "Scheduler shell command" is activated. It can be used by Tiki administrators to execute shell commands which can lead to security risks.')
+    ];
+}
 
 // Check if any of the mail-in accounts uses "Allow anonymous access"
 if ($prefs['feature_mailin'] == 'y') {

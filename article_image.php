@@ -20,6 +20,7 @@
 // If image_type has no value, we default to "article" to preserve previous behaviour
 
 require_once('tiki-setup.php');
+TikiLib::lib('header')->setXRobotsTag($robots);
 use Tiki\Lib\Image\Image;
 
 $artlib = TikiLib::lib('art');

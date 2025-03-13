@@ -45,24 +45,20 @@ if ($_REQUEST["parentId"]) {
 $smarty->assign('parentId', $_REQUEST["parentId"]);
 $smarty->assign('path', $path);
 //chekck for edit folder
-if (isset($_REQUEST["editfolder"])) {
+$folder_info["name"] = '';
+if (! empty($_REQUEST["editfolder"])) {
     $folder_info = $bookmarklib->get_folder($_REQUEST["editfolder"], $user);
-} else {
-    $folder_info["name"] = '';
-    $_REQUEST["editfolder"] = 0;
 }
 $smarty->assign('foldername', $folder_info["name"]);
-$smarty->assign('editfolder', $_REQUEST["editfolder"]);
-if (isset($_REQUEST["editurl"])) {
+$smarty->assign('editfolder', $_REQUEST["editfolder"] ?? null);
+// Check for edit URL
+$url_info = ["name" => '', "url" => ''];
+if (! empty($_REQUEST["editurl"])) {
     $url_info = $bookmarklib->get_url($_REQUEST["editurl"]);
-} else {
-    $url_info["name"] = '';
-    $url_info["url"] = '';
-    $_REQUEST["editurl"] = 0;
 }
 $smarty->assign('urlname', $url_info["name"]);
 $smarty->assign('urlurl', $url_info["url"]);
-$smarty->assign('editurl', $_REQUEST["editurl"]);
+$smarty->assign('editurl', $_REQUEST["editurl"] ?? null);
 // Create a folder inside the parentFolder here
 if (isset($_REQUEST["addfolder"])) {
     $access->checkCsrf();

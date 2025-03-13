@@ -81,7 +81,7 @@
         <label class="col-sm-3 col-form-label">{tr}Upload file{/tr}</label>
         <div class="col-sm-7">
             <input type="hidden" name="MAX_FILE_SIZE" value="10000000000000">
-            <input size="16" name="userfile1" type="file">
+            <input size="16" name="userfile1" type="file" accept=".csv">
         </div>
     </div>
     <div class="mb-3 row">

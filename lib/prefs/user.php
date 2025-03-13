@@ -217,7 +217,7 @@ function prefs_user_list($partial = false)
         ],
         'user_register_prettytracker_outputtowiki' => [
             'name' => tra('Page name field ID'),
-            'description' => tra("User the tracker's field ID whose value is used as the output page name."),
+            'description' => tra("Use the tracker's field ID whose value is used as the output page name."),
             'type' => 'text',
             'size' => '20',
             'default' => '',

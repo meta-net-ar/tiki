@@ -7,25 +7,32 @@
 
 use Search\Formatter\Sublist\Record as Sublist;
 
-/** This it to format a list of search results.  It moslty handles all the FORMAT blocks of pluginlist (in ValueFormatter) as opposed to class Search_Formatter which mostly deals with the OUTPUT block.  */
+/** This it to format a list of search results.  It mostly handles all the FORMAT blocks of pluginlist (in ValueFormatter) as opposed to class Search_Formatter_Builder which mostly deals with the OUTPUT block.  */
 class Search_Formatter
 {
     public $plugin;
-    private $counter;
+    private int $counter;
     private $subFormatters = [];
     private $customFilters = [];
     private $subLists = [];
     private $alternateOutput;
+    private ?string $context;
 
-    public function __construct(Search_Formatter_Plugin_Interface $plugin, $counter = 0)
+    public function __construct(Search_Formatter_Plugin_Interface $plugin, int $counter = 0)
     {
         $this->plugin = $plugin;
         $this->counter = $counter;
+        $this->context = null;
     }
 
     public function setAlternateOutput($output)
     {
         $this->alternateOutput = $output;
+    }
+
+    public function setContext(?string $context)
+    {
+        $this->context = $context;
     }
 
     public function addSubFormatter($name, $formatter)
@@ -45,7 +52,7 @@ class Search_Formatter
 
     public function format($list)
     {
-        if (0 == count($list) && $this->alternateOutput) {
+        if (0 == count($list) && (isset($this->alternateOutput))) {
             return $this->renderFilters() . $this->alternateOutput;
         }
 
@@ -94,6 +101,14 @@ class Search_Formatter
                     }
                 }
             }
+            // preload target fields that sublists will search for - this is necessary for multivalue fields that need dereferencing to actual values
+            foreach ($this->subLists as $sublist) {
+                foreach ($sublist->getParentFields() as $f) {
+                    if (isset($pre[$f])) {
+                        $pre[$f];
+                    }
+                }
+            }
 
             $row = array_filter($defaultValues, function ($v) {
                 return ($v !== null);   // allow empty default values like "" or 0 (or even false) but not null
@@ -118,8 +133,8 @@ class Search_Formatter
                 if (! $finalValue && $rawValue) {
                     $finalValue = $rawValue;
                 }
-                if ($finalValue) {
-                    // Only set if not a blank value so the defaults prevail
+                if ($finalValue || ! isset($row[$k])) {
+                    // Only set if not a blank value so the defaults prevail but make sure to set it if default is not specified
                     $row[$k] = $finalValue;
                 }
             }
@@ -131,13 +146,21 @@ class Search_Formatter
         }
 
         foreach ($this->subLists as $sublist) {
+            //The root data is the same as data, since we are in the root list
             $sublist->executeOverDataset($data, $data, $this);
         }
 
         foreach ($data as $i => $row) {
             $subEntries = [];
             foreach ($this->subFormatters as $key => $plugin) {
-                $subInput = new Search_Formatter_ValueFormatter(array_merge($subDefault[$key], $row));
+                // use more intelligent merge - prefer non-null default values if target row key is null, so defaults prevail
+                $subRow = $subDefault[$key];
+                foreach ($row as $col => $val) {
+                    if (! isset($subRow[$col]) || ! is_null($val)) {
+                        $subRow[$col] = $val;
+                    }
+                }
+                $subInput = new Search_Formatter_ValueFormatter($subRow);
                 $subEntries[$key] = $this->render($plugin, Search_ResultSet::create([$plugin->prepareEntry($subInput)]), $this->plugin->getFormat());
             }
 
@@ -164,9 +187,6 @@ class Search_Formatter
             foreach ($fields as $key => $field) {
                 $fieldName = str_replace('tracker_field_', '', trim($field));
                 $mode = $custom_filter['mode'];
-                if ($custom_filter['mode'] == 'multiple') {
-                    $mode = 'multiselect';
-                }
                 $filter = Tracker\Filter\Collection::getFilter($fieldName, $mode, strstr($field, 'tracker_field_'));
                 if ($key == 0) {
                     $filters[] = $filter;
@@ -228,6 +248,9 @@ class Search_Formatter
     public function render($plugin, $resultSet, $target)
     {
         $pluginFormat = $plugin->getFormat();
+        if (method_exists($plugin, 'setContext')) {
+            $plugin->setContext($this->context);
+        }
         $out = $plugin->renderEntries($resultSet);
 
         if ($target == $pluginFormat || $pluginFormat == Search_Formatter_Plugin_Interface::FORMAT_CSV) {

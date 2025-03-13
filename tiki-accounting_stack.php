@@ -41,26 +41,21 @@ require_once('tiki-setup.php');
 
 // Feature available?
 if ($prefs['feature_accounting'] != 'y') {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_accounting');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_accounting', \Laminas\Http\Response::STATUS_CODE_403);
 }
+
+if (! isset($_REQUEST['bookId'])) {
+    Feedback::errorAndDie(tra('Missing book id'), \Laminas\Http\Response::STATUS_CODE_400);
+}
+$bookId = $_REQUEST['bookId'];
 
 $globalperms = Perms::get();
 $objectperms = Perms::get([ 'type' => 'accounting book', 'object' => $bookId ]);
 
 if (! ($globalperms->acct_book or $objectperms->acct_book_stack)) {
-    $smarty->assign('msg', tra('You do not have the right to book into the stack'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra("You do not have the right to book into the stack"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
-if (! isset($_REQUEST['bookId'])) {
-    $smarty->assign('msg', tra('Missing book id'));
-    $smarty->display('error.tpl');
-    die;
-}
-$bookId = $_REQUEST['bookId'];
 $smarty->assign('bookId', $bookId);
 
 if (! isset($_REQUEST['stackId'])) {
@@ -76,13 +71,17 @@ if (isset($_REQUEST['hideform'])) {
 }
 
 $accountinglib = TikiLib::lib('accounting');
-$book = $accountinglib->getBook($bookId);
+try {
+    $book = $accountinglib->getBook($bookId);
+} catch (Exception $e) {
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
+}
 $smarty->assign('book', $book);
 
 $accounts = $accountinglib->getAccounts($bookId, $all = true);
 $smarty->assign('accounts', $accounts);
 
-if ($_POST['stack_Year']) {
+if (! empty($_POST['stack_Year'])) {
     $stackDate = new DateTime();
     $stackDate->setDate(
         $_POST['stack_Year'],
@@ -164,7 +163,7 @@ if (is_array($result)) {
     }
 } else {
     if ($stackId != 0) {
-        $stackEntry = $accountinglib->getStackTransaction($bookId, $_POST['stackId']);
+        $stackEntry = $accountinglib->getStackTransaction($bookId, $_REQUEST['stackId']);
         $smarty->assign('stackId', $stackId);
         $smarty->assign('stackDate', $stackEntry['stackDate']);
         $smarty->assign('stackDescription', $stackEntry['stackDescription']);

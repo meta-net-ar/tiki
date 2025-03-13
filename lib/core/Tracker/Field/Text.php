@@ -138,7 +138,11 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
             $value = smarty_modifier_escape($value);
         }
-        if ($this->getConfiguration('isMultilingual') == 'y' && $context['list_mode'] === 'csv') {
+        if (
+            $this->getConfiguration('isMultilingual') == 'y' &&
+            $context['list_mode'] === 'csv' &&
+            ($context['multiLanguageAsJson'] ?? false) === true
+        ) {
             $value = str_replace('"', '\"', json_encode($value, JSON_UNESCAPED_UNICODE));
         }
 

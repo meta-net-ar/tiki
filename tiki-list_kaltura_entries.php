@@ -93,9 +93,7 @@ try {
                 break;
 
             case 'default':
-                $smarty->assign('msg', tra('Invalid action'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('Invalid action'), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 

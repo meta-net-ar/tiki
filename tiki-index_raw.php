@@ -15,10 +15,7 @@ $structlib = TikiLib::lib('struct');
 $wikilib = TikiLib::lib('wiki');
 
 if ($prefs['feature_wiki'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_wiki");
-
-    $smarty->display("error_raw.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_wiki", \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 // Create the HomePage if it doesn't exist
@@ -45,9 +42,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra("Page cannot be found"));
-    $smarty->display("error_raw.tpl");
-    die;
+    Feedback::errorAndDie(tra("Page cannot be found"), \Laminas\Http\Response::STATUS_CODE_404, "error_raw.tpl");
 }
 
 require_once 'lib/wiki/renderlib.php';

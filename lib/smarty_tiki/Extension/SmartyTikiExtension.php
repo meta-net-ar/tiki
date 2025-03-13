@@ -78,6 +78,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\Div(), 'handle'];
             case 'duration_short':
                 return [new \SmartyTiki\Modifier\DurationShort(), 'handle'];
+            case 'debug_print_tree':
+                return [new \SmartyTiki\Modifier\DebugPrintTree(), 'handle'];
             case 'duration':
                 return [new \SmartyTiki\Modifier\Duration(), 'handle'];
             case 'escape':
@@ -180,6 +182,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\Ternary(), 'handle'];
             case 'tiki_date_format':
                 return [new \SmartyTiki\Modifier\TikiDateFormat(), 'handle'];
+            case 'tiki_date_timezone_from_unix':
+                return [new \SmartyTiki\Modifier\TikiDateTimezoneFromUnix(), 'handle'];
+            case 'strtotime':
+                return [$this, 'smartyModifierStrtotime'];
             case 'tiki_long_date':
                 return [new \SmartyTiki\Modifier\TikiLongDate(), 'handle'];
             case 'tiki_long_datetime':
@@ -422,9 +428,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'filegal_manager_url':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalManagerUrl();
                 break;
-            case 'filegal_uploader':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileGalUploader();
-                break;
             case 'fileinfo':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FileInfo();
                 break;
@@ -662,8 +665,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'var_dump':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VarDump();
                 break;
-            case 'vimeo_uploader':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VimeoUploader();
                 break;
             case 'wiki_diff':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\WikiDiff();
@@ -1055,5 +1056,19 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smartyModifierZoneIsEmpty($zoneName)
     {
         return zone_is_empty($zoneName);
+    }
+
+    /**
+     * Smarty modifier strtotime
+     * -------------------------
+     * Purpose: Parse about any English textual datetime description into a Unix timestamp.
+     *
+     * @param string $datetime The date/time string to convert.
+     * @param int|null $baseTimestamp The base timestamp to use for relative calculations.
+     * @return int|false The Unix timestamp representing the given date/time string, or false on failure.
+     */
+    public function smartyModifierStrtotime($datetime, $baseTimestamp = null)
+    {
+        return strtotime($datetime, $baseTimestamp);
     }
 }

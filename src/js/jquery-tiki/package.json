@@ -24,6 +24,8 @@
     "@fullcalendar/resource-timegrid": "^6.1.11",
     "@fullcalendar/resource-timeline": "^6.1.11",
     "@fullcalendar/timegrid": "^6.1.11",
-    "@svgedit/svgcanvas": "^7.2.1"
+    "@svgedit/svgcanvas": "^7.2.1",
+    "jspdf" : "^2.5.2",
+    "summernote": "^0.9.1"
   }
 }

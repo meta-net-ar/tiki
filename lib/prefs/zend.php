@@ -227,6 +227,7 @@ function prefs_zend_list()
             'size' => '20',
             'perspective' => false,
             'default' => '',
+            'keywords' => 'catchall',
         ],
     ];
 }

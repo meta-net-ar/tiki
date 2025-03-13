@@ -182,6 +182,16 @@ class ObjectLib extends TikiLib
                         $href = "tiki-admin_content_templates.php?templateId=$itemId";
                         break;
 
+                    case 'surveys':
+                    case 'survey':
+                        $surveylib = TikiLib::lib('survey');
+                        $info = $surveylib->get_survey($itemId);
+
+                        $description = $info['description'];
+                        $name = $info['name'];
+                        $href = 'tiki-take_survey.php?surveyId=' . $itemId;
+                        break;
+
                     default:
                         if ($checkHandled) {
                             return false;
@@ -219,7 +229,9 @@ class ObjectLib extends TikiLib
             'poll',
             'quiz',
             'tracker',
+            'survey',
             'trackeritem',
+            'user',
             'wiki page',
             'template',
         ];
@@ -228,14 +240,19 @@ class ObjectLib extends TikiLib
     public function getSelectorType($type)
     {
         $supported = [
+            'blog' => 'blog',
             'calendar' => 'calendar',
             'category' => 'category',
+            'file' => 'file',
             'file_gallery' => 'file gallery',
             'forum' => 'forum',
             'group' => 'group',
+            'poll' => 'poll',
             'tracker' => 'tracker',
             'tracker_field' => 'trackerfield',
+            'survey' => 'survey',
             'trackerfield' => 'trackerfield',
+            'user' => 'user',
             'wiki_page' => 'wiki page',
             'wiki page' => 'wiki page',
             'template' => 'template',
@@ -446,6 +463,7 @@ class ObjectLib extends TikiLib
                 }
                 // no return
             case 'surveys':
+            case 'survey':
                 switch ($action) {
                     case 'view':
                     case 'read':
@@ -670,7 +688,6 @@ class ObjectLib extends TikiLib
                     $info['heading'],
                     $info['body'],
                     $info['publishDate'],
-                    $info['expireDate'],
                     $info['author'],
                     $info['articleId'],
                     $info['image_x'],
@@ -681,6 +698,7 @@ class ObjectLib extends TikiLib
                     $info['subtitle'],
                     $info['linkto'],
                     $info['image_caption'],
+                    $info['image_alt'],
                     $info['lang'],
                     $info['ispublished']
                 );
@@ -703,10 +721,12 @@ class ObjectLib extends TikiLib
                 );
                 break;
             case 'surveys':
+            case 'survey':
                 include_once('lib/surveys/surveylib.php');
-                $info = $srvlib->get_survey($object);
+                $surveylib = TikiLib::lib('survey');
+                $info = $surveylib->get_survey($object);
                 $info = array_merge($info, $data);
-                $srvlib->replace_survey(
+                $surveylib->replace_survey(
                     $info['surveyId'],
                     $info['name'],
                     $info['description'],
@@ -879,6 +899,9 @@ class ObjectLib extends TikiLib
      */
     public function getFormattedValues(array $objects, string $format)
     {
+        if (empty($objects)) {
+            return [];
+        }
         $lib = TikiLib::lib('unifiedsearch');
         $metaItemIds = [];
         $query = $lib->buildQuery([]);
@@ -1125,6 +1148,7 @@ class ObjectLib extends TikiLib
             // can't have individual permissions, although they can be categorized.
             // should they have permissions too?
             'poll' => 'tiki_p_vote_poll',
+            'surveys' => 'tiki_p_take_survey',
             'survey' => 'tiki_p_take_survey',
             'directory' => 'tiki_p_view_directory',
             'faq' => 'tiki_p_view_faqs',
@@ -1226,6 +1250,7 @@ class ObjectLib extends TikiLib
             case 'trackeritemattachments':
                 return ['tiki_tracker_item_attachments', 'attId'];
             case 'surveys':
+            case 'survey':
                 return ['tiki_surveys', 'surveyId'];
             case 'calendar event':
                 return ['tiki_calendar_items', 'calitemId'];

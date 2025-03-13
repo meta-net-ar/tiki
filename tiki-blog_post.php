@@ -34,7 +34,7 @@ $inputConfiguration = [
         'freetag_string'           => 'text',              //post
         'save'                     => 'bool',              //post
         'contributions'            => 'text',              //post
-        'title'                    => 'word',              //post
+        'title'                    => 'string',            //post
         'geolocation'              => 'word',              //post
         ],
     ],
@@ -61,9 +61,7 @@ $smarty->assign_by_ref('blogs', $blogs);
 
 // If user doesn't have permission to post in any blog display error message
 if (count($blogs) == 0) {
-    $smarty->assign('msg', tra("It isn't possible to post in any blog.") . ' <a href="tiki-edit_blog.php" >' . tra("You may need to create a blog first.") . '</a>');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("It isn't possible to post in any blog.") . ' <a href="tiki-edit_blog.php" >' . tra("You may need to create a blog first.") . '</a>', \Laminas\Http\Response::STATUS_CODE_401);
 } elseif ($blogId == 0 && count($blogs) == 1) {
     $blogId = $blogs[0]['blogId'];
 }
@@ -82,10 +80,7 @@ if ($postId > 0) {
     // If the user owns the weblog then he can edit
     if (! $user || ($data["user"] != $user && $user != $blog_data["user"] && ! ($blog_data['public'] == 'y' && $tikilib->user_has_perm_on_object($user, $_REQUEST['blogId'], 'blog', 'tiki_p_blog_post')))) {
         if ($tiki_p_blog_admin != 'y' && ! $tikilib->user_has_perm_on_object($user, $_REQUEST['blogId'], 'blog', 'tiki_p_blog_admin')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this post"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this post"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
     if (isset($data['wysiwyg']) && ! isset($_POST['wysiwyg'])) {

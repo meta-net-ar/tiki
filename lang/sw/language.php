@@ -12845,7 +12845,7 @@ $lang_current = array(
 // "Simple search controls for the map" => "Simple search controls for the map",
 "Menu" => "Orodha",
 "Displays a menu or a structure as a menu" => "Inaonyesha orodha au muundo kama orodha",
-"Identifier of the menu (from tiki-admin_menus.php) " => "Kitambulisho cha menyu(kutoka tiki-admin_menus.php)",
+"Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1) " => "Inatumia ID ya menyu (kuhariri/kuongeza menyu mpya nenda kwa %0Menyu za Msimamizi%1)",
 "Structure" => "Muundo",
 // "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)" => "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)",
 "Orientation of menu: horiz or vert (default vert) " => "Mwelekeo wa menyu: hori au kijani (vert default)",
@@ -15398,7 +15398,7 @@ $lang_current = array(
 "Email:" => " Anwani ya barua pepe:",
 // "Email address or " => "Email address or ",
 // "User account ID" => "User account ID",
-// "Enter a username and click 'Switch'.<br>Useful for testing permissions" => "Enter a username and click 'Switch'.<br>Useful for testing permissions",
+// "Select a username and click 'Switch'.<br>Useful for testing permissions" => "Select a username and click 'Switch'.<br>Useful for testing permissions",
 // "Toggle Dropdown" => "Toggle Dropdown",
 "My Account" => "Akaunti yangu",
 // "{\$user|username|escape|replace:'&amp;':'&'}" => "{\$user|username|escape|replace:'&amp;':'&'}",
@@ -17521,7 +17521,7 @@ $lang_current = array(
 "~tc~ Tiki Comment ~/tc~ makes a Tiki comment. It will be completely removed from the display, but saved in the file for future reference. ~hc~ HTML Comment ~/hc~ makes an HTML comment. It will be inserted as a comment in the output HTML; these are not normally displayed in browsers, but can be seen using \"View Source\" or similar" => "~ tc ~ Maoni Tiki ~ / tc ~ tengeneze maoni ya Tiki. Itaondolewa kabisa kutoka kwenye maonyesho, lakini imehifadhiwa kwenye faili kwa kutaja baadaye. ~ hc ~ Maoni HTML ~ / hc ~ kuunda maoni ya HTML. Itaingizwa kama maoni katika pato la HTML; hizi si kawaida zinaonyeshwa na vivinjari, lakini zinaweza kuonekana kwa kutumia 'Tazama Chanzo Kanuni' au sawa",
 "Block Preformatting" => "Zuia Uumbizaji Awali",
 "Indent text with any number of spaces to change it to a monospaced block that still follows other Wiki formatting instructions. It will be indented with the same number of spaces that are used. Note that this mode does not preserve exact spacing and line breaks; use ~pp~...~/pp~ for that." => "Inatoa maandiko kwa wahusika wengi kama inahitajika kufuata maelekezo mengine ya Wiki. Indentation itakuwa sawa na ile unayoyotumia. Kumbuka kuwa hali hii haifai idadi sawa ya nafasi na mapumziko ya mstari; tumia ~ pp ~ ... ~ / pp ~ kwa hiyo.",
-"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for langages as Arabic and Hebrew." => "Kuingizwa kwa, kwa mtiririko huo, kipande cha maandishi yaliyoelekezwa kutoka kulia kwenda kushoto au kutoka kushoto kwenda kulia (hadi mwisho wa maandishi) na alama kwa lugha za Kiarabu au Kiebrania.",
+"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for languages as Arabic and Hebrew." => "Kuingizwa kwa, kwa mtiririko huo, kipande cha maandishi yaliyoelekezwa kutoka kulia kwenda kushoto au kutoka kushoto kwenda kulia (hadi mwisho wa maandishi) na alama kwa lugha za Kiarabu au Kiebrania.",
 "Special characters" => "Wahusika maalum",
 "hard space" => "Eneo lisilovunja",
 "numeric between ~ for HTML numeric characters entity" => "kati ya ~ kwa HTML ya kiungo cha tabia ya tabia",
@@ -19118,8 +19118,8 @@ $lang_current = array(
 "Leave \"New password\" and \"Confirm new password\" fields blank to keep current password" => "Acha mashamba \"Neno la siri \" na \"Hakikisha nenosiri mpya \" tupu ili kuweka nenosiri la sasa",
 "Current password (required)" => "Neno la sasa (inahitajika)",
 // "Two-Factor Authentication" => "Two-Factor Authentication",
-// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®",
-// "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation" => "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation",
+// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app",
+// "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation" => "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation",
 // "Enable Two-Factor Auth" => "Enable Two-Factor Auth",
 // "Disable Two-Factor Auth" => "Disable Two-Factor Auth",
 // "Regenerate Two-Factor Auth" => "Regenerate Two-Factor Auth",
@@ -19993,10 +19993,10 @@ $lang_current = array(
 "Subscription confirmed!" => "Usajili umehakikishiwa!",
 // "Subscribe to the newsletter" => "Subscribe to the newsletter",
 // "Show QRCode" => "Show QRCode",
-// "Install Google Authenticator® app on your device and open it" => "Install Google Authenticator® app on your device and open it",
+// "Install an authenticator app on your device and open it" => "Install an authenticator app on your device and open it",
 // "Tap “Scan a barcode”" => "Tap “Scan a barcode”",
 // "Scan the QR code that is open in your browser" => "Scan the QR code that is open in your browser",
-// "Done, Google Authenticator® is now generating codes" => "Done, Google Authenticator® is now generating codes",
+// "Done, the authenticator app is now generating codes" => "Done, the authenticator app is now generating codes",
 // "Add new application" => "Add new application",
 // "End tour" => "End tour",
 // "-- Choose an option --" => "-- Choose an option --",
@@ -21961,3 +21961,8 @@ $lang_current = array(
 "System Menu" => "Menyu ya Mfumo",
 );
 $lang = array_replace($lang, $lang_current);
+
+
+
+
+

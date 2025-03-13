@@ -18,7 +18,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'center':
                 $label = tra('Align Center');
                 $iconname = 'align-center';
-                $wysiwyg = 'JustifyCenter';
+                $wysiwyg = 'paragraph';
                 if ($prefs['feature_use_three_colon_centertag'] == 'y') {
                     $syntax = ":::text:::";
                 } else {
@@ -28,7 +28,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'rule':
                 $label = tra('Horizontal Bar');
                 $iconname = 'horizontal-rule';
-                $wysiwyg = 'HorizontalRule';
+                $wysiwyg = 'hr';
                 $syntax = '---';
                 $markdown = '***';
                 $markdown_wysiwyg = 'hr';
@@ -54,6 +54,7 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
                 $label = tra('Block quote');
                 $iconname = 'quote-left';
                 $markdown_wysiwyg = 'quote';
+                $wysiwyg = 'style';
                 break;
             case 'h1':
             case 'h2':

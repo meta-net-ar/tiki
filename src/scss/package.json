@@ -1,5 +1,5 @@
 {
-  "name": "scss-tiki",
+  "name": "scss",
   "version": "1.0.0",
   "description": "Sass (scss) build system for themes.  Note that for themes in _custom to actually work, you also need the main vite js build to run to copy the assets (images, fonts, etc.)",
   "type": "module",

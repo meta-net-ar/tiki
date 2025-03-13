@@ -28,14 +28,43 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
             get_calendar_part_imap($this->get('msg_struct'), $this);
         }
         if ($this->get('calendar_event_raw')) {
-            $data = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
-            $this->out('calendar_event', $data);
+            $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
+            $this->out('calendar_event', $event);
+        } else {
+            $event = null;
         }
+        // get recipient from TO header
         $recipient = null;
         $headers = $this->get('msg_headers', []);
         foreach ($headers as $name => $value) {
             if (strtolower($name) == 'to') {
                 $recipient = (string)$value;
+            }
+        }
+        if (! empty($event['participants'])) {
+            // try to find the recipient in the participants' list
+            $found = false;
+            foreach ($event['participants'] as $participant) {
+                if ($participant['email'] == $recipient) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (! $found) {
+                // might be an email sent to multiple people, try to match by imap mailbox email
+                list($success, $form) = $this->process_form(['imap_server_id']);
+                if ($success) {
+                    $imap_details = Hm_IMAP_List::dump($form['imap_server_id']);
+                    if (! empty($imap_details['user'])) {
+                        foreach ($event['participants'] as $participant) {
+                            if ($participant['email'] == $imap_details['user']) {
+                                $found = true;
+                                $recipient = $imap_details['user'];
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
         $this->out('recipient', $recipient);
@@ -93,9 +122,14 @@ class Hm_Handler_event_rsvp_action extends Hm_Handler_Module
             if (isset($component->ATTENDEE)) {
                 foreach ($component->ATTENDEE as $attendee) {
                     $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                    if ($email === $recipient && $partstat) {
-                        $attendee['PARTSTAT'] = $partstat;
-                        unset($attendee['RSVP']);
+                    if ($email === $recipient) {
+                        if ($partstat) {
+                            $attendee['PARTSTAT'] = $partstat;
+                            unset($attendee['RSVP']);
+                        }
+                        if (isset($this->request->post['rsvp_comment'])) {
+                            $attendee['X-COMMENT'] = $this->request->post['rsvp_comment'];
+                        }
                         $component->ATTENDEE = $attendee;
                     }
                 }
@@ -117,13 +151,13 @@ class Hm_Handler_event_rsvp_action extends Hm_Handler_Module
 
         // use specific text body for the reply
         $event = $this->get('calendar_event');
-        $body = "$from_name has $action the invitation to the following event:
-
-*{$event['name']}*
-
-When: " . TikiLib::lib('tiki')->get_long_datetime($event['start']) . " - " . TikiLib::lib('tiki')->get_long_datetime($event['end']) . "
-
-Invitees: " . implode(",\n", $event['attendees']);
+        $comment = $this->request->post['rsvp_comment'] ?? '';
+        $body = "$from_name has $action the invitation to the following event: \n\n*{$event['name']}*";
+        if ($comment) {
+            $body .= "\n\nNote: $comment";
+        }
+        $body .= "\n\nWhen: " . TikiLib::lib('tiki')->get_long_datetime($event['start']) . " - " . TikiLib::lib('tiki')->get_long_datetime($event['end']) . "
+        \n\nInvitees: " . implode(",\n", $event['attendees']);
 
         // add attachments
         $content = Hm_Crypt::ciphertext($event_response, Hm_Request_Key::generate());
@@ -163,8 +197,13 @@ Invitees: " . implode(",\n", $event['attendees']);
                 $event['calitemId'] = $existing['calitemId'];
                 if (! empty($event['participants'])) {
                     foreach ($event['participants'] as &$role) {
-                        if ($role['email'] === $recipient && $partstat) {
-                            $role['partstat'] = $partstat;
+                        if ($role['email'] === $recipient) {
+                            if ($partstat) {
+                                $role['partstat'] = $partstat;
+                            }
+                            if (isset($this->request->post['rsvp_comment'])) {
+                                $role['comment'] = $this->request->post['rsvp_comment'];
+                            }
                         }
                     }
                 }
@@ -243,6 +282,50 @@ class Hm_Handler_add_to_calendar extends Hm_Handler_Module
         }
 
         Hm_Msgs::add("Event created");
+    }
+}
+
+/**
+ * Update an event in Tiki calendar
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_update_in_calendar extends Hm_Handler_Module
+{
+    public function process()
+    {
+        global $prefs, $user;
+
+        if ($prefs['feature_calendar'] !== 'y') {
+            return;
+        }
+
+        $data = $this->get('calendar_event');
+        $existing = TikiLib::lib('calendar')->find_by_uid(null, $data['uid']);
+
+        if (! $existing) {
+            Hm_Msgs::add("ERRExisting event could not be found in your calendar");
+            return;
+        }
+
+        $perms = Perms::get('event', $existing['calitemId']);
+        if (! $perms->change_events) {
+            Hm_Msgs::add("ERRInsufficient permissions to update the event in the calendar");
+            return;
+        }
+
+        $client = new \Tiki\SabreDav\CaldavClient();
+        if ($data['rec']) {
+            $rec = $data['rec'];
+            $rec->setId($existing['recurrenceId']);
+            $rec->setCalendarId($existing['calendarId']);
+            $client->saveRecurringCalendarObject($rec);
+        } else {
+            $data['calitemId'] = $existing['calitemId'];
+            $data['calendarId'] = $existing['calendarId'];
+            $client->saveCalendarObject($data);
+        }
+
+        Hm_Msgs::add("Event updated");
     }
 }
 
@@ -339,10 +422,40 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         tr('Add to calendar'),
                         implode('', $options)
                     );
+                } else {
+                    $existing = TikiLib::lib('calendar')->get_item($existing['calitemId']);
+                    $res .= sprintf(
+                        '<tr><th>%s</th><td class="header_links"><a href="tiki-calendar.php?calitemId=%s" data-external="1">%s</a></td></tr>',
+                        tr('Event'),
+                        $existing['calitemId'],
+                        tr('View event in my calendar')
+                    );
+                    foreach (['start', 'end', 'name', 'description', 'participants'] as $field) {
+                        $val1 = $existing[$field];
+                        $val2 = $event[$field];
+                        if ($field == 'participants') {
+                            $val1 = array_map(function ($p) {
+                                return $p['email'];
+                            }, $val1);
+                            sort($val1);
+                            $val2 = array_map(function ($p) {
+                                return $p['email'];
+                            }, $val2);
+                            sort($val2);
+                        }
+                        if ($val1 != $val2) {
+                            $res .= sprintf(
+                                '<tr class="header_event_addtocal"><th>&nbsp;</th><td class="header_links"><a href="#" class="event_calendar_update">%s</a></td></tr>',
+                                tr('Update in my calendar')
+                            );
+                            break;
+                        }
+                    }
                 }
             }
             if ($method == 'REQUEST') {
                 $partstat = null;
+                $comment = '';
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
                 if ($existing) {
                     $existing = TikiLib::lib('calendar')->get_item($existing['calitemId']);
@@ -351,32 +464,13 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                     foreach ($existing['participants'] as $role) {
                         if ($role['email'] == $this->get('recipient')) {
                             $partstat = $role['partstat'];
+                            $comment = $role['comment'] ?? '';
                         }
                     }
                 }
-                $yes_tag = $maybe_tag = $no_tag = "a";
-                if ($partstat == 'ACCEPTED') {
-                    $yes_tag = "span";
-                }
-                if ($partstat == 'TENTATIVE') {
-                    $maybe_tag = "span";
-                }
-                if ($partstat == 'DECLINED') {
-                    $no_tag = "span";
-                }
-                $res .= sprintf(
-                    '<tr class="header_event_rsvp"><th>%s</th><td class="header_links"><%s class="event_rsvp_link hlink" data-action="accept" href="#">%s</%s> | <%s class="event_rsvp_link hlink" data-action="maybe" href="#">%s</%s> | <%s class="event_rsvp_link hlink" data-action="decline" href="#">%s</%s></td></tr>',
-                    tr('RSVP'),
-                    $yes_tag,
-                    tr('Yes'),
-                    $yes_tag,
-                    $maybe_tag,
-                    tr('Maybe'),
-                    $maybe_tag,
-                    $no_tag,
-                    tr('No'),
-                    $no_tag
-                );
+                $res .= '<tr>
+                    <th><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></th>
+                </tr>';
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'REPLY') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
@@ -467,20 +561,8 @@ if (! hm_exists('get_calendar_part_imap')) {
         if ($success) {
             $cache = Hm_IMAP_List::get_cache($mod->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (imap_authed($imap)) {
-                if ($imap->select_mailbox(hex2bin($form['folder']))) {
-                    $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
-                    if ($part !== false) {
-                        if ($part == 0) {
-                            $max = 500000;
-                        } else {
-                            $max = false;
-                        }
-                        $struct = $imap->search_bodystructure($msg_struct, ['imap_part_number' => $part]);
-                        $msg_struct_current = array_shift($struct);
-                        $event = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
-                    }
-                }
+            if ($imap->authed()) {
+                $event = $imap->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, true)[2];
             }
         }
         $mod->out('calendar_method', $method);

@@ -95,8 +95,8 @@ function diff2($page1, $page2, $type = 'sidediff')
         preg_match_all($search, $page2, $out, PREG_PATTERN_ORDER);
         $page2 = $out[0];
     } else {
-        $page1 = explode("\n", $page1);
-        $page2 = explode("\n", $page2);
+        $page1 = empty($page1) ? [] : explode("\n", $page1);
+        $page2 = empty($page2) ? [] : explode("\n", $page2);
     }
     $z = new Text_Diff($page1, $page2);
     if ($z->isEmpty()) {

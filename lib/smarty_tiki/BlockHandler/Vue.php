@@ -53,22 +53,9 @@ class Vue extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
-        global $prefs;
-        $headerlib = \TikiLib::lib('header');
-
         if ($repeat || empty($content)) {
             return '';
         }
-
-        if ($prefs['vuejs_enable'] === 'n') {
-            \Feedback::error(tr('Vue.js is not enabled.'));
-            return '';
-        }
-
-        //The js loader will deduplicate if necessary
-        $headerlib->add_jsfile_cdn("vendor_bundled/vendor/npm-asset/vue/dist/{$prefs['vuejs_build_mode']}");
-
-        // all ready? then we shall begin
 
         $app = ! (empty($params['app']) || $params['app'] === 'n');
         $name = ! isset($params['name']) ? '' : $params['name'];

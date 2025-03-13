@@ -17,8 +17,10 @@ function wikiplugin_groupstat_info()
             'groups' => [
                 'required' => false,
                 'name' => tra('Groups'),
-                'description' => tra('Groups, separated by ":". If empty, all groups will be listed.'),
+                'description' => tra('Select one or more groups. If none selected, all groups will be listed.'),
                 'since' => '4.0',
+                'separator' => ':',
+                'profile_reference' => 'group',
             ],
             'percent_of' => [
                 'required' => false,
@@ -70,7 +72,7 @@ function wikiplugin_groupstat($data, $params)
     $smarty = TikiLib::lib('smarty');
 
     if (isset($params['groups'])) {
-        $groups = explode(':', $params['groups']);
+        $groups = $params['groups'];
         if (isset($params['percent_of']) && $params['percent_of'] == 'site') {
             $total = $userlib->nb_users_in_group();
         } else {

@@ -14,18 +14,15 @@ $sheetlib = TikiLib::lib("sheet");
 
 $access->check_feature('feature_sheet');
 
-$info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('Incorrect parameter');
-    $smarty->display('error.tpl');
-    die;
+try {
+    $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $objectperms = Perms::get('sheet', $_REQUEST['sheetId']);
 if ($tiki_p_admin != 'y' && ! $objectperms->view_sheet && ! ($user && $info['author'] == $user)) {
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 $smarty->assign('sheetId', $_REQUEST["sheetId"]);
 
@@ -53,24 +50,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $access->checkCsrf()) {
         default: // All file based handlers registered
             $handler_ = new TikiSheet();
             if (! in_array($handler, $handler_->getHandlerList())) {
-                $smarty->assign('msg', "Handler is not allowed.");
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("Handler is not allowed."), \Laminas\Http\Response::STATUS_CODE_401);
             }
 
             if (file_exists($_FILES['file']['tmp_name'])) {
                 $handler = new $handler($_FILES['file']['tmp_name'], $encoding, 'UTF-8');
             } else {
-                $smarty->assign('msg', "File path does not exist");
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("File path does not exist"), \Laminas\Http\Response::STATUS_CODE_500);
             }
     }
 
     if (! $grid->import($handler)) {
-        $smarty->assign('msg', "Impossible to import the file.");
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Impossible to import the file."), \Laminas\Http\Response::STATUS_CODE_500);
     }
 
     $handler = new TikiSheetDatabaseHandler($sheetId);

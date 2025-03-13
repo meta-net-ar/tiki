@@ -246,9 +246,7 @@ if ($_REQUEST["comments_threadId"] > 0) {
     global $prefs;
 
     if ($prefs['feature_forum_allow_flat_forum_quotes'] != 'y' && $comment_info['parentId'] > 0 && $forum_info['is_flat'] == 'y') {
-        $smarty->assign('msg', tra("This forum is flat and doesn't allow replies to other replies"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("This forum is flat and doesn't allow replies to other replies."), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if ($comment_info["data"] != '') {

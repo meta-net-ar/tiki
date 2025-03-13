@@ -30,23 +30,4 @@ class Identifiers
         $uniqueid = hash('crc32b', implode('', $values));
         return $uniqueid;
     }
-
-    /**
-     * Generates a random identifier for a Vue component
-     * @param int $length
-     *
-     * @return string A random identifier for the Vue component (data-v-xxxxxx)
-     */
-    public static function generateRandomVueIdentifier($length = 10)
-    {
-        $characters = '0123456789abcd';
-        $randomString = '';
-        $max = strlen($characters) - 1;
-
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $max)];
-        }
-
-        return 'data-v-' . $randomString;
-    }
 }

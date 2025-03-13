@@ -106,7 +106,8 @@ class Cachelib
         global $tikidomain, $prefs;
         $logslib = TikiLib::lib('logs');
 
-        $inInstaller = defined('TIKI_IN_INSTALLER');
+        $skipLog = defined('TIKI_IN_INSTALLER') // If this is being executed during the installer
+            || (defined('DB_STATUS') && ! DB_STATUS); // or from command line, without a working DB
 
         if (! is_array($dir_names)) {
             $dir_names = [$dir_names];
@@ -126,14 +127,14 @@ class Cachelib
             $this->flush_memcache();
             $this->flush_redis();
             $this->invalidate('global_preferences');
-            if (! $inInstaller) {
+            if (! $skipLog) {
                 $logslib->add_log($log_section, 'erased all cache content');
             }
         }
         if (in_array('templates_c', $dir_names)) {
             $this->erase_dir_content(SMARTY_COMPILED_TEMPLATES_PATH . "/$tikidomain");
             $this->flush_opcode_cache();
-            if (! $inInstaller) {
+            if (! $skipLog) {
                 $logslib->add_log($log_section, 'erased templates_c content');
             }
         }
@@ -144,13 +145,13 @@ class Cachelib
                 $this->erase_dir_content(TEMP_CACHE_PATH . "/$tikidomain/R_*/");
             }
             $this->flush_redis();
-            if (! $inInstaller) {
+            if (! $skipLog) {
                 $logslib->add_log($log_section, 'erased temp/cache content');
             }
         }
         if (in_array('temp_public', $dir_names)) {
             $this->erase_dir_content(TEMP_PUBLIC_PATH . "/$tikidomain");
-            if (! $inInstaller) {
+            if (! $skipLog) {
                 $logslib->add_log($log_section, 'erased ' . TEMP_PUBLIC_PATH . ' content');
             }
         }

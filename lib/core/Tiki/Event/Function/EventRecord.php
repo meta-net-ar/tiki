@@ -16,7 +16,18 @@ class Tiki_Event_Function_EventRecord extends Math_Formula_Function
     public function evaluate($element)
     {
         $event = $this->evaluateChild($element[0]);
-        $arguments = $this->evaluateChild($element[1]);
+
+        if (! is_string($event)) {
+            $this->error(tr('Event name may be empty or invalid.'));
+        }
+
+        if ($element[1]) {
+            $arguments = $this->evaluateChild($element[1]);
+
+            if (! is_array($arguments)) {
+                $this->error(tr('Arguments are expected to be a value map.'));
+            }
+        }
 
         $this->recorder->recordEvent($event, $arguments);
 

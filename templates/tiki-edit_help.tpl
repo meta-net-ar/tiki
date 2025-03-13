@@ -171,7 +171,7 @@
     {/if}
     <tr>
         <td>
-            <strong>{tr}Direction{/tr}</strong> <br/>{literal}{r2l}{/literal}, {literal}{l2r}{/literal}, {literal}{rm}{/literal}, {literal}{lm}{/literal}{tr}Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for langages as Arabic and Hebrew.{/tr}
+            <strong>{tr}Direction{/tr}</strong> <br/>{literal}{r2l}{/literal}, {literal}{l2r}{/literal}, {literal}{rm}{/literal}, {literal}{lm}{/literal}{tr}Controls text direction: creates DIV blocks for right-to-left or left-to-right text, and direction markers useful for languages like Arabic and Hebrew.{/tr}
         </td>
     </tr>
     <tr>

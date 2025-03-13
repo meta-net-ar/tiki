@@ -346,9 +346,7 @@ if (isset($_REQUEST['show_history'])) {
 if (($_REQUEST['taskId']) && ! isset($_REQUEST['preview'])) {
     $info = $tasklib->get_task($user, $_REQUEST['taskId'], $show_history, $task_admin);
     if (! (isset($info['user']))) {
-        $smarty->assign('msg', tra("Sorry, this task does not exist or you don't have permission to view this task"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Sorry, this task does not exist or you don't have permission to view this task"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if ($show_admin) {
         $user_for_group_list = $info['creator'];
@@ -593,9 +591,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $taskId = $tasklib->new_task($_REQUEST['task_user'], $user, $public_for_group, $rights_by_creator, $tikilib->now, $save);
         } else {
             unset($_REQUEST['taskId']);
-            $smarty->assign('msg', tra("Either you don't have permission to send tasks to other users, or the user doesn't have permission to receive tasks!"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Either you don't have permission to send tasks to other users, or the user doesn't have permission to receive tasks!"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
         if ($auto_accepted_status) {
@@ -663,9 +659,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
     }
     if (! isset($info['user'])) {
         unset($_REQUEST['taskId']);
-        $smarty->assign('msg', tra("Sorry, there was an error while trying to write data into the database"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Sorry, there was an error while trying to write data into the database"), \Laminas\Http\Response::STATUS_CODE_500);
     }
     if ($send_message and $userlib->user_has_permission($msg_from, 'tiki_p_messages') and $userlib->user_has_permission($msg_to, 'tiki_p_messages')) {
         $msg_body = "__" . tra('Task') . ":__";

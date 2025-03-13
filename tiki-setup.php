@@ -11,6 +11,8 @@
  */
 
 // die if called directly.
+
+use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
 
@@ -105,6 +107,8 @@ require_once('lib/setup/sections.php');
 /** @var HeaderLib $headerlib */
 $headerlib = TikiLib::lib('header');
 
+$headerlib->add_js('window.tikiroot = "' . $tikiroot . '";');
+
 $domain_map = [];
 if (isset($_SERVER['HTTP_HOST'])) {
     $host = $_SERVER['HTTP_HOST'];
@@ -115,6 +119,23 @@ if (isset($_SERVER['REQUEST_URI'])) {
     $requestUri = $_SERVER['REQUEST_URI'];
 } else {
     $requestUri = "";
+}
+
+//The value returned allows to check if the user has already enabled 2FA
+$twoFactorSecret = $userlib->get_2_factor_secret($user);
+//Check if user is forced to enable 2FA
+$force2FA = $userlib->forceTwoFactorAuth($user);
+//Check if 2FA is required for a user and if it not yet enabled
+if ($prefs['twoFactorAuth'] == 'y' && empty($twoFactorSecret) && $force2FA && ! empty($user)) {
+    $accesslib = TikiLib::lib('access');
+    //URL to send user who has not yet enabled 2FA
+    $accessibleUrl = $base_url . 'tiki-user_preferences.php';
+    $pageUrl = $url_scheme . "://" . $host . $requestUri;
+    //Do not redirect the user if it is a logout action
+    if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
+        header('location: tiki-user_preferences.php');
+        exit();
+    }
 }
 
 if ($prefs['tiki_domain_prefix'] == 'strip' && substr($host, 0, 4) == 'www.') {
@@ -192,13 +213,6 @@ if ($color_mode_table_exists) {
 
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
-}
-
-// load svgedit CSS file before themes to prevent svgedit CSS from breaking themes CSS
-if ($prefs['feature_draw'] == 'y') {
-    //This should really not be here.  It's gigantic (3MB of javascript, which will be included in every request if the feature is enabled)  Unfortunately, until we have a headerlib.js to generically add javascript to the original page from ajax code, this can't be solved cleanly.  - benoitg - 2024-05-07
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-svgedit_draw";');
-    $headerlib->add_cssfile("themes/base_files/feature_css/svg-edit-draw.css");
 }
 
 require_once('lib/setup/theme.php');
@@ -450,8 +464,16 @@ $smarty->assign('tiki_version', $TWV->version);
 $smarty->assign('tiki_branch', $TWV->branch);
 $smarty->assign('tiki_star', $TWV->getStar());
 $smarty->assign('tiki_uses_svn', $TWV->svn);
-
 $smarty->assign('symbols', TikiLib::symbols());
+
+$maintenance = new Maintenance();
+if ($maintenance->isTime()) {
+    TikiLib::lib('access')->showSiteClosed('maintenance', $maintenance->getMessage());
+} elseif ($maintenance->isPreMaintenanceTime()) {
+    $smarty->assign('maintenanceNotification', $maintenance->getPreMaintenanceMessage());
+} elseif ($maintenance->isIndexing()) {
+    $smarty->assign('maintenanceNotification', $maintenance->getIndexingMessage());
+}
 
 // Used by TikiAccessLib::redirect()
 if (isset($_GET['msg'])) {
@@ -505,7 +527,7 @@ if (isset($_REQUEST['geo_zoomlevel_to_found_location'])) {
 $headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
 
 if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_jsfile('lib/jquery_tiki/tiki-maps-ol3.js');
+    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js");
 }
 
 if ($prefs['feature_jquery_zoom'] === 'y') {
@@ -539,14 +561,12 @@ if ($prefs['feature_syntax_highlighter'] == 'y') {
         ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
     //add tiki stuff
         ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
-        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js');
+        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js')
+    //add interactjs
+        ->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
 
     require_once("lib/codemirror_tiki/tiki_codemirror.php");
     createCodemirrorModes();
-}
-
-if ($prefs['feature_jquery_carousel'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/infinitecarousel/jquery.infinitecarousel3.js');
 }
 
 if ($prefs['feature_ajax'] === 'y') {
@@ -600,9 +620,9 @@ if ($prefs['jquery_select2'] == 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.js");
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.css");
     if (Language::isRTL()) {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-theme/dist/select2-bootstrap-5-theme.rtl.min.css');
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.rtl.min.css');
     } else {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-theme/dist/select2-bootstrap-5-theme.min.css');
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css');
     }
 }
 if ($prefs['jquery_fitvidjs'] == 'y') {
@@ -611,26 +631,36 @@ if ($prefs['jquery_fitvidjs'] == 'y') {
         ->add_jq_onready("fitvids('article', $customSelectors);");
 }
 if ($prefs['jquery_smartmenus_enable'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/drmonty/smartmenus/js/jquery.smartmenus.js');
-    // $headerlib->add_jsfile('vendor_bundled/vendor/drmonty/smartmenus/js/jquery.smartmenus.bootstrap-4.js');
-    $headerlib->add_jsfile('lib/jquery_tiki/tiki-smartmenus-bootstrap-4.js');
-    $headerlib->add_cssfile('vendor_bundled/vendor/drmonty/smartmenus/css/sm-core-css.css');
-    $headerlib->add_cssfile('vendor_bundled/vendor/drmonty/smartmenus/css/jquery.smartmenus.bootstrap-4.css');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
+    $headerlib->add_js_module('import SmartMenus from "smartmenus";
+        const nav = document.querySelectorAll("nav");
+        let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
+        let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
+        let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
+
+        for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
+            if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
+                nav[indexCurrentNav].classList.add("sm-navbar");
+                nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
+                const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+            }
+        }
+    ');
 }
 if ($prefs['feature_jquery_reflection'] == 'y') {
     $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/reflection-jquery/js/reflection.js');
 }
 if ($prefs['feature_jquery_tablesorter'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/jquery.tablesorter.combined.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/parsers/parser-input-select.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-columnSelector.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-filter-formatter-jui.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-grouping.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-math.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-pager.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-output.js'); // APTITUDE NEEDS THIS
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/jquery.tablesorter.combined.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/parsers/parser-input-select.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-columnSelector.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-grouping.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-math.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-pager.min.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-output.min.js'); // APTITUDE NEEDS THIS
     //currently only working when ajax is not used
-    $headerlib->add_jsfile('vendor_bundled/vendor/mottie/tablesorter/js/widgets/widget-sort2Hash.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/widgets/widget-sort2Hash.min.js');
     $headerlib->add_jsfile('lib/jquery_tiki/tablesorter.js');
 }
 
@@ -669,11 +699,11 @@ if ($prefs['tiki_prefix_css'] == 'y') {
 }
 
 // note: jquery.async.js load a copy of jquery
-// Used by treetable and a few more places
+
 $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/async/jquery.async.js');
 
-$headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/treetable/jquery.treetable.js');
-$headerlib->add_cssfile('vendor_bundled/vendor/jquery-plugins/treetable/css/jquery.treetable.css');
+$headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.js');
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.css');
 
 if ($prefs['feature_equal_height_rows_js'] == 'y') {
     $headerlib->add_jsfile("vendor_bundled/vendor/Sam152/Javascript-Equal-Height-Responsive-Rows/grids.min.js");
@@ -681,11 +711,6 @@ if ($prefs['feature_equal_height_rows_js'] == 'y') {
 
 //This must always be loaded (early), as it's curently used by any Vue3 module using single-spa to make onDOMElementRemoved() available
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
-
-//The following pref is (currently) only used for Vue2 code.  It's probably going to be removed once all code moves to vue3, as vue3 is always enabled.
-if ($prefs['vuejs_enable'] === 'y' && $prefs['vuejs_always_load'] === 'y') {
-    $headerlib->add_jsfile_cdn("vendor_bundled/vendor/npm-asset/vue/dist/{$prefs['vuejs_build_mode']}");
-}
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
@@ -944,7 +969,7 @@ if ($prefs['openpgp_gpg_pgpmimemail'] == 'y') {
 //adding pdf creation javascript, used to integrate plugins like tablesorter, trackerfilter with mpdf.
 if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('lib/jquery_tiki/pdf.js');
-    $headerlib->add_jsfile('vendor_bundled/vendor/npm-asset/html2canvas/dist/html2canvas.min.js', true);
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.min.js", true);
     $headerlib->add_jsfile('vendor_bundled/vendor/mrrio/jspdf/jspdf.min.js', true);
 }
 
@@ -975,11 +1000,17 @@ if ($prefs['feature_tiki_manager'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-manager.js');
 }
 
+$robots = $headerlib->getRobots();
+if (! empty($robots)) {
+    $smarty->assign('metatag_robots', $robots);
+}
+
 if ($prefs['feature_realtime'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-websockets.js');
 }
 
 if ($prefs['feature_calendar'] === 'y') {
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/index.css");
     $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
     $headerlib->add_js_module('import "@jquery-tiki/fullcalendar_to_pdf";');
 }
@@ -995,12 +1026,23 @@ $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = 
 // Shoelace color picker
 $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
+$headerlib->add_js_module("import { textareaColorpicker } from '@jquery-tiki/ui-utils'; textareaColorpicker();");
 
-// element-plus-ui select, transfer
-$headerlib->add_js_module("import * as elementPlus from '@vue-widgets/element-plus-ui';");
-if (isset($prefs['feature_elementplus']) && $prefs['feature_elementplus'] == 'y') {
-    $headerlib->add_js_module("elementPlus.applySelect();");
+// element-plus-ui
+if ($prefs['feature_elementplus'] == 'y') {
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/base.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message-box.css');
+    if ($prefs['elementplus_select'] == 'y') {
+        $headerlib->add_js_module("import { applySelect } from '@vue-widgets/el-select'; applySelect();");
+    }
+    if ($prefs['elementplus_autocomplete'] == 'y') {
+        $headerlib->add_js_module("import { autocomplete } from '@jquery-tiki/ui-utils'; window.autocomplete = autocomplete;");
+    }
 }
 
+$headerlib->add_js_module('import "@jquery-tiki/constants";');
+
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
 // use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not
 define('TIKI_SETUP_FINISHED', true);

@@ -134,11 +134,11 @@
             {preference name=site_layout_per_object}
             {preference name=theme_navbar_fixed_topbar_offset}
             {preference name=theme_header_and_address_bar_color}
+            {preference name=theme_default_color_mode}
 
-            <legend class="h3">{tr}Admin pages layout{/tr} (<small>{tr}Admin theme must be selected first{/tr}</small>)</legend>
+            <legend class="h3">{tr}Admin pages layout{/tr}</legend>
             {preference name=site_layout_admin}
 
-            {* <legend class="h3">{tr}Fixed vs full width layout{/tr}</legend> *}
             <hr>
 
             <legend class="h3">{tr}Logo and Title{/tr}</legend>
@@ -262,8 +262,8 @@
                     {preference name=wiki_heading_links}
                     {preference name=feature_equal_height_rows_js}
                     {preference name=feature_conditional_formatting}
-                    {preference name=jquery_ui_modals_draggable}
-                    {preference name=jquery_ui_modals_resizable}
+                    {preference name=feature_draggable_modals}
+                    {preference name=feature_resizable_modals}
                 </div>
             </fieldset>
             <hr>
@@ -525,7 +525,6 @@
                         {button href="tiki-edit_templates.php" _text="{tr}Edit Templates{/tr}"}
                     </div>
                 {/if}
-                {preference name="theme_iconeditable"}
             </fieldset>
             <hr>
         {/tab}

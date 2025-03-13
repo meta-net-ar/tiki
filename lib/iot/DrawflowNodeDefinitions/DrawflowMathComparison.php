@@ -1,10 +1,10 @@
 <?php
 
-namespace Tiki\Lib\Iot\DrawflowNodeDefinitions;
+namespace Tiki\Lib\iot\DrawflowNodeDefinitions;
 
 use Exception;
-use Tiki\Lib\Iot\DrawflowNodeType;
-use Tiki\Lib\Iot\DrawflowActionInterface;
+use Tiki\Lib\iot\DrawflowNodeType;
+use Tiki\Lib\iot\DrawflowActionInterface;
 use Math_Formula_Runner;
 
 class DrawflowMathComparison implements DrawflowActionInterface

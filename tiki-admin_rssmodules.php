@@ -12,7 +12,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'     => [
             'rssId'            => 'int',      //post
-            'name'             => 'word',        //post
+            'name'             => 'string',      //post
             'url'              => 'url',         //post
             'description'      => 'xss',         //post
             'refreshMinutes'   => 'digits',      //post
@@ -151,7 +151,6 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
             $_REQUEST['article'],
             [
                 'active' => isset($_POST['enable']),
-                'expiry' => $jitPost->expiry->int(),
                 'atype' => $jitPost->type->text(),
                 'custom_atype' => $jitPost->asArray('custom_atype'),
                 'topic' => $jitPost->topic->int(),
@@ -174,9 +173,14 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
     } else {
         $cookietab = 3;
     }
-
-    $config = $rsslib->get_article_generator($_REQUEST['article']);
-    $smarty->assign('articleConfig', $config);
+    try {
+        $config = $rsslib->get_article_generator($_REQUEST['article']);
+    } catch (Exception $e) {
+        $smarty->assign('msg', $e->getMessage());
+        $smarty->display("error.tpl");
+        die;
+    }
+    $smarty->assign('articleConfig', $config ?? []);
     $smarty->assign('ratingOptions', array_map('strval', range(0, 10)));
 
     $sourcecats = $rsslib->get_feed_source_categories($_REQUEST["article"]);

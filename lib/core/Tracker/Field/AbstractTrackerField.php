@@ -51,7 +51,7 @@ abstract class AbstractTrackerField
      * visibleInHistoryMode
      */
     protected array $fieldRow;
-        /**
+    /**
      * @var handle ??? -
      */
     private \Tracker_Options $options;
@@ -65,6 +65,10 @@ abstract class AbstractTrackerField
 
     public static function getInstanceFromTrackerAndRow(\Tracker_Definition $trackerDefinition, array $fieldRow)
     {
+        //check if fieldId is not null or empty
+        if (! isset($fieldRow['fieldId']) || is_null($fieldRow['fieldId'])) {
+            throw new \InvalidArgumentException("Field ID is missing or null");
+        }
         $itemFieldClass = Tracker_Field_Factory::getTrackerItemFieldClassFromType($fieldRow['type']);
         $class = $itemFieldClass::getTrackerFieldClass();
         $field = $trackerDefinition->getFieldInstanceFromCache($fieldRow['fieldId']);
@@ -118,6 +122,11 @@ abstract class AbstractTrackerField
     public function isMandatory(): bool
     {
         return $this->fieldRow['isMandatory'] == 'y';
+    }
+
+    public function getType(): string
+    {
+        return $this->fieldRow['type'];
     }
 
     public function getFieldTypeName(): string

@@ -903,3 +903,32 @@ function sendCommentNotification($type, $id, $title, $content, $commentId, $anon
 
     return 0;
 }
+
+function sendSwitchUserNotification($adminUser, $targetUser)
+{
+    global $user, $prefs;
+    $userlib = TikiLib::lib('user');
+    $tikilib = TikiLib::lib('tiki');
+
+    $targetUserEmail = $userlib->get_user_email($targetUser);
+
+    if (empty($targetUserEmail)) {
+        return;
+    }
+
+    $smarty = TikiLib::lib('smarty');
+    $smarty->assign('admin_user', $adminUser);
+    $smarty->assign('target_user', $targetUser);
+    $smarty->assign('action', 'switch');
+
+    $additionalHeaders = [];
+
+    $watches[] = [
+        'email' => $targetUserEmail,
+        'user' => $targetUser,
+        'language' => $userlib->get_user_preference($user, 'language', $prefs['site_language']),
+        'watchId' => $userlib->get_user_id($user)
+    ];
+
+    sendEmailNotification($watches, null, 'user_switched_notification_subject.tpl', null, 'user_switched_notification.tpl', '', $adminUser, $additionalHeaders);
+}

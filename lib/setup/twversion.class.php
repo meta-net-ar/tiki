@@ -50,7 +50,7 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '28.0vcs';
+        $this->version  = '29.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
 
@@ -126,6 +126,7 @@ class TWVersion
                 36 => 'Sagittarius A*',  // 25.x
                 37 => 'Alnilam',         // 26.x
                 38 => 'Miaplacidus',     // 27.x
+                39 => 'Castor',          // 28.x
         ];
     }
 
@@ -360,6 +361,8 @@ class TWVersion
                 '21.7',
                 '21.8',
                 '21.9',
+                '21.10',
+                '21.11',
                 '22.0alpha',
                 '22.0beta',
                 '22.0RC1',
@@ -382,6 +385,7 @@ class TWVersion
                 '24.4',
                 '24.5',
                 '24.6',
+                '24.7',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -395,10 +399,17 @@ class TWVersion
                 '26.0',
                 '26.1',
                 '26.2',
+                '26.3',
                 '27.0alpha',
                 '27.0beta',
                 '27.0RC1',
                 '27.0',
+                '27.1',
+                '28.0alpha',
+                '28.0beta',
+                '28.0RC1',
+                '28.0',
+                '28.1',
             ];
     }
 

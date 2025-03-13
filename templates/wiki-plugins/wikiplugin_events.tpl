@@ -22,6 +22,17 @@
                 <a class="linkmodule" href="tiki-ajax_services.php?controller=calendar&action=view_item&calitemId={$event.calitemId}">{$event.name|escape}</a>
                 {if $desc}<br>{$event.parsed}{/if}
             </td>
+            {if $attendees eq 'y'}
+                <td>
+                    {foreach $listAttendees as $attendee}
+                        {if $attendee.calitemId eq $event.calitemId}
+                            <li>
+                                {$attendee.username}<br>
+                            </li>
+                        {/if}
+                    {/foreach}
+                </td>
+            {/if}
         </tr>{* {cycle} *}
     {/foreach}
     </table>

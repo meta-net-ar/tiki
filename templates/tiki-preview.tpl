@@ -1,5 +1,5 @@
 {* templates/tiki-preview.tpl start *}
-<div class="wikipreview" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
+<div class="wikipreview border-bottom border-4" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
     {if $prefs.ajax_autosave eq "y"}
         <div class="mb-3 float-sm-end text-end">
             <div class="">
@@ -11,8 +11,11 @@
             <div>
                 <select name="diff_style" id="preview_diff_style" class="form-select">
                     <option value="" {if empty($diff_style)}selected="selected"{/if}>{tr}Preview{/tr}</option>
-                    <option value="htmldiff" {if isset($diff_style) && $diff_style == "htmldiff"}selected="selected"{/if}>{tr}HTML diff{/tr}</option>
-                    <option value="sidediff" {if isset($diff_style) && $diff_style == "sidediff"}selected="selected"{/if}>{tr}Side-by-side diff{/tr}</option>
+                     {foreach  $diff_styles.options as $value => $label}
+                     {if $value eq 'htmldiff' or $value eq 'sidediff' }
+                     <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>{tr}{$label}{/tr}</option>
+                     {/if}
+                     {/foreach}
                 </select>
             </div>
             {jq}
@@ -33,18 +36,23 @@
             {/jq}
         </div>
     {/if}
-    {if $prefs.feature_jquery_ui eq "y"}
-        {jq}
-            $('#autosave_preview').resizable({
-                handles:{'s':'#autosave_preview_grippy'},
-                alsoResize:'#autosave_preview>div',
-                resize: function(event, ui) {
-                    setCookie("wiki", $('#autosave_preview').height(), "preview", "session");
+    {jq}
+        $('#autosave_preview').height(getCookie("wiki", "preview", ""));
+        interact('#autosave_preview').resizable({
+            edges: { bottom: true },
+            inertia: true,
+            listeners: {
+                move: (e) => {
+                    const target = e.target;
+                    let height = parseFloat(getComputedStyle(target).height.slice(0, -2));
+                    height += e.deltaRect.top + e.deltaRect.bottom;
+                    target.style.height = `${height}px`;
                 }
-            }).height(getCookie("wiki", "preview", ""));
-            $("#autosave_preview>div").height(getCookie("wiki", "preview", ""));
-        {/jq}
-    {/if}
+            }
+        }).on('resizeend', function (event) {
+            setCookie("wiki", $('#autosave_preview').height(), "preview", "session");
+        });
+    {/jq}
     <h2>{tr}Preview:{/tr} {$page|escape}</h2>
     {if $prefs.feature_wiki_description eq 'y'}
         <small>{$description}</small>
@@ -62,7 +70,6 @@
     </div>
     {if $prefs.ajax_autosave eq "y"}
         </div>
-        <span id="autosave_preview_grippy" class="ui-resizable-handle ui-resizable-s"> </span>
     {/if}
 </div>
 <hr style="clear:both; height:0px;"/> {* Information below the wiki content

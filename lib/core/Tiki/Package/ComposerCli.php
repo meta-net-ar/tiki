@@ -354,6 +354,7 @@ class ComposerCli
         }
 
         $content = json_decode(file_get_contents($this->getComposerConfigFilePath()), true);
+        $packagesFromLock = json_decode(file_get_contents($this->getComposerLockFilePath()), true);
         $composerShow = $this->execShow();
 
         $installedPackages = [];
@@ -367,11 +368,20 @@ class ComposerCli
         if (isset($content['require']) && is_array($content['require'])) {
             foreach ($content['require'] as $name => $version) {
                 if (isset($installedPackages[$this->normalizePackageName($name)])) {
+                    $installedVersion = $installedPackages[$name]['version'];
+                    if (str_starts_with($installedVersion, 'dev-master')) {
+                        foreach ($packagesFromLock['packages'] as $lockedPackage) {
+                            if ($lockedPackage['name'] === $name && isset($lockedPackage['source']['reference'])) {
+                                $installedVersion = 'dev-master ' . substr($lockedPackage['source']['reference'], 0, 8);
+                                break;
+                            }
+                        }
+                    }
                     $result[] = [
                         'name' => $name,
                         'status' => ComposerManager::STATUS_INSTALLED,
                         'required' => $version,
-                        'installed' => $installedPackages[$name]['version'],
+                        'installed' => $installedVersion,
                     ];
                 } else {
                     $result[] = [

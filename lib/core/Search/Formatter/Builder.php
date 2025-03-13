@@ -12,22 +12,22 @@ use Search\Formatter\Sublist\Parser as SublistParser;
 class Search_Formatter_Builder
 {
     private $parser;
-    private $sublistParser;
+    private SublistParser $sublistParser;
     private $paginationArguments;
 
-    private $formatterPlugin;
+    private ?Search_Formatter_Plugin_Interface $formatterPlugin = null;
     private $subFormatters = [];
     private $customFilters = [];
-    private $subLists = [];
+    private array $subLists = [];
     private $alternateOutput;
     private $id;
     private $count;
     private $tsOn;
     private $tsettings;
     private $actions;
+    private $additionalOutputData;
     private $isDownload;
     private $downloadName;
-
     public function __construct()
     {
         $this->parser = new WikiParser_PluginArgumentParser();
@@ -60,11 +60,15 @@ class Search_Formatter_Builder
         $this->isDownload = $isDownload;
     }
 
+    public function setAdditionalOutputData(array $data)
+    {
+        $this->additionalOutputData = $data;
+    }
+
     public function apply($matches, $params = null)
     {
         foreach ($matches as $match) {
             $name = $match->getName();
-
             if ($name == 'output') {
                 $this->handleOutput($match, $params);
             }
@@ -91,7 +95,7 @@ class Search_Formatter_Builder
         }
     }
 
-    public function getFormatter($errorInQuery = '')
+    public function getFormatter($errorInQuery = ''): Search_Formatter
     {
         global $prefs;
         $plugin = $this->formatterPlugin;
@@ -133,14 +137,54 @@ class Search_Formatter_Builder
             return;
         }
 
-        if (isset($arguments['name'])) {
+        if (! isset($arguments['name'])) {
+            return;
+        }
+
+        $smarty = TikiLib::lib('smarty');
+        $tikilib = TikiLib::lib('tiki');
+
+        if (isset($arguments['template'])) {
+            if (! file_exists($arguments['template'])) {
+                $temp = $smarty->get_filename($arguments['template']);
+                if (empty($temp)) {
+                    Feedback::error(tr('Missing template "%0"', $arguments['template']));
+                    return;
+                }
+                $arguments['template'] = $temp;
+            }
+            $plugin = new Search_Formatter_Plugin_SmartyTemplate($arguments['template']);
+            $templateData = file_get_contents($arguments['template']);
+        } elseif (isset($arguments['tplwiki'])) {
+            if (! $tikilib->page_exists($arguments['tplwiki'])) {
+                Feedback::error(tr('Template tplwiki page "%0" not found', $arguments['tplwiki']));
+                return;
+            }
+            $wikitpl = "tplwiki:" . $arguments['tplwiki'];
+            $plugin = new Search_Formatter_Plugin_SmartyTemplate($wikitpl);
+            $data = $tikilib->get_page_info($arguments['tplwiki']);
+            $templateData = $data['data'];
+        } else {
             $plugin = new Search_Formatter_Plugin_WikiTemplate($match->getBody());
             $plugin->setRaw(! empty($arguments['mode']) && $arguments['mode'] == 'raw');
-            $this->subFormatters[$arguments['name']] = $plugin;
+            $templateData = null;
         }
+
+        if ($templateData) {
+            $abuilder = new Search_Formatter_ArrayBuilder();
+            $outputData = $abuilder->getData($match->getBody());
+            $plugin->setData($outputData);
+            $plugin->setFields($this->findFields($outputData, $templateData));
+        }
+
+        if (! empty($arguments['editable'])) {
+            $plugin->setEditable($arguments['editable'], 'format' . hash('sha256', $match->getArguments() . $match->getBody()));
+        }
+
+        $this->subFormatters[$arguments['name']] = $plugin;
     }
 
-    private function handleFilter($match)
+    private function handleFilter(WikiParser_PluginMatcher_Match $match): void
     {
         $arguments = $this->parser->parse($match->getArguments());
 
@@ -172,16 +216,31 @@ class Search_Formatter_Builder
      *
      * @throws Exception
      */
-    private function handleOutput($output, $params)
+    private function handleOutput(WikiParser_PluginMatcher_Match $output, $params): void
     {
+        global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
         $smarty = TikiLib::lib('smarty');
         $tikilib = TikiLib::lib('tiki');
+        $data = [];
+        if ($prefs['feature_categories'] == 'y') {
+            $categlib = TikiLib::lib('categ');
+            $categories = $categlib->getCategories();
+
+            foreach ($categories as &$category) {
+                $category['canchange'] = 'y';
+            }
+            // Get the categories tree for display
+            $cat_tree = $categlib->generate_cat_tree($categories);
+            $data['categories'] = $categories;
+            $data['cat_tree'] = $cat_tree;
+            $data['tiki_p_modify_object_categories'] = $tiki_p_modify_object_categories;
+            $data['tiki_p_admin_categories'] = $tiki_p_admin_categories;
+        }
         $arguments = $this->parser->parse($output->getArguments());
 
         if (isset($arguments['template'])) {
             if ($arguments['template'] == 'table') {
                 $arguments['template'] = __DIR__ . '/../../../../templates/search/list/table.tpl';
-                $arguments['pagination'] = true;
             } elseif ($arguments['template'] == 'medialist') {
                 $arguments['template'] = __DIR__ . '/../../../../templates/search/list/medialist.tpl';
             } elseif ($arguments['template'] == 'carousel') {
@@ -196,7 +255,7 @@ class Search_Formatter_Builder
                 $temp = $smarty->get_filename($arguments['template']);
                 if (empty($temp)) { //if get_filename cannot find template, return error
                     Feedback::error(tr('Missing template "%0"', $arguments['template']));
-                    return '';
+                    return;
                 }
                 $arguments['template'] = $temp;
             }
@@ -205,9 +264,12 @@ class Search_Formatter_Builder
             foreach ($this->paginationArguments as $k => $v) {
                 $outputData[$k] = $this->paginationArguments[$k];
             }
+            $outputData['actions'] = $this->actions;
+            if ($this->additionalOutputData) {
+                $outputData = array_merge($outputData, $this->additionalOutputData);
+            }
             if (strstr($arguments['template'], 'table')) {
                 $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y' ? true : false;
-                $outputData['actions'] = $this->actions;
                 if (isset($arguments['downloadable'])) {
                     $outputData['downloadable'] = true;
                     $this->downloadName = $arguments['downloadable'];
@@ -230,6 +292,7 @@ class Search_Formatter_Builder
                 }
             }
 
+            $outputData = array_merge($outputData, $data);
             $templateData = file_get_contents($arguments['template']);
 
             $plugin = new Search_Formatter_Plugin_SmartyTemplate($arguments['template']);
@@ -242,6 +305,10 @@ class Search_Formatter_Builder
                 $outputData = $abuilder->getData($output->getBody());
                 foreach ($this->paginationArguments as $k => $v) {
                     $outputData[$k] = $this->paginationArguments[$k];
+                }
+                $outputData['actions'] = $this->actions;
+                if ($this->additionalOutputData) {
+                    $outputData = array_merge($outputData, $this->additionalOutputData);
                 }
                 $data = $tikilib->get_page_info($arguments['tplwiki']);
                 $wikicontent = $data['data'];
@@ -266,7 +333,7 @@ class Search_Formatter_Builder
             $plugin = new Search_Formatter_Plugin_WikiTemplate($output->getBody());
         }
 
-        if (isset($arguments['pagination'])) {
+        if (isset($arguments['pagination']) && in_array((string) $arguments['pagination'], ['y', '1'], true)) {
             $plugin = new Search_Formatter_AppendPagination($plugin, $this->paginationArguments);
         }
 

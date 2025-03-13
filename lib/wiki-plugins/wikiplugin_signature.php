@@ -88,7 +88,7 @@ function wikiplugin_signature($data, $params)
 
     $headerlib = TikiLib::lib('header');
     $headerlib->add_jsfile(
-        SIGNATURE_PAD_DIST_PATH . '/signature_pad.min.js'
+        SIGNATURE_PAD_DIST_PATH . '/signature_pad.umd.min.js'
     );
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-signature.js', true);
     $headerlib->add_cssfile(

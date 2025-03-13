@@ -250,12 +250,15 @@ class PdfGenerator
 
     /**
      * @param $url string - address of the item to print as PDF
+     * @param $parsedData string - page contents to print as PDF
+     * @param $params array - parameters to pass to the PDF
+     *
      * @return string     - contents of the PDF
      */
-    private function mpdf($url, $parsedData = '', $params = [])
+    private function mpdf(string $url, string $parsedData = '', array $params = []): string
     {
         global $prefs;
-
+        $page = '';
         if ($parsedData != '') {
             $html = $parsedData;
         } else {
@@ -340,7 +343,7 @@ class PdfGenerator
         $mpdf->SetTitle($params['page'] ?? '');
 
         //toc levels
-        $mpdf->h2toc = isset($pdfSettings['toclevels']) ? $pdfSettings['toclevels'] : [];
+        $mpdf->h2toc = $pdfSettings['toclevels'] ?? [];
         //password protection
         if ($pdfSettings['print_pdf_mpdf_password']) {
             $mpdf->SetProtection([], 'UserPassword', $pdfSettings['print_pdf_mpdf_password']);
@@ -352,24 +355,77 @@ class PdfGenerator
         $basecss = file_get_contents('themes/base_files/css/tiki_base.css'); // external css
         //apply available fonts to classes for printing
         $basecss .= '.far, .fa-regular { font-family: fontawesome; } .fa, .fas, .fa-solid { font-family: fontawesome-solid; } .fab, .fa-brands { font-family: fontawesome-brands; }';
-        //getting theme css
-        $themeLib = TikiLib::lib('theme');
-        $themecss = $themeLib->get_theme_path($prefs['theme'], '', $prefs['theme'] . '.css');
-        $themecss = file_get_contents($themecss) . 'b,strong{font-weight:bold !important;}';
-        $extcss = file_get_contents('vendor_bundled/vendor/jquery/jquery-sheet/jquery.sheet.css');
 
-        //checking if print friendly option is enabled, then attach print css otherwise theme styles will be retained by theme css
-        if ($pdfSettings['print_pdf_mpdf_printfriendly'] == 'y') {
+        if ($prefs['feature_sheet'] == 'y') {
+            $extcss = file_get_contents('vendor_bundled/vendor/jquery/jquery-sheet/jquery.sheet.css');
+        } else {
+            $extcss = '';
+        }
+
+        // checking if print friendly preference is enabled if so then attach print css
+        // otherwise theme styles will be retained by theme css
+        if ($pdfSettings['print_pdf_mpdf_printfriendly'] === 'y') {
             $printcss = file_get_contents('themes/base_files/css/printpdf.css'); // external css
             $bodycss = 'tiki tiki-print'; //execluding theme css in case print friendly is set to yes.
-        } else {//preserving theme styles by removing media print styles to print what is shown on screen
-            $themecss = str_replace(["media print","color : fff"], ["media p","color : #fff"], $themecss);
-            $printcss = file_get_contents('themes/base_files/css/printqueries.css'); //for bootstrap print hidden, screen hidden styles on divs
+        } else {
+            //getting theme css
+            $themeLib = TikiLib::lib('theme');
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                '',
+                'css/' . $prefs['theme'] . '.css'
+            );
+            $themecss = file_get_contents($themePath);
+            // add custom.css if there
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                '',
+                'css/custom.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            // add theme option css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'css/' . $prefs['theme_option'] . '.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+            // and an option custom.css
+            $themePath = ThemeLib::getThemePath(
+                $prefs['theme'],
+                $prefs['theme_option'],
+                'css/custom.css'
+            );
+            if ($themePath) {
+                $themecss .= file_get_contents($themePath);
+            }
+
+            $themecss .= "\nb,strong{font-weight:bold !important;}";
+            // preserving theme styles by removing media print styles to print what is shown on screen
+            $themecss = str_replace(["media print", "color : fff"], ["media p","color : #fff"], $themecss);
+            //  for bootstrap print hidden, screen hidden styles on divs
+            $printcss = file_get_contents('themes/base_files/css/printqueries.css');
             $bodycss = '';
         }
 
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
-        $cssStyles = str_replace([".tiki","opacity: 0;","page-break-inside: avoid;"], ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"], '<style>' . $basecss . $themecss . $printcss . $extcss . $this->bootstrapReplace() . $prefs["header_custom_css"] . '</style>'); //adding css styles with first page content
+        //adding css styles with first page content
+        $allCss = '<style>' .
+                $basecss . $themecss . $printcss . $extcss .
+                $this->bootstrapReplace() .
+                $prefs["header_custom_css"] .
+            '</style>';
+
+        $cssStyles = str_replace(
+            [".tiki","opacity: 0;","page-break-inside: avoid;"],
+            ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"],
+            $allCss
+        );
         //PDF import templates will not work if background color is set, need to replace in css
         $cssStyles = $this->replaceCssVariables($cssStyles);
         $cssStyles = $this->evaluateCalcExpressions($cssStyles);
@@ -392,6 +448,8 @@ class PdfGenerator
             $textAlign = 'center';
             $textBgColor = '';
             $coverPageTextBorder = '';
+            $coverPageBgColor = '';
+            $coverPageBorder = '';
             if (count($coverPage) === 1 && ! empty($pdfSettings['coverpage_settings'])) {
                 list($bgColorValue, $borderWidthValue, $borderColorValue) = explode('|', $pdfSettings['coverpage_settings'] . '||');
                 $coverPageBgColor = ! empty($bgColorValue) ? "background-color:{$bgColorValue};" : '';
@@ -521,8 +579,11 @@ class PdfGenerator
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
                     }
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''));
+                    //Add the header to the first page
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "O");
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "E");
                     $mpdf->AddPage($pdfPage['orientation'], '', $resetPage, '', '', $pdfPage['margin_left'], $pdfPage['margin_right'], $pdfPage['margin_top'], $pdfPage['margin_bottom'], $pdfPage['margin_header'], $pdfPage['margin_footer'], '', '', '', '', '', '', '', '', '', $pdfPage['pagesize']);
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? '')); //Add the header to other pages
                     $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top')); //footer needs to be reset after page content is added
                     //checking watermark on page
                     $mpdf->SetWatermarkText($pdfPage['watermark']);
@@ -739,7 +800,7 @@ class PdfGenerator
                 }
             }
             //checking preferences
-            $pdfSettings['print_pdf_mpdf_printfriendly'] = $prefs['print_pdf_mpdf_printfriendly'] != '' ? $prefs['print_pdf_mpdf_printfriendly'] : '';
+            $pdfSettings['print_pdf_mpdf_printfriendly'] = $prefs['print_pdf_mpdf_printfriendly'] ?? '';
             $orientation = ! empty($params['orientation']) ? $params['orientation'] : $prefs['print_pdf_mpdf_orientation'];
             $pdfSettings['orientation'] = $orientation != '' ? $orientation : 'P';
             $pdfSettings['pagesize'] = $prefs['print_pdf_mpdf_pagesize'] != '' ? $prefs['print_pdf_mpdf_pagesize'] : 'Letter';
@@ -905,7 +966,7 @@ class PdfGenerator
      */
     public function file_get_contents_by_fget($url): string
     {
-        global $base_url;
+        global $base_url, $prefs;
         //check if image is internal with full path
         $internalImg = 0;
         if (substr($url, 0, strlen($base_url)) == $base_url) {
@@ -928,6 +989,9 @@ class PdfGenerator
         $opts = [];
         if (! empty($cookie)) {
             $opts['http'] = ['header' => 'Cookie: ' . $cookie . "\r\n"];
+        }
+        if (! empty($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests']) && $prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] === 'y') {
+            $opts['ssl'] = ['verify_peer' => false, 'verify_peer_name' => false];
         }
         $context = stream_context_create($opts);
         session_write_close();
@@ -1554,9 +1618,8 @@ function loadHTMLContent($html)
 
     // Set error reporting to ignore warnings
     error_reporting($errorLevel & ~E_WARNING);
-
-    $html = htmlspecialchars($html, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
-    $html = html_entity_decode($html, ENT_QUOTES | ENT_HTML401, 'UTF-8');
+    //Encode character to HTML numeric string reference
+    $html = mb_encode_numericentity($html, [0x80, 0xfffffff, 0, 0xfffffff], 'UTF-8');
     $doc->loadHTML($html);
 
     // Restore the previous error reporting level

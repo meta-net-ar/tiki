@@ -20,8 +20,7 @@ add_output('groupmail', 'groupmail_end', true, 'tiki', 'groupmail_start', 'after
 
 /* folder list update ajax request */
 add_handler('ajax_hm_folders', 'check_groupmail_setting', true, 'tiki', 'load_user_data', 'after');
-add_output('ajax_hm_folders', 'groupmail_page_link', true, 'tiki', 'logout_menu_item', 'before');
-add_output('ajax_hm_folders', 'clear_cache_link', true, 'tiki', 'folder_list_content_end', 'before');
+add_output('ajax_hm_folders', 'groupmail_page_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* ajax groupmail callback data */
 setup_base_ajax_page('ajax_tiki_groupmail', 'imap');
@@ -56,7 +55,7 @@ add_handler('ajax_tiki_message_content', 'load_tiki_contacts', true, 'tiki', 'lo
 add_handler('compose', 'load_tiki_contacts', true, 'tiki', 'load_contacts', 'after');
 add_handler('ajax_delete_contact', 'load_tiki_contacts', true, 'tiki', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'load_tiki_contacts', true, 'tiki', 'load_contacts', 'after');
-add_output('ajax_hm_folders', 'tiki_contacts_page_link', true, 'tiki', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'tiki_contacts_page_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* compose page handlers */
 add_handler('compose', 'check_for_tiki_redirect', true, 'smtp', 'process_compose_form_submit', 'after');
@@ -84,6 +83,13 @@ add_handler('ajax_add_to_calendar', 'check_calendar_invitations_imap', true, 'im
 add_handler('ajax_add_to_calendar', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_add_to_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_add_to_calendar', 'add_to_calendar', true, 'tiki', 'imap_message_content', 'after');
+
+/* message page update in calendar function */
+setup_base_ajax_page('ajax_update_in_calendar', 'core');
+add_handler('ajax_update_in_calendar', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
+add_handler('ajax_update_in_calendar', 'load_imap_servers_from_config', true, 'imap');
+add_handler('ajax_update_in_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_update_in_calendar', 'update_in_calendar', true, 'tiki', 'imap_message_content', 'after');
 
 /* message page update participant status function */
 setup_base_ajax_page('ajax_update_participant_status', 'core');
@@ -198,6 +204,8 @@ add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after'
 add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');
 
 /* sieve filters */
+add_handler('sieve_filters', 'tiki_add_sieve_config_host', true, 'tiki', 'load_imap_servers_from_config', 'after');
+add_handler('sieve_filters', 'settings_load_imap', true);
 add_output('sieve_filters', 'tiki_filters_cron', true, 'tiki', 'sievefilters_settings_start', 'after');
 
 setup_base_ajax_page('ajax_tiki_sieve_get_mailboxes', 'core');
@@ -219,6 +227,7 @@ return [
     'ajax_put_back_groupmail',
     'ajax_rsvp_action',
     'ajax_add_to_calendar',
+    'ajax_update_in_calendar',
     'ajax_update_participant_status',
     'ajax_remove_from_calendar',
     'ajax_move_to_tracker',
@@ -251,7 +260,8 @@ return [
     'flag_state' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'trackers' => [FILTER_DEFAULT, false],
     'tracker_data' => [FILTER_DEFAULT, false],
-    'mailboxes' => [FILTER_UNSAFE_RAW, false]
+    'mailboxes' => [FILTER_UNSAFE_RAW, false],
+    'msg_headers' => [FILTER_UNSAFE_RAW, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -263,6 +273,7 @@ return [
     'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
     'list_path' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'rsvp_action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'rsvp_comment' => FILTER_DEFAULT,
     'calendar_id' => FILTER_VALIDATE_INT,
     'debug_mode' => FILTER_VALIDATE_INT,
     'allow_external_images' => FILTER_VALIDATE_INT,

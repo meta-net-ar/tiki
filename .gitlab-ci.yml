@@ -13,9 +13,8 @@ variables:
   MYSQL_USER: tikiuser
   MYSQL_PASSWORD: tikipass
   ELASTICSEARCH_HOST: elasticsearch
-  #The source for these images is at https://github.com/rjsmelo/docker-ubuntu-php
-  #Would be nice to update them from code, similar to https://medium.com/devops-with-valentine/how-to-build-a-docker-image-and-push-it-to-the-gitlab-container-registry-from-a-gitlab-ci-pipeline-acac0d1f26df
-  BASE_QA_IMAGE: rjsmelo/ubuntu-php:8.1-qa
+  #The source for these images is at https://gitlab.com/tikiwiki/ci-helpers/docker-tikiwiki-ci 
+  BASE_QA_IMAGE: tikiwiki/tikiwiki-ci:8.1-qa
   #DBDiff is sensitive to mysql version.  
   #The schemas dumped for prior tikis on https://gitlab.com/tikiwiki/tikiwiki-ci-databases have explicit COLLATION() statements for each table column.  Later versions of mysql (8.0.11+, but not sure) will not dump the same whits explicit collations.
   #Running php doc/devtools/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into doc/devtool/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
@@ -187,13 +186,14 @@ phpcs:
         prefix: "phpcs"
         files:
           - phpcs.xml.dist
+          - doc/devtools/codesniffer/standards/TikiIgnore/ignore_list.json
       paths:
         - phpcs.cache
       policy: pull-push
 
 phplint:
   stage: lint
-  image: ${DEPENDENCY_PROXY_PREFIX}rjsmelo/ubuntu-php:${PHP_VERSION}-qa
+  image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
   script:
@@ -364,7 +364,7 @@ composer-could-update-lock:
       alias: mysql,
       command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
   script:
-    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
+    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
     - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
     - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
     - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
@@ -388,6 +388,14 @@ composer-could-update-lock:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       command: [ "--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
       alias: mysql
+
+db-upgrade-28-mysql:
+  <<: *template-tiki-schema-upgrade-mysql8
+  variables:
+    DBFILE: ci_28.sql
+    DBVER: 28
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+    ENGINE: InnoDB
 
 db-upgrade-27-mysql:
   <<: *template-tiki-schema-upgrade-mysql8
@@ -420,62 +428,6 @@ db-upgrade-24-mysql:
     DBVER: 24
     IMAGE: ${MYSQL_5_IMAGE}
     ENGINE: InnoDB
-
-db-upgrade-22-mariadb:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_22.sql
-    DBVER: 22
-    IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-22-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_22.sql
-    DBVER: 22
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-21-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_21.sql
-    DBVER: 21
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-20-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_20.sql
-    DBVER: 20
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-19:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_19.sql
-    DBVER: 19
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-18-lts:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_18.sql
-    DBVER: 18
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-18-lts-myisam:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_18.sql
-    DBVER: 18
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: MyISAM
 
 sql-engine-conversion:
   stage: tiki-check
@@ -532,7 +484,7 @@ console-php-works:
   stage: unit-tests
   needs:
     - composer
-  image: ${DEPENDENCY_PROXY_PREFIX}rjsmelo/ubuntu-php:${PHP_VERSION}-qa
+  image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
       alias: mysql
@@ -582,6 +534,17 @@ unit-tests-node:
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
+
+# This test is only required because we don't have a combined node and php image currently. - benoitg - 2025-03-08
+unit-tests-icon-generator:
+  stage: unit-tests
+  needs:
+    - composer
+    - node_modules
+  image:
+    name: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php console.php build:generateiconlist
 
 #
 # Package this Tiki build

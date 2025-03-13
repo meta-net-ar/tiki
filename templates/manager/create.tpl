@@ -31,6 +31,21 @@
                     </div>
                 </div>
             </div>
+            <div class="tiki-form-group row">
+                <label class="col-form-label col-sm-3">
+                    {tr}Force{/tr}
+                    <a class="tikihelp text-info" title="{tr}Description{/tr}|{tr}Force deletion of target folder files.{/tr}">
+                        {icon name=information}
+                    </a>
+                </label>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <input type="checkbox" class="form-check-input" id="force_option" name="force_option" value="yes" checked>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="tiki-form-group row preference">
                 <label class="col-form-label col-sm-3">
                     {tr}Connection type{/tr}
@@ -180,6 +195,19 @@
             </div>
             <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
+                    {tr}PHP Version{/tr}
+                    <a class="tikihelp text-info" title="{tr}Description{/tr}|{tr}List of available PHP versions{/tr}">
+                        {icon name=information}
+                    </a>
+                </label>
+                <div class="col-sm-9">
+                    <select class="form-control" id="php_executable" name="php_executable">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="tiki-form-group row">
+                <label class="col-form-label col-sm-3">
                     {tr}Tiki branch{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr}|{tr}{$help.branch}{/tr}">
                         {icon name=information}
@@ -187,9 +215,7 @@
                     </label>
                 <div class="col-sm-9">
                     <select class="form-control" id="branch" name="branch">
-                        {foreach item=branch from=$inputValues['branches']}
-                            <option value="{$branch|escape}" {if $inputValues['selected_branch'] eq $branch}selected="selected"{/if}>{$branch}</option>
-                        {/foreach}
+                        <option value=""></option>
                     </select>
                 </div>
             </div>

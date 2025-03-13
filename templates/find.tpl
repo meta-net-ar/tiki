@@ -13,6 +13,8 @@
     * find_show_categories  : If value = 'y' adds categories dropdown with categories array values
     * find_show_categories_multi : If value = 'y' adds categories dropdown with categories array values with multi selector
     * find_categId          : categories selected value
+    * find_show_objects_multi : If value = 'y' adds trackers dropdown with trackers array values with multi selector
+    * find_objectId        : trackers selected value
     * find_show_num_rows    : If value = 'y' adds maxRecords field. Value: maxRecords
     * find_show_date_range  : If value = 'y' adds date range to filter within
     * find_show_orphans     : If value = 'y' adds a checkbox orphan
@@ -35,12 +37,12 @@
             {if !empty($filegals_manager)}<input type="hidden" name="filegals_manager"
                                                  value="{$filegals_manager|escape}">{/if}
             {query _type='form_input' maxRecords='NULL' type='NULL' types='NULL' find='NULL' topic='NULL' lang='NULL' exact_match='NULL' categId='NULL' cat_categories='NULL' filegals_manager='NULL' save='NULL' offset=0 searchlist='NULL' searchmap='NULL'}
-            <div class="input-group">
+            <div>
                 <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Find{/tr}" value="{$find|escape}"
                        placeholder="{if empty($whatlabel)}{tr}Find{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
                        title="{if ! empty($find_in)}{$find_in|escape}{/if}" data-html="true" data-bs-toggle="focus">
                 {if isset($autocomplete)}
-                    {jq}$("#find").tiki("autocomplete", "{{$autocomplete}}");{/jq}
+                    {autocomplete element="#find" type="{$autocomplete}"}
                 {/if}
                 {jq}
                     jQuery("#find").tooltip();
@@ -294,8 +296,24 @@
                 {/if}
             </div>
         {/if}
+        {if ($find_show_objects_multi eq 'y')}
+            <div class="mb-3 row mx-0 findfilter">
+                
+                <label class="col-form-label col-sm-5">
+                    {tr}Filtered trackers{/tr}
+                </label>
+                <div class="col-sm-7">
+                    <select name="filterTracker[]" class="form-control form-control-sm" multiple>
+                        <option value=''>{tr}Objects :{/tr}</option>
+                        {foreach item=object from=$findAllObjects}
+                            <option value="{$object[$objectId]}" {if in_array($object[$objectId], $find_objectId)} selected="selected"{/if}>{$object['name']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        {/if}
         {if (!isset($map_only) or $map_only ne 'y') or (isset($gmapbuttons) && $gmapbuttons)}
-        <div class="mx-3">
+        <div>
             <button type="submit" class="btn btn-info" name="search">{tr}Find{/tr}</button>
         </div>
         {/if}

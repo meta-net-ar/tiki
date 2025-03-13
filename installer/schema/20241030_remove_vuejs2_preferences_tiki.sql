@@ -1,0 +1,1 @@
+DELETE FROM `tiki_preferences` WHERE `name` IN ('vuejs_enable', 'vuejs_always_load', 'vuejs_build_mode');

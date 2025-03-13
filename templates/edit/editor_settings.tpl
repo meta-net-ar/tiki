@@ -6,18 +6,18 @@
         {if $prefs.feature_wysiwyg eq 'y' and $prefs.wysiwyg_optional eq 'y'}
             <div class="mb-3">
                 <label for="editor-select" class="form-label">{tr}Editor Type{/tr}</label>
-                <select class="form-select noselect2" aria-label="{tr}Plain or WYSIWYG{/tr}" id="editor-select">
-                    <option value="plain">{tr}Plain{/tr}</option>
-                    <option value="wysiwyg">{tr}WYSIWYG{/tr}</option>
+                <select class="form-select" aria-label="{tr}Plain or WYSIWYG{/tr}" id="editor-select">
+                    <option value="plain" {if $type neq 'wysiwyg'}selected{/if}>{tr}Plain{/tr}</option>
+                    <option value="wysiwyg" {if $type eq 'wysiwyg'}selected{/if}>{tr}WYSIWYG{/tr}</option>
                 </select>
             </div>
         {/if}
         {if $prefs.markdown_enabled eq 'y'}
             <div class="mb-3">
                 <label for="syntax-select" class="form-label">{tr}Syntax{/tr}</label>
-                <select class="form-select noselect2" aria-label="{tr}Tiki or Markdown{/tr}" id="syntax-select">
-                    <option value="tiki">{tr}Tiki{/tr}</option>
-                    <option value="markdown">{tr}Markdown{/tr}</option>
+                <select class="form-select" aria-label="{tr}Tiki or Markdown{/tr}" id="syntax-select">
+                    <option value="tiki" {if $syntax eq 'tiki'}selected{/if}>{tr}Tiki{/tr}</option>
+                    <option value="markdown" {if $syntax eq 'markdown'}selected{/if}>{tr}Markdown{/tr}</option>
                 </select>
             </div>
         {/if}
@@ -25,20 +25,4 @@
             <button type="submit" class="btn btn-primary">{tr}Save{/tr}</button>
         </div>
     </form>
-
-    {jq}
-
-    const $form = $("#{{$domId}}").parents('form');
-    const $editorSelect = $("#editor-select");
-    const $syntaxSelect = $("#syntax-select");
-    const $wysiwygInput = $form.find("input[name=wysiwyg]");
-    const $syntaxInput = $form.find("input[name=syntax]");
-    
-    const initialEditorType = $wysiwygInput.val() === "y" ? "wysiwyg" : "plain";
-    const initialSyntax = $syntaxInput.val();
-
-    $editorSelect.val(initialEditorType).trigger("change");
-    $syntaxSelect.val(initialSyntax).trigger("change");
-
-    {/jq}
 {/block}

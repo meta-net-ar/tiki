@@ -134,7 +134,7 @@
                 <h2>{tr}Add Pages from Structures:{/tr}</h2>
                 <div class="mb-3 row">
                     <div class="col-sm-12">
-                        <select name="structureId" size="5" style="width:99%" border="1" class="form-control">
+                        <select name="structureId" size="5" style="width:99%" border="1" class="form-control" required>
                             {section name=ix loop=$structures}
                                 {if !in_array($structures[ix].page_ref_id,$printstructures)}
                                     <option value="{$structures[ix].page_ref_id|escape}">{$structures[ix].pageName}</option>

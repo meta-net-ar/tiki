@@ -687,7 +687,7 @@ function prefs_feature_list($partial = false)
         // TODO: Replace feature_wysiwyg and wysiwyg_optional with a single tri-state preference (allowing either just normal editor (default), just WYSIWYG or both) to clarify and avoid misinterpretation
         'feature_wysiwyg' => [
             'name' => tra('Full WYSIWYG editor'),
-            'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://ckeditor.com">CKEditor</a> is used to provide a word-processor-like editing experience.'),
+            'description' => tra('WYSIWYG is an acronym for "What You See Is What You Get". <a href="https://summernote.org">Summernote</a> is used to provide a word-processor-like editing experience.'),
             'help' => 'Wysiwyg',
             'type' => 'flag',
             'default' => 'y',
@@ -697,8 +697,6 @@ function prefs_feature_list($partial = false)
                 'feature_wiki_paragraph_formatting',
                 'feature_wiki_paragraph_formatting_add_br',
             ],
-            'tags' => ['deprecated'],
-            'warning' => tra('CKEditor4 is no longer supported.'),
         ],
 
         'feature_kaltura' => [
@@ -1372,7 +1370,7 @@ function prefs_feature_list($partial = false)
             'name' => tra('Element Plus'),
             'description' => tra('Use Element Plus Vue based UI elements'),
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['experimental'],
         ],
         'feature_sefurl_routes' => [
@@ -1660,6 +1658,12 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
         ],
+        'feature_forum_process_inbound_mail_in_cron' => [
+            'name' => tra('Process inbound mail in cron job.'),
+            'description' => tra('This prevent to process inbound mail when user is viewing a forum. This will require setting up a cron job running "php console.php forum:inbound-mail" command'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'feature_forum_parse' => [
             'name' => tra('Accept wiki syntax'),
             'type' => 'flag',
@@ -1900,14 +1904,18 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
         ],
         'feature_jquery_autocomplete' => [
-            'name' => tra('Autocomplete'),
+            'name' => tra('jQuery Autocomplete'),
             'description' => tra('Provides various dropdown menus on many text input boxes for page names, user names, groups, tags, etc.'),
             'type' => 'flag',
             'help' => 'JQuery#Autocomplete',
             'dependencies' => [
                 'feature_jquery_ui',
             ],
-            'default' => 'y',   // autocomplete on pages in QuickEdit (more coming soon)
+            'conflicts' => [
+                'elementplus_autocomplete',
+            ],
+            'default' => 'n',   // autocomplete on pages in QuickEdit (more coming soon)
+            'tags' => ['deprecated'],
         ],
         'feature_jquery_reflection' => [
             'name' => tra('Reflection'),
@@ -2999,6 +3007,18 @@ function prefs_feature_list($partial = false)
                 'feature_trackers',
                 'feature_realtime',
             ],
-        ]
+        ],
+        'feature_draggable_modals' => [
+            'name' => tra('Draggable Modals'),
+            'description' => tra('Modal popups can be moved around.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
+        'feature_resizable_modals' => [
+            'name' => tra('Resizable Modals'),
+            'description' => tra('Modal popups can be resized.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
     ];
 }

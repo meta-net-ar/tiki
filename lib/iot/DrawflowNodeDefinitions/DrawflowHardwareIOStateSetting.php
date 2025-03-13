@@ -1,9 +1,9 @@
 <?php
 
-namespace Tiki\Lib\Iot\DrawflowNodeDefinitions;
+namespace Tiki\Lib\iot\DrawflowNodeDefinitions;
 
-use Tiki\Lib\Iot\DrawflowNodeType;
-use Tiki\Lib\Iot\DrawflowActionInterface;
+use Tiki\Lib\iot\DrawflowNodeType;
+use Tiki\Lib\iot\DrawflowActionInterface;
 
 class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
 {
@@ -68,7 +68,7 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
         $io_id = $user_input['io']['id'];
         $io_state = $user_input['io']['state'];
         try {
-            $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], -1, -1, 'exception');
+            $current_state = \TikiDb::get()->getOne("SELECT state_object FROM `tiki_iot_apps` WHERE `app_uuid`=?", [$this->app_uuid], 'exception');
             $current_state_array = json_decode($current_state, true);
             if (empty($current_state_array[$io_id])) {
                 $current_state_array[$io_id] = [];
@@ -76,7 +76,7 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
             $current_state_array[$io_id]['state'] = $io_state;
             $current_state_array[$io_id]['hardware_sync_done'] = false;
             \TikiDb::get()->query("UPDATE `tiki_iot_apps` SET `state_object`=? WHERE `app_uuid`=?", [json_encode($current_state_array),$this->app_uuid]);
-            $input['message'] = tra('IO status scheduled to be changed: ') . json_encode($user_input);
+            $input['message'] = tra('IO status scheduled to be changed: ') . $io_id . ' => ' . $io_state;
             $input['success'] = true;
         } catch (\Exception $e) {
             $input['message'] = tra("Couldn't update IO status: ") . $e->getMessage();

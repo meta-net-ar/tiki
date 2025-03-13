@@ -30,7 +30,7 @@
                         <td><input type="checkbox" name="select[]" value="{$token.token|escape}"/></td>
                         <td><a href="{$smarty.server.SCRIPT_NAME}?page=semantic&token={$token.token|escape}">{$token.token|escape}</a></td>
                         <td>{$token.label|escape}</td>
-                        <td><a href="{$smarty.server.SCRIPT_NAME}?page=semantic&token={$token.invert_token|escape}">{$tokens[$token.invert_token].label|escape}</a></td>
+                        <td>{if isset($token.invert_token, $tokens[$token.invert_token])}<a href="{$smarty.server.SCRIPT_NAME}?page=semantic&token={$token.invert_token|escape}">{$tokens[$token.invert_token].label|escape}</a>{/if}</td>
                     </tr>
                     {/foreach}
                 </table>

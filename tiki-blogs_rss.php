@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
+TikiLib::lib('header')->setXRobotsTag($robots);
 $bloglib = TikiLib::lib('blog');
 $rsslib = TikiLib::lib('rss');
 $access->check_feature('feature_blogs');
@@ -64,7 +65,7 @@ if ($output["data"] == "EMPTY") {
                 'is_html' => ($data['wysiwyg'] == 'y' ? 1 : 0)
             ]
         );
-        $data['sefurl'] = filter_out_sefurl(sprintf($readrepl, $data['postId'], $data['blogId']), 'blogpost', $data['title']);
+        $data['sefurl'] = filter_out_sefurl(sprintf($readrepl, $data['postId']), 'blogpost', $data['title']);
         $tmp[] = $data;
     }
     $changes["data"] = $tmp;

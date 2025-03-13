@@ -225,6 +225,14 @@ class Services_Search_CustomSearchController
 
     private function cs_dataappend_multivalue(Search_Query $query, $config, $value)
     {
+        if (isset($config['_trackerId'], $config['_field'])) {
+            $def = Tracker_Definition::get($config['_trackerId']);
+            $field = $def->getFieldFromPermName(str_replace('tracker_field_', '', $config['_field']));
+            $handler = $def->getFieldFactory()->getHandler($field);
+            if (in_array($config['_field'] . '_multi', $handler->getProvidedFields())) {
+                $config['_field'] .= '_multi';
+            }
+        }
         if (! empty($config['_value'])) {
             $value = $config['_value'];
             $query->filterMultivalue($value, $config['_field']);

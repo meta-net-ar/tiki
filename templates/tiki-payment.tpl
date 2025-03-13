@@ -59,7 +59,7 @@
                             {tr}Details{/tr}
                         </label>
                         <div class="col-sm-8">
-                            <textarea class="form-control" id="details" name="details" style="width: 100%;" rows="6"></textarea>
+                            <textarea class="form-control" id="details" name="details" rows="6"></textarea>
                         </div>
                     </div>
                     <div class="tiki-form-group row">
@@ -68,7 +68,7 @@
                         </label>
                         <div class="col-sm-8">
                             <div class="input-group">
-                                <input type="text" id="amount" name="amount" class="form-control text-end">
+                                <input type="number" step="0.01" min="0" id="amount" name="amount" class="form-control text-end">
                                 <span class="input-group-text">
                                     {$prefs.payment_currency|escape}
                                 </span>
@@ -81,7 +81,7 @@
                         </label>
                         <div class="col-sm-8 mb-3">
                             <div class="input-group">
-                                <input type="text" id="payable" class="text-end form-control" name="payable" value="{$prefs.payment_default_delay|escape}">
+                                <input type="number" id="payable" class="text-end form-control" name="payable" value="{$prefs.payment_default_delay|escape}">
                                 <span class="input-group-text">
                                     {tr}days{/tr}
                                 </span>
@@ -92,7 +92,7 @@
                         {include file="categorize.tpl" labelcol=3 labelclass='text-end' inputcol=8 inputgroup=y}
                     {/if}
                     <div class="mb-3 row">
-                        <div class="col-sm-8 offset-sm-3">
+                        <div class="col-sm-8 offset-sm-3 text-end">
                             <input type="submit" class="btn btn-secondary" name="request" value="{tr}Request{/tr}">
                         </div>
                     </div>

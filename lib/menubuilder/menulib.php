@@ -544,22 +544,21 @@ class MenuLib extends TikiLib
         }
     }
 
-    public function import_menu_options($menuId)
+    public function import_menu_options($menuId, $importAsNew = false)
     {
         $smarty = TikiLib::lib('smarty');
 
         $options = [];
         $fname = $_FILES['csvfile']['tmp_name'];
         $fhandle = fopen($fname, "r");
-        $fields = fgetcsv($fhandle, 1000);
+        $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         if (! $fields[0]) {
-            $smarty->assign('msg', tra('The file has incorrect syntax or is not a CSV file'));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra('The file has incorrect syntax or is not a CSV file'), \Laminas\Http\Response::STATUS_CODE_409);
         }
+        $mismatch_options = [];
         while (! feof($fhandle)) {
             $res = ['optionId' => '', 'type' => '', 'name' => '', 'url' => '', 'position' => 0, 'section' => '', 'perm' => '', 'groupname' => '', 'userlevel' => '', 'class' => '', 'icon' => '', 'remove' => ''];
-            $data = fgetcsv($fhandle, 1000);
+            $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
             if (empty($data)) {
                 continue;
             }
@@ -569,12 +568,29 @@ class MenuLib extends TikiLib
             if (empty($res['optionId']) || $this->check_menu_option($menuId, $res['optionId'])) {
                 $options[] = $res;
             } else {
-                $smarty->assign('msg', tra('You can only use optionId = 0 to create a new option; or, to update a menu, use an optionId that is the same as an optionId that is already used in the menu.'));
-                $smarty->display('error.tpl');
-                die;
+                if ($importAsNew) {
+                    $res['optionId'] = 0;
+                    $options[] = $res;
+                } else {
+                    $mismatch_options[] = $res;
+                }
             }
         }
         fclose($fhandle);
+
+        if (! empty($mismatch_options)) {
+            global $jitRequest;
+            $jitRequest['mismatch_options'] = $mismatch_options;
+            $jitRequest['menuId'] = $menuId;
+            $jitRequest['title'] = tr('Menu Import Conflict: Resolve Mismatched Options');
+            $controller = 'menu';
+            $action = 'mismatch_import';
+
+            $broker = TikiLib::lib('service')->getBroker();
+            $broker->process($controller, $action, $jitRequest);
+            exit;
+        }
+
         foreach ($options as $option) {
             if ($option['remove'] == 'y') {
                 $this->remove_menu_option($option['optionId']);
@@ -588,20 +604,16 @@ class MenuLib extends TikiLib
     {
         $data = '"optionId","type","name","url","position","section","perm","groupname","userlevel","class","icon","remove"' . "\r\n";
         $options = $this->list_menu_options($menuId, 0, -1, 'position_asc', '', true, 0, true);
+        $keysToKeep = [
+            "optionId", "type", "name", "url", "position", "section",
+            "perm", "groupname", "userlevel", "class", "icon"
+        ];
         foreach ($options['data'] as $option) {
-            $data .= $option['optionId']
-                            . ',"' . $option['type']
-                            . '","' . str_replace('"', '""', $option['name'])
-                            . '","' . str_replace('"', '""', $option['canonic'])
-                            . '",' . $option['position']
-                            . ',"' . $option['section']
-                            . '","' . $option['perm']
-                            . '","' . $option['groupname']
-                            . '",' . $option['userlevel']
-                            . ',' . $option['class']
-                            . ',' . $option['icon']
-                            . ',"n"' . "\r\n"
-                            ;
+            $option = array_intersect_key($option, array_flip($keysToKeep));
+            $option = array_map(fn($value) => $this->sanitizeForCsv($value), $option);
+            $option['remove'] = 'n';
+            $data .= $this->str_putcsv($option);
+            $data .= "\r\n";
         }
         if (empty($encoding)) {
             $encoding = 'UTF-8';

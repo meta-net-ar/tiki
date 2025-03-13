@@ -7,16 +7,16 @@
         <span class="titleb">{tr}By:{/tr} {$authorName} {$publishDate|tiki_short_datetime:'On:'} (0 {tr}Reads{/tr})</span>
     </header>
     <div class="articleheading">
-        <table cellpadding="0" cellspacing="0">
+        <table>
             <tr>
-                <td valign="top">
+                <td>
                     {if $useImage eq 'y'}
                         <img alt="{tr}Article image{/tr}" src="received_article_image.php?id={$receivedArticleId}">
                     {else}
                         <img alt="{tr}Topic image{/tr}" src="article_image.php?image_type=topic&amp;id={$topic}">
                     {/if}
                 </td>
-                <td valign="top">
+                <td>
                     <span class="articleheading">{$parsed_heading}</span>
                 </td>
             </tr>
@@ -121,7 +121,7 @@
         </div>
         <div class="tiki-form-group row">
             <label class="col-form-label col-sm-3">{tr}Image size:{/tr}</label>
-            <div class="col-sm-7 form-control-plaintext">
+            <div class="col-sm-7">
                 {$image_size}
             </div>
         </div>
@@ -170,9 +170,11 @@
             <label class="col-form-label col-sm-3">{tr}Accept Article{/tr}</label>
             <div class="col-sm-7">
                 <select name="topic">
-                    {section name=t loop=$topics}
-                        <option value="{$topics[t].topicId|escape}" {if $topic eq $topics[t].topicId}selected="selected"{/if}>{$topics[t].name}</option>
-                    {/section}
+                    {foreach from=$topics key=topicKey item=topicItem}
+                        <option value="{$topicItem.topicId|escape}" {if $topic eq $topicItem.topicId}selected="selected"{/if}>
+                            {$topicItem.name}
+                        </option>
+                    {/foreach}
                 </select>
                 <input type="submit" class="btn btn-primary btn-sm" name="accept" value="{tr}Accept{/tr}">
             </div>

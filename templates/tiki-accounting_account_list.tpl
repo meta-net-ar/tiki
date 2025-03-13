@@ -20,18 +20,18 @@
                 <td>{$a.accountNotes|escape}</td>
                 <td class="text-end">
                     {if $book.bookCurrencyPos==-1}{$book.bookCurrency}{/if}
-                    {$a.accountBudget|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
+                    {$a.accountBudget|default:0|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
                     {if $book.bookCurrencyPos==1}{$book.bookCurrency}{/if}
                 </td>
                 <td>{if $a.accountLocked==1}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}</td>
                 <td class="text-end">
                     {if $book.bookCurrencyPos==-1}{$book.bookCurrency}{/if}
-                    {$a.debit|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
+                    {$a.debit|default:0|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
                     {if $book.bookCurrencyPos==1}{$book.bookCurrency}{/if}
                 </td>
                 <td class="text-end">
                     {if $book.bookCurrencyPos==-1}{$book.bookCurrency}{/if}
-                    {$a.credit|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
+                    {$a.credit|default:0|number_format:$book.bookDecimals:$book.bookDecPoint:$book.bookThousand}
                     {if $book.bookCurrencyPos==1}{$book.bookCurrency}{/if}
                 </td>
                 <td>{$a.accountTax}</td>

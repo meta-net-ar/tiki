@@ -16,7 +16,6 @@
 // will be serialized and sent to the browser.
 //
 // Otherwise, the procedural script remains
-
 $inputConfiguration = [[
     'staticKeyFilters' => [
         'action' => 'word',         //get
@@ -48,21 +47,15 @@ if (isset($_REQUEST['controller'])) {
             $controller = $parts[2];
         }
     }
-    $action = 'no_action';
-    if (isset($_REQUEST['action'])) {
-        $action = $_REQUEST['action'];
-        $broker = TikiLib::lib('service')->getBroker($extensionPackage);
-        $broker->process($controller, $action, $jitRequest);
-        exit;
-    } else {
-        $broker = TikiLib::lib('service')->getBroker($extensionPackage);
-        $broker->process($controller, $action, $jitRequest);
-        exit;
-    }
+
+    $action = $_REQUEST['action'] ?? 'no_action';
+    $broker = TikiLib::lib('service')->getBroker($extensionPackage);
+    $broker->process($controller, $action, $jitRequest);
+    exit;
 }
 
 if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly')) {
-    $access->check_feature('feature_jquery_autocomplete');
+    $access->check_feature(['feature_jquery_autocomplete', 'elementplus_autocomplete'], '', 'features', true);
 
     $listonly = $jitRequest->listonly->word();
     $query = $jitRequest->q->text();

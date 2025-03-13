@@ -15,10 +15,6 @@ require_once('tiki-setup.php');
 $access->check_feature('feature_calendar');
 $access->check_permission('tiki_p_view_events');
 
-// Initialization
-TikiInit::appendIncludePath("lib/ical/");
-include_once('lib/ical/iCal.php');
-
 // list calendars //
 $calendarlib = TikiLib::lib('calendar');
 
@@ -42,7 +38,9 @@ if (! isset($calendarViewMode)) {
 # If specified, limit the export to the maximum number of records (events)
 # indicated in the request; otherwise, the limit is from the global preferences.
 if (isset($_REQUEST['maxRecords'])) {
-        $maxRecords = $_REQUEST['maxRecords'];
+    $maxRecords = $_REQUEST['maxRecords'];
+} else {
+    $maxRecords = -1;
 }
 
 if (isset($_SESSION['CalendarFocusDate'])) {
@@ -76,9 +74,9 @@ if ($calendarViewMode['casedefault'] == 'month') {
 $stopTime = $endDate->getTime();
 
 if (isset($_REQUEST['stop_date_Month'])) {
-    $stopTime = TikiLib::make_time(0, 0, 0, $_REQUEST['stop_date_Month'], $_REQUEST['stop_date_Day'], $_REQUEST['stop_date_Year']);
+    $stopTime = TikiLib::make_time(23, 59, 59, $_REQUEST['stop_date_Month'], $_REQUEST['stop_date_Day'], $_REQUEST['stop_date_Year']);
 } elseif (isset($_REQUEST["tstop"])) {
-    $stopTime = $_REQUEST["tstop"];
+    $stopTime = strtotime('23:59:59', $_REQUEST["tstop"]);
 }
 
 $calendarIds = [];
@@ -113,31 +111,31 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
         $events = $calendarlib->getItemWithRecurrence($_REQUEST["calendarItem"]);
     }
 
+    TikiLib::lib('header')->setXRobotsTag($robots);
+
     if (isset($_REQUEST['csv'])) {
         header('Content-type: text/csv');
         header("Content-Disposition: inline; filename=tiki-calendar.csv");
-        $first = true;
-        $description = '';
-        foreach ($events as $event) {
-            $line = '';
-            foreach ($event as $name => $field) {
-                if ($first === true) {
-                    $description .= '"' . $name . '";';
-                }
-                if (is_array($field)) {
-                    $line .= '"' . str_replace(["\n","\r",'"'], ['\\n','','""'], join(',', $field)) . '";';
-                } else {
-                    $line .= '"' . str_replace(["\n","\r",'"'], ['\\n','','""'], $field) . '";';
-                }
-            }
-            if ($first === true) {
-                echo (trim($description, ';')) . "\n";
-                $first = false;
-            }
-            echo trim($line, ';') . "\n";
+        $fh = fopen('php://temp', 'rw');
+        if (! empty($events)) {
+            $header = array_keys(reset($events));
+            fputcsv($fh, $header, escape: "");
         }
+        foreach ($events as $event) {
+            foreach ($event as $name => $field) {
+                if (is_array($field)) {
+                    $event[$name] = implode(',', $field);
+                }
+            }
+            $event = array_values($event);
+            fputcsv($fh, $event, escape: "");
+        }
+        rewind($fh);
+        $csv = stream_get_contents($fh);
+        fclose($fh);
+        echo trim($csv);
     } else {
-        // create ical
+        // create ical with sabre/dav
 
         $userlb = TikiLib::get('Users');
 
@@ -216,8 +214,6 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
     die;
 }
 
-
-$smarty->assign('iCal', $iCal);
 
 // Display the template
 $smarty->display("tiki.tpl");

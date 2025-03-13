@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="page_{$page_id}"{/if}>
+<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if Language::isRTL()} dir="rtl"{/if}{if !empty($page_id)} id="page_{$page_id}"{/if}>
 <head>
     {include file='header.tpl'}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,10 @@
 {if $prefs.feature_ajax eq 'y'}
     {include file='tiki-ajax_header.tpl'}
 {/if}
+
+{if $section !== 'admin'}
+    {include file='tiki-maintenance_banner.tpl'}
+{/if}
 <a class="btn btn-info btn-lg skipnav" href="#col1">{tr}Skip to main content{/tr}</a>
 <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
@@ -22,6 +26,9 @@
         </div>
     {/if}
     <div class="row row-middle" id="row-middle">
+        {if $section === 'admin'}
+            {include file='tiki-maintenance_banner.tpl'}
+        {/if}
         {modulelist zone=topbar class="topbar_modules topbar navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Navigation and related functionality and content{/tr}'}
         <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
         {if (zone_is_empty('left') or $prefs.feature_left_column eq 'n') and (zone_is_empty('right') or $prefs.feature_right_column eq 'n')}

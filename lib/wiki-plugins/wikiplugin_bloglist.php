@@ -17,10 +17,11 @@ function wikiplugin_bloglist_info()
             'Id' => [
                 'required' => true,
                 'name' => tra('Blog ID'),
-                'description' => tra('The ID number of the blog on the site to list posts from. More than one blog can be provided, separated by colon. Example: 1:5. Limitation: if more than one blog is provided, the private posts (drafts) are not shown.'),
+                'description' => tra('Select one or more blogs to list posts from. Limitation: if more than one blog is selected, private posts (drafts) will not be shown.'),
                 'filter' => 'striptags',
                 'default' => '',
                 'profile_reference' => 'blog',
+                'separator' => ':',
                 'since' => '1'
             ],
             'Items' => [
@@ -36,6 +37,7 @@ function wikiplugin_bloglist_info()
                 'name' => tra('Author'),
                 'description' => tra('Only display posts created by this user (all posts listed by default)'),
                 'default' => '',
+                'profile_reference' => 'user',
                 'since' => '3.5',
             ],
             'simpleList' => [
@@ -164,7 +166,7 @@ function wikiplugin_bloglist($data, $params)
     global $user;
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
-
+    $params['Id'] = implode(':', $params['Id']);
     if (! isset($params['Id'])) {
         Feedback::error(tra('Missing blog ID for Bloglist plugin'));
         return '';

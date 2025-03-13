@@ -57,46 +57,6 @@ if (empty($_REQUEST['parentId'])) {
     $access->check_permission('tiki_p_admin_categories', '', 'category', $_REQUEST['parentId']);
 }
 
-if (! empty($_REQUEST['unassign']) && $access->checkCsrf(true)) {
-    $result = $categlib->unassign_all_objects($_REQUEST['parentId']);
-    if ($result->numrows()) {
-        $msg = $result->numrows() === 1 ? tr('One object unassigned from category')
-            : tr('%0 objects unassigned from category', $result->numrows());
-        Feedback::success($msg);
-    } else {
-        Feedback::error(tra('No objects unassigned'));
-    }
-}
-if (! empty($_REQUEST['move_to']) && ! empty($_REQUEST['toId']) && $access->checkCsrf()) {
-    if (! $categlib->get_category($_REQUEST['toId']) || empty($_REQUEST['toId'])) {
-        Feedback::error(tr('Incorrect category ID %0 - objects not moved.', (int) $_REQUEST['toId']));
-    } else {
-        $access->check_permission('tiki_p_admin_categories', '', 'category', $_REQUEST['toId']);
-        $result = $categlib->move_all_objects($_REQUEST['parentId'], $_REQUEST['toId']);
-        if ($result->numRows()) {
-            $msg = $result->numrows() === 1 ? tr('One object moved to selected category')
-                : tr('%0 objects moved to selected category', $result->numrows());
-            Feedback::success($msg);
-        } else {
-            Feedback::error(tr('No objects moved'));
-        }
-    }
-}
-if (! empty($_REQUEST['copy_from']) && ! empty($_REQUEST['to']) && $access->checkCsrf()) {
-    if (! $categlib->get_category($_REQUEST['to']) || empty($_REQUEST['toId'])) {
-        Feedback::error(tr('Incorrect category ID %0 - objects not copied.', (int) $_REQUEST['to']));
-    } else {
-        $access->check_permission('tiki_p_admin_categories', '', 'category', $_REQUEST['to']);
-        $result = $categlib->assign_all_objects($_REQUEST['parentId'], $_REQUEST['to']);
-        if ($result->numRows()) {
-            $msg = $result->numrows() === 1 ? tr('One object copied to selected category')
-                : tr('%0 objects copied to selected category', $result->numrows());
-            Feedback::success($msg);
-        } else {
-            Feedback::error(tr('No objects copied'));
-        }
-    }
-}
 if (isset($_REQUEST["addpage"]) && $_REQUEST["parentId"] != 0 && $access->checkCsrf()) {
     // Here we categorize a page
     // add multiple pages at once
@@ -332,7 +292,7 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
     if (! $fhandle) {
         Feedback::error(tr("The file has incorrect syntax or is not a CSV file"));
     } else {
-        $fields = fgetcsv($fhandle, 1000);
+        $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         if (! $fields[0]) {
             Feedback::error(tr("The file has incorrect syntax or is not a CSV file"));
         } else {
@@ -342,7 +302,7 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
             } else {
                 while (! feof($fhandle)) {
                     $success = false;
-                    $data = fgetcsv($fhandle, 1000);
+                    $data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
                     if (! empty($data)) {
                         $temp_max = count($fields);
                         $getCategory = true;
@@ -534,7 +494,7 @@ foreach ($categories as $category) {
                         {
                         	filter: {
                                 deep_categories: $this.data("categid"),
-                                object_type: "not activity and not category",
+                                object_type: "not activity and not category and not comment",
                                 searchable: "y"
                             },
                             maxRecords: 1

@@ -6,9 +6,7 @@
         <input type="hidden" name="wp_trade_offset" value="{$wp_trade_offset|escape}">
         {if $wp_trade_other_user_set eq "n"}
             <input type="text" id="other_user{$wp_trade_offset|escape}" name="wp_trade_other_user" value="{$wp_trade_other_user.login|escape}"> ({tr}separated by |{/tr})
-            {jq}
-                $('#other_user{{$wp_trade_offset|escape}}').tiki("autocomplete", "username", {multiple: true, multipleSeparator: "|"});
-            {/jq}
+            {autocomplete element="#other_user{$wp_trade_offset|escape}" type="username" options="multiple: true, multipleSeparator: '|'"}
         {/if}
         {if $user}
             <input type="submit" class="btn btn-primary btn-sm" value="{$wp_trade_action}">

@@ -354,6 +354,8 @@ class SemanticLib
         $querystring = "SELECT `source_itemId` `fromPage`, `target_itemId` `toPage` FROM `tiki_object_relations` WHERE $mid";
         $aliases = $tikilib->fetchAll($querystring, $bindvars);
 
+        $aliases = Perms::filter(['type' => 'wiki page'], 'object', $aliases, ['object' => 'fromPage'], 'view');
+
         $aliases = $this->onlyKeepAliasesFromPageInLanguage($in_lang, $aliases);
         return $aliases;
     }

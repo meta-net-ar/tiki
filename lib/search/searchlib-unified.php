@@ -4,8 +4,13 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Search\Formatter\Transform\DynamicLoader;
 use Tiki\Search\ContentSource\CreditSource;
 use Tiki\Search\ContentSource\GoalSource;
+use Tiki\Search\Elastic\ElasticSearchIndexManager;
+use Tiki\Search\Manticore\ManticoreSearchIndexManager;
+use Tiki\Search\MySql\MysqlSearchIndexManager;
 use Tiki\TikiInit;
 
 /**
@@ -254,6 +259,7 @@ class UnifiedSearchLib
 
         $stat = [];
         $indexer = null;
+        $totalFieldsUsedIn = 'total fields used in the ' . $prefs['unified_engine'] . ' search index: ';
         try {
             $indexDecorator = new Search_Index_TypeAnalysisDecorator($index);
             $indexer = $this->buildIndexer($indexDecorator, $loggit);
@@ -277,7 +283,7 @@ class UnifiedSearchLib
                 $fieldsCount = $engineResults->getEngineFieldsCount();
 
                 if ($fieldsCount !== $stat['total tiki fields indexed']) {
-                    $stat['total fields used in the ' . $prefs['unified_engine'] . ' search index: '] = $fieldsCount;
+                    $stat[$totalFieldsUsedIn] = $fieldsCount;
                 }
                 $tikilib->set_preference('unified_total_fields', $fieldsCount);
             }
@@ -527,6 +533,7 @@ class UnifiedSearchLib
     public function getSupportedTypes()
     {
         global $prefs;
+
         $types = [];
 
         if ($prefs['feature_wiki'] == 'y') {
@@ -534,6 +541,7 @@ class UnifiedSearchLib
         }
 
         if ($prefs['feature_blogs'] == 'y') {
+            $types['blog'] = tra('blog');
             $types['blog post'] = tra('blog post');
         }
 
@@ -588,8 +596,16 @@ class UnifiedSearchLib
             $types['calendar'] = tra('calendar');
         }
 
+        if ($prefs['feature_surveys'] == 'y') {
+            $types['survey'] = tra('survey');
+        }
+
         $types['user'] = tra('user');
         $types['group'] = tra('group');
+
+        if ($prefs['feature_polls'] == 'y') {
+            $types['poll'] = tra('poll');
+        }
 
         return $types;
     }
@@ -782,6 +798,10 @@ class UnifiedSearchLib
             $aggregator->addContentSource('forum', new Search_ContentSource_ForumSource());
         }
 
+        if (isset($types['blog'])) {
+            $aggregator->addContentSource('blog', new Search_ContentSource_BlogSource());
+        }
+
         if (isset($types['blog post'])) {
             $aggregator->addContentSource('blog post', new Search_ContentSource_BlogPostSource());
         }
@@ -892,6 +912,14 @@ class UnifiedSearchLib
         if ($mode == 'indexing') {
             $aggregator->addGlobalSource(new Search_GlobalSource_PermissionSource(Perms::getInstance()));
             $aggregator->addGlobalSource(new Search_GlobalSource_RelationSource());
+        }
+
+        if (isset($types['survey'])) {
+            $aggregator->addContentSource('survey', new Search_ContentSource_SurveySource());
+        }
+
+        if (isset($types['poll'])) {
+            $aggregator->addContentSource('poll', new Search_ContentSource_PollSource());
         }
 
         $aggregator->addGlobalSource(new Search_GlobalSource_TitleInitialSource());
@@ -1295,7 +1323,7 @@ class UnifiedSearchLib
 
     public function initQueryPresentation($query)
     {
-        $query->applyTransform(new Search_Formatter_Transform_DynamicLoader($this->getDataSource('formatting')));
+        $query->applyTransform(new DynamicLoader($this->getDataSource('formatting')));
     }
 
     /**
@@ -1403,7 +1431,6 @@ class UnifiedSearchLib
                 $query->filterContent($value, $key);
             }
         }
-
         return $query;
     }
 
@@ -1519,7 +1546,6 @@ class UnifiedSearchLib
 
     public function isOutdated()
     {
-
         global $prefs;
 
         // If incremental update is enabled we cannot rely on the unified_last_rebuild date.
@@ -1636,6 +1662,21 @@ class UnifiedSearchLib
 
         if (isset($types['group'])) {
             // todo: unable to track groups by dates
+        }
+
+        if (isset($types['survey'])) {
+            $surveylib = TikiLib::lib('survey');
+
+            $last_survey = $surveylib->list_surveys(0, 1, 'lastTaken_desc');
+            if (! empty($last_survey['data'][0]['lastTaken']) && $last_survey['data'][0]['lastTaken'] > $threshold) {
+                return true;
+            }
+
+            // Also check creation date
+            $last_created_survey = $surveylib->list_surveys(0, 1, 'created_desc');
+            if (! empty($last_created_survey['data'][0]['created']) && $last_created_survey['data'][0]['created'] > $threshold) {
+                return true;
+            }
         }
     }
 
@@ -1851,5 +1892,49 @@ class UnifiedSearchLib
                 }
             }
         }
+    }
+
+    public function listAllUnusedIndexes($currentEngine)
+    {
+        global $prefs;
+
+        $indices = [];
+        list($engine, $version, $currentIndex) = $currentEngine;
+
+        switch ($engine) {
+            case 'Elastic':
+                try {
+                    $indexPrefix = $prefs['unified_elastic_index_prefix'];
+                    $connUrl = $prefs['unified_elastic_url'];
+                    $manager = new ElasticSearchIndexManager($currentIndex, $indexPrefix, $connUrl);
+                    $indices['indices'] = $manager->getUnusedIndexes();
+                } catch (\Exception $e) {
+                    $indices['error'] = "An error occurred while getting indices for Elasticsearch: " . $e->getMessage();
+                }
+                break;
+            case 'MySQL':
+                try {
+                    $mysqlManager = new MysqlSearchIndexManager($currentIndex);
+                    $indices['indices'] = $mysqlManager->getUnusedIndexes();
+                } catch (\Exception $e) {
+                    $indices['error'] = "An error occurred while getting indices for MYSQL: " . $e->getMessage();
+                }
+                break;
+            case 'Manticore':
+                try {
+                    $indexPrefix = $prefs['unified_manticore_index_prefix'] . 'main';
+                    $dsn = $prefs['unified_manticore_url'];
+                    $pdoPort = $prefs['unified_manticore_mysql_port'] ?: 9306;
+                    $manticoreManager = new ManticoreSearchIndexManager($currentIndex, $indexPrefix, $dsn, $pdoPort);
+                    $indices['indices'] = $manticoreManager->getUnusedIndexes();
+                } catch (\Exception $e) {
+                    $indices['error'] = "An error occurred while getting indices for Manticore: " . $e->getMessage();
+                }
+                break;
+            default:
+                break;
+        }
+
+        return $indices;
     }
 }

@@ -12842,7 +12842,7 @@ $lang_current = array(
 "Simple search controls for the map" => "Einfache Suchfunktion für die Karte",
 "Menu" => "Menü",
 "Displays a menu or a structure as a menu" => "Zeigt ein Menü oder eine Struktur als Menü",
-"Identifier of the menu (from tiki-admin_menus.php) " => "Kennzeichner (ID) eines Menü (von tiki-admin_menus.php)",
+"Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1) " => "Verwendet die ID des Menüs (um ein neues Menü zu bearbeiten/hinzufügen, gehen Sie zu %0Admin-Menüs%1)",
 "Structure" => "Struktur",
 "Identifier of a structure of wiki pages (name or number from tiki-admin_structures.php)" => "Kennung einer Struktur von Wiki Seiten (Name oder Nummer aus tiki-admin_structures.php)",
 "Orientation of menu: horiz or vert (default vert) " => "Ausrichtung für Menüs horiz (für horizontal) vert (für vertikal) (Standard: vert)",
@@ -15403,7 +15403,7 @@ $lang_current = array(
 // "Email address or " => "Email address or ",
 // "User account ID" => "User account ID",
 "Username:" => "Nutzername",
-// "Enter a username and click 'Switch'.<br>Useful for testing permissions" => "Enter a username and click 'Switch'.<br>Useful for testing permissions",
+// "Select a username and click 'Switch'.<br>Useful for testing permissions" => "Select a username and click 'Switch'.<br>Useful for testing permissions",
 // "Toggle Dropdown" => "Toggle Dropdown",
 "My Account" => "Mein Tiki",
 // "{\$user|username|escape|replace:'&amp;':'&'}" => "{\$user|username|escape|replace:'&amp;':'&'}",
@@ -17524,7 +17524,7 @@ $lang_current = array(
 "~tc~ Tiki Comment ~/tc~ makes a Tiki comment. It will be completely removed from the display, but saved in the file for future reference. ~hc~ HTML Comment ~/hc~ makes an HTML comment. It will be inserted as a comment in the output HTML; these are not normally displayed in browsers, but can be seen using \"View Source\" or similar." => "~tc~ Text ~/tc~ erstellt einen Tikikommentar.  Dieser ist nicht sichtbar, wird aber zusammen mit der Datei zu künftigen Nachweisen abgespeichert.  ~hc~ Text ~/hc~ fügt einen HTML-Kommentar ein.  Er wird als Kommentar im HTML-Output eingefügt und kann dann vom Browser über die Quelltextanzeige angezeigt werden.",
 "Block Preformatting" => "Block Vorformatierung",
 "Indent text with any number of spaces to change it to a monospaced block that still follows other Wiki formatting instructions. It will be indented with the same number of spaces that are used. Note that this mode does not preserve exact spacing and line breaks; use ~pp~...~/pp~ for that" => "Rücke Text mit einer beliebigen Zahl von Leerzeichen ein, um ihn in in einen Block nichtproportionaler Schrift umzuwandeln. Andere Wiki Formatierungen bleiben erhalten. Er wird mit der gleichen Zahl von Leerzeichen eingerückt, die benutzt wurden.  Beachte, dass dieser Modus nicht die exakten Abstände und Zeilenumbrüche erhält; Benutze ~pp~...~/pp~ hierfür",
-"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for langages as Arabic and Hebrew." => "Fügt ein DIV für die Textschreibrichtung recht-nach-links bzw. links-nach-rechts-ein. Außerdem eine Kennzeichnung für die Sprache als Arabisch und Herbräisch.",
+"Insert with respect to right-to-left and left-to-right text direction DIV (up to end of text) and markers for languages as Arabic and Hebrew." => "Fügt ein DIV für die Textschreibrichtung recht-nach-links bzw. links-nach-rechts-ein. Außerdem eine Kennzeichnung für die Sprache als Arabisch und Herbräisch.",
 "Special characters" => "Sonderzeichen",
 "hard space" => "untrennbares Leerzeichen",
 "numeric between ~ for HTML numeric characters entity" => "numerisch zwischen ~ für eine numerische HTML-Zeicheneinheit",
@@ -19124,8 +19124,8 @@ $lang_current = array(
 "Email address:" => "eMail-Adresse:",
 "Current password (required)" => "aktuelles Passwort (erforderlich)",
 // "Two-Factor Authentication" => "Two-Factor Authentication",
-// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®",
-// "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation" => "Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation",
+// "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app" => "Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,\n            Tiki will require a code from your mobile phone during login. This code is generated by an authenticator app",
+// "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation" => "Install an authenticator app from your application repository and use it to scan this QR code. More information is available in the documentation",
 // "Enable Two-Factor Auth" => "Enable Two-Factor Auth",
 // "Disable Two-Factor Auth" => "Disable Two-Factor Auth",
 // "Regenerate Two-Factor Auth" => "Regenerate Two-Factor Auth",
@@ -20000,10 +20000,10 @@ $lang_current = array(
 "Subscription confirmed!" => "Abonnement bestätigt!",
 "Subscribe to the newsletter" => "Newsletter abonnieren",
 // "Show QRCode" => "Show QRCode",
-// "Install Google Authenticator® app on your device and open it" => "Install Google Authenticator® app on your device and open it",
+// "Install an authenticator app on your device and open it" => "Install an authenticator app on your device and open it",
 // "Tap “Scan a barcode”" => "Tap “Scan a barcode”",
 // "Scan the QR code that is open in your browser" => "Scan the QR code that is open in your browser",
-// "Done, Google Authenticator® is now generating codes" => "Done, Google Authenticator® is now generating codes",
+// "Done, the authenticator app is now generating codes" => "Done, the authenticator app is now generating codes",
 // "Add new application" => "Add new application",
 // "End tour" => "End tour",
 // "-- Choose an option --" => "-- Choose an option --",
@@ -21969,3 +21969,8 @@ $lang_current = array(
 // "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine" => "Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine",
 );
 $lang = array_replace($lang, $lang_current);
+
+
+
+
+

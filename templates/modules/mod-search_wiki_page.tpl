@@ -1,5 +1,5 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="search_wiki_page" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
-    {jq}$(".pagename").tiki("autocomplete", "pagename");{/jq}
+    {autocomplete element=".pagename" type="pagename"}
     <form class="forms" method="post" action="tiki-listpages.php">
         <input type="hidden" name="lang" value=""/>
         <div class="input-group">

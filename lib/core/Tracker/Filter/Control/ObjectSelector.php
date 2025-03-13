@@ -90,8 +90,11 @@ class ObjectSelector implements Control
         $smarty = \TikiLib::lib('smarty');
 
         if ($this->multi) {
-            $params['_value'] = implode(',', $this->value);
-            $params['_separator'] = ',';
+            if (is_array($this->value)) {
+                $params['_value'] = implode("\n", $this->value);
+            } else {
+                $params['_value'] = $this->value;
+            }
 
             $result = smarty_function_object_selector_multi($params, $smarty->getEmptyInternalTemplate());
         } else {

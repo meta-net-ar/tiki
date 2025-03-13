@@ -28,6 +28,11 @@ class TikiDb_Table
         $this->errorMode = TikiDb::ERR_EXCEPTION;
     }
 
+    public function getTableName()
+    {
+        return $this->tableName;
+    }
+
     /**
      * Inserts a row in the table by building the SQL query from an array of values.
      * The target table is defined by the instance. Argument names are not validated

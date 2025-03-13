@@ -45,7 +45,7 @@ use Smarty\Template;
  */
 class PaginationLinks extends Base
 {
-    public function handle($params, $content, Template $template, &$repeat)
+    public function handle($params, $url, Template $template, &$repeat)
     {
         global $prefs;
 
@@ -149,7 +149,11 @@ class PaginationLinks extends Base
         }
 
         if (empty($url) || preg_match('/^\s*$/', $url)) {
-            $url = smarty_function_query(['_type' => $default_type], $template);
+            $query_params = ['_type' => $default_type];
+            if (isset($params['_keepall'])) {
+                $query_params['_keepall'] = $params['_keepall'];
+            }
+            $url = smarty_function_query($query_params, $template);
         }
 
         // remove empty url arguments (done by default)

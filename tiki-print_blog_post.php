@@ -17,9 +17,7 @@ $bloglib = TikiLib::lib('blog');
 $access->check_feature('feature_blogs');
 
 if (! isset($_REQUEST["postId"])) {
-    $smarty->assign('msg', tra("No post indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No post indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $postId = $_REQUEST["postId"];
@@ -33,9 +31,7 @@ $access->check_permission('tiki_p_read_blog', '', 'blog post', $postId);
 $blog_data = $bloglib->get_blog($blogId);
 
 if (! $blog_data) {
-    $smarty->assign('msg', tra("Blog not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Blog not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $parsed_data = TikiLib::lib('parser')->parse_data($post_info["data"], ['is_html' => true]);
@@ -54,4 +50,5 @@ $smarty->assign('mid', 'tiki-view_blog_post.tpl');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 // Display the template
+$smarty->assign('print_page', 'y');
 $smarty->display("tiki-print_blog_post.tpl");

@@ -120,7 +120,7 @@ class Table_Code_Other extends Table_Code_Manager
                             ''
                         );
                     }
-                    $htmlbefore[] = $this->iterate($divr, '<div style="float:right">', '</div>', '', '', '');
+                    $htmlbefore[] = $this->iterate($divr, '<div style="float:right" class="w-25">', '</div>', '', '', '');
                 }
             }
             // add custom dropdown parser
@@ -190,7 +190,7 @@ class Table_Code_Other extends Table_Code_Manager
             if (isset($opt)) {
                 $pagerdiv[] = $this->iterate(
                     $opt,
-                    '<div class="btn-group"><label for="pagesize" class="right-margin mx-1">' . tra("Rows") . '</label><select id="pagesize" class="pagesize form-control-sm">',
+                    '<div class="btn-group" style="width: 35%"><label for="pagesize" class="right-margin mx-1">' . tra("Rows") . '</label><select id="pagesize" class="pagesize form-control-sm">',
                     '</select></div>',
                     '<option',
                     '</option>',

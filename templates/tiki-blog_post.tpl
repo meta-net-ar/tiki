@@ -63,7 +63,7 @@
                 <input type="text" maxlength="255" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
             </div>
         </div>
-        {if $blog_data.use_excerpt eq 'y'}
+        {if isset($blog_data) and $blog_data.use_excerpt eq 'y'}
             <div class="mb-3 row">
                 <div class="col-md-12">
                     <label class="col-form-label" for="post_excerpt">{tr}Excerpt{/tr}</label>
@@ -138,7 +138,7 @@
         {if $prefs.feature_contribution eq 'y'}
             {include file='contribution.tpl'}
         {/if}
-        {if $blog_data.allow_post_categorization === 'y'}
+        {if isset($blog_data) and $blog_data.allow_post_categorization === 'y'}
             {include file='categorize.tpl'}
         {/if}
     </fieldset>

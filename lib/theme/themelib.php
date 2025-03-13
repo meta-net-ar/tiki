@@ -221,6 +221,7 @@ class ThemeLib extends TikiLib
                 $layoutName == 'mobile'
                 || $layoutName == 'layout_plain.tpl'
                 || $layoutName == 'internal'
+                || $layoutName == 'admin'
             ) {
                 // hide layouts that are for internal use only
                 continue;

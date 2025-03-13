@@ -31,9 +31,13 @@
 
                 {preference name=feature_warn_on_edit}
                 {preference name=ajax_inline_edit}
+                {preference name="tracker_item_select_feature"}
                 <div class="adminoptionboxchild" id="ajax_inline_edit_childcontainer">
                     {preference name=ajax_inline_edit_trackerlist}
                 </div>
+                {preference name=tracker_adminonlyviewedititem_by_default}
+                {preference name=tracker_display_wiki_only_status}
+                {preference name=tracker_display_categories}
                 {preference name=tracker_report_resize_button}
                 {preference name=tracker_show_comments_below}
                 {preference name=tracker_legacy_insert}

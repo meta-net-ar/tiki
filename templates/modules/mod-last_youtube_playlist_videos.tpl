@@ -12,14 +12,18 @@
             nobox="{if isset($module_params.nobox)}{$module_params.nobox}{/if}"
             notitle="{if isset($module_params.notitle)}{$module_params.notitle}{/if}"}
     <div class="youtubemodule" >
-        {foreach from=$data.videos item=videoEntry key=videoId}
-            <a class="linkmodule" href="http://www.youtube.com/watch?v={$videoId}" {if $verbose eq 'y' && isset($videoEntry.description)} title="{$videoEntry.description|escape:'html'}"{/if} >
-                {$videoEntry.title|escape:"html"}
-            </a>
-            {if isset($videoEntry.xhtml)}
-                <div class="module video youtube" >{$videoEntry.xhtml}</div>
-            {/if}
-        {/foreach}
+        {if isset($data.videos)}
+            {foreach from=$data.videos item=videoEntry key=videoId}
+                <a class="linkmodule" href="https://www.youtube.com/watch?v={$videoId}" {if $verbose eq 'y' && isset($videoEntry.description)} title="{$videoEntry.description|escape:'html'}"{/if} >
+                    {$videoEntry.title|escape:"html"}
+                </a>
+                {if isset($videoEntry.xhtml)}
+                    <div class="module video youtube" >{$videoEntry.xhtml}</div>
+                {/if}
+            {/foreach}
+        {else}
+            <p>{tr}No video found.{/tr}
+        {/if}
     </div>
     {if $link_url neq ''}
         <div class="lastlinkmodule" >

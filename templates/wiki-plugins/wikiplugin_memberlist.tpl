@@ -76,6 +76,4 @@
         {if $can_apply}<input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}">{/if}
     </div>
 </form>
-{jq}
-    $('.username-input').tiki('autocomplete','username');
-{/jq}
+{autocomplete element=".username-input" type="username"}

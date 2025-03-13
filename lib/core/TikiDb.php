@@ -74,16 +74,19 @@ abstract class TikiDb
 
     protected function startTimer()
     {
-        list($micro, $sec) = explode(' ', microtime());
-        return $micro + $sec;
+        return microtime(true);
     }
 
     protected function stopTimer($starttime)
     {
         global $elapsed_in_db;
-        list($micro, $sec) = explode(' ', microtime());
-        $now = $micro + $sec;
-        $elapsed_in_db += $now - $starttime;
+
+        $now = microtime(true);
+        $elapsed = $now - $starttime;
+
+        $elapsed_in_db += $elapsed;
+
+        return $elapsed;
     }
 
     abstract public function qstr($str);
@@ -584,5 +587,48 @@ abstract class TikiDb
     {
         $result = $this->getOne("SELECT IS_USED_LOCK(?) as isLocked", [$str]);
         return (bool)((int)$result);
+    }
+
+    public static function splitSqlStatements($command)
+    {
+        $statements = [];
+        $buffer = '';
+        $insideFunction = false;
+
+        // Split by line breaks to process each line
+        $lines = preg_split("/\r\n|\n|\r/", $command);
+
+        foreach ($lines as $line) {
+            // Check if we're starting a CREATE FUNCTION or CREATE PROCEDURE block
+            if (preg_match('/^\s*CREATE\s+(FUNCTION|PROCEDURE)/i', $line)) {
+                $insideFunction = true;
+            }
+
+            // If we're inside a function/procedure, just add the line without splitting on semicolons
+            if ($insideFunction) {
+                $buffer .= $line . "\n";
+
+                // Detect the end of the function/procedure block (usually 'END;' or 'END$$')
+                if (preg_match('/^\s*END\s*;/i', $line)) {
+                    $statements[] = trim($buffer);
+                    $buffer = '';
+                    $insideFunction = false;
+                }
+            } else {
+                // If not inside a function, split by semicolon
+                $buffer .= $line . "\n";
+                if (preg_match('/;\s*$/', $line)) {
+                    $statements[] = trim($buffer);
+                    $buffer = '';
+                }
+            }
+        }
+
+        // Add any remaining buffer content as a statement
+        if (! empty(trim($buffer))) {
+            $statements[] = trim($buffer);
+        }
+
+        return $statements;
     }
 }

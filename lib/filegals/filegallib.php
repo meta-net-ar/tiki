@@ -49,7 +49,13 @@ class FileGalLib extends TikiLib
     {
         global $prefs;
 
-        $return = $this->getGalleryId($pageName, $prefs['fgal_root_wiki_attachments_id']);
+        if (mb_strlen($pageName) > 80) {
+            $galName = mb_substr($pageName, 0, 80);
+        } else {
+            $galName = $pageName;
+        }
+
+        $return = $this->getGalleryId($galName, $prefs['fgal_root_wiki_attachments_id']);
 
         // Get the Wiki Attachment Gallery for this wiki page or create it if it does not exist
         if ($create && ! $return) {
@@ -57,7 +63,7 @@ class FileGalLib extends TikiLib
             if ($this->get_page_id_from_name($pageName) > 0) {
                 $return = $this->replace_file_gallery(
                     [
-                        'name' => $pageName,
+                        'name' => $galName,
                         'user' => 'admin',
                         'type' => 'attachments',
                         'public' => 'y',
@@ -877,6 +883,18 @@ class FileGalLib extends TikiLib
         return $id;
     }
 
+    public function moveFilesToNewGallery($fileIds, $newGalleryId)
+    {
+        foreach ($fileIds as $fileId) {
+            if (! empty($newGalleryId)) {
+                $result = $this->set_file_gallery($fileId, $newGalleryId);
+                if (! $result && $result->numRows() !== 1) {
+                    throw new Exception(tr('An error occurred while moving file to the new gallery.'));
+                }
+            }
+        }
+    }
+
     public function change_file_handler($mime_type, $cmd)
     {
         $handlers = $this->table('tiki_file_handlers');
@@ -1175,7 +1193,7 @@ class FileGalLib extends TikiLib
     {
         return $this->get_files($offset, $maxRecords, $sort_mode, $find, $fileId, true, false, false, true, false, false, false, false, '', false, true);
     }
-    public function duplicate_file_gallery($galleryId, $name, $description = '')
+    public function duplicate_file_gallery($galleryId, $name, $description = '', $parentId = null)
     {
         global $user;
         $info = $this->get_file_gallery_info($galleryId);
@@ -1183,6 +1201,9 @@ class FileGalLib extends TikiLib
         $info['galleryId'] = 0;
         $info['description'] = $description;
         $info['name'] = ($name ?: $info['name'] . tra(' copy'));
+        if (! is_null($parentId)) {
+            $info['parentId'] = $parentId;
+        }
         $newGalleryId = $this->replace_file_gallery($info);
         return $newGalleryId;
     }
@@ -2914,6 +2935,29 @@ class FileGalLib extends TikiLib
     }
 
     /**
+     * Convert a file size from bytes to a human-readable format.
+     *
+     * This function takes a file size in bytes and converts it to a more
+     * readable format using appropriate units (B, KB, MB, GB).
+     *
+     * @param int $size The file size in bytes.
+     * @return string The converted file size with the appropriate unit.
+     */
+    public function convertFileSize($size)
+    {
+        $size = (int) $size;
+        if ($size < 1024) {
+            return $size . ' B';
+        } elseif ($size < 1048576) {
+            return round($size / 1024, 2) . ' KB';
+        } elseif ($size < 1073741824) {
+            return round($size / 1048576, 2) . ' MB';
+        } else {
+            return round($size / 1073741824, 2) . ' GB';
+        }
+    }
+
+    /**
      * Get a file with additional data
      *
      * @param int $fileId
@@ -3070,6 +3114,8 @@ class FileGalLib extends TikiLib
      */
     private function actionHandlerRemoveFile($params)
     {
+        global $prefs;
+
         // mandatory params: int fileId
         // optional params: boolean draft, array gal_info
         if (! empty($params) && isset($params['fileId'])) {
@@ -3081,9 +3127,7 @@ class FileGalLib extends TikiLib
 
             $smarty = TikiLib::lib('smarty');
             if (! $info = $this->get_file_info($params['fileId'])) {
-                $smarty->assign('msg', tra('Incorrect param'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
             }
 
             if (empty($params['gal_info']) || ! isset($params['gal_info']['user'])) {
@@ -3097,10 +3141,7 @@ class FileGalLib extends TikiLib
             global $tiki_p_admin_file_galleries, $user;
             if ($tiki_p_admin_file_galleries != 'y' && ( ! $user || $user != $params['gal_info']['user'] )) {
                 if ($user != $info['user']) {
-                    $smarty->assign('errortype', 401);
-                    $smarty->assign('msg', tra('You do not have permission to remove files from this gallery'));
-                    $smarty->display('error.tpl');
-                    die;
+                    Feedback::errorAndDie(tra('You do not have permission to remove files from this gallery'), \Laminas\Http\Response::STATUS_CODE_401);
                 }
             }
 
@@ -3115,7 +3156,10 @@ class FileGalLib extends TikiLib
             if ($params['draft']) {
                 return $this->remove_draft($info['fileId'], $user);
             } else {
-                return $this->remove_file($info, $params['gal_info']);
+                if (empty($params['detach'])) {
+                    return $this->remove_file($info, $params['gal_info']);
+                }
+                return $this->update_file($params['fileId'], ['galleryId' => $prefs['fgal_user_trash_id']]);
             }
         }
     }
@@ -3155,10 +3199,7 @@ class FileGalLib extends TikiLib
             if ($gal_info !== null && ( $nb_files = count($params['galleryId']) ) != 1) {
                 for ($i = $nb_files - 1; $i >= 0; $i--) {
                     if (! isset($params['galleryId'][$i]) || $params['galleryId'][$i] != $params['galleryId'][0]) {
-                        $smarty->assign('errortype', 401);
-                        $smarty->assign('msg', tra('You are trying to edit multiple files in different galleries, which is not supported yet'));
-                        $smarty->display('error.tpl');
-                        die;
+                        Feedback::errorAndDie(tra('You are trying to edit multiple files in different galleries, which is not supported yet'), \Laminas\Http\Response::STATUS_CODE_409);
                     }
                 }
             }
@@ -3168,9 +3209,7 @@ class FileGalLib extends TikiLib
                 $fileInfo['fileId'] = $editFileId;
             } else {
                 if (! ( $fileInfo = $this->get_file_info($editFileId) )) {
-                    $smarty->assign('msg', tra('The specified file does not exist'));
-                    $smarty->display('error.tpl');
-                    die;
+                    Feedback::errorAndDie(tra('The specified file does not exist'), \Laminas\Http\Response::STATUS_CODE_404);
                 }
             }
 
@@ -3201,9 +3240,7 @@ class FileGalLib extends TikiLib
                         // use a dummy.svg filename just so content checker knows this is being interpreted as svg
                         $this->assertUploadedContentIsSafe($fileInfo['data'], 'dummy.svg');
                     } catch (Exception $e) {
-                        $smarty->assign('msg', tra("Forcing a filetype of image/svg+xml is blocked for security reasons"));
-                        $smarty->display('error.tpl');
-                        die;
+                        Feedback::errorAndDie(tra("Forcing a filetype of image/svg+xml is blocked for security reasons"), \Laminas\Http\Response::STATUS_CODE_403);
                     }
                 }
                 $fileInfo['filetype'] = $params['filetype'][0];
@@ -3493,6 +3530,7 @@ class FileGalLib extends TikiLib
         if (! empty($params['returnUrl'])) {
             if (! empty($errors)) {
                 $smarty->assign('msg', implode('<br />', $errors));
+                $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
                 $smarty->display('error.tpl');
                 die;
             }

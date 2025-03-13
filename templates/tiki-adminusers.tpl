@@ -225,7 +225,7 @@
                                                         </action>
                                                         <action>
                                                             <a class="link" href="tiki-assignuser.php?assign_user={$users[user].user|escape:url}" title="{tr}Edit group expiry{/tr}">
-                                                                {icon name='time' _menu_text='y' _menu_icon='y' alt='{tr}Edit group expiry{/tr}'}
+                                                                {icon name='time' _menu_text='y' _menu_icon='y' alt="{tr}Edit group expiry{/tr}"}
                                                             </a>
                                                         </action>
                                                         <action>
@@ -407,7 +407,7 @@
         {tab name="{$add_edit_user_tablabel}"}
             {if $prefs.feature_user_encryption eq 'y'}
                 {remarksbox type="warning" title="{tr}Warning: User Encryption is Active{/tr}"}
-                {tr}The feature User Encryption stores encrypted user information, such as password used to connect to externalsystems.
+                {tr}The feature User Encryption stores encrypted user information, such as password used to connect to external systems.
                     If the password is changed, it will destroy the user's decryption key, and make the data unreadable.
                     The user will be forced to re-enter the passwords and other data that may be encrypted.{/tr}</a>.
                 {/remarksbox}
@@ -675,7 +675,7 @@
                 <div class="mb-3 row">
                     <label for="csvlist" class="col-form-label col-md-3">{tr}CSV File{/tr}</label>
                     <div class="col-md-9">
-                        <input type="file" id="csvlist" name="csvlist" class="form-control">
+                        <input type="file" accept=".csv" id="csvlist" name="csvlist" class="form-control">
                         <small class="form-text">
                             {tr}Your file should contain in the first row (first entry) the following fields:{/tr}
                             <span class="font-weight-bold">login</span>, <span class="font-weight-bold">password</span>, <span class="font-weight-bold">email</span>, groups, default_group,realName.<br><br>

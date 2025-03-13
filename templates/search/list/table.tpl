@@ -6,40 +6,6 @@
         <input type="hidden" name="tsAjax" value="y">
         <input type="submit" name="submit" value="{tr}Download{/tr}" class="btn btn-primary">
     </form>
-{jq}
-(function(){
-    $('#listexecute-download-top-{{$iListExecute}}').on("submit", function(){
-        var $form = $(this);
-        $form.find('input[name^=filter]').remove();
-        $('.tablesorter-filter').each(function(i,el){
-            var column = $(el).data('column'),
-                    value = $(el).val();
-            if( value ) {
-                $('<input type="hidden" name="filter['+column+']">')
-                    .val(value)
-                    .appendTo($form);
-            }
-        });
-        var m = "{{$id}}".match(/wpcs\-(\d+)$/);
-        var id = m ? m[1] : null;
-        var cs = window['customsearch_'+id];
-        if (cs) {
-            $form.attr('action', $.service('search_customsearch', 'customsearch'));
-            var datamap = {
-                definition: cs.definition,
-                adddata: JSON.stringify(cs.searchdata),
-                searchid: cs.id,
-                offset: cs.offset,
-                maxRecords: cs.maxRecords,
-                store_query: cs.store_query
-            }
-            $.each(datamap, function(k, v) {
-                $('<input type="hidden">').attr('name', k).val(v).appendTo($form);
-            });
-        }
-    });
-})();
-{/jq}
 {/if}
 {if isset($tableparams.title)}
     <div class="list-table-heading">{wiki}{$tableparams.title|escape}{/wiki}</div>
@@ -80,7 +46,10 @@
         {/if}
 {/if}
 {if $actions}
-<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center" id="listexecute-{$iListExecute}">
+<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
+<input type="hidden" name="plugin" value="{$fingerprint}">
+<input type="hidden" name="iListExecute" value="{$iListExecute}">
+{ticket}
 {/if}
 {if not empty($column.field)}
     {$column = [$column]}{* if there is only one column then it will not be in an array *}
@@ -187,9 +156,9 @@
                 {if $actions}
                     <td>
                         <input type="checkbox" name="objects{$iListExecute}[]" class="checkbox_objects form-check-input" aria-label="{tr}Select{/tr}" value="{$row.object_type|escape}:{$row.object_id|escape}">
-                        {if $row.report_status eq 'success'}
+                        {if isset($entry.report_status) && $row.report_status eq 'success'}
                             {icon name='ok'}
-                        {elseif $row.report_status eq 'error'}
+                        {elseif isset($entry.report_status) && $row.report_status eq 'error'}
                             {icon name='error'}
                         {/if}
                     </td>
@@ -248,102 +217,62 @@
 {if $actions}
     <div class="row w-100 list_execute_actions">
         <div class="col-sm-1">
-            <input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{tr}Apply{/tr}">
+            <input type="submit" class="btn btn-primary btn-sm list_execute_submit" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{tr}Apply{/tr}">
         </div>
         <div class="col-sm-4">
-            <select name="list_action" class="form-control" id="check_submit_select_{$id}">
+            <select name="list_action" class="form-control check_submit_select" id="check_submit_select_{$id}">
                 <option></option>
                 {foreach from=$actions item=action}
-                    <option value="{$action->getName()|escape}" data-input='{$action->requiresInput()}'>
+                    <option value="{$action->getName()|escape}" data-input='{$action->requiresInput()}' data-inputtype='{$action->inputtype()}'{if $action->getDefault()} selected{/if}>
                         {$action->getName()|escape}
                     </option>
                 {/foreach}
             </select>
         </div>
-        <div class="col-sm-4" id="list_input_container_{$id}">
+        <div class="col-sm-4 list_input_container" id="list_input_container_{$id}">
         </div>
         <input type="text" name="list_input" value="" class="form-control" style="display:none">
+        {*category_tree*}
+        {if $prefs.feature_categories eq 'y' and $tiki_p_modify_object_categories eq 'y' and count($categories) gt 0}
+            <div class="multiselect form-select cat_tree" style="display:none;">
+                {if is_array($categories) and count($categories) gt 0}
+                    {$cat_tree}
+                    <input type="hidden" name="cat_categorize" value="on">
+                    <div class="clearfix">
+                        {if $tiki_p_admin_categories eq 'y'}
+                            <div class="float-sm-end">
+                                <a class="btn btn-link btn-sm tips" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                    {icon name="cog"} {tr}Categories{/tr}
+                                </a>
+                            </div>
+                        {/if}
+                        {select_all checkbox_names='cat_categories[]' label="{tr}Select/deselect all categories{/tr}"}
+                    </div> {* end .clear *}
+                {else}
+                    <div class="clearfix">
+                        {if $tiki_p_admin_categories eq 'y'}
+                            <div class="float-sm-end">
+                                <a class="btn btn-link" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                    {icon name="cog"} {tr}Categories{/tr}
+                                </a>
+                            </div>
+                        {/if}
+                    </div> {* end .clear *}
+                    {tr}No categories defined{/tr}
+                {/if}
+            </div> {* end #multiselect *}
+        {/if}
     </div>
 
 </form>
 {$checkboxVisible = (isset($tableparams.checkboxVisible) and $tableparams.checkboxVisible eq 'y')}
 {jq}
 (function(){
-    var countChecked = function() {
-        if ($('#{{$id}}-div .checkbox_objects').is(':checked')) {
-            if($('select#check_submit_select_{{$id}}').val()){
-                $('input#submit_form_{{$id}}').prop('disabled', false);
-            }
-        } else {
-            $('input#submit_form_{{$id}}').prop('disabled', true);
-        }
-        var header_checked = $('#{{$id}}-div .checkbox_objects').not(':checked').length == 0;
-        $('#listexecute-{{$iListExecute}} .listexecute-all').val(header_checked ? 'ALL' : '');
-    };
-    $('#listexecute-{{$iListExecute}} .listexecute-select-all').removeClass('listexecute-select-all')
-        .on('click', function (e) {
-            $(this).closest('form').find('tbody :checkbox{{if $checkboxVisible}}:visible{{/if}}:not(:disabled)').each(function () {
-                $(this).prop("checked", ! $(this).prop("checked"));
-            }).promise().done(function(){ countChecked(); });
-        });
     {{if $checkboxVisible}}
         $( "#{{$id}}" ).on( 'tablesorter-ready', function() {
             $(this).data("tablesorter").checkboxVisible = true;
         });
     {{/if}}
-    $('#listexecute-{{$iListExecute}}').find('select[name=list_action]')
-        .on('change', function() {
-            var valueSel = $('select#check_submit_select_{{$id}}').val();
-            if(valueSel == ''){
-                $('input#submit_form_{{$id}}').prop('disabled', true);
-            } else {
-                if($('#{{$id}}-div .checkbox_objects').is(':checked')){
-                    $('input#submit_form_{{$id}}').prop('disabled', false);
-                }
-            }
-            var params = $(this).find('option:selected').data('input');
-            if(typeof params === "object") {
-                params = Object.values(params).filter(function(el){ return !!el; }).shift();
-            }
-            if (typeof params === "object") {
-                $("#list_input_container_{{$id}}").load(
-                    $.service('tracker', 'fetch_item_field', params),
-                    function () {
-                        $(this).tiki_popover().applySelect2();
-                    }
-                ).show();
-            } else if( params ) {
-                $(this).closest('.list_execute_actions').find('input[name=list_input]').show();
-                $("#list_input_container_{{$id}}").hide();
-            } else {
-                $(this).closest('.list_execute_actions').find('input[name=list_input]').hide();
-                $("#list_input_container_{{$id}}").hide();
-            }
-        });
-    $( "#{{$id}}-div .checkbox_objects" ).on( "click", countChecked );
-    countChecked();
-    $('#listexecute-{{$iListExecute}}').on("submit", function(){
-        feedback(tr('Action is being executed, please wait.'));
-        $(this).tikiModal(" ");
-        var filters = $('#list_filter{{$iListExecute|replace:'wplistexecute-':''}} form').serializeArray(),
-            inp, i;
-        for(i = 0, l = filters.length; i < l; i++) {
-            inp = $('<input type="hidden">');
-            inp.attr('name', filters[i].name);
-            inp.val(filters[i].value);
-            $('#listexecute-{{$iListExecute}}').append(inp);
-        }
-        var trackerInputs = $("input,select,textarea", "#list_input_container_{{$id}}").serializeArray();
-        if (trackerInputs) {
-            for (i = 0; i < trackerInputs.length; i++) {
-                inp = $('<input type="hidden">');
-                inp.attr("name", "list_input~" + trackerInputs[i].name);    // add tracker inputs as an array "inside" list_input
-                inp.val(trackerInputs[i].value);
-                $('#listexecute-{{$iListExecute}}').append(inp);
-            }
-            $("#listexecute-{{$iListExecute}}").remove("input[list_input]");
-        }
-    });
 })();
 {/jq}
 {/if}
@@ -357,40 +286,6 @@
         <input type="hidden" name="tsAjax" value="y">
         <input type="submit" name="submit" value="{tr}Download{/tr}" class="btn btn-primary">
     </form>
-{jq}
-(function(){
-    $('#listexecute-download-{{$iListExecute}}').on("submit", function(){
-        var $form = $(this);
-        $form.find('input[name^=filter]').remove();
-        $('.tablesorter-filter').each(function(i,el){
-            var column = $(el).data('column'),
-                    value = $(el).val();
-            if( value ) {
-                $('<input type="hidden" name="filter['+column+']">')
-                    .val(value)
-                    .appendTo($form);
-            }
-        });
-        var m = "{{$id}}".match(/wpcs\-(\d+)$/);
-        var id = m ? m[1] : null;
-        var cs = window['customsearch_'+id];
-        if (cs) {
-            $form.attr('action', $.service('search_customsearch', 'customsearch'));
-            var datamap = {
-                definition: cs.definition,
-                adddata: JSON.stringify(cs.searchdata),
-                searchid: cs.id,
-                offset: cs.offset,
-                maxRecords: cs.maxRecords,
-                store_query: cs.store_query
-            }
-            $.each(datamap, function(k, v) {
-                $('<input type="hidden">').attr('name', k).val(v).appendTo($form);
-            });
-        }
-    });
-})();
-{/jq}
 {/if}
 {if $showFacets}
         </div>

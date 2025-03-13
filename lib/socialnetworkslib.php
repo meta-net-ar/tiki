@@ -299,11 +299,7 @@ class SocialNetworksLib extends LogsLib
             if ($local_user) {
                 $user = $local_user;
             } else {
-                $smarty = TikiLib::lib('smarty');
-                $smarty->assign('errortype', 'login');
-                $smarty->assign('msg', tra('You need to link your local account to Facebook before you can login using it'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('You need to link your local account to Facebook before you can login using it'), \Laminas\Http\Response::STATUS_CODE_401);
             }
 
             global $user_cookie_site;
@@ -344,11 +340,7 @@ class SocialNetworksLib extends LogsLib
         $user = $userlib->add_user($user, $randompass, $email);
 
         if (! $user) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('We were unable to create a new user with your Facebook account. Please contact the administrator.'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('We were unable to create a new user with your Facebook account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
         $ret = $userlib->get_usertrackerid("Registered");
@@ -452,11 +444,7 @@ class SocialNetworksLib extends LogsLib
         $ret = json_decode($curl_result);
 
         if (empty($curl_result)) {
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('We were unable to connect to your LinkedIn account. Please contact the administrator.'));
-                        $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('We were unable to connect to your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
         $_SESSION['LINKEDIN_ACCESS_TOKEN'] = $ret->access_token;
@@ -490,11 +478,7 @@ class SocialNetworksLib extends LogsLib
 
         if (isset($linkedin_info->serviceErrorCode)) {
             curl_close($curl);
-            $smarty = TikiLib::lib('smarty');
-            $smarty->assign('errortype', 'login');
-            $smarty->assign('msg', tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
         if ($prefs['socialnetworks_linkedin_email'] == 'y') {
@@ -514,11 +498,7 @@ class SocialNetworksLib extends LogsLib
 
             if (isset($linkedin_email->serviceErrorCode)) {
                 curl_close($curl);
-                $smarty = TikiLib::lib('smarty');
-                $smarty->assign('errortype', 'login');
-                $smarty->assign('msg', tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
 
@@ -550,11 +530,7 @@ class SocialNetworksLib extends LogsLib
                 $user = $userlib->add_user($user, $randompass, $email);
 
                 if (! $user) {
-                    $smarty = TikiLib::lib('smarty');
-                    $smarty->assign('errortype', 'login');
-                    $smarty->assign('msg', tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'));
-                    $smarty->display('error.tpl');
-                    die;
+                    Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
                 }
                 //Checks if user tracker is used and if it is, then set the names as per the info
                 $ret = $userlib->get_usertrackerid("Registered");
@@ -599,11 +575,7 @@ class SocialNetworksLib extends LogsLib
                 }
             } else {
                 $_SESSION['loginfrom'] = str_replace('tiki-socialnetworks_linkedin.php', 'tiki-socialnetworks.php', $_SERVER['REQUEST_URI']);
-                $smarty = TikiLib::lib('smarty');
-                $smarty->assign('errortype', 'login');
-                $smarty->assign('msg', tra('You need to link your local account to LinkedIn before you can login using it'));
-                $smarty->display('error.tpl');
-                die;
+                Feedback::errorAndDie(tra('You need to link your local account to LinkedIn before you can login using it'), \Laminas\Http\Response::STATUS_CODE_500);
             }
             global $user_cookie_site;
             $_SESSION[$user_cookie_site] = $user;

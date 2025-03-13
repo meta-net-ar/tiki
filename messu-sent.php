@@ -41,9 +41,7 @@ if (isset($_POST["archive"])) {
         $i = 0;
         foreach (array_keys($_POST["msg"]) as $msg) {
             if (($prefs['messu_archive_size'] > 0) && ($tmp + $i >= $prefs['messu_archive_size'])) {
-                $smarty->assign('msg', tra("Archive is full. Delete some messages from archive first."));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("Archive is full. Delete some messages from archive first."), \Laminas\Http\Response::STATUS_CODE_507);
             }
             $result = $messulib->archive_message($user, $msg, 'sent');
             $i = $i + $result->numRows();

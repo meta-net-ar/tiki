@@ -64,8 +64,8 @@ if (isset($_REQUEST['import'])) {
     if (isset($_FILES['userfile1'])) {
         if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-            $heading = fgetcsv($fp, 1000, ",");
-            while ($data = fgetcsv($fp, 1000, ",")) {
+            $heading = fgetcsv($fp, 1000, ",", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
+            while ($data = fgetcsv($fp, 1000, ",", escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) {
                 $subject = $data[array_search('Subject', $heading) ];
                 $description = $data[array_search('Description', $heading) ];
                 $start = strtotime($data[array_search('Start Date', $heading) ]);
@@ -88,10 +88,7 @@ if (isset($_REQUEST['addtopic'])) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
             $data = '';

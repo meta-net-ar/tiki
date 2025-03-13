@@ -436,6 +436,8 @@ function wikiplugin_cypht($data, $params)
         }
     }
 
+    $headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
+
     return '<div class="inline-cypht">'
         . '<input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
         . '<input type="hidden" id="hm_session_prefix" value="' . htmlentities($session_prefix, ENT_COMPAT) . '" />'

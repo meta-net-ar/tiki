@@ -140,7 +140,7 @@
         <br>
         <div class="input-group col-sm-8">
             <select class="form-select" name="action">
-                <option value="" selected="selected">
+                <option value="" selected disabled>
                     {tr}Select action to perform with checked{/tr}...
                 </option>
                 <option

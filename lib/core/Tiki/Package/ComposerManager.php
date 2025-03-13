@@ -283,6 +283,23 @@ class ComposerManager
     }
 
     /**
+     * return the list of deprecated packages
+     */
+    public function getListOfDeprecatedPackages()
+    {
+        $deprecatedPackages = [];
+        $availablePackages = $this->getAvailable(false, false);
+
+        foreach ($availablePackages as $pkg) {
+            if ($pkg['state'] === ComposerPackage::STATE_DEPRECATED && isset($pkg['actions'][0]) && $pkg['actions'][0] === 'remove') {
+                $deprecatedPackages[] = $pkg;
+            }
+        }
+
+        return $deprecatedPackages;
+    }
+
+    /**
      * return the list of packages installed
      *
      * @param $filterInstalled

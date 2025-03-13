@@ -314,7 +314,7 @@
                         </select>
                     </div>
                     <div class="col-sm-1 pt-1">
-                        <a class="tips" href="javascript:setUserModuleFromCombo('list_contents', 'um_data');" aria-label="{tr}Use dynamic content{/tr}" title=":{tr}Use dynamic content{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>>
+                        <a class="tips" href="javascript:setUserModuleFromCombo('list_contents', 'um_data');" aria-label="{tr}Use dynamic content{/tr}" title=":{tr}Use dynamic content{/tr}">{icon name='add' alt="{tr}Use{/tr}"}</a>
                         <a title="{tr}Help{/tr}" aria-label="{tr}Help{/tr}" {popup text="Params: id=" width=100 center=true}>{icon name='help'}</a>
                     </div>
                 </div>

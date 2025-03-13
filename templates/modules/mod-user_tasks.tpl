@@ -7,7 +7,7 @@
 <input style="font-size: .8rem;" type="submit" class="btn btn-primary btn-sm" name="modTasksSave" value="{tr}Add{/tr}" />
 </form>
 </div>
-<form action="{$ownurl}" method="post">
+<form action="{$ownurl}" method="post" id="modTasksActionForm">
 {if $nonums != 'y'}<ol>{else}<ul>{/if}
 {section name=ix loop=$modTasks}
     <li class="prio{$modTasks[ix].priority}">
@@ -20,8 +20,20 @@
     </li>
 {/section}
 {if $nonums != 'y'}</ol>{else}</ul>{/if}
-<input style="font-size: .8rem;" type="submit" class="btn btn-primary btn-sm" name="modTasksCom" value="{tr}Done{/tr}" />
-<input style="font-size: .8rem;" type="submit" class="btn btn-primary btn-sm" name="modTasksDel" value="{tr}Del{/tr}" />
+<input style="font-size: .8rem;" type="submit" class="btn btn-primary btn-sm modTasksButton" name="modTasksCom" value="{tr}Done{/tr}" />
+<input style="font-size: .8rem;" type="submit" class="btn btn-primary btn-sm modTasksButton" name="modTasksDel" value="{tr}Del{/tr}" />
 </form>
 {/tikimodule}
 {/if}
+{jq}
+    $(document).ready(function() {
+        $('#modTasksActionForm').on('submit', function(event) {
+            const checkboxes = $(this).find('input[type="checkbox"]');
+            const isChecked = checkboxes.is(':checked');
+            if (!isChecked) {
+                event.preventDefault();
+                alert(tr('Please select an item'));
+            }
+        });
+    });
+{/jq}

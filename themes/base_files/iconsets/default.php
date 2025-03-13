@@ -269,6 +269,9 @@ function iconset_default()
             'admin_section_backend' => [
                 'id' => 'cogs',
             ],
+            'admin_seoprefs' => [
+                'id' => 'search-dollar',
+            ],
             'adn' => [
                 'id' => 'adn',
                 'prepend' => 'fab fa-'
@@ -500,6 +503,10 @@ function iconset_default()
                 'id' => 'deviantart',
                 'prepend' => 'fab fa-'
             ],
+            'diagram' => [
+                'id' => 'diagram-project',
+                'prepend' => 'fa fa-'
+            ],
             'difference' => [
                 'id' => 'strikethrough',
             ],
@@ -706,6 +713,9 @@ function iconset_default()
                 'prepend' => 'fab fa-'
             ],
             'group' => [
+                'id' => 'users',
+            ],
+            'groupedit' => [
                 'id' => 'users',
             ],
             'h1' => [
@@ -933,6 +943,10 @@ function iconset_default()
             'merge' => [
                 'id' => 'random',
             ],
+            'message' => [
+                'id' => 'comment-dots',
+                'prepend' => 'fas fa-',
+            ],
             'microsoft' => [
                 'id' => 'microsoft',
                 'prepend' => 'fab fa-'
@@ -957,6 +971,10 @@ function iconset_default()
             ],
             'money' => [
                 'id' => 'money-bill',
+            ],
+            'monitor' => [
+                'id' => 'desktop',
+                'prepend' => 'far fa-',
             ],
             'more' => [
                 'id' => 'ellipsis-h',
@@ -1307,6 +1325,9 @@ function iconset_default()
             //thumbs-up in defaults
             'ticket' => [
                 'id' => 'ticket-alt',
+            ],
+            'tikimanager' => [
+                'id' => 'toolbox',
             ],
             'time' => [
                 'id' => 'clock',
@@ -1829,10 +1850,6 @@ function iconset_default()
                 'id' => 'code-compare',
                 'prepend' => 'fas fa-',
             ],
-            'code-fork' => [
-                'id' => 'code-fork',
-                'prepend' => 'fas fa-',
-            ],
             'code-pull-request' => [
                 'id' => 'code-pull-request',
                 'prepend' => 'fas fa-',
@@ -2162,6 +2179,9 @@ function iconset_default()
             'k' => [
                 'id' => 'k',
                 'prepend' => 'fas fa-',
+            ],
+            'kaltura' => [
+                'id' => 'sun'
             ],
             'kip-sign' => [
                 'id' => 'kip-sign',

@@ -1,4 +1,5 @@
 //------- Tiki CSS variables
+@import "variables";
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
@@ -76,14 +77,14 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 .tiki-top-nav-light, .tiki-top-nav-dark {
     --tiki-top-border-width: 0 0 0.75rem 0;
@@ -99,6 +100,8 @@
     --tiki-admin-top-nav-color: #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-light-hover-color};
     --tiki-admin-top-nav-link-hover-bg: none ;
+    --tiki-admin-top-border: solid #1a1a1a;
+    --tiki-admin-top-border-width: 0 0 0.75rem 0;
     --tiki-admin-aside-nav-bg: #{$body-bg};
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
@@ -130,7 +133,7 @@
     .accordion-item {
         border-width: 0 !important;
     }
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -184,10 +187,20 @@
 :root {
     --tiki-card-bg: #fff;
     --tiki-card-color: var(--bs-body-color);
-//    --tiki-card-link-color:
+    .sm-nav-link {
+        --sm-font-family: var(--bs-body-font-family);
+    }
 }
 
-[data-bs-theme=dark] {
+@media (min-width: 768px) {
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
+        --sm-font-family: #{$headings-font-family};
+        text-transform: uppercase;
+    }
+}
+
+
+    [data-bs-theme=dark] {
     --tiki-card-bg: #{$body-secondary-bg-dark};
 //    .popover-body { background: #{$body-secondary-bg-dark}; }
     --tiki-card-color: var(--bs-body-color);

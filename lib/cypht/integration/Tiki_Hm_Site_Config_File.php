@@ -44,8 +44,6 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
             unset($output_modules[$page]['header_start']);
             unset($output_modules[$page]['header_content']);
             unset($output_modules[$page]['header_end']);
-            unset($output_modules[$page]['content_start']);
-            unset($output_modules[$page]['content_end']);
             if (isset($output_modules[$page]['save_reminder'])) {
                 unset($output_modules[$page]['save_reminder']);
             }
@@ -61,7 +59,6 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
             }
         }
         // cleanup side menu
-        unset($output_modules['ajax_hm_folders']['logout_menu_item']);
         unset($output_modules['ajax_hm_folders']['contacts_page_link']);
         unset($output_modules['ajax_hm_folders']['settings_save_link']);
         // show links according to permissions

@@ -13,12 +13,7 @@ require_once('tiki-setup.php');
 // this since I do not know too much about Tiki permission system, so
 // I would kindly ask a wizard to enlarge this. (filmil)
 if ($tiki_p_admin != 'y') {
-    $smarty->assign(
-        'msg',
-        tra("This feature is for admins only") . ": show_raw_links"
-    );
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is for admins only") . ": show_raw_links", \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 // Otherwise do the following:
@@ -27,6 +22,7 @@ if ($tiki_p_admin != 'y') {
 // 3. Print first the name of the page P, then one after the other,
 //    all pages that it points to.
 
+TikiLib::lib('header')->setXRobotsTag($robots);
 header("Content-Type: text/plain; charset=utf-8");
 $query = "select `pageName` from `tiki_pages`";
 $result = $tikilib->query($query, []);

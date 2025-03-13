@@ -45,7 +45,8 @@ class Services_Scheduler_Controller
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
             $this->lib->remove_scheduler($schedulerId);
-
+            $feedback = sprintf(tra('Scheduler %s was deleted.'), $scheduler['name']);
+            Feedback::success($feedback);
             return [
                 'schedulerId' => 0,
             ];

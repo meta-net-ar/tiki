@@ -83,10 +83,10 @@
                             <td class="date"><strong>{if not empty($hist.lastModif)}{$hist.lastModif|tiki_short_datetime}{/if}</strong></td>
                             <td class="username"><strong>{$hist.user|username}</strong></td>
                             <td class="text">
-                                {if $fieldId ne -1}{$fieldId}{/if}
+                                {if $fieldId ne HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}{$fieldId}{/if}
                             </td>
                             <td class="text">
-                                {if $fieldId eq -1}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
+                                {if $fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
                             </td>
                             {if empty($diff_style)}
                                 {if !empty($field_value.fieldId)}

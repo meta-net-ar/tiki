@@ -36,7 +36,6 @@ $tiki-topbar-row-sidemargins: -15px;
     }
 }
 
-
 .navbar .nav-item {
 //  flex: 1 1 auto !important;
   text-align: center;
@@ -125,7 +124,7 @@ body.fullscreen {
 
 // UAB (Admin)
 // Replicate vertical menu text centering in UAB accordion
-button.was-nav-link.accordion-button {
+button.accordion-button {
     border-left: 1px solid var(--tiki-nav-link-border-left-color);
     border-bottom: 3px solid #09c;
     span.ms-1.narrow-hide {

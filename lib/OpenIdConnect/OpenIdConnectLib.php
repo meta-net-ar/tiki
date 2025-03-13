@@ -152,6 +152,7 @@ class OpenIdConnectLib
             );
             if ($cachedValue) {
                 $jwkArr = unserialize($cachedValue);
+                return $jwkArr;
             } else {
                 $jwkArr = file_get_contents($this->jwksUrl);
 

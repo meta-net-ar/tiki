@@ -303,11 +303,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         if (! is_file($file) || ! $command = file_get_contents($file)) {
             throw new Exception('Fatal: Cannot open ' . $file);
         }
-        // split the file into several queries?
-        $statements = preg_split("#(;\s*\n)|(;\s*\r\n)#", $command);
-        $statements = array_filter($statements, function ($st) {
-            return trim($st) && preg_match('/^\s*(?!-- )/m', $st);
-        });
+        $statements = self::splitSqlStatements($command);
 
         $this->queries['currentFile'] = basename($file);
         array_push($this->queries['files'], $file);

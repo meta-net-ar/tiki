@@ -22,15 +22,11 @@ $polllib = TikiLib::lib('poll');
 $access->check_feature('feature_polls');
 $access->check_permission('tiki_p_vote_poll');
 if (empty($_REQUEST["pollId"])) {
-    $smarty->assign('msg', tra("No poll indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No poll indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $poll_info = $polllib->get_poll($_REQUEST["pollId"]);
 if (empty($poll_info)) {
-        $smarty->assign('msg', tra("No poll indicated"));
-        $smarty->display("error.tpl");
-        die;
+    Feedback::errorAndDie(tra("No poll indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $options = $polllib->list_poll_options($_REQUEST["pollId"]);
 $smarty->assign_by_ref('menu_info', $poll_info);

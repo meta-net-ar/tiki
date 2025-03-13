@@ -480,6 +480,19 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $hits->total = $hits->total->value;
         }
 
+        if ($query->processDidYouMean() && $hits->total === 0) {
+            list($result, $correctKeywords, $didYouMean) = $this->callSuggestions([
+                'fullQuery' => $fullQuery,
+                'indices' => $indices,
+                'words' => implode(' ', $query->getWords()),
+            ]);
+
+            $hits = $result->hits;
+            if (isset($hits->total->value)) {
+                $hits->total = $hits->total->value;
+            }
+        }
+
         /**
          * Sorted Search size adjustment (part 2) - Checks to see if the number of results returned
          * are more than 500. If they are, set an approximate period filter to get to 500 results next
@@ -544,6 +557,9 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         );
 
         $resultSet = new Search_Elastic_ResultSet($entries, $hits->total, $resultStart, $resultCount);
+        if (! empty($didYouMean)) {
+            $resultSet->setDidYouMean(implode(' ', $correctKeywords));
+        }
 
         $reader = new Search_Elastic_FacetReader($result);
         foreach ($query->getFacets() as $facet) {
@@ -553,6 +569,118 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         }
 
         return $resultSet;
+    }
+
+    public function callSuggestions(array $options): array
+    {
+        $suggestionQuery = [
+            'query' => ['bool' => ['must' => []]],
+            "suggest" => [
+                "text" => $options['words'],
+                "contents_suggestion" => [
+                    "phrase" => [
+                        "field" => "contents",
+                        "size" => 5,
+                        "confidence" => 1,
+                        "max_errors" => 2,
+                        "collate" => [
+                            "params" => ["field_name" => "contents"],
+                            "prune" => true,
+                            "query" => [
+                                "source" => [
+                                    "match" => [
+                                        "{{field_name}}" => [
+                                            "query" => "{{suggestion}}",
+                                            "operator" => "and"
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ],
+                    ]
+                ],
+                "title_suggestion" => [
+                    "phrase" => [
+                        "field" => "title",
+                        "size" => 5,
+                        "confidence" => 1,
+                        "max_errors" => 2,
+                        "collate" => [
+                            "params" => ["field_name" => "title"],
+                            "prune" => true,
+                            "query" => [
+                                "source" => [
+                                    "match" => [
+                                        "{{field_name}}" => [
+                                            "query" => "{{suggestion}}",
+                                            "operator" => "and"
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ],
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->connection->search($options['indices'], $suggestionQuery);
+        $didYouMean = false;
+
+        $correctKeywords = null;
+        $bestScore = -1;
+
+        foreach ($result->suggest as $suggestions) {
+            foreach ($suggestions as $suggestion) {
+                foreach ($suggestion->options as $option) {
+                    if ($option->score > $bestScore) {
+                        if ($option->text != $options['words']) {
+                            $didYouMean = true;
+                        }
+                        $bestScore = $option->score;
+                        $correctKeywords = $option->text;
+                    }
+                }
+            }
+        }
+        $correctKeywords = explode(' ', $correctKeywords);
+        $fullQuery = $this->replaceKeywords($options['fullQuery'], explode(' ', $options['words']), $correctKeywords);
+
+        $result = $this->connection->search($options['indices'], $fullQuery);
+
+        return [$result, $correctKeywords, $didYouMean];
+    }
+
+    private function replaceKeywords($data, $wrongKeywords, $correctKeywords)
+    {
+        $correctQueryImploded = implode(' ', $correctKeywords);
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->replaceKeywords($value, $wrongKeywords, $correctKeywords);
+            } elseif ($key === "query") {
+                if (isset($data['rescore_query'])) {
+                    $data[$key] = $correctQueryImploded;
+                } else {
+                    foreach ($wrongKeywords as $index => $wrongKeyword) {
+                        if (strpos($value, $wrongKeyword) !== false) {
+                            $data[$key] = str_replace($wrongKeyword, $correctKeywords[$index], $value);
+                        }
+                    }
+                }
+            }
+        }
+
+        $correctQueryImploded = implode(' ', $correctKeywords);
+        if (isset($data['rescore'])) {
+            array_walk_recursive($data['rescore'], function (&$item, $key) use ($correctQueryImploded) {
+                if ($key === 'query') {
+                    $item = $correctQueryImploded;
+                }
+            });
+        }
+
+        return $data;
     }
 
     public function scroll(Search_Query_Interface $query)

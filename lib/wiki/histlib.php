@@ -1188,7 +1188,10 @@ function histlib_helper_setup_diff($page, $oldver, $newver, $diff_style = '', $c
     $prefs['wiki_edit_section'] = 'n';
 
     $info = $tikilib->get_page_info($page);
-
+    $exists = 0;
+    $old = $new = [];
+    $new['data'] = '';
+    $old['data'] = '';
     if ($oldver == 0 || $oldver == $info["version"]) {
         $old = & $info;
         $smarty->assign_by_ref('old', $info);

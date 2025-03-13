@@ -81,6 +81,8 @@
     --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.76);
     --tiki-admin-top-nav-hover-color: #1a1a1a;
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-border: solid rgba(0, 0, 0, 0.1);
+    --tiki-admin-top-border-width: 1px;
     --tiki-admin-aside-nav-bg: rgba(255, 255, 255, 1);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
@@ -106,7 +108,7 @@
     .accordion-item {
         border-color: transparent;
     }
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }

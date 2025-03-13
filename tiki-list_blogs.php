@@ -30,10 +30,7 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $data = $bloglib->get_blog($_REQUEST["remove"]);
     if ($data["user"] != $user) {
         if ($tiki_p_blog_admin != 'y') {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to remove this blog"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to remove this blog"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
     $bloglib->remove_blog($_REQUEST["remove"]);

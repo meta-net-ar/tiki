@@ -160,10 +160,6 @@
                                 <div class="mb-3">
                                     <label for="tool_token">{tr}Wysiwyg Token:{/tr}</label>
                                     <input type="text" name="tool_token" id="tool_token" class="form-control" placeholder="{tr}Search...{/tr}">
-                                    <div class="d-none">
-                                        {* hidden ckeditor to laod the list of commands for the Token field options *}
-                                        {textarea id='cked' wysiwyg='y'}{/textarea}
-                                    </div>
                                 </div>
                             {/if}
                             <input type="hidden" value="" name="save_tool" id="save_tool">

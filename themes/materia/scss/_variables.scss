@@ -59,6 +59,10 @@ $code-color:                      $body-color; //   $pink;  // default // Bootst
 
 $web-font-path: none; // Override value in vendor file
 
+.btn-info.skipnav {
+    position: absolute !important; // Override vendor file's btn-info { position: relative; }
+}
+
 .tiki .select2-container--bootstrap-5 .select2-selection {
     padding: 0 !important;
     box-shadow: inset 0 -1px 0 #ddd;

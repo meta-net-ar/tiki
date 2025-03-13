@@ -79,6 +79,11 @@ $smarty->assign_by_ref('categs', $categs['data']);
 $smarty->assign('cols', $prefs['directory_columns']);
 // Now if needed get sites
 $categ_info = $dirlib->dir_get_category($_REQUEST['parent']);
+if (is_array($categ_info)) {
+    $categ_info['allowSites'] = $categ_info['allowSites'] ?? 'n';
+} else {
+    $categ_info = ['allowSites' => 'n'];
+}
 $smarty->assign_by_ref('categ_info', $categ_info);
 if ($user) {
     $userGroup = $userlib->get_user_groups($user);

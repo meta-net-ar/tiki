@@ -71,7 +71,7 @@ class APIWriter
                         $url = str_replace('#id', $id, $this->config['delete_url']);
                         $method = strtolower($this->config['delete_method'] ?? 'delete');
                         $formatted_row = $this->formatRow(@$this->config['delete_format'], $columns, $row);
-                        $result = $this->sendApiRequest($url, $method, $formatted_row);
+                        $result = $this->sendApiRequest($url, $method, $formatted_row, $user);
                     } else {
                         $skipped++;
                         continue;
@@ -98,7 +98,7 @@ class APIWriter
                         $url = str_replace('#id', $id, $this->config['update_url']);
                         $method = strtolower($this->config['update_method'] ?? 'patch');
                         $formatted_row = $this->formatRow(@$this->config['update_format'], $columns, $row);
-                        $result = $this->sendApiRequest($url, $method, $formatted_row);
+                        $result = $this->sendApiRequest($url, $method, $formatted_row, $user);
                     } else {
                         $skipped++;
                         continue;
@@ -109,7 +109,7 @@ class APIWriter
                         $url = $this->config['create_url'];
                         $method = strtolower($this->config['create_method'] ?? 'post');
                         $formatted_row = $this->formatRow(@$this->config['create_format'], $columns, $row);
-                        $result = $this->sendApiRequest($url, $method, $formatted_row);
+                        $result = $this->sendApiRequest($url, $method, $formatted_row, $user);
                     } else {
                         $skipped++;
                         continue;
@@ -233,7 +233,7 @@ class APIWriter
         return $result;
     }
 
-    private function sendApiRequest($url, $method, $formatted_row)
+    private function sendApiRequest($url, $method, $formatted_row, $user)
     {
         global $url_host;
         $client = new \Services_ApiClient($url, false);

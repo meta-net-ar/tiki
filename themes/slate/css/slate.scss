@@ -36,10 +36,10 @@ body {
 body.fullscreen { background: var(--#{$prefix}body-bg); }
 
 // Increase navbar height to reinstate Bootswatch style
-.topbar_modules > * {
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
+//.topbar_modules > * {
+//    margin-top: .5rem;
+//    margin-bottom: .5rem;
+//}
 
 // Bootstrap variable overrides seem to have to be here to be effective.
 // Override Bootstrap CSS variable for valid CSS calc in mod-logo (0 must have a unit).

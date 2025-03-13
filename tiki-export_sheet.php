@@ -19,18 +19,21 @@ $auto_query_args = [
 
 $access->check_feature('feature_sheet');
 
-$info = TikiLib::lib("sheet")->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('msg', tra('Incorrect parameter'));
-    $smarty->display('error.tpl');
+if (! isset($_REQUEST['sheetId'])) {
+    Feedback::errorAndDie(tra('Missing parameter "sheetId"'), \Laminas\Http\Response::STATUS_CODE_400);
+}
+
+try {
+    $info = TikiLib::lib("sheet")->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    $smarty->assign('msg', tra($e->getMessage()));
+    $smarty->display("error.tpl");
     die;
 }
 
 $objectperms = Perms::get('sheet', $_REQUEST['sheetId']);
 if ($tiki_p_admin != 'y' && ! $objectperms->view_sheet && ! ($user && $info['author'] == $user)) {
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $encoding = new Encoding();
@@ -59,14 +62,13 @@ if (isset($_REQUEST['encoding'])) {
     $handlers_ = new TikiSheet();
 
     if (! in_array($handler, $handlers_->getHandlerList())) {
-        $smarty->assign('msg', "Handler is not allowed.");
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Handler is not allowed."), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     $handler = new $handler("php://stdout", 'UTF-8', $_REQUEST['encoding']);
     $grid->export($handler);
 
+    TikiLib::lib('header')->setXRobotsTag($robots);
     header("Content-type: text/comma-separated-values");
     header("Content-Disposition: attachment; filename=export.csv");
     header("Expires: 0");

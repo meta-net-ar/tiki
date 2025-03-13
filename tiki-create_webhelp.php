@@ -63,10 +63,7 @@ $struct_info = $structlib->s_get_structure_info($_REQUEST['struct']);
 $smarty->assign_by_ref('struct_info', $struct_info);
 
 if (! $tikilib->user_has_perm_on_object($user, $struct_info['pageName'], 'wiki page', 'tiki_p_view')) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view this page.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (isset($_REQUEST['create'])) {
@@ -84,15 +81,11 @@ if (isset($_REQUEST['create'])) {
 
     if (! is_dir(WHELP_PATH)) {
         if (! mkdir(WHELP_PATH)) {
-            $smarty->assign('msg', tra("Unable to create directory Run <code>sh setup.sh</code> from the command line to fix."));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra("Unable to create directory Run <code>sh setup.sh</code> from the command line to fix."), \Laminas\Http\Response::STATUS_CODE_500);
         }
     }
     if (! is_writeable(WHELP_PATH)) {
-        $smarty->assign('msg', tra("You need to change chmod 'whelp' manually to 777"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("You need to change chmod 'whelp' manually to 777"), \Laminas\Http\Response::STATUS_CODE_500);
     }
 
     if (! is_dir(WHELP_PATH . "/$dir")) {

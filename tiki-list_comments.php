@@ -19,7 +19,7 @@ $inputConfiguration = [
         'find'                     => 'word',            //post
         ],
         'staticKeyFiltersForArrays' => [
-            'types'                    => 'word',        //post
+            'types'                    => 'string',      //post
             'types_section'            => 'word',        //post
             'checked'                  => 'int',         //post
         ],
@@ -37,9 +37,7 @@ if (isset($_REQUEST['blogId'])) {
     $tikilib->get_perm_object('blog', $blogId);
 
     if ($tiki_p_blog_admin != 'y') {
-        $smarty->assign('msg', tra('You do not have permission to view the comments for this blog'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('You do not have permission to view the comments for this blog'), \Laminas\Http\Response::STATUS_CODE_401);
     }
 } else {
     $access->check_permission('tiki_p_admin_comments');

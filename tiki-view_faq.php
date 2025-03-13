@@ -31,9 +31,7 @@ if ($prefs['feature_categories'] == 'y') {
 $access->check_feature('feature_faqs');
 
 if (empty($_REQUEST["faqId"])) {
-    $smarty->assign('msg', tra("No FAQ indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No FAQ indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $tikilib->get_perm_object($_REQUEST['faqId'], 'faq');

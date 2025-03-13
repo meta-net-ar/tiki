@@ -17,7 +17,7 @@ class Payment extends Base
 {
     public function handle($params, Template $template)
     {
-        global $prefs, $user, $globalperms;
+        global $prefs, $user;
         $userlib = TikiLib::lib('user');
         $tikilib = TikiLib::lib('tiki');
         $paymentlib = TikiLib::lib('payment');
@@ -65,10 +65,6 @@ class Payment extends Base
             if ($prefs['payment_system'] == 'cclite' && isset($_POST['cclite_payment_amount']) && $_POST['cclite_payment_amount'] == $info['amount_remaining']) {
                 global $cclitelib;
                 require_once 'lib/payment/cclitelib.php';
-                $access = TikiLib::lib('access');
-                $cartlib = TikiLib::lib('cart');
-
-                //$access->check_authenticity( tr('Transfer currency? %0 %1?', $info['amount'], $info['currency'] ));
 
                 // check currency matches
                 if (empty($params['registry'])) {
@@ -99,7 +95,7 @@ class Payment extends Base
             } elseif ($prefs['payment_system'] == 'tikicredits') {
                 require_once 'lib/payment/creditspaylib.php';
                 $userpaycredits = new \UserPayCredits();
-                $userpaycredits->setPrice($info['amount_remaining']);
+                $userpaycredits->setPrice($info['amount_remaining_raw']);
                 $smarty->assign('userpaycredits', $userpaycredits->credits);
             }
 
@@ -120,7 +116,7 @@ class Payment extends Base
                 $info['returnurl'] .= (strstr($params['returnurl'], '?') ? '&' : '?') . "invoice=$invoice";
             }
             $smarty->assign('payment_info', $info);
-            $smarty->assign('payment_detail', TikiLib::lib('parser')->parse_data(htmlspecialchars($info['detail'])));
+            $smarty->assign('payment_detail', TikiLib::lib('parser')->parse_data(htmlspecialchars($info['detail'] ?? "")));
 
             $smarty_cache_id = $smarty_compile_id = $prefs['language'] . md5('tiki-payment-single.tpl');
             return $smarty->fetch('tiki-payment-single.tpl', $smarty_cache_id, $smarty_compile_id);

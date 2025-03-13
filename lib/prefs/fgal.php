@@ -734,8 +734,7 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'description' => tra('if this setting is enabled, will use RecordRTC to record the screen activity.'),
             'type' => 'flag',
             'default' => 'n',
-            'tags' => ['experimental'],
-            'packages_required' => ['npm-asset/recordrtc' => VendorHelper::getAvailableVendorPath('recordrtc', '/npm-asset/recordrtc/RecordRTC.js')]
+            'tags' => ['experimental']
         ],
         'fgal_use_record_rtc_screen_gallery_id' => [
             'name' => tra('Gallery default for RecordRTC recordings'),

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
 
+TikiLib::lib('header')->setXRobotsTag($robots);
+
 include_once("lib/ziplib.php");
 include_once('lib/wiki/exportlib.php');
 

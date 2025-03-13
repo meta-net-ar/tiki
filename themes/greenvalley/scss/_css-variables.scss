@@ -4,7 +4,7 @@ $imagePath: "../images/";
 // CSS variables / custom properties for base_files/scss/_tiki-pagetop_colors.scss -- Interpolation info from https://developersink.com/css/css-custom-properties-sass-variables/
 // Background images (actual images or CSS gradients, etc.), if assigned, override background colors.
 @mixin top-nav-dark {
-    --tiki-top-bg: url('#{$imagePath}header_background_ltr.jpg'); // Same with both dark and light options
+    --tiki-top-bg: url('../images/header_background_ltr.jpg'); // Same with both dark and light options
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
     --tiki-top-text-color: #{$navbar-light-hover-color};
@@ -35,7 +35,7 @@ $imagePath: "../images/";
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
-.tiki:not(.tiki-admin.uab) .tiki-top-nav-light {
+.tiki:not(.tiki-admin) .tiki-top-nav-light {
     @include top-nav-light;
 }
 
@@ -43,7 +43,7 @@ $imagePath: "../images/";
     @include topbar-nav-light;
 }
 
-.tiki:not(.tiki-admin.uab) .tiki-top-nav-dark {
+.tiki:not(.tiki-admin) .tiki-top-nav-dark {
     @include top-nav-dark;
 }
 
@@ -52,10 +52,10 @@ $imagePath: "../images/";
 }
 
 // Top and topbar image background properties (used with background image CSS variables above)
-.tiki:not(.tiki-admin.uab) .tiki-top-nav-light,
-.tiki:not(.tiki-admin.uab) .tiki-top-nav-dark,
-.tiki:not(.tiki-admin.uab) .tiki-topbar-nav-light,
-.tiki:not(.tiki-admin.uab) .tiki-topbar-nav-dark {
+.tiki:not(.tiki-admin) .tiki-top-nav-light,
+.tiki:not(.tiki-admin) .tiki-top-nav-dark,
+.tiki:not(.tiki-admin) .tiki-topbar-nav-light,
+.tiki:not(.tiki-admin) .tiki-topbar-nav-dark {
     background-repeat: no-repeat;
     background-size: cover;
 }
@@ -187,12 +187,12 @@ $imagePath: "/images/";
 }
 
 :root {
-    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
-    .fc-v-event {
+    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
+    .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
-    .fc-event-time,
-    .fc-event-title {
+    .ec-event-time,
+    .ec-event-title {
         color: var(--bs-body-color) !important;
     }
 }

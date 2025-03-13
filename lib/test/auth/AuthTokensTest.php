@@ -38,6 +38,9 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
         $this->obj = new AuthTokens($this->db, [], $this->dt);
 
+        global $prefs;
+        $prefs['feature_sefurl'] = 'n'; // default
+
         parent::setUp();
     }
 
@@ -68,6 +71,17 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $row = $this->db->query('SELECT `tokenId`, `creation`, `timeout`, `entry`, `parameters`, `groups` FROM `tiki_auth_tokens` ORDER BY `creation` desc')->fetchRow();
 
         $this->assertEquals(md5(implode('', $row)), $token);
+    }
+
+    public function testConvertToStandardUrl(): void
+    {
+        global $prefs;
+        $this->assertEquals('tiki-view_blog.php?blogId=1', $this->obj->convertToStandardUrl('/blog1'));
+        $this->assertEquals('tiki-read_article.php?articleId=25', $this->obj->convertToStandardUrl('/article25-Consectetur'));
+        $this->assertEquals('tiki-index.php?blogId=1', $this->obj->convertToStandardUrl('tiki-index.php?blogId=1'));
+        $prefs['feature_sefurl'] = 'y';
+        $this->assertEquals('/blog1', $this->obj->convertToStandardUrl('/blog1'));
+        $this->assertEquals('tiki-index.php?blogId=1', $this->obj->convertToStandardUrl('tiki-index.php?blogId=1'));
     }
 
     public function testRetrieveGroupsForToken(): void

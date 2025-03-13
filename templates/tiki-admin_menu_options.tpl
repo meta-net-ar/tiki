@@ -24,44 +24,7 @@
 {tab name="{tr}Manage menu{/tr} {$editable_menu_info.name}"}
     <div>
         <h2>{tr}Menu options{/tr} <span class="badge bg-secondary">{$cant_pages}</span></h2>
-
-        <div class="navbar mb-4 clearfix">
-            {button _text='{tr}Save Options{/tr}' _class='save_menu  btn btn-sm disabled float-start mb-2' _type='primary' _ajax='n' _auto_args='save_menu,page_ref_id'}
-            <ol class="new-option">
-                <li id="node_new" class="new p-2">
-                    <div class="options--group-container">
-                        <div class="label-group">
-                            <div class="input-group input-group-sm" style="max-width: 100%">
-                                <span class="input-group-text">{icon name='sort'}</span>
-                                <input type="text" class="field-label form-control" value="" placeholder="{tr}New option{/tr}" readonly="readonly">
-                                    <span class="tips input-group-text option-edit" title="|{tr}Check this if the option is an alternative to the previous one.{/tr}">
-                                        <input type="checkbox" class="samepos">
-                                    </span>
-                                    <a href="javascript:void(0)" class="tips input-group-text " title="{tr}New option{/tr}|{tr}Drag this on to the menu area below{/tr}">
-                                        {icon name='info'}
-                                    </a>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 d-inline-block url-group">
-                            <div class="input-group input-group-sm">
-                                    <a href="javascript:void(0)" class="input-group-text tips confirm" onclick='return false;'>
-                                        {icon name='link'}
-                                    </a>
-                                <input type="text" class="field-url form-control" value="" placeholder="{tr}URL or ((page name)){/tr}">
-                                    <a href="javascript:void(0)" class="input-group-text  option-edit">
-                                        {icon name='edit' _menu_icon='y' alt="{tr}Details{/tr}"}
-                                    </a>
-                                    <a href="javascript:void(0)" class="input-group-text text-danger option-remove" disabled="disabled">
-                                        {icon name='remove' _menu_icon='y' alt="{tr}Remove{/tr}"}
-                                    </a>
-                            </div>
-                        </div>
-                    </div>
-                    {* TODO: Logic for nested new options *}
-                    {* <ol class="child-options"></ol> *}
-                </li>
-            </ol>
-        </div>
+        {include file='tiki-admin_menu_options_insert_component.tpl'}
         <form method="get" action="tiki-admin_menu_options.php">
             {ticket}
             <input type="hidden" name="find" value="{$find|escape}">
@@ -128,6 +91,12 @@
                                     {$tooltip = "|{tr}separator{/tr}"}
                                 {/if}
 
+                                {if $editable_menu_info.use_items_icons eq 'y'}
+                                    <div class="label-group input-group-sm">
+                                        <input name="menu-icon" class="field-icon form-control" placeholder="Icon" value="{$option.icon}" id="icon-{$option.name}" />
+                                        {autocomplete type="icon" element="#icon-{$option.name}"}
+                                    </div>
+                                {/if}
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">{icon name='sort'}</span>
@@ -165,10 +134,7 @@
             </div>
             <input type="hidden" id="deletemenu" name="deletemenu">
         </form>
-
-        {button _text='{tr}Save Options{/tr}' _class='save_menu  btn btn-sm disabled' _type='primary' _ajax='n' _auto_args='save_menu,page_ref_id'}
-
-
+        {include file='tiki-admin_menu_options_insert_component.tpl'}
     </div>
 {/tab}
 {tab name="{tr}Preview and Deploy{/tr}"}

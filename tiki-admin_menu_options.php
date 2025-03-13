@@ -21,9 +21,7 @@ require_once('tiki-setup.php');
 $menulib = TikiLib::lib('menu');
 $access->check_permission(['tiki_p_edit_menu_option']);
 if (! isset($_REQUEST["menuId"])) {
-    $smarty->assign('msg', tra("No menu indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No menu indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $auto_query_args = [
     'menuId',
@@ -88,7 +86,6 @@ $smarty->assign('module_zone_list', $module_zones);
 
 $headerlib->add_js_module('import "@jquery-tiki/tiki-admin_menu_options";');
 $headerlib->add_jsfile('lib/modules/tiki-admin_modules.js');
-$headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/nestedsortable/jquery.ui.nestedSortable.js');
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

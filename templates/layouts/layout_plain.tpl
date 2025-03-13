@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="page_{$page_id}"{/if}>
+<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="page_{$page_id}"{/if}{if Language::isRTL()} dir="rtl"{/if}>
     <head>
         {include file='header.tpl'}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
             {include file='tiki-ajax_header.tpl'}
         {/if}
 
-        <div class="container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">
+        <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">
 {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
             <div class="row">
                 <header class="page-header w-100" id="page-header">

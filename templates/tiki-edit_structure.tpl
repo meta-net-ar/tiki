@@ -183,9 +183,9 @@
                         </div>
                     {/if}
                 </div>
-                <ul id="page_list_container">
+                <ul id="page_list_container" class="list-group">
                     {foreach $listpages.data as $aPage}
-                        <li class="ui-state-default" data-page-name="{$aPage.pageName|escape}">
+                        <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
                             {$aPage.pageName|escape}
                         </li>
                     {/foreach}

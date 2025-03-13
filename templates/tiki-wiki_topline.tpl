@@ -142,6 +142,11 @@
                             {tr}Page actions{/tr}
                         </h6>
                         <div class="dropdown-divider"></div>
+                        {if $prefs.wiki_collapse_expand_all_headings eq 'y'}
+                            <a class="dropdown-item" id="expandCollapseCollapsibleHeadings" href="#" data-action="expand">
+                                {icon name="heading"} <span>{tr}Expand all collapsible headings{/tr}</span>
+                            </a>
+                        {/if}
                         {if $pdf_export eq 'y' and $pdf_warning eq 'n' and $prefs["feature_wiki_print"] eq 'y'}
                             <a class="dropdown-item generate-pdf" href="tiki-print.php?{query _keepall='y' display="pdf" page=$page}">
                                 {icon name="pdf"} {tr} PDF{/tr}
@@ -192,28 +197,8 @@
                             {/if}
                             {if ($tiki_p_edit eq 'y' or $tiki_p_edit_inline eq 'y' or $page|lower eq 'sandbox') and $beingEdited ne 'y' and $machine_translate_to_lang eq ''}
                                 {if $prefs.wysiwyg_inline_editing eq 'y' and $prefs.feature_wysiwyg eq 'y'}
-                                    {jq}
-                                        $("#wysiwyg_inline_edit").on("click", function () {
-                                        var $icon = $("#wysiwyg_inline_edit");
-                                        var $toggleOnIcon = '{{icon iclass="toggle-icon" name="toggle-on"}}';
-                                        var $toggleOffIcon = '{{icon iclass="toggle-icon" name="toggle-off"}}';
-                                        if (! $icon.hasClass("active highlight")) {
-                                            if (enableWysiwygInlineEditing()) {
-                                                $icon.addClass("active highlight");
-                                                $(".toggle-icon", this).replaceWith($toggleOnIcon);
-                                            }
-                                        } else {
-                                            if (disableWYSIWYGInlineEditing()) {
-                                                $icon.removeClass("active highlight");
-                                                $(".toggle-icon", this).replaceWith($toggleOffIcon);
-                                            }
-                                        }
-                                        return false;
-                                        });
-                                        if (getCookie("wysiwyg_inline_edit", "preview")) { $("#wysiwyg_inline_edit").trigger("click"); }
-                                    {/jq}
                                     <a class="dropdown-item" href="#" id="wysiwyg_inline_edit" title="{tr}Click to toggle on/off{/tr}">
-                                            <span class="d-flex align-items-center text-with-toggle"><span class="text flex-fill me-3">{icon name='edit'} {tr}Inline edit{/tr} ({tr}Wysiwyg{/tr})</span> {icon iclass="toggle-icon" name="toggle-off"}</span>
+                                            <span class="d-flex align-items-center text-with-toggle"><span class="text flex-fill me-3">{icon name='edit'} {tr}Inline edit{/tr} ({tr}Wysiwyg{/tr})</span> {icon iclass="toggle-icon" name="toggle-off"} {icon iclass="toggle-icon d-none" name="toggle-on"}</span>
                                             {assign var="hasPageAction" value="1"}
                                     </a>
                                 {/if}

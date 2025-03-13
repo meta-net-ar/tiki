@@ -1,7 +1,7 @@
 import { createStore } from "vuex";
 import { toRaw } from "vue";
 import { v4 as uuidv4 } from "uuid";
-import moment from "moment-timezone/builds/moment-timezone-with-data-10-year-range.js";
+import moment from "moment-timezone";
 import strftime from "strftime";
 
 export default createStore({

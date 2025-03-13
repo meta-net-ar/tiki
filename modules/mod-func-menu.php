@@ -15,7 +15,7 @@ function module_menu_info()
         'params' => [
             'id' => [
                 'name' => tra('Menu'),
-                'description' => tra('Identifier of the menu (from tiki-admin_menus.php)'),
+                'description' => tr('Uses the ID of the menu (to edit/add a new menu go to %0Admin Menus%1)', '<a href="tiki-admin_menus.php">', '</a>'),
                 'filter' => 'int',
                 'profile_reference' => 'menu',
             ],

@@ -19,12 +19,13 @@ footer {
   cursor: pointer;
 }
 
-.input-group-append {
+.input-group-append, .input-group-addon {
   display: inline-block;
   width: auto;
   padding: 2px;
   border: 1px solid #aaa !important;
   border-radius: 3px !important;
+  visibility: hidden;
 }
 
 .box-search .input-group-append:last-child > .btn,
@@ -49,7 +50,7 @@ Theme Customizer Main Styles
 .customizer select {
   display: block !important;
 }
-.customizer .chosen-container {
+.customizer .select2-container {
   display: none;
 }
 .customizer .row {
@@ -78,17 +79,17 @@ Theme Customizer Main Styles
   font-style: normal !important;
   text-transform: none !important;
 }
-.customizer .input input, .customizer .input textarea, .customizer .input select {
+.customizer .input input:not([type=checkbox]), .customizer .input textarea, .customizer .input select {
   width: 78px;
   padding: 4px;
   border-radius: 3px;
   border: 1px solid #aaa;
 }
-.customizer .input input {
+.customizer .input input:not([type=checkbox]) {
   background-color: #fff;
   color: #000;
 }
-.customizer .input input[disabled] {
+.customizer .input input:not([type=checkbox])[disabled] {
   background-color: #ff0000;
   border: 1px solid #ff0000;
   cursor: not-allowed;
@@ -108,10 +109,6 @@ Theme Customizer Main Styles
 .customizer .colors .input span {
   width: 150px;
   height: 150px;
-  margin: 0 0 0.75em;
-  cursor: pointer;
-  border: 1px solid #aaa !important;
-  border-radius: 3px !important;
 }
 .customizer .colors .input span i {
   width: 100%;
@@ -124,17 +121,19 @@ Theme Customizer Main Styles
   padding-right: 0;
   text-align: left;
 }
+.customizer .colors .input .input-group-addon {
+  visibility: visible;
+}
 .customizer .fonts .h3a {
   font-size: 1.5em;
 }
-.customizer .fonts .input input {
+.customizer .fonts .input input:not([type=checkbox]) {
   width: 150px;
 }
 .customizer .fonts .input label {
   width: 95px;
 }
 .customizer .fonts .input .check {
-  width: auto;
   margin: 0 5px 0 0;
   vertical-align: middle;
 }
@@ -148,7 +147,6 @@ Theme Customizer Main Styles
   width: 92px;
 }
 .customizer .headings .input .check {
-  width: auto;
   margin: 0 5px 0 0;
   vertical-align: middle;
 }
@@ -180,7 +178,7 @@ Theme Customizer Main Styles
 }
 .customizer .forms span:not(.input-group-addon) {
   display: inline-block;
-  width: 85px;
+  width: 115px;
 }
 .customizer .forms .col-md-9 label {
   display: block;
@@ -412,15 +410,31 @@ Theme Customizer Responsive Design Stuff
   footer {
     padding-bottom: 75px;
   }
-
+  .customizer sl-color-picker {
+    vertical-align: middle;
+  }
   .customizer .colors .input span {
     width: 110px;
     height: 110px;
   }
+  .customizer .input .picker.d-flex {
+    display: block;
+  }
+  .customizer .input .picker label {
+    display: block;
+  }
   .customizer .tabs .input label, .customizer .tables .input label, .customizer .navbars .input label, .customizer .dropdowns .input label {
     display: block;
   }
-
+  .customizer .tables .input .nocolor, .customizer .forms .input .nocolor, .customizer .lists .input .nocolor, .customizer .tabs .input .nocolor {
+    width: 100%;
+  }
+  .customizer .forms .input p:last-child input {
+    width: 100%;
+  }
+  .customizer .navbars .input label, .customizer .dropdowns .input label {
+    width: 100%;
+  }
   .tc-footer .footer-ui > span {
     display: block;
     margin-top: 7px;
@@ -436,7 +450,6 @@ Theme Customizer Responsive Design Stuff
   footer {
     padding-bottom: 124px;
   }
-
   .customizer .col-md-3 {
     padding-left: 0;
   }
@@ -463,15 +476,14 @@ Theme Customizer Responsive Design Stuff
   .customizer .alerts .input {
     padding-top: 0;
   }
-
   .tc-footer {
-    font-size: 0.85em;
+    font-size: 0.75em;
   }
   .tc-footer label {
     margin-bottom: 0;
   }
   .tc-footer .btn {
-    margin: 0 5px 10px 0;
+    margin: 0 5px 0 0;
     padding: 4px 10px;
   }
   .tc-footer .icon {
@@ -479,6 +491,30 @@ Theme Customizer Responsive Design Stuff
   }
   .tc-footer #generate-css {
     margin-bottom: 0;
+  }
+  .tc-footer #generate-custom-css {
+    text-indent: -9999px;
+    line-height: 0;
+    font-size: 1em;
+  }
+  .tc-footer #generate-custom-css:after {
+    content: "Generate";
+    display: block;
+    text-indent: 0;
+    line-height: initial;
+  }
+  .tc-footer #generate-custom-css + label {
+    margin-right: 5px;
+  }
+  .tc-footer #dLabel {
+    text-indent: -9999px;
+    line-height: 0;
+  }
+  .tc-footer #dLabel:after {
+    content: "Section:";
+    display: block;
+    text-indent: 0;
+    line-height: initial;
   }
   .tc-footer .footer-ui > span {
     position: absolute;
@@ -491,11 +527,11 @@ Theme Customizer Responsive Design Stuff
     display: table-cell;
   }
   .tc-footer .dropup {
-    float: none;
+    margin-top: 3px;
   }
   .tc-footer .dropup > a {
     padding: 10px;
   }
 }
 
-/*# sourceMappingURL=../css/theme-customizer.css.map */
+/*# sourceMappingURL=theme-customizer.css.map */

@@ -489,6 +489,7 @@ excludeFromNotification = {$field['excludeFromNotification']}
 visibleInViewMode = {$field['visibleInViewMode']}
 visibleInEditMode = {$field['visibleInEditMode']}
 visibleInHistoryMode = {$field['visibleInHistoryMode']}
+isMultilingual = {$field['isMultilingual']}
 
 EXPORT;
     }

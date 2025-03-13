@@ -35,17 +35,33 @@
         {tr}experimental{/tr}
     </span>
 {/if}
-{if !empty($p.dependencies)}
-    {foreach from=$p.dependencies item=dep}
-        {if !empty($dep.met)}
-            {icon name="ok" class="pref_dependency tips text-success" title="{tr}Requires:{/tr} "|cat:$dep.label|escape|cat:" (OK)"}
-        {elseif $dep.type eq 'profile'}
-            <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified} style="display:none;"{/if}>{tr}You need apply profile{/tr} <a href="{$dep.link|escape}" class="alert-link">{$dep.label|escape}</a></div>
-        {else}
-            <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified} style="display:none;"{/if}>{tr}You need to set{/tr} <a href="{$dep.link|escape}" class="alert-link">{$dep.label|escape}</a></div>
-        {/if}
-    {/foreach}
-{/if}
+
+<div class="d-inline-flex flex-column">
+    {if !empty($p.conflicts)}
+        {foreach from=$p.conflicts.active item=conflict}
+            <div class="alert alert-danger pref_conflict d-inline-block alert-sm">{tr}Conflict:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a> {tr}must be disabled first.{/tr}</div>
+        {/foreach}
+        {foreach from=$p.conflicts.inactive item=conflict}
+            <div class="alert alert-warning pref_conflict d-inline-block alert-sm">{tr}Incompatibility detected with:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a></div>
+        {/foreach}
+    {/if}
+    {if !empty($p.dependencies)}
+        {foreach from=$p.dependencies item=dep}
+            {if !empty($dep.met)}
+                {icon name="ok" class="pref_dependency tips text-success" title="{tr}Requires:{/tr} "|cat:$dep.label|escape|cat:" (OK)"}
+            {elseif $dep.type eq 'profile'}
+                <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified} style="display:none;"{/if}>{tr}You need apply profile{/tr} <a href="{$dep.link|escape}" class="alert-link">{$dep.label|escape}</a></div>
+            {else}
+                <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified} style="display:none;"{/if}>{tr}You need to set{/tr} <a href="{$dep.link|escape}" class="alert-link">{$dep.label|escape}</a></div>
+            {/if}
+        {/foreach}
+    {/if}
+    {if !empty($p.notices)}
+        {foreach from=$p.notices key=value item=notice}
+            <div class="alert alert-warning pref_notice d-none" data-value="{$value}" data-pref-name="{$p.preference}">{$notice|escape}</div>
+        {/foreach}
+    {/if}
+</div>
 
 {* Contents moved to shared-form-text.tpl, to display under input. *}
 

@@ -1,3 +1,10 @@
+{assign var="listTemplate" value=$list}
+{*
+    We assign $list to another name before calling the extends line below because
+    the extends line below comes with another variable $list, which is also an array
+    but contains the elements of the main menu. Therefore, we reassign it to avoid a collision
+    between the two.
+*}
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
@@ -23,7 +30,7 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}</th>
                 <th>{tr}Action{/tr}</th>
             </tr>
-            {foreach from=$list item=template}
+            {foreach from=$listTemplate item=template}
                 <tr>
                     <td>
                         {$template.templateId}

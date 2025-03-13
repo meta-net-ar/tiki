@@ -217,42 +217,45 @@
         .ui-datepicker {
             z-index:9999 !important;
         }
-        .fc .fc-scrollgrid, .fc .fc-scrollgrid table,
-        .fc .fc-daygrid-body {
+        .ec .ec-scrollgrid, .ec .ec-scrollgrid table,
+        .ec .ec-day-grid {
             width: 100% !important;
         }
-        .fc-daygrid-event-harness {
+        .ec-day-grid-harness {
             border-radius: 4px;
             margin: 0px 3px 0px;
         }
-        .fc-event {
+        .ec-event {
             display: block;
             white-space: break-spaces;
         }
-        .fc-daygrid-day-events .fc-event-time {
+        .ec-events .ec-event-time {
             color: #ffffff;
             font-weight: bold;
         }
-        .fc-daygrid-day-events .fc-event-title {
+        .ec-events .ec-event-title {
             color: #ffffff;
             font-weight: normal;
         }
-        .fc-timegrid-event .fc-event-time {
+        .ec-time-grid-event .ec-event-time {
             font-weight: bold;
         }
-        .fc-timegrid-event .fc-event-title {
+        .ec-time-grid .ec-event-title {
             font-weight: normal;
+        }
+        .ec-dark .ec-active {
+            color: white;
         }
         @media only screen and (max-width: 767px) {
-            .fc-header-toolbar {
+            .ec-toolbar {
                 display: block !important;
             }
-            .fc-header-toolbar .fc-toolbar-chunk .btn-group .btn {
+            .ec-toolbar .ec-button .btn-group .btn {
                 padding: 0.375rem 0.1rem;
             }
         }
         @media print {
-            .fc .fc-daygrid-day-top {
+            .ec .ec-day-grid-day-top {
                 border-bottom: 1px solid #dee2e6;
             }
         }

@@ -293,7 +293,7 @@ function wikiplugin_slideshow($data, $params)
 
     $headerlib = TikiLib::lib('header');
     if (! isset($_REQUEST['theme'])) {
-        $headerlib->add_cssfile(REVEALJS_ASSETS_PATH . '/css/theme/' . $params['theme'] . '.css', 1);
+        $headerlib->add_cssfile(REVEALJS_DIST_PATH . "./theme/" . $params['theme'] . '.css', 1);
         $headerlib->add_js(
             '$( "#showtheme" ).val( "' . $params['theme'] . '" );'
         );

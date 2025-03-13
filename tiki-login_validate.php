@@ -141,7 +141,5 @@ if ($isvalid) {
     } else {
         $error = tra('Invalid username or password');
     }
-    $smarty->assign('errortype', 'no_redirect_login');
-    $smarty->assign('msg', $error);
-    $smarty->display("error.tpl");
+    Feedback::errorAndDie($error, \Laminas\Http\Response::STATUS_CODE_409);
 }

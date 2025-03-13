@@ -65,14 +65,14 @@
 }
 
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
-    }
-    .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
-    }
-}
+//[data-bs-theme=light] {                              // color mode
+//    .tiki-top-nav-dark {                           // dark top selector
+//        @include top-nav-light;                      // light values
+//    }
+//    .tiki-topbar-nav-dark {
+//        @include topbar-nav-light;
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 
@@ -82,6 +82,8 @@
     --tiki-admin-top-nav-color: rgba(0, 0, 0, 0.9);
     --tiki-admin-top-nav-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-border: solid #333;
+    --tiki-admin-top-border-width: 2px;
     --tiki-admin-aside-nav-bg: rgb(255, 255, 255);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
@@ -89,10 +91,18 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
+}
+
+.tiki.tiki-admin header .navbar-light-parent.tiki-top-nav-light {
+    border-radius: 25px 25px 55px 5px / 5px 55px 25px 25px;
+}
+
+.navbar-expand-md.navbar-light.bg-light.tiki-topbar-nav-light.tiki-admin-top-nav-light.admin-navbar {
+    border: none;
 }
 
 // Dark navbar minus top nav
@@ -112,7 +122,7 @@
         border-width: 0 !important;
     }
     .accordion-item.search-preferences,
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }

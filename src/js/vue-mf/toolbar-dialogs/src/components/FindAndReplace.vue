@@ -1,6 +1,7 @@
 <script setup>
 import DialogInput from "./DialogInput.vue";
-import { onMounted, defineProps, defineExpose, ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { preg_quote } from './../utils/string';
 
 const props = defineProps({
     toolbarObject: {
@@ -9,27 +10,18 @@ const props = defineProps({
     },
 });
 
-const toolbarObject = ref(props.toolbarObject);
-
-const findInputElement = ref();
 const findInput = ref("");
-const replaceInputElement = ref();
 const replaceInput = ref("");
 
 const caseSensitiveCheck = ref(false);
 const regexCheck = ref(false);
 const replaceAllCheck = ref(false);
 
-onMounted(() => {
-    $(findInputElement.value.$el)
-        .parents(".modal").first()
-        .on("show.bs.modal", (event) => {
-            _shown(event);
-        });
-});
+const toolbarObject = computed(() => props.toolbarObject);
 
-function _shown(event) {
-    const $modal = $(findInputElement.value.$el).parents(".modal").first();
+function _shown() {
+    const $modal = $(toolbarObject.value.modalElement)
+
     $modal.find('[data-bs-toggle="tooltip"]').tooltip();
     if (toolbarObject.value.name === "replace") {
         $modal.find(".btn.btn-primary").text(tr("Replace"));
@@ -60,7 +52,7 @@ function _find() {
                 regexOptions += "i";
             }
             if (! regexCheck.value) {
-                // TODO find a js version of preg_quote, possibly https://locutus.io/php/pcre/preg_quote/
+                toFind = preg_quote(toFind);
             }
             textAreaContent = $textArea.val();
             re = new RegExp(toFind, regexOptions);
@@ -85,12 +77,14 @@ function _find() {
                     const scrollTop = $textArea.scrollTop();
                     $textArea.val(textAreaContent.replace(re, replaceInput.value));
                     // close the modal
-                    setTimeout(function () {
+                    const tm = setTimeout(function () {
                         setSelectionRange($textArea, matches.index + pos, matches.index + replaceInput.value.length + pos);
+                        clearTimeout(tm);
                     }, 100);
                 } else {
-                    setTimeout(function () {
+                    const tm = setTimeout(function () {
                         setSelectionRange($textArea, matches.index + pos, matches.index + toFind.length + pos);
+                        clearTimeout(tm);
                     }, 100);
                 }
             }
@@ -107,21 +101,22 @@ function onEnter() {
     //toolbarObject.value.bootstrapModalRef.close()
 }
 
+onMounted(_shown);
+
 defineExpose({ execute: _find, shown: _shown });
 </script>
 
 <template>
-    <DialogInput ref="findInputElement" v-model="findInput" v-on:keyup.enter="onEnter" label="Find" class="mb-2"/>
-    <DialogInput v-if="toolbarObject.name === 'replace'" ref="replaceInputElement" v-model="replaceInput" label="Replace" class="mb-2"/>
+    <DialogInput v-model="findInput" v-on:keyup.enter="onEnter" label="Find" class="mb-2"/>
+    <DialogInput v-if="toolbarObject.name === 'replace'" v-model="replaceInput" label="Replace" class="mb-2"/>
     <div class="form-check mr-sm-2">
         <input
                 class="form-check-input"
                 type="checkbox"
-                @input="$emit('update:modelValue', $event.target.value)"
-                id="replaceAllCheck"
+                id="caseSensitiveCheck"
                 v-model="caseSensitiveCheck"
         />
-        <label class="form-check-label" for="replaceAllCheck">
+        <label class="form-check-label" for="caseSensitiveCheck">
             Case sensitive
         </label>
     </div>
@@ -129,7 +124,6 @@ defineExpose({ execute: _find, shown: _shown });
         <input
                 class="form-check-input"
                 type="checkbox"
-                @input="$emit('update:modelValue', $event.target.value)"
                 id="replaceAllCheck"
                 v-model="replaceAllCheck"
         />
@@ -137,12 +131,11 @@ defineExpose({ execute: _find, shown: _shown });
             Replace all
         </label>
     </div>
-<!--
+
     <div class="form-check mr-sm-2">
         <input
                 class="form-check-input"
                 type="checkbox"
-                @input="$emit('update:modelValue', $event.target.value)"
                 id="regexCheck"
                 v-model="regexCheck"
         />
@@ -150,5 +143,5 @@ defineExpose({ execute: _find, shown: _shown });
             Use regular expressions
         </label>
     </div>
--->
+
 </template>

@@ -40,10 +40,7 @@ $access->check_permission('tiki_p_admin_dynamic');
 $dcslib = TikiLib::lib('dcs');
 
 if (! isset($_REQUEST["contentId"])) {
-    $smarty->assign('msg', tra("No content id indicated"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No content id indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('contentId', $_REQUEST["contentId"]);

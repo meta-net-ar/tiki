@@ -19,18 +19,25 @@ class Rss extends Base
     {
         extract($params, EXTR_SKIP);
         // Param = zone
-        if (empty($id)) {
-            trigger_error("assign: missing id parameter");
+        if (empty($id) && empty($url)) {
+            trigger_error("assign: missing id or url parameter");
             return '';
         }
         if (empty($max)) {
             $max = 99;
         }
 
+        $params = ['max' => $max];
+        if (! empty($id)) {
+            $params['id'] = $id;
+        } elseif (! empty($url)) {
+            $params['url'] = $url;
+        }
+
         $out = TikiLib::lib('parser')->pluginExecute(
             'rss',
             '',
-            ['id' => $id, 'max' => $max,],
+            $params,
             0,
             false,
             ['context_format' => 'html']

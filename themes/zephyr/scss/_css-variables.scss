@@ -65,8 +65,8 @@
 
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
-    .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
+    body:not(.tiki-admin) .tiki-top-nav-dark {                           // dark top selector
+        @include top-nav-dark;                      // dark values
     }
     .tiki-topbar-nav-dark {
         @include topbar-nav-light;
@@ -103,7 +103,7 @@
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }

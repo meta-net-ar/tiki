@@ -1282,10 +1282,10 @@ window.onload = loadScript;');
         }
         */
 
-        $this->add_jsfile_external('vendor_bundled/vendor/openlayers/openlayers/ol.js', true)
-            ->add_cssfile('vendor_bundled/vendor/openlayers/openlayers/ol.css')
-            ->add_jsfile_external('vendor_bundled/vendor/walkermatt/ol-layerswitcher/dist/ol-layerswitcher.js')
-            ->add_cssfile('vendor_bundled/vendor/walkermatt/ol-layerswitcher/src/ol-layerswitcher.css')
+        $this->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
+            ->add_cssfile(OL_PATH . '/ol.css')
+            ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
+            ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
             ->add_js(
                 ''
             );
@@ -1301,6 +1301,43 @@ window.onload = loadScript;');
         return $this;
     }
 
+    /**
+     * Get robots tag based on robots.txt file
+     *
+     * @return string|null
+     */
+    public function getRobots()
+    {
+        $robotsContent = file_get_contents('robots.txt');
+        $scriptUri = preg_quote(basename($_SERVER['SCRIPT_NAME']));
+        $requestUri = preg_quote(basename($_SERVER['REQUEST_URI']));
+
+        if (preg_match('/^Disallow: \/(' . $scriptUri . '|' . $requestUri . ')/m', $robotsContent)) {
+            return 'NOINDEX, NOFOLLOW';
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the X-Robots-Tag HTTP header.
+     *
+     * This method sets the X-Robots-Tag header with the provided value, typically used to control
+     * how search engines index and follow the page. If no value is provided, no header is set.
+     *
+     * @param string|null $robots The value for the X-Robots-Tag header (e.g., "noindex, nofollow").
+     * If null or empty, no header will be set.
+     * @return string|null The value of the X-Robots-Tag header that was set, or null if no header was set.
+     */
+    public function setXRobotsTag(?string $robots = null): ?string
+    {
+        if (! empty($robots)) {
+            header('X-Robots-Tag: noindex');
+            return $robots;
+        }
+
+        return null;
+    }
 
     public function __toString()
     {

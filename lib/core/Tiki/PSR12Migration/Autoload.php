@@ -23,6 +23,8 @@ class Autoload
         'InstallerDatabaseErrorHandler' => 'Tiki\\Installer\\InstallerDatabaseErrorHandler',
         'LogsLib' => 'Tiki\\Lib\\Logs\\LogsLib',
         'LogsQueryLib' => 'Tiki\\Lib\\Logs\\LogsQueryLib',
+        'Search_Formatter_Transform_DynamicLoaderWrapper' => 'Tiki\\Search\\Formatter\\Transform\\DynamicLoaderWrapper',
+        'Search_Formatter_Transform_DynamicLoader' => 'Tiki\\Search\\Formatter\\Transform\\DynamicLoader',
     ];
 
     /**

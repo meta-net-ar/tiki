@@ -22,7 +22,7 @@ $inputConfiguration = [
             'save'                        => 'bool',      //post
             'sort_mode'                   => 'word',      //post
             'offset'                      => 'int',       //get
-            'find'                        => 'word',      //post
+            'find'                        => 'string',    //post
             'maxRecords'                  => 'int',       //post
         ],
     ]
@@ -39,9 +39,7 @@ if (! isset($_REQUEST["assign_user"]) || ($tiki_p_admin != 'y' && $tiki_p_admin_
     $smarty->assign_by_ref('userChoice', $userChoice);
 } else {
     if (! $userlib->user_exists($_REQUEST['assign_user'])) {
-        $smarty->assign('msg', tra("User doesn't exist"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("User doesn't exist"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $userChoice = '';
     $smarty->assign_by_ref('assign_user', $_REQUEST['assign_user']);

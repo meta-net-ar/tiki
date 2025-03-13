@@ -464,8 +464,12 @@
                 </div>
             </div>
             <div class="form-check">
+                {$adminOnlyViewEditItem_is_checked = 'n'}
+                {if $info.adminOnlyViewEditItem eq 'y'|| (empty($info.adminOnlyViewEditItem) && $prefs.tracker_adminonlyviewedititem_by_default eq 'y')} {* No value in $info.adminOnlyViewEditItem means tracker creation *}
+                    {$adminOnlyViewEditItem_is_checked = 'y'}
+                {/if}
                 <input type="checkbox" class="form-check-input" name="adminOnlyViewEditItem" id="adminOnlyViewEditItem" value="1"
-                        {if $info.adminOnlyViewEditItem eq 'y'} checked="checked"{/if}>
+                    {if $adminOnlyViewEditItem_is_checked eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="adminOnlyViewEditItem">
                     {tr}Restrict non admins to wiki page access only{/tr}
                 </label>

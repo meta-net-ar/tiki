@@ -84,7 +84,7 @@
                     }
                         <div class="input-group col-sm-12">
                             <select name="fgal_actions" class="form-select" aria-label="{tr}Select action to perform with checked...{/tr}">
-                                <option value="" selected="selected">
+                                <option value="" selected disabled>
                                     {tr}Select action to perform with checked...{/tr}
                                 </option>
                                 {if $tiki_p_assign_perm_file_gallery eq 'y'}

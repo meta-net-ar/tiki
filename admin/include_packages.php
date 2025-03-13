@@ -153,6 +153,12 @@ $smarty->assign('composer_bundled_packages_installed', $composerManagerBundled->
 $smarty->assign('composer_custom_packages_installed', $composerManagerCustom->getCustomPackages());
 $smarty->assign('composer_phar_exists', $composerManager->getComposer()->composerPharExists());
 
+$deprecatedPackagesFromYml = $composerManager->getListOfDeprecatedPackages();
+$deprecatedPackageNames = array_column($deprecatedPackagesFromYml, 'name');
+$installedPackagesNames = array_column($installableList, 'name');
+$installedDeprecatedPackages = array_values(array_intersect($installedPackagesNames, $deprecatedPackageNames));
+$smarty->assign('installedDeprecatedPackages', $installedDeprecatedPackages);
+
 $finder = new PhpExecutableFinder();
 $phpCli = $finder->find($phpCliVersion);
 $majorMinorOffset = strpos(PHP_VERSION, '.', 2);

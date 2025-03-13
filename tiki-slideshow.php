@@ -74,14 +74,7 @@ if (isset($_REQUEST['theme'])) {
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);
 if ($tiki_p_view != 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign(
-        'msg',
-        tra("Permission denied. You cannot view this page.")
-    );
-
-    $smarty->display("error_raw.tpl");
-    die;
+    Feedback::errorAndDie(tra("Permission denied. You cannot view this page."), \Laminas\Http\Response::STATUS_CODE_401, "error_raw.tpl");
 }
 
 // BreadCrumbNavigation here
@@ -192,7 +185,7 @@ if (isset($_REQUEST['pdf'])) {
         } else {
             $doc = new DOMDocument();
             libxml_use_internal_errors(true);
-            $doc->loadHTML($pdata, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $doc->loadHTML('<html lang="en"><head><meta charset="UTF-8"></head><body>' . $pdata . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             libxml_clear_errors();
 
             $sections = $doc->getElementsByTagName('section');
@@ -225,10 +218,10 @@ if (isset($_REQUEST['pdf'])) {
 
             //getting css
             $customCSS = file_get_contents(
-                REVEALJS_ASSETS_PATH . '/css/reveal.css'
+                REVEALJS_DIST_PATH . '/reveal.css'
             );
             $customCSS .= file_get_contents(
-                REVEALJS_ASSETS_PATH . '/css/theme/' . $theme . '.css'
+                REVEALJS_DIST_PATH . '/' . 'theme/' . $theme . '.css'
             );
 
             $customCSS .= '.reveal section{width:100%; height:100%;text-align:center;margin:auto;} section{text-align:center;margin: auto;width:100%;} .ss-heading{line-height:2.5em,padding-bottom:20px;} ' . $imgBackgroundCSS;
@@ -252,6 +245,7 @@ if (isset($_REQUEST['pdf'])) {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
+        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
         exit(0);
     }
@@ -271,27 +265,203 @@ include_once('tiki-section_options.php');
 
 
 $headerlib->add_jsfile(
-    REVEALJS_ASSETS_PATH . '/js/reveal.js'
+    REVEALJS_DIST_PATH . '/reveal.js'
 );
 $headerlib->add_cssfile(
-    REVEALJS_ASSETS_PATH . '/css/reveal.css'
+    REVEALJS_DIST_PATH . '/reveal.css'
 );
 $headerlib->add_cssfile(
-    REVEALJS_ASSETS_PATH . '/css/theme/' . $theme
+    REVEALJS_DIST_PATH . '/' . 'theme/' . $theme
                 . '.css'
 );
-$headerlib->add_css(
-    '.reveal span{font-family: "Font Awesome 5 Free";font-style: normal;font-weight:900} .reveal #ss-options span.select2-selection__choice__value { font-family: "Source Sans Pro", Helvetica, sans-serif } .reveal .controls{z-index:103;}#ss-settings-holder {position:fixed;top:10px;left:0px;width:10%;height:30px;text-align:left;padding-left:15px;cursor:pointer;z-index:102;line-height:1.5rem}#ss-options{position:fixed;top:50px;left:-2000px;width:230px;background-color:rgba(00,00,00,0.8);font-size:1.1rem;line-height:2.2rem;color:#fff;z-index:101;padding: 10px;border-top-right-radius: 25px;border-bottom-right-radius: 25px;} #ss-options a{color:#999} #ss-options a:hover{color:#fff} #page-bar,.icon_edit_section,.editplugin, #show-errors-button, .wikitext, .icon_edit_section, #toc,.heading-link {display:none} .fade:not(.show) { opacity: 1;} @media all and (orientation: portrait){.reveal section div,.reveal span,.reveal p,.reveal blockquote,.reveal pre,.reveal ol,.reveal ul,.reveal article,.reveal section {font-size:100% !important}} #reveal-controls span,#listSlides{cursor:pointer;color:#999;padding:0.15em} #reveal-controls span:hover,#listSlides:hover{color:#fff} footer{visibility:hidden} .scale-1{transform:scale(0.9);transform-origin:top center} .scale-2{transform:scale(0.8);transform-origin:top center} .scale-3{transform:scale(0.7);transform-origin:top center} .scale-4{transform:scale(0.6);transform-origin:top center} .scale-5{transform:scale(0.5);transform-origin:top center} .scale-6{transform:scale(0.45);transform-origin:top center}'
+
+$headerlib->add_css(<<<CSS
+    .reveal span {
+        font-weight: bold;
+    }
+
+    .reveal #ss-options span.select2-selection__choice__value {
+        font-family: "Source Sans Pro", Helvetica, sans-serif;
+    }
+
+    .reveal .controls {
+        z-index: 103;
+    }
+
+    #ss-settings-holder {
+        position: fixed;
+        top: 10px;
+        left: 0px;
+        width: 10%;
+        height: 30px;
+        text-align: left;
+        padding-left: 15px;
+        cursor: pointer;
+        z-index: 102;
+        line-height: 1.5rem;
+    }
+
+    #ss-options {
+        position: fixed;
+        top: 50px;
+        left: -2000px;
+        width: 230px;
+        background-color: rgba(0, 0, 0, 0.8);
+        font-size: 1.1rem;
+        line-height: 2.2rem;
+        color: #fff;
+        z-index: 101;
+        padding: 10px;
+        border-top-right-radius: 25px;
+        border-bottom-right-radius: 25px;
+    }
+
+    #ss-options a {
+        color: #999;
+    }
+
+    #ss-options a:hover {
+        color: #fff;
+    }
+
+    #page-bar, .icon_edit_section, .editplugin, #show-errors-button, .wikitext, .icon_edit_section, #toc, .heading-link {
+        display: none;
+    }
+
+    .fade:not(.show) {
+        opacity: 1;
+    }
+
+    @media all and (orientation: portrait) {
+        .reveal section div, .reveal span, .reveal p, .reveal blockquote, .reveal pre, .reveal ol, .reveal ul, .reveal article, .reveal section { 
+            font-size: 100% !important; 
+        }
+    }
+
+    #reveal-controls span, #listSlides { 
+        cursor: pointer;
+        color: #999;
+        padding: 0.15em;
+    }
+
+    #reveal-controls span:hover, #listSlides:hover {
+        color: #fff;
+    }
+
+    footer {
+        visibility: hidden;
+    }
+
+    .scale-1 {
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+
+    .scale-2 {
+        transform: scale(0.8);
+        transform-origin: top center;
+    }
+
+    .scale-3 {
+        transform: scale(0.7);
+        transform-origin: top center; 
+    }
+
+    .scale-4 {
+        transform: scale(0.6);
+        transform-origin: top center; 
+    }
+
+    .scale-5 {
+        transform: scale(0.5);
+        transform-origin: top center;
+    }
+
+    .scale-6 {
+        transform: scale(0.45);
+        transform-origin: top center; 
+    }
+CSS
 );
 
-$headerlib->add_jq_onready(
-    '$("<link/>", {rel: "stylesheet",type: "text/css",href: "", id:"themeCSS"}).appendTo("head");
-    $("body").append("<style type=\"text/css\">.reveal li,.reveal section p { font-size: 1.3em; line-height:1.4em } .reveal li{margin:0.1em 0.5em 0.1em 0.5em} .reveal li ul li{font-size:0.9em !important; margin:0em !important}.reveal section pre code { font-size: 0.7em !important;} .reveal h1 {font-size: 2.8em; text-transform:none !important;margin-bottom:0 !important;} .reveal  {font-size: 1.4em;}.reveal .slides section .fragment.grow.visible {transform: scale(1.03);}.reveal table {overflow: hidden;} .reveal section img {border:0px;background:none;box-shadow:none} .reveal table th, .reveal table td{text-align:center;vertical-align:top !important} .reveal ul{vertical-align:top !important}</style>");
+$headerlib->add_jq_onready(<<<JS
+    $("<link/>", {
+        rel: "stylesheet",
+        type: "text/css",
+        href: "",
+        id:"themeCSS"
+    }).appendTo("head");
+
+    $("body").append(`
+        <style type=\"text/css\">
+            .reveal li, .reveal section p {
+                font-size: 1.3em;
+                line-height: 1.4em;
+            }
+            
+            .reveal li {
+                margin: 0.1em 0.5em 0.1em 0.5em;
+            }
+            
+            .reveal li ul li {
+                font-size: 0.9em !important;
+                margin: 0em !important;
+            }
+            
+            .reveal section pre code {
+                font-size: 0.7em !important;
+            }
+            
+            .reveal h1 {
+                font-size: 2.8em;
+                text-transform: none !important;
+                margin-bottom: 0 !important;
+            } 
+            
+            .reveal  {
+                font-size: 1.4em;
+            }
+            
+            .reveal .slides section .fragment.grow.visible {
+                transform: scale(1.03);
+            }
+            
+            .reveal table {
+                overflow: hidden;
+            } 
+            
+            .reveal section img {
+                border: 0px;
+                background: none;
+                box-shadow: none;
+            }
+            
+            .reveal table th, .reveal table td {
+                text-align: center;
+                vertical-align: top !important;
+            }
+            
+            .reveal ul {
+                vertical-align: top !important;
+            }
+            
+            @media (max-width: 768px) {
+                .reveal {
+                    font-size: 1em;
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
+                    white-space: normal;
+                    word-break: break-word;
+                }
+            }
+        </style>
+    `);
+
     var extraElements=["#page-bar",".icon_edit_section",".icon-link-external",".editplugin","#show-errors-button",".wikitext",".icon_edit_section","#toc","footer",".heading-link"];
+
     jQuery.each( extraElements, function( i, val ) {
         $( val ).remove();
     });
-
 
     if(fragments=="y") {
         $( "li" ).addClass( "fragment "+fragmentClass+" "+fragmentHighlightColor );
@@ -301,23 +471,23 @@ $headerlib->add_jq_onready(
         var position = $("#ss-options").position();
         if(position.left==0){
             $("#ss-settings").switchClass("fa-times","fa-cogs");
-            $("#ss-options").animate({left: \'-2000px\'});
+            $("#ss-options").animate({left: '-2000px'});
         }
         else {
             $("#ss-settings").switchClass("fa-cogs","fa-times");
-            $("#ss-options").animate({left: \'0px\'});}
+            $("#ss-options").animate({left: '0px'});}
         });
-        Reveal.addEventListener( \'slidechanged\', function( event ) {
+        Reveal.addEventListener( 'slidechanged', function( event ) {
 
             var position = $("#ss-options").position();
             if(position.left==0){
                 $("#ss-settings").switchClass("fa-times","fa-cogs");
-                $("#ss-options").animate({left: \'-2000px\'});
+                $("#ss-options").animate({left: '-2000px'});
             }
         });
 
         //reveal controls
-        $("body").on("#play","click", function () {
+        $("body").on("click", "#play", function () {
             if($("#play").hasClass("fa-play-circle")) {
                 $("#play").switchClass("fa-play-circle","fa-pause-circle", 1000, "easeInOutQuad");
                 Reveal.configure({ autoSlide:10000 });
@@ -330,26 +500,26 @@ $headerlib->add_jq_onready(
                 $(this).attr("style","");
             }
         });
-        $("body").on("#firstSlide","click", function () {
+        $("body").on("click", "#firstSlide", function () {
             Reveal.slide( 0, 0,0 ); //Reveal.slide( indexh, indexv, indexf );
         });
-        $("body").on("#lastSlide","click", function () {
+        $("body").on("click", "#lastSlide", function () {
             Reveal.slide( Reveal.getTotalSlides()-1, 0,0 ); //Reveal.slide( indexh, indexv, indexf );
         });
-        $("body").on("#nextSlide","click", function () {
+        $("body").on("click", "#nextSlide", function () {
             var currentSlide=Reveal.getIndices().h;
             Reveal.slide(currentSlide+1,0,0); //Reveal.slide( indexh, indexv, indexf );
         });
-        $("body").on("#prevSlide","click", function () {
+        $("body").on("click", "#prevSlide", function () {
             var currentSlide=Reveal.getIndices().h;
             if(currentSlide>0) {
             Reveal.slide(currentSlide-1,0,0);
              } //Reveal.slide( indexh, indexv, indexf );
         });
-        $("body").on("#listSlides","click", function () {
+        $("body").on("click", "#listSlides", function () {
             Reveal.toggleOverview();
         });
-        $("body").on("#loop","click", function () {
+        $("body").on("click", "#loop", function () {
             if($("#loop").hasClass("icon-inactive")){
                 $("#loop").switchClass("icon-inactive","icon-active");
                 Reveal.configure({loop: true});
@@ -366,13 +536,13 @@ $headerlib->add_jq_onready(
 
         $( "#showtheme" ).on("change", function() {
             var selectedCSS=$("#showtheme" ).val();
-            $("#themeCSS").attr("href","' . REVEALJS_ASSETS_PATH . '/css/theme/"+selectedCSS+".css");
+            $("#themeCSS").attr("href","' . REVEALJS_DIST_PATH . '/theme/"+selectedCSS+".css");
         });
         $( "#showtransition" ).on("change", function() {
             var selectedTransition=$("#showtransition" ).val();
             Reveal.configure({ transition: selectedTransition });
         });
-        $("body").on("#exportPDF","click", function () {
+        $("body").on("click", "#exportPDF", function () {
             if($("#showtheme" ).val()!="") {
                 var pdfURL= $( "#exportPDF" ).attr("href")+"&theme="+$("#showtheme" ).val();
                 $( "#exportPDF" ).attr("href",pdfURL);
@@ -397,7 +567,7 @@ $headerlib->add_jq_onready(
             //end of loop
         });
 
-        Reveal.addEventListener( \'ready\', function( event ) {
+        Reveal.addEventListener( 'ready', function( event ) {
 
             var found=0;
             if(location.hash && found==0){
@@ -415,7 +585,7 @@ $headerlib->add_jq_onready(
                  });
              }
         });
-        '
+JS
 );
 
 $params = [];
@@ -472,10 +642,8 @@ function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator
     // set error level
     $internalErrors = libxml_use_internal_errors(true);
 
-    $doc->loadHTML(
-        htmlentities('<html lang="en"><body>' . $content . '</body></html>', ENT_QUOTES, 'UTF-8'),
-        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
-    );
+    $doc->loadHTML('<html lang="en"><head><meta charset="UTF-8"></head><body>' . $content . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
     $xpath = new DOMXpath($doc);
     $expression = '(//sslide//h1|//sslide//h2|//sslide//h3)';
     $elements = $xpath->query($expression);

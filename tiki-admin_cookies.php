@@ -89,6 +89,9 @@ if (isset($_REQUEST["upload"]) && $access->checkCsrf()) {
     }
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
+    if (! $_REQUEST['cookie']) {
+        Feedback::errorAndDie(tra('You cannot save the cookie with empty cookie content'), \Laminas\Http\Response::STATUS_CODE_400);
+    }
     $result = $taglinelib->replace_cookie($_REQUEST["cookieId"], $_REQUEST["cookie"]);
     if ($result && $result->numRows()) {
         Feedback::success(tr('Cookie saved'));

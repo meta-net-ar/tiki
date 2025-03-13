@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\FunctionHandler;
 
+use Perms;
+use Tracker_Definition;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 
@@ -132,6 +134,12 @@ class ObjectLink extends Base
         if ($url) {
             $escapedHref = smarty_modifier_escape(\TikiLib::tikiUrlOpt($url));
         } else {
+            if ($type == 'tracker') {
+                $definition = Tracker_Definition::get($object);
+                if ($definition && $definition->isEnabled('adminOnlyViewEditItem') && ! Perms::get($type, $object)->admin_trackers) {
+                    return $escapedText;
+                }
+            }
             $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($object, $type));
         }
 
@@ -225,7 +233,7 @@ class ObjectLink extends Base
             $pre .= " ";
         }
 
-        if ($item && $item->canView()) {
+        if ($item && $item->canView() && (! $item->getDefinition()->isEnabled('adminOnlyViewEditItem') || Perms::get('trackeritem', $object)->admin_trackers)) {
             return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $title, $type, $url, $params);
         } else {
             if (empty($title)) {

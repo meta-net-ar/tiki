@@ -31,9 +31,9 @@ $inputConfiguration = [
             'name'                        => 'string',         //post
             'description'                 => 'xss',            //get
             'timeLimit'                   => 'digits',         //post
-            'passingperct'                => 'string',         //post
+            'passingperct'                => 'int',         //post
             'remove'                      => 'int',            //post
-            'sort_mode'                   => 'alpha',          //get
+            'sort_mode'                   => 'word',          //get
             'offset'                      => 'int',            //get
             'find'                        => 'alpha',          //get
         ],
@@ -171,7 +171,12 @@ if (isset($_REQUEST["save"])) {
     $smarty->assign('quizId', $_REQUEST["quizId"]);
     $quizId = 0;
 } elseif ($_REQUEST["quizId"]) {
-    $info = $quizlib->get_quiz($_REQUEST["quizId"]);
+    $result = $quizlib->get_quiz($_REQUEST["quizId"]);
+    if (! $result) {
+        Feedback::error(tra("The quiz you are trying to edit was not found. Please verify the quiz ID or create a new one."));
+    } else {
+        $info = $result;
+    }
 
     if (! isset($info["publishDate"])) {
         $info["publishDate"] = $tikilib->now;

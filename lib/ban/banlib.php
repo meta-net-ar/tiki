@@ -195,17 +195,14 @@ class BanLib extends TikiLib
     {
         $fields = false;
         if ($fhandle = fopen($fname, 'r')) {
-            $fields = fgetcsv($fhandle, 1000);
+            $fields = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
         if ($fields === false) {
             $smarty = TikiLib::lib('smarty');
-
-            $smarty->assign('msg', tra("The file has incorrect syntax or is not a CSV file"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("The file has incorrect syntax or is not a CSV file"), \Laminas\Http\Response::STATUS_CODE_400);
         }
         $nb = 0;
-        while (($data = fgetcsv($fhandle, 1000)) !== false) {
+        while (($data = fgetcsv($fhandle, 1000, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $d = ["banId" => "", "mode" => "", "title" => "", "ip1" => "", "ip2" => "",
                        "ip3" => "", "ip4" => "", "user" => "", "date_from" => "", "date_to" => "", "use_dates" => "", "created" => "", "created_readable" => "", "message" => ""];
             foreach ($fields as $field) {

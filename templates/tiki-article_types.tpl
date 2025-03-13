@@ -23,7 +23,6 @@
                     <th>{tr}Articles{/tr}</th>
                     <th>{tr}Author rating{/tr}</th>
                     <th>{tr}Show before publish date{/tr}</th>
-                    <th>{tr}Show after expire date{/tr}</th>
                     <th>{tr}Heading only{/tr}</th>
                     <th>{tr}Comments{/tr}</th>
                     <th>{tr}Comment can rate article{/tr}</th>
@@ -40,9 +39,6 @@
                     </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_pre_publ[{$types[user].type|escape}]" {if $types[user].show_pre_publ eq 'y'}checked="checked"{/if}>
-                    </td>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_post_expire[{$types[user].type|escape}]" {if $types[user].show_post_expire eq 'y'}checked="checked"{/if}>
                     </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="heading_only[{$types[user].type|escape}]" {if $types[user].heading_only eq 'y'}checked="checked"{/if}>
@@ -67,7 +63,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>{tr}Show expire date{/tr}</th>
                     <th>{tr}Show reads{/tr}</th>
                     <th>{tr}Show size{/tr}</th>
                     <th>{tr}Show topline{/tr}</th>
@@ -78,9 +73,6 @@
                     <td colspan="3"></td> {* th changed to td to prevent ARIA empty header error  *}
                 </tr>
                 <tr>
-                    <td class="checkbox-cell">
-                        <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_expdate[{$types[user].type|escape}]" {if $types[user].show_expdate eq 'y'}checked="checked"{/if}>
-                    </td>
                     <td class="checkbox-cell">
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="show_reads[{$types[user].type|escape}]" {if $types[user].show_reads eq 'y'}checked="checked"{/if}>
                     </td>

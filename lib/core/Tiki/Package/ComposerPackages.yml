@@ -46,25 +46,6 @@ Expose:
   requiredBy:
     - ids_enabled
   requiredVersion: ^3.0
-FullCalendarSchedulerDeprecated:
-  actions:
-    - remove
-  licence: See website
-  licenceUrl: "https://fullcalendar.io/scheduler/license/"
-  name: fullcalendar/fullcalendar-scheduler
-  requiredBy:
-    - "wikiplugin_trackercalendar"
-  requiredVersion: ^1.9
-  state: replaced
-  replacedBy:
-    - npm-asset/fullcalendar-scheduler
-FullCalendarScheduler:
-  licence: See website
-  licenceUrl: "https://fullcalendar.io/scheduler/license/"
-  name: npm-asset/fullcalendar-scheduler
-  requiredBy:
-    - "wikiplugin_trackercalendar"
-  requiredVersion: ^5.11.0
 Faker:
   licence: MIT
   licenceUrl: "https://github.com/fzaninotto/Faker/blob/master/LICENSE"
@@ -114,7 +95,7 @@ diagram:
   name: tikiwiki/diagram
   requiredBy:
     - "wikiplugin_diagram"
-  requiredVersion: ^24.0
+  requiredVersion: ^26.0.6
 PHPSaml:
   state: deprecated
   actions:
@@ -182,6 +163,9 @@ PhpReadability:
     - "Fetch page content"
   requiredVersion: ^2.0.3
 RecordRTC:
+  state: deprecated
+  actions:
+    - remove
   licence: MIT
   licenceUrl: "https://github.com/muaz-khan/recordrtc/blob/master/LICENSE"
   name: npm-asset/recordrtc

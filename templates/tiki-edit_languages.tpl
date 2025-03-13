@@ -1,14 +1,14 @@
 {title admpage="i18n"}{tr}Edit languages{/tr}{/title}
 <div class="t_navbar mb-4">
-    {if $smarty.session.interactive_translation_mode eq 'on'}
+    {if isset($smarty.session.interactive_translation_mode) && $smarty.session.interactive_translation_mode eq 'on'}
         {button href="tiki-interactive_trans.php?interactive_translation_mode=off" _text="{tr}Turn off interactive translation{/tr}" _ajax="n"}
     {else}
         {button href="tiki-interactive_trans.php?interactive_translation_mode=on" _text="{tr}Turn on interactive translation{/tr}" _ajax="n"}
     {/if}
-    <a class="btn btn-link tips" href="{service controller=language action=manage_custom_translations}" title="{tr}Customized String Translation:{/tr}{tr}Manage local translations in a custom.php file{/tr}">
+    <a class="btn btn-link tips" href="{service controller=language action=manage_custom_translations}" title="{tr}Customized String Translation{/tr}|{tr}Manage local translations in a custom.php file{/tr}">
         {icon name="file-code-o"} {tr}Custom Translations{/tr}
     </a>
-    <a class="btn btn-link tips" href="{service controller=language action=upload language={$edit_language}}" title="{tr}Upload Translations:{/tr}{tr}Upload a file with translations for the selected language.{/tr}">
+    <a class="btn btn-link tips" href="{service controller=language action=upload language={$edit_language}}" title="{tr}Upload Translations{/tr}|{tr}Upload a file with translations for the selected language.{/tr}">
         {icon name="upload"} {tr}Upload Translations{/tr}
     </a>
 </div>
@@ -31,14 +31,14 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <a class="btn btn-link tips" href="{service controller=language action=download language={$edit_language} file_type=language_php}" title="{tr}Download:{/tr}{tr}Download language.php file for the selected language.{/tr}">
+                <a class="btn btn-link tips" href="{service controller=language action=download language={$edit_language} file_type=language_php}" title="{tr}Download{/tr}|{tr}Download language.php file for the selected language.{/tr}">
                     {icon name="download"}
                 </a>
-                <a class="btn btn-link tips" href="{service controller=language action=download_db_translations language={$edit_language}}" title="{tr}Download Database Translations:{/tr}{tr}Download a file with all the translations in the database for the selected language.{/tr}">
+                <a class="btn btn-link tips" href="{service controller=language action=download_db_translations language={$edit_language}}" title="{tr}Download Database Translations{/tr}|{tr}Download a file with all the translations in the database for the selected language.{/tr}">
                     {icon name="file-text-o"}
                 </a>
-                <a class="btn btn-link tips" href="{bootstrap_modal controller=language action=write_to_language_php language={$edit_language}}" title="{tr}Write to language.php:{/tr}{tr}Translations in the database will be merged with the other translations in language.php for the selected language.{/tr}">
-                    {icon name="flash"}
+                <a class="btn btn-link tips" href="{bootstrap_modal controller=language action=write_to_language_php language={$edit_language}}" title="{tr}Write to language.php{/tr}|{tr}Translations in the database will be merged with the other translations in language.php for the selected language.{/tr}">
+                    {icon name="language"}
                 </a>
             </div>
         </div>
@@ -47,7 +47,7 @@
         <div class="mb-3 row">
             <label for="add_tran_sw" class="col-md-4 col-form-label">{tr}Add a translation{/tr}</label>
             <div class="col-md-8">
-                <input id="add_tran_sw" class="translation_action" type="radio" name="action" value="add_tran_sw" {if $action eq 'add_tran_sw'}checked="checked"{/if}>
+                <input id="add_tran_sw" class="translation_action" type="radio" name="action" value="add_tran_sw"{if $action eq 'add_tran_sw'} checked{/if}>
             </div>
         </div>
     </div>
@@ -55,10 +55,10 @@
         <div class="mb-3 row">
             <label for="edit_rec_sw" class="col-md-4 col-form-label">{tr}Untranslated strings{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_rec_sw" class="translation_action" type="radio" name="action" value="edit_rec_sw" {if $action eq 'edit_rec_sw'}checked="checked"{/if}>
+                <input id="edit_rec_sw" class="translation_action" type="radio" name="action" value="edit_rec_sw"{if $action eq 'edit_rec_sw'} checked{/if}>
                 {if $prefs.record_untranslated eq 'y'}
                 <div class="adminoptionboxchild form-check">
-                    <label class="form-check-label"><input id="only_db_untranslated" class="form-check-input translation_action" type="checkbox" name="only_db_untranslated" {if $only_db_untranslated eq 'y'}checked="checked"{/if}>{tr}Show only database stored untranslated strings{/tr}</label>
+                    <label class="form-check-label"><input id="only_db_untranslated" class="form-check-input translation_action" type="checkbox" name="only_db_untranslated"{if $only_db_untranslated eq 'y'} checked{/if}>{tr}Show only database stored untranslated strings{/tr}</label>
                 </div>
                 {/if}
             </div>
@@ -68,9 +68,9 @@
         <div class="mb-3 row">
             <label for="edit_tran_sw" class="col-md-4 col-form-label">{tr}Edit translations{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_tran_sw" class="translation_action" type="radio" name="action" value="edit_tran_sw" {if $action eq 'edit_tran_sw'}checked="checked"{/if}>
+                <input id="edit_tran_sw" class="translation_action" type="radio" name="action" value="edit_tran_sw"{if $action eq 'edit_tran_sw'} checked{/if}>
                 <div class="adminoptionboxchild form-check">
-                    <label class="form-check-label"><input id="only_db_translations" class="translation_action form-check-input" type="checkbox" name="only_db_translations" {if $only_db_translations eq 'y'}checked="checked"{/if}>{tr}Show only database stored translations{/tr}</label>
+                    <label class="form-check-label"><input id="only_db_translations" class="translation_action form-check-input" type="checkbox" name="only_db_translations"{if $only_db_translations eq 'y'} checked{/if}>{tr}Show only database stored translations{/tr}</label>
                 </div>
             </div>
         </div>
@@ -164,8 +164,8 @@
 
                                 <div class="d-flex flex-row flex-wrap align-items-center float-end">
                                     {if $prefs.lang_control_contribution eq 'y'}
-                                        <div class="mb-3 mx-md-1" {if ! isset($item.id)}style="display: none"{/if}{* Only translations in the database have an id. *}>
-                                            <label class="my-1 me-sm-2" for="scope_{$smarty.foreach.translations.index}" >{tr}Contribute:{/tr}</label>
+                                        <div class="mb-3 mx-md-1"{if ! isset($item.id)} style="display: none"{/if}{* Only translations in the database have an id. *}>
+                                            <label class="my-1 me-sm-2" for="scope_{$smarty.foreach.translations.index}">{tr}Contribute:{/tr}</label>
                                             <select class="{*custom-select*}form-select my-1 me-sm-2" name="scope_{$smarty.foreach.translations.index}" id="scope_{$smarty.foreach.translations.index}">
                                                 <option {if ! isset($item.general)}selected {/if}value="">{tr}Undecided{/tr}</option>
                                                 <option {if $item.general === true}selected {/if}value="general">{tr}Yes{/tr}</option>

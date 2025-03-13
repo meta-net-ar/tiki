@@ -30,7 +30,7 @@ $find = $_REQUEST['find'] ?? '';
 $averageStatOffset = $_REQUEST['average_stat_offset'] ?? 0;
 $maximumStatOffset = $_REQUEST['maximum_stat_offset'] ?? 0;
 $maximumStatOrder = $_REQUEST['maximum_stat_order'] ?? 'DESC';
-if ($_REQUEST['no_of_requests']) {
+if (! empty($_REQUEST['no_of_requests'])) {
     $averageStatOrder = $_REQUEST['no_of_requests'] ?? 'DESC';
     $orderType = 'no_of_requests';
 } else {

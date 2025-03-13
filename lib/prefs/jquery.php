@@ -92,9 +92,12 @@ function prefs_jquery_list($partial = false)
             'name' => tra('jQuery Select2 Select Boxes'),
             'description' => tra('Styled replacement for dropdown select lists and multiple-select inputs.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
             'dependencies' => [
                 'jquery',
+            ],
+            'conflicts' => [
+                'elementplus_select',
             ],
         ],
         'jquery_select2_sortable' => [
@@ -176,24 +179,6 @@ function prefs_jquery_list($partial = false)
             'keywords' => 'smart menu open close click',
             'dependencies' => [
                 'jquery_smartmenus_enable',
-            ],
-        ],
-        'jquery_ui_modals_draggable' => [
-            'name' => tra('Draggable Modals'),
-            'description' => tra('Modal popups can be moved around.'),
-            'type' => 'flag',
-            'default' => 'y',
-            'dependencies' => [
-                'feature_jquery_ui',
-            ],
-        ],
-        'jquery_ui_modals_resizable' => [
-            'name' => tra('Resizable Modals'),
-            'description' => tra('Modal popups can be resized.'),
-            'type' => 'flag',
-            'default' => 'y',
-            'dependencies' => [
-                'feature_jquery_ui',
             ],
         ],
         'jquery_jqdoublescroll' => [

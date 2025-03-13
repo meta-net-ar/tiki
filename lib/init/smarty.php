@@ -632,7 +632,7 @@ class Smarty_Tiki extends \Smarty\Smarty
         if (! empty($prefs['site_layout'])) {
             $layout = $prefs['site_layout'];
         } else {
-            $layout = 'classic';
+            $layout = SMARTY_DEFAULT_LAYOUT;
         }
 
         $this->setCompileId("$lang-$tikidomain-$layout");
@@ -642,7 +642,7 @@ class Smarty_Tiki extends \Smarty\Smarty
     /**
      * Call addTemplateDir on:
      * - $templatePath/layouts/configured_site_layout_or_site_layout_admin
-     *    - Falls back to $templatePath/layouts/basic/
+     *    - Falls back to $templatePath/layouts/SMARTY_DEFAULT_LAYOUT/ (defined in path_constants.php)
      * @param [type] $templatePath
      * @return void
      */
@@ -650,14 +650,14 @@ class Smarty_Tiki extends \Smarty\Smarty
     {
         global $prefs, $section;
         if ($section != "admin") {
-            $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? 'basic';
+            $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? SMARTY_DEFAULT_LAYOUT;
         } else {
-            $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? 'basic';
+            $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? SMARTY_DEFAULT_LAYOUT;
         }
 
         $layout = TIKI_PATH . "/$templatePath/" . 'layouts/' . $selectedLayout . '/';
         if (! is_readable($layout)) {
-            $layout = TIKI_PATH . "/$templatePath/" . 'layouts/basic/';
+            $layout = TIKI_PATH . "/$templatePath/" . 'layouts/' . SMARTY_DEFAULT_LAYOUT . '/';
         }
         if (is_readable($layout)) {
             $this->addTemplateDir($layout);

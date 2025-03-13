@@ -17,7 +17,6 @@ $inputConfiguration = [
             'update_type'                 => 'bool',                //post
             'use_ratings'                 => 'bool',                //post
             'show_pre_publ'               => 'bool',                //post
-            'show_post_expire'            => 'bool',                //post
             'heading_only'                => 'bool',                //post
             'allow_comments'              => 'bool',                //post
             'comment_can_rate_article'    => 'bool',                //post
@@ -25,7 +24,6 @@ $inputConfiguration = [
             'show_avatar'                 => 'bool',                //post
             'show_author'                 => 'bool',                //post
             'show_pubdate'                => 'bool',                //post
-            'show_expdate'                => 'bool',                //post
             'show_reads'                  => 'bool',                //post
             'show_size'                   => 'bool',                //post
             'show_topline'                => 'bool',                //post
@@ -50,72 +48,45 @@ $access->check_feature('feature_articles');
 $access->check_permission(['tiki_p_articles_admin_types']);
 
 if (isset($_REQUEST["add_type"])) {
-    $artlib->add_type($_REQUEST["new_type"]);
+    if (! empty($_REQUEST["new_type"])) {
+        $artlib->add_type($_REQUEST["new_type"]);
+    }
 } elseif (isset($_REQUEST["remove_type"])) {
     $access->checkCsrf();
     $artlib->remove_type($_REQUEST["remove_type"]);
 } elseif (isset($_REQUEST["update_type"])) {
     foreach (array_keys($_REQUEST["type_array"]) as $this_type) {
-        if (! isset($_REQUEST["use_ratings"][$this_type])) {
-            $_REQUEST["use_ratings"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_pre_publ"][$this_type])) {
-            $_REQUEST["show_pre_publ"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_post_expire"][$this_type])) {
-            $_REQUEST["show_post_expire"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["heading_only"][$this_type])) {
-            $_REQUEST["heading_only"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["allow_comments"][$this_type])) {
-            $_REQUEST["allow_comments"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["comment_can_rate_article"][$this_type])) {
-            $_REQUEST["comment_can_rate_article"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_image"][$this_type])) {
-            $_REQUEST["show_image"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_avatar"][$this_type])) {
-            $_REQUEST["show_avatar"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_author"][$this_type])) {
-            $_REQUEST["show_author"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_pubdate"][$this_type])) {
-            $_REQUEST["show_pubdate"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_expdate"][$this_type])) {
-            $_REQUEST["show_expdate"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_reads"][$this_type])) {
-            $_REQUEST["show_reads"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_size"][$this_type])) {
-            $_REQUEST["show_size"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_topline"][$this_type])) {
-            $_REQUEST["show_topline"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_subtitle"][$this_type])) {
-            $_REQUEST["show_subtitle"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_image_caption"][$this_type])) {
-            $_REQUEST["show_image_caption"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_linkto"][$this_type])) {
-            $_REQUEST["show_linkto"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["creator_edit"][$this_type])) {
-            $_REQUEST["creator_edit"][$this_type] = 'n';
-        }
+        $defaultFields = [
+            "use_ratings",
+            "show_pre_publ",
+            "heading_only",
+            "allow_comments",
+            "comment_can_rate_article",
+            "show_image",
+            "show_avatar",
+            "show_author",
+            "show_pubdate",
+            "show_reads",
+            "show_size",
+            "show_topline",
+            "show_subtitle",
+            "show_image_caption",
+            "show_linkto",
+            "creator_edit"
+        ];
 
+        // Initialize fields with 'n' if not defined
+        foreach ($defaultFields as $field) {
+            $_REQUEST[$field] = is_array($_REQUEST[$field] ?? null) ? $_REQUEST[$field] : [];
+            if (! isset($_REQUEST[$field][$this_type])) {
+                $_REQUEST[$field][$this_type] = 'n';
+            }
+        }
+        // Edit type of article
         $artlib->edit_type(
             $this_type,
             $_REQUEST["use_ratings"][$this_type],
             $_REQUEST["show_pre_publ"][$this_type],
-            $_REQUEST["show_post_expire"][$this_type],
             $_REQUEST["heading_only"][$this_type],
             $_REQUEST["allow_comments"][$this_type],
             $_REQUEST["comment_can_rate_article"][$this_type],
@@ -123,7 +94,6 @@ if (isset($_REQUEST["add_type"])) {
             $_REQUEST["show_avatar"][$this_type],
             $_REQUEST["show_author"][$this_type],
             $_REQUEST["show_pubdate"][$this_type],
-            $_REQUEST["show_expdate"][$this_type],
             $_REQUEST["show_reads"][$this_type],
             $_REQUEST["show_size"][$this_type],
             $_REQUEST["show_topline"][$this_type],
@@ -133,13 +103,11 @@ if (isset($_REQUEST["add_type"])) {
             $_REQUEST["creator_edit"][$this_type]
         );
 
-        // Add custom attributes
+        // Adding custom attributes
         if ($prefs["article_custom_attributes"] == 'y' && ! empty($_REQUEST["new_attribute"][$this_type])) {
             $ok = $artlib->add_article_type_attribute($this_type, $_REQUEST["new_attribute"][$this_type]);
             if (! $ok) {
-                $smarty->assign('msg', tra("Failed to add attribute"));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("Failed to add attribute"), \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
     }

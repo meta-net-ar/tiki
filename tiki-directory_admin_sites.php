@@ -83,22 +83,16 @@ if (isset($_REQUEST["remove"])) {
 if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
     if (empty($_REQUEST["name"])) {
-        $smarty->assign('msg', tra("Must enter a name to add a site"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must enter a name to add a site"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (empty($_REQUEST["url"])) {
-        $smarty->assign('msg', tra("Must enter a url to add a site"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must enter a url to add a site"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if ((substr($_REQUEST["url"], 0, 7) <> 'http://') && (substr($_REQUEST["url"], 0, 8) <> 'https://') && (substr($_REQUEST["url"], 0, 6) <> 'ftp://')) {
         $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
     }
     if (! isset($_REQUEST["siteCats"]) || count($_REQUEST["siteCats"]) == 0) {
-        $smarty->assign('msg', tra("Must select a category"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Must select a category"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (isset($_REQUEST["isValid"]) && $_REQUEST["isValid"] == 'on') {
         $_REQUEST["isValid"] = 'y';

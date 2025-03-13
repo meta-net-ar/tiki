@@ -193,7 +193,7 @@ class HtmlSelectTime extends Base
             }
 
             //minute intervals less than 10 are followed by a '0', here we ensure that they are selectable
-            if (strlen($selected) == 1) {
+            if (strlen((string) $selected) == 1) {
                 $selected = '0' . $selected;
             }
 

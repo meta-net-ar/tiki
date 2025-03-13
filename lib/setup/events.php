@@ -87,11 +87,12 @@ function tiki_setup_events()
         }
 
         if ($prefs['tracker_tabular_enabled'] == 'y') {
-            $events->bind('tiki.trackeritem.save', $defer('tabular', 'syncItemSaved'));
-            $events->bind('tiki.trackeritem.delete', $defer('tabular', 'syncItemDeleted'));
+            // should run after incremental index in case default tabular queries must be executed to conditionally fetch the item
+            $events->bindPriority(200, 'tiki.trackeritem.save', $defer('tabular', 'syncItemSaved'));
+            $events->bindPriority(200, 'tiki.trackeritem.delete', $defer('tabular', 'syncItemDeleted'));
             $checkIsTrackerItemTypeFn = fn ($args) => $args['type'] === 'trackeritem';
-            $events->bind('tiki.comment.save', $defer('tabular', 'syncCommentSaved', $checkIsTrackerItemTypeFn));
-            $events->bind('tiki.comment.delete', $defer('tabular', 'syncCommentDeleted', $checkIsTrackerItemTypeFn));
+            $events->bindPriority(200, 'tiki.comment.save', $defer('tabular', 'syncCommentSaved', $checkIsTrackerItemTypeFn));
+            $events->bindPriority(200, 'tiki.comment.delete', $defer('tabular', 'syncCommentDeleted', $checkIsTrackerItemTypeFn));
         }
 
         $events->bind('tiki.trackeritem.create', $defer('trk', 'setup_wiki_fields'));

@@ -132,6 +132,11 @@ function check_session_save_path()
     global $errors;
     if (ini_get('session.save_handler') == 'files') {
         $save_path = ini_get('session.save_path');
+        if (empty($save_path)) {
+            // as per https://bugs.php.net/bug.php?id=26757 if empty default to sys_get_temp_dir
+            $save_path = sys_get_temp_dir();
+        }
+
         // check if we can check it. The session.save_path can be outside
         // the open_basedir paths.
         $open_basedir = ini_get('open_basedir');
@@ -147,9 +152,12 @@ function check_session_save_path()
             $save_path = sys_get_temp_dir();
 
             if (is_dir($save_path) && TikiInit::is_writeable($save_path)) {
-                ini_set('session.save_path', $save_path);
+                if (session_status() !== PHP_SESSION_ACTIVE) {
+                    // We can't change session settings when a session is already active
+                    ini_set('session.save_path', $save_path);
 
-                $errors = '';
+                    $errors = '';
+                }
             }
         }
     }

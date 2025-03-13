@@ -25,7 +25,7 @@ class TrIf
                 },
                 array_keys($args)
             );
-            return str_replace($search, $replace, $source);
+            return str_replace($search, $replace, $source ?? '');
         }
     }
 }

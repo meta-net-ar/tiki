@@ -127,7 +127,7 @@ $(function () {
             $(this).data("id", fakeId);
             fakeId++;
         });
-        // Adjusted to previous nestedSortable plugin result array
+        // Adjusted to previous sortable result array
         const arr = [
             {
                 item_id: "root",

@@ -139,9 +139,6 @@
                     {preference name=pwa_cache_links}
                     <div class="adminoptionboxchild" id="pwa_feature_childcontainer">
                         {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
-                            {if $prefs.feature_sefurl eq 'y'}
-                                {tr}Search Engine Friendly URL feature needs to be disabled.{/tr}<br/>
-                            {/if}
                             {tr}PWA feature requires bypassing CSRF Tokens, this represents a security issue.{/tr}
                         {/remarksbox}
                     </div>
@@ -180,12 +177,15 @@
                 <legend class="h3"><h4 class="showhide_heading" id="element-plus"> {tr}Element Plus{/tr}  <a href="#element-plus" class="heading-link" aria-label="{tr}Element Plus{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
                 {preference name=feature_elementplus}
                 <div class="adminoptionboxchild" id="feature_elementplus_childcontainer">
+                    {preference name=elementplus_autocomplete}
+                    {preference name=elementplus_select}
                     {preference name=elementplus_select_clearable}
                     {preference name=elementplus_select_collapse_tags}
                     {preference name=elementplus_select_max_collapse_tags}
                     {preference name=elementplus_select_filterable}
                     {preference name=elementplus_select_allow_create}
                     {preference name=elementplus_select_sortable}
+                    {preference name=elementplus_upload}
                 </div>
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
@@ -226,10 +226,7 @@
                         <legend class="h3"><h4 class="showhide_heading" id="Experimental">{tr}Experimental{/tr} <a href="#Experimental" class="heading-link" aria-label="{tr}Experimental{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
                         {preference name=feature_jquery_carousel}
                         {preference name=feature_jquery_tablesorter}
-                        {preference name=vuejs_enable}
                         <div class="adminoptionboxchild" id="vuejs_enable_childcontainer">
-                            {preference name=vuejs_always_load}
-                            {preference name=vuejs_build_mode}
                             {preference name=tracker_field_rules}
                         </div>
                     </fieldset>

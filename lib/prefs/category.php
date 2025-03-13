@@ -24,6 +24,7 @@ function prefs_category_list()
             'type' => 'text',
             'filter' => 'int',
             'default' => [0], //empty string needed to keep preference from setting unexpectedly
+            'detail' => tra('This should only be set for perspectives, and not globally.'),
             'profile_reference' => 'category',
         ],
         'category_defaults' => [

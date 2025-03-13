@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\core\Scheduler\DefaultSchedulers;
+
 @ignore_user_abort(true); // Allow execution to continue even if the request gets canceled.
 
 try {
@@ -33,6 +35,9 @@ if (! isset($_REQUEST['token']) || $_REQUEST['token'] !== $cron_token) {
     return;
 }
 
+$defaultSchedulers = new DefaultSchedulers();
+$defaultSchedulers->checkAndUpdate();
+
 $asUser = 'admin';
 
 if (TikiLib::lib('user')->user_exists($asUser)) {
@@ -50,7 +55,7 @@ if (empty($cron_interval)) {
 
 $start_time = time();
 
-if ($last_cron_run + $cron_interval >= $start_time) {
+if (strtotime($last_cron_run) + $cron_interval >= $start_time) {
     //too soon;
     return;
 }

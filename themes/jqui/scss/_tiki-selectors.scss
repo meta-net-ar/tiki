@@ -2,7 +2,7 @@
 
 .topbar {
     border-radius: $border-radius;
-//    border: 1px solid #aaaaaa;
+    //    border: 1px solid #aaaaaa;
 }
 
 .topbar {
@@ -19,27 +19,32 @@
 
 .card-header,
 .tiki .bg-dark:not(.navbar-dark) {
-  background-image: var(--tiki-card-header-bg); //linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    background-image: var(--tiki-card-header-bg); //linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
 }
 
 //.navbar-dark .navbar-brand {
 //  color: $primary;
 //}
-
-.topbar .nav-link {
-//  border-right: 1px solid #aaaaaa;
-  font-weight: bold;
+.top_modules,
+.topbar_modules {
+    .nav-link,
+    button.dropdown-toggle, {
+        //  border-right: 1px solid #aaaaaa;
+        font-weight: bold;
+    }
 }
 
 .topbar .nav-link:first-of-type {
-  border-left: none;
+    border-left: none;
 }
 
 // Make links visible in dark mode
 #col2 .navbar {
     background: transparent;
+
     .nav-link {
         color: var(--tiki-vert-nav-link-color);
+
         &:hover {
             color: var(--tiki-vert-nav-link-hover-color);
         }
@@ -48,13 +53,13 @@
 
 .card.postbody,
 .card.postbody .card-header {
-  border: 1px solid #999;
+    border: 1px solid #999;
 }
 
 .card-header {
-  margin: 3px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+    margin: 3px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 .card-title {
@@ -62,11 +67,13 @@
     font-size: 1rem;
 }
 
-.card-body h4 { font-size: 1rem; }
+.card-body h4 {
+    font-size: 1rem;
+}
 
 .card.postbody .card-footer {
-  background-color: rgba(0, 0, 0, .03);
-  border-top: 1px solid #999;
+    background-color: rgba(0, 0, 0, .03);
+    border-top: 1px solid #999;
 }
 
 .btn-primary,
@@ -81,7 +88,7 @@
     background: -o-linear-gradient(top, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
     background: linear-gradient(to bottom, #f2f2f2 0%, #f2f2f2 46%, #e6e6e6 50%, #eeeeee 50%, #eeeeee 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f2f2f2', endColorstr='#eeeeee', GradientType=0);
-  color: #333;
+    color: #333;
 }
 
 .btn-primary:hover,
@@ -91,12 +98,12 @@
 .btn-warning:hover,
 .btn-danger:hover {
     background: #eeeeee;
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(50%,#eeeeee), color-stop(50%,#e6e6e6), color-stop(54%,#f2f2f2), color-stop(100%,#f2f2f2));
-    background: -webkit-linear-gradient(top,  #eeeeee 0%,#eeeeee 50%,#e6e6e6 50%,#f2f2f2 54%,#f2f2f2 100%);
-    background: -o-linear-gradient(top,  #eeeeee 0%,#eeeeee 50%,#e6e6e6 50%,#f2f2f2 54%,#f2f2f2 100%);
-    background: linear-gradient(to bottom,  #eeeeee 0%,#eeeeee 50%,#e6e6e6 50%,#f2f2f2 54%,#f2f2f2 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#f2f2f2',GradientType=0 );
-  color: #333;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeeeee), color-stop(50%, #eeeeee), color-stop(50%, #e6e6e6), color-stop(54%, #f2f2f2), color-stop(100%, #f2f2f2));
+    background: -webkit-linear-gradient(top, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
+    background: -o-linear-gradient(top, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
+    background: linear-gradient(to bottom, #eeeeee 0%, #eeeeee 50%, #e6e6e6 50%, #f2f2f2 54%, #f2f2f2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#f2f2f2', GradientType=0);
+    color: #333;
 }
 
 .btn-primary:disabled,
@@ -110,10 +117,12 @@
 .btn-success.disabled,
 .btn-info.disabled,
 .btn-warning.disabled,
-.btn-danger.disabled { color: lighten(#333, 10%);}
+.btn-danger.disabled {
+    color: lighten(#333, 10%);
+}
 
 .show > .btn-primary.dropdown-toggle {
-  color: #333333;
+    color: #333333;
 }
 
 .btn-outline-primary,
@@ -122,7 +131,7 @@
 .btn-outline-info,
 .btn-outline-warning,
 .btn-outline-danger {
-  background: transparent;
+    background: transparent;
 }
 
 // So form submit buttons with icons and text used in popover actions can look just like links

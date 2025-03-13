@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
@@ -30,6 +31,12 @@ class BackupDBCommand extends Command
                 'dateFormat',
                 InputArgument::OPTIONAL,
                 'Format to use for the date part of the backup file. Defaults to "Y-m-d_H-i-s" and uses the PHP date function format'
+            )
+            ->addOption(
+                'no-hex',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not encode BLOB fields as hexadecimal characters'
             )
         ;
     }
@@ -73,6 +80,9 @@ class BackupDBCommand extends Command
         }
         if ($host_tiki) {
             $args[] = "-h" . escapeshellarg($host_tiki);
+        }
+        if (! $input->getOption('no-hex')) {
+            $args[] = '--hex-blob';
         }
 
         // Find out how many non-InnoDB tables exist in the schema

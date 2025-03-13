@@ -17,7 +17,7 @@ class ToolbarWikiplugin extends ToolbarUtilityItem
             if ($info = $parserlib->plugin_info($name)) {
                 $tag = new self();
                 $tag->setLabel(str_ireplace('wikiplugin_', '', $info['name']))
-                    ->setWysiwygToken(str_replace(' ', '_', $info['name']))
+                    ->setWysiwygToken(strtolower(str_replace(' ', '', $info['name'])))
                     ->setMarkdownSyntax($name)
                     ->setMarkdownWysiwyg(str_replace(' ', '_', $info['name']))
                     ->setPluginName($name)
@@ -58,41 +58,21 @@ class ToolbarWikiplugin extends ToolbarUtilityItem
         return parent::isAccessible() && $parserlib->plugin_enabled($this->pluginName, $dummy_output);
     }
 
-    public function getWysiwygToken($add_js = true): string
+    public function getWysiwygToken(): string
     {
-        if (! empty($this->wysiwyg) && $add_js) {
-            $js = "popupPluginForm(editor.name,'{$this->pluginName}');";
-            //CKEditor needs image icons so get legacy plugin icons for the toolbar
-            $iconpath = 'img/icons/plugin.png';
-            if (! $this->icon && ! empty($this->iconname)) {
-                $iconsetlib = TikiLib::lib('iconset');
-                $legacy = $iconsetlib->loadFile('themes/base_files/iconsets/legacy.php');
-                if (array_key_exists($this->iconname, $legacy['icons'])) {
-                    $iconinfo = $legacy['icons'][$this->iconname];
-                } elseif (in_array($this->iconname, $legacy['defaults'])) {
-                    $iconinfo['id'] = $this->iconname;
-                }
-                if (isset($iconinfo)) {
-                    $prepend = $iconinfo['prepend'] ?? 'img/icons/';
-                    $append = $iconinfo['append'] ?? '.png';
-                    $this->icon = $prepend . $iconinfo['id'] . $append;
-                }
-            }
-            $this->setupCKEditorTool($js);
-        }
         return $this->wysiwyg;
     }
 
-    public function getWysiwygWikiToken($add_js = true): string // wysiwyg_htmltowiki
+    public function getWysiwygWikiToken(): string // wysiwyg_htmltowiki
     {
         switch ($this->pluginName) {
             case 'img':
-                $this->wysiwyg = 'wikiplugin_img';  // don't use ckeditor's html image dialog
+                $this->wysiwyg = 'wikiplugin_img';
                 break;
             default:
         }
 
-        return $this->getWysiwygToken($add_js);
+        return $this->getWysiwygToken();
     }
 
     /**

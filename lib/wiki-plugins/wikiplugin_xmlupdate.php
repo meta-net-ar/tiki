@@ -22,6 +22,7 @@ function wikiplugin_xmlupdate_info()
                 'description' => tra('File Id of the XML file stored in a File Gallery which is assumed to store its data in a directory'),
                 'since' => '15.0',
                 'filter' => 'digits',
+                'profile_reference' => 'file',
             ],
             'attribute' => [
                 'required' => false,

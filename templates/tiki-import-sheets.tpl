@@ -87,9 +87,5 @@
             </div>
         </div>
     </form>
-    {if $prefs.feature_jquery_autocomplete eq 'y'}
-        {jq}
-            $("#querypage").tiki("autocomplete", "pagename");
-        {/jq}
-    {/if}
+    {autocomplete element="#querypage" type="pagename"}
 {/if}

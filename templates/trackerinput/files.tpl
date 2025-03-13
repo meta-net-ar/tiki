@@ -1,15 +1,21 @@
+{if $field.excessBehavior === 'split'}
+    {assign var=actual_limit value=100}
+{else}
+    {assign var=actual_limit value=$field.limit|default:100}
+{/if}
 <div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}" data-namefilter="{$field.namefilter|escape}" data-namefilter-error="{$field.namefilterError|escape}">
-    {if !empty($field.canUpload)}
+    {if (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem !== 'y') || (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem === 'y' && $field.canCreateGallery)}
         {if !empty($field.limit)}
-            {if $field.limit == 1}
-                {remarksbox _type=info title="{tr}Attached files limitation{/tr}"}
-                    {tr }The amount of files that can be attached is limited to <strong>1</strong>. The latest file will be preserved.{/tr}
-                {/remarksbox}
-            {else}
-                {remarksbox _type=info title="{tr}Attached files limitation{/tr}"}
-                    {tr _0=$field.limit}The amount of files that can be attached is limited to <strong>%0</strong>. The latest files will be preserved.{/tr}
-                {/remarksbox}
-            {/if}
+            {remarksbox _type=info title="{tr}Attached files limitation{/tr}"}
+                {tr _0=$field.limit}The amount of files that can be attached to this item is limited to <strong>%0</strong>.{/tr}
+                {if $field.excessBehavior === 'split'}
+                    {tr}Excessive files will be attached to new item(s) automatically created from this item.{/tr}
+                {elseif $field.limit == 1}
+                    {tr}The latest file will be preserved.{/tr}
+                {else}
+                    {tr}The latest files will be preserved.{/tr}
+                {/if}
+            {/remarksbox}
         {/if}
         <ol class="tracker-item-files current-list">
             {foreach from=$field.files item=info}
@@ -56,12 +62,12 @@
             {wikiplugin _name='vimeo' fromFieldId=$field.fieldId|escape fromItemId=$item.itemId|escape galleryId=$field.galleryId|escape}{/wikiplugin}
         {else}
             {if $field.options_map.uploadInModal neq 'n'}
-                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$field.limit|default:100 type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files">
-                    {if $field.limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
+                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files">
+                    {if $actual_limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
                 </a>
             {else}
                 <div class="upload-files-inline-form">
-                    {service_inline controller=file action=uploader uploadInModal=0 galleryId=$field.galleryId limit=$field.limit|default:100 type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload directoryPattern=$field.directoryPattern}
+                    {service_inline controller=file action=uploader uploadInModal=0 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload directoryPattern=$field.directoryPattern}
                 </div>
             {/if}
         {/if}
@@ -69,7 +75,7 @@
             {if $prefs.fgal_elfinder_feature eq 'y'}
                 {button href='tiki-list_file_gallery.php' _text="{tr}Browse files{/tr}" _onclick=$context.onclick title="{tr}Browse files{/tr}"}
             {else}
-                <a href="{service controller=file action=browse galleryId=$context.galleryId limit=$field.limit|default:100 type=$field.filter image_x=$field.image_x image_y=$field.image_y}" class="btn btn-primary browse-files">{tr}Browse Files{/tr}</a>
+                <a href="{service controller=file action=browse galleryId=$context.galleryId limit=$actual_limit type=$field.filter image_x=$field.image_x image_y=$field.image_y}" class="btn btn-primary browse-files">{tr}Browse Files{/tr}</a>
             {/if}
         {/if}
         {if $prefs.fgal_upload_from_source eq 'y' and $field.canUpload}
@@ -94,8 +100,13 @@
             </fieldset>
         {/if}
     {else}
+        {if empty($field.canUpload)}
             {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
             {/remarksbox}
+        {else}
+            {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
+            {/remarksbox}
+        {/if}
     {/if}
 </div>
 
@@ -130,7 +141,7 @@
                 $field.input_csv('add', ',', fileId);
 
                 li.prepend($.fileTypeIcon(fileId, { type: type, name: name }));
-                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger">{{icon name='trash'}}</a><a class="file-delete-icon text-danger">{{icon name='delete'}}</a></div>'));
+                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger" title="{tr}Remove from tracker item and delete permanently from file gallery.{/tr}">{{icon name='trash'}}</a><a class="file-delete-icon text-danger" title="{tr}Remove from tracker item but keep in file gallery.{/tr}">{{icon name='delete'}}</a></div>'));
 
                 if (replaceFile && $self.data('firstfile') > 0) {
                     li.prev('li').remove();
@@ -338,24 +349,28 @@
                 }
             });
 
-            window.handleFinderFile = function (file, elfinder) {
-                var hash = "";
-                if (typeof file === "string") {
-                    var m = file.match(/target=([^&]*)/);
-                    if (!m || m.length < 2) {
-                        return false;    // error?
+            window.handleFinderFile = function (files, elfinder) {
+                var hashes = [];
+                for (var i = 0; i < files.length; i++) {
+                    let file = files[i];
+                    if (typeof file === "string") {
+                        var m = file.match(/target=([^&]*)/);
+                        if (!m || m.length < 2) {
+                            return false;    // error?
+                        }
+                        hashes.push(m[1]);
+                    } else {
+                        hashes.push(file.hash);
                     }
-                    hash = m[1];
-                } else {
-                    hash = file.hash;
                 }
+
                 $.ajax({
                     type: 'GET',
                     url: $.service('file_finder', 'finder'),
                     dataType: 'json',
                     data: {
                         cmd: "tikiFileFromHash",
-                        hash: hash
+                        hash: hashes
                     },
                     success: function (data) {
                         var eventOrigin = $("body").data("eventOrigin");
@@ -365,7 +380,9 @@
                             $files = $(".current-list", $ff);
                         }
 
-        addFile(data.fileId, data.filetype, data.name);
+                        for (var i = 0; i < data.length; i++) {
+                            addFile(data[i].fileId, data[i].filetype, data[i].name);
+                        }
                     },
                     error: function (jqxhr) {
                     },

@@ -35,18 +35,12 @@ $trklib = TikiLib::lib('trk');
 if (isset($_REQUEST['userId'])) {
     $userwatch = $tikilib->get_user_login($_REQUEST['userId']);
     if ($userwatch === false) {
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->assign('msg', tra("Unknown user"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Unknown user"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 } elseif (isset($_REQUEST['view_user'])) {
     $userwatch = $_REQUEST['view_user'];
     if (! $userlib->user_exists($userwatch)) {
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->assign('msg', tra("Unknown user"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Unknown user"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 } else {
     $access->check_user($user);

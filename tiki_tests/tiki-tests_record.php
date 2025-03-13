@@ -7,15 +7,11 @@
 require_once('../tiki-setup.php');
 
 if ($prefs['feature_tikitests'] != 'y') {
-    $smarty->assign('msg', tra('This feature is disabled') . ': feature_tikitests');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_edit_tikitests != 'y') {
-    $smarty->assign('msg', tra('You do not have permission to do that'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 $smarty->assign('tidy', extension_loaded('tidy'));

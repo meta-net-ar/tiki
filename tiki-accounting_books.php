@@ -24,7 +24,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'               => [
             'action'                     => 'alpha',     //post
-            'bookId'                     => 'alpha',     //post
+            'bookId'                     => 'int',     //post
             'book_start_Year'            => 'digits',    //post
             'book_start_Month'           => 'digits',    //post
             'book_start_Day'             => 'digits',    //post
@@ -34,13 +34,13 @@ $inputConfiguration = [
             'bookName'                   => 'striptags', //post
             'bookCurrency'               => 'striptags', //post
             'bookCurrencyPos'            => 'int',       //post
-            'bookDecimals'               => 'striptags', //post
+            'bookDecimals'               => 'int',       //post
             'bookDecPoint'               => 'striptags', //post
             'bookThousand'               => 'striptags', //pos
             'exportSeparator'            => 'striptags', //pos
             'exportEOL'                  => 'striptags', //pos
             'exportQuote'                => 'striptags', //pos
-            'bookAutoTax'                => 'bool',      //post
+            'bookAutoTax'                => 'striptags', //post
         ],
     ],
 ];
@@ -49,9 +49,7 @@ $section = 'accounting';
 require_once('tiki-setup.php');
 // Feature available?
 if ($prefs['feature_accounting'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_accounting");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_accounting", \Laminas\Http\Response::STATUS_CODE_403);
 }
 if (! isset($_REQUEST['action'])) {
     $_REQUEST['action'] = '';
@@ -60,7 +58,7 @@ if (! isset($_REQUEST['action'])) {
 $globalperms = Perms::get();
 $accountinglib = TikiLib::lib('accounting');
 
-if ($_REQUEST['book_start_Year']) {
+if (! empty($_REQUEST['book_start_Year'])) {
     $bookStartDate = new DateTime();
     $bookStartDate->setDate(
         $_REQUEST['book_start_Year'],
@@ -68,7 +66,7 @@ if ($_REQUEST['book_start_Year']) {
         $_REQUEST['book_start_Day']
     );
 }
-if ($_REQUEST['book_end_Year']) {
+if (! empty($_REQUEST['book_end_Year'])) {
     $bookEndDate = new DateTime();
     $bookEndDate->setDate(
         $_REQUEST['book_end_Year'],

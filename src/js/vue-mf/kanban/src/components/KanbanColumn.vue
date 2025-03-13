@@ -106,7 +106,7 @@ const handleEditClick = event => {
                     <div class="px-2">
                         <span class="dropdown-item-text">List actions</span>
                         <div class="dropdown-divider"></div>
-                        <ColorPicker :pureColor="store.getters.getColColor(props.colId)" useType="pure" format="hex" @pureColorChange="handleColorChange" />
+                        <!-- <ColorPicker :pureColor="store.getters.getColColor(props.colId)" useType="pure" format="hex" @pureColorChange="handleColorChange" /> -->
                     </div>
                 </template>
             </Dropdown>

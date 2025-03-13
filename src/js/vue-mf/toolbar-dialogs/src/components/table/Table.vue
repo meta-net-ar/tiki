@@ -3,7 +3,7 @@
 // see https://vuejs.org/examples/#cells
 
 import TableCell from "./TableCell.vue"
-import { onMounted, ref, defineProps, defineExpose } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { cells } from "./store.js"
 
 const props = defineProps({
@@ -14,12 +14,14 @@ const props = defineProps({
 });
 
 const tableBuilderTable = ref();
-const toolbarObject = ref(props.toolbarObject);
+
+const toolbarObject = computed(() => props.toolbarObject);
 
 function addRow() {
     cells.value.push(Array(cells.value[0].length).fill(""))
-    setTimeout(function () {
-        $("tr:nth(" + (cells.value.length - 1) + ") td", tableBuilderTable.value).first().find("input").trigger("focus")
+    const tm = setTimeout(function () {
+        $("tr:nth(" + (cells.value.length - 1) + ") td", tableBuilderTable.value).first().find("input").trigger("focus");
+        clearTimeout(tm);
     }, 10)
 }
 
@@ -37,15 +39,6 @@ function deleteRow(row) {
 function deleteCol(col) {
     cells.value.forEach(row => row.splice(col, 1))
 }
-
-onMounted(() => {
-    // nasty fix for attaching a hook on show.bs.modal to trigger the tool's init
-    $(tableBuilderTable.value)
-        .parents(".modal").first()
-        .on("show.bs.modal", (event) => {
-            _shown(event);
-        });
-});
 
 function _shown() {
     let selection = getTASelection($("#" + toolbarObject.value.domElementId).get(0));
@@ -81,8 +74,9 @@ function _shown() {
         }
     }
     // click the aligned buttons to set the input alignments
-    setTimeout(function () {
-        $(".text-primary", tableBuilderTable.value).trigger("click")
+    const tm = setTimeout(function () {
+        $(".text-primary", tableBuilderTable.value).trigger("click");
+        clearTimeout(tm);
     }, 10)
 }
 
@@ -108,11 +102,13 @@ function _insert() {
     return output
 }
 
+onMounted(_shown);
+
 defineExpose({ execute: _insert, shown: _shown });
 </script>
 
 <template>
-    <table toolbar-object="toolbarObject" class="w-100 table table-sm table-borderless" ref="tableBuilderTable">
+    <table class="w-100 table table-sm table-borderless" ref="tableBuilderTable">
       <tbody>
         <tr v-for="i in cells.length">
           <td v-for="(c, j) in cells[0]">

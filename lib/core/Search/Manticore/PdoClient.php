@@ -103,7 +103,11 @@ class PdoClient
             if (! empty($type) && $row['Type'] != $type) {
                 continue;
             }
-            $results[] = $row['Index'];
+            if (isset($row['Table'])) {
+                $results[] = $row['Table'];
+            } elseif (isset($row['Index'])) {
+                $results[] = $row['Index'];
+            }
         }
         return $results;
     }
@@ -213,6 +217,9 @@ class PdoClient
                 // local index
                 $fields[$table] = $this->describe($table);
             }
+        }
+        if (count($fields) == 1) {
+            return array_keys(array_shift($fields));
         }
         $common = [];
         $result = array_shift($fields);
@@ -335,10 +342,10 @@ class PdoClient
         $this->prepareAndExecute("DELETE FROM $index WHERE object_type = :object_type AND object_id = :object_id", ['object_type' => $type, 'object_id' => $id]);
     }
 
-    public function document($index, $type, $id)
+    public function document($index, $type, $id): ResultSet
     {
         $stmt = $this->prepareAndExecute("SELECT * FROM $index WHERE object_type = :object_type AND object_id = :object_id", ['object_type' => $type, 'object_id' => $id]);
-        return new ResultSet($stmt->fetch());
+        return new ResultSet($stmt->fetch(), 1, 0, 1);
     }
 
     public function optimize($index)
@@ -414,6 +421,7 @@ class PdoClient
         if ($facets) {
             $sql .= ' ' . $facets;
         }
+        $stmt = null;
         try {
             $subselects = [];
             $original_order = [];
@@ -441,7 +449,7 @@ class PdoClient
                     if (! empty($row['Message']) && preg_match('/unknown local table/', $row['Message'])) {
                         // remote agent rebuild has invalidated this distributed index, need recreate the distributed index with fresh index table names
                         \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
-                        return $this->fetchAllRowsets($selectFields, $selectExpressions, $table, $condition, $order, $resultStart, $resultCount, $facets, false);
+                        return $this->fetchAllRowsets($selectFields, $selectExpressions, $table, $condition, $order, $resultStart, $resultCount, $facets, $indexFields, false);
                     }
                 }
             }
@@ -462,6 +470,8 @@ class PdoClient
                         $type = 'trackeritem';
                     }
                     $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
+                    //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
+                    $sql .= " LIMIT 0, $resultCount ";
                     $stmt = $this->prepareAndExecute($sql, $object_ids);
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;
@@ -472,9 +482,12 @@ class PdoClient
             return $result;
         } catch (PDOException $e) {
             if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+                if ($stmt) {
+                    $stmt->closeCursor();
+                }
                 // federated index tables might have been rebuilt and distributed one not updated properly -> refresh and retry
                 \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
-                return $this->fetchAllRowsets($selectFields, $selectExpressions, $table, $condition, $order, $resultStart, $resultCount, $facets, false);
+                return $this->fetchAllRowsets($selectFields, $selectExpressions, $table, $condition, $order, $resultStart, $resultCount, $facets, $indexFields, false);
             } else {
                 throw $e;
             }
@@ -483,6 +496,9 @@ class PdoClient
 
     public function quote($string)
     {
+        if (is_null($string)) {
+            return $string;
+        }
         return $this->pdo->quote($string);
     }
 
@@ -503,7 +519,7 @@ class PdoClient
             if ($matches[1] == '?') {
                 return $this->quote($params[$i++]);
             } else {
-                return $this->query($params[substr($matches[1], 1)] ?? '');
+                return $this->quote($params[substr($matches[1], 1)] ?? '');
             }
         }, $query);
         fwrite($this->log, $query . ";\n");

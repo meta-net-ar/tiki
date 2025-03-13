@@ -50,7 +50,6 @@ $inputConfiguration = [
             'attach_comment'   => 'word',          //get
             'attach_version'   => 'int',           //get
             'attach_longdesc'  => 'word',          //get
-            'attId'            => 'int',           //get
             'status'           => 'word',          //get
             'conflictoverride' => 'bool',          //get
         ]
@@ -108,10 +107,7 @@ $special = false;
 if (! isset($trackerId) && $prefs['userTracker'] == 'y' && ! isset($_REQUEST['user'])) {
     if (isset($_REQUEST['view']) and $_REQUEST['view'] == ' user') {
         if (empty($user)) {
-            $smarty->assign('msg', tra("You are not logged in"));
-            $smarty->assign('errortype', '402');
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You are not logged in"), \Laminas\Http\Response::STATUS_CODE_402);
         }
         $utid = $userlib->get_tracker_usergroup($user);
         if (isset($utid['usersTrackerId'])) {
@@ -202,12 +198,7 @@ if ($prefs['userTracker'] == 'y' && isset($_REQUEST['view']) && $_REQUEST['view'
         if (! empty($fieldId)) {
             $itemId = $trklib->get_item_id($trackerId, $fieldId, $_REQUEST['user']);
             if (! $itemId) {
-                $smarty->assign(
-                    'msg',
-                    tra("You don't have a personal tracker item yet. Click here to make one:") . '<br /><a href="tiki-view_tracker.php?trackerId=' . $trackerId . '&cookietab=2">' . tra('Create tracker item') . '</a>'
-                );
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You don't have a personal tracker item yet. Click here to make one:") . '<br /><a href="tiki-view_tracker.php?trackerId=' . $trackerId . '&cookietab=2">' . tra('Create tracker item') . '</a>', \Laminas\Http\Response::STATUS_CODE_409);
             }
         }
     }
@@ -219,24 +210,17 @@ if ((! isset($trackerId) || ! $trackerId) && isset($itemId)) {
     }
 }
 if (! isset($trackerId) || ! $trackerId) {
-    $smarty->assign('msg', tra("No tracker indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No tracker indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if (! isset($utid) and ! isset($gtid) and (! isset($itemId) or ! $itemId) and ! isset($_REQUEST["offset"])) {
-    $smarty->assign('msg', tra("No item indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No item indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 if (isset($itemId)) {
     $item_info = $trklib->get_tracker_item($itemId);
 
     if (! $item_info) {
-        $smarty->assign('errortype', 404);
-        $smarty->assign('msg', tra('Item not found'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Item not found'), \Laminas\Http\Response::STATUS_CODE_404);
     }
     TikiLib::events()->trigger(
         'tiki.trackeritem.view',
@@ -252,10 +236,7 @@ if (isset($itemId)) {
 $definition = Tracker_Definition::get($trackerId);
 
 if (! $definition) {
-    $smarty->assign('errortype', 404);
-    $smarty->assign('msg', tra("Tracker not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Tracker not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 $fieldDefinitions = $definition->getFields();
@@ -369,9 +350,7 @@ $smarty->assign('itemId', $itemId);
 if (! isset($item_info)) {
     $item_info = $trklib->get_tracker_item($itemId);
     if (empty($item_info)) {
-        $smarty->assign('msg', tra("No item indicated"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("No item indicated"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 $item_info['logs'] = ['cant' => $trklib->item_has_history($item_info['itemId'])];   // only used to show history links, no need to load everything
@@ -401,11 +380,7 @@ if (! isset($tracker_info["groupCanSeeOwn"]) or (isset($gtid) and ($trackerId !=
 }
 $tikilib->get_perm_object($trackerId, 'tracker', $tracker_info);
 if (! $itemObject->canView()) {
-    $smarty->assign('errortype', 403);
-    $smarty->assign('msg', tra("Permission denied"));
-    header('HTTP/1.0 403 Forbidden');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Permission denied"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 if (isset($tracker_info['adminOnlyViewEditItem']) && $tracker_info['adminOnlyViewEditItem'] === 'y') {
     $access->check_permission('tiki_p_admin_trackers', tra('This tracker restricts access to the built-in tracker interfaces. You need admin tracker permission'), 'tracker', $tracker_info['trackerId']);
@@ -425,11 +400,7 @@ if (! empty($_REQUEST['moveto'])) {
         header('Location: ' . filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId));
         exit;
     } else {
-        $smarty->assign('errortype', 403);
-        $smarty->assign('msg', tra("Permission denied"));
-        header('HTTP/1.0 403 Forbidden');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Permission denied"), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
 if (isset($_REQUEST["removeattach"])) {
@@ -516,10 +487,7 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["save_return"]) || isset($_REQUE
     if ($itemObject->canModify()) {
         $captchalib = TikiLib::lib('captcha');
         if (empty($user) && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
-            $smarty->assign('msg', $captchalib->getErrors());
-            $smarty->assign('errortype', 'no_redirect_login');
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($captchalib->getErrors(), \Laminas\Http\Response::STATUS_CODE_502);
         }
         // Check field values for each type and presence of mandatory ones
         $mandatory_missing = [];
@@ -638,11 +606,7 @@ if (! isset($info['trackerId'])) {
     $info['trackerId'] = $trackerId;
 }
 if (! $itemObject->canView()) {
-    $smarty->assign('errortype', 403);
-    $smarty->assign('msg', tra('Permission denied'));
-    header('HTTP/1.0 403 Forbidden');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $fieldFactory = $definition->getFieldFactory();
@@ -777,9 +741,7 @@ if ($tracker_info_value('useAttachments') == 'y') {
                 $fhash = md5($_FILES['userfile1']['name'] . $tikilib->now);
                 $fw = fopen($prefs['t_use_dir'] . $fhash, "wb");
                 if (! $fw) {
-                    $smarty->assign('msg', tra('Cannot write to this file:') . $fhash);
-                    $smarty->display("error.tpl");
-                    die;
+                    Feedback::errorAndDie(tra('Cannot write to this file:') . $fhash, \Laminas\Http\Response::STATUS_CODE_500);
                 }
             }
             while (! feof($fp)) {
@@ -802,17 +764,13 @@ if ($tracker_info_value('useAttachments') == 'y') {
                     $filegallib->assertUploadedContentIsSafe($data, $_FILES['userfile1']['name']);
                 }
             } catch (Exception $e) {
-                $smarty->assign('msg', $_FILES['userfile1']['name'] . ': ' . $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . $e->getMessage(), \Laminas\Http\Response::STATUS_CODE_500);
             }
             $size = $_FILES['userfile1']['size'];
             $name = $_FILES['userfile1']['name'];
             $type = $_FILES['userfile1']['type'];
         } else {
-            $smarty->assign('msg', $_FILES['userfile1']['name'] . ': ' . tra('Upload was not successful') . ': ' . $tikilib->uploaded_file_error($_FILES['userfile1']['error']));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . tra('Upload was not successful') . ': ' . $tikilib->uploaded_file_error($_FILES['userfile1']['error']), \Laminas\Http\Response::STATUS_CODE_500);
         }
         $trklib->replace_item_attachment($_REQUEST["attId"], $name, $type, $size, $data, $_REQUEST["attach_comment"], $user, $fhash, $_REQUEST["attach_version"], $_REQUEST["attach_longdesc"], $trackerId, $itemId, $tracker_info);
         $_REQUEST["attId"] = 0;
@@ -909,6 +867,7 @@ if ($itemObject->canModify() && $prefs['tracker_legacy_insert'] == 'y' && $prefs
         $msg .= '<br /><br /><a href="' . filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId . '&conflictoverride=y') . '">' . tra('Override lock and carry on with edit') . '</a>';
         $smarty->assign('msg', $msg);
         $smarty->assign('errortitle', tra('Item is currently being edited'));
+        $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_423);
         $smarty->display("error.tpl");
         die;
     }
@@ -1007,6 +966,7 @@ try {
             header("Content-Type: application/pdf");
             header("Content-Transfer-Encoding: binary");
             header('Content-Length: ' . $length);
+            TikiLib::lib('header')->setXRobotsTag($robots);
             echo $pdf;
         }
          //end of pdf

@@ -128,7 +128,7 @@
         });
 
         $("#save_{{$pivottable.id}}").on("click", function(){
-            saveConfig("#output_{{$pivottable.id}}", "{{$pivottable.page}}", {{$pivottable.index|json_encode}}, {{$pivottable.dataSource|json_encode}}, {{$pivottable.fieldsArr|json_encode}});
+            saveConfig("#output_{{$pivottable.id}}", "{{$pivottable.page}}", {{$pivottable.index|json_encode}}, {{$pivottable.dataSource|json_encode}}, {{$pivottable.fieldsArr|json_encode}}, {{$pivottable.defaults|json_encode}});
         });
 
         createEditBtn({{$pivottable.id|json_encode}});

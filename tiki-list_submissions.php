@@ -12,14 +12,13 @@ $section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-        'remove'                   => 'bool',                //post
+        'remove'                   => 'int',                //post
         'approve'                  => 'int',                 //post
         'submit_mult'              => 'string',              //post
-        'deleteexpired'            => 'bool',                //post
         'maxRecords'               => 'int',                 //post
         'sort_mode'                => 'word',                //get
         'offset'                   => 'int',                 //get
-        'find'                     => 'word',                //post
+        'find'                     => 'string',              //post
         'topic'                    => 'word',                //post
         'lang'                     => 'lang',                //post
         'type'                     => 'word',                //post
@@ -68,10 +67,7 @@ if (isset($_REQUEST['submit_mult']) && count($_REQUEST["checked"]) > 0 &&  $acce
         }
     }
 }
-if (isset($_REQUEST["deleteexpired"]) && $access->checkCsrf()) {
-    $access->check_permission('tiki_p_remove_submission');
-    $artlib->delete_expired_submissions();
-}
+
 // This script can receive the threshold
 // for the information as the number of
 // days to get in the log 1,3,4,etc

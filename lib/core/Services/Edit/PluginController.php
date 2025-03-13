@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\WikiPlugin\Enums\PluginParameterTags;
+
 /**
  * Class Services_Edit_PluginController
  *
@@ -144,9 +147,46 @@ class Services_Edit_PluginController
             ];
         } else {        // render the form
             $info = $parserlib->plugin_info($type, $pluginArgs);
+            if (! $info) {
+                throw new Services_Exception_NotFound(tr('Plugin not found'));
+            }
             $info['advancedParams'] = [];
             $validationRules = [];
             $objectlib = TikiLib::lib('object');
+
+            $paramsKeys = array_keys($info['params']);
+            $buttonsKeys = array_filter(($paramsKeys), function ($key) {
+                return strpos($key, 'buttons') === 0;
+            });
+
+            $buttonsProps = [];
+            $insertButtonParametersAtPos = 0;
+            foreach ($buttonsKeys as $key) {
+                preg_match('/buttons(\w*)/', $key, $matches);
+                $prop = strtolower($matches[1]);
+
+                if (empty($prop)) {
+                    $prop = 'label';
+                }
+
+                $buttonsProps[$prop] = $info['params'][$key];
+
+                $insertButtonParametersAtPos = array_search($key, array_keys($info['params']));
+
+                unset($info['params'][$key]);
+            }
+
+            if (! empty($buttonsProps)) {
+                $firstPart = array_slice($info['params'], 0, $insertButtonParametersAtPos);
+                $secondPart = array_slice($info['params'], $insertButtonParametersAtPos, null, true);
+                $info['params'] = array_merge($firstPart, [
+                    'buttons' => [
+                        'name' => tra('Buttons'),
+                        'type' => 'buttons',
+                        'fields' => $buttonsProps,
+                    ],
+                ], $secondPart);
+            }
 
             foreach ($info['params'] as $key => & $param) {
                 if ($prefs['feature_jquery_validation'] === 'y') {
@@ -163,7 +203,7 @@ class Services_Edit_PluginController
                         }
                     }
                 }
-                if (! empty($param['advanced']) && ! isset($pluginArgs[$key]) && empty($param['parentparam'])) {
+                if (! empty($param['advanced']) && empty($param['parentparam'])) {
                     $info['advancedParams'][$key] = $param;
                     unset($info['params'][$key]);
                 }
@@ -192,9 +232,14 @@ class Services_Edit_PluginController
                 }
             }
 
-            $extraParams = array_filter(array_diff_key($pluginArgs, $info['params'] ?? []));
+            $allParameters = array_merge($info['params'], $info['advancedParams']);
+            $extraParams = array_filter(array_diff_key($pluginArgs, $allParameters));
 
             foreach ($extraParams as $extraParam => $val) {
+                // skip buttons parameters as obviously at this stage they will be plugged as extra parameters
+                if (strpos($extraParam, 'buttons') === 0) {
+                    continue;
+                }
                 $info['params'][$extraParam] = [
                     'required' => false,
                     'name' => $extraParam,
@@ -225,7 +270,7 @@ class Services_Edit_PluginController
                     $pluginArgs['module'] = $selectedMod;
                 }
                 $file = 'modules/mod-func-' . $pluginArgs['module'] . '.php';
-                if (file_exists($file)) {
+                if ($file = TikiLib::lib('tiki')->safeFileExistsInPath($file)) {
                     include_once($file);
                     $info_func = "module_{$pluginArgs['module']}_info";
                     if (function_exists($info_func)) {
@@ -258,6 +303,12 @@ class Services_Edit_PluginController
                     }
                 }
             }
+
+            $parameterTags = [];
+            foreach (PluginParameterTags::cases() as $case) {
+                $parameterTags[$case->name] = $case->value;
+            }
+
             return [
                 // pass back the input parameters
                 'area_id' => $area_id,
@@ -273,6 +324,7 @@ class Services_Edit_PluginController
 
                 'info' => $info,
                 'title' => $info['name'],
+                'parameterTags' => $parameterTags,
             ];
         }
     }

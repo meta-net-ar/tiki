@@ -11,12 +11,12 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'       => [
-        'objectId'               => 'word',        //get
-        'objectType'             => 'word',       //post
-        'objectName'             => 'word',       //post
-        'referer'                => 'word',       //post
+        'objectId'               => 'string',        //get
+        'objectType'             => 'string',       //post
+        'objectName'             => 'string',       //post
+        'referer'                => 'string',     //post
         'parentId'               => 'int',        //post
-        'permType'               => 'word',       //post
+        'permType'               => 'string',     //post
         'assignstructure'        => 'bool',       //post
         'propagate_category'     => 'bool',       //post
         'feature_select'         => 'bool',       //post
@@ -43,9 +43,7 @@ $inputConfiguration = [
 include_once('tiki-setup.php');
 if (! empty($_REQUEST['objectType']) && $_REQUEST['objectType'] != 'global') {
     if (! isset($_REQUEST['objectName']) || empty($_REQUEST['objectId'])) {
-        $smarty->assign('msg', tra('Not enough information to display this page'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Not enough information to display this page'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -88,10 +86,7 @@ if ($_REQUEST['objectType'] == 'wiki page') {
 }
 
 if (! ($tiki_p_admin_objects == 'y' || (isset($$perm) && $$perm == 'y') || (isset($special_perm) && $special_perm == 'y'))) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to assign permissions for this object'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to assign permissions for this object'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! isset($_REQUEST['referer'])) {

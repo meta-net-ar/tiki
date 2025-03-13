@@ -1,7 +1,7 @@
 {title help="Stats"}{tr}Stats{/tr}{/title}
 
 {tabset}
-    {tab name="{tr}Tiki Statistics{/tr}"}
+    {tab name="{tr}Tiki Statistics{/tr}" print={$print_page == 'y' ? 'y' : 'n'}}
         <div class="t_navbar mb-4">
             {button href="#site_stats" _type="link" class="btn btn-link" _icon_name="home" _text="{tr}Site{/tr}"}
             {if $wiki_stats}
@@ -44,18 +44,44 @@
                 {button href="#tracker_stats" _type="link" class="btn btn-link" _icon_name="sort-numeric-asc" _text="{tr}Trackers{/tr}"}
             {/if}
         </div>
-
+        {if $pdf_export eq 'y' and $tiki_p_export_pdf eq 'y'}
+            <div class="text-end">
+                <div class="btn-group">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Stats Actions{/tr}">
+                        {icon name="menu-extra"}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <h6 class="dropdown-header">
+                            {tr}Stats actions{/tr}
+                        </h6>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="?{query display='pdf'}">
+                           {icon name="pdf"} {tr}PDF{/tr}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {/if}
         <h2 id="site_stats">{tr}Site Stats{/tr}</h2>
         {cycle values="odd,even" print=false advance=false}
         <div class="table-responsive">
             <table class="table table-striped">
                 <tr>
                     <td>{tr}Date of first pageview{/tr}</td>
-                    <td style="text-align:right;">{if $site_stats.started == 'No pageviews yet'}{$site_stats.started}{else}{$site_stats.started|tiki_long_date}{/if}</td>
+                    <td style="text-align:right;">{$site_stats.started|tiki_long_date}</td>
                 </tr>
                 <tr>
                     <td>{tr}Days since first pageview{/tr}</td>
                     <td style="text-align:right;">{$site_stats.days}</td>
+                </tr>
+                <tr>
+                    <td>{tr}Date tracking began{/tr}</td>
+                    <td style="text-align:right;">{if $site_stats.tracking == 'No pageviews yet'}{$site_stats.tracking}{else}{$site_stats.tracking|tiki_long_date}{/if}</td>
+
+                </tr>
+                <tr>
+                    <td>{tr}Days since tracking began{/tr}</td>
+                    <td style="text-align:right;">{$site_stats.tracking_days}</td>
                 </tr>
                 <tr>
                     <td>{tr}Total pageviews{/tr}</td>
@@ -457,5 +483,4 @@
             {*{wikiplugin _name=googleanalytics account=$prefs.site_google_analytics_account}{/wikiplugin}*}
         {/tab}
     {/if}
-
 {/tabset}

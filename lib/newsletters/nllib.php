@@ -522,8 +522,10 @@ class NlLib extends TikiLib
             } else {
                 try {
                     tiki_send_email($zmail);
+                    $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'Subscribe Newsletter');
                     return true;
                 } catch (ZendMailException | SlmMailException $e) {
+                    $this->logEmailStatus($zmail, $e->getMessage(), trim($zmail->getSubject()), 'Subscribe Newsletter');
                     return false;
                 }
             }
@@ -539,6 +541,33 @@ class NlLib extends TikiLib
         }
         /*$this->update_users($nlId);*/
         return false;
+    }
+
+    private function logEmailStatus($mail, $error, $subject, $slug)
+    {
+        global $prefs;
+        $logslib = TikiLib::lib('logs');
+        $logEmailRes = [];
+
+        $logEmailRes['subject'] = strip_tags($subject);
+
+        foreach ($mail->getFrom() as $address) {
+            $logEmailRes['from_email'] = $address->getEmail();
+            $logEmailRes['from_name'] = $address->getName();
+            break;
+        }
+
+        if ($error || $prefs['log_mail'] == 'y') {
+            $recipients = $mail->getTo();
+            foreach ($recipients as $destination) {
+                $emailStatus = empty($error) ? 'success' : 'error';
+                $logEmailRes['to'] = $destination->getEmail();
+                $logEmailRes[$emailStatus] = empty($error) ? 'Email has been sent' : $error;
+                $isCan = empty($error) ? 'send' : 'can not send';
+                $logslib->add_log('Email', sprintf('%s - %s to %s, subject - %s', $slug, $isCan, $logEmailRes['to'], $logEmailRes['subject']), '', '', '', '', $logEmailRes);
+                unset($logEmailRes[$emailStatus]);
+            }
+        }
     }
 
     public function confirm_subscription($code)
@@ -634,7 +663,10 @@ class NlLib extends TikiLib
         } else {
             try {
                 tiki_send_email($zmail);
+                $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'Confirm Subscription');
+                return $this->get_newsletter($res["nlId"]);
             } catch (ZendMailException | SlmMailException $e) {
+                $this->logEmailStatus($zmail, $e->getMessage(), trim($zmail->getSubject()), 'Confirm Subscription');
                 return false;
             }
         }
@@ -732,7 +764,9 @@ class NlLib extends TikiLib
             } else {
                 try {
                     tiki_send_email($zmail);
+                    $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'Unsubscribe');
                 } catch (ZendMailException | SlmMailException $e) {
+                    $this->logEmailStatus($zmail, $e->getMessage(), trim($zmail->getSubject()), 'Unsubscribe');
                 }
             }
         }
@@ -1703,6 +1737,7 @@ class NlLib extends TikiLib
                     }
                     $this->delete_edition_subscriber($info['editionId'], $us);
                     $logStatus = 'OK';
+                    $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'From Send Method nllib');
                 } catch (ZendMailException | SlmMailException $e) {
                     if ($browser) {
                         print '<div class="confirmation">' . ' Total emails sent: ' . count($sent)
@@ -1713,6 +1748,7 @@ class NlLib extends TikiLib
                     $errors[] = ["user" => $us['user'], "email" => $email, "msg" => $e->getMessage()];
                     $this->mark_edition_subscriber($info['editionId'], $us);
                     $logStatus = 'Error';
+                    $this->logEmailStatus($zmail, $e->getMessage(), trim($zmail->getSubject()), 'From Send Method nllib');
                 }
             } else {
                 if ($browser) {

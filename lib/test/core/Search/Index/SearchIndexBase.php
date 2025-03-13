@@ -27,6 +27,7 @@ abstract class SearchIndexBase extends TikiTestCase
                 'allowed_groups' => $typeFactory->multivalue(['Project Lead', 'Editor', 'Admins']),
                 'contents' => $typeFactory->plaintext('a description for the page Bonjour world!'),
                 'number' => $typeFactory->numeric(123),
+                'help' => $typeFactory->plaintext('Use --instances to get all results.'),
                 'relations' => $typeFactory->multivalue(
                     [
                         Search_Query_Relation::token('tiki.content.link', 'wiki page', 'About'),
@@ -68,6 +69,13 @@ abstract class SearchIndexBase extends TikiTestCase
 
         $this->assertGreaterThan(0, count($found->search($this->index)));
         $this->assertCount(0, $off->search($this->index));
+    }
+
+    public function testHyphenSearch()
+    {
+        $query = new Search_Query();
+        $query->filterContent('--instances', ['title', 'help']);
+        $this->assertCount(1, $query->search($this->index));
     }
 
     public function testWithOrCondition()

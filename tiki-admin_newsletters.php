@@ -27,7 +27,6 @@ $inputConfiguration = [
              'frequency'              => 'int',            //post
              'author'                 => 'string',         //post
              'allowArticleClip'       => 'bool',           //post
-             'emptyClipBlocksSend'    => 'bool',           //post
              'sort_mode_g'            => 'string',         //get
              'offset'                 => 'string',         //get
              'find'                   => 'string',         //get
@@ -36,7 +35,7 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'newsletters';
+$section = 'admin';
 require_once('tiki-setup.php');
 $access->check_feature('feature_newsletters');
 

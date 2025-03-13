@@ -26,6 +26,8 @@ class Services_Tracker_CalendarController
 
         $start = 'tracker_field_' . $input->beginField->word();
         $end = 'tracker_field_' . $input->endField->word();
+        $title = 'tracker_field_' . $input->title->word();
+        $description = 'tracker_field_' . $input->description->word();
 
         if ($resource = $input->resourceField->word()) {
             $resource = 'tracker_field_' . $resource;
@@ -142,8 +144,8 @@ class Services_Tracker_CalendarController
             $response[] = [
                 'id'               => $row['object_id'],
                 'trackerId'        => isset($row['tracker_id']) ? $row['tracker_id'] : null,
-                'title'            => $row['title'],
-                'description'      => $row['description'],
+                'title'            => $row[$title] ? $row[$title] : $row['title'],
+                'extendedProps'      => ['description' => $row[$description] ? $row[$description] : $row['description']],
                 'url'              => smarty_modifier_sefurl($row['object_id'], $row['object_type']),
                 'allDay'           => false,
                 'start'            => $useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false),

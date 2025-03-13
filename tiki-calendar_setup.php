@@ -31,15 +31,14 @@ global $prefs;
 if (! ($prefs['feature_calendar'] == 'y' || $prefs['feature_action_calendar'] == 'y')) {
     if (isset($_SERVER['SCRIPT_NAME'])) {
         if ($_SERVER['SCRIPT_NAME'] == "tiki-calendar.php") {
-            $smarty->assign('msg', tra("This feature is disabled") . ": feature_calendar");
+            Feedback::errorAndDie(tra("This feature is disabled") . ": feature_calendar", \Laminas\Http\Response::STATUS_CODE_401);
         } elseif ($_SERVER['SCRIPT_NAME'] == "tiki-action_calendar.php") {
-            $smarty->assign('msg', tra("This feature is disabled") . ": feature_action_calendar");
+            Feedback::errorAndDie(tra("This feature is disabled") . ": feature_action_calendar", \Laminas\Http\Response::STATUS_CODE_401);
         } else {
-            $smarty->assign('msg', tra("This feature is disabled"));
+            Feedback::errorAndDie(tra("This feature is disabled"), \Laminas\Http\Response::STATUS_CODE_401);
         }
     }
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Unable to access the feature"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $calendarlib = TikiLib::lib('calendar');
@@ -71,9 +70,7 @@ if (
     (int)$focusYear <= 0 || ! is_numeric($focusDay)
 ) {
     $_SESSION['CalendarFocusDate'] = $tikilib->now;
-    $smarty->assign('msg', tra('Invalid date format'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Invalid date format'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 list($focus_day, $focus_month, $focus_year) = [
         $focusDay,
@@ -157,9 +154,7 @@ $smarty->assign('short_format_day', tra('%m/%d'));
 $focus_day_limited = min($focus_day, 28);
 
 if (! function_exists('cal_days_in_month')) {
-    $smarty->assign('msg', tra('Your PHP installation does not have calendar enabled.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Your PHP installation does not have calendar enabled.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $focus_prev = $calendarlib->focusPrevious($focus, $calendarViewMode['casedefault']);
 $focus_next = $calendarlib->focusNext($focus, $calendarViewMode['casedefault']);

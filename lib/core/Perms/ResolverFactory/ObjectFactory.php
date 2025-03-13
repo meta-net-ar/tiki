@@ -169,7 +169,12 @@ class Perms_ResolverFactory_ObjectFactory implements Perms_ResolverFactory
 
             $this->known[$hash][$group][] = $perm;
         }
-
+        $values = array_map(function ($item) {
+            return is_array($item) ? implode(',', $item) : $item;
+        }, $values);
+        $found = array_map(function ($item) {
+            return is_array($item) ? implode(',', $item) : $item;
+        }, $found);
         return array_values(array_diff($values, $found));
     }
 
@@ -207,7 +212,7 @@ class Perms_ResolverFactory_ObjectFactory implements Perms_ResolverFactory
 
     private function cleanObject($name)
     {
-        $name = is_array($name) ? $name[0] : $name;
+        $name = is_array($name) ? ($name[0] ?? null) : $name;
         return $name !== null ? strtolower(trim($name)) : '';
     }
 }

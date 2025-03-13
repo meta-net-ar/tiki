@@ -82,12 +82,6 @@
         {remarksbox type="warning" title="{tr}Warning{/tr}"}
             {tr}Using <strong>Approve</strong> or <strong>Approve All</strong> will approve and activate the pending plugins.{/tr} {tr}Use this feature <strong>only</strong> if you have verified that all the pending plugins are safe.{/tr}
         {/remarksbox}
-
-        <script type='text/javascript'>
-            <!--
-            // Fake js to allow the use of the <noscript> tag (so non-js-users can still submit)
-            //-->
-        </script>
         <noscript>
             <input type="submit" class="btn btn-primary btn-sm" value="{tr}OK{/tr}">
         </noscript>

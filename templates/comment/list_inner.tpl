@@ -23,7 +23,12 @@
                         </div>
                     </h4>
                     <div class="comment-body">
-                        <span class="d-flex ps-2 border-start border-5 comment-replied-to">{if $prefs.comments_threshold_indent neq '0' && $level && $level gte $prefs.comments_threshold_indent}{tr _0=$repliedTo.parsed|truncate:15}Replied to %0{/tr}{/if} </span>
+                        {if isset($repliedTo) && $repliedTo.parsed && $level >= $prefs.comments_threshold_indent && $prefs.comments_threshold_indent ne 0}
+                            <span class="d-flex ps-2 border-start border-5 comment-replied-to">
+                                {assign var="parentExcerpt" value=$repliedTo.parsed|strip_tags|truncate:15}
+                                {tr _0="<em>$parentExcerpt</em>"}In reply to %0{/tr}
+                            </span>
+                        {/if}
                         {$comment.parsed}
                     </div>
                     <div class="buttons comment-form comment-footer mt-2">

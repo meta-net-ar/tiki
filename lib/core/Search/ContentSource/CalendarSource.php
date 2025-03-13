@@ -21,7 +21,6 @@ class Search_ContentSource_CalendarSource implements Search_ContentSource_Interf
     public function getDocument($objectId, Search_Type_Factory_Interface $typeFactory): array|false
     {
         if (! TikiLib::lib('calendar')->calendarExists($objectId)) {
-            trigger_error('Object calendar with Id : ' . $objectId . ' not found', E_USER_WARNING);
             return false;
         }
         $item = TikiLib::lib('calendar')->get_calendar($objectId);

@@ -49,10 +49,7 @@ $access->check_feature('feature_articles');
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $artperms = Perms::get([ 'type' => 'article', 'object' => $_REQUEST['remove'] ]);
     if ($artperms->remove_article != 'y') {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to remove articles"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to remove articles"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $artlib->remove_article($_REQUEST["remove"]);
 }

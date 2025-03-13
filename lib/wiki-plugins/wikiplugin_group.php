@@ -21,8 +21,7 @@ function wikiplugin_group_info()
             'groups' => [
                 'required' => false,
                 'name' => tra('Allowed Groups'),
-                'description' => tra('Pipe separated list of groups allowed to view the block.
-                    Example:') . ' <code>Admins|Developers</code>',
+                'description' => tra('Select one or more groups allowed to view the block.'),
                 'since' => '1',
                 'filter' => 'groupname',
                 'default' => '',
@@ -32,17 +31,17 @@ function wikiplugin_group_info()
             'users' => [
                 'required' => false,
                 'name' => tra('Allowed Users'),
-                'description' => tra('Pipe separated list of users allowed to view the block.
-                    Example:') . ' <code>admin|johndoe|foo</code>',
+                'description' => tra('Select one or more users allowed to view the block.'),
                 'since' => '27',
                 'filter' => 'username',
                 'default' => '',
                 'separator' => '|',
+                'profile_reference' => 'user'
             ],
             'notgroups' => [
                 'required' => false,
                 'name' => tra('Denied Groups'),
-                'description' => tra('Pipe-separated list of groups not allowed to view the block.'),
+                'description' => tra('Select one or more groups not allowed to view the block.'),
                 'since' => '1',
                 'filter' => 'groupname',
                 'default' => '',
@@ -52,17 +51,18 @@ function wikiplugin_group_info()
             'friends' => [
                 'required' => false,
                 'name' => tra('Allowed User Friends'),
-                'description' => tra('Pipe separated list of users whose friends are allowed to view the block.
-                    Example:') . ' <code>admin|johndoe|foo</code>',
+                'description' => tr('Select one or more users. Friends of these selected users will be allowed to view the block.'),
                 'since' => '4.0',
                 'filter' => 'username',
-                'default' => ''
+                'default' => '',
+                'separator' => '|',
+                'profile_reference' => 'user'
             ],
             'pending' => [
                 'required' => false,
                 'name' => tra('Allowed Groups Pending Membership'),
-                'description' => tra('User allowed to view block if membership payment to join group (or pipe-separated
-                    list of groups) is outstanding.'),
+                'description' => tra('Select one or more groups. Users will be allowed to view the block if 
+                    their membership payment to join the groups is outstanding.'),
                 'since' => '13.0',
                 'filter' => 'groupname',
                 'default' => '',
@@ -72,8 +72,8 @@ function wikiplugin_group_info()
             'notpending' => [
                 'required' => false,
                 'name' => tra('Allowed Groups Full Membership'),
-                'description' => tra('User allowed to view block if membership in the group (or pipe-separated list of
-                    groups) is not pending.'),
+                'description' => tra('Select one or more groups. Users will be allowed to view the block if their 
+                    membership in all of the selected groups is not pending.'),
                 'since' => '13.0',
                 'filter' => 'groupname',
                 'default' => '',

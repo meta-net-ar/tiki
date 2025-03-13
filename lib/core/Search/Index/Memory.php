@@ -106,4 +106,9 @@ class Search_Index_Memory implements Search_Index_Interface
     {
         return $this->lastCount;
     }
+
+    public function callSuggestions(array $options): array
+    {
+        return [];
+    }
 }

@@ -207,7 +207,7 @@
                     {tr}Passing Percentage{/tr}
                 </label>
                 <div class="col-sm-2">
-                    <input type="text" name="passingperct" id="quiz-passingperct" class="form-control" maxlength='3' value="{$passingperct}">
+                    <input type="number" name="passingperct" id="quiz-passingperct" class="form-control" maxlength='3' value="{$passingperct}">
                     <div class="form-text">
                         {tr}%{/tr}
                     </div>

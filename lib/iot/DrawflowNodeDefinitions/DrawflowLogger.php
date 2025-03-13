@@ -1,9 +1,9 @@
 <?php
 
-namespace Tiki\Lib\Iot\DrawflowNodeDefinitions;
+namespace Tiki\Lib\iot\DrawflowNodeDefinitions;
 
-use Tiki\Lib\Iot\DrawflowNodeType;
-use Tiki\Lib\Iot\DrawflowActionInterface;
+use Tiki\Lib\iot\DrawflowNodeType;
+use Tiki\Lib\iot\DrawflowActionInterface;
 
 class DrawflowLogger implements DrawflowActionInterface
 {

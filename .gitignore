@@ -130,3 +130,7 @@ themes/**/*.css.map
 
 # Test coverage reports
 /coverage
+
+.DS_Store
+
+sbom.json

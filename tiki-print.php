@@ -50,9 +50,7 @@ if (! ($info = $tikilib->get_page_info($page))) {
     $wikilib->clean_url_suffix_and_redirect($page, $type = '', $path = '', $prefix = '');
 
     // If after cleaning the url, the page does not exist then display an error
-    $smarty->assign('msg', tra('Page cannot be found'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Page cannot be found'), \Laminas\Http\Response::STATUS_CODE_404);
 }
 $smarty->assign('page_id', $info['page_id']);
 
@@ -204,10 +202,12 @@ if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
                 header("Content-Type: application/pdf");
                 header("Content-Transfer-Encoding: binary");
                 header('Content-Length: ' . $length);
+                TikiLib::lib('header')->setXRobotsTag($robots);
                 echo $pdf;
             } catch (\Exception $e) {
                 $smarty->assign('print_page', 'n');
                 $smarty->assign('msg', tra($e->getMessage()));
+                $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
                 $smarty->display('error.tpl');
                 die;
             }

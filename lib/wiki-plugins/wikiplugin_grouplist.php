@@ -16,10 +16,11 @@ function wikiplugin_grouplist_info()
             'group' => [
                 'required' => false,
                 'name' => tra('Group Name'),
-                'description' => tra('If empty, all groups will be listed. Entering a group name will cause only groups
+                'description' => tra('If no group is selected, all groups will be listed. Selecting a group will cause only groups
                     that include this group to be listed.'),
                 'since' => '5.0',
                 'filter' => 'groupname',
+                'profile_reference' => 'group',
             ],
             'description' => [
                 'required' => false,

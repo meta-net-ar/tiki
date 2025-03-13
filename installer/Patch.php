@@ -96,7 +96,9 @@ HTML;
         $working_env = php_sapi_name();
         if ($working_env != 'cli') {
             echo $scripts;
-            ob_flush();
+            if (ob_get_level() > 0) {
+                ob_flush();
+            }
         }
     }
 }

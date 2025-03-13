@@ -21,11 +21,11 @@ $inputConfiguration = [
             'save'                  => 'bool',               //post
             'status'                => 'striptags',          //post
             'remove'                => 'int',                //post
-            'find'                  => 'word',               //post
+            'find'                  => 'string',             //post
         ],
     ],
 ];
-$section = 'surveys';
+$section = 'admin';
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
 $access->check_feature('feature_surveys');

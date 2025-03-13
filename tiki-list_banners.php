@@ -21,10 +21,7 @@ $bannerlib = TikiLib::lib('banner');
 
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     if ($tiki_p_admin_banners != 'y') {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to remove banners"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to remove banners"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $bannerlib->remove_banner($_REQUEST["remove"]);
 }

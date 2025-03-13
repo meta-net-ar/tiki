@@ -63,7 +63,7 @@ function prefs_theme_list($partial = false)
             'type' => 'flag',
             'help' => 'Themes',
             'description' => tra('Use modern layout for control panels.'),
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['basic'],
         ],
         'theme_admin' => [
@@ -143,15 +143,6 @@ function prefs_theme_list($partial = false)
             'default' => 'n',
             'tags' => ['experimental'],
             'view' => TikiLib::lib('service')->getUrl(['controller' => 'styleguide', 'action' => 'show']),
-        ],
-        'theme_iconeditable' => [
-            'name' => tra('Editable Icons'),
-            'description' => tra('Edit icons with the icon picker'),
-            'type' => 'list',
-            'options' => ['n' => tra("No"),'y' => tra("Yes")],
-            'default' => 'n',
-            'help' => 'Icon-Picker',
-            'tags' => ['basic'],
         ],
         'theme_header_and_address_bar_color' => [
             'name' => tra('Header bar and Address bar color'),

@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
+declare(strict_types=1);
+
 if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
     header('location: index.php');
     exit;
@@ -62,6 +64,27 @@ class Feedback
             $smarty->assign('errortype', $feedback['errortype']);
         }
         $smarty->display(! empty($feedback['tpl']) ? $feedback['tpl'] : 'error.tpl');
+        die;
+    }
+
+    /**
+     * Redirect to a page with error feedback and Die
+     *
+     * @param string $message
+     * @param int $httpCode
+     * @param string|null $errorPage
+     * @return never
+     * @throws Exception
+     */
+
+    public static function errorAndDie(string $message, int $httpCode, ?string $errorPage = null): never
+    {
+        $errorPage = $errorPage ?? "error.tpl";
+        $smarty = TikiLib::lib('smarty');
+        $smarty->assign('errortype', $httpCode);
+        $smarty->assign('msg', $message);
+        http_response_code($httpCode);
+        $smarty->display($errorPage);
         die;
     }
 

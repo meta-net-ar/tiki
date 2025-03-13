@@ -175,13 +175,16 @@ class TikiAccessLib extends TikiLib
     public function getOriginUrl()
     {
         global $base_uri;
-
         $gobackto = '';
         if (! empty($base_uri)) {
             $pathInfo = parse_url($base_uri);
-            $pathData = explode('/', $pathInfo["path"]);
-            $gobackto = end($pathData);
-
+            // Ensure "path" is set and not null
+            $path = $pathInfo["path"] ?? '';
+            if ($path) {
+                $pathData = explode('/', $path);
+                $gobackto = end($pathData);
+            }
+            // Append the query if present
             if (! empty($pathInfo['query'])) {
                 $gobackto .= '?' . $pathInfo['query'];
             }
@@ -944,9 +947,7 @@ class TikiAccessLib extends TikiLib
         }
         if (! $check) {
             if ($returnHtml) {
-                $smarty = TikiLib::lib('smarty');
-                $smarty->display('error.tpl');
-                exit();
+                Feedback::errorAndDie("", \Laminas\Http\Response::STATUS_CODE_409);
             } else {
                 return false;
             }
@@ -1031,6 +1032,7 @@ class TikiAccessLib extends TikiLib
             $this->output_serialized($detail);
         } elseif ($this->is_xml_http_request()) {
             $smarty->assign('detail', $detail);
+            $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
             $smarty->display('error-ajax.tpl');
         } else {
             if (
@@ -1563,7 +1565,7 @@ class TikiAccessLib extends TikiLib
      *
      * @return void
      */
-    public function showSiteClosed($mode)
+    public function showSiteClosed(string $mode, string $errorMessage = '')
     {
         global $prefs, $error_login;
 
@@ -1572,6 +1574,12 @@ class TikiAccessLib extends TikiLib
                 $title = $prefs['site_busy_title'];
                 $error = $prefs['site_busy_msg'];
                 $prefs['site_closed'] = 'y';    // tell the rest of tiki we're closed
+
+                break;
+            case 'maintenance':
+                $title = tra('Maintenance');
+                $error = $errorMessage;
+                $prefs['site_closed'] = 'y';
 
                 break;
             case 'closed':

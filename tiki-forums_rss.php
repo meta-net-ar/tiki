@@ -28,6 +28,8 @@ if ($res) {
     require_once('tiki-rss_error.php');
 }
 
+TikiLib::lib('header')->setXRobotsTag($robots);
+
 $feed = "forums";
 $uniqueid = $feed;
 $output = $rsslib->get_from_cache($uniqueid);

@@ -32,14 +32,14 @@
                         </div>
                     </div>
                 </td>
-                <td style="word-wrap:break-word; {if $infocals.$calendarId.custombgcolor ne ''}background-color:#{$infocals.$calendarId.custombgcolor};{/if}">
+                <td style="word-wrap:break-word; {if isset($infocals.$calendarId.custombgcolor) && $infocals.$calendarId.custombgcolor ne ''}background-color:#{$infocals.$calendarId.custombgcolor};{/if}">
                     <a href="{bootstrap_modal controller='calendar' action='view_item' size='modal-lg' calitemId=$event.calitemId}" title="{tr}View{/tr}">
-                    {if $infocals.$calendarId.customfgcolor ne ''}<span style="color:#{$infocals.$calendarId.customfgcolor};">{/if}
+                    {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}<span style="color:#{$infocals.$calendarId.customfgcolor};">{/if}
                     <span class="summary">{$event.name|escape}</span></a><br>
                     <span class="description" style="font-style:italic">{$event.parsed}</span>
                     {if !empty($event.web)}
                         <br><a href="{$event.web}" target="_other" class="calweb" title="{$event.web}">{icon name='link-external'}</a>
-                        {if $infocals.$calendarId.customfgcolor ne ''}</span>{/if}
+                        {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}</span>{/if}
                     {/if}
                 </td>
                 <td class="action">

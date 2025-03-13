@@ -93,7 +93,7 @@
                             
                             <li class="dropdown-item">
                                 <a href="tiki-export_tracker_schema.php?trackerIds[]={$trackerId}">
-                                    {icon name="table"} {tr}Show in ER Diagram{/tr}
+                                    {icon name="diagram"}</i> {tr}Show in ER Diagram{/tr}
                                 </a>
                                     
                             </li>

@@ -94,7 +94,7 @@ $navbar-light-hover-bg: red;
         border-width: 0 !important;
     }
     .accordion-item.search-preferences,
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -117,7 +117,7 @@ $navbar-light-hover-bg: red;
         border-width: 0 !important;
     }
     .accordion-item.search-preferences,
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -138,21 +138,21 @@ $navbar-light-hover-bg: red;
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
-    .tiki .tiki-admin-top-nav-light,
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {               // light top selectors
-        @include admin-nav-dark;                      // dark values
-    }
-}
+//[data-bs-theme=dark] {                              // dark color mode
+//    .tiki .tiki-admin-top-nav-light,
+//    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+//    .tiki .tiki-admin-aside-nav-light {               // light top selectors
+//        @include admin-nav-dark;                      // dark values
+//    }
+//}
 // Color mode preference trumps L&F admin dark navbar option
-[data-bs-theme=light] {                              // light color mode
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
-        @include admin-nav-light;                      // light values
-    }
-}
+//[data-bs-theme=light] {                              // light color mode
+//    .tiki .tiki-admin-top-nav-dark,
+//    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+//    .tiki .tiki-admin-aside-nav-dark {                // dark top selectors
+//        @include admin-nav-light;                      // light values
+//    }
+//}
 
 // - - - - - New admin pages (Unified Admin Backend) END - - - - - - - //
 
@@ -163,11 +163,14 @@ $navbar-light-hover-bg: red;
 
 [data-bs-theme=dark] {
     --bs-secondary-bg: #2c3237;
+    .sm-sub-link {
+        color: var(--bs-link-color) !important;
+    }
 }
 
 :root {
-    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
-    .fc-v-event {
+    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
+    .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
 }

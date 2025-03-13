@@ -28,9 +28,7 @@ if ($prefs['feature_categories'] == 'y') {
 $access->check_feature('feature_surveys');
 
 if (! isset($_REQUEST["surveyId"])) {
-    $smarty->assign('msg', tra("No survey indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No survey indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $access->check_permission('take_survey', 'Take Survey', 'survey', $_REQUEST['surveyId']);
 
@@ -41,9 +39,7 @@ $smarty->assign('survey_info', $survey_info);
 // Check if user has taken this survey
 if ($tiki_p_admin != 'y' || $survey_info['restriction'] == 'y') {
     if ($tikilib->user_has_voted($user, 'survey' . $_REQUEST["surveyId"])) {
-        $smarty->assign('msg', tra("You cannot take this survey twice"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You cannot take this survey twice"), \Laminas\Http\Response::STATUS_CODE_401);
     }
 }
 $questions = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, 'position_asc', '');

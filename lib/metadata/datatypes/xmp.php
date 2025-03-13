@@ -178,7 +178,11 @@ class Xmp
             //TODO need to be able to handle multiple segments
             while ($done === false) {
                 //search for hexadecimal marker for segment APP1 used for xmp data, and note position
-                $app1_hit       = strpos($filecontent, "\xFF\xE1", $start);
+                if ($start <= strlen($filecontent)) {
+                    $app1_hit = strpos($filecontent, "\xFF\xE1", $start);
+                } else {
+                    $app1_hit = false;
+                }
                 if ($app1_hit !== false) {
                     //next two bytes after marker indicate the segment size
                     $size_raw   = substr($filecontent, $app1_hit + 2, 2);

@@ -318,7 +318,7 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
                     );
                 }); // each
 
-                const elementPlusTransfer = document.querySelector("element-plus-ui[field-name=\'" + data.request.insertId + "\']");
+                const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + data.request.insertId + "\']");
                 if (elementPlusTransfer) {
                     const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);
                     elementPlusTransferCopy.setAttribute("data", JSON.stringify(transferData));

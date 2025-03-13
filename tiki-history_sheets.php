@@ -26,23 +26,18 @@ $auto_query_args = [
 $access->check_feature('feature_sheet');
 
 if (! isset($_REQUEST['sheetId'])) {
-    $smarty->assign('msg', tra('Missing parameter "sheetId"'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Missing parameter "sheetId"'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
-$info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
-if (empty($info)) {
-    $smarty->assign('msg', tr('Unable to retrieve sheet id %0', $_REQUEST['sheetId']));
-    $smarty->display('error.tpl');
-    die;
+try {
+    $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+} catch (Exception $e) {
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $objectperms = Perms::get('sheet', $_REQUEST['sheetId']);
 if ($tiki_p_admin != 'y' && ! $objectperms->view_sheet && ! ($user && $info['author'] == $user)) {
-    $smarty->assign('msg', tra('Permission denied'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('Permission denied'), \Laminas\Http\Response::STATUS_CODE_403);
 }
 $smarty->assign('objectperms', $objectperms);
 $smarty->assign('sheetId', $_REQUEST["sheetId"]);

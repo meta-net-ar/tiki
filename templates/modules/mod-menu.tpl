@@ -1,6 +1,6 @@
 {tikimodule error=$module_error title=$tpl_module_title name=$tpl_module_name flip=$module_params.flip|default:null decorations=$module_params.decorations|default:null nobox=$module_params.nobox|default:null notitle=$module_params.notitle|default:null type=$module_type}
     {if $module_params.bootstrap|default:null neq 'n'}
-        <nav class="navbar navbar-expand-lg{if $module_params.type == 'horiz'} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-nav-{$navbar_color_variant}{/if}{if !empty($module_params.navbar_class)} {$module_params.navbar_class}{/if}" role="navigation"> {* Only horizontal navbars get Bootstrap navbar color and background.  *}
+        <nav class="navbar navbar-expand-lg{if $module_params.type == 'horiz'} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-nav-{$navbar_color_variant}{/if} {if $prefs.jquery_smartmenus_enable eq 'y' and $module_params.type|default:null eq 'vert'}sm-navbar--vertical {/if}{if !empty($module_params.navbar_class)} {$module_params.navbar_class}{/if}" role="navigation"> {* Only horizontal navbars get Bootstrap navbar color and background.  *}
             {if $module_params.navbar_brand neq ''}
                 <a class="navbar-brand" href="index.php">
                     <img id="logo-header" src="{$module_params.navbar_brand}" alt="Logo">
@@ -14,9 +14,21 @@
                 {/if}
             {/if}
             {if $module_params.navbar_toggle eq 'y'}
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#mod-menu{$module_position}{$module_ord} .navbar-collapse" aria-controls="mod-menu{$module_position}{$module_ord}" aria-expanded="false" aria-label="{tr}Toggle navigation{/tr}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                {if $prefs.jquery_smartmenus_enable eq 'y'}
+                    <span class="sm-toggler-state" id="sm-toggler-state-1"></span>
+                    <div class="sm-toggler">
+                        <a class="sm-toggler-anchor sm-toggler-anchor--show" href="#sm-toggler-state-1" role="button" aria-label="Open main menu">
+                            <span class="sm-toggler-icon sm-toggler-icon--show"></span>
+                        </a>
+                        <a class="sm-toggler-anchor sm-toggler-anchor--hide" href="#" role="button" aria-label="Close main menu">
+                            <span class="sm-toggler-icon sm-toggler-icon--hide"></span>
+                        </a>
+                    </div>
+               {else}
+                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#mod-menu{$module_position}{$module_ord} .navbar-collapse" aria-controls="mod-menu{$module_position}{$module_ord}" aria-expanded="false" aria-label="{tr}Toggle navigation{/tr}">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                {/if}
             {/if}
             <div class="collapse navbar-collapse {if $module_params.navbar_toggle eq 'n'}show{/if} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }mega-menu-static{/if}">
                 {if $prefs.menus_edit_icon eq 'y' AND $tiki_p_admin eq 'y' AND $module_params.id neq '42'}

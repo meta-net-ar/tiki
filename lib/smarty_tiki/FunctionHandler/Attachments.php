@@ -102,6 +102,7 @@ class Attachments extends Base
         $params['gal_info'] = $gal_info;
         $params['files'] = $files['data'];
         $params['cant'] = $files['cant'];
+        $params['from_wiki_page'] = true;
 
         $return = "\n" . $smarty->plugin_fetch('fgal_attachments.tpl', $params) . "\n";
 

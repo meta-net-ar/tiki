@@ -27,9 +27,15 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
 {LISTEXECUTE}';
 
     protected CommandTester $commandTester;
+    protected $oldprefs;
 
     protected function setUp(): void
     {
+        global $testhelpers, $prefs;
+
+        $this->oldprefs = $prefs;
+        $prefs['fallbackBaseUrl'] = 'https://tiki.org/';
+
         $testhelpers = new TestHelpers();
 
         parent::setUp();
@@ -52,6 +58,10 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
 
     protected function tearDown(): void
     {
+        global $testhelpers, $prefs;
+
+        $prefs = $this->oldprefs;
+
         $testhelpers = new TestHelpers();
 
         parent::tearDown();
@@ -75,7 +85,10 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $this->assertStringContainsString('ListExecute plugin is pending for approval.', $this->commandTester->getDisplay());
+        $pageName = self::PAGE_NAME;
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expected = "[ERROR] Action action failed on page {$pageName}. ListExecute plugin is pending for approval.";
+        $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
     }
 
@@ -95,7 +108,10 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $this->assertStringContainsString('ListExecute plugin was rejected.', $this->commandTester->getDisplay());
+        $pageName = self::PAGE_NAME;
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expected = "[ERROR] Action action failed on page {$pageName}. ListExecute plugin was rejected.";
+        $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
     }
 
@@ -115,8 +131,40 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $this->assertEquals("Action action executed on page " . self::PAGE_NAME . ".\n", $this->commandTester->getDisplay());
+        $actual = trim($this->commandTester->getDisplay());
+        $pageName = self::PAGE_NAME;
+
+        $expected = "[OK] Action action executed on page {$pageName}.";
+        $this->assertEquals($expected, $actual);
         $this->assertEquals(0, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * Test responsible for executing a list execute command check fallbackBaseUrl warning
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnFallbackBaseUrl()
+    {
+        $this->updatePluginStatus('accept');
+
+        global  $prefs;
+        $prefValue = $prefs['fallbackBaseUrl'];
+        $prefs['fallbackBaseUrl'] = '';
+        $this->commandTester->execute(
+            [
+                 'page'   => self::PAGE_NAME,
+                 'action' => 'action',
+            ]
+        );
+
+        $pageName = self::PAGE_NAME;
+        $actualString = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expectedString = "[WARNING] Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the admin. [OK] Action action executed on page {$pageName}.";
+
+        $this->assertStringContainsString($expectedString, $actualString);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+        $prefs['fallbackBaseUrl'] = $prefValue;
     }
 
     protected function updatePluginStatus($status)

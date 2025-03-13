@@ -25,7 +25,7 @@
                     {tr}Mark all as read{/tr}
                 </a>
             {/if}
-            <a class="btn btn-secondary" href="{$more_link|escape}">{tr}Show More{/tr}</a>
+            <a class="btn btn-secondary show-more custom-handling" href="{$more_link|escape}">{tr}Show More{/tr}</a>
         </div>
     </div>
 
@@ -46,6 +46,11 @@
                 $('#bootstrap-modal').modal('hide');
             }, 100 * (last + 2));
             $('#notification-link').trigger('clear-all.monitor.tiki');
+        });
+
+        $('.notification-container .show-more').on("click", function (e) {
+        e.preventDefault();
+        window.location.href = $(this).attr('href');
         });
 
         $('.notification-container .close').on("click", function (e) {

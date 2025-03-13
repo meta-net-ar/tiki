@@ -14,8 +14,7 @@ function prefs_footnote_list()
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => [
-                'wikiplugin_footnote',
-                'feature_jquery_ui'
+                'wikiplugin_footnote'
             ],
         ],
     ];

@@ -1,4 +1,3 @@
-{$forum_info.name}
 {block name=title}
     {title help="forums" admpage="forums"}
         {$forum_info.name}
@@ -132,8 +131,8 @@
 {/if}
 
 <section class="top_post">
-    {if $prefs.feature_freetags eq 'y' and $tiki_p_view_freetags eq 'y' and $prefs.freetags_show_middle eq 'y'
-        and !$thread_info.topic.threadId}
+    {if $prefs.feature_freetags eq 'y' and isset($tiki_p_view_freetags) and $tiki_p_view_freetags eq 'y' and $prefs.freetags_show_middle eq 'y'
+        and !$thread_info.threadId}
         {include file='freetag_list.tpl'}
         <div class="text-end mb-4">
             {wikiplugin _name="addfreetag" object="forum post:$comments_parentId"}{/wikiplugin}

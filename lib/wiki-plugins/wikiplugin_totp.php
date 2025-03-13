@@ -98,9 +98,7 @@ function wikiplugin_totp($data, $params)
 
      // Validate the secret key length and format
     if (strlen($params['secret']) !== 16 || ! preg_match('/^[A-Z2-7]+$/', $params['secret'])) {
-        $smarty->assign('msg', tra('Error: The secret key must be 16 characters long and contain only uppercase letters A-Z and digits 2-7.'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Error: The secret key must be 16 characters long and contain only uppercase letters A-Z and digits 2-7.'), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'add_totp' && isset($_REQUEST['secret'])) {

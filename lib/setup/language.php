@@ -14,8 +14,19 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 function isValidLocale($localeIdentifier = '')
 {
     global $prefs;
-    return preg_match("/[a-zA-Z-_]+$/", $localeIdentifier) && file_exists('lang/' . $localeIdentifier . '/language.php')
-        && ($prefs['restrict_language'] === 'n' || empty($prefs['available_languages']) || in_array($localeIdentifier, $prefs['available_languages']));
+
+    $availableLanguages = $prefs['available_languages'];
+
+    if (is_string($availableLanguages)) {
+        $availableLanguages = json_decode($availableLanguages, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $availableLanguages = [];
+        }
+    }
+
+    return preg_match("/[a-zA-Z-_]+$/", $localeIdentifier)
+        && file_exists('lang/' . $localeIdentifier . '/language.php')
+        && ($prefs['restrict_language'] === 'n' || empty($availableLanguages) || in_array($localeIdentifier, $availableLanguages));
 }
 
 // Sets the language

@@ -12,6 +12,7 @@ use Exception;
 use PDO;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Tiki\Process\Process;
+use TikiDb;
 use TWVersion;
 
 /**
@@ -351,8 +352,7 @@ class CheckSqlEngineConversion
      */
     protected function runSQL($sql, $dbConnection, $convertToInnoDB = false)
     {
-        // split the file into several queries?
-        $statements = preg_split("#(;\s*\n)|(;\s*\r\n)#", $sql);
+        $statements = TikiDb::splitSqlStatements($sql);
 
         $status = true;
         foreach ($statements as $statement) {

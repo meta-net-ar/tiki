@@ -56,9 +56,7 @@ if (isset($_REQUEST['assign'])) {
         $access->checkCsrf();
         $themecontrollib->tc_assign_category($_REQUEST['categoryId'], $_REQUEST['theme']);
     } else {
-        $smarty->assign('msg', tra("Please create a category first"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Please create a category first"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 if (isset($_REQUEST['delete'])) {

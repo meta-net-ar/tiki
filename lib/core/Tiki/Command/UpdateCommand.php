@@ -11,6 +11,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tiki\Installer\Installer;
+use Tiki\Installer\Patch;
+use TikiMail;
 
 #[AsCommand(
     name: 'database:update',
@@ -26,18 +29,60 @@ class UpdateCommand extends Command
                 'a',
                 InputOption::VALUE_NONE,
                 'Record any failed patch as applied.'
+            )
+            ->addOption(
+                'check-if-updated',
+                null,
+                InputOption::VALUE_NONE,
+                'Check if a database update is needed without performing the upgrade'
+            )
+            ->addOption(
+                'email',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Email address to send an alert to if the database needs an update (used together with --check-if-updated)'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $autoRegister = $input->getOption('auto-register');
-        $installer = \Tiki\Installer\Installer::getInstance();
+        $checkIfUpdated = $input->getOption('check-if-updated');
+        $userEmail = $input->getOption('email');
+        $installer = Installer::getInstance();
         $installed = $installer->tableExists('users_users');
 
         if ($installed) {
             // tiki-setup.php may not have been run yet, so load the minimum required libs to be able process the schema updates
             require_once('lib/tikilib.php');
+
+            if ($checkIfUpdated) {
+                $notAppliedPatches = Patch::getPatches([Patch::NOT_APPLIED]);
+                if (count($notAppliedPatches) > 0) {
+                    $subject = 'Database update required';
+                    $mail_data = "Database update is required. Please run command to update the database [php console.php database:update]";
+                    if ($userEmail) {
+                        $mail = new TikiMail();
+                        $mail->setUser($userEmail);
+                        $mail->setSubject($subject);
+                        $mail->setHtml($mail_data);
+                        $isEmailSent = $mail->send([$userEmail]);
+                        if (! $isEmailSent) {
+                            $msg = 'Unable to send mail';
+                            $mailerrors = print_r($mail->errors, true);
+                            $msg .= $mailerrors;
+                            $output->writeln('<error>' . $msg . '</error>');
+                        }
+                    } else {
+                        $output->writeln('<info>' . $mail_data . '</info>');
+                    }
+
+                    return Command::FAILURE;
+                } else {
+                    $output->writeln('<info>Database is up to date.</info>');
+                    return Command::SUCCESS;
+                }
+            }
 
             $result = $installer->update();
             if ($result) {
@@ -45,14 +90,14 @@ class UpdateCommand extends Command
             } else {
                 $output->writeln('<error>Update interrupted as a patch failed to complete. Please fix the errors below and try again.</error>');
             }
-            foreach (array_keys(\Tiki\Installer\Patch::getPatches([\Tiki\Installer\Patch::NEWLY_APPLIED])) as $patch) {
+            foreach (array_keys(Patch::getPatches([Patch::NEWLY_APPLIED])) as $patch) {
                 $output->writeln("<info>Installed: $patch</info>");
             }
-            foreach (array_keys(\Tiki\Installer\Patch::getPatches([\Tiki\Installer\Patch::NOT_APPLIED])) as $patch) {
+            foreach (array_keys(Patch::getPatches([Patch::NOT_APPLIED])) as $patch) {
                 $output->writeln("<error>Failed: $patch</error>");
 
                 if ($autoRegister) {
-                    \Tiki\Installer\Patch::$list[$patch]->record();
+                    Patch::$list[$patch]->record();
                 }
             }
 

@@ -114,7 +114,7 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #fff;
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         font-size: 1.1rem;
     }
 }
@@ -135,7 +135,7 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color:  #fff;
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
         font-size: 1.1rem;

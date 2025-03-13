@@ -51,9 +51,6 @@ class ToolbarLaunchPlugins extends ToolbarUtilityItem
 
     public function getWysiwygToken(): string
     {
-
-        $this->setupCKEditorTool($this->getWysiwygJs());
-
         return 'tiki_launchplugins';
     }
 
@@ -65,7 +62,7 @@ class ToolbarLaunchPlugins extends ToolbarUtilityItem
         return parent::getMarkdownWysiwyg();
     }
 
-    private function getWysiwygJs(): string
+    public function getWysiwygJs(): string
     {
         global $section;
 
@@ -74,12 +71,12 @@ class ToolbarLaunchPlugins extends ToolbarUtilityItem
         $params = ['controller' => 'edit', 'action' => 'help', 'modal' => 1];
         $params['plugins'] = 1;
 
-        // multiple ckeditors share the same toolbar commands, so area_id (editor.name) must be added when clicked
+        // multiple editor could share the same toolbar commands, so area_id must be added when clicked
         $params['areaId'] = $this->domElementId;
 
         return '$.openModal({show: true, remote: "' . $servicelib->getUrl($params) . '"});';
     }
-    protected function getOnClick(): string
+    public function getOnClick(): string
     {
         // set by markdown wysiwyg
         return $this->onClick;

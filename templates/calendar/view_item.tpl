@@ -284,27 +284,42 @@
                             {/if}
                         </td>
                     </tr>
-                    <tr class="participants">
-                        {$particiapting = false}
+                    <tr class="participants">  
+                        {$participating = false}
                         <th>{tr}Participants:{/tr}</th>
                         <td>
                             <p>
+                                {assign var="emailString" value=""}
                                 {if $calitem.participants|@count}
                                     <ul>
                                     {foreach $calitem.participants as $person}
+                                        {if $emailString}
+                                            {assign var="emailString" value="{$emailString}, {$person.email}"}
+                                        {else}
+                                            {assign var="emailString" value=$person.email}
+                                        {/if}
                                         <li>
                                             {$person.username|userlink}
                                             {if $listroles[$person.role]} ({$listroles[$person.role]}){/if}
                                         </li>
-                                        {if $person.username eq $user}{$particiapting = true}{/if}
+                                        {if $person.username eq $user}{$participating = true}{/if}
                                     {/foreach}
                                     </ul>
                                 {else}
                                     <em class="text-secondary">{tr}No participants{/tr}</em>
                                 {/if}
+                                {if $calitem.participants|@count}
+                                    <div class="float-end">
+                                    <input id="event-participants" value="{$emailString|replace:',' : ''|escape}" class="visually-hidden"/>
+                                        <a href="javascript:void(0)" class="copy text-dark me-2" data-clipboard-action="copy" data-clipboard-target="#event-participants">{icon name="copy" ititle='{tr}Copy participants emails{/tr}' alt='{tr}Copy participants emails{/tr}'}</a>
+                                        <a href="tiki-webmail.php?page=compose&compose_to={$emailString|escape}&compose_subject={$calitem.parsedName}" class="link-dark">
+                                            {icon name='envelope' ititle='{tr}Email participants{/tr}' alt='{tr}Email participants{/tr}'}
+                                        </a>
+                                    </div>
+                                {/if}
                             </p>
                             {if not $preview and $tiki_p_calendar_add_my_particip eq 'y'}
-                                {if $particiapting}
+                                {if $participating}
                                     {button _text="{tr}Withdraw me from the list of participants{/tr}" href="{service controller='calendar' action='del_me' calitemId=$calitem.calitemId}" _class='btn-sm'}
                                 {else}
                                     {button _text="{tr}Add me to the list of participants{/tr}" href="{service controller='calendar' action='add_me' calitemId=$calitem.calitemId}" _class='btn-sm'}

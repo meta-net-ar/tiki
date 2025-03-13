@@ -168,10 +168,11 @@ class Services_Calendar_BaseController
                     'email'    => $email,
                     'role'     => $role,
                     'partstat' => $calitem['participant_partstat'][$username] ?? '',
+                    'comment' => $calitem['participant_comment'][$username] ?? '',
                 ];
             }
             $calitem['participants'] = $participants;
-            unset($calitem['participant_roles'], $calitem['participant_partstat']);
+            unset($calitem['participant_roles'], $calitem['participant_partstat'], $calitem['participant_comment']);
         } else {
             $calitem['participants'] = [];
         }

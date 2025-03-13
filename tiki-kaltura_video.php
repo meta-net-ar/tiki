@@ -134,8 +134,7 @@ try {
                 break;
 
             case 'default':
-                $smarty->assign('msg', tra('Incorrect param'));
-                $smarty->display('error.tpl');
+                Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
                 exit;
         }
     } else {

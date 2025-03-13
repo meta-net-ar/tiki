@@ -14,7 +14,7 @@ $inputConfiguration = [
              'pollId'                    => 'int',            //post
              'closeall'                  => 'bool',           //get
              'activeall'                 => 'bool',           //get
-             'active'                    => 'bool',           //get
+             'active'                    => 'string',           //get
              'save'                      => 'bool',           //post
              'add'                       => 'bool',           //post
              'addPoll'                   => 'bool',           //post
@@ -24,9 +24,9 @@ $inputConfiguration = [
              'poll_template'             => 'word',           //get
              'pollPublishDate'           => 'int',            //post
              'voteConsiderationSpan'     => 'digits',         //post
-             'title'                     => 'word',           //post
+             'title'                     => 'string',         //post
              'sort_mode'                 => 'word',           //get
-             'find'                      => 'word',           //post
+             'find'                      => 'string',         //post
              'offset'                    => 'digits',         //get
              'Time_Meridian'             => 'digits',         //get
              'Time_Hour'                 => 'digits',         //get
@@ -37,7 +37,7 @@ $inputConfiguration = [
              'optionsId'                 => 'int',            //get
         ],
              'staticKeyFiltersForArrays' => [
-                'options'                => 'word',           //post
+                'options'                => 'string',         //post
                 'pages'                  => 'pagename',       //get
         ],
     ],

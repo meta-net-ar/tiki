@@ -23,7 +23,7 @@ class FacetReader
             if (empty($result)) {
                 continue;
             }
-            if (array_key_first($result[0]) == $facet->getName()) {
+            if (strtolower(array_key_first($result[0])) == strtolower($facet->getName())) {
                 $entry = $result;
                 break;
             }

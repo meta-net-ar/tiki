@@ -186,9 +186,9 @@
 			<element name="timestamp" type="dateTime" />
 			<element name="contributor" type="mw:ContributorType" />
 			<element name="minor" minOccurs="0" maxOccurs="1"/>
-			<element name="comment" type="mw:CommentType"/>
+			<element name="comment" type="mw:CommentType" minOccurs="0" maxOccurs="1"/>
 			<!-- corresponds to slot origin for the main slot -->
-			<element name="origin" type="positiveInteger" />
+			<element name="origin" type="positiveInteger" minOccurs="0" maxOccurs="1"/>
 			<!-- the main slot's content model -->
 			<element name="model" type="mw:ContentModelType" />
 			<!-- the main slot's serialization format -->
@@ -255,21 +255,28 @@
 		</simpleContent>
 	</complexType>
 
-	<complexType name="TextType">
-		<simpleContent>
-			<extension base="string">
-				<attribute ref="xml:space" default="preserve" />
-				<!-- This allows deleted=deleted on non-empty elements, but XSD is not omnipotent -->
-				<attribute name="deleted" type="mw:DeletedFlagType" />
-				<!-- This isn't a good idea; we should be using "ID" instead of "NMTOKEN" -->
-				<!-- However, "NMTOKEN" is strictest definition that is both compatible with existing -->
-				<!-- usage ([0-9]+) and with the "ID" type. -->
-				<attribute name="id" type="NMTOKEN" />
-				<attribute name="location" type="anyURI" />
-				<attribute name="sha1" type="string"/>
-				<attribute name="bytes" type="nonNegativeInteger" />
-			</extension>
-		</simpleContent>
+	<complexType name="TextType" mixed="true">
+		<sequence>
+			<!-- Allow <ref> tags within the content -->
+			<element name="ref" minOccurs="0" maxOccurs="unbounded">
+				<complexType mixed="true">
+					<sequence>
+						<!-- Define possible nested elements or text content -->
+					</sequence>
+					<attribute name="name" type="string" use="optional" />
+				</complexType>
+			</element>
+    	</sequence>
+		<attribute ref="xml:space" default="preserve" />
+		<!-- This allows deleted=deleted on non-empty elements, but XSD is not omnipotent -->
+		<attribute name="deleted" type="mw:DeletedFlagType" />
+		<!-- This isn't a good idea; we should be using "ID" instead of "NMTOKEN" -->
+		<!-- However, "NMTOKEN" is strictest definition that is both compatible with existing -->
+		<!-- usage ([0-9]+) and with the "ID" type. -->
+		<attribute name="id" type="NMTOKEN" />
+		<attribute name="location" type="anyURI" />
+		<attribute name="sha1" type="string"/>
+		<attribute name="bytes" type="nonNegativeInteger" />
 	</complexType>
 
 	<complexType name="LogTextType">

@@ -24,10 +24,7 @@
                 {preference name='object_maintainers_default_update_frequency'}
             </div>
             {preference name='pwa_feature'}
-            {preference name=vuejs_enable}
             <div class="adminoptionboxchild" id="vuejs_enable_childcontainer">
-                {preference name=vuejs_always_load}
-                {preference name=vuejs_build_mode}
                 {preference name=tracker_field_rules}
             </div>
             {preference name='twoFactorAuth'}

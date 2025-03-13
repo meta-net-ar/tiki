@@ -336,7 +336,7 @@ class Comments extends TikiLib
         }
     }
 
-    public function process_inbound_mail($forumId)
+    public function process_inbound_mail($forumId, $maxImport = 10)
     {
         global $prefs, $user;
         require_once("lib/webmail/net_pop3.php");
@@ -348,24 +348,20 @@ class Comments extends TikiLib
         // the inbound_pop_server field in the table.
         $info["inbound_pop_server"] = trim($info["inbound_pop_server"]);
 
-        if (! $info["inbound_pop_server"] || empty($info["inbound_pop_server"])) {
+        if (empty($info["inbound_pop_server"])) {
             return;
         }
 
         $pop3 = new Net_POP3();
-        $pop3->connect($info["inbound_pop_server"]);
-        $pop3->login($info["inbound_pop_user"], $info["inbound_pop_password"]);
-
-        if (! $pop3) {
+        if (! $pop3->connect($info["inbound_pop_server"], $info["inbound_pop_port"])) {
+            return;
+        }
+        if ($pop3->login($info["inbound_pop_user"], $info["inbound_pop_password"]) !== true) {
             return;
         }
 
         $mailSum = $pop3->numMsg();
 
-        //we don't want the operation to time out... this would result in the same messages being imported over and over...
-        //(messages are only removed from the pop server on a gracefull connection termination... ie .not php or webserver a timeout)
-        //$maximport should be in a admin config screen, but I don't know how to do that yet.
-        $maxImport = 10;
         if ($mailSum > $maxImport) {
             $mailSum = $maxImport;
         }
@@ -707,6 +703,7 @@ class Comments extends TikiLib
         if (! empty($currentUser)) {
             new Perms_Context($currentUser);    // restore current user's perms
         }
+        return true;
     }
 
     /** Removes font and span tags from lists - should be only ones outside <li> elements but this currently removes all TODO?
@@ -3877,15 +3874,11 @@ class Comments extends TikiLib
             return 0;
         }
         if ($forum_info['is_locked'] == 'y') {
-            $smarty->assign('msg', tra("This forum is locked"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("This forum is locked"), \Laminas\Http\Response::STATUS_CODE_401);
         }
         $parent_comment_info = $this->get_comment($parent_id);
         if ($parent_comment_info && $parent_comment_info['locked'] == 'y') {
-            $smarty->assign('msg', tra("This thread is locked"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("This thread is locked"), \Laminas\Http\Response::STATUS_CODE_401);
         }
 
         if (empty($user) && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
@@ -3911,7 +3904,7 @@ class Comments extends TikiLib
 
             if ($threadId = $this->check_for_topic($params['comments_title'], $forum_info['forumId'])) {
                 $url = smarty_modifier_sefurl($threadId, 'forumthread');
-                $link = sprintf('<a href="%s">%s</a>', $url, $params['comments_title']);
+                $link = sprintf('<a href="%s">%s</a>', $url, htmlspecialchars($params['comments_title']));
                 $errors[] = tr('This topic already exists in this forum. Visit: %0', $link);
             }
         } else {

@@ -4,6 +4,7 @@ namespace Test\Wiki;
 
 use PHPUnit\Framework\TestCase;
 use Tiki\Wiki\SlugManager;
+use Tiki\Wiki\SlugManager\DashGenerator;
 use Tiki\Wiki\SlugManager\UrlencodeGenerator;
 use Tiki\Wiki\SlugManager\UnderscoreGenerator;
 
@@ -19,6 +20,7 @@ class SlugManagerTest extends TestCase
         });
         $this->manager->addGenerator(new UrlencodeGenerator());
         $this->manager->addGenerator(new UnderscoreGenerator());
+        $this->manager->addGenerator(new DashGenerator());
     }
 
     public function testGenerateSimple()
@@ -88,5 +90,58 @@ class SlugManagerTest extends TestCase
             [new UnderscoreGenerator(), 'Hello_World', 'Hello   World', null],
             [new UnderscoreGenerator(), 'Hello_World', '  Hello   World  ', null],
         ];
+    }
+
+    /**
+     * @dataProvider generateSlugsVariationsProvider
+     */
+    public function testGenerateSlugsVariations($slug, $expected)
+    {
+        $result = $this->manager->generateSlugsVariations($slug);
+        $this->assertEquals($expected, $result);
+    }
+
+    public static function generateSlugsVariationsProvider()
+    {
+        return [
+            ["Hello World", [
+                'dash' => 'Hello-World',
+                'underscore' => 'Hello_World',
+                'urlencode' => 'Hello+World'
+            ]],
+            ["Hello-World", [
+                'dash' => 'Hello-World',
+                'underscore' => 'Hello_World',
+                'urlencode' => 'Hello-World'
+            ]],
+            ["Hello_World", [
+                'dash' => 'Hello-World',
+                'underscore' => 'Hello_World',
+                'urlencode' => 'Hello_World'
+            ]],
+            ["Hello+World", [
+                'dash' => 'Hello+World',
+                'underscore' => 'Hello+World',
+                'urlencode' => 'Hello+World'
+            ]],
+            ["Hello-World_Test", [
+                'dash' => 'Hello-World-Test',
+                'underscore' => 'Hello_World_Test',
+                'urlencode' => 'Hello-World_Test'
+            ]],
+        ];
+    }
+    public function testGenerateSlugsVariationsWithEmptySlug()
+    {
+        $result = $this->manager->generateSlugsVariations('');
+        $this->assertEquals(['dash' => '', 'underscore' => '', 'urlencode' => ''], $result);
+    }
+
+    public function testNormalizeToDash()
+    {
+        $this->assertEquals('hello-world', $this->manager->normalizeToDash('hello world'));
+        $this->assertEquals('hello-world', $this->manager->normalizeToDash('hello+world'));
+        $this->assertEquals('hello-world', $this->manager->normalizeToDash('hello_world'));
+        $this->assertEquals('hello-world', $this->manager->normalizeToDash(' hello world '));
     }
 }

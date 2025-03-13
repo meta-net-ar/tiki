@@ -98,6 +98,8 @@ if ($prefs['feature_jquery'] == 'y') {
     // JS to handle theme/option changes client-side
     // the var (theme_options) has to be declared in the same block for AJAX call scope
     $none = json_encode(tr('None'));
+    // get the Tiki default layout from path_constants.php and pass it below to the JS
+    $default_layout = SMARTY_DEFAULT_LAYOUT;
     $headerlib->add_js(
         <<<JS
 $js
@@ -1136,10 +1138,10 @@ function edit_custom_mode(el,id,name,icon){
                     layoutDropDown.append(\$('<option/>').attr('value',i).text(val));
                 });
 
-                //try setting the option to the previously selected option and if no layout matched, set to 'basic'
+                //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
                 layoutDropDown.val(current);
                 if (!layoutDropDown.val()){
-                    layoutDropDown.val('basic');
+                    layoutDropDown.val($default_layout);
                 }
             }
             layoutDropDown.trigger("change");

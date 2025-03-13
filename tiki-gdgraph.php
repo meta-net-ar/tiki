@@ -26,9 +26,7 @@ require_once('lib/graph-engine/graph.bar.php');
 $access->check_feature('wikiplugin_gdgraph');
 
 if (! isset($_REQUEST['type'])) {
-    $smarty->assign('msg', tra("No type indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No type indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 //Decode the passed array

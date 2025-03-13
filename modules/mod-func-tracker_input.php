@@ -98,15 +98,14 @@ function module_tracker_input($mod_reference, $module_params)
     $hiddeninput = isset($module_params['hiddeninput']) ? $module_params['hiddeninput'] : '';
     $streetview = isset($module_params['streetview']) ? $module_params['streetview'] : '';
     $streetViewField = null ;
-    if (! empty($streetview) && ! empty($definition)) {
-        $streetViewField = $definition->getFieldFromPermName($streetview);
-    }
     $success = isset($module_params['success']) ? $module_params['success'] : '';
     $insertmode = isset($module_params['insertmode']) ? $module_params['insertmode'] : '';
 
-    if (! $streetview || $prefs['fgal_upload_from_source'] != 'y' || ! $streetViewField) {
-        trigger_error("Error: ‘streetViewField’ missing. Check ‘streetview’ is correctly defined.", E_USER_WARNING);
-        $streetview = '';
+    if ($streetview && $definition) {
+        $streetViewField = $definition->getFieldFromPermName($streetview);
+        if (! $streetViewField || $prefs['fgal_upload_from_source'] != 'y') {
+            throw new \Exception("Error: ‘streetViewField’ missing. Check ‘streetview’ is correctly defined.");
+        }
     }
 
     $location = null;

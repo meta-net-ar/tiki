@@ -33,23 +33,17 @@ require_once('tiki-setup.php');
 
 // Feature available?
 if ($prefs['feature_accounting'] != 'y') {
-    $smarty->assign('msg', tra("This feature is disabled") . ": feature_accounting");
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("This feature is disabled") . ": feature_accounting", \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 if (! isset($_REQUEST['bookId'])) {
-    $smarty->assign('msg', tra("Missing book id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing book id"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $bookId = $_REQUEST['bookId'];
 $smarty->assign('bookId', $bookId);
 
 if (! isset($_REQUEST['journalId'])) {
-    $smarty->assign('msg', tra("Missing journal id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing journal id."), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $journalId = $_REQUEST['journalId'];
 $smarty->assign('journalId', $journalId);
@@ -57,9 +51,7 @@ $smarty->assign('journalId', $journalId);
 $globalperms = Perms::get();
 $objectperms = Perms::get([ 'type' => 'accounting book', 'object' => $bookId ]);
 if (! ($globalperms->acct_view or $objectperms->acct_book)) {
-    $smarty->assign('msg', tra("You do not have the right to cancel transactions"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have the right to cancel transactions"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $accountinglib = TikiLib::lib('accounting');
@@ -68,9 +60,7 @@ $smarty->assign('book', $book);
 
 $entry = $accountinglib->getTransaction($bookId, $journalId);
 if ($entry === false) {
-    $smarty->assign('msg', tra("Error retrieving data from journal"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Error retrieving data from journal."), \Laminas\Http\Response::STATUS_CODE_500);
 }
 $smarty->assign('entry', $entry);
 

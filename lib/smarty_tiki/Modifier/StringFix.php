@@ -28,6 +28,8 @@ class StringFix
 {
     public function handle($string, $what = '_', $by = ' ')
     {
+        // Convert $string to string if null
+        $string = $string ?? ''; // If $string is null, replace it with an empty string
         return str_replace($what, $by, $string);
     }
 }

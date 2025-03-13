@@ -159,11 +159,14 @@ class Services_User_MonitorController
 
     public function action_unread($input)
     {
-        global $user;
+        global $user, $prefs;
         $loginlib = TikiLib::lib('login');
         $servicelib = TikiLib::lib('service');
         $tikilib = TikiLib::lib('tiki');
 
+        if ($prefs['activity_stream_disable_indexing'] === 'y') {
+            throw new Services_Exception_Enabled('activity_stream_disable_indexing');
+        }
         $lastread = $tikilib->get_user_preference($user, 'notification_read', 1388534400); // Jan 2014, as the feature did not exist prior to this date anyway
 
         $userId = $loginlib->getUserId();

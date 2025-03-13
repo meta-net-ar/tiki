@@ -14,5 +14,11 @@ interface Search_Action_Step
 
     public function execute(array $entry);
 
+    public function inputType();
+
     public function requiresInput();
+
+    public function getAction();
+
+    public function getDefinition();
 }

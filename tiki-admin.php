@@ -298,8 +298,8 @@ if (isset($_REQUEST['page'])) {
     // Check if the associated incude_*.php file exists. If not, check to see if it might exist in the Addons.
     // If it exists, include the associated file
     $utilities = new \Tiki\Package\Extension\Utilities();
-    if (file_exists("admin/include_$adminPage.php")) {
-        include_once("admin/include_$adminPage.php");
+    if ($file = TikiLib::lib('tiki')->safeFileExistsInPath("admin/include_$adminPage.php", "admin")) {
+        include_once($file);
     } elseif ($filepath = $utilities->getExtensionFilePath("admin/include_$adminPage.php")) {
         include_once($filepath);
     }
@@ -324,11 +324,11 @@ if (isset($_REQUEST['page'])) {
             $admin_icon = array_merge([ 'disabled' => false, 'description' => ''], $admin_icon);
         }
         if (isset($admin_icons[$adminPage])) {
-            $admin_icon = $admin_icons[$adminPage];
+            $current_admin_icon = $admin_icons[$adminPage];
 
-            $admintitle = $admin_icon['title'];
-            $description = isset($admin_icon['description']) ? $admin_icon['description'] : '';
-            $helpUrl = isset($admin_icon['help']) ? $admin_icon['help'] : '';
+            $admintitle = $current_admin_icon['title'];
+            $description = isset($current_admin_icon['description']) ? $current_admin_icon['description'] : '';
+            $helpUrl = isset($current_admin_icon['help']) ? $current_admin_icon['help'] : '';
         }
     }
     $helpDescription = tr("Help on %0 Config", $admintitle);
@@ -482,6 +482,11 @@ if ($prefs['feature_wiki_attachments'] === 'y' && $prefs['feature_use_fgal_for_w
 $unifiedsearch = \TikiLib::lib('unifiedsearch');
 $smarty->assign('search_index_outdated', $unifiedsearch->isOutdated());
 
+if ($prefs['feature_scheduler'] === 'y') {
+    $schedulerUtils = new \Scheduler_Utils();
+    $smarty->assign('isSchedulerRunConfigured', $schedulerUtils->isSchedulerRunConfigured());
+}
+
 if (! $unifiedsearch->rebuildInProgress()) {
     $searchIndex = [
         'error' => false,
@@ -520,5 +525,4 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
-
 $smarty->display('tiki.tpl');

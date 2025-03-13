@@ -539,6 +539,24 @@ class Search_Query implements Search_Query_Interface
         return $this->expr;
     }
 
+    public function getWords()
+    {
+        $words = [];
+        $factory = new \Search_Type_Factory_Direct();
+        $this->expr->walk(
+            function ($node) use (&$words, $factory) {
+                if ($node instanceof \Search_Expr_Token && $node->getField() !== 'searchable') {
+                    $word = $node->getValue($factory)->getValue();
+                    if (is_string($word) && ! in_array($word, $words)) {
+                        $words[] = $word;
+                    }
+                }
+            }
+        );
+
+        return $words;
+    }
+
     private function parse($query)
     {
         if (is_scalar($query)) {

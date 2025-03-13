@@ -4,12 +4,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\core\Scheduler\DefaultSchedulers;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'               => [
             'scheduler'                  => 'word',           //post
-            'scheduler_name'             => 'word',           //post
-            'scheduler_description'      => 'word',           //post
+            'scheduler_name'             => 'string',         //post
+            'scheduler_description'      => 'string',         //post
             'scheduler_task'             => 'string',         //post
             'scheduler_status'           => 'string',         //post
             'scheduler_rerun'            => 'bool',           //post
@@ -25,6 +27,10 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+
+$defaultSchedulers = new DefaultSchedulers();
+$defaultSchedulers->checkAndUpdate();
+
 function saveScheduler()
 {
     $schedLib = TikiLib::lib('scheduler');

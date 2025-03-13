@@ -70,7 +70,7 @@
         <img id='avtimg' src="{$value}" alt="{tr}Profile picture{/tr}">
     {/if}
     <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
-    <input name="{$field.ins_id}" id="{$field.ins_id|escape}" type="file">
+    <input name="{$field.ins_id}" id="{$field.ins_id|escape}" type="file" accept=".gif,.jpg,.jpeg,.png,.webp,.avif">
     <div class="form-text">
         {if $prefs.user_store_file_gallery_picture neq 'y'}{tr}File (only .gif, .jpg and .png images approximately 45px × 45px){/tr}{else}{tr}File (only .gif, .jpg and .png images){/tr}{/if}:
     </div>

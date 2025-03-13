@@ -12,7 +12,7 @@ $inputConfiguration = [
             'site'                 => 'digits',            //post
             'password'             => 'password',          //post
             'dbg'                  => 'bool',              //post
-            'find'                 => 'word',              //post
+            'find'                 => 'string',            //post
             'addpage'              => 'bool',              //post
             'pageName'             => 'pagename',          //post
             'clearpages'           => 'bool',              //post
@@ -44,10 +44,7 @@ $access->check_feature('feature_comm');
 $access->check_permission_either(['tiki_p_send_pages', 'tiki_p_send_articles']);
 
 if ($tiki_p_send_pages != 'y' && $tiki_p_send_articles != 'y') {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have the permission that is needed to use this feature'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have the permission that is needed to use this feature'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! isset($_REQUEST['username'])) {
@@ -232,7 +229,6 @@ if (isset($_REQUEST['send'])) {
                     new XML_RPC_Value($page_info['image_y'], 'int'),
                     new XML_RPC_Value(base64_encode($page_info['image_data']), 'string'),
                     new XML_RPC_Value($page_info['publishDate'], 'int'),
-                    new XML_RPC_Value($page_info['expireDate'], 'int'),
                     new XML_RPC_Value($page_info['created'], 'int'),
                     new XML_RPC_Value(base64_encode($page_info['heading']), 'string'),
                     new XML_RPC_Value(base64_encode($page_info['body']), 'string'),

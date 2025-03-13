@@ -112,7 +112,8 @@
                     <label class="col-form-label col-md-3" for="icon">{tr}Icon:{/tr}</label>
 
                     <div class="col-md-9">
-                        <input type="text" name="icon" value="{$info.icon|escape}" class="form-control">
+                        <input type="text" name="icon" value="{$info.icon|escape}" class="form-control" id="icon">
+                        {autocomplete element="#icon" type='icon'}
                     </div>
                 </div>
             {/if}

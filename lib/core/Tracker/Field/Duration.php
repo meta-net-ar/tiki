@@ -149,13 +149,6 @@ class Tracker_Field_Duration extends \Tracker\Field\AbstractItemField implements
     {
         global $prefs;
 
-        if ($prefs['vuejs_enable'] === 'n') {
-            return $this->renderTemplate('trackerinput/duration.tpl', $context, [
-                'amounts' => $this->denormalize(),
-                'units' => array_keys(self::getFactors())
-            ]);
-        }
-
         // vue.js integration
         $headerlib = TikiLib::lib('header');
         $value = $this->getValue();

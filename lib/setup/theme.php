@@ -16,12 +16,6 @@ list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
 $prefs['theme'] = $theme_active;
 $prefs['theme_option'] = $theme_option_active;
 
-if ($prefs['theme_unified_admin_backend'] === 'y' && strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') !== false) {
-    $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
-} else {
-    $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
-}
-
 //START loading theme related items
 //This bundle Loads bootstrap JS and popper JS
 
@@ -56,11 +50,11 @@ if ($prefs['feature_fixed_width'] === 'y') {
 $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
 
 //3) Always add bundled font-awesome css for the default icon fonts
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/@fortawesome/fontawesome/all.css');
+$headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 
 // 3a) Optionally add bundled Bootstrap-icons CSS for the optional Bootstrap icons
 if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/bootstrap-icons/font/bootstrap-icons.css');
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
 }
 
 //4) Add Addon custom css first, so it can be overridden by themes
@@ -103,6 +97,50 @@ if (! empty($prefs['header_custom_scss'])) {
         $theme_css = ThemeLib::getThemeCssFilePath($theme_active, null);
         $headerlib->add_cssfile($theme_css);
     }
+}
+
+//6) include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
+$groups = $userlib->get_user_groups($user);
+if (
+    $prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups)
+    && (strpos($_SERVER['PHP_SELF'], 'admin')
+    || strpos($_SERVER['PHP_SELF'], 'cache')
+    || strpos($_SERVER['PHP_SELF'], 'import')
+    || strpos($_SERVER['PHP_SELF'], 'manage')
+    || strpos($_SERVER['PHP_SELF'], 'permissions')
+    || strpos($_SERVER['PHP_SELF'], 'stats')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-export')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-import')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-received')
+    || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
+) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
+    $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
+    if (strpos($_SERVER['PHP_SELF'], 'tiki-admin.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') === false && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
+        /* Force the admin layout on admin pages */
+        $prefs['site_layout_admin'] = 'admin';
+        /* Force the admin layout on setup/management pages too */
+        $prefs['site_layout'] = 'admin';
+        include_once 'admin/define_admin_icons.php';
+        foreach ($admin_icons as & $admin_icon) {
+            foreach ($admin_icon['children'] as & $child) {
+                $child = array_merge(['disabled' => false, 'description' => ''], $child);
+            }
+        }
+        $smarty->assign('admin_icons', $admin_icons);
+    }
+    if (! strpos($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
+        $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
+    }
+} else {
+    $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
 }
 
 //7) include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css

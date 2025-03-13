@@ -18,7 +18,7 @@
             </td>
             <td>
                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-                <input name="userfile1" class="form-control" type="file">
+                <input name="userfile1" class="form-control" type="file" accept="image/*">
             </td>
         </tr>
         <tr>

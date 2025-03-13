@@ -1,12 +1,13 @@
 .inline-cypht {
-    background-color: var(--bs-body-bg) !important;
     font-family: $font-family-base;
     color: var(--bs-body-color) !important;
+    position: relative;
+    overflow-y: hidden;
+    background-color: var(--bs-secondary-bg);
 
     .hide { display: none !important; }
     // override colors when not using cypht default theme
     img { opacity: 1 !important; max-width: 100%; }
-    main, div { border-radius: 0; }
     i.bi, .folders li, .inner_list li { color: var(--bs-body-color) !important; }
     .ui-widget-content { background-color: $tiki-ui-default-bg !important; }
     .ui-menu-item-wrapper { color: var(--bs-body-color) !important; }
@@ -86,8 +87,6 @@
 }
 
 .inline-cypht {
-    background-color: transparent !important;
-    position: relative;
     a:not(.btn):hover {
         text-decoration: $link-hover-decoration !important;
     }
@@ -116,27 +115,7 @@
         color: $popover-body-color;
     }
 
-    .folder_list, .content_cell { border: 1px solid $input-border-color; }
-    .content_cell { width: 70%; }
-
-    .message_list .content_title, .message_list .content_title > div:first-child {
-        flex-direction: column;
-        align-items: flex-start;
-        display: block;
-        margin-bottom: 10px;
-    }
     .mailbox_list_title { display: inline-block; }
-    .msg_controls { position: absolute; top: 25px; left: 50px; }
-    .msg_controls .dropdown.on_mobile { display: none; }
-    .msg_controls .core_msg_control,
-    .msg_controls .btn {
-        padding: 1px 3px;
-        border-radius: 5px;
-        font-weight: bold;
-        color: var(--bs-body-color);
-    }
-    .msg_controls > .core_msg_control { display: none; }
-    .msg_controls .dropdown.on_mobile { display: block; }
     .move_to_location 
 
     .msg_text_inner {
@@ -191,33 +170,12 @@
 
     // message list / text
     .refresh_list, .list_settings_link { padding:0; margin: 5px 2px 0; }
-    .toggle_recipients { right: 25px; }
     .msg_date { font-weight: bold; }
     .msg_parts tr:not(:last-child) { border-bottom: 1px solid #444; }
     .part_desc, .part_size, .download_link { margin-left: 25px; }
     .msg_part_icon { padding: 0; margin-left: 5px; }
-    .imap_keyword { margin-top: 4px; }
     .msg_headers td { padding-right: 35px; }
     .noselect2 { display: none !important; }
-
-    //Search
-    .search_form {
-        form {
-            display: flex;
-            max-width: 100%;
-            flex-wrap: wrap;
-        }
-        .search_terms {
-            min-width: 100px;
-            max-width: 150px;
-            margin: 0px;
-            margin-bottom: 10px;
-        }
-    }
-
-    .save_search, .delete_search {
-        img { padding: 5px 0 0 5px; }
-    }
 
     .advanced_search_form {
         input[type="radio"], input[type="checkbox"] { margin-right: 5px; }
@@ -236,18 +194,43 @@
     }
 
     .select2-container { min-width: 150px; margin-bottom: 0; }
-    .combined_sort { display: inline-block; margin-left: 10px; }
+    .message_list .combined_sort, .message_list .combined_sort + el-select { display: inline-block; margin-left: 10px; width: 150px; }
 
-    .folder_cell { max-width: 27%; width: 27%; }
     .folders li, .inner_list li {
         word-break: break-all;
         white-space: unset;
-        padding: 0;
     }
     .toggle_link { margin-right: 10px; }
-    .folder_list { min-width: 95%; }
     .move_to_location .folders a:not(.btn), .move_to_location i { color: $dropdown-link-color !important; }
     .shortcut_table { width: 100%; }
+    .app-container {
+        padding: 20px;
+    }
+    .folder_list, .content_cell{
+        position: relative;
+        overflow-y: auto;
+        border-radius: var(--bs-border-radius);
+    }
+    .collapsed ul {
+        display: inherit;
+    }
+    main .container {
+        width: 100%;
+    }
+    #imap_filter_form {        
+        .imap_sort, .imap_sort + el-select, .imap_filter + el-select {
+            width: 150px;
+        }
+    }
+    .form-floating:has(el-select) {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .form-floating el-select + label {
+        transform: unset !important;
+        position: relative !important;
+        padding: 0 !important;
+    }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
@@ -277,10 +260,18 @@
 //
 .mobile {
     .inline-cypht {
-        padding-top: 30px;
-
+        .app-container {
+            padding: 20px 0;
+        }
+        nav.folder_cell {
+            position: fixed;
+            z-index: 9999;
+        }
+        .menu-toggle {
+            z-index: 9999;
+        }
         .content_cell {
-            padding: 20px 0 20px; border: none;
+            border: none;
             display: block !important;
         }
 
@@ -289,14 +280,7 @@
         }
 
         .content_title {
-            top: -7px;
-            z-index: 2000;
             background-color: $body-bg !important;
-            .list_controls {
-                border: none;
-                width: 100%;
-                padding: 5px 15px;
-            }
         }
 
         .list_controls i.bi-filter-circle {
@@ -307,20 +291,19 @@
             z-index: 100;
         }
         .imap_filter_form { margin-left: 10px; margin-right: 10px; }
+        .imap_sort, .imap_sort + el-select, .imap_filter + el-select {
+            width: 120px;
+        }
+        .imap_filter + el-select {
+            display: none;
+        }
 
-        .message_list .content_title > div:first-child { display: flex; flex-direction: row; }
         .mailbox_list_title { order: 2 }
         .msg_headers th { width: 20%; }
 
         .sys_messages {
             top: 0; right: 0; width: 100%; min-height: 5px;
             padding-bottom: 15px; white-space: normal;
-        }
-
-        // mobile main menu
-        .folder_toggle {
-            display: block !important; letter-spacing: normal; z-index: 10000;
-            img { width: 24px; height: 30px; margin: -5px 0 0 5px; }
         }
 
         // mobile home
@@ -372,7 +355,7 @@
 
         // mobile compose
         .compose_page { padding: 10px; overflow: hidden; }
-        .compose_form { width: 100% !important; padding: 0 !important; }
+        .compose_form { width: 100% !important; }
         .toggle_recipients { right: 10px !important; }
         .compose_bcc, .compose_cc, .compose_subject,
         .compose_to, .compose_body, .compose_server {
@@ -403,8 +386,7 @@
         .msg_controls { position: relative; left: 0 !important; height: auto; padding-top: 0; }
         .select2-container { min-width: 100px; }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { flex-direction: row; justify-content: center; align-items: center; }
-        #list_controls_menu.show > form { margin: 0 10px }
+        #list_controls_menu.show { justify-content: center; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }
 
         // groupmail
@@ -422,33 +404,6 @@
         }
     }
 
-
-    // mobile main menu animation
-    .inner_list { margin-bottom: 0; }
-    .src_name {
-        max-height: 100px; margin: 0;
-        padding-top: 10px; padding-bottom: 10px;
-    }
-
-    .folder_cell {
-        position: fixed; width: 300px;
-        top: 60px; left: -310px;
-        overflow: auto; z-index: 1;
-        transition: all 1s ease;
-        transform: translateX(-300px);
-
-        &.slide-in {
-            transition: all 0.5s ease;
-            transform: translateX(300px);
-        }
-
-        .folder_list {
-            display: block !important; width: auto;
-            margin-bottom: 50px; font-size: 100%;
-            li a { padding-top: 0; }
-            .update_message_list, .hide_folders { display: none; }
-        }
-    }
     // Remove the fixed navbar as it will make Cypht navbar not visible
     .navbar.fixed-top { display: none; }
 }
@@ -464,11 +419,4 @@
     #row-middle { margin-left: -15px; margin-right: -15px; border: none; }
     #col1 { padding: 0; border: none; }
     #col2, #col3 { margin-left: 15px; margin-right: 15px; }
-}
-
-.folder_list .clear_cache {
-    font-size: 80%;
-    padding-top: 10px;
-    float: right;
-    margin-left: 5px;
 }

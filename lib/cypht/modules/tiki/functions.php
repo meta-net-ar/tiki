@@ -111,6 +111,7 @@ if (! hm_exists('tiki_mime_part_to_bodystructure')) {
                 $file_attributes[$header->getValue()][] = $header->getValueFor('filename');
             }
         }
+        $msgContent = (string) $part->getContent();
         $result = [$part_num => [
         'type' => $content_type[0],
         'subtype' => $content_type[1],
@@ -118,8 +119,8 @@ if (! hm_exists('tiki_mime_part_to_bodystructure')) {
         "id" => $part->getContentId(),
         'description' => false,
         'encoding' => $part->getContentTransferEncoding(),
-        'size' => strlen($part->getContent()),
-        'lines' => $part->isTextPart() ? substr_count($part->getContent(), "\n") : false,
+        'size' => strlen($msgContent),
+        'lines' => $part->isTextPart() ? substr_count($msgContent, "\n") : false,
         'md5' => false,
         'disposition' => $part->getContentDisposition(false),
         'file_attributes' => $file_attributes,
@@ -269,6 +270,7 @@ if (! hm_exists('tiki_flag_message')) {
         } else {
             $flags = '';
         }
+        $state = $flag;
         if ($action == 'remove') {
             $flags = preg_replace('/\\\?' . ucfirst($flag) . '/', '', $flags);
             $state = 'un' . $flag;
@@ -329,7 +331,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
 
         // try to connect
         $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (! smtp_authed($smtp)) {
+        if (! $smtp->authed()) {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             return false;
         }
@@ -388,8 +390,8 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             }
         }
         $res = "<div class=\"d-inline-block\">";
-        $res .= "<a class=\"hlink" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\">" . $mod->trans($title) . "</a>";
-        $res .= "<div class='" . $class . " dropdown-menu' style=\"display: none;\"><div class='move_to_title'>" . $mod->trans($dropdown_title) . "<span><a class=\"close_{$class}\" href='#'>X</a></span></div>" . implode("<br>\n", $field_list) . "</div></div>";
+        $res .= "<a class=\"hlink dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
+        $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div></div>";
 
         return $res;
     }
@@ -400,14 +402,14 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
  * @return string array message and headers
  */
 if (! hm_exists('get_message_data')) {
-    function get_message_data($imap, $msg_id)
+    function get_message_data($imap, $folder, $msg_id)
     {
         $msg = $imap->get_message_content($msg_id, 0);
         $msg = str_replace("\r\n", "\n", $msg);
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg) . "\r\n";
 
-        $headers = $imap->get_message_headers($msg_id);
+        $headers = $imap->get_message_headers($folder, $msg_id);
         if (! empty($headers['Flags'])) {
             $msg = "Flags: " . $headers['Flags'] . "\r\n" . $msg;
         }
@@ -429,8 +431,8 @@ if (! hm_exists('bind_tracker_item_update_event')) {
             $old = $args['old_values'][$form['tracker_field_id']];
             $new = $args['values'][$form['tracker_field_id']];
             if (substr_count($old, ',') != substr_count($new, ',')) {
-                $imap->message_action('DELETE', $args['msg_ids']);
-                $imap->message_action('EXPUNGE', $args['msg_ids']);
+                $imap->get_connection()->message_action('DELETE', $args['msg_ids']);
+                $imap->get_connection()->message_action('EXPUNGE', $args['msg_ids']);
             }
         }, ['imap' => $imap, 'form' => $form, 'msg_ids' => $msg_ids]);
     }

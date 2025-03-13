@@ -21,8 +21,8 @@ class IconGenerator
 
     public function __construct(OutputInterface $output)
     {
-        $this->bootstrapIconsFilePath = __DIR__ . '/../' . BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css';
-        $this->fontAwesomeFilePath = __DIR__ . '/../' . FONTAWESOME_CSS_PATH . '/all.css';
+        $this->bootstrapIconsFilePath = __DIR__ . '/../' . BOOTSTRAP_ICONS_FONT_SRC_PATH . '/bootstrap-icons.css';
+        $this->fontAwesomeFilePath = __DIR__ . '/../' . FONTAWESOME_CSS_SRC_PATH . '/all.css';
         $this->bootstrapJsonFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.json';
         $this->bootstrapPhpFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.php';
         $this->fontAwesomeJsonFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.json';
@@ -94,8 +94,7 @@ class IconGenerator
     public function checkFileContent($filePath, $error_key): string|false
     {
         if (realpath($filePath) === false) {
-            $this->state[$error_key] = -1;
-            return false;
+            throw new Exception(sprintf("Failed to open the %s file, fontawesome icons won't be synched. Maybe composer or npm install didn't run yet?", $filePath));
         }
         $content = file_get_contents($filePath);
         return $content;
@@ -111,24 +110,10 @@ class IconGenerator
         }
     }
 
-    public function reportFailure(): void
-    {
-        if ($this->state['bs'] == -1) {
-            throw new Exception("Failed to open the bootstrap css vendor file, bootstrap icons won't be synched. Maybe npm is not available at this stage.");
-        }
-        if ($this->state['fa'] == -1) {
-            throw new Exception("Failed to open the fontawesome css vendor file, fontawesome icons won't be synched. Maybe composer is not available at this stage.");
-        }
-    }
-
     public function execute(): void
     {
         $bootstrapIconsContent = $this->checkFileContent($this->bootstrapIconsFilePath, 'bs');
         $fontAwesomeContent = $this->checkFileContent($this->fontAwesomeFilePath, 'fa');
-
-        if (! $bootstrapIconsContent || ! $fontAwesomeContent) {
-            $this->reportFailure();
-        }
 
         $modifiedIcons = $this->generateIconArraysFromCss($bootstrapIconsContent, $fontAwesomeContent);
         if (! is_dir(__DIR__ . "/../" . GENERATED_ICONSET_PATH) && ! mkdir(__DIR__ . "/../" . GENERATED_ICONSET_PATH, 0777, true)) {

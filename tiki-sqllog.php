@@ -28,9 +28,7 @@ $access->check_permission('tiki_p_admin');
 $query = "show tables like 'tiki_sql_query_logs'";
 $result = $tikilib->query($query, []);
 if (! $result->numRows()) {
-    $smarty->assign('msg', tra('This feature is disabled') . ': log_sql');
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('This feature is disabled') . ': log_sql', \Laminas\Http\Response::STATUS_CODE_401);
 }
 // let look at the log even if not active for older logs
 //if ($prefs['log_sql'] != 'y') {

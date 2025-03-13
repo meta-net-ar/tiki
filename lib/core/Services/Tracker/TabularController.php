@@ -12,7 +12,6 @@ use Tracker\Tabular\Source\CsvSource;
 use Tracker\Tabular\Schema;
 use Tracker\Tabular\Source\PaginatedQuerySource;
 use Tracker\Tabular\Source\QuerySource;
-use Tracker\Tabular\Source\TrackerSource;
 use Tracker\Tabular\Writer\APIWriter;
 use Tracker\Tabular\Writer\HtmlWriter;
 use Tracker\Tabular\Writer\ODBCWriter;
@@ -54,7 +53,11 @@ class Services_Tracker_TabularController
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $lib = TikiLib::lib('tabular');
-            $lib->remove($tabularId);
+            $result = $lib->remove($tabularId);
+
+            if ($result->numRows() > 0) {
+                Feedback::success(tr('Import-Export Tracker was deleted successfully.'));
+            }
         }
 
         return [
@@ -151,6 +154,38 @@ class Services_Tracker_TabularController
             'encodings' => $encodings,
 
         ];
+    }
+
+    public function updateColumns($trackerId, $oldName, $newName, $oldPermName, $newPermName)
+    {
+        $lib = TikiLib::lib('tabular');
+        $formats = $lib->getList(['trackerId' => $trackerId]);
+
+        foreach ($formats as $format) {
+            $info = $lib->getInfo($format['tabularId']);
+            $formatDescriptor = $info['format_descriptor'];
+            $filterDescriptor = $info['filter_descriptor'];
+
+            foreach ($formatDescriptor as $key => $field) {
+                if ($field['label'] == $oldName) {
+                    $formatDescriptor[$key]['label'] = $newName;
+                }
+                if ($field['field'] == $oldPermName) {
+                    $formatDescriptor[$key]['field'] = $newPermName;
+                }
+            }
+
+            foreach ($filterDescriptor as $key => $field) {
+                if ($field['label'] == $oldName) {
+                    $filterDescriptor[$key]['label'] = $newName;
+                }
+                if ($field['field'] == $oldPermName) {
+                    $filterDescriptor[$key]['field'] = $newPermName;
+                }
+            }
+
+            $lib->update($format['tabularId'], $info['name'], $formatDescriptor, $filterDescriptor, $info['config'], $info['odbc_config'], $info['api_config']);
+        }
     }
 
     /**
@@ -271,6 +306,36 @@ class Services_Tracker_TabularController
         ];
     }
 
+    public function action_choose_applied_value($input)
+    {
+        $tabularId = $input->tabularId->int();
+
+        $info = TikiLib::lib('tabular')->getInfo($tabularId);
+        $trackerId = $info['trackerId'];
+
+        Services_Exception_Denied::checkObject('tiki_p_view_trackers', 'tracker', $trackerId);
+
+        $schema = $this->getSchema($info);
+        $collection = $schema->getFilterCollection();
+        $filter = $collection->getFilters()[$input->filterIndex->int()] ?? null;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($filter) {
+                $filter->applyInput($input);
+                return $filter->jsonSerialize();
+            } else {
+                return [];
+            }
+        }
+
+        return [
+            'title' => tr('Choose applied value'),
+            'tabularId' => $tabularId,
+            'filterIndex' => $input->filterIndex->int(),
+            'filter' => $filter,
+        ];
+    }
+
     public function action_export_full_csv($input)
     {
         $lib = TikiLib::lib('tabular');
@@ -281,7 +346,7 @@ class Services_Tracker_TabularController
         $schema = $this->getSchema($info);
         $schema->validate();
 
-        $source = new TrackerSource($schema);
+        $source = $schema->getDefaultFilterSource();
 
         if ($info['odbc_config']) {
             $writer = new ODBCWriter($info['odbc_config']);
@@ -321,6 +386,30 @@ class Services_Tracker_TabularController
             );
             exit;
         }
+    }
+
+    public function actionExportSimpleHeaders($input)
+    {
+        $lib = TikiLib::lib('tabular');
+        $info = $lib->getInfo($input->tabularId->int());
+
+        Services_Exception_Denied::checkObject('tiki_p_tabular_export', 'tabular', $info['tabularId']);
+
+        $schema = $this->getSchema($info);
+        $schema->validate();
+
+        $headers = array_map(function ($column) {
+            return $column->getLabel();
+        }, $schema->getColumns());
+
+        $name = TikiLib::lib('tiki')->remove_non_word_characters_and_accents($info['name']) . '_simple_headers.csv';
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment;filename=' . $name);
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, $headers, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
+        fclose($output);
+        exit;
     }
 
     public function action_export_partial_csv($input)
@@ -660,7 +749,7 @@ class Services_Tracker_TabularController
         $schema = $this->getSchema($info);
         $collection = $schema->getFilterCollection();
 
-        $collection->applyInput($input);
+        $collection->applyInput($input, true);
 
         $search = TikiLib::lib('unifiedsearch');
         $query = $search->buildQuery([
@@ -714,6 +803,7 @@ class Services_Tracker_TabularController
             'data' => $writer->getData($source),
             'resultset' => $source->getResultSet(),
             'baseArguments' => $arguments,
+            'config' => $info['config'],
         ];
     }
 

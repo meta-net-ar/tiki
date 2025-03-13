@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
+TikiLib::lib('header')->setXRobotsTag($robots);
 $rsslib = TikiLib::lib('rss');
 $calendarlib = TikiLib::lib('calendar');
 

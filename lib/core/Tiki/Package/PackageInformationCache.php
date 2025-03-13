@@ -169,12 +169,21 @@ class PackageInformationCache
 
         // Track files that may change - use that to invalidate the cache.
         // Cast to int so that if filemtime fails (e.g. file does not exist) we can run max.
+        $errorLevel = error_reporting();
+        if (! file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_CONFIG)) {
+            \Feedback::error(tra('Composer.json is missing from vendor_bundled.'));
+        }
+        if (! file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_LOCK)) {
+            \Feedback::error(tra('Composer.lock is missing from vendor_bundled.'));
+        }
+        error_reporting(E_ALL & ~E_WARNING);
         $configModificationTime = (int)filemtime(TIKI_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_CONFIG);
         $lockModificationTime = (int)filemtime(TIKI_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_LOCK);
+        $configModificationTimeBundled = (int)filemtime(TIKI_PATH . DIRECTORY_SEPARATOR . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_CONFIG);
+        $lockModificationTimeBundled = (int)filemtime(TIKI_PATH . DIRECTORY_SEPARATOR . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . DIRECTORY_SEPARATOR . ComposerCli::COMPOSER_LOCK);
         $packagesModificationTime = (int)filemtime(__DIR__ . DIRECTORY_SEPARATOR . ComposerManager::CONFIG_PACKAGE_FILE);
-
-        $lastModif = max($configModificationTime, $lockModificationTime, $packagesModificationTime);
-
+        $lastModif = max($configModificationTime, $configModificationTimeBundled, $lockModificationTime, $lockModificationTimeBundled, $packagesModificationTime);
+        error_reporting($errorLevel);
         /** @var \Cachelib $cachelib */
         $cachelib = TikiLib::lib('cache');
 

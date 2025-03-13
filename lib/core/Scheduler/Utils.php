@@ -73,4 +73,24 @@ class Scheduler_Utils
 
         return $users;
     }
+
+    /**
+     * Check if schedulers are configured
+     *
+     * @return bool
+     */
+    public function isSchedulerRunConfigured()
+    {
+        $tikilib = TikiLib::lib('tiki');
+
+        $lastRunWarningMinutes = $tikilib->get_preference('scheduler_last_run_warning_minutes', 60);
+        $lastRunTimestamp = $tikilib->get_preference('scheduler_last_run_timestamp');
+        $lastRunThreshold = ! empty($lastRunTimestamp) ? strtotime('+ ' . $lastRunWarningMinutes . ' minutes', $lastRunTimestamp) : 0;
+
+        if ($lastRunWarningMinutes > 0 && time() > $lastRunThreshold) {
+            return false;
+        }
+
+        return true;
+    }
 }

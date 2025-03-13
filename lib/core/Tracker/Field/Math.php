@@ -192,36 +192,47 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
 
         $permName = $this->getConfiguration('permName');
-        $schema->addNew($permName, 'default')
-        ->setLabel($this->getConfiguration('name'))
-        ->setRenderTransform(function ($value) {
-            return $value;
-        })
-        ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-            $info['fields'][$permName] = $value;
-        })
-        ;
-        $schema->addNew($permName, 'default-recalc')
-        ->setLabel($this->getConfiguration('name'))
-        ->setRenderTransform(function ($value) {
-            return $value;
-        })
-        ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-            $info['fields'][$permName] = $value;
-            $data = $info['fields'];
-            if (! empty($info['itemId']) && ! isset($data['old_values_by_permname'])) {
-                $data['old_values_by_permname'] = [];
-                $currentItem = (new Services_Tracker_Utilities())->getItem($this->getTrackerDefinition()->getConfiguration('trackerId'), $info['itemId']);
-                foreach ($currentItem['fields'] as $fieldId => $val) {
-                    $field = $this->getTrackerDefinition()->getField($fieldId);
-                    if ($field) {
-                        $data['old_values_by_permname'][$field['permName']] = $val;
+        $handler = $this->getMirroredHandler();
+
+        if ($handler && $handler instanceof \Tracker\Field\ExportableInterface) {
+            $sub = $handler->getTabularSchema();
+            foreach ($sub->getColumns() as $column) {
+                $column->setPermName($permName)
+                    ->setLabel($this->getConfiguration('name'));
+                $schema->addActualColumn($column);
+            }
+        } else {
+            $schema->addNew($permName, 'default')
+            ->setLabel($this->getConfiguration('name'))
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            })
+            ;
+            $schema->addNew($permName, 'default-recalc')
+            ->setLabel($this->getConfiguration('name'))
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+                $data = $info['fields'];
+                if (! empty($info['itemId']) && ! isset($data['old_values_by_permname'])) {
+                    $data['old_values_by_permname'] = [];
+                    $currentItem = (new Services_Tracker_Utilities())->getItem($this->getTrackerDefinition()->getConfiguration('trackerId'), $info['itemId']);
+                    foreach ($currentItem['fields'] as $fieldId => $val) {
+                        $field = $this->getTrackerDefinition()->getField($fieldId);
+                        if ($field) {
+                            $data['old_values_by_permname'][$field['permName']] = $val;
+                        }
                     }
                 }
-            }
-            $info['fields'][$permName] = $this->handleFinalSave($data);
-        })
-        ;
+                $info['fields'][$permName] = $this->handleFinalSave($data);
+            })
+            ;
+        }
 
         return $schema;
     }

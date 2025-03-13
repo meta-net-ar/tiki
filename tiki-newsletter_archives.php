@@ -25,9 +25,7 @@ if (! empty($_REQUEST['nlId'])) {
     $smarty->assign('nlId', $_REQUEST["nlId"]);
     $nl_info = $nllib->get_newsletter($_REQUEST["nlId"]);
     if (empty($nl_info)) {
-        $smarty->assign('msg', tra('Newsletter does not exist'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Newsletter does not exist'), \Laminas\Http\Response::STATUS_CODE_404);
     }
     $smarty->assign_by_ref('nl_info', $nl_info);
 }
@@ -37,9 +35,7 @@ $access->check_permission_either(['tiki_p_view_newsletter']);
 
 if (isset($_REQUEST['remove']) && ! empty($_REQUEST['nlId']) && $access->checkCsrf()) {
     if (! $tikilib->user_has_perm_on_object($user, $_REQUEST['nlId'], 'newsletter', 'tiki_p_admin_newsletters')) {
-        $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_403);
     }
     $nllib->remove_edition($_REQUEST["nlId"], $_REQUEST["remove"]);
 }

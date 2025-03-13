@@ -26,7 +26,7 @@
         <label class="col-sm-3 col-form-label" for="cookie">{tr}Upload from disk{/tr}</label>
         <div class="col-sm-9">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">
-            <input name="userfile1" type="file" class="form-control">
+            <input name="userfile1" type="file" accept=".txt" class="form-control">
         </div>
     </div>
     <div class="mb-3 text-center">

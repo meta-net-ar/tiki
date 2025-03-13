@@ -1,22 +1,8 @@
 {if not empty($item.children)}
     <li class="mega-menu--item mega-menu--item-level-{$item.sectionLevel}">
         <a href="{$item.sefurl|escape}" class="" data-bs-toggle="dropdown">
-            {if $prefs.menus_items_icons eq "y"}
-                <span 
-                    data-preset="icon-picker" 
-                    tabindex="0" 
-                    role="button" 
-                    data-bs-toggle="popover" 
-                    data-bs-trigger="focus" 
-                    title="Pick an icon" 
-                    data-icon-for="{$item.optionId}" 
-                    data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                >
-                {* here we display the icon html passed constructed from function.menu.php *}
-                {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                {* Refer to the style section in this file to know how this is done manually*}
-                {$menu_icons_html[$item.optionId]}
-                </span>
+            {if $menu_info.use_items_icons eq "y" && $item.icon}
+                {icon name=$item.icon}
             {/if}
             {tr}{$item.name}{/tr}
         </a>
@@ -30,43 +16,15 @@
     <li class="mega-menu--item mega-menu--item-level-{$item.sectionLevel}">
         {if !empty($item.block)}
             <div class="block--container">
-                {if $prefs.menus_items_icons eq "y"}
-                    <span
-                        data-preset="icon-picker" 
-                        tabindex="0" 
-                        role="button" 
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="focus" 
-                        title="Pick an icon" 
-                        data-icon-for="{$item.optionId}" 
-                        data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                    >
-                    {* here we display the icon html passed constructed from function.menu.php *}
-                    {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                    {* Refer to the style section the bootstrap_menu.tpl file to know how this is done manually*}
-                    {$menu_icons_html[$item.optionId]}
-                    </span>
+                {if $menu_info.use_items_icons eq "y" && $item.icon}
+                    {icon name=$item.icon}
                 {/if}
                 {tr}{$item.name}{/tr}
             </div></a> {* </a> added to close the anchor in the menu list item -- g_c-l *}
         {else}
             <a class="" href="{$item.sefurl|escape}">
-                {if $prefs.menus_items_icons eq "y"}
-                    <span 
-                        data-preset="icon-picker" 
-                        tabindex="0" 
-                        role="button" 
-                        data-bs-toggle="popover" 
-                        data-bs-trigger="focus" 
-                        title="Pick an icon" 
-                        data-icon-for="{$item.optionId}" 
-                        data-icon-editable="{if $prefs.theme_iconeditable eq "y" AND $tiki_p_admin eq 'y'}yes{/if}"
-                    >
-                    {* here we display the icon html passed constructed from function.menu.php *}
-                    {* TODO Add a way to modify the look: eg. the size,color,position etc*}
-                    {* Refer to the style section in this file to know how this is done manually*}
-                    {$menu_icons_html[$item.optionId]}
-                    </span>
+                {if $menu_info.use_items_icons eq "y" && $item.icon}
+                    {icon name=$item.icon}
                 {/if}
                 {tr}{$item.name}{/tr}
             </a>

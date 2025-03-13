@@ -8,7 +8,7 @@
 // @import "../../../node_modules/bootstrap/scss/_variables.scss"; Already imported by vendor bootstrap.scss
 
 // Load bootstrap4c-chosen variables and svn to uri converter
-@import "../../../vendor_bundled/vendor/npm-asset/sass-svg-uri/_svg-uri.scss";
+@import "../../../node_modules/sass-svg-uri/_index.scss";
 
 
 //@import "_bs3-bs4-transition.scss"; obsolete
@@ -73,11 +73,11 @@
     left: 0px;
     z-index: 1;
 }
-// Icon to toggle table formatting
+// Icon to toggle table formatting for small devices
 .toggle-table-wrap .btn {
-  font-family: 'Font Awesome 6 Free' !important;
-  font-weight: 600;
-  font-size: 1.25rem;
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 600;
+    font-size: 1.25rem;
 }
 
 //Cypth select2

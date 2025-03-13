@@ -640,7 +640,7 @@ function wikiplugin_pivottable($data, $params)
                 } else {
                     $field = $field['name'];
                 }
-                $attributesOrder[$field] = str_getcsv($arguments['order']);
+                $attributesOrder[$field] = str_getcsv($arguments['order'], escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
             }
         }
 
@@ -1099,6 +1099,7 @@ function wikiplugin_pivottable($data, $params)
         'dataCallback' => $params['dataCallback'],
         'index' => $id,
         'allowStickyHeaders' => $params['allowStickyHeaders'],
+        'defaults' => $defaults,
     ]);
 
     $out .= $smarty->fetch('wiki-plugins/wikiplugin_pivottable.tpl');

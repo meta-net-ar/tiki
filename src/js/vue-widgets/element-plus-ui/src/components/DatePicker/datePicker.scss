@@ -1,0 +1,18 @@
+@use 'element-plus/theme-chalk/el-date-picker.css';
+@use 'element-plus/theme-chalk/el-select.css';
+@use 'element-plus/theme-chalk/el-input.css';
+@use 'element-plus/theme-chalk/el-icon.css';
+@use 'element-plus/theme-chalk/el-button.css';
+@use '../all.scss';
+
+.el-date-editor {
+    --el-date-editor-datetimerange-width: calc(100% - 20px); // 20px is the total padding of the wrapper element on the left and right
+}
+
+.el-date-editor.el-input {
+    width: 100%;
+}
+
+.timezone-picker {
+    margin-top: 1rem;
+}

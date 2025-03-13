@@ -1,0 +1,13 @@
+{
+    "name": "tiki-vue-sfc-loader",
+    "description": "Load .vue files dynamically at runtime (from your wiki pages,etc). no build step needed.",
+    "version": "0.0.1",
+    "scripts": {
+      "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+      "format": "prettier .  --write"
+    },
+    "dependencies": {
+        "vue3-sfc-loader": "^0.9.5"
+    },
+    "devDependencies": {}
+}

@@ -7,6 +7,7 @@
 use Tiki\File\DiagramHelper;
 use Tiki\Package\VendorHelper;
 use Tiki\FileGallery\File as TikiFile;
+use Tiki\HeadlessBrowser\Exception\HeadlessException;
 
 function wikiplugin_diagram_info()
 {
@@ -137,9 +138,18 @@ function wikiplugin_diagram($data, $params)
         $html = '';
 
         foreach ($diagrams as $diagram) {
+            $diagramContent = '';
+            try {
+                $diagramContent = DiagramHelper::getDiagramAsImage($diagram);
+            } catch (HeadlessException $e) {
+                $logsLib = TikiLib::lib('logs');
+                $logsLib->add_log('HeadlessBrowser', $e->getMessage());
+                Feedback::error($e->getMessage());
+                break;
+            }
             $html .= ! empty($html) ? '<br/>' : '';
             $html .= '<div style="text-align:' . $alignment . ';">' .
-                '<img src="data:image/png;base64,' . DiagramHelper::getDiagramAsImage($diagram) . '"></div>';
+                '<img src="data:image/png;base64,' . $diagramContent . '"></div>';
         }
 
         return $html;

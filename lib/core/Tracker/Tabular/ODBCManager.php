@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tracker\Tabular;
 
+use TikiLib;
+
 class ODBCManager
 {
     public $orig_handler;
@@ -33,6 +35,7 @@ class ODBCManager
     public function fetch($row, $pk = null, $id = null)
     {
         $this->handleErrors();
+        $row = $this->fillFieldsFromConfig($row);
         $conn = $this->getConnection();
         if ($pk) {
             $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
@@ -48,6 +51,7 @@ class ODBCManager
             odbc_execute($rs, $params);
             $result = odbc_fetch_array($rs);
         }
+        $result = $this->reverseMapFieldsFromConfig($result);
         $this->stopErrorHandler();
         return $result;
     }
@@ -56,17 +60,33 @@ class ODBCManager
     {
         $this->handleErrors();
         $conn = $this->getConnection();
+        if (! empty($this->config['value_mappings'])) {
+            $fields = array_merge($fields, array_keys($this->config['value_mappings']));
+        }
         $select = implode('", "', $fields);
-        $sql = "SELECT \"{$select}\" FROM {$this->config['table']}";
+        $sql = "SELECT \"{$select}\" FROM {$this->config['table']} WHERE 1=1";
+        $bind = [];
         if ($modifiedField && $lastImport) {
-            $sql .= " WHERE \"{$modifiedField}\" >= ?";
+            $sql .= " AND \"{$modifiedField}\" >= ?";
+            $bind[] = $lastImport;
+        }
+        if (! empty($this->config['permanent_values'])) {
+            foreach ($this->config['permanent_values'] as $field => $value) {
+                $sql .= " AND \"$field\" = ?";
+                $bind[] = $value;
+            }
+        }
+        if ($bind) {
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, [$lastImport]);
+            odbc_execute($rs, $bind);
         } else {
             $rs = odbc_exec($conn, $sql);
         }
-        while ($row = odbc_fetch_array($rs)) {
-            yield $row;
+        if ($rs) {
+            while ($row = odbc_fetch_array($rs)) {
+                $row = $this->reverseMapFieldsFromConfig($row);
+                yield $row;
+            }
         }
         $this->stopErrorHandler();
     }
@@ -85,6 +105,7 @@ class ODBCManager
             $id = null;
         }
         if ($exists) {
+            $row = $this->fillFieldsFromConfig($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
                 $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                     return "\"{$k}\" = ?";
@@ -108,6 +129,7 @@ class ODBCManager
             if ($fullRow) {
                 $row = $fullRow;
             }
+            $row = $this->fillFieldsFromConfig($row);
             $row = array_filter($row, function ($val) {
                 if (is_bool($val) || is_int($val) || is_float($val)) {
                     return true;
@@ -129,6 +151,7 @@ class ODBCManager
             $result = odbc_fetch_array($rs);
             $result = ['is_new' => true, 'entry' => $result];
         }
+        $result['entry'] = $this->reverseMapFieldsFromConfig($result['entry']);
         $this->stopErrorHandler();
         return $result;
     }
@@ -139,6 +162,7 @@ class ODBCManager
             return $row;
         }
         $this->handleErrors();
+        $row = $this->fillFieldsFromConfig($row);
         $conn = $this->getConnection();
         foreach (array_chunk($row, 50, true) as $chunk) {
             $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
@@ -166,6 +190,7 @@ class ODBCManager
         $params = array_filter(array_values($existing));
         odbc_execute($rs, $params);
         $result = odbc_fetch_array($rs);
+        $result = $this->reverseMapFieldsFromConfig($result);
         $result = ['is_new' => false, 'entry' => $result];
         $this->stopErrorHandler();
         return $result;
@@ -214,7 +239,11 @@ class ODBCManager
 
     private function getConnection()
     {
-        return odbc_connect($this->config['dsn'], $this->config['user'], $this->config['password']);
+        $conn = odbc_connect($this->config['dsn'], $this->config['user'], $this->config['password']);
+        if (stristr($this->config['dsn'], 'mysql') || stristr($this->config['dsn'], 'mariadb')) {
+            odbc_exec($conn, "SET sql_mode = 'ANSI_QUOTES'");
+        }
+        return $conn;
     }
 
     private function getCatalog()
@@ -229,7 +258,7 @@ class ODBCManager
     private function handleErrors()
     {
         $this->orig_handler = set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            $this->errors[] = $errstr;
+            $this->errors[] = "$errstr on line $errline of $errfile";
         });
     }
 
@@ -239,5 +268,127 @@ class ODBCManager
         if ($this->errors) {
             throw new \Exception(implode(' ', $this->errors));
         }
+    }
+
+    private function fillFieldsFromConfig(array $row): array
+    {
+        if (! empty($this->config['permanent_values'])) {
+            foreach ($this->config['permanent_values'] as $field => $value) {
+                $row[$field] = $value;
+            }
+        }
+        if (! empty($this->config['value_mappings'])) {
+            $found = [];
+            foreach ($this->config['value_mappings'] as $field => $mapping) {
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $login = $row[$field];
+                    if (! $login) {
+                        continue;
+                    }
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['loginField']}\" = ?");
+                    if ($rs) {
+                        $id = null;
+                        odbc_execute($rs, [$login]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $id = $result[$mapping['valueField']] ?? null;
+                        }
+                        if (! $id) {
+                            $rs = odbc_prepare($conn, "INSERT INTO {$mapping['table']} (\"{$mapping['loginField']}\", \"{$mapping['realnameField']}\") values (?, ?)");
+                            if ($rs) {
+                                $name = TikiLib::lib('tiki')->get_user_preference($login, 'realName', '');
+                                odbc_execute($rs, [$login, $name]);
+                                $rs = odbc_exec($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = @@IDENTITY");
+                                if ($result = odbc_fetch_array($rs)) {
+                                    $id = $result[$mapping['valueField']] ?? null;
+                                }
+                            }
+                        }
+                        $row[$field] = $id;
+                    }
+                    continue;
+                }
+                if (isset($mapping['~replace~']) && ! isset($found[$mapping['~replace~']])) {
+                    $found[$mapping['~replace~']] = false;
+                }
+                foreach ($mapping as $remote => $local) {
+                    if (isset($row[$field]) && $row[$field] == $local) {
+                        $row[$field] = $remote;
+                        $found[$field] = true;
+                        break;
+                    }
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $row[$mapping['~replace~']] == $local) {
+                        $row[$field] = $remote;
+                        $row[$mapping['~replace~']] = '';
+                        $found[$mapping['~replace~']] = true;
+                        break;
+                    }
+                }
+                if (! isset($row[$field])) {
+                    $row[$field] = '';
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if ($exists) {
+                    continue;
+                }
+                foreach ($this->config['value_mappings'] as $field => $mapping) {
+                    if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
+                        foreach ($mapping as $remote => $local) {
+                            if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                                $row[$m[1]] = $row[$orig_field];
+                                $row[$field] = $remote;
+                                $row[$orig_field] = '';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $row;
+    }
+
+    private function reverseMapFieldsFromConfig(array $row): array
+    {
+        $userslib = TikiLib::lib('user');
+        if (! empty($this->config['value_mappings'])) {
+            foreach ($this->config['value_mappings'] as $field => $mapping) {
+                if (! isset($row[$field])) {
+                    continue;
+                }
+                if (isset($mapping['type']) && $mapping['type'] === 'user') {
+                    $conn = $this->getConnection();
+                    $rs = odbc_prepare($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = ?");
+                    if ($rs) {
+                        odbc_execute($rs, [$row[$field]]);
+                        if ($result = odbc_fetch_array($rs)) {
+                            $login = $result[$mapping['loginField']] ?? null;
+                            $name = $result[$mapping['realnameField']] ?? '';
+                            if ($login && ! $userslib->user_exists($login)) {
+                                $pass = TikiLib::lib('tiki')->genPass();
+                                $userslib->add_user($login, $pass, '');
+                                $userslib->set_user_preference($login, 'realName', $name);
+                            }
+                            $row[$field] = $login;
+                        }
+                    }
+                    continue;
+                }
+                foreach ($mapping as $remote => $local) {
+                    if ($row[$field] == $remote) {
+                        if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                            $local = $row[$m[1]];
+                        }
+                        if (! empty($mapping['~replace~'])) {
+                            $row[$mapping['~replace~']] = $local;
+                        } else {
+                            $row[$field] = $local;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return $row;
     }
 }

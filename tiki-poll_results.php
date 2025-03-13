@@ -13,7 +13,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'maxRecords'               => 'digits',            //post
-        'find'                     => 'word',              //post
+        'find'                     => 'string',            //post
         'which_date'               => 'word',              //post
         'vote_from_date'           => 'digits',            //post
         'from_Month'               => 'digits',            //post
@@ -34,7 +34,6 @@ $inputConfiguration = [
         'scoresort'                => 'text',              //get
         'sort_mode'                => 'text',              //get
         'offset'                   => 'digit',             //get
-        'find'                     => 'text',              //post
         ],
     ],
 ];

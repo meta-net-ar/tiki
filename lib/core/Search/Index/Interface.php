@@ -21,4 +21,6 @@ interface Search_Index_Interface
     public function destroy();
 
     public function exists();
+
+    public function callSuggestions(array $options): array;
 }

@@ -25,25 +25,30 @@
     "checkEnvironmentComment": "The idea is to emulate running all processes sequentially with && (fail if any return a non zero exit code), but be compatible with the different shells on windows",
     "checkEnvironment": "run-s --print-label \"checkEnvironment:*\"",
     "prebuild": "run-s --print-label \"checkEnvironment\"",
+    "build:generateIconList": "node lib/iconGeneratorNodeWrapper.js",
     "build:js": "vite --config=src/js/vite.config.mjs build --mode=production",
     "build:scss": "npm run build -w src/scss",
-    "build": "concurrently \"npm:build:*\"",
+    "build:_custom": "copy-and-watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
+    "build": "concurrently  --kill-others-on-fail \"npm:build:*\"",
     "prewatch": "npm run checkEnvironment",
+    "watch:generateIconList": "npm run build:generateIconList",
     "watch:js": "vite --config=src/js/vite.config.mjs build --watch --mode=development",
     "watch:scss": "npm run watch -w src/scss",
+    "watch:_custom": "copy-and-watch --watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
     "watch": "concurrently --kill-others-on-fail \"npm:watch:*\"",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "format": "prettier .  --write",
     "clean:wsconf": "php console.php dev:buildwsconfs --clean",
     "clean:scss": "npm run clean -w src/scss",
     "clean": "concurrently \"npm:clean:*\"",
-    "build:generateIconList": "node lib/iconGeneratorNodeWrapper.js",
     "test": "vitest --config=src/js/vite.config.mjs --coverage",
-    "testci": "vitest --config=src/js/vite.config.mjs --coverage --run"
+    "testci": "vitest --config=src/js/vite.config.mjs --coverage --run",
+    "postinstall": "patch-package --patch-dir=src/js/patches",
+    "patch": "patch-package --patch-dir=src/js/patches"
   },
   "engines": {
     "npm": ">=9.0.0 <11",
-    "node": ">=20.0.0 <22"
+    "node": ">=20.0.0 <23"
   },
   "enginesComment": {
     "npm": "Npm arrived at version 9 in the middle of node 18 lifecycle, but version 9 is required to keep the version of package-lock.json at v3",
@@ -53,33 +58,36 @@
     "single-spa-css": "^2.0.0",
     "single-spa-vue": "^3.0.0"
   },
+  "common-externals": {
+    "reveal.js": "^5.1.0"
+  },
   "depencenciesCommentSingleLibs": {},
   "devDependencies": {
-    "@guanghechen/rollup-plugin-copy": "^6.0.2",
-    "@stylistic/eslint-plugin-js": "^2.9.0",
+    "@stylistic/eslint-plugin-js": "^2.12.1",
     "@testing-library/vue": "^8.1.0",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "@vitest/coverage-v8": "^2.1.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitest/coverage-istanbul": "^2.1.8",
     "check-engines": "^1.6.0",
-    "concurrently": "^9.0.1",
-    "es-module-shims": "^1.10.0",
-    "eslint": "^9.12.0",
+    "concurrently": "^9.1.0",
+    "copy-and-watch": "^0.1.8",
+    "es-module-shims": "^1.10.1",
+    "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-vue": "^9.29",
-    "glob": "^10.4.5",
-    "happy-dom": "^14.12.0",
-    "npm-run-all2": "^6.2.3",
-    "prettier": "^3.3.3",
+    "eslint-plugin-vue": "^9.32",
+    "glob": "^11.0.0",
+    "happy-dom": "^15.11.7",
+    "npm-run-all2": "^7.0.2",
+    "patch-package": "^8.0.0",
+    "prettier": "^3.4.2",
     "rollup-plugin-visualizer": "^5.12.0",
-    "unplugin-auto-import": "^0.18.3",
-    "unplugin-vue-components": "^0.27.4",
-    "vite": "^5.4.8",
-    "vite-plugin-static-copy": "^2.0.0",
-    "vitest": "^2.1.2"
+    "unplugin-auto-import": "^0.19.0",
+    "unplugin-vue-components": "^0.28.0",
+    "vite": "^6.0.5",
+    "vite-plugin-static-copy": "^2.2.0",
+    "vitest": "^2.1.8"
   },
   "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace": {
-    "@guanghechen/rollup-plugin-copy": "https://github.com/guanghechen/node-scaffolds/tree/@guanghechen/rollup-plugin-copy@6.0.1/packages/rollup-plugin-copy",
     "es-module-shims": "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
     "@vitejs/plugin-vue": "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
     "eslint": "",
@@ -95,9 +103,10 @@
   "workspaces": [
     "src/js/common-externals",
     "src/js/jquery-tiki",
+    "src/js/tiki-iot",
+    "src/js/tiki-vue-sfc-loader",
     "src/js/vue-mf/*",
     "src/js/vue-widgets/*",
-    "src/js/tiki-iot",
     "src/scss"
   ]
 }

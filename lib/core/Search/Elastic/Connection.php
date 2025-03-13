@@ -144,7 +144,7 @@ class Search_Elastic_Connection
             return $this->delete("/$index");
         } catch (Search_Elastic_Exception $e) {
             if ($e->getCode() !== 404) {
-                throw $e;
+                throw new Search_Elastic_Exception(tr("Failed deleting index %0: %1", $index, $e->getMessage()), $e->getCode());
             }
         }
     }

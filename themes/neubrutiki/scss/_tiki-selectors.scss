@@ -37,7 +37,7 @@ h1, h2, h3, h4, h5, h6,
 
 div.table-responsive,
 .tiki .col1 .table-responsive,
-.fc-scrollgrid.table-bordered, // Calendar
+.ec-scrollgrid.table-bordered, // Calendar
 .tiki .ui-datepicker.ui-widget.ui-widget-content.ui-helper-clearfix.ui-corner-all {
     border: 4px solid #000;
     box-shadow: $card-box-shadow;
@@ -240,6 +240,10 @@ table.table {
 // -------------------- Badges -------------------- //
 // -------------------- Modals -------------------- //
 // -------------------- Alerts -------------------- //
+.alert .position-absolute.end-0 {  // Move inward to clear border and shadow
+    right: 10px !important;
+}
+
 // -------------------- Progress bars -------------------- //
 // -------------------- List group -------------------- //
 // -------------------- Image thumbnails -------------------- //
@@ -307,4 +311,7 @@ input:checked + .slide-container .slide {
     .btn-link { color: #83b5fd !important; }
     .btn-link:hover {color: #83B5FDFF !important; }
     .dropdown-item:hover, .dropdown-item.active {background: #52525e};
+    ul.navbar-nav.sm-nav > .sm-nav-item > .sm-nav-link {
+        color: #83b5fd !important;
+    }
 }

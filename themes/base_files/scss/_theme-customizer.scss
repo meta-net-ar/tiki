@@ -24,11 +24,12 @@ footer { padding-bottom:50px; }
 }
 
 .input-group-append, .input-group-addon {
-    display:inline-block;
-    width:auto;
-    padding:2px;
-    border:1px solid #aaa !important;
-    border-radius:3px !important;
+    display: inline-block;
+    width: auto;
+    padding: 2px;
+    border: 1px solid #aaa !important;
+    border-radius: 3px !important;
+    visibility: hidden;
 }
 
 .box-search {
@@ -77,14 +78,14 @@ Theme Customizer Main Styles
             text-transform:none !important;
         }
 
-        input, textarea, select {
+        input:not([type='checkbox']), textarea, select {
             width:78px;
             padding:4px;
             border-radius:3px;
             border:1px solid #aaa;
         }
 
-        input {
+        input:not([type='checkbox']) {
             background-color:#fff; color:#000;
 
             &[disabled] {
@@ -112,13 +113,13 @@ Theme Customizer Main Styles
             span {
                 width:150px;
                 height:150px;
-                margin:0 0 0.75em;
 
                 i { width:100%; height:100%; }
             }
 
             input { display:block; }
             .error:after { padding-right:0; text-align:left; }
+            .input-group-addon { visibility: visible; }
         }
     }
 
@@ -128,11 +129,10 @@ Theme Customizer Main Styles
         .h3a { font-size:1.5em; }
 
         .input {
-            input { width:150px; }
+            input:not([type='checkbox']) { width:150px; }
             label { width:95px; }
 
             .check {
-                width:auto;
                 margin:0 5px 0 0;
                 vertical-align:middle;
             }
@@ -150,7 +150,6 @@ Theme Customizer Main Styles
             label { width:92px; }
 
             .check {
-                width:auto;
                 margin:0 5px 0 0;
                 vertical-align:middle;
             }
@@ -185,7 +184,7 @@ Theme Customizer Main Styles
 
 // forms section
     .forms {
-        span:not(.input-group-addon) { display:inline-block; width:85px; }
+        span:not(.input-group-addon) { display: inline-block; width: 115px; }
 
         .col-md-9 {
             label { display:block; }
@@ -384,7 +383,7 @@ Theme Customizer Responsive Design Stuff
 */
 
 // desktop
-@include media-breakpoint-down(lg) {
+@include media-breakpoint-down(xl) {
     .customizer {
         .tables, .navbars, .dropdowns {
             .input label { display:block; }
@@ -394,14 +393,27 @@ Theme Customizer Responsive Design Stuff
 
 
 // tablet
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(lg) {
     footer { padding-bottom:75px; }
-
     .customizer {
+        sl-color-picker { vertical-align: middle; }
         .colors .input span { width:110px; height:110px; }
+        .input .picker {
+            &.d-flex { display: block; }
+            label { display: block; }
+        }
 
         .tabs, .tables, .navbars, .dropdowns {
             .input label { display:block; }
+        }
+
+        .tables, .forms, .lists, .tabs {
+            .input .nocolor { width: 100%; }
+        }
+        .forms .input p:last-child input { width: 100%; }
+
+        .navbars, .dropdowns {
+            .input label { width: 100%; }
         }
     }
 
@@ -414,7 +426,7 @@ Theme Customizer Responsive Design Stuff
 
 
 // mobile
-@include media-breakpoint-down(sm) {
+@include media-breakpoint-down(md) {
     footer { padding-bottom:124px; }
 
     .customizer {
@@ -433,11 +445,26 @@ Theme Customizer Responsive Design Stuff
     }
 
     .tc-footer {
-        font-size:0.85em;
+        font-size: 0.75em;
         label { margin-bottom:0; }
-        .btn { margin:0 5px 10px 0; padding:4px 10px; }
+        .btn { margin:0 5px 0 0; padding:4px 10px; }
         .icon { display:none; }
         #generate-css { margin-bottom:0; }
+        #generate-custom-css {
+            text-indent: -9999px; line-height: 0; font-size: 1em;
+            &:after {
+                content: "Generate"; display: block;
+                text-indent: 0; line-height: initial;
+            }
+        }
+        #generate-custom-css + label { margin-right: 5px; }
+        #dLabel {
+            text-indent: -9999px; line-height: 0;
+            &:after {
+                content: "Section:"; display: block;
+                text-indent: 0; line-height: initial;
+            }
+        }
 
         .footer-ui > span {
             position:absolute; display:table;
@@ -448,7 +475,7 @@ Theme Customizer Responsive Design Stuff
 
         .dropup {
 //            position:absolute; bottom:0; right:10px;
-            float:none;
+            margin-top: 3px;
             > a { padding:10px; }
         }
     }

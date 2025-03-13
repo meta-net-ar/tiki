@@ -20,6 +20,7 @@ $inputConfiguration = [
         'endDate_Year'         => 'digits',       //get
         'endDate_Month'        => 'digits',       //get
         'endDate_Day'          => 'digits',       //get
+        'display'              => 'striptags'
         ],
         'catchAllUnset' => null
     ],
@@ -130,6 +131,29 @@ $best_objects_stats_lastweek = $statslib->best_overall_object_stats(20, 7);
 $smarty->assign_by_ref('best_objects_stats_lastweek', $best_objects_stats_lastweek);
 $best_objects_stats_between = $statslib->best_overall_object_stats(20, 0, $start_date, $end_date);
 $smarty->assign_by_ref('best_objects_stats_between', $best_objects_stats_between);
-
 $smarty->assign('mid', 'tiki-stats.tpl');
-$smarty->display("tiki.tpl");
+
+if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
+    $smarty->assign('display', $_REQUEST['display']);
+    $smarty->assign('print_page', 'y');
+    $pdata = $smarty->fetch("tiki.tpl");
+    $generator = new PdfGenerator();
+    if (! empty($generator->error)) {
+        Feedback::error($generator->error);
+        $access->redirect($_SERVER['HTTP_REFERER']);
+    } else {
+        $pdf = $generator->getPdf('tiki-stats.php', ['display' => 'print'], $pdata);
+        header('Cache-Control: private, must-revalidate');
+        header('Pragma: private');
+        header("Content-Description: File Transfer");
+        header('Content-disposition: attachment; filename="stats.pdf"');
+        header("Content-Type: application/pdf");
+        header("Content-Transfer-Encoding: binary");
+        header('Content-Length: ' . strlen($pdf));
+        echo $pdf;
+    }
+} else {
+    $smarty->assign('display', '');
+    $smarty->assign('pdf_export', ($prefs['print_pdf_from_url'] != 'none') ? 'y' : 'n');
+    $smarty->display("tiki.tpl");
+}

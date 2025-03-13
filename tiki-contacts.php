@@ -23,7 +23,7 @@ $inputConfiguration = [
             'groups'                      => 'groupname',    //post
             'sort_mode'                   => 'word',         //get
             'offset'                      => 'int',          //get
-            'find'                        => 'word',         //post
+            'find'                        => 'string',       //post
             'maxRecords'                  => 'int',          //get
             'initial'                     => 'string',       //get
             'view'                        => 'string',       //get
@@ -97,14 +97,21 @@ if (isset($_REQUEST["save"])) {
     foreach ($exts as $ext) {
         $ext_result[$ext['fieldId']] = isset($_REQUEST['ext_' . $ext['fieldId']]) ? $_REQUEST['ext_' . $ext['fieldId']] : '';
     }
-    $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'], $ext_result);
-    $info["firstName"] = '';
-    $info["lastName"] = '';
-    $info["email"] = '';
-    $info["nickname"] = '';
-    $info["groups"] = [];
-    $smarty->assign('info', $info);
-    $smarty->assign('contactId', 0);
+    if (empty($_REQUEST["firstName"])) {
+        $feedback = tra('You must specify the contact name.');
+        Feedback::error($feedback);
+    } else {
+        $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'] ?? [], $ext_result);
+        $feedback = sprintf(tra('Contact %s was created.'), $_REQUEST['firstName']);
+        Feedback::success($feedback);
+        $info["firstName"] = '';
+        $info["lastName"] = '';
+        $info["email"] = '';
+        $info["nickname"] = '';
+        $info["groups"] = [];
+        $smarty->assign('info', $info);
+        $smarty->assign('contactId', 0);
+    }
 }
 
 $sort_mode = $_REQUEST["sort_mode"] ?? 'email_asc';

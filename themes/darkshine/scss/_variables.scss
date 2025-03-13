@@ -98,7 +98,7 @@ $form-feedback-invalid-color: #C9312C;
 
 // Z-index master list
 // Navs
-$nav-link-color:                    #600000; // var(--#{$prefix}link-color); //#fff;
+$nav-link-color:                    var(--#{$prefix}link-color); // #600000; // var(--#{$prefix}link-color); //#fff;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color);  // default
 $nav-link-disabled-color: #666E75;
 

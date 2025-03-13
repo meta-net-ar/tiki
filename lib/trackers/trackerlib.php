@@ -22,6 +22,13 @@
 /**
  * This script may only be included, so it is better to die if called directly.
  */
+
+/**
+ * This constant is used to indicate that the status is not a tracker field in the strict context.
+ * Therefore, this field ID does not exist for a tracker item.
+ */
+define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
+
 /**
  * TrackerLib Class
  *
@@ -2042,7 +2049,7 @@ class TrackerLib extends TikiLib
 
         $tracker_definition = Tracker_Definition::get($trackerId);
 
-        if (method_exists($tracker_definition, 'getInformation') == false) {
+        if (empty($tracker_definition) || ! method_exists($tracker_definition, 'getInformation')) {
             return -1;
         }
 
@@ -2104,7 +2111,7 @@ class TrackerLib extends TikiLib
 
         if (! empty($oldStatus) || ! empty($status)) {
             if (! empty($itemId) && $oldStatus != $status) {
-                 $this->log($version, $itemId, -1, $oldStatus);
+                 $this->log($version, $itemId, HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE, $oldStatus);
             }
         }
 
@@ -2140,7 +2147,7 @@ class TrackerLib extends TikiLib
 
             $handler = $this->get_field_handler($array, array_merge($item_info, $fil));
 
-            if (method_exists($handler, 'postSaveHook')) {
+            if ($handler && method_exists($handler, 'postSaveHook')) {
                 // postSaveHook will be called with final value saved
                 // after saving all item fields
                 $postSave[] = [
@@ -2149,7 +2156,7 @@ class TrackerLib extends TikiLib
                 ];
             }
 
-            if (method_exists($handler, 'handleFinalSave')) {
+            if ($handler && method_exists($handler, 'handleFinalSave')) {
                 // handleFinalSave will be called after all other fields are saved, and
                 // will get as parameter all other field data (other than ones that also
                 // use finalSave).
@@ -2162,7 +2169,7 @@ class TrackerLib extends TikiLib
                 }
             }
 
-            if (method_exists($handler, 'handleSave')) {
+            if ($handler && method_exists($handler, 'handleSave')) {
                 $array = array_merge($array, $handler->handleSave(! isset($array['value']) ? null : $array['value'], $old_value));
                 $value = ! isset($array['value']) ? null : $array['value'];
 
@@ -2178,7 +2185,7 @@ class TrackerLib extends TikiLib
                 continue;
             }
 
-            if (method_exists($handler, 'handleSpecialSave')) {
+            if ($handler && method_exists($handler, 'handleSpecialSave')) {
                 $array = array_merge($array, $handler->handleSpecialSave($array));
                 $value = ! isset($array['value']) ? null : $array['value'];
 
@@ -2332,7 +2339,7 @@ class TrackerLib extends TikiLib
             }
 
             foreach ($final as $job) {
-                if (isset($job['field']['value'])) {
+                if (isset($job['field']['value']) && empty($data[$job['field']['permName']])) {
                     $data[$job['field']['permName']] = $job['field']['value'];
                 }
                 $value = $job['handler']->handleFinalSave($data);
@@ -2466,7 +2473,7 @@ class TrackerLib extends TikiLib
         $itemFields = $this->itemFields();
 
         $tracker_info = $this->get_tracker_options($trackerId);
-        if (($header = fgetcsv($csvHandle, 100000, $csvDelimiter)) === false) {
+        if (($header = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) === false) {
             return 'Illegal first line';
         }
         if ($encoding == 'UTF-8') {
@@ -2516,7 +2523,7 @@ class TrackerLib extends TikiLib
         $definition = Tracker_Definition::get($trackerId);
         $line = 0;
         $errors = [];
-        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter)) !== false) {
+        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $line++;
             if ($encoding == 'ISO-8859-1') {
                 for ($i = 0; $i < $max; $i++) {
@@ -2555,9 +2562,9 @@ class TrackerLib extends TikiLib
 
         // back to first row excluding header
         fseek($csvHandle, 0);
-        fgetcsv($csvHandle, 100000, $csvDelimiter);
+        fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
 
-        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter)) !== false) {
+        while (($data = fgetcsv($csvHandle, 100000, $csvDelimiter, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)) !== false) {
             $status = 'o';
             $itemId = 0;
             $created = $tikilib->now;
@@ -3093,7 +3100,7 @@ class TrackerLib extends TikiLib
                     }
 
                     $handler = $this->get_field_handler($f, $this->get_item_info($itemId));
-                    if (method_exists($handler, 'isValid') && empty($f['readonly'])) {
+                    if ($handler && method_exists($handler, 'isValid') && empty($f['readonly'])) {
                         $validationResponse = $handler->isValid($fields);
                         if ($validationResponse !== true) {
                             if (! empty($f['validationMessage'])) {
@@ -3386,7 +3393,7 @@ class TrackerLib extends TikiLib
 
         foreach ($result as & $res) {
             $typeInfo = Tracker_Field_Factory::getFieldInfo($res['type']);
-            $options = Tracker_Options::fromSerialized($res['options'], $typeInfo);
+            $options = Tracker_Options::fromSerialized($res['options'] ?? '', $typeInfo);
             $res['options_array'] = $options->buildOptionsArray();
             $res['options_map'] = $options->getAllParameters();
             $res['itemChoices'] = ( $res['itemChoices'] != '' ) ? unserialize($res['itemChoices']) : [];
@@ -4145,61 +4152,31 @@ class TrackerLib extends TikiLib
     {
         global $prefs;
 
-        $query = "select tif.`value` from `tiki_tracker_item_fields` tif, `tiki_tracker_items` i, `tiki_tracker_fields` tf where i.`itemId`=? and i.`itemId`=tif.`itemId` and tf.`fieldId`=tif.`fieldId` and tf.`isMain`=? ORDER BY tf.`position`";
-        $queryResult = $this->getOne($query, [ (int) $itemId, "y"]);
-        $result = $queryResult;
-        if (! $trackerId) {
-            $trackerId = (int) $this->table('tiki_tracker_items')->fetchOne('trackerId', ['itemId' => $itemId]);
-        }
+        $query = "SELECT tif.`value`, tf.`type` 
+                FROM `tiki_tracker_item_fields` tif
+                JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
+                JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
+                WHERE i.`itemId` = ? AND tf.`isMain` = ?
+                ORDER BY tf.`position`";
+        $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
 
-        try {
-            $definition = Tracker_Definition::get($trackerId);
-        } catch (InvalidArgumentException $e) {
-            trigger_error(
-                tr(
-                    'Requested main tracker item field value of item %0 but tracker %1 not found.',
-                    $itemId,
-                    $trackerId
-                ),
-                E_USER_WARNING
-            );
-            return '';
-        }
-        $mainFieldId = $definition->getMainFieldId();
-        if ($mainFieldId) {
-            $field = $definition->getFieldInfoFromFieldId($mainFieldId);
-            $main_field_type = $field['type'];
-            // for TextArea, ItemLink, AutoIncrement, UserPref and Category fields use the proper output method
-            if (in_array($main_field_type, ['a', 'r', 'q', 'p', 'e'])) {
-                $item = $this->get_tracker_item($itemId);
-                $handler = $this->get_field_handler($field, $item);
-                // when called from \ObjectLib::get_title Category fields need to have getFieldData run before the category name can be rendered
-                if ($handler) {
-                    $field = array_merge($field, $handler->getFieldData());
-                    $handler = $this->get_field_handler($field, $item);
-                    if ($main_field_type == 'a') {
-                        $result = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
-                    } else {
-                        $result = $handler->renderOutput(['list_mode' => 'csv']);
-                    }
-                }
+        $titles = [];
+        $item = $this->get_tracker_item($itemId);
+        foreach ($queryResult as $row) {
+            $value = $row['value'];
+            $field = ['type' => $row['type'], 'value' => $value];
+            $handler = $this->get_field_handler($field, $item);
+
+            if ($handler) {
+                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+            }
+
+            if (! empty($value)) {
+                $titles[] = $value;
             }
         }
-
-        if (strlen($result) && $result[0] === '{') {
-            $decoded = json_decode($result, true);
-            if ($decoded !== null) {     // might start with a "{" but may not be a json_encoded value
-                if (isset($decoded[$prefs['language']])) {
-                    return $decoded[$prefs['language']];
-                } elseif (is_array($decoded)) {
-                    return reset($decoded);
-                }
-            }
-        }
-
-        return (string) $result;
+        return implode(' ', $titles);
     }
-
     /**
      * @param int $itemId
      *
@@ -6871,7 +6848,7 @@ class TrackerLib extends TikiLib
         return array_filter(
             array_map(function ($user) {
                 return trim($user ?? '');
-            }, is_array($value) ? $value : str_getcsv($value ?? ''))
+            }, is_array($value) ? $value : str_getcsv($value ?? '', escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)),
         );
     }
 

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Command;
 
+use Laminas\Log\Writer\Stream as WriterStream;
+use Laminas\Log\Logger;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -62,6 +64,8 @@ class IndexRebuildCommand extends Command
         $unifiedsearchlib = \TikiLib::lib('unifiedsearch');
         $currentEngine = $unifiedsearchlib->getCurrentEngineDetails();
         $fallbackEngine = $unifiedsearchlib->getFallbackEngineDetails();
+        $unusedIndices = $unifiedsearchlib->listAllUnusedIndexes($currentEngine);
+        $logFiles = [];
 
         if (! $cron) {
             $message = '[' . \TikiLib::lib('tiki')->get_short_datetime(0) . '] Started rebuilding index...';
@@ -192,8 +196,36 @@ class IndexRebuildCommand extends Command
                     }
                 }
 
+                if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
+                    $io->section("\nUnused Indexes Detected");
+                    $io->listing($unusedIndices['indices']);
+                    $io->note("If you don't need them (for debugging), run the command: php console.php index:cleanup");
+                } elseif (isset($unusedIndices['error'])) {
+                    $io->error($unusedIndices['error']);
+                }
+
+                $executionTime = $timer->stop();
+                if ($executionTime < 60) {
+                    $seconds = floor($executionTime);
+                    $executionTime = $seconds . ' ' . ($seconds == 1 ? 'sec' : 'secs');
+                } elseif ($executionTime < 3600) {
+                    $minutes = floor($executionTime / 60);
+                    $executionTime = $minutes . ' ' . ($minutes == 1 ? 'min' : 'mins');
+                } else {
+                    $hours = round($executionTime / 3600, 1);
+                    $executionTime = $hours . ' ' . ($hours == 1 ? 'hr' : 'hrs');
+                }
+
+                if ($log && is_array($currentEngine) && count($currentEngine)) {
+                    list($engine) = $currentEngine;
+                    $logToFile = new WriterStream($unifiedsearchlib->getLogFilename($log, strtolower($engine)), 'a');
+                    $loggerInstance = new Logger();
+                    $loggerInstance->addWriter($logToFile);
+                    $loggerInstance->info("Execution time: " . $executionTime);
+                }
+
                 $io->section("\nExecution Statistics");
-                $output->writeln('Execution time: ' . FormatterHelper::formatTime($timer->stop()));
+                $output->writeln('Execution time: ' . $executionTime);
                 $output->writeln('Current Memory usage: ' . FormatterHelper::formatMemory(memory_get_usage()));
                 $output->writeln('Memory peak usage before indexing: ' . FormatterHelper::formatMemory($memory_peak_usage_before));
                 $output->writeln('Memory peak usage after indexing: ' . FormatterHelper::formatMemory(memory_get_peak_usage()));

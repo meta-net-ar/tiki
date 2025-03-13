@@ -1,13 +1,13 @@
 {* ==> put in this file what is not displayed in the layout (javascript, debug..)*}
 {foreach [1, 2, 3] as $modal}
     {assign var='modalId' value=($modal eq 1) ? 'bootstrap-modal' : "bootstrap-modal-{$modal}"}
-    <div id={$modalId} class="modal fade footer-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id={$modalId} class="modal fade footer-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title-{$modalId}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 {* Add header with title to avoid HTML validation errors for aria-labelledby missing a title while hidden.
                 Gets replaced when modal becomes visible.*}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="myModalLabel{$modal}"></h5>
+                    <h5 class="modal-title" id="modal-title-{$modalId}"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -46,7 +46,7 @@
 {if (! isset($display) or $display eq '')}
     {if $phpErrors}
         {if ($prefs.error_reporting_adminonly eq 'y' and $tiki_p_admin eq 'y') or $prefs.error_reporting_adminonly eq 'n'}
-    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} my-3">
+    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} errors-wrapper my-3">
         {button _ajax="n" _id="show-errors-button" _onclick="flip('errors');return false;" _text="{tr}Show PHP error messages{/tr}"}
         <div id="errors" class="alert alert-warning" style="display: {if (isset($smarty.session.tiki_cookie_jar.show_errors) and $smarty.session.tiki_cookie_jar.show_errors eq 'y')}block{else}none{/if};">
             &nbsp;{listfilter selectors='#errors>div.rbox-data'}

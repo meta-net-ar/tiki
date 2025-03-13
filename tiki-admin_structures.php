@@ -11,10 +11,10 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'name'                  => 'word',             //post
+            'name'                  => 'string',           //post
             'lang'                  => 'lang',             //post
             'rremove'               => 'int',              //post
-            'find'                  => 'word',             //post
+            'find'                  => 'string',           //post
             'page'                  => 'pagename',         //post
             'tree'                  => 'xss',              //post
         ],
@@ -41,10 +41,7 @@ if ($tiki_p_edit_structures == 'y') {
     if (isset($_REQUEST['rremove'])) {
         $structure_info = $structlib->s_get_structure_info($_REQUEST['rremove']);
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this page."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
         $access->checkCsrf();
         $structlib->s_remove_page($_REQUEST["rremove"], false, empty($_REQUEST['page']) ? '' : $_REQUEST['page']);
@@ -52,10 +49,7 @@ if ($tiki_p_edit_structures == 'y') {
     if (isset($_REQUEST['rremovex'])) {
         $structure_info = $structlib->s_get_structure_info($_REQUEST['rremovex']);
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this page."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
         $access->checkCsrf();
         $structlib->s_remove_page($_REQUEST["rremovex"], true, empty($_REQUEST['page']) ? '' : $_REQUEST['page']);
@@ -64,10 +58,7 @@ if ($tiki_p_edit_structures == 'y') {
         $access->checkCsrf(false, true);
         $structure_info = $structlib->s_get_structure_info($_REQUEST['export']);
         if ($prefs['feature_wiki_export'] != 'y' || $tiki_p_admin_wiki != 'y' || ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra('You do not have permission to view this page.'));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
         }
         $structlib->s_export_structure($_REQUEST['export']);
     }
@@ -90,11 +81,9 @@ if ($tiki_p_edit_structures == 'y') {
         $access->checkCsrf(false, true);
         $structure_info = $structlib->s_get_structure_info($_REQUEST['export_tree']);
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra('You do not have permission to view this page.'));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
         }
+        TikiLib::lib('header')->setXRobotsTag($robots);
         header("content-type: text/plain");
         $structlib->s_export_structure_tree($_REQUEST['export_tree']);
         die;
@@ -126,10 +115,7 @@ if ($tiki_p_edit_structures == 'y') {
     if (isset($_REQUEST['remove']) && $access->checkCsrf()) {
         $structure_info = $structlib->s_get_structure_info($_REQUEST['remove']);
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to edit this page."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
         $smarty->assign('askremove', 'y');
         $smarty->assign('removename', $structure_info["pageName"]);
@@ -142,17 +128,13 @@ if ($tiki_p_edit_structures == 'y') {
     if (isset($_REQUEST["create"])) {
         $access->checkCsrf();
         if ((empty($_REQUEST['name']))) {
-            $smarty->assign('msg', tra("You must specify a page name, it will be created if it doesn't exist."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You must specify a page name, it will be created if it doesn't exist."), \Laminas\Http\Response::STATUS_CODE_409);
         }
         //try to add a new structure
         $structure_id = $structlib->s_create_page(null, null, $_REQUEST['name'], $_REQUEST['alias'], null);
         //Cannot create a structure if a structure already exists
         if (! isset($structure_id)) {
-            $smarty->assign('msg', $_REQUEST['name'] . " " . tra("page not added (Exists)"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($_REQUEST['name'] . " " . tra("page not added (Exists)"), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $cat_name = $_REQUEST['name'];
         $cat_objid = $cat_name;

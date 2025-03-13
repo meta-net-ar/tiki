@@ -2,7 +2,7 @@
     {if (not isset($translation_mode) or $translation_mode ne 'y') and empty($hide_version_info)}
         <h2>{tr _0=$old.version _1=$new.version}Comparing version %0 with version %1{/tr}</h2>
     {/if}
-    {if $curver.version ne $preview && $object_curver eq 'y'}
+    {if $curver.version|default:null ne $preview && $object_curver eq 'y'}
         {self_link _script="tiki-pagehistory.php" page=$page preview=$curver.version|escape:'url' _title="{tr}Go to current version{/tr}"}{tr}Go to current version{/tr}{/self_link}
     {/if}
     <div class="table-responsive">
@@ -36,6 +36,7 @@
                     <td colspan="2"><div class="wikitext">{$new.data}</div></td>
                 </tr>
             {/if}
+            {if isset($smarty.request.oldver_idx, $smarty.request.newver_idx)}
             <tr>
                 {if $smarty.request.oldver_idx + 1 eq $smarty.request.newver_idx or $smarty.request.oldver_idx eq $smarty.request.newver_idx}
                     <td colspan="4">
@@ -62,6 +63,7 @@
                     </td>
                 {/if}
             </tr>
+            {/if}
             {if $diff_style eq 'unidiff'}
                 <tr>
                     <td colspan="4">

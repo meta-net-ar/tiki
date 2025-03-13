@@ -258,7 +258,7 @@ $navbar-light-brand-color: $navbar-light-color;
 $navbar-light-brand-hover-color:darken($navbar-light-color,10%);
 $navbar-light-brand-hover-bg:transparent;
 
-$navbar-dark-color:                 rgba($white, .55);  // default
+$navbar-dark-color:                 $leaf; // rgba($white, .55);  // default
 $navbar-dark-hover-color:           rgba($white, .75);  // default
 $navbar-dark-active-color:          $white;  // default
 $navbar-dark-disabled-color:        rgba($white, .25);  // default

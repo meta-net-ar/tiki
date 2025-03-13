@@ -189,7 +189,7 @@ class Services_Utilities
         }
         // Assume JS always is enabled, so no need for server-side redirection
         $extra = array_merge($thisExtra, $moreExtra);
-        $ret = [
+        return [
             'FORWARD' => [
                 'modal' => '1',
                 'controller' => 'access',
@@ -202,7 +202,6 @@ class Services_Utilities
                 'extra' => $extra,
             ]
         ];
-        return $ret;
     }
 
     /**

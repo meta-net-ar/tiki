@@ -52,9 +52,7 @@ $html = isset($_REQUEST["html"]) ? ($_REQUEST["html"] == 'on' ? 'y' : 'n') : 'n'
 $all = isset($_REQUEST["all"]) ? ($_REQUEST["all"] == 'on' ? 'y' : 'n') : 'n';
 $enabled = isset($_REQUEST["enabled"]) ? ($_REQUEST["enabled"] == 'on' ? 'y' : 'n') : 'n';
 if (! isset($_REQUEST["repID"]) || $repID <= 0) {
-    $smarty->assign('msg', tra("No repository"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No repository"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 // Create instance of integrator
 $integrator = new TikiIntegrator();
@@ -68,9 +66,7 @@ if (isset($_REQUEST["save"])) {
     if (strlen($srch) > 0) {
         $integrator->add_replace_rule($repID, $ruleID, $ord, $srch, $repl, $type, $casesense, $rxmod, $enabled, $description);
     } else {
-        $smarty->assign('msg', tra("Search is mandatory field"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Search is mandatory field"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 // Check if 'preview' button pressed ...
@@ -104,9 +100,7 @@ if (isset($_REQUEST["preview"])) {
         // Check if file given and present at configured location
         $f = $integrator->get_rep_file($rep, $file);
         if ((substr($rep["path"], 0, 7) != 'http://') && (substr($rep["path"], 0, 8) != 'https://') && ! file_exists($f)) {
-            $smarty->assign('msg', tra("File not found ") . $f);
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("File not found ") . $f, \Laminas\Http\Response::STATUS_CODE_404);
         }
         // Get file content to string
         $data = @file_get_contents($f);
@@ -158,9 +152,7 @@ if (isset($_REQUEST["action"])) {
             break;
 
         default:
-            $smarty->assign('msg', tra("Requested action in not supported on repository"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Requested action in not supported on repository"), \Laminas\Http\Response::STATUS_CODE_500);
             break;
     }
 }

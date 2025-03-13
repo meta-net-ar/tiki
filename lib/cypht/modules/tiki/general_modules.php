@@ -96,11 +96,11 @@ class Hm_Output_tiki_contacts_page_link extends Hm_Output_Module
     public $format;
     protected function output()
     {
-        $res = '<li class="menu_contacts"><a class="unread_link" href="tiki-contacts.php">';
+        $res = '<li class="menu_contacts"><a class="unread_link" href="#">';
         if (! $this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-people-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-people-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Contacts') . '</a></li>';
+        $res .= '<span class="nav-label">' . $this->trans('Contacts') . '</span></a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -363,23 +363,6 @@ class Hm_Output_enable_oauth2_over_imap_setting extends Hm_Output_Module
         <tr class="reveal-if-unchecked"><td>' . tr('Outlook Token Uri') . '</td><td><textarea class="form-control" name="outlook_token_uri">' . $outlook_token_uri . '</textarea></td></tr>
         <tr class="reveal-if-unchecked"><td>' . tr('Outlook Refresh Uri') . '</td><td><textarea class="form-control" name="outlook_refresh_uri">' . $outlook_refresh_uri . '</textarea></td></tr>
         ';
-    }
-}
-
-/**
- * Clear cache link
- * @subpackage tiki/output
- */
-class Hm_Output_clear_cache_link extends Hm_Output_Module
-{
-    public $format;
-    protected function output()
-    {
-        $res = '<a href="#" class="clear_cache">' . $this->trans('[clear cache]') . '</a>';
-        if ($this->format == 'HTML5') {
-            return $res;
-        }
-        $this->concat('formatted_folder_list', $res);
     }
 }
 

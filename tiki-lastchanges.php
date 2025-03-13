@@ -13,7 +13,7 @@ $section_class = "tiki_wiki_page manage";   // This will be body class instead o
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'find'                          => 'word',               //post
+        'find'                          => 'string',             //post
         'days'                          => 'digits',             //get
         'sort_mode'                     => 'word',               //get
         'offset'                        => 'int',                //get

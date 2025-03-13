@@ -45,7 +45,7 @@ function module_last_actions($mod_reference, $module_params)
     if ($user) {
         $logslib = TikiLib::lib('logs');
 
-        $results = $logslib->list_actions('', '', $tiki_p_admin == 'y' ? '' : $user, 0, $mod_reference["rows"]);
+        $results = $logslib->list_actions('', '', $tiki_p_admin == 'y' ? '' : $user, 0, $mod_reference["rows"], 'lastModif_desc', '', 0, 0, '', true);
         $actions = $results['data'];
 
         $smarty->assign('modLastActions', $actions);

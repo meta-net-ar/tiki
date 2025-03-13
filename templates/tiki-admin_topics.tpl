@@ -18,7 +18,7 @@
         <label class="col-sm-2 col-form-label" for="image">{tr}Image{/tr}</label>
         <div class="col-sm-10">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input class="form-control" name="userfile1" type="file">
+            <input class="form-control" name="userfile1" type="file" accept="image/*">
         </div>
     </div>
     <div class="mb-3 row">
@@ -55,7 +55,7 @@
                 </td>
                 <td class="text">
                     {if $topics[user].image_size}
-                        <img alt="{tr}topic image{/tr}" src="article_image.php?image_type=topic&amp;id={$topics[user].topicId}&amp;reload=1">
+                        <img alt="{tr}topic image{/tr}" src="article_image.php?image_type=topic&amp;id={$topics[user].topicId}&amp;reload=1" class="img-fluid" style="max-width: 200px; max-height: 200px;">
                     {else}
                         &nbsp;
                     {/if}

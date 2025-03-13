@@ -53,10 +53,7 @@ for ($i = 0; $i < 5; $i++) {
         try {
             $filegallib->assertUploadedFileIsSafe($_FILES["userfile$i"]['tmp_name'], $_FILES["userfile$i"]['name']);
         } catch (Exception $e) {
-            $smarty->assign('errortype', 403);
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
         }
         $fp = fopen($_FILES["userfile$i"]['tmp_name'], "rb");
         $data = '';
@@ -66,9 +63,7 @@ for ($i = 0; $i < 5; $i++) {
             $fhash = md5(uniqid('.'));
             $fw = fopen($prefs['uf_use_dir'] . $fhash, "wb");
             if (! $fw) {
-                $smarty->assign('msg', tra('Cannot write to this file:') . $fhash);
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra('Cannot write to this file:') . $fhash, \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
         while (! feof($fp)) {
@@ -88,9 +83,7 @@ for ($i = 0; $i < 5; $i++) {
         $name = $_FILES["userfile$i"]['name'];
         $type = $_FILES["userfile$i"]['type'];
         if ($quota + $size > $limit) {
-            $smarty->assign('msg', tra('Cannot upload this file. The storage quota would be exceeded'));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra('Cannot upload this file. The storage quota would be exceeded'), \Laminas\Http\Response::STATUS_CODE_507);
         }
         $userfileslib->upload_userfile($user, '', $name, $type, $size, $data, $fhash);
     }

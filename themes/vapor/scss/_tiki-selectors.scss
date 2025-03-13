@@ -38,12 +38,12 @@ $imagePath: "../images/";
 //    background-color: #e9ecef;
 //}
 
-.fc-col-header-cell,
+.ec-header,
 .textarea-toolbar > div,
 .textarea-toolbar > ul {
     background: $list-group-bg;
 }
 
-.tiki .fc-daygrid-event-harness {
+.tiki .ec-day-grid-event-harness {
     background-color: $info !important;
 }

@@ -1,12 +1,12 @@
 .CodeMirror {
     background-color: #F8F8F8;
-    border: 1px solid gray;
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
     cursor: text;
     font: 1em Arial,Helvetica,sans-serif ! important;
     height: auto;
     margin-bottom: .5em;
-    z-index: -1 ! important;
     padding: 5px ! important;
+    border-bottom-width: 4px;
 }
 
 /*from the codemirror website*/
@@ -63,4 +63,8 @@
 
 .CodeMirror-scroll.cm-s-default {
     height: auto !important;
+}
+
+.CodeMirror-scroll {
+    min-height: 100% !important;
 }

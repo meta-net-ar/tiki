@@ -57,7 +57,7 @@ class ShoutboxLib extends TikiLib
             // if not in tag or on a space or doesn't contain a html entity we split all plain text strings longer than 25 chars using the empty span tag again
             $wrap_at = 25;
             // $res["message"] = preg_replace('e', "'\\1'.wordwrap('\\2', '".$wrap_at."', '<span></span>', 1).'\\3'", $res["message"]);
-            $res["message"] = preg_replace_callback('/(\s*)([^\;>\s]{' . $wrap_at . ',})([^&]<|$)/', function ($m, $wrap_at) {
+            $res["message"] = preg_replace_callback('/(\s*)([^\;>\s]{' . $wrap_at . ',})([^&]<|$)/', function ($m) use ($wrap_at) {
                 return $m[1] . wordwrap($m[2], $wrap_at, '<span></span>', 1) . $m[3];
             }, $res["message"]);
             // emoticons support
@@ -77,7 +77,7 @@ class ShoutboxLib extends TikiLib
         $id = $socialnetworkslib->tweet($message, $user);
         if ($id > 0) {
             $query = "update `tiki_shoutbox` set `tweetId`=? where `user`=? and `msgId`=?";
-            $bindvars = [$id,$user,$msgId];
+            $bindvars = [$id, $user, $msgId];
             $this->query($query, $bindvars);
         }
         return $id;
@@ -105,7 +105,7 @@ class ShoutboxLib extends TikiLib
         // Back on track for normal shoutbox posting
 
         $hash = md5($message);  // this checks for the same message already existing
-        $cant = $this->getOne("select count(*) from `tiki_shoutbox` where `hash`=? and `user`=?", [$hash,$user]);
+        $cant = $this->getOne("select count(*) from `tiki_shoutbox` where `hash`=? and `user`=?", [$hash, $user]);
 
         if ($cant) {
             // at least update  the timestamp - can be convenient if message is thanks or hello - we can see the last post
@@ -113,13 +113,13 @@ class ShoutboxLib extends TikiLib
             $bindvars = [(int) $this->now, $user, $hash];
         } elseif ($msgId) {
             $query = "update `tiki_shoutbox` set `user`=?, `message`=?, `hash`=? where `msgId`=?";
-            $bindvars = [$user,$message,$hash,(int) $msgId];
+            $bindvars = [$user, $message, $hash, (int) $msgId];
         } else {
             $query = "delete from `tiki_shoutbox` where `user`=? and `timestamp`=? and `hash`=?";
-            $bindvars = [$user,(int) $this->now,$hash];
+            $bindvars = [$user, (int) $this->now, $hash];
             $this->query($query, $bindvars);
             $query = "insert into `tiki_shoutbox`(`message`,`user`,`timestamp`,`hash`) values(?,?,?,?)";
-            $bindvars = [$message,$user,(int) $this->now,$hash];
+            $bindvars = [$message, $user, (int) $this->now, $hash];
         }
 
         $result = $this->query($query, $bindvars);
@@ -176,7 +176,7 @@ class ShoutboxLib extends TikiLib
         $ret = [];
 
         while ($res = $result->fetchRow()) {
-                $ret[] = $res;
+            $ret[] = $res;
         }
 
         $retval = [];

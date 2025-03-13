@@ -40,11 +40,12 @@ if (! isset($_REQUEST["sheetId"])) {
     if (isset($_REQUEST['edit_mode']) && $_REQUEST['edit_mode'] == 1) {
         $cookietab = 2;
     }
-    $info = $sheetlib->get_sheet_info($_REQUEST["sheetId"]);
-    if (empty($info) && $_SERVER['REQUEST_METHOD'] == 'GET') {
-        $smarty->assign('msg', tra("Spreadsheet not found"));
-        $smarty->display('error.tpl');
-        die;
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        try {
+            $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
+        } catch (Exception $e) {
+            Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_404);
+        }
     }
     if ($tiki_p_admin == 'y' || $tiki_p_admin_sheet == 'y' || $tikilib->user_has_perm_on_object($user, $_REQUEST['sheetId'], 'sheet', 'tiki_p_view_sheet')) {
         $tiki_p_view_sheet = 'y';
@@ -64,7 +65,7 @@ if (! isset($_REQUEST["sheetId"])) {
         $tiki_p_view_sheet_history = 'n';
     }
     $smarty->assign('tiki_p_view_sheet_history', $tiki_p_view_sheet_history);
-    $smarty->assign('headtitle', tra('Spreadsheet - ') . $_REQUEST['title']);
+    $smarty->assign('headtitle', tra('Spreadsheet - ') . $info['title']);
 }
 
 $access->check_permission('tiki_p_view_sheet');
@@ -81,6 +82,7 @@ $smarty->assign('title', '');
 $smarty->assign('description', '');
 $smarty->assign('edit_mode', 'n');
 $smarty->assign('chart_enabled', (function_exists('imagepng') || function_exists('pdf_new')) ? 'y' : 'n');
+$smarty->assign('creator', $user);
 // If we are editing an existing sheet prepare smarty variables
 if (isset($_REQUEST["edit_mode"]) && $_REQUEST["edit_mode"]) {
     $access->check_permission('tiki_p_edit_sheet');
@@ -102,7 +104,6 @@ if (isset($_REQUEST["edit_mode"]) && $_REQUEST["edit_mode"]) {
         $smarty->assign('headerRow', '0');
         $smarty->assign('footerRow', '0');
         $smarty->assign('parseValues', 'n');
-        $smarty->assign('creator', $user);
         $smarty->assign('parentSheetId', 0);
     }
 }
@@ -144,6 +145,7 @@ if (isset($_REQUEST["removesheet"]) && $access->checkCsrf()) {
     $access->check_permission('tiki_p_edit_sheet');
     $sheetlib->remove_sheet($_REQUEST["sheetId"]);
     header("Location: tiki-sheets.php");
+    exit;
 }
 $cat_objid = $_REQUEST['sheetId'];
 include_once('categorize_list.php');

@@ -15,12 +15,12 @@ $inputConfiguration = [
         'faqId'                    => 'int',                //post
         'remove'                   => 'int',                //get
         'save'                     => 'bool',               //post
-        'title'                    => 'word',               //post
+        'title'                    => 'string',             //post
         'canSuggest'               => 'bool',               //post
         'description'              => 'xss',                //post
         'sort_mode'                => 'word',               //get
         'offset'                   => 'int',                //get
-        'find'                     => 'word',               //post
+        'find'                     => 'string',             //post
         ],
     ],
 ];
@@ -47,19 +47,18 @@ $smarty->assign('description', $info["description"]);
 $smarty->assign('canSuggest', $info["canSuggest"]);
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     if ($tiki_p_admin_faqs != 'y') {
-        $smarty->assign('msg', tra("You do not have the permission that is needed to use this feature"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have the permission that is needed to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $faqlib->remove_faq($_REQUEST["remove"]);
 }
 if (isset($_REQUEST["save"])) {
+    if (empty($_REQUEST["title"])) {
+        Feedback::errorAndDie(tra("You can not create a FAQ without a title "), \Laminas\Http\Response::STATUS_CODE_409);
+    }
     $access->checkCsrf();
     $access->check_permission('tiki_p_admin_faqs');
     if (mb_strlen($_REQUEST["title"]) > 200) {
-        $smarty->assign('msg', tra("You have exceeded the number of characters allowed (200 max) for the FAQ title field"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You have exceeded the number of characters allowed (200 max) for the FAQ title field"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     if (isset($_REQUEST["canSuggest"]) && $_REQUEST["canSuggest"] == 'on') {
         $canSuggest = 'y';

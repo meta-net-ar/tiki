@@ -25,9 +25,7 @@ $structlib = TikiLib::lib('struct');
 $access->check_feature('feature_wiki_multiprint');
 
 if (! isset($_REQUEST['printpages']) && ! isset($_REQUEST['printstructures'])) {
-    $smarty->assign('msg', tra("No pages indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No pages indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 } else {
     if (isset($_REQUEST['printpages'])) {
         $printpages = json_decode(urldecode($_REQUEST['printpages']));
@@ -44,34 +42,24 @@ if (isset($_REQUEST["print"]) || isset($_REQUEST["display"])) {
     $access->checkCsrf();
     // Create XMLRPC object
     $pages = [];
+    $prefs['feature_jquery_tablesorter'] = 'n';
     foreach ($printpages as $page) {
         // If the page doesn't exist then display an error
         if (! $tikilib->page_exists($page)) {
-            $smarty->assign('msg', tra("Page cannot be found"));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("Page cannot be found"), \Laminas\Http\Response::STATUS_CODE_404);
         }
         // Now check permissions to access this page
         if (! $tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_view')) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to view this page."));
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to view this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
         // check if user can print or export pdf
         if (isset($_REQUEST["display"]) && $_REQUEST["display"] == 'pdf') {
             if (! $tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_export_pdf')) {
-                $smarty->assign('errortype', 401);
-                $smarty->assign('msg', tra("You do not have permission to export to pdf this page."));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You do not have permission to export to pdf this page."), \Laminas\Http\Response::STATUS_CODE_401);
             }
         } else {
             if (! $tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_print')) {
-                $smarty->assign('errortype', 401);
-                $smarty->assign('msg', tra("You do not have permission to view the print version of this page."));
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie(tra("You do not have permission to view the print version of this page."), \Laminas\Http\Response::STATUS_CODE_401);
             }
         }
         $pages[] = $tikilib->get_page_print_info($page);
@@ -153,6 +141,7 @@ if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . strlen($pdf));
+        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
     } else {
         Feedback::error($generator->error);

@@ -83,10 +83,6 @@ $tiki-jq-ui-btn-font-weight: normal !default;
 $tiki-sheet-font-size: $font-size-base !default;
 $tiki-sheet-border-color: $table-border-color !default;
 
-// CKEditor colors
-$tiki-editor-bg: $body-bg !default;
-$tiki-editor-text-color: $body-color !default;
-
 //jQuery-UI
 $tiki-ui-default-border: var(-bs-border-color); // $nav-tabs-border-color !default;
 $tiki-ui-default-bg: var(--bs-body-bg); // $body-bg !default;
@@ -150,10 +146,16 @@ header.navbar.fixed-top {
     --tiki-input-bg: var(--bs-body-bg);
     --tiki-input-select-color: var(--bs-emphasis-color); // $form-select-color;
     --tiki-input-select-bg: var(--bs-tertiary-bg);
+    --tiki-navbar-dark-color: #{$navbar-dark-color}; // The Bootstrap variable wasn't being defined.
 }
 
 [data-bs-theme=dark] {
     .bg-light {
         background-color: var(--bs-tertiary-bg);
     }
+}
+
+// Added for Smartmenus 2
+.tiki .sm-navbar {
+    --sm-navbar-z-index: 1000; // reset; // 1050; // 9999;
 }

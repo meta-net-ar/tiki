@@ -12,9 +12,7 @@ require_once 'tiki-setup.php';
 $creditslib = TikiLib::lib('credits');
 
 if ($prefs['feature_credits'] == 'n' and ! empty($user)) {
-    $smarty->assign('msg', tra('You do not have the permission that is needed to use this feature'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have the permission that is needed to use this feature'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 require_once('admin/include_credits.php');

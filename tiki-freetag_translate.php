@@ -30,9 +30,7 @@ $cat_type = $_REQUEST['type'] ?? 'wiki page';
 $cat_objId = $_REQUEST['objId'] ?? '';
 
 if ($cat_type != 'wiki page' && $cat_type != 'article') {
-    $smarty->assign('msg', tra("Not supported yet."));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Not supported yet."), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $freetaglib = TikiLib::lib('freetag');
@@ -41,10 +39,7 @@ $multilinguallib = TikiLib::lib('multilingual');
 // Check for invalid or missing objId and non-admin user permissions
 function handleError($message, $smarty)
 {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', $message);
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! empty($cat_objId)) {

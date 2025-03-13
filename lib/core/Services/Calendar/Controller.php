@@ -820,6 +820,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
     {
         $calitem = $input->asArray('calitem');
         $calitem = $this->convertCalitemTimes($calitem, $input);
+        $calitem = $this->processParticipants($calitem);
         $recurrence = parent::createRecurrenceFromInput($input);
         $recurrence->setCalendarId($calitem['calendarId']);
         $tz = date_default_timezone_get();
@@ -843,6 +844,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $recurrence->setDescription($calitem['description']);
         $recurrence->setRecurenceDstTimezone($input->recurrenceDstTimezone->text());
         $recurrence->setUser($calitem['user']);
+        $recurrence->setOrganizers($calitem['organizers']);
+        $recurrence->setParticipants($calitem['participants']);
+        $recurrence->setProcessItip($calitem['process_itip']);
         if (! empty($calitem['calitemId'])) {
             // store the initial event if it was already created
             $recurrence->setInitialItem($calitem);

@@ -326,11 +326,9 @@ class MonitorLib
     private function finalHandleEvent($args, $events, $force)
     {
         $currentUser = TikiLib::lib('login')->getUserId();
-        if ($force) {
-            if ($currentUser != $force['userId']) {
-                // Direct notification, we know user and priority
-                $results = [$force];
-            }
+        if ($force && $currentUser != $force['userId']) {
+            // Direct notification, we know user and priority
+            $results = [$force];
         } else {
             $targets = $this->collectTargets($args);
 

@@ -62,7 +62,7 @@ class CaldavClient
         } else {
             $uri = Utilities::getCalendarObjectUri($calRecurrence);
         }
-        $vcal = $calRecurrence->constructVCalendar();
+        $vcal = $calRecurrence->constructVCalendar(null, $calRecurrence->getOrganizers(), $calRecurrence->getParticipants());
         $vcal->VEVENT->{'X-Tiki-UpdateManuallyChangedEvents'} = intval($updateManuallyChangedEvents);
         // TODO: Sabredav validation fails when multiple events reside in the same calendar, so we can only send one event per request
         // foreach ($calRecurrence->getOverrides(1) as $calitem) {
@@ -175,6 +175,7 @@ class CaldavClient
 
     public function syncSubscription($subscriptionInfo)
     {
+        global $prefs;
         $source = $subscriptionInfo['source'];
         if (empty($source)) {
             throw new Exception(tr('Calendar subscription source not defined.'));
@@ -194,6 +195,9 @@ class CaldavClient
                 'userName' => $result['arguments']['username'],
                 'password' => $result['arguments']['password'],
             ]);
+            if ($prefs['zend_http_sslverifypeer'] !== 'y') {
+                $client->addCurlSetting(CURLOPT_SSL_VERIFYPEER, 0);
+            }
             $response = $client->request('REPORT', '', '
 <c:calendar-query xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
     <d:prop>
@@ -317,6 +321,9 @@ class CaldavClient
                             $caldata = $prop['value'];
                         }
                     }
+                }
+                if (empty($caldata)) {
+                    continue;
                 }
                 if (! empty($recipient[0]['value'])) {
                     $recipient = $recipient[0]['value'];

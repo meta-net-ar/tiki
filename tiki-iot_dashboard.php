@@ -17,7 +17,7 @@ $trackerlib = TikiLib::Lib('trk');
 $trackerUtilities = new Services_Tracker_Utilities();
 $field_types = $trackerUtilities->getFieldTypes();
 
-use Tiki\Lib\Iot\DrawflowEditor;
+use Tiki\Lib\iot\DrawflowEditor;
 $iot_apps = [];
 
 global $jitRequest;
@@ -71,7 +71,7 @@ if ($mode == "view" && ! empty($app_id)) {
     if ($iot_apps[0]['app_active'] != 'y') {
         Feedback::warning(tr("You can't view the dashboard UI if the app is not activated; please activate it from the main IoT dashboard"));
     }
-    $iot_apps[0]['hardware_io'] = json_decode($iot_app[0]['state_object'], true);
+    $iot_apps[0]['hardware_io'] = json_decode($iot_apps[0]['state_object'], true);
     $iot_apps[0]['session_id'] = session_id();
     $smarty->assign("app", $iot_apps[0]);
     $smarty->assign('mid', 'tiki-iot_ui_dashboard.tpl');
@@ -107,7 +107,6 @@ if ($mode == "view" && ! empty($app_id)) {
         $iot_apps[$key]['hardware_io'] = json_decode($iot_app['state_object'], true);
         $iot_apps[$key]['tracker_fields'] = $trkfields;
         $edit_iot_app_forms[$iot_app['app_uuid']] = $smarty->fetch("iot/edit_iot_app_form.tpl", ['trackerIdsList' => $trackerIdsList['data'], 'app_data' => $iot_app]);
-        $headerlib->add_js("var editIotAppFormTemplate = `{$edit_iot_app_form}`;");
         unset($iot_apps[$key]['app_raw_info']['scenario_config']);
         $onReadyScripts[] = $editor->getEditorScript($iot_app['scenario_config']);
         $smarty->assign("iconset", TikiLib::lib('iconset')->getIconsetForTheme($prefs['theme_iconset'], "")->icons());
@@ -236,5 +235,4 @@ if ($mode == "view" && ! empty($app_id)) {
 
     $smarty->assign('mid', 'tiki-iot_dashboard.tpl');
 }
-
 $smarty->display("tiki.tpl");

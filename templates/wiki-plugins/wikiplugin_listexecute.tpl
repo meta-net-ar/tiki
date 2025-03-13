@@ -1,29 +1,66 @@
 <a name="listexecute_{$iListExecute}"></a>
-<form method="post" action="#listexecute_{$iListExecute}" class="d-flex flex-row flex-wrap align-items-center" id="listexecute-{$iListExecute}">
-    <button class="listexecute-select-all btn btn-primary btn-sm">{tr}Select All{/tr}</button>
+<form method="post" action="#listexecute_{$iListExecute}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
+    <input type="hidden" name="plugin" value="{$fingerprint}">
+    <input type="hidden" name="iListExecute" value="{$iListExecute}">
+    <input type="checkbox" class="form-check-input listexecute-select-all" aria-label="{tr}Select{/tr}" name="selectall" value="">
+    <input type="hidden" name="objects{$iListExecute}[]" value="" class="listexecute-all">
+    {ticket}
+    {tr}Select All{/tr}
     <ol>
         {foreach from=$results item=entry}
             <li>
-                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="objects{$iListExecute}[]" value="{$entry.object_type|escape}:{$entry.object_id|escape}">
-                {if $entry.report_status eq 'success'}
+                <input type="checkbox" class="checkbox_objects form-check-input" aria-label="{tr}Select{/tr}" name="objects{$iListExecute}[]" value="{$entry.object_type|escape}:{$entry.object_id|escape}">
+                {if isset($entry.report_status) && $entry.report_status eq 'success'}
                     {icon name='ok'}
-                {elseif $entry.report_status eq 'error'}
+                {elseif isset($entry.report_status) && $entry.report_status eq 'error'}
                     {icon name='error'}
                 {/if}
                 {object_link type=$entry.object_type id=$entry.object_id backuptitle=$entry.title}
             </li>
         {/foreach}
     </ol>
-    <select name="list_action" class="form-select">
+    <select name="list_action" class="form-select check_submit_select" id="check_submit_select_{$id}">
         <option></option>
         {foreach from=$actions item=action}
-            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}"{if $action->getDefault()} selected{/if}>
+            <option value="{$action->getName()|escape}" data-input="{$action->requiresInput()}" data-inputtype="{$action->inputtype()}"{if $action->getDefault()} selected{/if}>
                 {$action->getName()|escape}
             </option>
         {/foreach}
     </select>
+    <div class="list_input_container" id="list_input_container_{$id}">
+    </div>
     <input type="text" name="list_input" value="" class="form-control" style="display:none">
-    <input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}">
+    {* category_tree *}
+    {if $prefs.feature_categories eq 'y' and $tiki_p_modify_object_categories eq 'y' and count($categories) gt 0}
+        <div class="multiselect form-select cat_tree" style="display:none;">
+            {if is_array($categories) and count($categories) gt 0}
+                {$cat_tree}
+                <input type="hidden" name="cat_categorize" value="on">
+                <div class="clearfix">
+                    {if $tiki_p_admin_categories eq 'y'}
+                        <div class="float-sm-end">
+                            <a class="btn btn-link btn-sm tips" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                {icon name="cog"} {tr}Categories{/tr}
+                            </a>
+                        </div>
+                    {/if}
+                    {select_all checkbox_names='cat_categories[]' label="{tr}Select/deselect all categories{/tr}"}
+                </div> {* end .clear *}
+            {else}
+                <div class="clearfix">
+                    {if $tiki_p_admin_categories eq 'y'}
+                        <div class="float-sm-end">
+                            <a class="btn btn-link" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
+                                {icon name="cog"} {tr}Categories{/tr}
+                            </a>
+                        </div>
+                    {/if}
+                </div> {* end .clear *}
+                {tr}No categories defined{/tr}
+            {/if}
+        </div> {* end #multiselect *}
+    {/if}
+    <input type="submit" class="btn btn-primary btn-sm list_execute_submit" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{tr}Apply{/tr}">
     {if isset($smarty.get.page) && isset($schedulers_amount)}
         <div class="ms-3">
             {if $schedulers_amount eq 0}
@@ -37,25 +74,3 @@
         </div>
     {/if}
 </form>
-{jq}
-$('.listexecute-select-all').removeClass('listexecute-select-all').on('click', function (e) {
-    $(this).closest('form').find(':checkbox:not(:checked):not(:disabled)').prop('checked', true);
-    e.preventDefault();
-});
-$('#listexecute-{{$iListExecute}}').find('select[name=list_action]').on('change', function() {
-    if( $(this).find('option:selected').data('input') ) {
-        $(this).siblings('input[name=list_input]').show();
-    } else {
-        $(this).siblings('input[name=list_input]').hide();
-    }
-});
-$('#listexecute-{{$iListExecute}}').on("submit", function(){
-    var filters = $('#list_filter{{$iListExecute|replace:'wplistexecute-':''}} form').serializeArray();
-    for(var i = 0, l = filters.length; i < l; i++) {
-        var inp = $('<input type="hidden">');
-        inp.attr('name', filters[i].name);
-        inp.val(filters[i].value);
-        $('#listexecute-{{$iListExecute}}').append(inp);
-    }
-});
-{/jq}

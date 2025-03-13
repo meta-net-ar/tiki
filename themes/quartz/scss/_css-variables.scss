@@ -83,7 +83,7 @@
     --tiki-admin-dropdown-link-color: #{$navbar-light-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -105,7 +105,7 @@
     --tiki-admin-dropdown-bg: #A4245DFF;
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    button.was-nav-link.accordion-button {
+    button.accordion-button {
         color: var(--tiki-admin-aside-nav-color) !important;
         background: var(--tiki-admin-aside-nav-bg) !important;
     }
@@ -160,11 +160,14 @@
              color: $link-color-dark;
         }
     }
+    ul.navbar-nav.sm-nav > .sm-nav-item > .sm-nav-link {
+        color: $link-color-dark;
+    }
 }
 
 :root {
-    .fc-event.fc-event-draggable.fc-event-start.fc-event-end.fc-event-past.fc-h-event.tips,
-    .fc-v-event {
+    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
+    .ec-v-event {
         background: var(--bs-secondary-bg) !important;
     }
 }

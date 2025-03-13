@@ -92,7 +92,7 @@
                 <div class="adminoptionbox mb-3 row">
                     <label for="csvlist" class="col-form-label col-sm-4">{tr}Batch upload (CSV file){/tr}</label>
                     <div class="col-sm-8">
-                        <input type="file" name="csvlist" id="csvlist" class="form-control">
+                        <input type="file" accept=".csv" name="csvlist" id="csvlist" class="form-control">
                         <div class="form-text mb-2">{tr}File format: title,authorName,heading,body,lang,user{/tr}....</div>
                         <input type="submit" class="btn btn-primary btn-sm" name="import" value="{tr}Import{/tr}">
                     </div>
@@ -112,7 +112,6 @@
                 {preference name=art_list_type}
                 {preference name=art_list_topic}
                 {preference name=art_list_date}
-                {preference name=art_list_expire}
                 {preference name=art_list_visible}
                 {preference name=art_list_lang}
                 {preference name=art_list_author}

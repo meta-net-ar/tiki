@@ -58,154 +58,49 @@ $(function () {
             new Sortable(el, sortableOptions);
         });
 
-        // $options.nestedSortable({
+        document.querySelectorAll(".new-option").forEach((element) => {
+            new Sortable(element, {
+                group: {
+                    name: "shared",
+                    pull: "clone",
+                    put: false, // Do not allow items to be put into this list
+                },
+                dragClass: "dragging-options",
+                animation: 150,
+                // invertSwap: true,
+                // invertedSwapThreshold: 1,
+                swapThreshold: 0.65,
+                direction: "vertical",
+                forceFallback: true,
+                fallbackOnBody: true,
+                // Called when dragging element changes position
+                onEnd: function (event) {
+                    // Sets ids
+                    var parentId = $(event.item).parents("li").first().data("id");
+                    if (!parentId) parentId = 0;
+                    // $(event.item).data('id', 0);
+                    $(event.item).data("parent", parentId);
 
-        //     disableNesting: 'no-nest',
-        //     forcePlaceholderSize: true,
-        //     handle: 'div',
-        //     helper: 'clone',
-        //     items: 'li',
-        //     maxLevels: 4,
-        //     opacity: .6,
-        //     tabSize: 20,
-        //     tolerance: 'pointer',
-        //     toleranceElement: '> div',
-        //     placeholder: "ui-state-highlight",
-        //     rootID: "root",
-        //     // connectWith:"#page_list_container",
+                    // Additional logic
+                    var $dropped = $(event.item);
+                    $dropped.find(".hidden").removeClass("hidden");
+                    $dropped.find(".field-label").prop("readonly", false).attr("placeholder", tr("Label"));
 
-        //     stop: function (event, ui) {
-        //         setDirty();
-        //         $(this).removeClass("ui-state-active");
-        //     },
-        //     start: function (event, ui) {
-        //         $(this).addClass("ui-state-active");
-        //     }
-        // })
-        //     .droppable({
-        //         classes: {
-        //             "ui-droppable-hover": "ui-state-active"
-        //         },
-        //         drop: function (event, ui) {
-        //             // new option dropped?
-        //             var $dropped = $(ui.draggable).clone();
+                    $dropped
+                        .find(".icon-edit")
+                        .parent()
+                        .prop("disabled", true)
+                        .attr("title", "|" + tr("Save all options to enable extended properties editing."))
+                        .addClass("tips")
+                        .css("opacity", 0.5)
+                        .parent()
+                        .tiki_popover();
 
-        //             if ($dropped.hasClass("new")) {
-
-        //                 $dropped.find(".hidden").removeClass("hidden");
-        //                 $dropped.find(".field-label")
-        //                     .prop("readonly", false)
-        //                     .attr("placeholder", tr("Label"));
-
-        //                 $(ui.helper).hide();
-        //                 var element = null,
-        //                     $target = [],
-        //                     y = event.clientY;
-
-        //                 do {
-        //                     element = document.elementFromPoint(event.clientX, y);
-        //                     $target = $(element);
-        //                     if (! $target.is("li")) {
-        //                         $target = $target.parents("li").first();
-        //                     }
-        //                     y -= 10;
-
-        //                 } while (y > $options.offset().top && ! element);
-
-        //                 $dropped
-        //                     .removeClass("new")
-        //                     .addClass("option-added")
-        //                     .show()
-        //                     .attr("id", "node_new_" + $(".option-added", $options).length);
-
-        //                 if ($target.length) {
-        //                     $target.after($dropped);
-        //                 } else {
-        //                     $options.prepend($dropped);    // add new one to the top if all else fails
-        //                 }
-
-        //                 $dropped.find(".icon-edit").parent()
-        //                     .prop("disabled", true)
-        //                     .attr("title", "|" + tr("Save all options to enable extended properties editing."))
-        //                     .addClass("tips")
-        //                     .css("opacity", 0.5)
-        //                     .parent()
-        //                     .tiki_popover();
-
-        //                 $dropped.find(".field-label").trigger("focus");
-        //                 setDirty();
-        //             }
-        //         }
-        //     })
-        //     .disableSelection();
-
-        new Sortable(document.getElementsByClassName("new-option")[0], {
-            group: {
-                name: "shared",
-                pull: "clone",
-                put: false, // Do not allow items to be put into this list
-            },
-            dragClass: "dragging-options",
-            animation: 150,
-            // invertSwap: true,
-            // invertedSwapThreshold: 1,
-            swapThreshold: 0.65,
-            direction: "vertical",
-            forceFallback: true,
-            fallbackOnBody: true,
-            // Called when dragging element changes position
-            onEnd: function (event) {
-                // Sets ids
-                var parentId = $(event.item).parents("li").first().data("id");
-                if (!parentId) parentId = 0;
-                // $(event.item).data('id', 0);
-                $(event.item).data("parent", parentId);
-
-                // Additional logic
-                var $dropped = $(event.item);
-                $dropped.find(".hidden").removeClass("hidden");
-                $dropped.find(".field-label").prop("readonly", false).attr("placeholder", tr("Label"));
-
-                $dropped
-                    .find(".icon-edit")
-                    .parent()
-                    .prop("disabled", true)
-                    .attr("title", "|" + tr("Save all options to enable extended properties editing."))
-                    .addClass("tips")
-                    .css("opacity", 0.5)
-                    .parent()
-                    .tiki_popover();
-
-                $dropped.find(".field-label").trigger("focus");
-                setDirty();
-            },
+                    $dropped.find(".field-label").trigger("focus");
+                    setDirty();
+                },
+            });
         });
-
-        // $("#node_new").draggable({
-        //     connectToSortable:"#options",
-        //     revert:"invalid",
-        //     helper:"clone",
-        //     start:function (event, ui) {
-        //         $(ui.helper)
-        //             .css({
-        //                 zIndex: 10000,
-        //                 width: "800px"
-        //             })
-        //             .find(".hidden").removeClass("hidden")
-        //         ;
-
-        //         $options.mouseover(function () {
-        //             $options.addClass("over");
-        //         }).mouseout(function () {
-        //             $options.removeClass("over");
-        //         });
-        //     },
-        //     stop:function (event, ui) {
-        //         $(ui.helper).css("z-index", "auto");
-
-        //         $options.off("mouseover").off("mouseout");
-        //     }
-        // }).disableSelection();
 
         $options.on("click", ".option-remove", function () {
             if (confirm(tr("Are you sure you want to remove this option?"))) {
@@ -306,6 +201,7 @@ $(function () {
                 position: null,
                 name: $(el).find("input.field-label").val(),
                 url: $(el).find("input.field-url").val(),
+                icon: $(el).find("input.field-icon").val(),
                 sectionLevel: null,
                 type: null,
             };

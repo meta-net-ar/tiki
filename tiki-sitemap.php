@@ -18,15 +18,7 @@ if ($prefs['sitemap_enable'] == 'y') {
         ! preg_match('/^.*\.(xml)$/', $siteMapFile, $matches)
         || ! file_exists($path . $siteMapFile)
     ) {
-        $smarty->assign(
-            'msg',
-            tra(
-                'The sitemap file is not available. Please check <a href="tiki-admin_sitemap.php" class="alert-link"> sitemap administration </a> to build it.'
-            )
-        );
-        header('HTTP/1.1 404 Not Found');
-        $smarty->display('error.tpl');
-        die();
+        Feedback::errorAndDie(tra('The sitemap file is not available. Please check <a href="tiki-admin_sitemap.php" class="alert-link"> sitemap administration </a> to build it.'), \Laminas\Http\Response::STATUS_CODE_404);
     }
 
     header('Content-Type: application/xml; charset=utf-8');
@@ -54,11 +46,5 @@ if ($prefs['sitemap_enable'] == 'y') {
         echo $file;
     }
 } else {
-    $smarty->assign(
-        'msg',
-        tra(
-            'Required features: sitemap_enable. If you do not have permission to activate these features, ask the site administrator.'
-        )
-    );
-    $smarty->display('error.tpl');
+    Feedback::errorAndDie(tra('Required features: sitemap_enable. If you do not have permission to activate these features, ask the site administrator.'), \Laminas\Http\Response::STATUS_CODE_401);
 }

@@ -132,6 +132,9 @@ class Services_Tracker_Controller
                 Feedback::error($msg);
 
                 return Services_Utilities::closeModal();
+            } elseif ($trackerIds = Tracker_Definition::permNameExists($permName)) {
+                Feedback::warning(tr('This permanent name %0 is already used in other trackers: %1', $permName, implode(", ", $trackerIds)));
+                Feedback::sendHeaders();
             }
 
             $fieldId = $this->utilities->createField(
@@ -355,9 +358,15 @@ class Services_Tracker_Controller
         $encryption_keys = TikiLib::lib('encryption')->get_keys();
 
         $permName = $input->permName->word();
+        if (isset($permName) && empty($permName)) {
+            throw new Services_Exception(tr('Tracker Field permanent name cannot be empty'));
+        }
         if ($permName && $field['permName'] != $permName) {
             if ($definition->getFieldFromPermName($permName)) {
                 throw new Services_Exception_DuplicateValue('permName', tr('This permanent name %0 is already used', $permName));
+            } elseif ($trackerIds = Tracker_Definition::permNameExists($permName)) {
+                Feedback::warning(tr('This permanent name %0 is already used in other trackers: %1', $permName, implode(", ", $trackerIds)));
+                Feedback::sendHeaders();
             }
         }
 
@@ -488,6 +497,21 @@ class Services_Tracker_Controller
                 if (in_array($key, $submitted_keys)) {
                     $data[$key] = $input->$key->int() ? 'y' : 'n';
                 }
+            }
+
+            // Detect name or permName changes and update tabular format descriptors
+            $nameChanged = $field['name'] !== $data['name'];
+            $permNameChanged = $field['permName'] !== $data['permName'];
+
+            if ($nameChanged || $permNameChanged) {
+                $tabularController = new Services_Tracker_TabularController();
+                $tabularController->updateColumns(
+                    $field['trackerId'],
+                    $field['name'],
+                    $data['name'],
+                    $field['permName'],
+                    $data['permName']
+                );
             }
 
             $this->utilities->updateField(
@@ -2334,12 +2358,13 @@ class Services_Tracker_Controller
                         $has_initial_version = true;
                     }
                     if (empty($field_option[$hist['fieldId']])) {
-                        if ($hist['fieldId'] > 0) {
+                        if ($hist['fieldId'] !== HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
                             $field_option[$hist['fieldId']] = $trklib->get_tracker_field($hist['fieldId']);
                         } else {
                             $field_option[$hist['fieldId']] = [ // fake field to do the diff on
                                 'type' => 't',
                                 'name' => tr('Status'),
+                                'fieldId' => $hist['fieldId'],
                                 'trackerId' => $item_info['trackerId'],
                             ];
                         }
@@ -2563,6 +2588,7 @@ class Services_Tracker_Controller
                                 'CR' => $cr,
                                 'delimitorL' => $delimitorL,
                                 'delimitorR' => $delimitorR,
+                                'multiLanguageAsJson' => true,
                             ]);
                         }
                     }

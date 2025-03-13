@@ -244,7 +244,7 @@ shift $((OPTIND - 1))
 # define command to execute for main program
 if [ -z "$1" ]; then
     COMMAND="default"
-    EXITONFAIL="n"
+    EXITONFAIL="y" #This was set to "n"  A) It's a tech support nightmare to to make failing composer operation non-blocking.  B) Presumably checking if there was no first parameter was a way to detect that we are in interactive mode.  It's silly to make the output and errors basically invisible especially in interactive mode!  If someone wants to restore this for some reason make it a command line parameter.  Can't believe we are still maintaining setup.sh.  benoitg - 2025-03-08
 else
     COMMAND=$1
     EXITONFAIL="y"
@@ -631,61 +631,38 @@ composer_core()
     then
         if [ ${LOGCOMPOSERFLAG} = "0" ] ; then
             #until php -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --no-dev
-            until "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} 2>&1 | sed '/Warning: Ambiguous class resolution/d'
+            INSTALL_CMD="$PHPCLI -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction $DEVELOPMENT"
+            # 2>&1 | sed '/Warning: Ambiguous class resolution/d'
+            # Whatever that sed hack above was trying to fix, it swallows the composer return code, preventing both download retries, and killing the script if composer fails!  benoitg - 2025-03-08
             # setting memory_limit here prevents suhosin ALERT - script tried to increase memory_limit to 536870912 bytes
-            do
-                if [ $N -eq 7 ];
-                then
-                    if [ ${EXITONFAIL} = "y" ]; then
-                        exit 1
-                    else
-                        return
-                    fi
-                else
-                    echo "Composer failed, retrying in 5 seconds, for a few times. Hit Ctrl-C to cancel."
-                    sleep 5
-                fi
-                N=$((N+1))
-            done
+            
         fi
         if [ ${LOGCOMPOSERFLAG} = "1" ] ; then
-            until "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} > ${TIKI_COMPOSER_INSTALL_LOG}
+            INSTALL_CMD="${PHPCLI} -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} > ${TIKI_COMPOSER_INSTALL_LOG}"
             # setting memory_limit here prevents suhosin ALERT - script tried to increase memory_limit to 536870912 bytes
-            do
-                if [ $N -eq 7 ];
-                then
-                    if [ ${EXITONFAIL} = "y" ]; then
-                        exit 1
-                    else
-                        return
-                    fi
-                else
-                    echo "Composer failed, retrying in 5 seconds, for a few times. Hit Ctrl-C to cancel."
-                    sleep 5
-                fi
-                N=$((N+1))
-            done
         fi
         if [ ${LOGCOMPOSERFLAG} = "2" ] ; then
             printf "Suppress output lines with 'Warning: Ambiguous class resolution'\n..."
             #until php -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --no-dev | sed '/Warning: Ambiguous class resolution/d'
-            until "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT}
+            INSTALL_CMD="${PHPCLI} -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT}"
             # setting memory_limit here prevents suhosin ALERT - script tried to increase memory_limit to 536870912 bytes
-            do
-                if [ $N -eq 7 ];
-                then
-                    if [ ${EXITONFAIL} = "y" ]; then
-                        exit 1
-                    else
-                        return
-                    fi
-                else
-                    echo "Composer failed, retrying in 5 seconds, for a few times. Hit Ctrl-C to cancel."
-                    sleep 5
-                fi
-                N=$((N+1))
-            done
         fi
+        echo "$INSTALL_CMD"
+        until eval "$INSTALL_CMD"
+        do
+            if [ $N -eq 7 ];
+            then
+                if [ ${EXITONFAIL} = "y" ]; then
+                    exit 1
+                else
+                    return
+                fi
+            else
+                echo "Composer failed, retrying in 5 seconds, for a few times. Hit Ctrl-C to cancel."
+                sleep 5
+            fi
+            N=$((N+1))
+        done
     fi
     return
 }

@@ -31,6 +31,23 @@ class Services_Search_Controller
         $num_queries_before = $num_queries;
 
         $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+        $currentEngine = $unifiedsearchlib->getCurrentEngineDetails();
+        $unusedIndices = $unifiedsearchlib->listAllUnusedIndexes($currentEngine);
+
+        if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
+            $unusedIndicesMessage = "You have the following unused indexes:\n";
+            $unusedIndicesMessage .= '<ul>';
+            foreach ($unusedIndices['indices'] as $m => $indices) {
+                $unusedIndicesMessage .= "<li>" . $indices . "</li>";
+            }
+            $unusedIndicesMessage .= '</ul>';
+            $unusedIndicesMessage .= "If you don't need them (for debugging), run the following command:";
+            $unusedIndicesMessage .= "<ul><li>php console.php index:cleanup</li></ul>";
+            Feedback::note(['mes' => $unusedIndicesMessage]);
+        } elseif (isset($unusedIndices['error'])) {
+            Feedback::error(['mes' => tr($unusedIndices['error'])]);
+        }
+
         $access = TikiLib::lib('access');
         $stat = null;
 
@@ -115,9 +132,18 @@ class Services_Search_Controller
 
         $num_queries = ($num_queries_after - $num_queries_before);
 
+        $executionTime = FormatterHelper::formatTime($timer->stop());
+
+        if ($input->loggit->int()) {
+            $log = new Laminas\Log\Writer\Stream($unifiedsearchlib->getLogFilename($input->loggit->int(), $prefs['unified_engine']), 'a');
+            $loggerInstance = new Laminas\Log\Logger();
+            $loggerInstance->addWriter($log);
+            $loggerInstance->info("Execution time: " . $executionTime);
+        }
+
         if ($num_queries) {
             $msg = '<ul>';
-            $msg .= '<li>' . tr('Execution time:') . ' ' . FormatterHelper::formatTime($timer->stop()) . '</li>';
+            $msg .= '<li>' . tr('Execution time:') . ' ' . $executionTime . '</li>';
             $msg .= '<li>' . tr('Current Memory usage:') . ' ' . FormatterHelper::formatMemory(memory_get_usage()) . '</li>';
             $msg .= '<li>' . tr('Memory peak usage before indexing:') . ' ' . FormatterHelper::formatMemory($memory_peak_usage_before) . '</li>';
             $msg .= '<li>' . tr('Memory peak usage after indexing:') . ' ' . FormatterHelper::formatMemory(memory_get_peak_usage()) . '</li>';

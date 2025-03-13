@@ -60,7 +60,7 @@
 <form action="tiki-directory_admin_related.php">
     {ticket}
     <input type="hidden" name="parent" value="{$parent|escape}">
-    <input type="hidden" name="oldcategId" value="{$items[user].relatedTo|escape}">
+    <input type="hidden" name="oldcategId" value="{$items[user].relatedTo|default:''|escape}">
 
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
         <table class="table table-striped table-hover">

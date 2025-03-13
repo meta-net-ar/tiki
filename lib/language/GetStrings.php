@@ -54,7 +54,7 @@ class Language_GetStrings
 
     /**
      * Whether file paths where the string was found
-     * is included or not in langauge.php files. Default
+     * is included or not in language.php files. Default
      * is false.
      *
      * @var bool

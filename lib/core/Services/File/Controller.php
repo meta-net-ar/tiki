@@ -96,7 +96,9 @@ class Services_File_Controller
 
         $gal_info = $this->checkTargetGallery($input);
         $fileId = $input->update->int() ? $input->fileId->int() : false;
-        $asuser = $input->user->text();
+        if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
+            $asuser = $input->asArray('user')[0];
+        }
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
         $directoryPattern = $input->directoryPattern->text();
@@ -155,6 +157,9 @@ class Services_File_Controller
             $title = $name;
         }
 
+        if ($directory = $input->directory->text()) {
+            $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
+        }
 
         /* The above if/else sets $type using finfo_file(). The following uses finfo_buffer(), which gives a type different from that obtained from finfo_file() in the case of Outlook .msg files on PHP 5.6. In this case, finfo_file()'s result is better. It is not impossible that the technique below would give better results in other cases.
         See https://stackoverflow.com/questions/45243973/fileinfo-finfo-buffer-results-differ-from-finfo-file
@@ -207,6 +212,11 @@ class Services_File_Controller
         $_REQUEST["cat_categorize"] = 'on';
         include('categorize.php');
 
+        $filegallib = TikiLib::lib('filegal');
+        $info = $filegallib->get_file_info($fileId);
+        // when stored in the database the file contents is here and should not be sent back to the client
+        $info['data'] = null;
+
         $util->setTicket();
         return [
             'size' => $size,
@@ -217,12 +227,14 @@ class Services_File_Controller
             'fileId' => $fileId,
             'galleryId' => $gal_info['galleryId'],
             'md5sum' => md5($data),
-            'ticket' => $util->getTicket()
+            'ticket' => $util->getTicket(),
+            'syntax' => $filegallib->getWikiSyntax($gal_info['galleryId'], $info, $input->asArray()),
+            'info' => $info,
         ];
     }
 
     /**
-     * Uploads several files at once, currently from jquery_upload when file_galleries_use_jquery_upload pref is enabled
+     * Uploads several files at once
      *
      * @param JitFilter $input
      * @return array
@@ -278,13 +290,6 @@ class Services_File_Controller
 
                     // do the actual upload
                     $file = $this->action_upload($input);
-
-                    if (! empty($file['fileId'])) {
-                        $file['info'] = $filegallib->get_file_info($file['fileId']);
-                        // when stored in the database the file contents is here and should not be sent back to the client
-                        $file['info']['data'] = null;
-                        $file['syntax'] = $filegallib->getWikiSyntax($file['galleryId'], $file['info'], $input->asArray());
-                    }
 
                     if (! empty($input->asArray('isbatch')) && $input->isbatch->word() && stripos($_FILES['data']['type'], 'zip') !== false) {
                         $errors = [];

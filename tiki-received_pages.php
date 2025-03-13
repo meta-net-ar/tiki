@@ -31,36 +31,45 @@ $wikilib = TikiLib::lib('wiki');
 $auto_query_args = ['receivedPageId', 'sort_mode', 'offset', 'find', 'sort_modes'];
 $access->check_feature('feature_comm');
 $access->check_permission('tiki_p_admin_received_pages');
-if (! isset($_REQUEST["receivedPageId"])) {
-    $_REQUEST["receivedPageId"] = 0;
-}
-$smarty->assign('receivedPageId', $_REQUEST["receivedPageId"]);
+
+$pageId = $_REQUEST["receivedPageId"] ?? 0;
+$smarty->assign('receivedPageId', $pageId);
+
+$info = [];
+$info["pageName"] = '';
+$info["data"] = '';
+$info["comment"] = '';
 $errors = [];
 if (isset($_REQUEST["accept"]) && $access->checkCsrf()) {
     // CODE TO ACCEPT A PAGE HERE
     if (! $commlib->accept_page($_REQUEST["accept"])) {
-        $info = $commlib->get_received_page($_REQUEST['accept']);
+        $pageId = $_REQUEST["accept"];
         $errors[] = tr('Page already exists');
     }
 }
-if ($_REQUEST["receivedPageId"]) {
-    $info = $commlib->get_received_page($_REQUEST["receivedPageId"]);
-} else {
-    $info = [];
-    $info["pageName"] = '';
-    $info["data"] = '';
-    $info["comment"] = '';
-}
+
 $smarty->assign('view', 'n');
+
 if (isset($_REQUEST["view"])) {
-    $info = $commlib->get_received_page($_REQUEST["view"]);
+    $pageId = $_REQUEST["view"];
     $smarty->assign('view', 'y');
 }
+
 if (isset($_REQUEST["preview"])) {
     $info["pageName"] = $_REQUEST["pageName"];
     $info["data"] = $_REQUEST["data"];
     $info["comment"] = $_REQUEST["comment"];
 }
+
+if ($pageId) {
+    try {
+        $info = $commlib->get_received_page($pageId);
+    } catch (Exception $e) {
+        Feedback::error($e->getMessage());
+        $smarty->assign('receivedPageId', 0);
+    }
+}
+
 $smarty->assign('pageName', $info["pageName"]);
 $smarty->assign('data', $info["data"]);
 $smarty->assign('comment', $info["comment"]);

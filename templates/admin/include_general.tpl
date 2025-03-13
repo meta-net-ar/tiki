@@ -112,6 +112,8 @@
                 </div>
                 {preference name=log_mail}
                 {preference name=log_sql}
+                {preference name=log_failed_logins}
+                {preference name=log_file}
                 <div class="adminoptionboxchild" id="log_sql_childcontainer">
                     {preference name=log_sql_perf_min}
                 </div>
@@ -147,6 +149,7 @@
                 <legend class="h3">{tr}Scheduler Settings{/tr}</legend>
                 {preference name=feature_scheduler}
                 {preference name=scheduler_delay}
+                {preference name=scheduler_shell_command}
                 {preference name=scheduler_stalled_timeout}
                 {preference name=scheduler_notify_on_stalled}
                 <div class="adminoptionboxchild" id="scheduler_notify_on_stalled_childcontainer">
@@ -158,6 +161,38 @@
                     {preference name=scheduler_users_to_notify_on_healed}
                 </div>
                 {preference name=scheduler_keep_logs}
+                {preference name=scheduler_last_run_warning_minutes}
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}Headless Browser Integration{/tr}</legend>
+                {preference name=headlessbrowser_integration_type}
+                <div class="adminoptionbox headlessbrowser_integration_type_childcontainer chrome">
+                    {preference name=headlessbrowser_chrome_path}
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>{tr}Maintenance{/tr}</legend>
+                {preference name=maintenanceMessageReindex}
+                <div class="adminoptionboxchild" id="maintenanceMessageReindex_childcontainer">
+                    {preference name=maintenanceReindexMessage}
+                </div>
+                {preference name=maintenanceTimeBeforeDisplayMessage}
+                {preference name=maintenanceRecurrentEnable}
+                <div class="adminoptionboxchild" id="maintenanceRecurrentEnable_childcontainer">
+                    {preference name=maintenanceRecurrentPreMessage}
+                    {preference name=maintenanceRecurrentDuringMessage}
+                    {preference name=maintenanceRecurrentStartTime}
+                    {preference name=maintenanceRecurrentDuration}
+                    {preference name=maintenanceEnableWeekdays}
+                </div>
+                {preference name=maintenanceOnceOffEnable}
+                <div class="adminoptionboxchild" id="maintenanceOnceOffEnable_childcontainer">
+                    {preference name=maintenanceOnceOffPreMessage}
+                    {preference name=maintenanceOnceOffDuringMessage}
+                    {preference name=maintenanceOnceOffStartDate}
+                    {preference name=maintenanceOnceOffStartTime}
+                    {preference name=maintenanceOnceOffDuration}
+                </div>
             </fieldset>
         {/tab}
         {tab name="{tr}General Settings{/tr}"}

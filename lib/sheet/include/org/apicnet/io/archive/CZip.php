@@ -245,23 +245,23 @@ class CZip {
 
 
     public function extract($dir, $zipfilename){
-        if (function_exists("zip_open")) {
-            //$dir  = eregi_replace("(\..*$)", "", $zipfilename);
+        $zip = new ZipArchive();
+        if ($zip->open($zipfilename) === TRUE) {
             $this->createDir($dir);
-            $zip  = zip_open($zipfilename);
-            if ($zip) {
-               while ($zip_entry = zip_read($zip)) {
-                   if (zip_entry_open($zip, $zip_entry, "r")) {
-                       $buf = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
-                       if (preg_match("/(\/)/i", zip_entry_name($zip_entry))) $this->createDir($dir."/".preg_replace("/\/.*$/", "", zip_entry_name($zip_entry)));
-                       $this->createFile($dir."/".zip_entry_name($zip_entry), $buf);
-                       zip_entry_close($zip_entry);
-                   }
-               }
-               zip_close($zip);
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $filename = $zip->getNameIndex($i);
+                $fileinfo = pathinfo($filename);
+
+                if ($fileinfo['dirname'] !== '.') {
+                    $this->createDir($dir . '/' . $fileinfo['dirname']);
+                }
+
+                if (!empty($fileinfo['basename'])) {
+                    $contents = $zip->getFromIndex($i);
+                    $this->createFile($dir . '/' . $filename, $contents);
+                }
             }
+            $zip->close();
         }
     }
-
-
 }

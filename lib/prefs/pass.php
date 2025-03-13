@@ -54,7 +54,7 @@ function prefs_pass_list()
         ],
         'pass_chr_special' => [
             'name' => tra('Require special characters'),
-            'description' => tra('Password must contain at least one special character in lower case like <b>" / $ % ? & * ( ) _ + .</b> Use this option to require users to select stronger passwords.'),
+            'description' => tra('Password must contain at least one special character like <b>" / $ % ? & * ( ) _ + .</b> Use this option to require users to select stronger passwords.'),
             'type' => 'flag',
             'default' => 'n',
         ],
@@ -68,6 +68,27 @@ function prefs_pass_list()
             'name' => tra('The password must be different from the user\'s log-in name'),
             'type' => 'flag',
             'default' => 'y',
+        ],
+        'pass_show_rules' => [
+            'name' => tra('Show rules for password creation'),
+            'description' => tra('Display the password creation rules to users when they are setting their passwords. This helps users understand the requirements for creating a valid password.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ],
+        'pass_history_management' => [
+            'name' => tra('Password History Management'),
+            'description' => tra('To enforce password security, this option allows to determine the number of password resets associated with a user account before the password can be reused.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
+        'pass_history_number' => [
+            'name' => tra('Use old password after'),
+            'description' => tra('Number of password resets before the password can be reused.'),
+            'type' => 'text',
+            'size' => 5,
+            'filter' => 'int',
+            'units' => tra('resets'),
+            'default' => 5,
         ],
     ];
 }

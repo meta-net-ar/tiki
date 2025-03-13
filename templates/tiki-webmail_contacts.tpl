@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{$prefs.language}">
+<html lang="{$prefs.language}"{if Language::isRTL()} dir="rtl"{/if}>
     <head>
         {include file='header.tpl'}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -18,13 +18,31 @@ function wikiplugin_rss_info()
         'tags' => [ 'basic' ],
         'params' => [
             'id' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('IDs'),
                 'separator' => ':',
                 'filter' => 'int',
-                'description' => tr('List of feed IDs separated by colons. ex: %0', '<code>feedId:feedId2</code>'),
+                'description' => tr('List of feed IDs separated by colons (e.g., %0). You can find the IDs in the RSS Administration page:  %1', '<code>feedId:feedId2</code>', '<code>tiki-admin_rssmodules.php</code>.'),
                 'since' => '1',
                 'default' => '',
+                'profile_reference' => 'rss',
+            ],
+            'url' => [
+                'required' => false,
+                'name' => tra('URL'),
+                'filter' => 'url',
+                'description' => tr('The full URL of the RSS feed. Use this parameter if you want to directly link to an RSS feed without adding it to the RSS Administration page.'),
+                'since' => '29.0',
+                'default' => '',
+                'profile_reference' => 'rss',
+            ],
+            'refresh' => [
+                'required' => false,
+                'name' => tra('Refresh Interval'),
+                'filter' => 'digits',
+                'description' => tra('Refresh period in minutes, determining how frequently the RSS feed is updated.'),
+                'since' => '29.0',
+                'default' => 60,
                 'profile_reference' => 'rss',
             ],
             'max' => [
@@ -158,7 +176,6 @@ function wikiplugin_rss_info()
 function wikiplugin_rss($data, $params)
 {
     $rsslib = TikiLib::lib('rss');
-
     $params = array_merge(
         [
             'max' => 10,
@@ -169,6 +186,7 @@ function wikiplugin_rss($data, $params)
             'showtitle' => 1,
             'ticker' => 0,
             'desclen' => 0,
+            'refresh' => 60,
         ],
         $params
     );
@@ -180,24 +198,31 @@ function wikiplugin_rss($data, $params)
         }
     }
 
-    if (! isset($params['id'])) {
-        return WikiParser_PluginOutput::argumentError([ 'id' ]);
+    if (empty($params['id']) && empty($params['url'])) {
+        return WikiParser_PluginOutput::argumentError([ 'id or url' ]);
     }
 
-    $params['id'] = (array) $params['id'];
+    if (! empty($params['id']) && ! empty($params['url'])) {
+        return WikiParser_PluginOutput::argumentError(['id or url, not both']);
+    }
 
-    $items = $rsslib->get_feed_items($params['id'], $params['max'], $params['sortBy'], $params['sortOrder']);
-
+    $items = [];
     $title = null;
-    if (count($params['id']) == 1) {
-        $module = $rsslib->get_rss_module(reset($params['id']));
 
-        if (isset($module['sitetitle'])) {
-            $title = [
-                'title' => $module['sitetitle'],
-                'link' => $module['siteurl'],
-            ];
+    if (! empty($params['id'])) {
+        $params['id'] = (array) $params['id'];
+        $items = $rsslib->get_feed_items($params['id'], $params['max'], $params['sortBy'], $params['sortOrder']);
+        if (count($params['id']) == 1) {
+            $module = $rsslib->get_rss_module(reset($params['id']));
+            if (isset($module['sitetitle'])) {
+                $title = [
+                    'title' => $module['sitetitle'],
+                    'link' => $module['siteurl'],
+                ];
+            }
         }
+    } elseif (! empty($params['url'])) {
+        ['params' => $params, 'items' => $items, 'meta' => $title] = $rsslib->loadRss($params);
     }
 
     if ($params['desc'] > 0 && $params['desclen'] > 0) {

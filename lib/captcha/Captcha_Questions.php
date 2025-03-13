@@ -74,9 +74,19 @@ class Captcha_Questions extends Laminas\Captcha\AbstractWord
      */
     public function render($view = null, $element = null)
     {
+        global $prefs;
         $question = $this->questions[$this->current];
 
-        return tra($question[0]);
+        /**
+         * Translate captcha questions if multilingual is enabled
+         *
+         * The English version of the questions can be entered into the translation database using
+         * the custom translation feature in the Tiki settings: Control Panels -> Custom Translations
+         */
+        if ($prefs["feature_multilingual"] === 'y') {
+            return tra($question[0]);
+        }
+        return $question[0];
     }
 
     /**

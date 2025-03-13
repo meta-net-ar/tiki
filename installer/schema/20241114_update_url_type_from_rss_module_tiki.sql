@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_rss_modules` MODIFY `url` text NOT NULL;

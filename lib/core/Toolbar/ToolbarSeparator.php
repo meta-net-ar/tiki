@@ -16,7 +16,7 @@ class ToolbarSeparator extends ToolbarUtilityItem
         return '|';
     }
 
-    protected function getOnClick(): string
+    public function getOnClick(): string
     {
         return '';
     }

@@ -61,5 +61,7 @@
         {/if}
     </div>
     {/if}
-
+    {if $prefs.module_zones_pagebottom eq 'fixed' or ($prefs.module_zones_pagebottom ne 'n' && ! zone_is_empty('pagebottom'))}
+        {multilike relation_prefix="tiki.multilike" type="forums" object=$comment.threadId showPoints='y'}
+    {/if}
 </div>

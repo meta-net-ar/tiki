@@ -130,7 +130,19 @@ if ($filterFieldThere['type'] == 'r') {
 }
 
 // start main processing - $trackerIdThere is not used at all in get_items_list()
-$remoteItemIds = $trklib->get_items_list($trackerIdThere, $finalFilterFieldIdThere, $finalFilterValueHere, $statusThere, $filterFieldThereMultipleValues);
+if ($filterFieldHere['type'] == 'r') {
+    $handler = $trklib->get_field_handler($filterFieldHere, [$filterFieldIdHere => $finalFilterValueHere]);
+    $finalFilterValueHere = $handler->getFieldData()['value'];
+}
+if (is_iterable($finalFilterValueHere)) {
+    $remoteItemIds = [];
+    foreach ($finalFilterValueHere as $ffvh) {
+        $remoteItemIds = array_merge($remoteItemIds, $trklib->get_items_list($trackerIdThere, $finalFilterFieldIdThere, $ffvh, $statusThere, $filterFieldThereMultipleValues));
+    }
+    $remoteItemIds = array_unique($remoteItemIds);
+} else {
+    $remoteItemIds = $trklib->get_items_list($trackerIdThere, $finalFilterFieldIdThere, $finalFilterValueHere, $statusThere, $filterFieldThereMultipleValues);
+}
 $listFieldThere = $trklib->get_tracker_field($listFieldIdThere);
 // special handling for itemList field. We would get always the same values on each iteration so we do it only one time.
 $itemListFirstRun = true;

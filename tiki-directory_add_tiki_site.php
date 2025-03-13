@@ -38,29 +38,21 @@ $smarty->assign_by_ref('path', $path);
 $_REQUEST["siteId"] = 0;
 $smarty->assign('siteId', $_REQUEST["siteId"]);
 if (empty($_REQUEST["name"])) {
-    $smarty->assign('msg', tra("Must enter a name to add a site"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Must enter a name to add a site"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 if (empty($_REQUEST["url"])) {
-    $smarty->assign('msg', tra("Must enter a url to add a site"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Must enter a url to add a site"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 if ((substr($_REQUEST["url"], 0, 7) <> 'http://') && (substr($_REQUEST["url"], 0, 8) <> 'https://')) {
     $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
 }
 if ($dirlib->dir_url_exists($_REQUEST['url'])) {
-    $smarty->assign('msg', tra("URL already added to the directory. Duplicate site?"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("URL already added to the directory. Duplicate site?"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if ($prefs['directory_validate_urls'] == 'y') {
     @$fsh = fopen($_REQUEST['url'], 'r');
     if (! $fsh) {
-        $smarty->assign('msg', tra("URL cannot be accessed: wrong URL or site is offline and cannot be added to the directory"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("URL cannot be accessed: wrong URL or site is offline and cannot be added to the directory"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 }
 $siteId = $dirlib->dir_replace_site($_REQUEST["siteId"], $_REQUEST["name"], $_REQUEST["description"], $_REQUEST["url"], $_REQUEST["country"], 'n');

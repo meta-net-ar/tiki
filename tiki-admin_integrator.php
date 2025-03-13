@@ -49,15 +49,11 @@ if (isset($_REQUEST['save'])) {
     // ... and all mandatory paramaters r OK
     if (strlen($name) > 0) {
         if (! is_int($expiration) || $expiration < 0) {
-            $smarty->assign("msg", tra("Cache expiration must be an integer and greater than 0."));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra("Cache expiration must be an integer and greater than 0."), \Laminas\Http\Response::STATUS_CODE_409);
         }
         $integrator->add_replace_repository($repID, $name, $path, $start, $cssfile, $vis, $cacheable, $expiration, $description);
     } else {
-        $smarty->assign('msg', tra("Repository name can't be an empty"));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("Repository name can't be an empty"), \Laminas\Http\Response::STATUS_CODE_409);
     }
 }
 
@@ -93,9 +89,7 @@ if (isset($_REQUEST['action'])) {
             exit;
 
         default:
-            $smarty->assign('msg', tra('Requested action is not supported on repository'));
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Requested action is not supported on repository'), \Laminas\Http\Response::STATUS_CODE_500);
             break;
     }
 }

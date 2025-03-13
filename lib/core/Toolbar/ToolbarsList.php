@@ -8,6 +8,8 @@
 //this script may only be included - so it's better to die if called directly.
 namespace Tiki\Lib\core\Toolbar;
 
+use TikiLib;
+
 if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
     header("location: index.php");
     exit;
@@ -130,6 +132,7 @@ class ToolbarsList
                     ))
                     && $tag->isAccessible()
                 ) {
+                    $tag->setSyntax($this->syntax);
                     $group[] = $tag->setDomElementId($this->domElementId);
                 }
             }
@@ -147,6 +150,7 @@ class ToolbarsList
     {
         $lines = [];
         $rightAligned = [];
+        $headerlib = TikiLib::lib('header');
         foreach ($this->lines as $line) {
             $lineOut = [];
 
@@ -156,7 +160,26 @@ class ToolbarsList
                     foreach ($group as $tag) {
                         if ($this->is_html) {
                             if ($token = $tag->getWysiwygToken($this->domElementId)) {
-                                $lineOut[] = $token;
+                                $callback = method_exists($tag, 'getWysiwygJs') ? $tag->getWysiwygJs() : $tag->getOnClick();
+                                $jsCbId = uniqid($token . "Editor");
+                                if ($callback) {
+                                    $headerlib->add_js("function $jsCbId () { $callback };");
+                                }
+
+                                $renderCallback = $tag->getWysiwygRenderCallback();
+                                if ($renderCallback) {
+                                    $jsRenderCbId = uniqid($token . "EditorRender");
+                                    $headerlib->add_js("function $jsRenderCbId () { $renderCallback };");
+                                }
+
+                                $lineOut[] = [
+                                    'token' => $token,
+                                    'label' => $tag->getLabel(),
+                                    'icon' => htmlentities($tag->getIconHtml()),
+                                    'type' => $tag->getType(),
+                                    'callback' => $jsCbId,
+                                    'renderCallback' => isset($jsRenderCbId) ? $jsRenderCbId : null,
+                                ];
                                 $group_count++;
                             }
                         } else {

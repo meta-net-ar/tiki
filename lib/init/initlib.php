@@ -23,6 +23,8 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
     exit;
 }
 
+require_once('lib/enforce_php_version_constraints.php');
+
 if (! file_exists(__DIR__ . '/../../vendor_bundled/vendor/autoload.php')) {
     $error = "Your Tiki is not completely installed because Composer has not been run to fetch package dependencies.\n" .
         "You need to run 'sh setup.sh' from the command line.\n" .
@@ -112,11 +114,24 @@ foreach ($smartyTikiFiles as $file) {
  */
 function tiki_error_handling($errno, $errstr, $errfile, $errline): bool
 {
-    global $prefs, $phpErrors;
+    global $prefs, $phpErrors, $tiki_p_admin;
 
-    if (0 === (error_reporting() & $errno)) {
-        // This error was triggered when evaluating an expression prepended by the at sign (@) error control operator, but since we are in a custom error handler, we have to ignore it manually.
-        // See http://ca3.php.net/manual/en/language.operators.errorcontrol.php#98895 and http://php.net/set_error_handler
+    $includeSmartyNotice = isset($prefs['smarty_notice_reporting']) && $prefs['smarty_notice_reporting'] === 'y';
+
+    /**
+     * @see http://ca3.php.net/manual/en/language.operators.errorcontrol.php#98895
+     * @see http://php.net/set_error_handler
+     * Errors that are suppressed by the @ operator or not included in PHP's `error_reporting()` level are ignored by Tiki's error handler.
+     * maintaining independence from PHP's error reporting settings.
+     * However, if `smarty_notice_reporting` is enabled, Tiki will handle and report Smarty notices
+     * even if PHP is configured to suppress them (via the @ operator or `error_reporting()` settings).
+     * By using this check, we ensure that:
+     * - Tiki respects PHP's native error suppression for all non-Smart notices.
+     * - Tiki includes Smarty notices in the UI or external logs when `smarty_notice_reporting` is enabled,
+     *   making Smarty notice handling independent of PHP's configuration.
+     */
+
+    if (0 === (error_reporting() & $errno) && ! $includeSmartyNotice) {
         return true;
     }
 
@@ -168,15 +183,16 @@ function tiki_error_handling($errno, $errstr, $errfile, $errline): bool
     }
     //This will log to glitchtip, and also call any handlers that were registered BEFORE tiki.  So we don't care about what they tell us to do in their return value.
     $retval = TikiLib::lib('errortracking')->handleError($errno, $errstr, $errfile, $errline);
+    $errno = $err[$errno] ?? 'UNKNOWN';
 
     $back = "<div class='rbox-data p-3 mb-3' style='font-size: 12px; border: 1px solid'>";
-    $back .= $type . " ($err[$errno]): <b>" . $errstr . "</b><br />";
+    $back .= $type . " ($errno): <b>" . $errstr . "</b><br />";
     $back .= "At line $errline in $errfile"; // $errfile comes after $errline to ease selection for copy-pasting.
     $back .= "</div>";
 
     $phpErrors[] = $back;
-    //Skip any other error processing, custom error handlers registered AFTER us have called us, so have processed.  Handlers registered BEFORE US (if any) have been called by handleError(), but we now ignore the return value and stop any further error processing.
-    return true;
+
+    return false;
 }
 
 // Patch missing $_SERVER['REQUEST_URI'] on IIS6

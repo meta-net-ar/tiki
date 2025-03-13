@@ -26,9 +26,7 @@ $access->check_permission(['tiki_p_view_integrator']);
 $repID = (isset($_REQUEST["repID"]) && strlen($_REQUEST["repID"]) > 0) ? $_REQUEST["repID"] : 0;
 
 if (! isset($_REQUEST["repID"]) && ($repID <= 0)) {
-    $smarty->assign('msg', tra("No repository given"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No repository given"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 // Create instance of integrator
 $integrator = new TikiIntegrator();
@@ -36,9 +34,7 @@ $integrator = new TikiIntegrator();
 $rep = $integrator->get_repository($repID);
 
 if (! $rep) {
-    $smarty->assign('msg', tra("Repository not found"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Repository not found"), \Laminas\Http\Response::STATUS_CODE_404);
 }
 
 
@@ -50,12 +46,11 @@ if (
     && ! file_exists($file)
 ) {
     if ($tiki_p_admin == 'y') {
-        $smarty->assign('msg', tra("File not found ") . $file);
+        $msg = tra("File not found ") . $file;
     } else {
-        $smarty->assign('msg', tra("File not found ") . $_REQUEST["file"]);
+        $msg = tra("File not found ") . $_REQUEST["file"];
     }
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_500);
 }
 // Needs to clear cached version of this file...
 if (isset($_REQUEST["clear_cache"]) && $rep["cacheable"]) {

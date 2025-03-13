@@ -31,6 +31,43 @@
                             {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}{tr}CapsLock is on.{/tr}{/remarksbox}
                         </div>
                     </div>
+                    {if $prefs.pass_show_rules eq 'y'}
+                        <div class="clearfix">
+                            <div class="text" id="divPasswordRules" >
+                                {remarksbox type="info" title="{tr}Attention{/tr}" close="n"}
+                                    {if $prefs.pass_due neq "-1" }
+                                        {if $prefs.pass_due >= 2 }
+                                            <div class="pass_due">{tr _0=$prefs.pass_due}Password change is forced when password is older than %0 days.{/tr}</div>
+                                        {else}
+                                            <div class="pass_due">{tr _0=$prefs.pass_due}Password change is forced when password is older than %0 day.{/tr}</tr>
+                                        {/if}
+                                    {/if}
+                                    {if ( $prefs.auth_method != 'cas' || $user == 'admin' ) && $prefs.min_pass_length gt 0 }
+                                        <div class="min_pass_length">{tr _0=$prefs.min_pass_length }Password should be at least %0 characters long.{/tr}</div>
+                                    {/if}
+                                    {if $prefs.pass_chr_case eq "y" }
+                                        <div class="pass_chr_case">{tr}Password must contain at least one lowercase alphabetical character like "a" and one uppercase character like "A".{/tr}</div>
+                                    {/if}
+                                    {if $prefs.pass_repetition eq "y" }
+                                        <div class="pass_repetition">{tr}Password must not contain a consecutive repetition of the same character such as "111" or "aab".{/tr}</div>
+                                    {/if}
+                                    {if $prefs.pass_chr_num eq "y" }
+                                        <div class="pass_chr_num">{tr}Password must contain both letters and numbers.{/tr}</div>
+                                    {/if}
+                                    {if $prefs.pass_chr_special eq "y" }
+                                        <div class="pass_chr_special">{tr}Password must contain at least one special character like " / $ % ? & * ( ) _ + ...{/tr}</div>
+                                    {/if}
+                                    {if $prefs.pass_diff_username eq "y" }
+                                        <div class="pass_diff_username">{tr}The password must be different from the user's log-in name.{/tr}</div>
+                                    {/if}
+                                {/remarksbox}
+                            </div>
+                        </div>
+                    {else}
+                        {remarksbox type="warning" title="{tr}Show password rules{/tr}" close="y"}
+                            <p>{tr _0='<a href="tiki-admin.php?page=login" class="alert-link">' _1='</a>'}To show the password rules the preference %0 pass_show_rules %1 should be enabled.{/tr}</p>
+                        {/remarksbox}
+                    {/if}
                     <div class="mb-3 row">
                         <label class="col-md-4 col-form-label" for="user">{tr}Username{/tr}</label>
                         <div class="col-md-8">

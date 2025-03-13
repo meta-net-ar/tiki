@@ -28,7 +28,7 @@ $section = 'admin';
 require_once('tiki-setup.php');
 $perspectivelib = TikiLib::lib('perspective');
 
-$access->check_feature(['feature_perspective', 'feature_jquery_ui']);
+$access->check_feature(['feature_perspective']);
 
 $selectedId = 0;
 $selectedPerspectiveInfo = null;

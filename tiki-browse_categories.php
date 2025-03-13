@@ -15,9 +15,9 @@ $inputConfiguration = [
             'parentId'                    => 'int',           //get
             'maxRecords'                  => 'int',           //get
             'sort_mode'                   => 'word',          //get
-            'type'                        => 'word',          //get
+            'type'                        => 'string',        //get
             'offset'                      => 'int',           //get
-            'find'                        => 'word',          //post
+            'find'                        => 'string',        //post
             'deep'                        => 'bool',          //get
             'watch_event'                 => 'word',          //get
             'watch_action'                => 'word',          //get
@@ -104,9 +104,7 @@ if ($_REQUEST['parentId']) {
 
     $p_info = $categlib->get_category($_REQUEST['parentId']);
     if (empty($p_info)) {
-        $smarty->assign('msg', tra('Incorrect parameter'));
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra('Incorrect parameter'), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if ($prefs["feature_multilingual"] === "y") {
         $p_info["name"] = tra($p_info["name"]);
@@ -121,10 +119,7 @@ if ($_REQUEST['parentId']) {
 $smarty->assign('father', $father);
 
 if (! $canView) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra('You do not have permission to view this page.'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 //watches
 if ($prefs['feature_user_watches'] == 'y') {
@@ -284,7 +279,7 @@ $objects = $categlib->list_category_objects(
 
 if ($deep == 'on') {
     foreach ($objects['data'] as &$object) {
-        $object['categName'] = $tikilib->other_value_in_tab_line($ctall, $object['categId'], 'categId', 'name');
+        $object['categNames'] = implode(", ", other_value_in_tab_line($ctall, $object['category_ids']));
     }
 }
 
@@ -468,4 +463,23 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
 
 
 //  return $eyes . $eyesgroup;
+}
+
+/**
+ * @param $tab
+ * @param $category_ids
+ * @return array
+ */
+function other_value_in_tab_line($tab, $categoryIds): array
+{
+    $categoryIds = explode(",", $categoryIds);
+    $categoryNames = [];
+    foreach ($categoryIds as $catId) {
+        foreach ($tab as $line) {
+            if ($line['categId'] == (int) $catId) {
+                $categoryNames[] = $line['name'];
+            }
+        }
+    }
+    return $categoryNames;
 }

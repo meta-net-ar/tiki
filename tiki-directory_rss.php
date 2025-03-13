@@ -28,6 +28,7 @@ if (! isset($_REQUEST["parent"])) {
     $errmsg = tra("No parent specified");
     require_once('tiki-rss_error.php');
 }
+TikiLib::lib('header')->setXRobotsTag($robots);
 $feed = "directory";
 $uniqueid = $feed . "?parent=" . $_REQUEST["parent"];
 $output = $rsslib->get_from_cache($uniqueid);

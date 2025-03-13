@@ -21,7 +21,6 @@ function module_recordrtc_info()
         'name' => tra('Record RTC'),
         'description' => tra('Capture audio and video in real-time for seamless collaboration'),
         'prefs' => ['fgal_use_record_rtc_screen'],
-        'packages_required' => ['npm-asset/recordrtc' => VendorHelper::getAvailableVendorPath('recordrtc', '/npm-asset/recordrtc/RecordRTC.js')],
         'params' => [
             'gallery_id' => [
                 'name' => tra('Gallery Id'),
@@ -70,9 +69,7 @@ function module_recordrtc($mod_reference, &$module_params)    // modifies $smod_
         return;
     }
 
-    include_once('lib/setup/absolute_urls.php');
-    $https = $https_mode ? true : false;
-
+    $https = TikiLib::httpScheme() === 'https';
     if (! $https) {
         $smarty->assign('module_error', tra('Record RTC requires https connection over SSL'));
         return;
@@ -81,16 +78,15 @@ function module_recordrtc($mod_reference, &$module_params)    // modifies $smod_
     $recordRtcService = new Services_RecordRtc_Controller();
     $recordRtcService->setUp();
 
-    $recordRtcVendor = VendorHelper::getAvailableVendorPath('recordrtc', 'npm-asset/recordrtc/RecordRTC.js');
-    if ($prefs['fgal_use_record_rtc_screen'] !== 'y' || empty($recordRtcVendor)) {
+    if ($prefs['fgal_use_record_rtc_screen'] !== 'y') {
         $smarty->assign('module_error', tra('Record RTC is not available.'));
         return;
     }
 
     $headerlib = TikiLib::lib('header');
-    $headerlib->add_jsfile('vendor/npm-asset/recordrtc/RecordRTC.js', true);
-    $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
+    $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
 
     $recordingTypes = module_recordrtc_recording_types();
     $smarty->assign('mod_recordrtc_recording_types', $recordingTypes);

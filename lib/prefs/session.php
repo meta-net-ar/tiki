@@ -18,6 +18,9 @@ function prefs_session_list()
                 'memcache' => tra('Memcache'),
             ],
             'default' => 'db',
+            'notices' => [
+                'db' => tra('Database storage is not efficient for high-traffic sites and is therefore not recommended for use in production.'),
+            ]
         ],
         'session_lifetime' => [
             'name' => tra('Session lifetime'),

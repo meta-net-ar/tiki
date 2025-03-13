@@ -62,32 +62,24 @@ if (isset($_SESSION['tiki_importer_feedback'])) {
         try {
             $importer->import($_FILES['importFile']['tmp_name']);
         } catch (Exception $e) {
-            $smarty->assign('msg', $e->getMessage());
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
         }
     } else {
         $msg = TikiImporter::displayPhpUploadError($_FILES['importFile']['error']);
-        $smarty->assign('msg', $msg);
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     die;
 } elseif (! empty($_POST['importerClassName'])) {
     // second step: display import options for the software previously chosen
     if (! class_exists($importerClassName)) {
-        $smarty->assign('msg', tra("Invalid software name"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Invalid software name"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 
     try {
         $importer->checkRequirements();
     } catch (Exception $e) {
-        $smarty->assign('msg', $e->getMessage());
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $importerOptions = $importer->getOptions();

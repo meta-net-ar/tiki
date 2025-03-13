@@ -22,9 +22,7 @@ $statslib = TikiLib::lib('stats');
 $access->check_feature('feature_html_pages');
 $access->check_permission('tiki_p_view_html_pages');
 if (! isset($_REQUEST["pageName"])) {
-    $smarty->assign('msg', tra("No page indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $page_data = $htmlpageslib->get_html_page($_REQUEST["pageName"]);
 $smarty->assign('type', $page_data["type"]);

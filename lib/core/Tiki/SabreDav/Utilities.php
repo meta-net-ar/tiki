@@ -288,6 +288,14 @@ class Utilities
             'uid'            => strval($component->UID),
         ];
 
+        $convertToString = function ($component_prop) {
+            if (is_null($component_prop)) {
+                return $component_prop;
+            } else {
+                return (string) $component_prop;
+            }
+        };
+
         if (isset($component->{'RECURRENCE-ID'})) {
             $result['recurrenceStart'] = $component->{'RECURRENCE-ID'}->getDateTime()->getTimeStamp();
         }
@@ -302,64 +310,64 @@ class Utilities
             $result['lastmodif'] = $component->{'LAST-MODIFIED'}->getDateTime()->getTimeStamp();
         }
         if (isset($component->SUMMARY)) {
-            $result['name'] = $component->SUMMARY;
+            $result['name'] = $convertToString($component->SUMMARY);
         }
         if (isset($component->DESCRIPTION)) {
-            $result['description'] = $component->DESCRIPTION;
+            $result['description'] = $convertToString($component->DESCRIPTION);
         }
         if (isset($component->LOCATION)) {
-            $result['newloc'] = $component->LOCATION;
+            $result['newloc'] = $convertToString($component->LOCATION);
         }
         if (isset($component->{'X-Tiki-LocationId'})) {
-            $result['locationId'] = $component->{'X-Tiki-LocationId'};
+            $result['locationId'] = $convertToString($component->{'X-Tiki-LocationId'});
             unset($result['newloc']);
         }
         if (isset($component->CATEGORIES)) {
-            $cats = explode(',', $component->CATEGORIES);
+            $cats = explode(',', $convertToString($component->CATEGORIES));
             $result['newcat'] = $cats[0];
         }
         if (isset($component->{'X-Tiki-CategoryId'})) {
-            $result['categoryId'] = $component->{'X-Tiki-CategoryId'};
+            $result['categoryId'] = $convertToString($component->{'X-Tiki-CategoryId'});
             unset($result['newcat']);
         }
         if (isset($component->{'X-Tiki-CategoryColor'})) {
-            $result['newcatbgcolor'] = $component->{'X-Tiki-CategoryColor'};
+            $result['newcatbgcolor'] = $convertToString($component->{'X-Tiki-CategoryColor'});
         }
         if (isset($component->PRIORITY)) {
-            $result['priority'] = $component->PRIORITY;
+            $result['priority'] = $convertToString($component->PRIORITY);
         }
         if (isset($component->STATUS)) {
-            $result['status'] = self::reverseMapEventStatus($component->STATUS);
+            $result['status'] = self::reverseMapEventStatus($convertToString($component->STATUS));
         }
         if (isset($component->URL)) {
-            $result['url'] = $component->URL;
+            $result['url'] = $convertToString($component->URL);
         }
         if (isset($component->{'X-Tiki-Allday'})) {
-            $result['allday'] = empty((string)$component->{'X-Tiki-Allday'}) ? 0 : 1;
+            $result['allday'] = empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1;
             if ($rec) {
-                $rec->setAllday(empty((string)$component->{'X-Tiki-Allday'}) ? 0 : 1);
+                $rec->setAllday(empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1);
             }
         }
         if (isset($component->{'X-Tiki-Language'})) {
-            $result['lang'] = $component->{'X-Tiki-Language'};
+            $result['lang'] = $convertToString($component->{'X-Tiki-Language'});
             if ($rec) {
-                $rec->setLang($component->{'X-Tiki-Language'});
+                $rec->setLang($convertToString($component->{'X-Tiki-Language'}));
             }
         }
         if (isset($component->{'X-Tiki-Dst-Timezone'}) && $rec) {
-            $rec->setRecurenceDstTimezone($component->{'X-Tiki-Dst-Timezone'});
+            $rec->setRecurenceDstTimezone($convertToString($component->{'X-Tiki-Dst-Timezone'}));
         }
         if (isset($component->{'X-Tiki-ProcessITip'})) {
-            $result['process_itip'] = $component->{'X-Tiki-ProcessITip'};
+            $result['process_itip'] = $convertToString($component->{'X-Tiki-ProcessITip'});
         }
         if (isset($component->{'X-Tiki-RecurrenceId'})) {
-            $result['recurrenceId'] = $component->{'X-Tiki-RecurrenceId'};
+            $result['recurrenceId'] = $convertToString($component->{'X-Tiki-RecurrenceId'});
         }
         if (isset($component->{'X-Tiki-Changed'})) {
-            $result['changed'] = $component->{'X-Tiki-Changed'};
+            $result['changed'] = $convertToString($component->{'X-Tiki-Changed'});
         }
         if (isset($component->{'X-Tiki-UpdateManuallyChangedEvents'})) {
-            $result['updateManuallyChangedEvents'] = intval((string)$component->{'X-Tiki-UpdateManuallyChangedEvents'});
+            $result['updateManuallyChangedEvents'] = intval($convertToString($component->{'X-Tiki-UpdateManuallyChangedEvents'}));
         }
         if (isset($component->ORGANIZER)) {
             $result['organizers'] = [];
@@ -370,7 +378,7 @@ class Utilities
                 if ($user) {
                     $result['organizers'][] = $user;
                 }
-                $cn = (string)$organizer->CN;
+                $cn = isset($organizer->CN) ? (string)$organizer->CN : '';
                 if (empty($cn)) {
                     $result['real_organizers'][] = $email;
                 } else {
@@ -395,17 +403,21 @@ class Utilities
                 if (isset($attendee['PARTSTAT'])) {
                     $participant['partstat'] = (string)$attendee['PARTSTAT'];
                 }
+                if (isset($attendee['X-COMMENT'])) {
+                    $participant['comment'] = (string)$attendee['X-COMMENT'];
+                }
                 $result['participants'][] = $participant;
             }
             // fetch attendees as they are for later reference like RSVP actions via Cypht
             $result['attendees'] = [];
             foreach ($component->ATTENDEE as $attendee) {
                 $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                $cn = (string)$attendee->CN;
+                $cn = isset($attendee->CN) ? (string)$attendee->CN : '';
                 if (empty($cn)) {
-                    $cn = $email;
+                    $result['attendees'][] = $email;
+                } else {
+                    $result['attendees'][] = "$cn <$email>";
                 }
-                $result['attendees'][] = "$cn <$email>";
             }
         }
 
@@ -675,7 +687,10 @@ class Utilities
             );
         }
         foreach ($participants as $par) {
-            $vevent->add(
+            if (! isset($par['role'])) {
+                $par['role'] = 0;
+            }
+            $attendee = $vevent->add(
                 'ATTENDEE',
                 'mailto:' . $par['email'],
                 [
@@ -684,6 +699,9 @@ class Utilities
                     'PARTSTAT' => $par['partstat'],
                 ]
             );
+            if (! empty($par['comment'])) {
+                $attendee->add('X-COMMENT', $par['comment']);
+            }
         }
 
         if ((string)$vevent->UID != @$row['uid']) {

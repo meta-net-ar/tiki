@@ -36,30 +36,29 @@ require_once('tiki-setup.php');
 if ($prefs['feature_accounting'] != 'y') {
     $smarty->assign('msg', tra("This feature is disabled") . ": feature_accounting");
     $smarty->assign('required_preferences', ['feature_accounting']);
+    $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_401);
     $smarty->display("error.tpl");
     die;
 }
 
 if (! isset($_REQUEST['bookId'])) {
-    $smarty->assign('msg', tra("Missing book id"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("Missing book id"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $bookId = $_REQUEST['bookId'];
-$smarty->assign('bookId', $bookId);
 
 $globalperms = Perms::get();
 $objectperms = Perms::get([ 'type' => 'accounting book', 'object' => $bookId ]);
 if (! ($globalperms->acct_view or $objectperms->acct_view)) {
-    $smarty->assign('msg', tra("You do not have the right view this page"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You do not have the right view this page"), \Laminas\Http\Response::STATUS_CODE_403);
 }
-
 $accountinglib = TikiLib::lib('accounting');
-$book = $accountinglib->getBook($bookId);
+try {
+    $book = $accountinglib->getBook($bookId);
+} catch (Exception $e) {
+    Feedback::errorAndDie(tra($e->getMessage()), \Laminas\Http\Response::STATUS_CODE_400);
+}
 $smarty->assign('book', $book);
-
+$smarty->assign('bookId', $bookId);
 $accounts = $accountinglib->getExtendedAccounts($bookId, true);
 $smarty->assign('accounts', $accounts);
 

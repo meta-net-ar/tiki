@@ -45,13 +45,6 @@ function wikiplugin_vue_info()
 
 function wikiplugin_vue($data, $params)
 {
-    global $prefs;
-
-    if ($prefs['vuejs_enable'] === 'n') {
-        Feedback::error(tr('Vue.js is not enabled.'));
-        return '';
-    }
-
     $smarty = TikiLib::lib('smarty');
 
     $repeat = false;

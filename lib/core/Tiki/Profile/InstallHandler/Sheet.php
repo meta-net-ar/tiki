@@ -58,6 +58,7 @@ class Tiki_Profile_InstallHandler_Sheet extends Tiki_Profile_InstallHandler
                 }
                 $nbdatasheetI = count($rows);
                 for ($r = 0; $r < $nbdatasheetI; $r++) {
+                    $sheets[$sheetI]->rows[$r] = new stdClass();
                     $nbdatasheetIr = count($rows[$r]);
                     $sheets[$sheetI]->rows[$r]->columns = [];
 

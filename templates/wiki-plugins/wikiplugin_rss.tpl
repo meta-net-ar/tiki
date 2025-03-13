@@ -32,6 +32,13 @@
                             {$item.description|escape}
                         </div>
                     {/if}
+                    {if $item.labels}
+                        <div class="rsslabels">
+                            {foreach from=$item.labels item=label}
+                            <span class="text-sm badge-pill badge bg-secondary">{$label|escape}</span>
+                            {/foreach}
+                        </div>
+                    {/if}
                 </div>
             </div>
             {if $key < count($items) - 1}

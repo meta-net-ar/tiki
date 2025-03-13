@@ -23,7 +23,7 @@ $access->check_feature('auth_token_access');
 $access->check_permission('tiki_p_admin');
 
 $tokenlib = AuthTokens::build($prefs);
-
+global $base_url;
 $action = '';
 $tokenId = 0;
 $smarty->assign('tokenCreated', false);
@@ -43,11 +43,10 @@ if ($action == 'delete' && $tokenId > 0) {
 if ($action == 'add') {
     $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $entry = parse_url($url, PHP_URL_PATH);
-
-    $groups = filter_input(INPUT_POST, 'groups', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $groups = str_replace(' ', '', $groups);
-    $groups = explode(',', $groups);
-
+    $groups = $_POST['groups'];
+    $sanitizedGroups = array_map(function ($group) {
+        return filter_var($group, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    }, $groups);
     $parameters = [];
     $query = parse_url($url, PHP_URL_QUERY);
 
@@ -74,6 +73,7 @@ if ($action == 'add') {
 }
 
 $tokens = $tokenlib->getTokens();
+$groups = $userlib->list_all_groups();
 
 foreach ($tokens as $key => $token) {
     $tokens[$key]['groups'] = join(', ', json_decode($token['groups']));
@@ -84,8 +84,14 @@ foreach ($tokens as $key => $token) {
         $tokens[$key]['expires'] = date('c', strtotime($token['creation']) + $token['timeout']);
     }
     $tokens[$key]['entry'] = preg_replace('#^' . preg_quote($tikiroot) . '#', '', $token['entry']);
+    $queryParams = http_build_query(array_merge($tokens[$key]['parameters'], ['TOKEN' => $token['token']]));
+    $tokenUrl = $tokenlib->convertToStandardUrl($tokens[$key]['entry'] . '?' . $queryParams);
+    $tokens[$key]['token_url'] = $tokenUrl;
+    $tokens[$key]['full_url'] = $base_url . $tokenUrl;
 }
+krsort($tokens);
 
 $smarty->assign('tokens', $tokens);
+$smarty->assign('groups', $groups);
 $smarty->assign('mid', 'tiki-admin_tokens.tpl');
 $smarty->display('tiki.tpl');

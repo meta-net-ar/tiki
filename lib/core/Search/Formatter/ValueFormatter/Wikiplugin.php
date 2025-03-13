@@ -22,18 +22,7 @@ class Search_Formatter_ValueFormatter_Wikiplugin extends Search_Formatter_ValueF
         }
 
         if (isset($this->arguments['content'])) {
-            $content = $this->arguments['content'];
-
-            // replace args in the plugin body with values from the results
-            // look for %field_name% in the content and replace with $entry['field_name']
-            if ($rc = preg_match_all('/%(\w+)%/', $content, $matches)) {
-                for ($i = 0; $i < $rc; $i++) {
-                    if (isset($entry[$matches[1][$i]])) {
-                        $content = str_replace($matches[0][$i], $entry[$matches[1][$i]], $content);
-                    }
-                }
-            }
-
+            $content = $this->replaceFieldNamesWithValues($this->arguments['content'], $entry);
             unset($this->arguments['content']);
         } else {
             $content = '';
@@ -50,7 +39,7 @@ class Search_Formatter_ValueFormatter_Wikiplugin extends Search_Formatter_ValueF
             } elseif (isset($defaults[$key])) {
                 $params[$key] = $defaults[$key];
             } elseif ($key !== 'default') {
-                $params[$key] = $val;
+                $params[$key] = $this->replaceFieldNamesWithValues($val, $entry);
             }
         }
 
@@ -69,5 +58,29 @@ class Search_Formatter_ValueFormatter_Wikiplugin extends Search_Formatter_ValueF
         );
 
         return '~np~' . $out . '~/np~';
+    }
+
+    /**
+     * Replaces placeholders surrounded by % chars with the value of that field in the current result
+     * e.g. in `[item%object_id%]` %object_id% would be replaced by the current item id
+     *
+     * @param string $string
+     * @param array  $entry
+     *
+     * @return array
+     */
+    private function replaceFieldNamesWithValues(string $string, array $entry): string
+    {
+        $matches = [];
+
+        // look for %field_name% in the content and replace with $entry['field_name']
+        if ($rc = preg_match_all('/%(\w+)%/', $string, $matches)) {
+            for ($i = 0; $i < $rc; $i++) {
+                if (isset($entry[$matches[1][$i]])) {
+                    $string = str_replace($matches[0][$i], $entry[$matches[1][$i]], $string);
+                }
+            }
+        }
+        return $string;
     }
 }

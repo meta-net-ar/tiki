@@ -4,6 +4,16 @@
     display: inline;
 }
 
+.adminoption {
+    align-items: center;
+}
+
+.tikihelp-reset-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 // Modules
 .modules {
     position: relative;
@@ -90,7 +100,7 @@ a.flipmodtitle .icon {
     overflow: auto;
 }
 
-#autosave_preview > div {
+#autosave_preview {
     height: 30ex;
     overflow-y: auto;
     overflow-x: hidden;

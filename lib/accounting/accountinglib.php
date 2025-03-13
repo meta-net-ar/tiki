@@ -127,18 +127,26 @@ class AccountingLib extends LogsLib
     /**
      *
      * Returns the details for a book with a given bookId
-     * @param   int $bookId Id of the book to retrieve the data for
+     *
+     * @param int $bookId Id of the book to retrieve the data for
+     *
      * @return  array       Array with book details
+     * @throws Exception
      */
-    public function getBook($bookId)
+    public function getBook(int $bookId): array
     {
         if (! is_array($this->book) or $this->book['bookId'] != $bookId) {
             $query = "SELECT * FROM `tiki_acct_book` WHERE `bookId`=?";
             $res = $this->query($query, [$bookId]);
+            if ($res->numrows === 0) {
+                throw new Exception(tra('No book found for the given book ID.'));
+            }
+
             $this->book = $res->fetchRow();
         }
         return $this->book;
     }
+
 
     /**
      *
@@ -280,15 +288,20 @@ class AccountingLib extends LogsLib
     /**
      * Returns an array with all data from the account
      *
-     * @param   int     $bookId             id of the current book
-     * @param   int     $accountId          account id to retrieve
-     * @param   boolean $checkChangeable    perform check, if the account is changeable
+     * @param int     $bookId          id of the current book
+     * @param int     $accountId       account id to retrieve
+     * @param boolean $checkChangeable perform check, if the account is changeable
+     *
      * @return  array   account data or false on error
+     * @throws Exception
      */
-    public function getAccount($bookId, $accountId, $checkChangeable = true)
+    public function getAccount(int $bookId, int $accountId, bool $checkChangeable = true): array
     {
         $query = "SELECT * FROM `tiki_acct_account` WHERE `accountbookId`=? AND `accountId`=?";
         $res = $this->query($query, [$bookId, $accountId]);
+        if ($res->numrows === 0) {
+            throw new Exception(tra('No Item found for the given accountID.'));
+        }
         $account = $res->fetchRow();
         if ($checkChangeable) {
             $account['changeable'] = $this->accountChangeable($bookId, $accountId);
@@ -300,11 +313,12 @@ class AccountingLib extends LogsLib
      * Checks if this accountId can be changed or the account can be deleted.
      * This can only be done, if the account has not been used -> no posts exist for the account
      *
-     * @param   int $bookId     id of the current book
-     * @param   int $accountId  account id to check
+     * @param int $bookId    id of the current book
+     * @param int $accountId account id to check
+     *
      * @return  boolean true, if the account can be changed/deleted
      */
-    public function accountChangeable($bookId, $accountId)
+    public function accountChangeable(int $bookId, int $accountId): bool
     {
         $book = $this->getBook($bookId);
         if ($book['bookClosed'] == 'y') {
@@ -323,52 +337,56 @@ class AccountingLib extends LogsLib
     /**
      * Creates an account with the given information
      *
-     * @param   int     $bookId         id of the current book
-     * @param   int     $accountId      id of the account to create
-     * @param   string  $accountName    name of the account to create
-     * @param   string  $accountNotes   notes for this account
-     * @param   float   $accountBudget  planned budget for the account
-     * @param   boolean $accountLocked  can this account be used, 0=unlocked, 1=locked
-     * @param   int     $accountTax     taxId for tax automation
-     * @return  array|bool          list of errors or true on success
+     * @param int     $bookId        id of the current book
+     * @param int     $accountId     id of the account to create
+     * @param string  $accountName   name of the account to create
+     * @param string  $accountNotes  notes for this account
+     * @param float   $accountBudget planned budget for the account
+     * @param int     $accountLocked can this account be used, 0=unlocked, 1=locked
+     * @param int     $accountTax    taxId for tax automation
+     *
+     * @return  bool          list of errors or true on success
+     * @throws Exception
      */
     public function createAccount(
-        $bookId,
-        $accountId,
-        $accountName,
-        $accountNotes,
-        $accountBudget,
-        $accountLocked,
-        $accountTax = 0
-    ) {
+        int $bookId,
+        int $accountId,
+        string $accountName,
+        string $accountNotes,
+        float $accountBudget,
+        int $accountLocked,
+        int $accountTax = 0
+    ): bool {
 
         $book = $this->getBook($bookId);
         if ($book['bookClosed'] == 'y') {
-            $errors = [tra("This book has been closed. You can't create new accounts.")];
-            return $errors;
+            throw new Exception(tra("This book has been closed. You can't create new accounts."));
         }
 
         $errors = $this->validateId('accountId', $accountId, 'tiki_acct_account', false, 'accountBookId', $bookId);
 
-        if ($accountName == '') {
+        if (empty($accountName)) {
             $errors[] = tra('Account name must not be empty.');
         }
-        $cleanbudget = $this->cleanupAmount($bookId, $accountBudget);
 
-        if ($cleanbudget === '') {
+        $cleanBudget = $this->cleanupAmount($bookId, $accountBudget);
+        if ($cleanBudget === '') {
             $errors[] = tra('Budget is not a valid amount: ') . $accountBudget;
         }
 
-        if ($accountLocked != 0 and $accountLocked != 1) {
+        if ($accountLocked != 0 && $accountLocked != 1) {
             $errors[] = tra('Locked must be either 0 or 1.');
         }
 
         if ($accountTax != 0) {
-            $errors = array_merge($errors, $this->validateId('taxId', $accountTax, 'tiki_acct_tax', true, 'taxBookId', $bookId));
+            $taxErrors = $this->validateId('taxId', $accountTax, 'tiki_acct_tax', true, 'taxBookId', $bookId);
+            if (! empty($taxErrors)) {
+                $errors = array_merge($errors, $taxErrors);
+            }
         }
 
         if (! empty($errors)) {
-            return $errors;
+            throw new Exception(implode(', ', $errors));
         }
 
         $query = 'INSERT INTO tiki_acct_account' .
@@ -382,15 +400,15 @@ class AccountingLib extends LogsLib
                 $accountId,
                 $accountName,
                 $accountNotes,
-                $cleanbudget,
+                $cleanBudget,
                 $accountLocked,
                 $accountTax
             ]
         );
         if ($res === false) {
-            $errors[] = tra('Error creating account') & " $accountId: " . $this->ErrorNo() . ": " . $this->ErrorMsg() . "<br /><pre>$query</pre>";
-            return $errors;
+            throw new Exception(tra('Error creating account') . " $accountId: " . "<br /><pre>$query</pre>");
         }
+
         return true;
     }
 
@@ -504,25 +522,34 @@ class AccountingLib extends LogsLib
     /**
      * Delete an account (if deleteable)
      *
-     * @param   int     $bookId             id of the current book
-     * @param   int     $accountId          account id to delete
-     * @param   bool    $checkChangeable    check, if the account is unused and can be deleted
-     * @return  array|bool                  array with errors or true, if deletion was successful
+     * @param int $bookId    id of the current book
+     * @param int $accountId account id to delete
+     *
+     * @return bool
+     * @throws Exception
      */
-    public function deleteAccount($bookId, $accountId, $checkChangeable = true)
+    public function deleteAccount(int $bookId, int $accountId): bool
     {
         $book = $this->getBook($bookId);
         if ($book['bookClosed'] == 'y') {
-            return [tra("This book has been closed. You can't delete the account.")];
+            throw new Exception(tra("This book has been closed. You can't delete the account."));
         }
 
         if (! $this->accountChangeable($bookId, $accountId)) {
-            return [tra('Account is already in use and must not be deleted. Please disable it, if it is no longer needed.')];
+            throw new Exception(tra('Account is already in use and must not be deleted. Please disable it, if it is no longer needed.'));
         }
 
         $query = "DELETE FROM `tiki_acct_account` WHERE `accountBookId`=? AND `accountId`=?";
         $res = $this->query($query, [$bookId, $accountId]);
-        return true;
+        $affectedRows = $res->numrows;
+
+        if ($affectedRows > 0) {
+            return true;
+        } elseif ($affectedRows === 0) {
+            throw new Exception(tra("No matching account found to delete."));
+        } else {
+            throw new Exception(tra("An error occurred while attempting to delete the account."));
+        }
     }
 
     /**

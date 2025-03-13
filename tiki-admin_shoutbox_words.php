@@ -14,9 +14,9 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'word'                  => 'word',             //post
+            'word'                  => 'string',           //post
             'add'                   => 'bool',             //post
-            'remove'                => 'int',              //get
+            'remove'                => 'string',           //get
             'sort_mode'             => 'word',             //get
             'offset'                => 'int',              //get
         ],
@@ -32,9 +32,7 @@ $access->check_permission('tiki_p_admin_shoutbox');
 if (isset($_REQUEST["add"])) {
     $access->checkCsrf();
     if (empty($_REQUEST["word"])) {
-        $smarty->assign('msg', tra("You have to provide a word"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You have to provide a word"), \Laminas\Http\Response::STATUS_CODE_409);
     }
     $shoutboxlib->add_bad_word($_REQUEST["word"]);
 }

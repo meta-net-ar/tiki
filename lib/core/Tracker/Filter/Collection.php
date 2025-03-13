@@ -96,9 +96,18 @@ class Collection
         }
     }
 
-    public function applyInput(\JitFilter $input)
+    /**
+     * Apply user input values to the underlying filters.
+     * @param JitFilter $input
+     * @param bool $conditional - if set to true, we will skip default positioned filters containing values
+     * as these are set to always apply by configuration.
+     */
+    public function applyInput(\JitFilter $input, $conditional = false)
     {
         foreach ($this->filters as $filter) {
+            if ($conditional && $filter->getPosition() === 'default' && $filter->getControl()->hasValue()) {
+                continue;
+            }
             $filter->applyInput($input);
         }
     }
@@ -115,6 +124,10 @@ class Collection
 
                 if (! empty($filter['label'])) {
                     $fil->setLabel($filter['label']);
+                }
+
+                if (! empty($filter['applied_value'])) {
+                    $fil->applyInput(new \JitFilter($filter['applied_value']));
                 }
             } catch (Exception\FieldNotFound $e) {
                 \Feedback::error($e->getMessage()); // TODO make error message appear when exporting
@@ -144,7 +157,7 @@ class Collection
                 return $filter;
             }
         }
-
+        \Feedback::error(tr('Filter "%0" is invalid for field "%1". The filter "%2" was applied by default.', $mode, $permName, $filter->getMode()));
         throw new Exception\ModeNotSupported($permName, $mode);
     }
 
@@ -330,12 +343,7 @@ class Collection
     public function getFilterDescriptor()
     {
         return array_map(function ($filter) {
-            return [
-                'label' => $filter->getLabel(),
-                'field' => $filter->getField(),
-                'mode' => $filter->getMode(),
-                'position' => $filter->getPosition(),
-            ];
+            return $filter->jsonSerialize();
         }, $this->filters);
     }
 

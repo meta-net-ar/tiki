@@ -31,19 +31,20 @@ $auto_query_args = ['quizId', 'resultId', 'sort_mode', 'offset', 'find'];
 $access->check_feature('feature_quizzes');
 
 if (! isset($_REQUEST["quizId"])) {
-    $smarty->assign('msg', tra("No quiz indicated"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No quiz indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $tikilib->get_perm_object($_REQUEST["quizId"], 'quiz');
 
 $smarty->assign('individual', 'n');
 $access->check_permission('tiki_p_admin_quizzes');
-
 $smarty->assign('quizId', $_REQUEST["quizId"]);
-$quiz_info = $quizlib->get_quiz_result($_REQUEST["quizId"]);
+$quiz_info = $quizlib->get_quiz($_REQUEST["quizId"]);
+if (! $quiz_info) {
+    Feedback::errorAndDie(tra("The requested quiz was not found. Please check the quiz ID and try again."), \Laminas\Http\Response::STATUS_CODE_404);
+}
+
+
 $smarty->assign('quiz_info', $quiz_info);
 
 if (! isset($_REQUEST["resultId"])) {

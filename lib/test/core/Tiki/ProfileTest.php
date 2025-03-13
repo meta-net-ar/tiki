@@ -173,7 +173,8 @@ class ProfileTest extends TikiTestCase
             ['$profileobject:user_tracker_acceptedTerms$', true],
             ['$profilestikiorg:BugTrackerProfile:bug_tracker', true],
             ['$profiles.tiki.org:Client.Management.Profile:client_tracker', false],
-            ['$profiles.tiki.org:Sample.Data.Profile', false]
+            ['$profiles.tiki.org:Sample.Data.Profile', false],
+            ['$profiles.tiki.org:Post-it_Sticky_Note_15', true],
         ];
     }
 

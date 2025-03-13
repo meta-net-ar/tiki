@@ -60,12 +60,10 @@ function wikiplugin_redirect($data, $params)
     extract($params, EXTR_SKIP);
     $areturn = '';
 
-    if (! isset($page)) {
-        $areturn = "REDIRECT plugin: No page specified!<br />";
+    if (! isset($page) && ! isset($url)) {
+        $areturn = "REDIRECT plugin: No page or url specified!<br />";
     }
-    if (! isset($url)) {
-        $areturn .= "REDIRECT plugin: No url specified!<br />";
-    }
+
     if (isset($page)) {
         $location = $page;
     } elseif (isset($url)) {
@@ -140,9 +138,23 @@ function wikiplugin_redirect($data, $params)
                 }
             }
 
-            /* SEO: Redirect with HTTP status 301 - Moved Permanently than default 302 - Found */
             if (isset($page)) {
-                TikiLib::lib('access')->redirect("tiki-index.php?page=$page&redirectpage=" . $_REQUEST['page'], '', 301);
+                $safePage = urlencode($page);
+                // Ensure temporary, non-cached redirect to avoid URL caching issues and SEO impact
+                header("Cache-Control: no-cache, no-store, must-revalidate");
+                header("Pragma: no-cache");
+                header("Expires: 0");
+                if (isset($_REQUEST['page']) && ! empty($_REQUEST['page'])) {
+                    $safeRedirectPage = urlencode($_REQUEST['page']);
+                    if ($safeRedirectPage === $safePage) {
+                        TikiLib::lib('access')->redirect("tiki-index.php?page={$safePage}", '', 302);
+                    } else {
+                        TikiLib::lib('access')->redirect("tiki-index.php?page={$safePage}&redirectpage={$safeRedirectPage}", '', 302);
+                    }
+                } else {
+                    // Final clean URL with 301 redirect if no loop check is needed
+                    TikiLib::lib('access')->redirect("tiki-index.php?page={$safePage}", '', 301);
+                }
             }
             if (isset($url)) {
                 global $base_url, $url_path;        // try to detect redirect loop to server root

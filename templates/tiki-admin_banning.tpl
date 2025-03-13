@@ -178,7 +178,7 @@
             <a title="{tr}Help{/tr}" {popup text=$smarty.capture.help|escape}>{icon name='help'}</a>
         </label>
         <div class="col-sm-8">
-            <input type="file" name="fileCSV" class="form-control">
+            <input type="file" accept=".csv" name="fileCSV" class="form-control">
             <label class="col-form-label" for="import_as_new">
                 <input type="checkbox" name="import_as_new" id="import_as_new">
                 {tr}Import as new rules{/tr}

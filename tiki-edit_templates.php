@@ -24,24 +24,20 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 
 $access->check_feature('feature_view_tpl');
-
+$globalperms = Perms::get();
 // you have to have the perm view and edit to continue:
       // if view perm is set: continue
 if (
-    ($tiki_p_view_templates != 'y') ||
+    ($globalperms->view_templates != 'y') ||
       // if edit perm is set: continue, else quit if user tries save/delete
-      ($tiki_p_edit_templates != 'y' &&
+      ($globalperms->edit_templates != 'y' &&
         (isset($_REQUEST["save"]) ||
          isset($_REQUEST['saveTheme']) ||
          isset($_REQUEST['delete'])
         )
       )
 ) {
-    $smarty->assign('errortype', 401);
-    $smarty->assign('msg', tra("You don't have permission to use this feature"));
-
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("You don't have permission to use this feature"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
 if (! isset($_REQUEST["mode"])) {
@@ -53,18 +49,14 @@ if (! isset($_REQUEST["mode"])) {
 // Validate to prevent editing any file
 if (isset($_REQUEST["template"])) {
     if (strstr($_REQUEST["template"], '..')) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to do that"));
-
-        $smarty->display('error.tpl');
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to do that"), \Laminas\Http\Response::STATUS_CODE_401);
     }
 }
 
-$relativeDirectories = ['', 'mail/', 'map/', 'modules/', 'styles/' . str_replace('.css', '', $prefs['style']) . '/'];
+$relativeDirectories = ['', 'mail/', 'map/', 'modules/', isset($prefs['style']) && ! empty($prefs['style']) ? 'styles/' . str_replace('.css', '', $prefs['style']) . '/' : ''];
 
 // do editing stuff only if you have the permission to:
-if ($tiki_p_edit_templates == 'y') {
+if ($globalperms->edit_templates == 'y') {
     if ((isset($_REQUEST["save"]) || isset($_REQUEST['saveTheme'])) && ! empty($_REQUEST['template']) && $access->checkCsrf(true)) {
         $access->check_feature('feature_edit_templates');
         $access->checkCsrf();
@@ -83,8 +75,7 @@ if ($tiki_p_edit_templates == 'y') {
                 if (in_array($relativeDirectory . '/', $relativeDirectories)) {
                     mkdir($domainStyleTemplatesDirectory . '/' . $relativeDirectory);
                 } else {
-                    $smarty->assign('msg', tr('Template directory %0 unknown', $relativeDirectory));
-                    $smarty->display('error.tpl');
+                    Feedback::errorAndDie(tr('Template directory %0 unknown', $relativeDirectory), \Laminas\Http\Response::STATUS_CODE_500);
                 }
             }
         } else {
@@ -92,10 +83,7 @@ if ($tiki_p_edit_templates == 'y') {
         }
         @$fp = fopen($file, 'w');
         if (! $fp) {
-            $smarty->assign('errortype', 401);
-            $smarty->assign('msg', tra("You do not have permission to write the template:") . ' ' . $file);
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra("You do not have permission to write the template:") . ' ' . $file, \Laminas\Http\Response::STATUS_CODE_401);
         }
         $_REQUEST["data"] = str_replace("\r\n", "\n", $_REQUEST["data"]);
         fwrite($fp, $_REQUEST["data"]);
@@ -120,10 +108,7 @@ if (isset($_REQUEST["template"])) {
     }
     $fp = fopen($file, 'r');
     if (! $fp) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to read the template"));
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to read the template"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $data = fread($fp, filesize($file));
     fclose($fp);

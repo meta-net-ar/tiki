@@ -295,6 +295,10 @@ $btn-link-disabled-color:     $gray-600;  // default
     --tiki-top-hover-color: #{$tiki-top-link-hover-color};
     --tiki-top-text-color: #{$tiki-top-link-hover-color};
     --tiki-top-border: solid #000;
+    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+    .navbar-light {
+        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
 }
 
 @mixin topbar-nav-light {
@@ -302,6 +306,10 @@ $btn-link-disabled-color:     $gray-600;  // default
     --tiki-topbar-color: #{$tiki-top-light-color};
     --tiki-topbar-hover-color: #{$navbar-light-link-hover-color};
     --tiki-topbar-text-color: #{$navbar-light-link-hover-color};
+    // When navbar-light is actually dark, lighten the hamburger icon color ('stroke' in the svg) for contrast.
+    .navbar-light {
+        --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
 }
 
 @mixin top-nav-dark {

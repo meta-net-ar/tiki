@@ -244,6 +244,7 @@ class Graphic
 {
     public $legend;
     public $title;
+    public $subTitle;
     public $parameters;
     public $dataHandlers;
 
@@ -252,6 +253,11 @@ class Graphic
         $this->legend = [];
         $this->parameters = [];
         $this->dataHandlers = [];
+    }
+
+    public function setSubtitle($subTitle)
+    {
+        $this->subTitle = $subTitle;
     }
 
     public function setTitle($title)
@@ -292,6 +298,11 @@ class Graphic
         if ($layout['title-active'] && ! empty($this->title)) {
             $top += 0.1;
             $renderer->drawText($this->title, 0, 1, 0.04, $renderer->getStyle($layout['title-font']));
+        }
+
+        if ($layout['subtitle-active'] && ! empty($this->subTitle)) {
+            $top += 0.1;
+            $renderer->drawText($this->subTitle, 0, 1, 0.1, $renderer->getStyle($layout['subtitle-font']));
         }
 
         if ($layout['legend-active'] && count($this->legend) > 0 && $layout['legend-location'] != 'static') {
@@ -536,6 +547,8 @@ class Graphic
         return [
             'title-active' => true,
             'title-font' => 'Normal-Text-Center', // Any Text style name
+            'subtitle-active' => true,
+            'subtitle-font' => 'Normal-Text-Center',
             'legend-active' => true,
             'legend-font' => 'Large-Text', // Any Text style name
             'legend-location' => 'right', // left, right, bottom, top, static

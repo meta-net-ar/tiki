@@ -14,7 +14,7 @@ $inputConfiguration = [
         'clear'                    => 'bool',              //post
         'sort_mode'                => 'word',              //get
         'offset'                   => 'digits',            //post
-        'find'                     => 'word',              //post
+        'find'                     => 'string',            //post
         ],
     ],
 ];

@@ -16,7 +16,7 @@ $inputConfiguration = [
         'sort_mode'          => 'word',              //get
         'offset'             => 'int',               //get
         'max'                => 'int',               //get
-        'find'               => 'word',              //post
+        'find'               => 'string',            //post
         ],
     ],
 ];

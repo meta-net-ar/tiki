@@ -9,6 +9,15 @@
 {/block}
 
 {block name="content"}
+    {function registerFieldDependency}
+        <script type="module">
+            {literal}
+                import {registerFieldDependency} from '@jquery-tiki/plugin-edit';
+            {/literal}
+            registerFieldDependency("{{$dependantFieldId}}", "{{$dependencyField}}", "{{$dependencyValue}}");
+        </script>
+    {/function}
+    
     {function plugin_edit_row}{* needs to be in the same block it seems? *}
         {if !empty($param.area)}{$inputId=$param.area|escape}{else}{$inputId="param_{$paramName|escape}_input"}{/if}
         <div class="col-sm-3">
@@ -39,6 +48,7 @@
             {/if}
         </div>
         <div class="col-sm-9">
+            {if isset($pluginArgs[$paramName])}{$val = $pluginArgs[$paramName]}{else}{$val=''}{/if}
             {if not empty($param.parentparam.name)}
                 {$groupClass = " group-`$param.parentparam.name`"}
                 {$dataAttribute = " data-parent_name='`$param.parentparam.name`' data-parent_value='`$param.parentparam.value`'"}
@@ -46,8 +56,9 @@
                 {$groupClass = ''}
                 {$dataAttribute = ''}
             {/if}
-            {if empty($param.options)}
-                {if isset($pluginArgs[$paramName])}{$val = $pluginArgs[$paramName]}{else}{$val=''}{/if}
+            {if $param.type eq 'buttons'}
+                {include file="plugin/types/buttons.tpl"}
+            {elseif empty($param.options)}
                 {if not empty($param.selector_type)}
                     {if empty($param.separator)}
                         {object_selector type=$param.selector_type _simplevalue=$val _simplename='params['|cat:$paramName|escape|cat:']' _simpleid=$inputId _parent=$param.parent _parentkey=$param.parentkey _class=$groupClass}
@@ -68,44 +79,62 @@
                 {else}
                     {if $param.filter eq "password"}
                         <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="password" name="params[{$paramName|escape}]"{$dataAttribute}>
+                    {elseif $param.filter eq "date"}
+                        {jscalendar id="{$inputId}" showtime='n' fieldname="params[{$paramName|escape}]" date=$val}
+                    {elseif $param.filter eq "datetime"}
+                        {jscalendar id="{$inputId}" showtime='y' showtimezone="n" fieldname="params[{$paramName|escape}]"}
                     {else}
                         <input value="{$val|escape}" class="form-control{$groupClass}" id="{$inputId}" type="text" name="params[{$paramName|escape}]"{$dataAttribute}>
                     {/if}
                     {if not empty($param.filter)}
                         {if $param.filter eq "pagename"}
-                            {jq}$({{$inputId}}).tiki("autocomplete", "pagename");{/jq}
+                            {autocomplete element="#{$inputId}" type="pagename"}
                         {elseif $param.filter eq "groupname"}
-                            {jq}$({{$inputId}}).tiki("autocomplete", "groupname", {multiple: true, multipleSeparator: "|"});{/jq}
+                            {autocomplete element="#{$inputId}" type="groupname" options="multiple: true, multipleSeparator: '|'"}
                         {elseif $param.filter eq "username"}
-                            {jq}$({{$inputId}}).tiki("autocomplete", "username", {multiple: true, multipleSeparator: "|"});{/jq}
+                            {autocomplete element="#{$inputId}" type="username" options="multiple: true, multipleSeparator: '|'"}
                         {elseif $paramName eq "biblio_code"}
-                            {jq}$({{$inputId}}).tiki("autocomplete", "reference", {multiple: true, multipleSeparator: ":"});{/jq}
-                        {elseif $param.filter eq "date"}
-                            {jq}
-                                $({{$inputId}}).tiki("datepicker");
-                                $(".ui-datepicker-trigger").remove();
-                            {/jq}
-                        {elseif $param.filter eq "datetime"}
-                            {jq}
-                                $({{$inputId}}).tiki("datetimepicker");
-                                $(".ui-datepicker-trigger").remove();
-                            {/jq}
+                            {autocomplete element="#{$inputId}" type="reference" options="multiple: true, multipleSeparator: ':'"}
                         {/if}
                     {/if}
                 {/if}
             {else}
-                <select class="form-select{$groupClass}" type="text" name="params[{$paramName|escape}]" id="{$inputId}"{$dataAttribute}>
-                   {if !isset($pluginArgs[$paramName])}
-                        <option value="" selected="selected">Please select an option</option>
-                    {/if}
-                    {foreach $param.options as $option}
-                        <option value="{$option.value|escape}" {if isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value} selected="selected"{/if}>
-                            {$option.text|escape}
-                        </option>
-                    {/foreach}
-                </select>
+                <div class="object-selector-options {$groupClass}">
+                    <select class="form-select{$groupClass}" type="text" id="{$inputId|escape}"
+                        name="params[{$paramName|escape}]" {$dataAttribute} 
+                        {if $param.select_multiple eq "y"}multiple{/if}
+                        data-separator="{$param.separator|default:'|'}">
+                        {if !isset($pluginArgs[$paramName]) && $param.select_multiple neq "y"}
+                            <option value="" selected="selected">Please select an option</option>
+                        {/if}
+                        {foreach $param.options as $option}
+                            <option value="{$option.value|escape}" 
+                                {if $param.select_multiple eq "y"}
+                                    {if isset($pluginArgs[$paramName]) && in_array($option.value, $pluginArgs[$paramName]|explode:($param.separator|default:','))}selected{/if}
+                                {else}
+                                    {if (isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value) or (!isset($pluginArgs[$paramName]) and $param.default eq $option.value)}
+                                    selected="selected"{/if}
+                                {/if}>
+                                {$option.text|escape}
+                            </option>
+                        {/foreach}
+                    </select>
+                </div>
             {/if}
             <div class="description">{$param.description}</div>
+            {if $param.tag}
+                <div class="mt-2">
+                    {if $param.tag eq $parameterTags.Deprecated}
+                        <span class="badge rounded-pill text-dark bg-warning">{$param.tag}</span>
+                    {elseif $param.tag eq $parameterTags.Experimental}
+                        <span class="badge rounded-pill text-dark bg-secondary-subtle">{$param.tag}</span>
+                    {/if}
+                    <span class="fw-lighter fst-italic">{$param.tagMessage}</span>
+                </div>
+            {/if}
+            {if not empty($param.depends)}
+                {registerFieldDependency dependantFieldId=$inputId dependencyField=$param.depends.field dependencyValue=$param.depends.value}
+            {/if}
         </div>
     {/function}
     <div id="plugin_params">
@@ -113,14 +142,14 @@
             {ticket mode='confirm'}
             {if not empty($info.params)}
                 {foreach $info.params as $name => $param}
-                    <div class="mb-3 row {if !empty($param.advanced)} advanced{/if}" id="param_{$name|escape}">
+                    <div class="mb-3 row {if !empty($param.advanced)} advanced{/if} field-container" id="param_{$name|escape}">
                         {plugin_edit_row param=$param paramName=$name info=$info pluginArgs=$pluginArgs}
                     </div>
                 {/foreach}
                 {if not empty($info.advancedParams)}
                     {button _text='Advanced' _onclick="$('.mb-3.advanced.default').toggle('fast'); return false;" _class='btn btn-sm mb-4'}
                     {foreach $info.advancedParams as $name => $param}
-                        <div class="mb-3 advanced row default" style="display: none;">
+                        <div class="mb-3 advanced row default field-container" style="display: none;">
                             {plugin_edit_row param=$param paramName=$name info=$info pluginArgs=$pluginArgs}
                         </div>
                     {/foreach}
@@ -128,11 +157,19 @@
 
             {/if}
 
-            <div class="mb-3 row"{if empty($info.body)} style="display:none"{/if}>
+            <div class="mb-3 row field-container"{if empty($info.body)} style="display:none"{/if}>
                 <label for="content" class="col-sm-3">{tr}Body{/tr}</label>
                 <div class="col-sm-9">
                     <textarea name="content" id="content" class="form-control" rows="12">{$bodyContent|escape}</textarea>
-                    <div class="description">{$info.body}</div>
+                    {if is_array($info.body)}
+                        {assign var="bodyDescription" value=$info.body.description}
+                        {if $info.body.depends}
+                            {registerFieldDependency dependantFieldId="content" dependencyField=$info.body.depends.field dependencyValue=$info.body.depends.value}
+                        {/if}
+                    {else}
+                        {assign var="bodyDescription" value=$info.body}
+                    {/if}
+                    <div class="description">{$bodyDescription}</div>
                 </div>
             </div>
 

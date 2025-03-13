@@ -27,7 +27,7 @@
                 {tr}Number of top voted polls to show{/tr}
             </label>
             <div class="col-sm-3">
-                <input type="text" name="maxRecords" class="form-control" value="{$maxRecords|escape}" size="3">
+                <input type="number" name="maxRecords" class="form-control" value="{$maxRecords|escape}" size="3">
             </div>
         </div>
         <br>

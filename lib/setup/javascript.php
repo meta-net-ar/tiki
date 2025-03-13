@@ -214,6 +214,7 @@ $jqueryTiki['tiki_same_day_time_only'] = $prefs['tiki_same_day_time_only'];
 $jqueryTiki['jquery_timeago'] = $prefs['jquery_timeago'] === 'y' ? true : false;
 $jqueryTiki['short_date_format'] = $prefs['short_date_format'];
 $jqueryTiki['short_time_format'] = $prefs['short_time_format'];
+$jqueryTiki['wiki_url_scheme'] = $prefs['wiki_url_scheme'];
 //set at 4 hours if empty
 $jqueryTiki['securityTimeout'] = ! empty($prefs['site_security_timeout']) ? $prefs['site_security_timeout']
     : TikiLib::lib('access')->getDefaultTimeout();
@@ -283,45 +284,66 @@ var syntaxHighlighter = {
 EOT;
 }
 
-if ($prefs['jquery_ui_modals_draggable'] === 'y') {
+if ($prefs['feature_draggable_modals'] === 'y') {
     $js .= <<< 'EOT'
 $(document).on("shown.bs.modal", function(event) {
-    $(event.target).find(".modal-dialog")
-        .css({
-            left: "",
-            top: ""
-        })
-        .draggable({
-            handle: ".modal-header",
-            cursor: "grabbing"
-        });
+    const draggableId = 'modal' + Math.random().toString(36).substring(7);
+    $(event.target).find(".modal-dialog").attr("id", draggableId);
+    const position = { x: 0, y: 0 };
+    interact(`#${draggableId}`).draggable({
+        inertia: true,
+        autoScroll: true,
+        listeners: {
+            move: (e) => {
+                const target = e.target;
+                position.x += e.dx;
+                position.y += e.dy;
+                target.style.transform = `translate(${position.x}px, ${position.y}px)`;
+            }
+        }
+    });
 });
 EOT;
     $headerlib->add_css('.modal-header {cursor: grab}');
 }
 
-if ($prefs['jquery_ui_modals_resizable'] === 'y') {
+if ($prefs['feature_resizable_modals'] === 'y') {
     $js .= <<< 'EOT'
 $(document).on("tiki.modal.redraw", function(event) {
-    var $modalContent = $(event.target);
+    let $modalContent = $(event.target);
     if (!$modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    if ($modalContent.is(".ui-resizable") && $modalContent.resizable("instance").started) {
-        $modalContent.resizable("destroy");
-    }
-    $modalContent
-        .css({
-            width: "",
-            height: ""
-        })
-        .resizable({
-            minHeight: 100,
-            minWidth: 200
-        })
-        .find(".modal-body").css({
-            "overflow": "auto"
-        });
+
+    const modalBody = $modalContent.find(".modal-body")[0];
+
+    const initialWidth = parseFloat(getComputedStyle($modalContent[0]).width.slice(0, -2));
+    const initialHeight = parseFloat(getComputedStyle($modalContent[0]).height.slice(0, -2));
+    const initialOverflow = getComputedStyle(modalBody).overflow;
+    
+    const modalId = 'modal' + Math.random().toString(36).substring(7);
+    $modalContent.attr("id", modalId);
+    interact(`#${modalId}`).resizable({
+        edges: { left: true, right: true, bottom: true, top: true },
+        inertia: true,
+        listeners: {
+            move: (e) => {
+                const target = e.target;
+                let width = parseFloat(getComputedStyle(target).width.slice(0, -2));
+                let height = parseFloat(getComputedStyle(target).height.slice(0, -2));
+                width += e.deltaRect.left + e.deltaRect.right;
+                height += e.deltaRect.top + e.deltaRect.bottom;
+                target.style.width = `${width}px`;
+                target.style.height = `${height}px`;
+                
+                if (width < initialWidth || height < initialHeight) {
+                    modalBody.style.overflow = "auto";
+                } else {
+                    modalBody.style.overflow = initialOverflow;
+                }
+            }
+        }
+    });
 });
 EOT;
 }

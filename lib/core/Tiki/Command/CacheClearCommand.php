@@ -49,8 +49,11 @@ class CacheClearCommand extends Command
             // Probably there for historical reasons, this ignores the command argument - benoitg 2023-05-08
             $output->writeln('Clearing all caches');
             $cachelib->empty_cache();
-            $output->writeln('Rebuilding admin index');
-            \TikiLib::lib('prefs')->rebuildIndex();
+
+            if (DB_STATUS) { // we have a functional db connection
+                $output->writeln('Rebuilding admin index');
+                \TikiLib::lib('prefs')->rebuildIndex();
+            }
         } else {
             switch ($type) {
                 case 'public':

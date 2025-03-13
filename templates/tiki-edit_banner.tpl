@@ -4,7 +4,7 @@
     {button href="tiki-list_banners.php" _class="btn btn-link" _type="link" _icon_name="list" _text="{tr}List banners{/tr}"}
 </div>
 
-<form action="tiki-edit_banner.php" method="post" enctype="multipart/form-data" mb-4">
+<form action="tiki-edit_banner.php" method="post" enctype="multipart/form-data" class="mb-4">
     {ticket}
     <input type="hidden" name="bannerId" value="{$bannerId|escape}">
     <div class="card mb-2">
@@ -88,7 +88,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label"></label>
                 <div class="col-sm-7">
-                    <input type="submit" class="btn btn-primary btn-sm" name="create_zone" value="{tr}Create a new Zone{/tr}">
+                    <input type="submit" class="btn btn-primary btn-sm" name="create_zone" value="{tr}Create a new Zone{/tr}" onclick="disableRequiredFields()">
                 </div>
             </div>
         </div>
@@ -181,12 +181,12 @@
             <div class="mb-3 row">
                 <div class="col-sm-4">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="use" id="useHTML" value="useHTML" {if $use eq 'useHTML'}checked="checked"{/if}>
+                        <input class="form-check-input" type="radio" name="use" id="useHTML" value="useHTML" {if $use eq 'useHTML'}checked="checked"{/if} onclick="toggleBannerContent('useHTML')">
                         <label class="form-check-label" for="useHTML"> {tr}Use HTML{/tr}</label>
                     </div>
                 </div>
-                <div class="col-sm-7">
-                    <textarea class="form-control" rows="5" name="HTMLData" aria-labelledby="HTMLcode">{$HTMLData|escape}</textarea>
+                <div class="col-sm-7" id="htmlContent">
+                    <textarea class="form-control" rows="5" name="HTMLData" aria-labelledby="HTMLcode" {if $use neq 'useHTML'}disabled="disabled"{/if} required>{$HTMLData|escape}</textarea>
                     <div class="form-text" id="HTMLcode">
                         {tr}HTML code{/tr}
                     </div>
@@ -195,16 +195,16 @@
             <div class="mb-3 row">
                 <div class="col-sm-4">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="use" id="useImage" value="useImage" {if $use eq 'useImage'}checked="checked"{/if}>
+                        <input class="form-check-input" type="radio" name="use" id="useImage" value="useImage" {if $use eq 'useImage'}checked="checked"{/if} onclick="toggleBannerContent('useImage')">
                         <label class="form-check-label" for="useImage"> {tr}Use Image{/tr}</label>
                     </div>
                 </div>
-                <div class="col-sm-7">
+                <div class="col-sm-7" id="imageContent">
                     <input type="hidden" name="imageData" value="{$imageData|escape}">
                     <input type="hidden" name="imageName" value="{$imageName|escape}">
                     <input type="hidden" name="imageType" value="{$imageType|escape}">
                     <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-                    <input name="userfile1" type="file" class="form-control" aria-label="Browse">
+                    <input name="userfile1" type="file" accept="image/*" class="form-control" aria-label="Browse" {if $use neq 'useImage'}disabled="disabled"{/if} required>
                 </div>
             </div>
             <div class="mb-3 row">
@@ -216,24 +216,56 @@
                 {/if}
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><label><input type="radio" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if}> {tr}Use Image from URL{/tr}</label></label>
-                <div class="col-sm-7">
-                    <input type="text" name="fixedURLData" value="{$fixedURLData|escape}" class="form-control">
+                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if} onclick="toggleBannerContent('useFixedURL')"> {tr}Use Image from URL{/tr}</label>
+                <div class="col-sm-7" id="fixedURLContent">
+                    <input type="text" name="fixedURLData" value="{$fixedURLData|escape}" class="form-control" {if $use neq 'useFixedURL'}disabled="disabled"{/if} required>
                     <div class="form-text">
                         {tr}(the image will be requested at the URL for each impression){/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><label><input type="radio" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if}> {tr}Use Text{/tr}</label></label>
-                <div class="col-sm-7">
-                    <textarea class="form-control" rows="5" name="textData">{$textData|escape}</textarea>
+                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if} onclick="toggleBannerContent('useText')"> {tr}Use Text{/tr}</label>
+                <div class="col-sm-7" id="textContent">
+                    <textarea class="form-control" rows="5" name="textData" {if $use neq 'useText'}disabled="disabled"{/if} required>{$textData|escape}</textarea>
                 </div>
             </div>
         </div>
     </div>
     <input type="submit" class="btn btn-primary" name="save" value="{tr}Save the Banner{/tr}">
 </form>
+
+<script>
+    function toggleBannerContent(selectedType) {
+        const contentTypes = {
+            'useHTML': 'htmlContent',
+            'useImage': 'imageContent',
+            'useFixedURL': 'fixedURLContent',
+            'useText': 'textContent'
+        };
+
+        for (const [type, id] of Object.entries(contentTypes)) {
+            document.getElementById(id).querySelector(type === 'useImage' ? 'input[type="file"]' : 'textarea, input').disabled = selectedType !== type;
+        }
+    }
+
+    function disableRequiredFields() {
+        const fields = {
+            'htmlContent': 'textarea',
+            'imageContent': 'input[type="file"]',
+            'fixedURLContent': 'input',
+            'textContent': 'textarea'
+        };
+        for (const [id, selector] of Object.entries(fields)) {
+            document.getElementById(id).querySelector(selector).removeAttribute('required');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectedType = document.querySelector('input[name="use"]:checked').value;
+        toggleBannerContent(selectedType);
+    });
+</script>
 
 {if $zones}
     <div align="left" class="card">

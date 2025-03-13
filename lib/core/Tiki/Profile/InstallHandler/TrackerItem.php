@@ -103,7 +103,7 @@ class Tiki_Profile_InstallHandler_TrackerItem extends Tiki_Profile_InstallHandle
                 }
             }
 
-            if ($fieldId) {
+            if (! empty($fieldId)) {
                 $providedfields[] = $fieldId;
             }
         }

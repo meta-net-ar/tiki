@@ -12,7 +12,7 @@ $inputConfiguration = [
         'clear'              => 'int',               //get
         'sort_mode'          => 'word',              //get
         'offset'             => 'int',               //get
-        'find'               => 'word',              //post
+        'find'               => 'string',            //post
         ],
     ],
 ];
@@ -25,9 +25,7 @@ $tikilib->get_perm_object($_REQUEST['surveyId'], 'survey');
 $access->check_permission('view_survey_stats', 'View Survey Statistics', 'survey', $_REQUEST['surveyId']);
 
 if (! isset($_REQUEST["surveyId"])) {
-    $smarty->assign('msg', tra("No survey indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No survey indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign('surveyId', $_REQUEST["surveyId"]);
 $survey_info = $srvlib->get_survey($_REQUEST["surveyId"]);

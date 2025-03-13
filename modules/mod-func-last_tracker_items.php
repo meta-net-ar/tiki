@@ -66,7 +66,9 @@ function module_last_tracker_items($mod_reference, $module_params)
             }
             if (empty($module_params['fieldId']) && isset($module_params['trackerId'])) {
                 $definition = Tracker_Definition::get($module_params['trackerId']);
-                $module_params['fieldId'] = $definition->getMainFieldId();
+                if ($definition) {
+                    $module_params['fieldId'] = $definition->getMainFieldId();
+                }
             }
             if (empty($module_params['fieldId'])) {
                 $smarty->assign('module_error', tra('Unable to determine which field to show. Tracker identifier may be invalid, or the tracker has no main field and neither Field identifier nor Field name were set.'));
@@ -84,6 +86,10 @@ function module_last_tracker_items($mod_reference, $module_params)
                 foreach ($tmp['data'] as $data) {
                     if (! empty($data['field_values'][0]['value'])) {
                         $data['subject'] = $data['field_values'][0]['value'];
+                        $baseUrl = "tiki-view_tracker_item.php?itemId={$data['itemId']}";
+                        $data['sefurl'] = ($prefs['feature_sefurl'] === 'y')
+                            ? filter_out_sefurl($baseUrl, 'trackeritem', '', null, 'y')
+                            : $baseUrl;
                         $modLastItems[] = $data;
                     }
                 }

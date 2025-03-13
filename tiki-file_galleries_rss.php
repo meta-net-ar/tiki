@@ -18,6 +18,8 @@ if ($prefs['feed_file_galleries'] != 'y') {
         require_once('tiki-rss_error.php');
 }
 
+TikiLib::lib('header')->setXRobotsTag($robots);
+
 $filegallib = TikiLib::lib('filegal');
 
 $feed = "filegals";

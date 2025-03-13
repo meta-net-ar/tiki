@@ -15,7 +15,7 @@ $inputConfiguration = [
         'pass' => 'none',
         'passAgain' => 'none',
         'oldpass' => 'none',
-        'change' => null,
+        'change' => 'text',
     ],
     ]
 ];
@@ -24,10 +24,7 @@ require_once('tiki-setup.php');
 $access->check_feature('change_password');
 
 if (empty($_REQUEST['user']) || ! $userlib->user_exists($_REQUEST['user'])) {
-    $smarty->assign('msg', tra('Invalid username'));
-    $smarty->assign('errortype', 'login');
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra('Invalid username'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 if (! isset($_REQUEST["oldpass"])) {
@@ -45,56 +42,44 @@ if (isset($_REQUEST["change"])) {
     $access->checkCsrf();
     // Check that pass and passAgain match, otherwise display error and exit
     if ($_REQUEST["pass"] != $_REQUEST["passAgain"]) {
-        $smarty->assign('msg', tra("The passwords do not match"));
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("The passwords do not match"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 
     // Check that new password is different from old password, otherwise display error and exit
     if ($_REQUEST["pass"] == $_REQUEST["oldpass"]) {
-        $smarty->assign('msg', tra("You can not use the same password again"));
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You can not use the same password again"), \Laminas\Http\Response::STATUS_CODE_400);
     }
 
     $polerr = $userlib->check_password_policy($_REQUEST["pass"]);
     if (strlen($polerr) > 0) {
-        $smarty->assign('msg', $polerr);
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
     }
 
     if (empty($_REQUEST['oldpass']) && ! empty($_REQUEST['actpass'])) {
         $_REQUEST['oldpass'] = $userlib->activate_password($_REQUEST['user'], $_REQUEST['actpass']);
         if (empty($_REQUEST['oldpass'])) {
-            $smarty->assign('msg', tra('Invalid username or activation code. Maybe this code has already been used.'));
-            $smarty->assign('errortype', 'no_redirect_login');
-            $smarty->display('error.tpl');
-            die;
+            Feedback::errorAndDie(tra('Invalid username or activation code. Maybe this code has already been used.'), \Laminas\Http\Response::STATUS_CODE_400);
         }
     }
     // Check that provided user name could log in with old password, otherwise display error and exit
     list($isvalid, $_REQUEST["user"], $error) = $userlib->validate_user($_REQUEST["user"], $_REQUEST["oldpass"]);
     if (! $isvalid) {
-        $smarty->assign('msg', tra("Invalid old password"));
-        $smarty->assign('errortype', 'no_redirect_login');
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Invalid old password"), \Laminas\Http\Response::STATUS_CODE_400);
     }
     if (isset($_REQUEST['email'])) {
         if (empty($_REQUEST['email']) || ! validate_email($_REQUEST['email'], $prefs['validateEmail'])) {
-            $smarty->assign('msg', tra('Your email could not be validated; make sure your email is correct'));
-            $smarty->assign('errortype', 'no_redirect_login');
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie(tra('Your email could not be validated; make sure your email is correct'), \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_email_only($_REQUEST['user'], $_REQUEST['email']);
     }
 
-    $userlib->change_user_password($_REQUEST["user"], $_REQUEST["pass"]);
+    $res = $userlib->change_user_password($_REQUEST["user"], $_REQUEST["pass"]);
+    //If the password is successfully changed
+    if ($res && $prefs['pass_history_management'] === 'y') {
+        // Add new password to history
+        $userlib->addPasswordHistory($_REQUEST["user"], $_REQUEST["pass"]);
+    }
+
     // Login the user and display Home page
     $_SESSION["$user_cookie_site"] = $_REQUEST["user"];
     $user = $_REQUEST["user"];

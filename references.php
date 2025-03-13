@@ -20,9 +20,7 @@ if (! isset($prefs['feature_references']) && ! $prefs['feature_references'] === 
 $referenceslib = TikiLib::lib('references');
 
 if (! isset($_REQUEST['page'])) {
-    $smarty->assign('msg', tra('No page indicated'));
-    $smarty->display('error.tpl');
-    die;
+    Feedback::errorAndDie(tra("No page indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $smarty->assign('page', $_REQUEST['page']);

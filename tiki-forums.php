@@ -16,7 +16,6 @@ $inputConfiguration = [
             'offset'                      => 'int',               //get
             'find'                        => 'string',            //post
             'numrows'                     => 'int',               //post
-            'find'                        => 'string',            //post
         ],
     ],
 ];

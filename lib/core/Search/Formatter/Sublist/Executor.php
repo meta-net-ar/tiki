@@ -7,10 +7,12 @@
 
 namespace Search\Formatter\Sublist;
 
+use ArrayObject;
 use Exception;
 use Search_Formatter;
 use Search_Formatter_Plugin_ArrayTemplate;
 use Search_Formatter_Plugin_Interface;
+use Search_Formatter_Plugin_Sublist;
 use Search_Formatter_Plugin_WikiTemplate;
 use Search_Formatter_ValueFormatter;
 use Search_Query;
@@ -57,22 +59,36 @@ class Executor
         }
     }
 
+    /** @array typically a raw array or a Tiki\Search\Formatter\Transform\DynamicLoaderWrapper */
+    private static function checkFieldIsAvailable(string $fieldName, array|\ArrayObject $record)
+    {
+        $arrayObject = is_array($record) ? new ArrayObject($record) : $record;
+        $retVal = $arrayObject->offsetExists($fieldName);
+        if (! $retVal) {
+            $availableFields = array_keys($arrayObject->getArrayCopy());
+            sort($availableFields);
+            $msg = tr('Field %0 not found.  The fields available in the current context are: %1', $fieldName, implode(', ', $availableFields));
+            throw new Exception($msg);
+        }
+        return $retVal;
+    }
     protected function replacePlaceholders()
     {
         $body = $this->record->getBody();
         foreach ($this->record->getFilters() as $filter) {
             $match = $filter['match'];
             $arguments = $filter['arguments'];
-            if (! isset($arguments['field'])) {
-                // TODO: consider other filter types as range searches
-                throw new Exception(tr('Filter blocks inside sublist sections in PluginList need field reference.'));
-            }
             foreach ($arguments as $name => $value) {
-                if (preg_match('/\$(parent|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
+                // Sublist special processing will only happen if parent or root is provided
+                if (preg_match('/\$(parent(\.parent){0,}|root)\.(.*?)\|?(object_ids|multivalue)?\$/', $value, $m)) {
+                    if (! isset($arguments['field'])) {
+                        // TODO: consider other filter types as range searches
+                        throw new Exception(tr('Filter blocks inside sublist sections in PluginList that use parent element values need field reference.'));
+                    }
                     $placeholder = $m[0];
-                    $type = $m[1];
-                    $field = $m[2];
-                    $modifier = $m[3] ?? null;
+                    $type = $m[1]; // parent(.parent...) or root
+                    $field = $m[3];
+                    $modifier = $m[4] ?? null;
                     $values = [];
                     $valueExtractor = function ($val) use ($placeholder, $value, $modifier, &$values) {
                         if ($modifier == 'object_ids') {
@@ -83,30 +99,65 @@ class Executor
                             $values = array_merge($values, $val);
                             return $val;
                         } elseif ($modifier == 'multivalue') {
-                            $val = str_replace($placeholder, $val, $value);
-                            $values[] = $val;
+                            if (is_array($val)) {
+                                $values = array_merge($values, $val);
+                            } else {
+                                $val = str_replace($placeholder, $val, $value);
+                                $values[] = $val;
+                            }
                             $converter = TikiLib::lib('unifiedsearch')->getIndex()->getTypeFactory()->multivalue($val);
                             return $converter->getValue();
                         } else {
-                            $val = str_replace($placeholder, $val, $value);
-                            $values[] = $val;
+                            if (is_array($val)) {
+                                $values = array_merge($values, $val);
+                            } else {
+                                $val = str_replace($placeholder, $val, $value);
+                                $values[] = $val;
+                            }
                             return $val;
                         }
                     };
-                    if ($type == 'parent') {
-                        foreach ($this->data as $i => $row) {
-                            if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
-                                // parent sublists might have entries with multiple records per key
-                                foreach ($row as $j => $subrow) {
-                                    if (! empty($subrow[$field])) {
-                                        $this->reverseMapping[$i][$j][] = [
-                                            'value' => $valueExtractor($subrow[$field]),
+                    if (substr($type, 0, 6) === 'parent') {
+                        $record = $this->record;
+                        $subtype = substr($type, 7);
+                        while (substr($subtype, 0, 6) === 'parent') {
+                            $subtype = substr($subtype, 7);
+                            $record = $record->getParent();
+                            if (! $record) {
+                                throw new Exception(tr('Sublist parent requested but no such parent found: %0', $type));
+                            }
+                        }
+                        foreach ($record->getDataset() as $i => $row) {
+                            //Row will be an empty array (so no keys to re-map) if the parent sublist didn't match anything.  But we still want to continue executing the sublist as there may be static output in the output block, or the sublist may not refer to anything on it's parent (which has little practical use except debugging, but for some reason doesn't seem to work now) - benoitg - 2024-11-26
+                            if ($row) {
+                                if ($record->getParent() && $record->getParent()->isMultiple()) {
+                                    // parent sublists might have entries with multiple records per key
+                                    foreach ($row as $j => $subrow) {
+                                        if (self::checkFieldIsAvailable($field, $subrow)) {
+                                            $map = [
+                                                'value' => $valueExtractor($subrow[$field]),
+                                                'target_field' => $arguments['field'],
+                                            ];
+                                            if ($record != $this->record) {
+                                                $this->reverseMapping[$j][$i][] = $map;
+                                            } else {
+                                                $this->reverseMapping[$i][$j][] = $map;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (self::checkFieldIsAvailable($field, $row)) {
+                                        $this->reverseMapping[$i][0][] = [
+                                            'value' => $valueExtractor($row[$field]),
                                             'target_field' => $arguments['field'],
                                         ];
                                     }
                                 }
                             }
-                            if (! empty($row[$field])) {
+                        }
+                    } elseif ($type == 'root') {
+                        foreach ($this->root_data as $i => $row) {
+                            if (self::checkFieldIsAvailable($field, $row)) {
                                 $this->reverseMapping[$i][0][] = [
                                     'value' => $valueExtractor($row[$field]),
                                     'target_field' => $arguments['field'],
@@ -114,14 +165,7 @@ class Executor
                             }
                         }
                     } else {
-                        foreach ($this->root_data as $i => $row) {
-                            if (! empty($row[$field])) {
-                                $this->reverseMapping[$i][0][] = [
-                                    'value' => $valueExtractor($row[$field]),
-                                    'target_field' => $arguments['field'],
-                                ];
-                            }
-                        }
+                        throw new Exception(tr("Invalid sublist filter type found: %0", $type));
                     }
                     $values = array_unique($values);
                     $arguments[$name] = implode(' OR ', $values);
@@ -129,7 +173,7 @@ class Executor
                         $arguments['content'] = $arguments['exact'];
                         unset($arguments['exact']);
                     }
-                    if (empty($values)) {
+                    if (empty($values) || array_keys(array_filter($arguments)) == ['field']) {
                         $replacement = str_replace($placeholder, '', (string)$match);
                     } else {
                         $replacement = $match->buildPluginString('filter', $arguments, $match->getBody());
@@ -160,31 +204,18 @@ class Executor
         return $query->search($index);
     }
 
-    protected function formatResult($result)
+    /** This applies formatters, which will rewrite $this->data */
+    protected function formatResult($result): void
     {
         $key = $this->record->getKey();
 
-        foreach ($result as $entry) {
-            $subrow = [];
-            foreach ($this->formatterPlugins as $name => $plugin) {
-                $defaultValues = $plugin->getFields();
-                $fields = array_keys($defaultValues);
-                $row = [];
-                foreach ($fields as $f) {
-                    if (isset($entry[$f])) {
-                        $row[$f] = $entry[$f];
-                    }
-                }
-                $subInput = new Search_Formatter_ValueFormatter(array_merge($defaultValues, $row));
-                $subrow[$name] = $this->searchFormatter->render($plugin, Search_ResultSet::create([$plugin->prepareEntry($subInput)]), $this->searchFormatter->plugin->getFormat());
-                if ($this->searchFormatter->plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_HTML && $plugin->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
-                    $subrow[$name] = preg_replace('/^~\/np~|~np~$/', '', $subrow[$name]);
-                    $subrow[$name] = TikiLib::lib('parser')->parse_data($subrow[$name]);
-                }
-            }
-            if (count($this->formatterPlugins) == 0) {
-                $subrow = $entry;
-            }
+        $sf = new Search_Formatter(new Search_Formatter_Plugin_Sublist($this->record));
+        foreach ($this->formatterPlugins as $name => $plugin) {
+            $sf->addSubFormatter($name, $plugin);
+        }
+        $formatted = $sf->getPopulatedList($result, true);
+
+        foreach ($formatted as $entry) {
             foreach ($this->reverseMapping as $i => $mappings) {
                 foreach ($mappings as $j => $mapping) {
                     $count = 0;
@@ -211,15 +242,20 @@ class Executor
                     if ($count == count($mapping)) {
                         if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                             if ($this->record->isMultiple()) {
-                                $this->data[$i][$j][$key][] = $subrow;
+                                // might be ArrayObject (Tiki\Search\Formatter\Transform\DynamicLoaderWrapper) where array auto-creation doesn't work
+                                $arr = $this->data[$i][$j][$key] ?? [];
+                                $arr[] = $entry;
+                                $this->data[$i][$j][$key] = $arr;
                             } else {
-                                $this->data[$i][$j][$key] = $subrow;
+                                $this->data[$i][$j][$key] = $entry;
                             }
                         } else {
                             if ($this->record->isMultiple()) {
-                                $this->data[$i][$key][] = $subrow;
+                                $arr = $this->data[$i][$key] ?? [];
+                                $arr[] = $entry;
+                                $this->data[$i][$key] = $arr;
                             } else {
-                                $this->data[$i][$key] = $subrow;
+                                $this->data[$i][$key] = $entry;
                             }
                         }
                     }
@@ -260,10 +296,10 @@ class Executor
             foreach ($this->data as $i => $row) {
                 if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                     foreach ($row as $j => $_) {
-                        $subdata[$i][$j] = &$this->data[$i][$j][$key];
+                        $subdata[] = &$this->data[$i][$j][$key];
                     }
                 } else {
-                    $subdata[$i] = &$this->data[$i][$key];
+                    $subdata[] = &$this->data[$i][$key];
                 }
             }
             foreach ($sublists as $sublist) {

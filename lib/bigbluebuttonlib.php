@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+
 /**
  *
  */
@@ -415,7 +417,9 @@ class BigBlueButtonLib
 
     /**
      * @param $room
+     *
      * @return array
+     * @throws Exception
      */
     public function getRecordings($room)
     {
@@ -427,6 +431,9 @@ class BigBlueButtonLib
             'getRecordings',
             ['meetingID' => $room,]
         );
+        if (empty($result)) {
+            throw new ServerSaltKeyException(tr('Invalid server salt key entered. Please contact the site administrator to insert a valid server salt key in the RTC > BigBlueButton control panel.'));
+        }
 
         $data = [];
         $recordings = $result->getElementsByTagName('recording');

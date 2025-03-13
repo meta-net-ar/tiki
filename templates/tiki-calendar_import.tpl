@@ -27,7 +27,7 @@
             <a title="{tr}Help{/tr}" {popup text=$smarty.capture.help|escape}>{icon name='help'}</a>
         </label>
         <div class="col-sm-7">
-            <input type="file" name="fileCSV" size="50" class="form-control">
+            <input type="file" accept=".csv" name="fileCSV" size="50" class="form-control">
         </div>
     </div>
     <div class="tiki-form-group row">

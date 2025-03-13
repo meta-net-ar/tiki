@@ -71,15 +71,11 @@ if (! empty($_REQUEST['itemId'])) {
 $_REQUEST["itemId"] = 0;
 $smarty->assign('itemId', $_REQUEST["itemId"]);
 if (! isset($_REQUEST["trackerId"])) {
-    $smarty->assign('msg', tra("No tracker indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No tracker indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 $trackerDefinition = Tracker_Definition::get($_REQUEST['trackerId']);
 if (! $trackerDefinition) {
-    $smarty->assign('msg', tra("No tracker indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No tracker indicated"), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $tracker_info = $trackerDefinition->getInformation();
@@ -189,15 +185,15 @@ if (isset($_REQUEST['status'])) {
     $_REQUEST['status'] = 'o';
 }
 foreach ($status_raw as $let => $sta) {
-    if ((isset(${$sta['perm']}) and ${$sta['perm']} == 'y') or ($my or $ours)) {
+    if (isset($sta['perm']) || ($my || $ours)) {
         if (in_array($let, $sts)) {
             $sta['class'] = 'statuson';
-            $sta['statuslink'] = str_replace($let, '', implode('', $sts));
+            $sta['statuslink'] = $let;
         } else {
             $sta['class'] = 'statusoff';
-            $sta['statuslink'] = implode('', $sts) . $let;
+            $sta['statuslink'] = $let;
         }
-        $status_types["$let"] = $sta;
+        $status_types[$let] = $sta;
     }
 }
 $smarty->assign('status_types', $status_types);
@@ -422,10 +418,7 @@ if (isset($_REQUEST["save"])) {
     if ($itemObject->canModify()) {
         $captchalib = TikiLib::lib('captcha');
         if (empty($user) && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
-            $smarty->assign('msg', $captchalib->getErrors());
-            $smarty->assign('errortype', 'no_redirect_login');
-            $smarty->display("error.tpl");
-            die;
+            Feedback::errorAndDie($captchalib->getErrors(), \Laminas\Http\Response::STATUS_CODE_502);
         }
         // Check field values for each type and presence of mandatory ones
         $mandatory_missing = [];

@@ -6,7 +6,7 @@
     <div id="upload-avatar" class="clearfix">
         <div class="user-avatar user-avatar-preview float-start" style="width: {$prefs.user_small_avatar_size}px">{$userwatch|avatarize:"":"":false}</div>
         <form method="post" enctype="multipart/form-data" action="{service controller=user action=upload_avatar user={$userwatch|escape}}" id="uploadAvatarForm">
-            <input id="userfile" name="userfile" type="file">
+            <input id="userfile" name="userfile" type="file" accept="image/*">
             {ticket mode='confirm'}
             <div class="submit">
                 <button href="{service controller=user action=upload_avatar user={$userwatch|escape} reset=y}" class="float-start btn btn-primary">{tr}Remove avatar{/tr}</button>

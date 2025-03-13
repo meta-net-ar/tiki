@@ -18,11 +18,7 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
 
 /* This file handles reporting PHP errors in the HTML user interface and glitchtip.  Note that errors thrown from smarty templates are handled differently. */
 
-if ($prefs['error_reporting_adminonly'] == 'y' and $tiki_p_admin != 'y') {
-    $errorReportingLevel = 0;
-} else {
-    $errorReportingLevel = Errors::getErrorReportingLevel();
-}
+$errorReportingLevel = Errors::getErrorReportingLevel();
 
 // Handle Smarty specific error reporting level
 $smarty = TikiLib::lib('smarty');
@@ -34,6 +30,7 @@ if (! empty($prefs['smarty_notice_reporting']) and $prefs['smarty_notice_reporti
 $smarty->error_reporting = $smartyErrorReportingLevel;
 
 if (php_sapi_name() != 'cli') { // This handler collects errors to display at the bottom of the general template, so don't use it in CLI, otherwise errors would be lost.
+    ini_set('display_errors', 0);
     $previousErrorHandler = set_error_handler('tiki_error_handling', $errorReportingLevel);
     if ($previousErrorHandler === 'tiki_error_handling') {
         //This is not normal, but actually happens in tiki-installer, so we restore the handler and go on.
@@ -44,7 +41,12 @@ if (php_sapi_name() != 'cli') { // This handler collects errors to display at th
         TikiLib::lib('errortracking')->setPreviousErrorHandler($previousErrorHandler);
     };
 }
-error_reporting($errorReportingLevel);
+
+if (($prefs['log_sql'] ?? 'n') == 'y' && $api_tiki == 'adodb') {
+    $dbTiki->LogSQL();
+    global $ADODB_PERF_MIN;
+    $ADODB_PERF_MIN = $prefs['log_sql_perf_min'];
+}
 
 // TODO: check this only once per session or only if a feature ask for it
 TikiSetup::check($tikidomain);

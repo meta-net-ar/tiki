@@ -37,7 +37,9 @@ class Services_Edit_Controller
 
     public function action_tohtml($input)
     {
-        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), false, $input->allowhtml->int() ? true : false);
+        $wysiwyg = $input->allowhtml->int() ? true : false;
+        $htmlEditor = $input->htmleditor->int() ? true : false;
+        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), false, $wysiwyg, ['wysiwyg' => $wysiwyg, 'html_editor' => $htmlEditor]);
 
         return [
             'data' => $res,
@@ -278,14 +280,6 @@ $(window).on("load", function(){
             ];
         }
 
-        if ($input->wysiwyg->int()) {
-            $help_sections[] = [
-                'id' => 'wysiwyg-help',
-                'title' => tr('WYSIWYG Help'),
-                'content' => $smarty->fetch('tiki-edit_help_wysiwyg.tpl'),
-            ];
-        }
-
         if ($input->plugins->int()) {
             $areaId = $input->areaId->word();
             $wikilib = TikiLib::lib('wiki');
@@ -300,8 +294,7 @@ $(window).on("load", function(){
 
             if ($prefs['wikiplugin_list_gui'] === 'y') {
                 TikiLib::lib('header')
-                    ->add_jsfile('lib/jquery_tiki/pluginedit_list.js')
-                    ->add_jsfile('vendor_bundled/vendor/jquery-plugins/nestedsortable/jquery.ui.nestedSortable.js');
+                    ->add_jsfile('lib/jquery_tiki/pluginedit_list.js');
             }
         }
 
@@ -329,6 +322,8 @@ $(window).on("load", function(){
         return [
             'title' => tr('Editor Settings'),
             'domId' => $input->domId->word(),
+            'type' => $input->type->word(),
+            'syntax' => $input->syntax->word(),
         ];
     }
 

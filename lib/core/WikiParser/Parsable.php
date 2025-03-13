@@ -254,7 +254,7 @@ class WikiParser_Parsable extends ParserLib
                     }
 
                     if ($this->option['wysiwyg']) {
-                        $ret = $this->convert_plugin_for_ckeditor($plugin_name, $arguments, tra('Plugin execution pending approval'), $plugin_data, ['icon' => 'img/icons/error.png']);
+                        $ret = $this->convert_plugin_for_html_editor($plugin_name, $arguments, tra('Plugin execution pending approval'), $plugin_data, ['icon' => 'img/icons/error.png']);
                     } else {
                         $smarty->assign('plugin_name', $plugin_name);
                         $smarty->assign('plugin_index', $current_index);
@@ -380,8 +380,6 @@ if ( \$('#$id') ) {
             TikiLib::lib('parser')->core_options = TikiLib::lib('parser')->option;
         }
 
-        $this->parse_wiki_argvariable($data);
-
         $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
 
         /* <x> XSS Sanitization handling */
@@ -397,8 +395,9 @@ if ( \$('#$id') ) {
 
         if (! $this->option['noparseplugins'] || $this->option['stripplugins']) {
             $this->parse_first($data, $preparsed, $noparsed);
-            $this->parse_wiki_argvariable($data);
         }
+
+        $this->parse_wiki_argvariable($data);
 
         if (! $this->option['noparsefilereferences']) {
             $data = $this->parseDataFileReferences($data);
@@ -452,6 +451,11 @@ if ( \$('#$id') ) {
             $this->setOptions($option);
         }
 
+        $this->parse_wiki_argvariable($data);
+        foreach ($args as &$arg) {
+            $this->parse_wiki_argvariable($arg);
+        }
+
         $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
@@ -491,7 +495,7 @@ if ( \$('#$id') ) {
 
         $func_name = 'wikiplugin_' . $name;
 
-        $plugins_parsing_data = ['accordion', 'benchmark', 'button', 'code', 'fade', 'footnote', 'gdgraph', 'html', 'htmlfeed', 'markdown', 'pdfpage', 'quote',
+        $plugins_parsing_data = ['accordion', 'benchmark', 'button', 'code', 'fade', 'footnote', 'gdgraph', 'html', 'markdown', 'pdfpage', 'quote',
                                 'registermemberpayment', 'rr_info', 'shorten', 'slideshowslide', 'swiper', 'tabs', 'tour', 'tracker', 'param', 'trackerquerytemplate', 'split', 'wantedpages', 'fluidgrid', 'sort'];
         if (($this->option['is_markdown'] ?? false) && ! in_array($name, $plugins_parsing_data)) {
             if ($name == 'fancytable') {
@@ -513,6 +517,8 @@ if ( \$('#$id') ) {
         if (! $validationPerformed && ! ($this->option['wysiwyg'] ?? false)) {
             $this->plugin_apply_filters($name, $data, $args);
         }
+
+        $result = '';
 
         if (function_exists($func_name)) {
             $pluginFormat = 'wiki';
@@ -549,14 +555,24 @@ if ( \$('#$id') ) {
             $killtoc = false;
 
             $plugin_result = $this->convert_plugin_output($output, $pluginFormat, $outputFormat);
-            if (($this->option['wysiwyg'] ?? false)) {
-                return $this->convert_plugin_for_ckeditor($name, $args, $plugin_result, $data, $info);
+            if (($this->option['html_editor'] ?? false)) {
+                return $this->convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info);
             } else {
-                return $plugin_result;
+                $result = $plugin_result;
             }
         } elseif (WikiPlugin_Negotiator_Wiki_Alias::findImplementation($name, $data, $args)) {
-            return $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
+            $result = $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
         }
+
+        if (! empty(ParserLib::$pluginCache)) {
+            $meta = $this->plugin_info($name, $args);
+            $fingerprint = $this->plugin_fingerprint($name, $meta, $data, $args);
+            if (isset(ParserLib::$pluginCache[$fingerprint])) {
+                ParserLib::$pluginCache[$fingerprint] = str_replace(['~np~', '~/np~'], '', $result);
+            }
+        }
+
+        return $result;
     }
 
     public function stripPlugins($name)

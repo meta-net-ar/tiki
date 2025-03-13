@@ -20,6 +20,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             'content' => true,
             'is_html' => false,
             'pdf_page_attachment' => false,
+            'file_attachments+' => false,
             'file_attachment_field' => false,
             'file_attachment_gal' => false,
         ];
@@ -32,52 +33,49 @@ class Search_Action_EmailAction implements Search_Action_Action
 
     public function execute(JitFilter $data)
     {
-        global $prefs;
-
-        require_once 'lib/mail/maillib.php';
-
         try {
-            $mail = tiki_get_admin_mail();
+            $mail = new TikiMail();
 
-            if ($replyto = $this->dereference($data->replyto->text())) {
+            if ($replyto = $this->dereference($data->replyto->raw())) {
                 $mail->setReplyTo($replyto[0]);
             }
 
-            foreach ($data->to->text() as $to) {
+            $recipients = [];
+            foreach ($data->to->raw() as $to) {
                 if (is_array($to)) {
                     foreach ($to as $user_email) {
                         if ($user_email = $this->dereference($user_email)) {
-                            foreach ($user_email as $email) {
-                                $mail->addTo($email);
+                            foreach ($user_email as $name => $email) {
+                                $recipients[] = $email;
                             }
                         }
                     }
                 } else {
                     if ($to = $this->dereference($to)) {
-                        foreach ($to as $email) {
-                            $mail->addTo($email);
+                        foreach ($to as $name => $email) {
+                            $recipients[] = $email;
                         }
                     }
                 }
             }
 
-            foreach ($data->cc->text() as $cc) {
+            foreach ($data->cc->raw() as $cc) {
                 if ($cc = $this->dereference($cc)) {
                     foreach ($cc as $email) {
-                        $mail->addCc($email);
+                        $recipients[] = $email;
                     }
                 }
             }
 
-            foreach ($data->bcc->text() as $bcc) {
+            foreach ($data->bcc->raw() as $bcc) {
                 if ($bcc = $this->dereference($bcc)) {
                     foreach ($bcc as $email) {
-                        $mail->addBcc($email);
+                        $recipients[] = $email;
                     }
                 }
             }
 
-            if ($from = $data->from->text()) {
+            if ($from = $data->from->raw()) {
                 $fromEmail = $this->dereference($from);
                 $fromName = $this->dereferenceName($from);
                 if (! empty($fromEmail[0])) {
@@ -91,16 +89,7 @@ class Search_Action_EmailAction implements Search_Action_Action
 
             $mail->setSubject(strip_tags($subject));
 
-            $bodyPart = new \Laminas\Mime\Message();
-            $bodyMessage = new \Laminas\Mime\Part($content);
-            $bodyMessage->type = \Laminas\Mime\Mime::TYPE_HTML;
-            if ($prefs['default_mail_charset']) {
-                $bodyMessage->setCharset($prefs['default_mail_charset']);
-            }
-
-            $messageParts = [
-                $bodyMessage
-            ];
+            $mail->setHtml($content);
 
             if (! empty($data->pdf_page_attachment->text())) {
                 $pageName = $data->pdf_page_attachment->text();
@@ -108,26 +97,19 @@ class Search_Action_EmailAction implements Search_Action_Action
                 $pdfContent = $this->getPDFAttachment($pageName);
 
                 if ($pdfContent) {
-                    $attachment = new \Laminas\Mime\Part($pdfContent);
-                    $attachment->type = 'application/pdf';
-                    $attachment->filename = $fileName;
-                    $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
-                    $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
-
-                    $messageParts[] = $attachment;
+                    $mail->addAttachment($pdfContent, $fileName, 'application/pdf');
                 } else {
                     return false;
                 }
             }
 
+            $fileIds = [];
             if (! empty($data->file_attachment_field->text()) || ! empty($data->file_attachment_gal->text())) {
                 $objectType = $data->object_type->text();
                 if ($objectType !== 'trackeritem') {
                     Feedback::error(tr('Parameters file_attachment_field and file_attachment_gal can only be used with trackeritem'));
                     return false;
                 }
-
-                $fileIds = [];
 
                 // get fileIds from Files field
                 if (! empty($data->file_attachment_field->text())) {
@@ -155,54 +137,36 @@ class Search_Action_EmailAction implements Search_Action_Action
                         }
                     }
                 }
-
-                foreach ($fileIds as $fileId) {
-                    $file = $this->getFileAttachment($fileId);
-                    if ($file) {
-                        $type = $file['filetype'];
-                        $fileName = $file['filename'];
-                        $attachment = new \Laminas\Mime\Part($file['contents']);
-                        $attachment->type = $type;
-                        $attachment->filename = $fileName;
-                        $attachment->disposition = \Laminas\Mime\Mime::DISPOSITION_ATTACHMENT;
-                        $attachment->encoding = \Laminas\Mime\Mime::ENCODING_BASE64;
-
-                        $messageParts[] = $attachment;
-                    } else {
-                        return false;
-                    }
+            }
+            foreach ($data->file_attachments->text() as $fileAttIds) {
+                if (is_string($fileAttIds)) {
+                    $fileAttIds = preg_split('/\s*,\s*/', trim($fileAttIds));
+                }
+                if (is_array($fileAttIds)) {
+                    $fileIds = array_merge($fileIds, $fileAttIds);
                 }
             }
 
-            $bodyPart->setParts($messageParts);
-            $mail->setBody($bodyPart);
-
-            if ($prefs['zend_mail_queue'] == 'y') {
-                $query = "INSERT INTO `tiki_mail_queue` (message) VALUES (?)";
-                $bindvars = [serialize($mail)];
-                TikiLib::lib('tiki')->query($query, $bindvars, -1, 0);
-            } else {
-                tiki_send_email($mail);
-            }
-
-            if ($prefs['log_mail'] == 'y') {
-                $logslib = TikiLib::lib('logs');
-                foreach ($data->to->text() as $email) {
-                    $logslib->add_log('mail', tr('EmailAction - send to %0, subject - %1', $email, $subject));
+            $fileIds = array_filter(array_unique($fileIds));
+            foreach ($fileIds as $fileId) {
+                $file = $this->getFileAttachment($fileId);
+                if ($file) {
+                    $mail->addAttachment($file['contents'], $file['filename'], $file['filetype']);
+                } else {
+                    return false;
                 }
             }
 
-            return true;
+            $isSent = $mail->send($recipients);
+            return $isSent;
         } catch (Exception $e) {
-            if ($prefs['log_mail'] == 'y') {
-                $logslib = TikiLib::lib('logs');
-                foreach ($data->to->text() as $email) {
-                    $logslib->add_log('mail error', tr("EmailAction - can't send new message"));
-                }
-            }
-
             throw new Search_Action_Exception(tr('Error sending email: %0', $e->getMessage()));
         }
+    }
+
+    public function inputType(): string
+    {
+        return "text";
     }
 
     public function requiresInput(JitFilter $data)
@@ -237,16 +201,35 @@ class Search_Action_EmailAction implements Search_Action_Action
     private function dereference($email_or_username)
     {
         if (empty($email_or_username)) {
-            return null;
+            return [];
         }
-        $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        if (strpbrk($email_or_username, ',;') !== false) {
+            $list = preg_split('/\s*[,;]\s*/', $email_or_username);
+            $res = [];
+            foreach ($list as $email_or_username) {
+                $res = array_merge($res, $this->dereference($email_or_username));
+            }
+            return array_filter($res);
+        }
+        $email_or_username = trim($this->stripNp($email_or_username));
+        if (preg_match_all('/([^<]*?)<([^@>]+@[^>]+)>/', $email_or_username, $m)) {
+            $emails = [];
+            foreach ($m[0] as $key => $_) {
+                $name = trim($m[1][$key], ",;\n\r\t ");
+                $emails[$name] = $m[2][$key];
+            }
+            return $emails;
+        } elseif (preg_match_all('/[^@]+@[^,;]+/', $email_or_username, $m)) {
+            return array_map(function ($email) {
+                return trim($email, ",;\n\r\t ");
+            }, $m[0]);
+        } elseif (strstr($email_or_username, '@')) {
             return [$email_or_username];
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
-            return array_map(function ($username) {
+            return array_filter(array_map(function ($username) {
                 return TikiLib::lib('user')->get_user_email($username);
-            }, $users);
+            }, $users));
         }
     }
 

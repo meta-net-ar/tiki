@@ -27,6 +27,13 @@ function module_zone_info()
                 'filter' => 'text',
                 'default' => '',
             ],
+            'accordion' => [
+                'required' => false,
+                'name' => tr('Accordion'),
+                'description' => tr('Enable accordion behavior.'),
+                'filter' => 'text',
+                'default' => 'n',
+            ],
         ],
     ];
 }

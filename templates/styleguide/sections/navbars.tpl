@@ -3,55 +3,57 @@
     <div class="row">
         <div class="col-sm-8 col-md-9">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a class="navbar-brand" href="#">Menu</a>
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-label="{tr}Toggle navigation{/tr}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Menu</a>
+                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#bs-example-navbar-collapse-1" aria-expanded="false" aria-label="{tr}Toggle navigation{/tr}">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item active">
-                            <a href="javascript:void(0);" class="nav-link">Link <span class="sr-only">(current)</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link">Link</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                Dropdown
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="javascript:void(0);">Action</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Another action</a>
-                                <a class="dropdown-item" href="javascript:void(0);">Something else here</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="javascript:void(0);">Separated link</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="javascript:void(0);">One more separated link</a>
-                            </div>
-                        </li>
-                    </ul>
-                    <form class="d-flex flex-row flex-wrap align-items-center my-2 my-lg-0">
-                        <input type="text" class="form-control me-sm-2" placeholder="Search" aria-label="{tr}Search{/tr}">
-                        <button type="submit" class="btn btn-primary my-2 my-sm-0">{tr}Submit{/tr}</button>
-                    </form>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item active">
+                                <a href="javascript:void(0);" class="nav-link">Link <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="javascript:void(0);" class="nav-link">Link</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    Dropdown
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="javascript:void(0);">Action</a>
+                                    <a class="dropdown-item" href="javascript:void(0);">Another action</a>
+                                    <a class="dropdown-item" href="javascript:void(0);">Something else here</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="javascript:void(0);">Separated link</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="javascript:void(0);">One more separated link</a>
+                                </div>
+                            </li>
+                        </ul>
+                        <form class="d-flex flex-row flex-nowrap align-items-center my-2 my-lg-0">
+                            <input type="text" class="form-control me-sm-2" placeholder="Search" aria-label="{tr}Search{/tr}">
+                            <button type="submit" class="btn btn-primary my-2 my-sm-0">{tr}Submit{/tr}</button>
+                        </form>
 {*
-                    <ul class="navbar-nav navbar-right me-auto">
-                        <li><a href="javascript:void(0);">Link</a></li>
-                        <li class="dropdown">
-                            <a href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                Dropdown
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-item"><a href="javascript:void(0);">Action</a></li>
-                                <li class="dropdown-item"><a href="javascript:void(0);">Another action</a></li>
-                                <li class="dropdown-item"><a href="javascript:void(0);">Something else here</a></li>
-                                <li role="separator" class="dropdown-divider"></li>
-                                <li class="dropdown-item"><a href="javascript:void(0);">Separated link</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                        <ul class="navbar-nav navbar-right me-auto">
+                            <li><a href="javascript:void(0);">Link</a></li>
+                            <li class="dropdown">
+                                <a href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    Dropdown
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item"><a href="javascript:void(0);">Action</a></li>
+                                    <li class="dropdown-item"><a href="javascript:void(0);">Another action</a></li>
+                                    <li class="dropdown-item"><a href="javascript:void(0);">Something else here</a></li>
+                                    <li role="separator" class="dropdown-divider"></li>
+                                    <li class="dropdown-item"><a href="javascript:void(0);">Separated link</a></li>
+                                </ul>
+                            </li>
+                        </ul>
 *}
+                    </div>
                 </div>
             </nav>
         </div>

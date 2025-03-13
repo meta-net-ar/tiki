@@ -59,8 +59,6 @@ function upgrade_20240311_various_pref_default_tiki27_tiki($installer)
     $installer->preservePreferenceDefault('user_store_file_gallery_picture', 'n');
     $installer->preservePreferenceDefault('user_picture_gallery_id', 0);
     $installer->preservePreferenceDefault('users_prefs_remember_closed_rboxes', 'n');
-    $installer->preservePreferenceDefault('vuejs_enable', 'n');
-    $installer->preservePreferenceDefault('vuejs_always_load', 'n');
     $installer->preservePreferenceDefault('vuejs_toolbar_dialogs', 'n');
     $installer->preservePreferenceDefault('wiki_cache', 0);
     $installer->preservePreferenceDefault('wiki_date_field', 'created');

@@ -11,8 +11,8 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'bannerId'                    => 'bool',          //post
-            'removeZone'                  => 'int',           //post
+            'bannerId'                    => 'int',           //post
+            'removeZone'                  => 'string',        //post
             'save'                        => 'bool',          //post
             'create_zone'                 => 'bool',          //post
             'fromTimeMeridian'            => 'int',           //post
@@ -38,7 +38,7 @@ $inputConfiguration = [
             'onlyInURIs'                  => 'string',        //post
             'exceptInURIs'                => 'string',        //post
             'url'                         => 'url',           //post
-            'use'                         => 'bool',          //post
+            'use'                         => 'string',        //post
             'useDates'                    => 'bool',          //post
             'Dmon'                        => 'bool',          //post
             'Dtue'                        => 'bool',          //post
@@ -69,19 +69,12 @@ if (isset($_REQUEST["bannerId"]) && $_REQUEST["bannerId"] > 0) {
     $info = $bannerlib->get_banner($_REQUEST["bannerId"]);
 
     if (! $info) {
-        $smarty->assign('msg', tra("Banner not found"));
-
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("Banner not found"), \Laminas\Http\Response::STATUS_CODE_404);
     }
 
     // Check user is admin or the client
     if (($user != $info["client"]) && ($tiki_p_admin_banners != 'y')) {
-        $smarty->assign('errortype', 401);
-        $smarty->assign('msg', tra("You do not have permission to edit this banner"));
-
-        $smarty->display("error.tpl");
-        die;
+        Feedback::errorAndDie(tra("You do not have permission to edit this banner"), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
     $fromTime = substr($info["hourFrom"], 0, 2) . ":" . substr($info["hourFrom"], 2, 2);
@@ -118,6 +111,7 @@ if (isset($_REQUEST["bannerId"]) && $_REQUEST["bannerId"] > 0) {
 
     if (strlen($info["imageData"]) > 0) {
         $tmpfname = $prefs['tmpDir'] . "/bannerimage" . "." . $_REQUEST["bannerId"];
+        $data = $info["imageData"];
         $fp = fopen($tmpfname, "wb");
         if ($fp) {
             fwrite($fp, $data);
@@ -189,9 +183,9 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     $smarty->assign('maxImpressions', $_REQUEST["maxImpressions"]);
     $smarty->assign('maxUserImpressions', $_REQUEST["maxUserImpressions"]);
     $smarty->assign('maxClicks', $_REQUEST["maxClicks"]);
-    $smarty->assign('HTMLData', $_REQUEST["HTMLData"]);
-    $smarty->assign('fixedURLData', $_REQUEST["fixedURLData"]);
-    $smarty->assign('textData', $_REQUEST["textData"]);
+    $smarty->assign('HTMLData', $_REQUEST["HTMLData"] ?? '');
+    $smarty->assign('fixedURLData', $_REQUEST["fixedURLData"] ?? '');
+    $smarty->assign('textData', $_REQUEST["textData"] ?? '');
 
     if (isset($_REQUEST["zone"])) {
         $smarty->assign('zone', $_REQUEST["zone"]);
@@ -303,10 +297,7 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
             try {
                 $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
             } catch (Exception $e) {
-                $smarty->assign('errortype', 403);
-                $smarty->assign('msg', $e->getMessage());
-                $smarty->display("error.tpl");
-                die;
+                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
             }
             $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
 

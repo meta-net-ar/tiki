@@ -50,7 +50,7 @@ function prefs_wysiwyg_list()
             'default' => 'y',
         ],
 
-        // This preference is called "htmltowiki" because it involves conversion of the HTML code CKeditor handles to "wiki syntax" (Tiki's syntax)... although it equally involves the opposite conversion.
+        // This preference is called "htmltowiki" because it involves conversion of the HTML code to "wiki syntax" (Tiki's syntax)... although it equally involves the opposite conversion.
         'wysiwyg_htmltowiki' => [
             'name' => tra('Use Wiki syntax in WYSIWYG'),
             'description' => tra('Causes parsed text areas based on wiki syntax when not in WYSIWYG mode to keep using Tiki syntax, instead of HTML as the WYSIWYG editor uses by default. Sometimes referred to as a "visual wiki".'),
@@ -61,21 +61,8 @@ function prefs_wysiwyg_list()
             ],
             // Should probably be (re)flagged as experimental. Chealer 2018-01-04
             'warning' => tra('Existing wiki pages remain in HTML, unless they are converted to non-WYSIWYG and back to WYSIWYG (one by one).') .
-                ' ' . tra('CKeditor offers possibilities which may not be expressible in Tiki syntax.') . ' See issue #6518 for example',
+                ' ' . tra('The HTML editor offers possibilities which may not be expressible in Tiki syntax.') . ' See issue #6518 for example',
             'default' => 'y',
-        ],
-        'wysiwyg_toolbar_skin' => [
-            'name' => tra('Full WYSIWYG editor skin'),
-            'type' => 'list',
-            'help' => 'http://ckeditor.com/addons/skins/all',
-            'options' => [
-                'moono' => tra('Moono (Default)'),
-                'kama' => tra('Kama'),
-                'bootstrapck' => tra('Bootstrap CK'),
-                'minimalist' => tra('Minimalist'),
-                'office2013' => tra('Office 2013'),
-            ],
-            'default' => 'moono',
         ],
         'wysiwyg_fonts' => [
             'name' => tra('Typefaces'),
@@ -86,25 +73,13 @@ function prefs_wysiwyg_list()
         ],
         'wysiwyg_inline_editing' => [
             'name' => tra('Inline WYSIWYG editor'),
-            'description' => tra('Seamless inline editing. Uses CKEditor 4. Inline editing enables editing pages without a context switch. The editor is embedded in the wiki page. When used on pages in wiki format, a conversion from HTML to wiki format is required'),
+            'description' => tra('Seamless inline editing. Inline editing enables editing pages without a context switch. The editor is embedded in the wiki page. When used on pages in wiki format, a conversion from HTML to wiki format is required'),
             'help' => 'Wiki-Inline-Editing',
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
                 'feature_wysiwyg',
             ],
-            'tags' => ['deprecated'],
-            'warning' => tra('CKEditor4 is no longer supported.'),
-        ],
-        'wysiwyg_extra_plugins' => [
-            'name' => tra('Extra plugins'),
-            'hint' => tra('List of plugin names (separated by,)'),
-            'description' => tra('In Tiki, CKEditor uses the "standard" package in which some plugins are disabled by default that are available in the "full" package.<br>See http://ckeditor.com/presets for a comparison of which plugins are enabled as standard.'),
-            'type' => 'textarea',
-            'size' => '1',
-            'default' => 'bidi,colorbutton,divarea,find,font,justify,pagebreak,showblocks,emoji',
-            'tags' => ['deprecated'],
-            'warning' => tra('CKEditor4 is no longer supported.'),
         ],
     ];
 }

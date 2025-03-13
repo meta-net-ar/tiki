@@ -239,8 +239,8 @@ class TikiIntegrator
         $dirs[] = ['fs' => $tiki_root . "/" . $rep['path'], 'rel' => "/" . $rep['path']];
 
         // Fill array of files to search
-        $ts = preg_replace('|\.css|', '', $style);   // Tiki style w/o '.css' extension
-        $is = preg_replace('|\.css|', '', $rep["css_file"]);
+        $ts = preg_replace('|\.css|', '', isset($style) ? $style : '');   // Tiki style w/o '.css' extension
+        $is = preg_replace('|\.css|', '', isset($rep["css_file"]) ? $rep["css_file"] : '');
 
         $files = [];
         $files[] = $ts . '-' . $rep["css_file"];        // matrix-doxygen.css

@@ -142,11 +142,9 @@ function wikiplugin_toc($data, $params)
     global $page_ref_id;
     $structlib = TikiLib::lib('struct');
 
-    global $prefs;
-    if ($prefs['feature_jquery_ui'] === 'y' && $type === 'admin') {
+    if ($type === 'admin') {
         TikiLib::lib('header')
-                ->add_jsfile('lib/structures/tiki-edit_structure.js')
-                ->add_jsfile(NESTEDSORTABLE_ASSETS_PATH . '/jquery.ui.nestedSortable.js');
+                ->add_jsfile('lib/structures/tiki-edit_structure.js');
 
         $smarty = TikiLib::lib('smarty');
         $button = smarty_function_button(

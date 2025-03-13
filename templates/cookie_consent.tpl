@@ -8,7 +8,7 @@
                     </div>
                     <div class="modal-body">
             {else}
-        <div id="{$prefs.cookie_consent_dom_id}" class="alert alert-primary col-sm-8 mx-auto" role="alert"
+        <div id="{$prefs.cookie_consent_dom_id}" class="alert alert-primary col-md-6 mx-auto my-4" role="alert"
             {if not empty($prefs.cookie_consent_mode)}
                 style="display:none;" class="{$prefs.cookie_consent_mode}"
             {/if}

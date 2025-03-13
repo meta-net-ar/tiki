@@ -91,6 +91,7 @@
                     </div>
 
                     <div class="adminoptionboxchild unified_engine_childcontainer mysql">
+                        {preference name="unified_mysql_index_current"}
                         {preference name="unified_mysql_short_field_names"}
                         {preference name="unified_mysql_restore_indexes"}
                     </div>
@@ -282,6 +283,7 @@
                 {preference name=feature_search_show_object_filter}
                 {preference name=search_show_sort_order}
                 {preference name=feature_search_show_search_box}
+                {preference name=search_did_you_mean}
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Information to display for each result{/tr}</legend>

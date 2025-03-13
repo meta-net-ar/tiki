@@ -39,7 +39,7 @@ class Search_GlobalSource_ArticleAttachmentSource implements Search_GlobalSource
         $textual = [];
 
         foreach ($relations as $rel) {
-            if ($rel['type'] == 'article') {
+            if ($rel['type'] == 'article' && ! empty($rel['itemId'])) {
                 if ($data = $this->source->getDocument($rel['itemId'], $typeFactory)) {
                     foreach ($this->source->getGlobalFields() as $name => $keep) {
                         $textual[] = $data[$name]->getValue();

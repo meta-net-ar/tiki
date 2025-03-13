@@ -16,7 +16,7 @@ class ToolbarSpacer extends ToolbarItem
         return '||';
     }
 
-    protected function getOnClick(): string
+    public function getOnClick(): string
     {
         return '';
     }

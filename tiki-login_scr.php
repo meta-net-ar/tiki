@@ -8,6 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\TwoFactorAuth\Exception\TwoFactorAuthException;
+use Tiki\TwoFactorAuth\TwoFactorAuth;
+
 $section_class = 'tiki_login';  // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -27,6 +31,23 @@ if (isset($_REQUEST["twoFactorForm"])) {
     $twoFactorForm = 'y';
 }
 $smarty->assign('twoFactorForm', $twoFactorForm);
+
+$create2FaCodeNormalLogin = isset($_REQUEST["create2FaCodeNormalLogin"]) ? 'y' : 'n';
+try {
+    if ($prefs['twoFactorAuth'] === 'y' && $create2FaCodeNormalLogin === 'y' && ! empty($_REQUEST['tiki_username'])) {
+        $tikiUserName = urldecode($_REQUEST['tiki_username']);
+        $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
+        $isTokenGenerated = $twoFactorAuth->generateCode($tikiUserName);
+        if ($prefs['twoFactorAuthType'] === TwoFactorAuth::EMAIL_2FA && ! empty($isTokenGenerated)) {
+            $message = tr("2FA token generated successfully and sent to your email");
+            Feedback::success($message);
+        }
+    }
+} catch (TwoFactorAuthException $e) {
+    $message = tr($e->getMessage());
+    Feedback::error($message);
+}
+$smarty->assign('create2FaCodeNormalLogin', $create2FaCodeNormalLogin);
 
 if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
     $access->redirect($prefs['login_autologin_redirectlogin_url']);

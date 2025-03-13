@@ -27,6 +27,11 @@ class Search_Action_UnknownStep implements Search_Action_Step
     {
     }
 
+    public function inputType(): string
+    {
+        return '';
+    }
+
     public function requiresInput()
     {
         return false;

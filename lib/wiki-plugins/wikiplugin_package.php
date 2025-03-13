@@ -40,5 +40,9 @@ function wikiplugin_package($data, $params)
 {
     global $smarty;
 
-    return "~np~" . smarty_block_packageplugin($params, $data, $smarty->getEmptyInternalTemplate()) . "~/np~";
+    // Reference: https://smarty-php.github.io/smarty/stable/api/extending/block-tags/
+    // Explicitly passing "true" to $repeat to match the Smarty's behavior
+    // Since we are calling this directly.
+    $tmp = true;
+    return "~np~" . smarty_block_packageplugin($params, $data, $smarty->getEmptyInternalTemplate(), $tmp) . "~/np~";
 }

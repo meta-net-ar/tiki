@@ -6,13 +6,13 @@
 
 {block name="content"}
     <form method="post" action="{service controller=translation action=detach}" class="form" role="form">
-        {tr}Are you sure you want to detach these translations?{/tr}
-        <ul>
-            <li>{object_link type=$type id=$source}</li>
+        <p>
             {if $source neq $target}
-                <li>{object_link type=$type id=$target}</li>
+                {tr _0=$target _1=$source}Are you sure you want to detach the translation %0 from %1 page?{/tr}
+            {else}
+                {tr _0=$target}Are you sure you want to detach %0 from translations?{/tr}
             {/if}
-        </ul>
+        </p>
         <div class="submit">
             <input type="hidden" name="type" value="{$type|escape}">
             <input type="hidden" name="source" value="{$source|escape}">

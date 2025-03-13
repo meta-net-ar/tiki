@@ -57,9 +57,14 @@ if (isset($_REQUEST["update"])) {
 // Add a relationship
 if (isset($_REQUEST["add"])) {
     $access->checkCsrf();
-    $dirlib->dir_add_categ_rel($_REQUEST["parent"], $_REQUEST["categId"]);
-    if (isset($_REQUEST["mutual"]) && $_REQUEST["mutual"] == 'on') {
-        $dirlib->dir_add_categ_rel($_REQUEST["categId"], $_REQUEST["parent"]);
+    if (! empty($_REQUEST["parent"]) && ! empty($_REQUEST["categId"])) {
+        $dirlib->dir_add_categ_rel($_REQUEST["parent"], $_REQUEST["categId"]);
+
+        if (isset($_REQUEST["mutual"]) && $_REQUEST["mutual"] == 'on') {
+            $dirlib->dir_add_categ_rel($_REQUEST["categId"], $_REQUEST["parent"]);
+        }
+    } else {
+        Feedback::error(tr('Must enter a parent directory category and a related directory category'));
     }
 }
 // Listing: categories in the parent category

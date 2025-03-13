@@ -62,7 +62,7 @@ class FileHelper
         } elseif ($file['filetype'] == 'application/pdf' || PDFHelper::canConvertToPDF($file['filetype'])) {
             // PDFs
             if ($tikilib->get_preference('fgal_pdfjs_feature') !== 'y') {
-                $accesslib->display_error('tiki-display.php', tr('PDF.js feature is disabled. If you do not have permission to enable, ask the site administrator.'));
+                $accesslib->display_error('tiki-display.php', tr("PDF.js feature is disabled. If you do not have permission to enable it, ask the site administrator to activate 'fgal_pdfjs_feature'."));
             }
 
             $errorMessageToAppend = '';
@@ -188,7 +188,7 @@ class FileHelper
         }
 
         if (! $fileExists) {
-            fputcsv($fileHandler, $headers);
+            fputcsv($fileHandler, $headers, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
 
         foreach ($content as $row) {
@@ -196,7 +196,7 @@ class FileHelper
                 return is_array($col) ? json_encode($col) : $col;
             }, $row);
 
-            fputcsv($fileHandler, $row);
+            fputcsv($fileHandler, $row, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
         }
 
         fclose($fileHandler);

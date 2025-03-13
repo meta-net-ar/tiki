@@ -1,8 +1,8 @@
 <?php
 
-namespace Tiki\Lib\Iot;
+namespace Tiki\Lib\iot;
 
-use Tiki\Lib\Iot\DrawflowNodeType;
+use Tiki\Lib\iot\DrawflowNodeType;
 
 interface DrawflowActionInterface
 {

@@ -13,7 +13,7 @@ class TikiDb_Bridge extends TikiDb
 
     public function stopTimer($starttime)
     {
-        self::get()->stopTimer($starttime);
+        return self::get()->stopTimer($starttime);
     }
 
     public function qstr($str)

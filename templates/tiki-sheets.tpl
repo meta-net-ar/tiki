@@ -51,7 +51,7 @@
                         {tr}Title{/tr}
                     </label>
                     <div class="col-sm-9">
-                        <input class="form-control" type="text" name="title" value="{$title|escape}">
+                        <input class="form-control" type="text" name="title" value="{$title|escape}" required="required">
                     </div>
                 </div>
                 <div class="mb-3 row">

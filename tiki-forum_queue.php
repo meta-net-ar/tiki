@@ -37,9 +37,7 @@ $access->check_feature('feature_forums');
 
 // forumId must be received
 if (! isset($_REQUEST["forumId"])) {
-    $smarty->assign('msg', tra("No forum indicated"));
-    $smarty->display("error.tpl");
-    die;
+    Feedback::errorAndDie(tra("No forum indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $smarty->assign('forumId', $_REQUEST["forumId"]);

@@ -174,10 +174,11 @@ class MultilingualLib extends TikiLib
         $ret = [];
         $langLib = TikiLib::lib('language');
         $l = $langLib->format_language_list([$objLang], $long ? 'n' : 'y');
-        $ret0 = ['objId' => $objId, 'objName' => $objName, 'lang' => $objLang, 'langName' => empty($l) ? '' : $l[0]['name']];
+        $ret0 = ['objId' => $objId, 'objName' => $objName, 'lang' => $objLang, 'langName' => empty($l) ? '' : $l[0]['name'], 'class' => ''];
         while ($res = $result->fetchRow()) {
             $l = $langLib->format_language_list([$res['lang']], $long ? 'n' : 'y');
             $res['langName'] = $l[0]['name'];
+            $res['class'] = ($res['lang'] === $objLang) ? 'text-primary' : 'text-secondary';
             $ret[] = $res;
         }
         usort($ret, ['MultilingualLib', 'compare_lang']);

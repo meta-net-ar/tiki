@@ -14,9 +14,9 @@
 <form method="get" action="tiki-syslog.php" class="mb-4">
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label" for="months">{tr}Clean logs older than{/tr}</label>
-        <div class="col-sm-8 d-flex flex-row flex-wrap align-items-center">
+        <div class="col-sm-8 d-flex flex-row flex-wrap align-items-center m-1">
             <input type="text" name="months" class="form-control me-4"> {tr}months{/tr}
-            <input type="submit" class="btn btn-primary btn-sm ms-4" value="{tr}Clean{/tr}" name="clean">
+            <input type="submit" class="btn btn-primary btn-sm ms-4 mt-1" value="{tr}Clean{/tr}" name="clean">
         </div>
     </div>
 </form>
@@ -42,7 +42,7 @@
             <tr>
                 <td class="id">{$list[ix].actionId}</td>
                 <td class="text">{$list[ix].action|escape}</td>
-                <td class="date"><span title="{$list[ix].lastModif|tiki_long_datetime}">{$list[ix].lastModif|tiki_short_datetime}</span></td>
+                <td class="date"><span title="{$list[ix].lastModif|tiki_long_datetime}">{$list[ix].lastModif|tiki_date_format:"%Y-%m-%d %H:%M:%S"}</span></td>
                 <td class="username">{$list[ix].user|userlink}</td>
                 <td class="text"><textarea class="form-control" readonly="readonly">{$list[ix].comment|escape:'html'}</textarea></td>
                 <td class="text">{$list[ix].ip|escape:"html"}</td>
