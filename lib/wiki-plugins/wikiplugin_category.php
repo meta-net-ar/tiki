@@ -31,9 +31,25 @@ function wikiplugin_category_info()
                 'description' => tra('List of object types to include in the list, separated by "+", for example, ')
                     . '<code>article+blog+blog post+fgal</code>',
                 'since' => '1',
-                'accepted' => 'article, blog, blog post, fgal, forum, newsletter, event, poll, quiz, survey, tracker, wiki, img',
+                'options' => [
+                    ['text' => tra('Article'), 'value' => 'article'],
+                    ['text' => tra('Blog'), 'value' => 'blog'],
+                    ['text' => tra('Blog post'), 'value' => 'blog post'],
+                    ['text' => tra('File gallery'), 'value' => 'fgal'],
+                    ['text' => tra('Forum'), 'value' => 'forum'],
+                    ['text' => tra('Newsletter'), 'value' => 'newsletter'],
+                    ['text' => tra('Event'), 'value' => 'event'],
+                    ['text' => tra('Poll'), 'value' => 'poll'],
+                    ['text' => tra('Quiz'), 'value' => 'quiz'],
+                    ['text' => tra('Survey'), 'value' => 'survey'],
+                    ['text' => tra('Tracker'), 'value' => 'tracker'],
+                    ['text' => tra('Wiki'), 'value' => 'wiki'],
+                    ['text' => tra('Image gallery'), 'value' => 'img'],
+                ],
                 'filter' => 'text',
                 'default' => '*',
+                'select_multiple' => 'y',
+                'separator' => '+',
             ],
             'sort' => [
                 'required' => false,
@@ -261,6 +277,7 @@ function wikiplugin_category($data, $params)
         $sort = '';
     }
 
+    $types = implode("+", $types);
     $types = (isset($types)) ? strtolower($types) : "*";
 
     $id = (! empty($id)) ? $id : 'current'; // use current category if none is given
