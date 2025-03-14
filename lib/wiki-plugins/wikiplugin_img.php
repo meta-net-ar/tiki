@@ -944,8 +944,9 @@ function wikiplugin_img($data, $params)
             $fheight = $imageObj->getHeight();
         }
 
-        $fheightt = 1;
-        $fwidtht = 1;
+        // Initialize default thumbnail dimensions
+        $fwidtht = 64;
+        $fheightt = 64;
         // Get image gallery thumbnail image for height and width
         if (! empty($dbinfo['data']) || ! empty($dbinfo['path'])) {
             if (! empty($dbinfo['data'])) {
@@ -960,8 +961,10 @@ function wikiplugin_img($data, $params)
                 $fheightt = $imageObjt->getHeight();
             } else {
                 // Handle the case where $imageObjt could not be created
-                Feedback::error(tr('Failed to create thumbnail image. The image file may be missing or corrupted.'));
-                return;
+                if (empty($dbinfo['fileId'])) {
+                    Feedback::error(tr('Failed to create thumbnail image. The image file may be missing or corrupted.'));
+                    return;
+                }
             }
         }
     /////////////////////////////////////Add image dimensions to src string////////////////////////////////////////////
