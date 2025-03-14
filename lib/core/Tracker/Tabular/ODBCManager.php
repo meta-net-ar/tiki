@@ -312,12 +312,12 @@ class ODBCManager
                     $found[$mapping['~replace~']] = false;
                 }
                 foreach ($mapping as $remote => $local) {
-                    if (isset($row[$field]) && $row[$field] == $local) {
+                    if (isset($row[$field]) && ($row[$field] == $local || '~all:' . $row[$field] . '~' == $local)) {
                         $row[$field] = $remote;
                         $found[$field] = true;
                         break;
                     }
-                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $row[$mapping['~replace~']] == $local) {
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && ($row[$mapping['~replace~']] == $local || '~all:' . $row[$mapping['~replace~']] . '~' == $local)) {
                         $row[$field] = $remote;
                         $row[$mapping['~replace~']] = '';
                         $found[$mapping['~replace~']] = true;
@@ -376,8 +376,12 @@ class ODBCManager
                 }
                 foreach ($mapping as $remote => $local) {
                     if ($row[$field] == $remote) {
-                        if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
-                            $local = $row[$m[1]];
+                        if (preg_match("/^~(.+?)(:.*)~$/", $local, $m)) {
+                            if (isset($row[$m[1]])) {
+                                $local = $row[$m[1]];
+                            } elseif ($m[1] == 'all' && ! empty($m[2])) {
+                                $local = substr($m[2], 1);
+                            }
                         }
                         if (! empty($mapping['~replace~'])) {
                             $row[$mapping['~replace~']] = $local;
