@@ -147,7 +147,7 @@ if ($prefs['eponymousGroups'] === 'y') {
         $show_eponymous = $_SESSION['show_eponymous'] = $_REQUEST['show_eponymous'];
     }
     if (empty($show_eponymous)) {
-        $show_eponymous = 'y';
+        $show_eponymous = 'n';
     }
     $smarty->assign('show_eponymous', $show_eponymous);
 } else {

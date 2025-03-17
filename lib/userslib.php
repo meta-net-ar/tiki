@@ -2625,20 +2625,45 @@ class UsersLib extends TikiLib
         return $ret;
     }
 
-    public function get_groups_for_permissions($show_eponymous = null)
+    public function get_groups_for_permissions($show_eponymous = null, $only_eponymous = null, $offset = 0, $maxRecords = -1, $sort_mode = 'id_asc', $find = '', $initial = '', $group_filter = [])
     {
-        $extra = '';
-        if ($show_eponymous !== 'y') {
-            $extra .= " and `isEponymousGroup` = 'n'";
+        $mid = '';
+        $bindvars = [];
+
+        if ($find) {
+            $mid .= ' and `groupName` like ?';
+            $bindvars[] = '%' . $find . '%';
         }
+
+        if ($initial) {
+            $mid .= ' and `groupName` like ?';
+            $bindvars = [$initial . '%'];
+        }
+
+        if ($show_eponymous !== 'y') {
+            if ($group_filter) {
+                $mid .= " and (`isEponymousGroup` = 'n' OR `id` IN (" . implode(',', array_map('intval', $group_filter)) . "))";
+            } else {
+                $mid .= " and `isEponymousGroup` = 'n'";
+            }
+        }
+
+        if ($only_eponymous === 'y') {
+            $mid .= " and `isEponymousGroup` = 'y'";
+        }
+
         $query = "SELECT * from users_groups
-                    where isTplGroup <> 'y' $extra and groupName not in (select groupName
+                    where isTplGroup <> 'y' $mid and groupName not in (select groupName
                     from  tiki_group_inclusion where includeGroup in (SELECT groupName
-                    from users_groups where isTplGroup = 'y')) order by id asc;";
-        $ret = $this->fetchAll($query);
+                    from users_groups where isTplGroup = 'y')) order by " . $this->convertSortMode($sort_mode);
+        $query_count = preg_replace('/^SELECT \*/', 'SELECT COUNT(*)', $query);
+        $ret = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
+        $count = $this->getOne($query_count, $bindvars);
+
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = count($ret);
+        $retval['cant'] = $count;
+
         return $retval;
     }
 
