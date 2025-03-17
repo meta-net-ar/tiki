@@ -78,7 +78,9 @@ class ODBCManager
         }
         if ($bind) {
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, $bind);
+            if ($rs) {
+                odbc_execute($rs, $bind);
+            }
         } else {
             $rs = odbc_exec($conn, $sql);
         }
@@ -111,13 +113,15 @@ class ODBCManager
                     return "\"{$k}\" = ?";
                 }, array_keys($chunk))) . " WHERE \"{$pk}\" = ?";
                 $rs = odbc_prepare($conn, $sql);
-                $params = array_map(function ($v) {
-                    return empty($v) && $v !== '0' ? null : $v;
-                }, array_values($chunk));
-                $params[] = $id;
-                odbc_execute($rs, $params);
-                if (odbc_error()) {
-                    $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                if ($rs) {
+                    $params = array_map(function ($v) {
+                        return empty($v) && $v !== '0' ? null : $v;
+                    }, array_values($chunk));
+                    $params[] = $id;
+                    odbc_execute($rs, $params);
+                    if (odbc_error()) {
+                        $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                    }
                 }
             }
             $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
@@ -141,15 +145,19 @@ class ODBCManager
             });
             $sql = "INSERT INTO {$this->config['table']}(\"" . implode('", "', array_keys($row)) . "\") VALUES (" . implode(", ", array_fill(0, count(array_keys($row)), '?')) . ")";
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, array_values($row));
-            if (odbc_error()) {
-                $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+            if ($rs) {
+                odbc_execute($rs, array_values($row));
+                if (odbc_error()) {
+                    $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+                }
+                $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
+                $rs = odbc_prepare($conn, $sql);
+                odbc_execute($rs, []);
+                $result = odbc_fetch_array($rs);
+                $result = ['is_new' => true, 'entry' => $result];
+            } else {
+                $result = ['is_new' => true, 'entry' => []];
             }
-            $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
-            $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, []);
-            $result = odbc_fetch_array($rs);
-            $result = ['is_new' => true, 'entry' => $result];
         }
         $result['entry'] = $this->reverseMapFieldsFromConfig($result['entry']);
         $this->stopErrorHandler();
