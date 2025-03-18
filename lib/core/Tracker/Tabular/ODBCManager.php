@@ -128,6 +128,9 @@ class ODBCManager
             $rs = odbc_prepare($conn, $sql);
             odbc_execute($rs, [$id]);
             $result = odbc_fetch_array($rs);
+            if (! $result) {
+                $result = [];
+            }
             $result = ['is_new' => false, 'entry' => $result];
         } else {
             if ($fullRow) {
@@ -154,6 +157,9 @@ class ODBCManager
                 $rs = odbc_prepare($conn, $sql);
                 odbc_execute($rs, []);
                 $result = odbc_fetch_array($rs);
+                if (! $result) {
+                    $result = [];
+                }
                 $result = ['is_new' => true, 'entry' => $result];
             } else {
                 $result = ['is_new' => true, 'entry' => []];
