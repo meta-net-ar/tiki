@@ -4145,31 +4145,61 @@ class TrackerLib extends TikiLib
     {
         global $prefs;
 
-        $query = "SELECT tif.`value`, tf.`type` 
-                FROM `tiki_tracker_item_fields` tif
-                JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
-                JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
-                WHERE i.`itemId` = ? AND tf.`isMain` = ?
-                ORDER BY tf.`position`";
-        $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
+        $query = "select tif.`value` from `tiki_tracker_item_fields` tif, `tiki_tracker_items` i, `tiki_tracker_fields` tf where i.`itemId`=? and i.`itemId`=tif.`itemId` and tf.`fieldId`=tif.`fieldId` and tf.`isMain`=? ORDER BY tf.`position`";
+        $queryResult = $this->getOne($query, [ (int) $itemId, "y"]);
+        $result = $queryResult;
+        if (! $trackerId) {
+            $trackerId = (int) $this->table('tiki_tracker_items')->fetchOne('trackerId', ['itemId' => $itemId]);
+        }
 
-        $titles = [];
-        $item = $this->get_tracker_item($itemId);
-        foreach ($queryResult as $row) {
-            $value = $row['value'];
-            $field = ['type' => $row['type'], 'value' => $value];
-            $handler = $this->get_field_handler($field, $item);
-
-            if ($handler) {
-                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
-            }
-
-            if (! empty($value)) {
-                $titles[] = $value;
+        try {
+            $definition = Tracker_Definition::get($trackerId);
+        } catch (InvalidArgumentException $e) {
+            trigger_error(
+                tr(
+                    'Requested main tracker item field value of item %0 but tracker %1 not found.',
+                    $itemId,
+                    $trackerId
+                ),
+                E_USER_WARNING
+            );
+            return '';
+        }
+        $mainFieldId = $definition->getMainFieldId();
+        if ($mainFieldId) {
+            $field = $definition->getFieldInfoFromFieldId($mainFieldId);
+            $main_field_type = $field['type'];
+            // for TextArea, ItemLink, AutoIncrement, UserPref and Category fields use the proper output method
+            if (in_array($main_field_type, ['a', 'r', 'q', 'p', 'e'])) {
+                $item = $this->get_tracker_item($itemId);
+                $handler = $this->get_field_handler($field, $item);
+                // when called from \ObjectLib::get_title Category fields need to have getFieldData run before the category name can be rendered
+                if ($handler) {
+                    $field = array_merge($field, $handler->getFieldData());
+                    $handler = $this->get_field_handler($field, $item);
+                    if ($main_field_type == 'a') {
+                        $result = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                    } else {
+                        $result = $handler->renderOutput(['list_mode' => 'csv']);
+                    }
+                }
             }
         }
-        return implode(' ', $titles);
+
+        if (is_string($result) && strlen($result) && $result[0] === '{') {
+            $decoded = json_decode($result, true);
+            if ($decoded !== null) {     // might start with a "{" but may not be a json_encoded value
+                if (isset($decoded[$prefs['language']])) {
+                    return $decoded[$prefs['language']];
+                } elseif (is_array($decoded)) {
+                    return reset($decoded);
+                }
+            }
+        }
+
+        return (string) $result;
     }
+
     /**
      * @param int $itemId
      *
