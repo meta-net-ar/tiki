@@ -384,7 +384,7 @@ class ODBCManager
                 }
                 foreach ($mapping as $remote => $local) {
                     if ($row[$field] == $remote) {
-                        if (preg_match("/^~(.+?)(:.*)~$/", $local, $m)) {
+                        if (preg_match("/^~(.+?)(:.*)?~$/", $local, $m)) {
                             if (isset($row[$m[1]])) {
                                 $local = $row[$m[1]];
                             } elseif ($m[1] == 'all' && ! empty($m[2])) {
