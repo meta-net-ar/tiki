@@ -109,6 +109,7 @@ class ODBCManager
         if ($exists) {
             $row = $this->fillFieldsFromConfig($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
+                unset($chunk[$pk]);
                 $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                     return "\"{$k}\" = ?";
                 }, array_keys($chunk))) . " WHERE \"{$pk}\" = ?";
