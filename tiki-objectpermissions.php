@@ -39,6 +39,7 @@ $inputConfiguration = [
         'staticKeyFiltersForArrays' => [
         'feature_filter'            => 'bool',       //post
         'group_filter'              => 'int',       //post
+        'eponymous_group_filter'    => 'int',       //post
         'perm'                      => 'word',       //post
         'old_perm'                  => 'word',       //post
         ],
@@ -185,6 +186,9 @@ if (isset($_REQUEST['group_select'])) {
     if (! isset($_REQUEST['group_filter'])) {
         $_REQUEST['group_filter'] = [];
     }
+    if (! empty($_REQUEST['eponymous_group_filter'])) {
+        $_REQUEST['group_filter'] = array_merge($_REQUEST['group_filter'], $_REQUEST['eponymous_group_filter']);
+    }
     $tikilib->set_user_preference($user, 'objectperm_admin_groups', serialize($_REQUEST['group_filter']));
     $cookietab = '1';
 }
@@ -201,6 +205,7 @@ if ($prefs['eponymousGroups'] === 'y') {
     } else {
         $numrows = $_REQUEST['numrows'];
     }
+    $smarty->assign('numrows', $numrows);
     if (! isset($_REQUEST["sort_mode"])) {
         $sort_mode = 'groupName_asc';
     } else {
@@ -211,6 +216,7 @@ if ($prefs['eponymousGroups'] === 'y') {
     } else {
         $offset = $_REQUEST["offset"];
     }
+    $smarty->assign('offset', $offset);
     if (isset($_REQUEST["initial"])) {
         $initial = $_REQUEST["initial"];
     } else {

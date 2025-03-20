@@ -209,7 +209,7 @@
 
             {if $prefs.eponymousGroups eq 'y'}
                 <h2>{tr}Eponymous Groups{/tr}</h2>
-                <div class="ts-wrapperdiv">
+                <div class="ts-wrapperdiv mb-3">
                 <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$eponymous_groups_count|escape}">
                 <thead>
                     <tr>
@@ -225,7 +225,7 @@
                     {foreach item=group from=$eponymous_groups}
                     <tr>
                         <td class="checkbox-cell">
-                            <input type="checkbox" class="form-check-input" name="group_filter[]" value="{$group.id}" {if $group.in_group_filter == 'y'}checked{/if}>
+                            <input type="checkbox" class="form-check-input" name="eponymous_group_filter[]" value="{$group.id}" {if $group.in_group_filter == 'y'}checked{/if}>
                         </td>
                         <td class="group">{$group.groupName|escape}</td>
                         <td class="desc">{$group.groupDesc|escape}</td>
@@ -234,6 +234,9 @@
                 </tbody>
                 </table>
                 </div>
+                {if !$ts.enabled}
+                    {pagination_links cant=$eponymous_groups_count step=$numrows offset=$offset}{/pagination_links}
+                {/if}
             {/if}
 
             <div class="input_submit_container" style="text-align: center">
