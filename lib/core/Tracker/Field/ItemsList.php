@@ -10,7 +10,7 @@
  * Letter key: ~l~
  *
  */
-class Tracker_Field_ItemsList extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface, Search_FacetProvider_Interface. \Tracker\Field\FilterableInterface
+class Tracker_Field_ItemsList extends \Tracker\Field\AbstractField implements \Tracker\Field\ExportableInterface, Search_FacetProvider_Interface, \Tracker\Field\FilterableInterface
 {
     private static $itemValuesLocalCache = [];
 
