@@ -222,7 +222,7 @@
         .flags { width: 170px; }
     }
 
-    .select2-container { min-width: 150px; margin-bottom: 0; }
+    .select2-container { margin-bottom: 0; width: auto !important; }
     .message_list .combined_sort, .message_list .combined_sort + el-select { display: inline-block; margin-left: 10px; width: 150px; }
 
     .folders li, .inner_list li {
@@ -262,6 +262,12 @@
         transform: unset !important;
         position: relative !important;
         padding: 0 !important;
+    }
+    .search_form > form {
+        flex-wrap: wrap;
+    }
+    .search_terms, .search_form select {
+        width: auto !important;
     }
 }
 
