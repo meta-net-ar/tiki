@@ -10,6 +10,14 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 
+/**
+ * Smarty {preference} special parameters
+ *
+ * @param string $syntax      Sets the language/mode for syntax highlighting.
+ *                            Supported modes include: "php", "javascript", "css", "html", etc.
+ *                            If $syntax is set and the feature_syntax_highlighter preference is enabled, then,
+ *                            codemirror is enabled automatically.
+ */
 class Preference extends Base
 {
     public function handle($params, Template $template)
@@ -110,7 +118,7 @@ class Preference extends Base
             $smarty->assign('codemirror');
             $smarty->assign('syntax');
 
-            if (! empty($params['syntax'])) {
+            if (! empty($params['syntax']) && $prefs['feature_syntax_highlighter'] == 'y') {
                 $smarty->assign('codemirror', 'true');
                 $smarty->assign('syntax', $params['syntax']);
             }

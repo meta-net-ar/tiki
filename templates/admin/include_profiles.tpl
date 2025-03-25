@@ -338,7 +338,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-12">
-                            <textarea data-codemirror="true" data-syntax="yaml" id="profile_tester" name="profile_tester" class="form-control">{if isset($test_source)}{$test_source}{/if}</textarea>
+                            {textarea name='profile_tester' id='profile_tester' codemirror='true' syntax='yaml' class='form-control' }{if isset($test_source)}{$test_source}{/if}{/textarea}
                         </div>
                     </div>
                 </div>
