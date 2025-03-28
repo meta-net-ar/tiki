@@ -296,7 +296,7 @@ class ODBCManager
             $found = [];
             foreach ($this->config['value_mappings'] as $field => $mapping) {
                 if (isset($mapping['type']) && $mapping['type'] === 'user') {
-                    $login = $row[$field];
+                    $login = $row[$field] ?? null;
                     if (! $login) {
                         continue;
                     }
@@ -338,9 +338,6 @@ class ODBCManager
                         $found[$mapping['~replace~']] = true;
                         break;
                     }
-                }
-                if (! isset($row[$field])) {
-                    $row[$field] = '';
                 }
             }
             foreach ($found as $orig_field => $exists) {
