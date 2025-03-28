@@ -290,33 +290,49 @@ Class CDir extends ErrorManager {
 	}
 	
 	//function multisort([$key, $order, $type]...)
-	function sort(){
+	public function sort() {
 		$error  = FALSE;
-		$params = "";
 		$plen   = func_num_args();
 		$result = NULL;
+
+		if ($plen > 2) {
+			$args = func_get_args();
+			$validKeys = ['File', 'Extension', 'Path', 'IsDirectory'];
+
+			for ($i = 0; $i < $plen; $i += 3) {
+				$key = $args[$i];
+				$order = $args[$i + 1];
+				$type = $args[$i + 2];
+
+				// Strict validation to prevent injection
+				if (!in_array($key, $validKeys)) {
+					$error = TRUE;
+					break;
+				}
+
+				if (!is_bool($order)) {
+					$error = TRUE;
+					break;
+				}
+
+				if (!is_int($type) || $type < 0 || $type > 4) {
+					$error = TRUE;
+					break;
+				}
 		
-		if (func_num_args() > 2) {
-			
-			for($i = 0; $i < func_num_args(); $i += 3){
-				$Key = func_get_arg($i);
-				$order = func_get_arg($i + 1);
-				if ($order) $order = 1;
-				else $order = 0;
-				$type = func_get_arg($i + 2);
-				$params .= $Key.", ".$order.", ".$type;
-				if ($i + 3 < func_num_args()) $params .= ', ';
-			}
-		} else {
-			$error = TRUE;
 		}
 		
 		if (!$error) {
-			//echo("params : multisort(\$this->aFiles, ".$params.");<br>");
-			eval("\$result = \$this->multisort(\$this->aFiles, ".$params.");");
-		} else {
-			$this -> ErrorTracker(4, "Error dans le trie du tableau", 'sort', __FILE__, __LINE__);
+		// Safe replacement for eval()
+		$result = call_user_func_array([$this, 'multisort'], array_merge([$this->aFiles], $args));
 		}
+	} else {
+	$error = TRUE;
+	}
+
+	if ($error) {
+		$this->ErrorTracker(4, "Error in array sorting", 'sort', __FILE__, __LINE__);
+	}
 		
 		return $result;
 	}

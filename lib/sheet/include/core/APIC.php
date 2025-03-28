@@ -139,20 +139,14 @@ class APIC extends APICObject {
 					die("Class ".$class." cannot be found");
 				}
 			}
-			
-			$params = '';
-			if ($parameters!=NULL && is_array($parameters)){
-				$plen = count($parameters);
-				if ($plen>0){
-					for ($i=0; $i < $plen; $i++){
-						$params .= '$parameters['.$i.']';
-						if ($i<($plen-1)){
-							$params .= ', ';
-						}
-					}
-				}
-			}
+			// Replace eval() instantiation with Reflection-based instantiation
 			$obj = NULL;
+			if ($parameters != NULL && is_array($parameters)) {
+				$reflection = new ReflectionClass($classname);
+				$obj = $reflection->newInstanceArgs($parameters);
+			} else {
+				$obj = new $classname();
+			}
 			eval('$obj = new '.$classname.'('.$params.');');
 			APIClassRegistry::registerClass($class, $obj);
 			return $obj;

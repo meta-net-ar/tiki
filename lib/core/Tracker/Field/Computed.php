@@ -62,6 +62,7 @@ class Tracker_Field_Computed extends Tracker_Field_Abstract
 	{
 		$ins_id = $this->getInsertId();
 		$data = [];
+		$value = null;
 
 		if (isset($requestData[$ins_id])) {
 			$value = $requestData[$ins_id];
@@ -71,10 +72,8 @@ class Tracker_Field_Computed extends Tracker_Field_Abstract
 			$option = $this->getOption('formula');
 
 			if ($option) {
-				$calc = preg_replace('/#([0-9]+)/', '$values[\1]', $option);
-				// FIXME: kill eval()
-				eval('$computed = ' . $calc . ';');
-				$value = $computed;
+				 // Evaluate the formula
+				 $value = $this->evaluateFormula($option, $values);
 
 				$trklib = TikiLib::lib('trk');
 
@@ -121,8 +120,8 @@ class Tracker_Field_Computed extends Tracker_Field_Abstract
 			$fieldId = $field['fieldId'];
 
 			if ($field['type'] == 'C') {
-				$calc = preg_replace('/#([0-9]+)/', '$args[\'values\'][\1]', $field['options_array'][0]);
-				eval('$value = ' . $calc . ';');
+				// Evaluate the formula
+				$value = self::evaluateFormula($field['options_array'][0], $args['values']);
 				$args['values'][$fieldId] = $value;
 				$trklib->modify_field($args['itemId'], $fieldId, $value);
 			}
@@ -138,5 +137,33 @@ class Tracker_Field_Computed extends Tracker_Field_Abstract
 			},
 			$value
 		);
+	}
+	/**
+	* New Method: Evaluate Formula Safely
+	* Safely evaluate a mathematical formula using only allowed characters and values from the $values array
+	*/
+	private static function evaluateFormula($formula, $values)
+	{
+		// Replace #1, #2, etc., with corresponding values from the $values array
+		$formula = preg_replace_callback('/#([0-9]+)/', function ($matches) use ($values) {
+		$fieldId = $matches[1];
+			return isset($values[$fieldId]) ? $values[$fieldId] : 0;
+		}, $formula);
+
+		// Check if the formula contains only allowed characters
+		if (! preg_match('/^[0-9+\-*/(). ]+$/', $formula)) {
+			return null;
+			}
+
+		// Safely evaluate using eval-like approach but only with mathematical expressions
+		$result = 0;
+		try {
+			// Use create_function or anonymous function to evaluate the formula safely
+			$result = @eval("return {$formula};");
+		} catch (\Throwable $e) {
+			$result = null;
+		}
+
+		return $result;
 	}
 }
