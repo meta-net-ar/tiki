@@ -128,16 +128,18 @@
         {/section}
         <tr>
             <td colspan="3" style="text-align:left; vertical-align:bottom;">
-                {icon name='ok' class='tips' title=":{tr}Select{/tr}" style="margin-bottom:8px; margin-left:5px"}
-                <select name="action" style="vertical-align:bottom;">
-                    <option value="" >{tr}Select One{/tr}</option>
-                    <option value="waiting_marked" >{tr}Waiting{/tr}</option>
-                    <option value="open_marked" >{tr}Open{/tr}</option>
-                    <option value="complete_marked" >{tr}Completed{/tr}</option>
-                    <option value="move_marked_to_trash">{tr}Trash{/tr}</option>
-                    <option value="remove_marked_from_trash">{tr}Undo Trash{/tr}</option>
-                </select>
-                <input type="submit" class="btn btn-primary btn-sm" name="update_tasks" value="{tr}Go{/tr}" style="vertical-align:bottom;">
+                <div class="input-group">
+                    {icon name='ok' class='tips' title=":{tr}Select{/tr}" style="margin-bottom:8px; margin-left:5px"}
+                    <select name="action">
+                        <option value="" >{tr}Select One{/tr}</option>
+                        <option value="waiting_marked" >{tr}Waiting{/tr}</option>
+                        <option value="open_marked" >{tr}Open{/tr}</option>
+                        <option value="complete_marked" >{tr}Completed{/tr}</option>
+                        <option value="move_marked_to_trash">{tr}Trash{/tr}</option>
+                        <option value="remove_marked_from_trash">{tr}Undo Trash{/tr}</option>
+                    </select>
+                    <input type="submit" class="btn btn-primary btn-sm" name="update_tasks" value="{tr}Go{/tr}">
+                </div>
             </td>
             <td colspan="3" style="text-align:right;">
                 <input type="submit" class="btn btn-secondary btn-sm" name="update_percentage" value="{tr}Go{/tr}" style="vertical-align:bottom;">

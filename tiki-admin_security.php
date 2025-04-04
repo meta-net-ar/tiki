@@ -123,6 +123,71 @@ if ($prefs['scheduler_shell_command'] == 'y') {
     ];
 }
 
+$risky_message = tra('Enabling this preference is potentially dangerous! Only Tiki administrators should be allowed to enable and use this feature.');
+
+if ($prefs['feature_blog_heading'] == 'y') {
+    $tikisettings['feature_blog_heading'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['feature_custom_html_head_content'] == 'y') {
+    $tikisettings['feature_custom_html_head_content'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['main_shadow_start'] == 'y') {
+    $tikisettings['main_shadow_start'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['header_shadow_start'] == 'y') {
+    $tikisettings['header_shadow_start'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['header_shadow_end'] == 'y') {
+    $tikisettings['header_shadow_end'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['center_shadow_start'] == 'y') {
+    $tikisettings['center_shadow_start'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['center_shadow_end'] == 'y') {
+    $tikisettings['center_shadow_end'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['footer_shadow_end'] == 'y') {
+    $tikisettings['footer_shadow_end'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
+if ($prefs['feature_endbody_code'] == 'y') {
+    $tikisettings['feature_endbody_code'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
 // Check if any of the mail-in accounts uses "Allow anonymous access"
 if ($prefs['feature_mailin'] == 'y') {
     $mailinlib = TikiLib::lib('mailin');

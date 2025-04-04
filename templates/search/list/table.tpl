@@ -48,7 +48,6 @@
 {if $actions}
 <form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
 <input type="hidden" name="plugin" value="{$fingerprint}">
-<input type="hidden" name="iListExecute" value="{$iListExecute}">
 {ticket}
 {/if}
 {if not empty($column.field)}

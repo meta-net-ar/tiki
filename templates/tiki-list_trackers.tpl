@@ -7,9 +7,11 @@
 {block name="navigation"}
     {if $tiki_p_admin_trackers eq 'y'}
         <div class="t_navbar mb-3">{* Class provides 15px bottom margin. *}
+
             <a class="btn btn-link me-2" href="{bootstrap_modal controller=tracker action=replace}">
                 {icon name="create"} {tr}Create{/tr}
             </a>
+
             {if $trackers|count gt 0}
                 <a class="btn btn-link me-2" href="{bootstrap_modal controller=tracker action=duplicate}">
                     {icon name="copy"} {tr}Duplicate{/tr}
@@ -20,25 +22,24 @@
                     {icon name="table"} {tr}ER diagram{/tr}
                 </a>
             {/if}
-            <div class="btn-group">
-                
-                <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
-                    {icon name="import"} {tr}Import{/tr}
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{bootstrap_modal controller=tracker action=import}">
-                        {tr}Import Structure{/tr}
+
+            <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
+                {icon name="import"} {tr}Import{/tr}
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="{bootstrap_modal controller=tracker action=import}">
+                    {tr}Import Structure{/tr}
+                </a>
+                <a class="dropdown-item" href="{bootstrap_modal controller=tracker action=import_profile}">
+                    {tr}Import From Profile/YAML{/tr}
+                </a>
+                {if $prefs.tracker_tabular_enabled eq 'y' && $tiki_p_admin_trackers eq 'y'}
+                    <a class="dropdown-item" href="{service controller=tabular action=manage}">
+                        {tr}Manage Import-Export Formats{/tr}
                     </a>
-                    <a class="dropdown-item" href="{bootstrap_modal controller=tracker action=import_profile}">
-                        {tr}Import From Profile/YAML{/tr}
-                    </a>
-                    {if $prefs.tracker_tabular_enabled eq 'y' && $tiki_p_admin_trackers eq 'y'}
-                        <a class="dropdown-item" href="{service controller=tabular action=manage}">
-                            {tr}Manage Import-Export Formats{/tr}
-                        </a>
-                    {/if}
-                </div>
+                {/if}
             </div>
+
             {if $prefs.tracker_tabular_enabled eq 'y' && $tiki_p_admin_trackers eq 'y'}
                 <a class="btn btn-link" href="{service controller=tabular action=manage}">
                     {icon name="list"} {tr}Manage Import-Export Formats{/tr}
@@ -70,6 +71,12 @@
                 <th>{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}</th>
                 <th class="text-end">{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Items{/tr}{/self_link}</th>
+                {if $prefs.tracker_display_categories eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Categories{/tr}{/self_link}</th>
+                {/if}
+                {if $prefs.tracker_display_wiki_only_status eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Wiki Only{/tr}{/self_link}</th>
+                {/if}
                 <td></td> {* Changed from th to td to prevent ARIA empty header error *}
             </tr>
 
@@ -111,11 +118,31 @@
                             title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
                             href="tiki-view_tracker.php?trackerId={$tracker.trackerId}"
                         >
-
-                                {$tracker.items|escape}
-
+                            {$tracker.items|escape}
                         </a>
                     </td>
+                    {if $prefs.tracker_display_categories eq 'y'}
+                    <td class="categories">
+                        {if !empty($tracker.category_names)}
+                            <ul class="tracker-category-list list-unstyled mb-0">
+                                {foreach from=$tracker.category_names item=catname}
+                                    <li><span class="badge bg-info">{$catname|escape}</span></li>
+                                {/foreach}
+                            </ul>
+                        {else}
+                            <span class="text-muted">{tr}No categories{/tr}</span>
+                        {/if}
+                    </td>
+                    {/if}
+                    {if $prefs.tracker_display_wiki_only_status eq 'y'}
+                        <td class="text-center">
+                            {if $tracker.wiki_only eq 'y'}
+                                <span class="badge bg-success" title="{tr}Non-admin users can only access this tracker through wiki pages{/tr}">{tr}Yes{/tr}</span>
+                            {else}
+                                <span class="text-muted">-</span>
+                            {/if}
+                        </td>
+                    {/if}
                     <td class="action">
                         {actions}
                             {strip}
@@ -148,7 +175,7 @@
                                         </a>
                                     </action>
                                     <action>
-                                        <a 
+                                        <a
                                             href="tiki-export_tracker_schema.php?trackerIds[]={$tracker.trackerId}"
                                         >
                                             {icon name='export' _menu_text='y' _menu_icon='y' alt="{tr}Show in ER diagram{/tr}"}

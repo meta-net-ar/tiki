@@ -531,6 +531,7 @@ class UnifiedSearchLib
     public function getSupportedTypes()
     {
         global $prefs;
+
         $types = [];
 
         if ($prefs['feature_wiki'] == 'y') {
@@ -591,6 +592,10 @@ class UnifiedSearchLib
         if ($prefs['feature_calendar'] === 'y') {
             $types['calendaritem'] = tra('calendar item');
             $types['calendar'] = tra('calendar');
+        }
+
+        if ($prefs['feature_surveys'] == 'y') {
+            $types['survey'] = tra('survey');
         }
 
         $types['user'] = tra('user');
@@ -901,6 +906,10 @@ class UnifiedSearchLib
         if ($mode == 'indexing') {
             $aggregator->addGlobalSource(new Search_GlobalSource_PermissionSource(Perms::getInstance()));
             $aggregator->addGlobalSource(new Search_GlobalSource_RelationSource());
+        }
+
+        if (isset($types['survey'])) {
+            $aggregator->addContentSource('survey', new Search_ContentSource_SurveySource());
         }
 
         $aggregator->addGlobalSource(new Search_GlobalSource_TitleInitialSource());
@@ -1527,7 +1536,6 @@ class UnifiedSearchLib
 
     public function isOutdated()
     {
-
         global $prefs;
 
         // If incremental update is enabled we cannot rely on the unified_last_rebuild date.
@@ -1644,6 +1652,21 @@ class UnifiedSearchLib
 
         if (isset($types['group'])) {
             // todo: unable to track groups by dates
+        }
+
+        if (isset($types['survey'])) {
+            $surveylib = TikiLib::lib('survey');
+
+            $last_survey = $surveylib->list_surveys(0, 1, 'lastTaken_desc');
+            if (! empty($last_survey['data'][0]['lastTaken']) && $last_survey['data'][0]['lastTaken'] > $threshold) {
+                return true;
+            }
+
+            // Also check creation date
+            $last_created_survey = $surveylib->list_surveys(0, 1, 'created_desc');
+            if (! empty($last_created_survey['data'][0]['created']) && $last_created_survey['data'][0]['created'] > $threshold) {
+                return true;
+            }
         }
     }
 

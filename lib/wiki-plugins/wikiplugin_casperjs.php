@@ -38,10 +38,9 @@ function wikiplugin_casperjs($data, $params)
     $label = tra('Execute CasperJS script');
     $urlParts = parse_url($_SERVER['REQUEST_URI']);
     $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+    $requestParams = [];
     if (isset($urlParts['query'])) {
         parse_str($urlParts['query'], $requestParams);
-    } else {
-        $requestParams = [];
     }
     $requestParams[$actionKey] = $label;
     $requestParamStr = http_build_query($requestParams, null, '&');
@@ -51,7 +50,7 @@ function wikiplugin_casperjs($data, $params)
 
     $executionResult = '';
     // Process request if the action key is set
-    if (isset($_REQUEST[$actionKey])) {
+    if (isset($requestParams[$actionKey])) {
         $executionResult .= "<h3>CasperJs Execution Details</h3>";
         $matches = WikiParser_PluginMatcher::match($data);
         foreach ($matches as $match) {

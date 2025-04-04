@@ -27,6 +27,13 @@ export default function applySelect() {
                     elementPlusUi.attr("allow-create", selectPreferences.allowCreate);
                     elementPlusUi.attr("ordering", selectPreferences.ordering);
 
+                    if ($(this).data("remote-source-url")) {
+                        $(elementPlusUi).attr(
+                            "remote-source-url",
+                            window.location.origin + (window.tikiroot || "/") + $(this).data("remote-source-url")
+                        );
+                    }
+
                     syncSelectOptions(elementPlusUi.get(0), this);
 
                     $(this).attr("element-plus-ref", elementUniqueId);

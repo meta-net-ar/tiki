@@ -192,7 +192,7 @@ if (isset($_REQUEST['pdf'])) {
         } else {
             $doc = new DOMDocument();
             libxml_use_internal_errors(true);
-            $doc->loadHTML($pdata, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+            $doc->loadHTML('<html lang="en"><head><meta charset="UTF-8"></head><body>' . $pdata . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             libxml_clear_errors();
 
             $sections = $doc->getElementsByTagName('section');

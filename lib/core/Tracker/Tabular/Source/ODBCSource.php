@@ -37,6 +37,7 @@ class ODBCSource implements SourceInterface
             }
         }
         $this->last_import_time = time();
+        $fields = array_filter($fields);
         foreach ($this->odbc_manager->iterate($fields, $modifiedField, $lastImport) as $row) {
             yield new ODBCSourceEntry($row);
         }

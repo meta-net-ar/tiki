@@ -715,7 +715,7 @@ $smarty->assign('editable', 'y');
 $smarty->assign('show_page', 'n');
 $smarty->assign('comments_show', 'n');
 
-$smarty->assign_by_ref('data', $info);
+$smarty->assign('data', $info);
 $smarty->assign('footnote', '');
 $smarty->assign('has_footnote', 'n');
 $parserlib = TikiLib::lib('parser');

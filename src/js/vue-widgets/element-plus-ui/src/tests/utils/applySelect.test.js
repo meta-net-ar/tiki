@@ -102,4 +102,22 @@ describe("applySelect", () => {
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("size")).toBe("small");
     });
+
+    test("applies the remote-source-url attribute to the el-select component if the select element has the data-remote-source-url attribute", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+        window.tikiroot = "/tiki/";
+
+        applySelect();
+
+        const givenSelect = document.createElement("select");
+        givenSelect.setAttribute("data-remote-source-url", "test");
+        document.body.appendChild(givenSelect);
+
+        await window.happyDOM.waitUntilComplete();
+
+        const elementPlusUi = document.querySelector("el-select");
+        expect(elementPlusUi.getAttribute("remote-source-url")).toBe(window.location.origin + window.tikiroot + "test");
+    });
 });

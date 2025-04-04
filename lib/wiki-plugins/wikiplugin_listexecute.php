@@ -27,22 +27,16 @@ function wikiplugin_listexecute_info()
     ];
 }
 
-function wikiplugin_listexecute($data, $params)
+function wikiplugin_listexecute($data, $params, $offset, $parser)
 {
     global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
     static $iListExecute = 0;
     $iListExecute++;
-
-    if (isset($_REQUEST['iListExecute'])) {
-        $iListExecute = $_REQUEST['iListExecute'];
-    }
+    $fingerprint = "listexecute-$iListExecute";
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
 
     TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/wikiplugin-listexecute.js', true);
-
-    $meta = TikiLib::lib('parser')->plugin_info('listexecute', $params);
-    $fingerprint = TikiLib::lib('parser')->plugin_fingerprint('listexecute', $meta, $data, $params);
 
     $actions = [];
 
@@ -313,5 +307,18 @@ function wikiplugin_listexecute($data, $params)
         }
     }
 
-    return $formatter->format($result);
+    $formatted = $formatter->format($result);
+
+    if (! strstr($formatted, "listexecute-$listexecute")) {
+        $formatted = '~np~
+<form method="post" class="list-executable" id="listexecute-' . $iListExecute . '" data-id="wplistexecute-' . $iListExecute . '">
+    <input type="hidden" name="plugin" value="' . $fingerprint . '">~/np~' . $formatted . '~np~
+</form>~/np~';
+    }
+
+    if (! empty($parser->option['mark_plugins']) && in_array($fingerprint, $parser->option['mark_plugins'])) {
+        $formatted = "~$fingerprint~" . $formatted . "~/$fingerprint~";
+    }
+
+    return $formatted;
 }

@@ -115,6 +115,21 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                             'op' => '!=='
                         ],
                     ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of users based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'inputtype',
+                            'value' => 'm',
+                            'pref' => 'elementplus_select'
+                        ],
+                    ],
                     'filterable' => [
                         'name' => tr('Filterable'),
                         'description' => tr('Allow the user to filter items within the transfer list'),
@@ -355,7 +370,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'user' => $name,
                         'id'  => (! empty($context['id']) ? $context['id'] : 'user_selector_' . $this->getConfiguration('fieldId')),
                         'select' => $value,
-                        'name' => $this->getInsertId(),
+                        'name' => $this->getHTMLFieldName(),
                         'multiple' => ( $this->getOption('multiple') ? 'true' : 'false' ),
                         'editable' => 'y',
                         'allowNone' => 'y',
@@ -369,7 +384,8 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'targetListTitle' => $this->getOption('targetListTitle'),
                         'ordering' => $this->getOption('ordering'),
                         'cardinalityParam' => $this->getConfiguration('validationParam'),
-                        'validationMessage' => $this->getConfiguration('validationMessage')
+                        'validationMessage' => $this->getConfiguration('validationMessage'),
+                        'lazyload' => $this->getOption('lazyload'),
                     ],
                     $smarty->getEmptyInternalTemplate()
                 );

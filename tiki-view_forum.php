@@ -14,7 +14,7 @@ $inputConfiguration = [
         'staticKeyFilters'               => [
             'forumId'                    => 'int',     //post
             'comments_threadId'          => 'int',     //post
-            'comments_title'             => 'word',     //post
+            'comments_title'             => 'topicname',   //post
             'openpost'                   => 'word',     //post
             'sort_mode'                  => 'word',    //get
             'report'                     => 'int',     //get
@@ -54,6 +54,11 @@ if ($prefs['feature_freetags'] == 'y') {
 
 $access->check_feature('feature_forums');
 
+if (isset($_REQUEST['comments_title'])) {
+    // decode comments_title
+    $_comments_title_decoded = htmlspecialchars_decode($_REQUEST['comments_title']);
+}
+
 $auto_query_args = [
     'forumId',
     'comment_threadId',
@@ -78,7 +83,7 @@ if (! isset($_REQUEST['forumId']) || ! ($forum_info = $commentslib->get_forum($_
 
 if (isset($_REQUEST['comments_postCancel'])) {
     unset($_REQUEST['comments_threadId']);
-    unset($_REQUEST['comments_title']);
+    unset($_comments_title_decoded);
     unset($_REQUEST['openpost']);
 }
 
@@ -193,9 +198,9 @@ $smarty->assign('warning', 'n');
 if (
     $tiki_p_forum_post_topic == 'n'
             && isset($_REQUEST['comments_postComment'])
-            && isset($_REQUEST['comments_title'])
+            && isset($_comments_title_decoded)
             && $_REQUEST['forumId'] == $prefs['wiki_forum_id']
-            && $tikilib->page_exists($_REQUEST['comments_title'])
+            && $tikilib->page_exists($_comments_title_decoded)
 ) {
     $tiki_p_forum_post_topic = 'y';
 }
@@ -224,7 +229,7 @@ if (isset($_REQUEST['comments_postComment'])) {
 // might have to be created, which happens above.
 if (isset($_REQUEST['comments_postComment'])) {
     // Check if the thread/topic already exists
-    $threadId = $commentslib->check_for_topic($_REQUEST['comments_title'], $_REQUEST['forumId']);
+    $threadId = $commentslib->check_for_topic($_comments_title_decoded, $_REQUEST['forumId']);
     // If it does, send the user there with no delay.
     if ($threadId && count($errors) === 0) {
         // If the samely titled comment already
@@ -274,7 +279,11 @@ if (isset($_REQUEST['comments_remove']) && isset($_REQUEST['comments_threadId'])
 
 if ($_REQUEST['comments_threadId'] > 0) {
     $comment_info = $commentslib->get_comment($_REQUEST['comments_threadId']);
-    $smarty->assign('comment_title', isset($_REQUEST['comments_title']) ? $_REQUEST['comments_title'] : $comment_info['title']);
+    if (isset($_comments_title_decoded)) {
+        // Encode back comment_title before display to avoid specials characters
+        $_comments_title_encoded = htmlspecialchars($_comments_title_decoded);
+    }
+    $smarty->assign('comment_title', isset($_comments_title_encoded) ? $_comments_title_encoded : $comment_info['title']);
     $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : $comment_info['data']);
     $smarty->assign(
         'comment_topictype',
@@ -286,7 +295,7 @@ if ($_REQUEST['comments_threadId'] > 0) {
     );
     $smarty->assign('comment_topicsmiley', $comment_info['smiley']);
 } else {
-    $smarty->assign('comment_title', isset($_REQUEST['comments_title']) ? $_REQUEST['comments_title'] : '');
+    $smarty->assign('comment_title', isset($_comments_title_encoded) ? $_comments_title_encoded : '');
     $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : '');
     $smarty->assign('comment_topictype', isset($_REQUEST['comment_topictype']) ? $_REQUEST['comment_topictype'] : '');
     $smarty->assign('comment_topictype', 'n');
@@ -297,9 +306,9 @@ if ($_REQUEST['comments_threadId'] > 0) {
 $smarty->assign('comment_preview', 'n');
 if (isset($_REQUEST['comments_previewComment'])) {
     $access->checkCsrf();
-    $smarty->assign('comments_preview_title', $_REQUEST['comments_title']);
+    $smarty->assign('comments_preview_title', $_comments_title_encoded);
     $smarty->assign('comments_preview_data', ($commentslib->parse_comment_data($_REQUEST['comments_data'])));
-    $smarty->assign('comment_title', $_REQUEST['comments_title']);
+    $smarty->assign('comment_title', $_comments_title_encoded);
     $smarty->assign('comment_data', $_REQUEST['comments_data']);
     $smarty->assign('comment_topictype', $_REQUEST['comment_topictype']);
     if ($forum_info['topic_summary'] == 'y') {

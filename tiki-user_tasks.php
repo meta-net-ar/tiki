@@ -591,6 +591,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         }
         if (($_REQUEST['task_user'] == $user) or ($userlib->user_has_permission($_REQUEST['task_user'], 'tiki_p_tasks_receive') and $userlib->user_has_permission($user, 'tiki_p_tasks_send'))) {
             $taskId = $tasklib->new_task($_REQUEST['task_user'], $user, $public_for_group, $rights_by_creator, $tikilib->now, $save);
+            Feedback::success(tr("Task: %0 created successfully.", $save['title']));
         } else {
             unset($_REQUEST['taskId']);
             $smarty->assign('msg', tra("Either you don't have permission to send tasks to other users, or the user doesn't have permission to receive tasks!"));
@@ -598,6 +599,7 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             die;
         }
     } else {
+        $success_message = tr("Task: %0 modified successfully.", $info['title']);
         if ($auto_accepted_status) {
             if ($info['user'] == $user) {
                 $msg_to = $info['creator'];
@@ -613,10 +615,21 @@ if (isset($_REQUEST['save']) && empty($errors)) {
                 $save['accepted_creator'] = null;
             }
         }
+        if (isset($_REQUEST['task_accept'])) {
+            $success_message = tr("Task: %0 accepted.", $info['title']);
+        }
+        if (isset($_REQUEST['task_not_accept'])) {
+            $success_message = tr("Task: %0 NOT accepted.", $info['title']);
+        }
+        if (isset($_REQUEST['move_into_trash'])) {
+            $success_message = tr("Task: %0 moved into trash.", $info['title']);
+        }
+
         $msg_from = $user;
         $tasklib->update_task($info['taskId'], $user, $save, $save_head, $admin_mode);
         $taskId = $info['taskId'];
         $msg_title = tra("Changes on Task") . ': "' . $info['title'] . '" by ' . $user;
+        Feedback::success($success_message);
     }
     $info = $tasklib->get_task($user, $taskId, null, $admin_mode);
     //send email to task user

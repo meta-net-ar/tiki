@@ -136,15 +136,11 @@ class CZip {
      *
      * @access public
      */
-    public function addFile($data, $name, $time = 0){
-        $name     = str_replace('\\', '/', $name);
+    public function addFile($data, $name, $time = 0) {
+        $name = str_replace('\\', '/', $name);
 
-        $dtime    = dechex($this->unix2DosTime($time));
-        $hexdtime = '\x' . $dtime[6] . $dtime[7]
-                  . '\x' . $dtime[4] . $dtime[5]
-                  . '\x' . $dtime[2] . $dtime[3]
-                  . '\x' . $dtime[0] . $dtime[1];
-        eval('$hexdtime = "' . $hexdtime . '";');
+        $dtime = dechex($this->unix2DosTime($time));
+        $hexdtime = pack('H*', $dtime);
 
         $fr   = "\x50\x4b\x03\x04";
         $fr   .= "\x14\x00";            // ver needed to extract
@@ -204,7 +200,6 @@ class CZip {
         // save to central directory
         $this -> ctrl_dir[] = $cdrec;
     }
-
 
     /**
      * Dumps out file

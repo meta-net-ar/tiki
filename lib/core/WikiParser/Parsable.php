@@ -564,14 +564,6 @@ if ( \$('#$id') ) {
             $result = $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
         }
 
-        if (! empty(ParserLib::$pluginCache)) {
-            $meta = $this->plugin_info($name, $args);
-            $fingerprint = $this->plugin_fingerprint($name, $meta, $data, $args);
-            if (isset(ParserLib::$pluginCache[$fingerprint])) {
-                ParserLib::$pluginCache[$fingerprint] = str_replace(['~np~', '~/np~'], '', $result);
-            }
-        }
-
         return $result;
     }
 

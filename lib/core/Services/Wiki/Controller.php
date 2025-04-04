@@ -1030,13 +1030,16 @@ class Services_Wiki_Controller
             $_GET = $_REQUEST = $input->asArray();
         }
 
-        ParserLib::$pluginCache = [$plugin => ''];
-
-        TikiLib::lib('parser')->parse_data($info['data']);
+        $data = TikiLib::lib('parser')->parse_data($info['data'], ['mark_plugins' => [$plugin]]);
+        if (preg_match("/~$plugin~(.*)~\/$plugin~/s", $data, $m)) {
+            $data = $m[1];
+        } else {
+            $data = tr("Plugin not found.");
+        }
 
         Feedback::sendHeaders();
         return [
-            'result' => ParserLib::$pluginCache[$plugin],
+            'result' => $data,
         ];
     }
 }

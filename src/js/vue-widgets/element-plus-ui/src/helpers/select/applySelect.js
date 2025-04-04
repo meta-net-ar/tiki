@@ -28,7 +28,7 @@ export function syncSelectOptions(elementPlusSelect, select) {
         .map(function () {
             return {
                 value: $(this).val(),
-                label: $(this).text(),
+                label: $(this).text().trim(),
                 disabled: $(this).prop("disabled"),
                 group: $(this).parent("optgroup").attr("label"),
             };

@@ -89,8 +89,10 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     } elseif ($listonly == 'users') {
         $names_array = explode(',', str_replace(';', ',', $query));
         $last_name = trim(end(array_filter($names_array)));
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
 
-        $listusers = $userlib->get_users_names(0, 100, 'login_asc', $last_name);
+        $listusers = $userlib->get_users_names(0, 100, 'login_asc', $last_name, $groups);
 
         $access->output_serialized($listusers);
     } elseif ($listonly == 'usersandcontacts') {
@@ -124,7 +126,8 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     } elseif ($listonly == 'userrealnames') {
         $names_array = explode(',', str_replace(';', ',', $query));
         $last_name = trim(end($names_array));
-        $groups = '';
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
         $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
         $done = [];
         $finalusers = [];

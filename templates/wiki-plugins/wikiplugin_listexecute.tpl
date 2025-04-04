@@ -1,7 +1,6 @@
 <a name="listexecute_{$iListExecute}"></a>
 <form method="post" action="#listexecute_{$iListExecute}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
     <input type="hidden" name="plugin" value="{$fingerprint}">
-    <input type="hidden" name="iListExecute" value="{$iListExecute}">
     <input type="checkbox" class="form-check-input listexecute-select-all" aria-label="{tr}Select{/tr}" name="selectall" value="">
     <input type="hidden" name="objects{$iListExecute}[]" value="" class="listexecute-all">
     {ticket}

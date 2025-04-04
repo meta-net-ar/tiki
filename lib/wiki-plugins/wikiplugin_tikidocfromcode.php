@@ -82,7 +82,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
             $sOutput = $this->generateFieldsExport($selectedFields);
         } elseif (
             // One of the variables below, not two or more, plus $info set
-            $this->exactlyOneSet([$module, $plugin, $preference, $trackerfield]) && isset($info)
+            $this->exactlyOneSet([[$module, $plugin, $preference, $trackerfield]]) && isset($info)
         ) {
             $aPrincipalField = ['field' => 'plugin', 'name' => 'Plugin'];
             $helppath = $helpurl . $aPrincipalField['name'];

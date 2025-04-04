@@ -37,11 +37,18 @@ class LoginLib
     {
         global $user, $user_cookie_site, $prefs;
         $perms = Perms::get();
-
         if (! $perms->admin) {
-            return;
+            $previous_username = $_SESSION[$user_cookie_site . '_previous'] ?? null;
+            if ($previous_username) {
+                $permsContext = new Perms_Context($previous_username);
+                $permsPrevious = Perms::get();
+                if (! $permsPrevious->admin) {
+                    return;
+                }
+            } else {
+                return;
+            }
         }
-
         $userlib = TikiLib::lib('user');
         $username = $userlib->get_user_real_case($name);
         $this->activateSession($username);

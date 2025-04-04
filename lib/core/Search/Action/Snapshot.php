@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\HeadlessBrowser\Exception\HeadlessException;
+use Tiki\HeadlessBrowser\HeadlessBrowserFactory;
+
 class Search_Action_Snapshot implements Search_Action_Action
 {
     public function getValues()
@@ -102,27 +106,15 @@ class Search_Action_Snapshot implements Search_Action_Action
      */
     private function snapshot(string $url, string $cssSelector)
     {
-        $script = <<<JS
-            var casper = require('casper').create();
-            casper.start('$url', function() {
-                var html = casper.evaluate(function() {
-                    return document.querySelector("$cssSelector").innerHTML;
-                });
-                this.echo(html);
-            });
-             
-            casper.run();
-        JS;
-
-        $runner = new WikiPlugin_Casperjs_Runner();
-        $result = $runner->run($script);
-        $result = implode("\n", array_filter($result->getScriptOutput(), function ($line) {
-            return ! empty($line);
-        }));
-        if ($result == 'null') {
-            throw new Search_Action_Exception(tr('Invalid css selector "%0".', $cssSelector));
+        try {
+            $headlessBrowser = HeadlessBrowserFactory::getHeadlessBrowser();
+            $result = $headlessBrowser->getUrlAsHtml($url, $cssSelector);
+            return $result;
+        } catch (HeadlessException $e) {
+            $logsLib = TikiLib::lib('logs');
+            $logsLib->add_log('HeadlessBrowser', $e->getMessage());
+            throw new Search_Action_Exception(tr('Unable capture snapshot: %0', $e->getMessage()));
         }
-        return $result;
     }
 
     /**

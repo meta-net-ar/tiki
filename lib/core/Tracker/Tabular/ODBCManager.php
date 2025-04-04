@@ -78,7 +78,9 @@ class ODBCManager
         }
         if ($bind) {
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, $bind);
+            if ($rs) {
+                odbc_execute($rs, $bind);
+            }
         } else {
             $rs = odbc_exec($conn, $sql);
         }
@@ -107,23 +109,29 @@ class ODBCManager
         if ($exists) {
             $row = $this->fillFieldsFromConfig($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
+                unset($chunk[$pk]);
                 $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                     return "\"{$k}\" = ?";
                 }, array_keys($chunk))) . " WHERE \"{$pk}\" = ?";
                 $rs = odbc_prepare($conn, $sql);
-                $params = array_map(function ($v) {
-                    return empty($v) && $v !== '0' ? null : $v;
-                }, array_values($chunk));
-                $params[] = $id;
-                odbc_execute($rs, $params);
-                if (odbc_error()) {
-                    $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                if ($rs) {
+                    $params = array_map(function ($v) {
+                        return empty($v) && $v !== '0' ? null : $v;
+                    }, array_values($chunk));
+                    $params[] = $id;
+                    odbc_execute($rs, $params);
+                    if (odbc_error()) {
+                        $this->errors[] = tr("Error updating remote item: %0", odbc_errormsg());
+                    }
                 }
             }
             $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = ?";
             $rs = odbc_prepare($conn, $sql);
             odbc_execute($rs, [$id]);
             $result = odbc_fetch_array($rs);
+            if (! $result) {
+                $result = [];
+            }
             $result = ['is_new' => false, 'entry' => $result];
         } else {
             if ($fullRow) {
@@ -141,15 +149,22 @@ class ODBCManager
             });
             $sql = "INSERT INTO {$this->config['table']}(\"" . implode('", "', array_keys($row)) . "\") VALUES (" . implode(", ", array_fill(0, count(array_keys($row)), '?')) . ")";
             $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, array_values($row));
-            if (odbc_error()) {
-                $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+            if ($rs) {
+                odbc_execute($rs, array_values($row));
+                if (odbc_error()) {
+                    $this->errors[] = tr("Error inserting remote item: %0", odbc_errormsg());
+                }
+                $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
+                $rs = odbc_prepare($conn, $sql);
+                odbc_execute($rs, []);
+                $result = odbc_fetch_array($rs);
+                if (! $result) {
+                    $result = [];
+                }
+                $result = ['is_new' => true, 'entry' => $result];
+            } else {
+                $result = ['is_new' => true, 'entry' => []];
             }
-            $sql = "SELECT * FROM {$this->config['table']} WHERE \"{$pk}\" = @@IDENTITY";
-            $rs = odbc_prepare($conn, $sql);
-            odbc_execute($rs, []);
-            $result = odbc_fetch_array($rs);
-            $result = ['is_new' => true, 'entry' => $result];
         }
         $result['entry'] = $this->reverseMapFieldsFromConfig($result['entry']);
         $this->stopErrorHandler();
@@ -281,7 +296,7 @@ class ODBCManager
             $found = [];
             foreach ($this->config['value_mappings'] as $field => $mapping) {
                 if (isset($mapping['type']) && $mapping['type'] === 'user') {
-                    $login = $row[$field];
+                    $login = $row[$field] ?? null;
                     if (! $login) {
                         continue;
                     }
@@ -312,20 +327,17 @@ class ODBCManager
                     $found[$mapping['~replace~']] = false;
                 }
                 foreach ($mapping as $remote => $local) {
-                    if (isset($row[$field]) && $row[$field] == $local) {
+                    if (isset($row[$field]) && ($row[$field] == $local || '~all:' . $row[$field] . '~' == $local)) {
                         $row[$field] = $remote;
                         $found[$field] = true;
                         break;
                     }
-                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $row[$mapping['~replace~']] == $local) {
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && ($row[$mapping['~replace~']] == $local || '~all:' . $row[$mapping['~replace~']] . '~' == $local)) {
                         $row[$field] = $remote;
                         $row[$mapping['~replace~']] = '';
                         $found[$mapping['~replace~']] = true;
                         break;
                     }
-                }
-                if (! isset($row[$field])) {
-                    $row[$field] = '';
                 }
             }
             foreach ($found as $orig_field => $exists) {
@@ -376,8 +388,12 @@ class ODBCManager
                 }
                 foreach ($mapping as $remote => $local) {
                     if ($row[$field] == $remote) {
-                        if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
-                            $local = $row[$m[1]];
+                        if (preg_match("/^~(.+?)(:.*)?~$/", $local, $m)) {
+                            if (isset($row[$m[1]])) {
+                                $local = $row[$m[1]];
+                            } elseif ($m[1] == 'all' && ! empty($m[2])) {
+                                $local = substr($m[2], 1);
+                            }
                         }
                         if (! empty($mapping['~replace~'])) {
                             $row[$mapping['~replace~']] = $local;

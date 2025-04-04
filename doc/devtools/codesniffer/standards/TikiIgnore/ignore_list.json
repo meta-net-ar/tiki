@@ -209,6 +209,9 @@
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Categorylist.php": {
             "class:Search_Formatter_ValueFormatter_Categorylist": true
         },
+        "lib\/core\/Search\/Formatter\/ValueFormatter\/Userlist.php": {
+            "class:Search_Formatter_ValueFormatter_Userlist": true
+        },
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Abstract.php": {
             "class:Search_Formatter_ValueFormatter_Abstract": true
         },
@@ -625,6 +628,9 @@
         },
         "lib\/core\/TikiDb\/Transaction.php": {
             "class:TikiDb_Transaction": true
+        },
+        "lib\/core\/Search\/ContentSource\/SurveySource.php": {
+            "class:Search_ContentSource_SurveySource": true
         },
         "lib\/test\/TikiLib\/TikiLibTest.php": {
             "class:TikiLibTest": true
@@ -4116,6 +4122,9 @@
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Categorylist.php": {
             "Search_Formatter_ValueFormatter_Categorylist": true
         },
+        "lib\/core\/Search\/Formatter\/ValueFormatter\/Userlist.php": {
+            "Search_Formatter_ValueFormatter_Userlist": true
+        },
         "lib\/core\/Search\/Formatter\/ValueFormatter\/Abstract.php": {
             "Search_Formatter_ValueFormatter_Abstract": true
         },
@@ -6424,6 +6433,9 @@
         "lib\/core\/Math\/Formula\/Function\/StrReplace.php": {
             "Math_Formula_Function_StrReplace": true
         },
+        "lib\/core\/Search\/ContentSource\/SurveySource.php": {
+            "Search_ContentSource_SurveySource": true
+        },
         "lib\/core\/Math\/Formula\/Function\/NotEquals.php": {
             "Math_Formula_Function_NotEquals": true
         },
@@ -8342,6 +8354,7 @@
             "UsersLib::object_has_one_permission": true,
             "UsersLib::user_exists": true,
             "UsersLib::user_exists_by_email": true,
+            "UsersLib::user_exists_by_realname": true,
             "UsersLib::get_user_real_case": true,
             "UsersLib::group_exists": true,
             "UsersLib::user_logout": true,

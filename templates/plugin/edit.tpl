@@ -111,15 +111,15 @@
                         {if $param.select_multiple eq "y"}multiple{/if}
                         data-separator="{$param.separator|default:'|'}">
                         {if !isset($pluginArgs[$paramName]) && $param.select_multiple neq "y"}
-                            <option value="" selected="selected">Please select an option</option>
+                            <option disabled hidden>{tr}Please select an option:{/tr}</option>
                         {/if}
                         {foreach $param.options as $option}
                             <option value="{$option.value|escape}" 
                                 {if $param.select_multiple eq "y"}
                                     {if isset($pluginArgs[$paramName]) && in_array($option.value, $pluginArgs[$paramName]|explode:($param.separator|default:','))}selected{/if}
                                 {else}
-                                    {if (isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value) or (!isset($pluginArgs[$paramName]) and $param.default eq $option.value)}
-                                    selected="selected"{/if}
+                                    {if (isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value)}
+                                    selected{/if}
                                 {/if}>
                                 {$option.text|escape}
                             </option>

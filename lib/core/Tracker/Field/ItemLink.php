@@ -72,6 +72,21 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 14,
                     ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of items based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown',
+                            'pref' => 'elementplus_select'
+                        ],
+                    ],
                     'displayFieldsList' => [
                         'name' => tr('Multiple Fields'),
                         'description' => tr('Display the values from multiple fields instead of a single one.'),
@@ -405,8 +420,20 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             return $template;
         }
 
+        if ($this->trackerField->getOption('lazyload')) {
+            $list = [];
+            foreach ($this->getValue() as $value) {
+                if ($value) {
+                    $list[$value] = $this->getItemLabel($value);
+                }
+            }
+        } else {
+            $list = $this->getPossibleItemValues();
+        }
+
         $data = [
-            'list' => $this->getPossibleItemValues(),
+            'list' => $list,
+            'listFields' => implode(',', $this->trackerField->getOption('displayFieldsList')),
             'displayFieldsListType' => $this->trackerField->getOption('displayFieldsListType'),
             'createTrackerItems' => $trackerPerms->create_tracker_items,
         ];

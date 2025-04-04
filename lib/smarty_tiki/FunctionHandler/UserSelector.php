@@ -111,6 +111,26 @@ class UserSelector extends Base
             $ucant = $userlib->count_users('');
         }
 
+        if ($params['lazyload']) {
+            if ($params['realnames'] === 'y') {
+                $remoteUrl = 'tiki-ajax_services.php?listonly=userrealnames';
+            } else {
+                $remoteUrl = 'tiki-ajax_services.php?listonly=users';
+            }
+
+            if (! empty($groupNames)) {
+                $remoteUrl .= '&groups=' . implode(',', $groupNames);
+            }
+
+            $options = "";
+            foreach ($params['select'] as $selected) {
+                $options .= "<option value=\"$selected\" selected>$selected</option>";
+            }
+            return <<<HTML
+                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}">{$options}</select>
+HTML;
+        }
+
         if ($prefs['feature_jquery_autocomplete'] == 'y' && ($ucant > $prefs['user_selector_threshold'] or $ucant > $params['user_selector_threshold'])) {
             $ret .= '<input id="' . $params['id'] . '" type="text" name="' . $params['name'] . '" value="' . htmlspecialchars($params['user']) . '"' . $sz . $ed . ' style="' . $params['style'] . '"' . $class . ' />';
             if (($params['contact'] == 'true')) {

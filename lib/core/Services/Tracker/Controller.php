@@ -893,6 +893,9 @@ class Services_Tracker_Controller
                 throw new Services_Exception_Denied(tr("There were errors cloning the item, please check error messages"));
             }
 
+            TikiLib::lib('unifiedsearch')->processUpdateQueue();
+            TikiLib::events()->trigger('tiki.process.redirect'); // wait for indexing to complete before loading of next request to ensure updated info shown
+
             $processedItem = $this->utilities->processValues($definition, $itemData);
             $processedFields = $processedItem['fields'];
         }
@@ -3125,5 +3128,41 @@ class Services_Tracker_Controller
             'areaId' => $input->domId->string(),
             'wysiwyg' => $input->wysiwyg->int(),
         ];
+    }
+
+    public function actionFindItems($input)
+    {
+        $trklib = TikiLib::lib('trk');
+
+        $query = $input->q->text();
+        $trackerId = $input->trackerId->int();
+        $field = $input->field->text();
+        $listFields = $input->listFields->text();
+        $limit = $input->limit->int();
+
+        if (! $listFields) {
+            $listFields = $field;
+        }
+
+        $listFields = explode(',', $listFields);
+
+        $listFields = array_reduce($listFields, function ($carry, $field) use ($trklib) {
+            $info = $trklib->get_tracker_field($field);
+            $carry[$field] = $info;
+            return $carry;
+        }, []);
+
+        $items = $trklib->list_items($trackerId, 0, $limit, 'itemId_asc', $listFields, $field, $query);
+
+        $data = [];
+
+        foreach ($items['data'] as $item) {
+            $item['label'] = implode(' ', array_map(fn ($fieldValue) => $fieldValue['value'], $item['field_values']));
+            $item['value'] = (string) $item['itemId'];
+            unset($item['field_values']);
+            $data[] = $item;
+        }
+
+        return $data;
     }
 }

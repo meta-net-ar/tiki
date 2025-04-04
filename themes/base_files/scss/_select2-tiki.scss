@@ -2,11 +2,16 @@
 // This seems to be needed to separate the x and v icons better:
 .tiki .select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear,
 .tiki .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__clear {
-    position: absolute;
-    top: 50%;
-    right: 2rem;
     height: 0.5rem;
     width: 0.5rem;
+}
+
+// Overrides to avoid x and v (dropdown arrow) icons overlap with selected option text
+.tiki .select2-container .select2-selection--single .select2-selection__rendered {
+    padding-right: 3rem;
+}
+.tiki .select2-container[dir="rtl"] .select2-selection--single .select2-selection__rendered {
+    padding-left: 3rem;
 }
 
 .tiki .select2-container--bootstrap-5 .select2-selection--single, .tiki .select2-container--default .select2-selection--multiple {

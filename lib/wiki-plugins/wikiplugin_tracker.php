@@ -41,6 +41,17 @@ function wikiplugin_tracker_info()
                 'parent' => 'input[name="params[trackerId]"]',
                 'parentkey' => 'tracker_id',
             ],
+            'requiredFields' => [
+                'required' => false,
+                'name' => tra('Required Fields'),
+                'description' => tr('Colon-separated list of field IDs to be required or mandatory in the form as input fields.
+                    If empty, all fields will keep the default behavior defined in the fields admin interface. Example: %0', '<code>2:4:5</code>'),
+                'default' => '',
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+            ],
             'values' => [
                     'required' => false,
                     'name' => tra('Values'),
@@ -1754,7 +1765,26 @@ function wikiplugin_tracker($data, $params)
             }
         }
 
-        // Check that individual fields are in the tracker
+        // Check that individual fields requiredFields in the $params are in the tracker
+        if (! empty($params['requiredFields'])) {
+            $fl = $params['requiredFields'];
+            if ($sort == 'y') {
+                $flds = $trklib->sort_fields($flds, $fl);
+            }
+            foreach ($fl as $l) {
+                $ok = false;
+                foreach ($flds['data'] as $f) {
+                    if ($f['fieldId'] == $l) {
+                        $ok = true;
+                        break;
+                    }
+                }
+                if (! $ok) {
+                    $back .= '<div class="alert alert-warning">' . tr('%0Incorrect fieldId: %1 detected on %2requiredFields%3 parameter%4.%5 Please ensure you are using the correct field ID and that it is properly included in the template, if any.', '<strong>', $l, '<code>', '</code>', '</strong>', '<br>') . '</div>';
+                }
+            }
+        }
+
         if (! empty($fields)) {
             $fl = $fields;
             if ($sort == 'y') {
@@ -1769,7 +1799,7 @@ function wikiplugin_tracker($data, $params)
                     }
                 }
                 if (! $ok) {
-                    $back .= '<div class="alert alert-warning"><strong>' . tra('Incorrect fieldId:') . ' ' . $l . '</strong>.<br> ' . tra("Please ensure you are using the correct field ID and that it is properly included in the template, if any.") . '</div>';
+                    $back .= '<div class="alert alert-warning">' . tr('%0Incorrect fieldId: %1 detected on %2fields%3 parameter%4.%5 Please ensure you are using the correct field ID and that it is properly included in the template, if any.', '<strong>', $l, '<code>', '</code>', '</strong>', '<br>') . '</div>';
                 }
             }
         } elseif (empty($fields) && empty($wiki) && empty($tpl)) {
@@ -1959,7 +1989,7 @@ function wikiplugin_tracker($data, $params)
                     $customvalidation_m .= 'passcode: { required: "' . tra("This field is required") . '"}, ';
                 }
             }
-            $validationjs = $validatorslib->generateTrackerValidateJS($definition, $customvalidation, $customvalidation_m);
+            $validationjs = $validatorslib->generateTrackerValidateJS($definition, $customvalidation, $customvalidation_m, '', $params['requiredFields']);
 
             if (! empty($params['_ajax_form_ins_id']) && $params['_ajax_form_ins_id'] === 'group') {
                 $headerlib->add_jq_onready("var ajaxTrackerValidation_group={validation:{" . $validationjs . '}};');        // return clean rules and messages object for ajax
@@ -2124,11 +2154,17 @@ function wikiplugin_tracker($data, $params)
             } else {
                 $renderedField = wikiplugin_tracker_render_input($f, $item, $dynamicSave);
             }
+
+            $isFieldMandatory = function ($f) use ($showmandatory, $params) {
+                return ($showmandatory === 'y' && $f['isMandatory'] === 'y') ||
+                       ($showmandatory === 'y' && isset($params['requiredFields']) && in_array($f['fieldId'], $params['requiredFields']));
+            };
+
             if (! in_array($f['fieldId'], $auto_fieldId) && in_array($f['fieldId'], $hidden_fieldId)) {
                 // Show in hidden form
                 $back .= '<span style="display:none;">' . $renderedField . '</span>';
             } elseif (! in_array($f['fieldId'], $auto_fieldId) && in_array($f['fieldId'], $outf)) {
-                if ($showmandatory == 'y' and $f['isMandatory'] == 'y') {
+                if ($isFieldMandatory($f)) {
                     $onemandatory = true;
                 }
                 if ($f['type'] == 'A') {
@@ -2144,7 +2180,8 @@ function wikiplugin_tracker($data, $params)
                         $smarty->assign('f_' . $f['fieldId'], $prettyout);
                         $smarty->assign('f_' . $f['permName'], $prettyout);
                     } else {
-                        $mand = ($showmandatory == 'y' and $f['isMandatory'] == 'y') ? "&nbsp;<strong class='mandatory_star text-danger tips' title=':" . tra("This field is mandatory") . "'>*</strong>&nbsp;" : '';
+                        $mand = ($isFieldMandatory($f)) ? "&nbsp;<strong class='mandatory_star text-danger tips' title=':" . tra("This field is mandatory") . "'>*</strong>&nbsp;" : '';
+
                         if (isset($showfielddesc) && $showfielddesc === 'y' && ! empty($f['description'])) {
                             $desc = $f['descriptionIsParsed'] == 'y' ? TikiLib::lib('parser')->parse_data($f['description']) : htmlspecialchars(tra($f['description']));
                             $desc = '<div class="trackerplugindesc">' . $desc . '</div>';
@@ -2219,9 +2256,10 @@ function wikiplugin_tracker($data, $params)
                         }
                         $back .= '" for="' . $f['ins_id'] . '">' . wikiplugin_tracker_name($f['fieldId'], tra($f['name']), $field_errors);
 
-                        if ($showmandatory == 'y' and $f['isMandatory'] == 'y') {
+                        if ($isFieldMandatory($f)) {
                             $back .= " <strong class='mandatory_star text-danger tips' title=':" . tra('This field is mandatory') . "' >*</strong> ";
                         }
+
                         $back .= '</label>';
                         // If use different lines, add a line break.
                         // Otherwise a new column

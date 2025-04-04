@@ -31,11 +31,11 @@ class ODBCWriter
                 $rendered = $entry->render($column, true);
                 if (is_array($rendered)) {
                     foreach ($column->getRemoteFields() as $key => $remoteField) {
-                        if (isset($rendered[$key])) {
+                        if (isset($rendered[$key]) && ! empty($remoteField)) {
                             $row[$remoteField] = $rendered[$key];
                         }
                     }
-                } else {
+                } elseif ($column->getRemoteField()) {
                     $row[$column->getRemoteField()] = $rendered;
                 }
                 if ($column->isPrimaryKey()) {

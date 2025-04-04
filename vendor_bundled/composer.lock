@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b18654d2111cbe8d63426c614028d7f",
+    "content-hash": "26dda2ccf5316d8799288560de803532",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -857,6 +857,134 @@
                 "rfc4648"
             ],
             "time": "2021-02-26T10:19:33+00:00"
+        },
+        {
+            "name": "chrome-php/chrome",
+            "version": "v1.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrome-php/chrome.git",
+                "reference": "079d2b3ed61b1bdba9f32dbac212bc5d98bca5bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://composer.tiki.org/dist/chrome-php/chrome/chrome-php-chrome-079d2b3ed61b1bdba9f32dbac212bc5d98bca5bb-zip-721e4f.zip",
+                "reference": "079d2b3ed61b1bdba9f32dbac212bc5d98bca5bb",
+                "shasum": "923bf4b4dfe95f1ade599a7530385596bdbe87ee"
+            },
+            "require": {
+                "chrome-php/wrench": "^1.7",
+                "evenement/evenement": "^3.0.1",
+                "monolog/monolog": "^1.27.1 || ^2.8 || ^3.2",
+                "php": "^7.4.15 || ^8.0.2",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
+                "symfony/filesystem": "^4.4 || ^5.0 || ^6.0 || ^7.0",
+                "symfony/polyfill-mbstring": "^1.26",
+                "symfony/process": "^4.4 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^9.6.3 || ^10.0.12",
+                "symfony/var-dumper": "^4.4 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HeadlessChromium\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Graham Campbell",
+                    "email": "hello@gjcampbell.co.uk",
+                    "homepage": "https://github.com/GrahamCampbell"
+                },
+                {
+                    "name": "Enrico Dias",
+                    "email": "enrico@enricodias.com",
+                    "homepage": "https://github.com/enricodias"
+                }
+            ],
+            "description": "Instrument headless chrome/chromium instances from PHP",
+            "keywords": [
+                "browser",
+                "chrome",
+                "chromium",
+                "crawl",
+                "headless",
+                "pdf",
+                "puppeteer",
+                "screenshot"
+            ],
+            "time": "2024-12-09T11:53:17+00:00"
+        },
+        {
+            "name": "chrome-php/wrench",
+            "version": "v1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrome-php/wrench.git",
+                "reference": "10cd90c49118ee85f182519805a4bb07b7f170d5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://composer.tiki.org/dist/chrome-php/wrench/chrome-php-wrench-10cd90c49118ee85f182519805a4bb07b7f170d5-zip-83b587.zip",
+                "reference": "10cd90c49118ee85f182519805a4bb07b7f170d5",
+                "shasum": "0b8e14077b8a748e164421697ba617f074105fe0"
+            },
+            "require": {
+                "ext-sockets": "*",
+                "php": "^7.4.15 || ^8.0.2",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
+                "symfony/polyfill-php80": "^1.26"
+            },
+            "conflict": {
+                "wrench/wrench": "*"
+            },
+            "require-dev": {
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^9.6.3 || ^10.0.12"
+            },
+            "type": "library",
+            "extra": {
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wrench\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Graham Campbell",
+                    "email": "hello@gjcampbell.co.uk",
+                    "homepage": "https://github.com/GrahamCampbell"
+                }
+            ],
+            "description": "A simple PHP WebSocket implementation",
+            "keywords": [
+                "WebSockets",
+                "hybi",
+                "websocket"
+            ],
+            "time": "2024-11-06T09:51:21+00:00"
         },
         {
             "name": "ckeditor/ckeditor",
@@ -2371,17 +2499,17 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "dev-master",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "93d9c952da662c31a0d0e518a91ea1067970d858"
+                "reference": "a3efbf567d96ec61ab441a9a14e0bbfd76aedc65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-93d9c952da662c31a0d0e518a91ea1067970d858-zip-20db17.zip",
-                "reference": "93d9c952da662c31a0d0e518a91ea1067970d858",
-                "shasum": "1d76bd9a3207e181c27cda477bf569a2e185a04c"
+                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-a3efbf567d96ec61ab441a9a14e0bbfd76aedc65-zip-ad135a.zip",
+                "reference": "a3efbf567d96ec61ab441a9a14e0bbfd76aedc65",
+                "shasum": "0a280401afbaa50029d76b444fc2a920b532c3c2"
             },
             "require": {
                 "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
@@ -2395,7 +2523,6 @@
                 "ext-openssl": "*",
                 "ext-session": "*",
                 "ezyang/htmlpurifier": "^4.17",
-                "garethp/php-ews": "dev-master",
                 "henrique-borba/php-sieve-manager": "^1.0",
                 "league/commonmark": "^2.4",
                 "paragonie/random_compat": "^2.0.18",
@@ -2420,7 +2547,17 @@
                 "ext-redis": "To use Redis for caching, this needs to be installed"
             },
             "type": "project",
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "post-update-cmd": [
+                    "composer suggest"
+                ],
+                "post-package-install": [
+                    "composer suggest"
+                ],
+                "post-install-cmd": [
+                    "composer suggest"
+                ]
+            },
             "license": [
                 "LGPL-2.1"
             ],
@@ -2449,7 +2586,14 @@
                 "webmail",
                 "webmail-client"
             ],
-            "time": "2024-12-17T17:13:22+00:00"
+            "support": {
+                "issues": "https://github.com/cypht-org/cypht/issues",
+                "chat": "https://gitter.im/cypht-org/community",
+                "wiki": "https://github.com/cypht-org/cypht/wiki",
+                "source": "https://github.com/cypht-org/cypht/",
+                "docs": "https://cypht.org/documentation.html"
+            },
+            "time": "2024-09-14T11:38:38+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -5733,6 +5877,104 @@
                 "typography"
             ],
             "time": "2016-12-13T01:01:17+00:00"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "2.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "5cf826f2991858b54d5c3809bee745560a1042a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://composer.tiki.org/dist/monolog/monolog/monolog-monolog-5cf826f2991858b54d5c3809bee745560a1042a7-zip-f2578e.zip",
+                "reference": "5cf826f2991858b54d5c3809bee745560a1042a7",
+                "shasum": "42cc59bab3e58ce3f87cff506e8fa94c687f8b5a"
+            },
+            "require": {
+                "php": ">=7.2",
+                "psr/log": "^1.0.1 || ^2.0 || ^3.0"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0 || 2.0.0 || 3.0.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
+                "doctrine/couchdb": "~1.0@dev",
+                "elasticsearch/elasticsearch": "^7 || ^8",
+                "ext-json": "*",
+                "graylog2/gelf-php": "^1.4.2 || ^2@dev",
+                "guzzlehttp/guzzle": "^7.4",
+                "guzzlehttp/psr7": "^2.2",
+                "mongodb/mongodb": "^1.8",
+                "php-amqplib/php-amqplib": "~2.4 || ^3",
+                "phpspec/prophecy": "^1.15",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^8.5.38 || ^9.6.19",
+                "predis/predis": "^1.1 || ^2.0",
+                "rollbar/rollbar": "^1.3 || ^2 || ^3",
+                "ruflin/elastica": "^7",
+                "swiftmailer/swiftmailer": "^5.3|^6.0",
+                "symfony/mailer": "^5.4 || ^6",
+                "symfony/mime": "^5.4 || ^6"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "elasticsearch/elasticsearch": "Allow sending log messages to an Elasticsearch server via official client",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-curl": "Required to send log messages using the IFTTTHandler, the LogglyHandler, the SendGridHandler, the SlackWebhookHandler or the TelegramBotHandler",
+                "ext-mbstring": "Allow to work properly with unicode symbols",
+                "ext-mongodb": "Allow sending log messages to a MongoDB server (via driver)",
+                "ext-openssl": "Required to send log messages using SSL",
+                "ext-sockets": "Allow sending log messages to a Syslog server (via UDP driver)",
+                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
+                "rollbar/rollbar": "Allow sending log messages to Rollbar",
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monolog\\": "src/Monolog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "https://seld.be"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "https://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "funding": [
+                {
+                    "url": "https://github.com/Seldaek",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/monolog/monolog",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-11-12T12:43:37+00:00"
         },
         {
             "name": "montefuscolo/xmpp",
@@ -17520,7 +17762,6 @@
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "garethp/php-ews": 20,
-        "jason-munro/cypht": 20,
         "montefuscolo/xmpp": 20,
         "npm-asset/html2canvas": 5,
         "phpcompatibility/php-compatibility": 20,
@@ -17546,7 +17787,8 @@
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
-        "ext-soap": "0"
+        "ext-soap": "0",
+        "ext-sockets": "0"
     },
     "plugin-api-version": "2.6.0"
 }

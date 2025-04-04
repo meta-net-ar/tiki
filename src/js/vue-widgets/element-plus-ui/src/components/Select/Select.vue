@@ -1,10 +1,10 @@
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed, onMounted, watchEffect } from 'vue';
 import Sortable from "sortablejs";
 import { sortOptions } from '../../helpers/select/sortable';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['options', 'placeholder', 'emitValueChange', 'value', 'multiple', 'isInvalid', 'max', 'clearable', 'collapseTags', 'filterable', 'allowCreate', 'maxCollapseTags', 'ordering', 'group', 'language', 'size']);
+const props = defineProps(['options', 'placeholder', 'emitValueChange', 'value', 'multiple', 'isInvalid', 'max', 'clearable', 'collapseTags', 'filterable', 'allowCreate', 'maxCollapseTags', 'ordering', 'group', 'language', 'size', 'remoteSourceUrl']);
 
 const modelValue = ref(JSON.parse(props.value));
 
@@ -16,10 +16,10 @@ const isInvalid = computed(() => props.isInvalid ? JSON.parse(props.isInvalid): 
 
 const clearable = props.clearable ? JSON.parse(props.clearable): false;
 const collapseTags = props.collapseTags ? JSON.parse(props.collapseTags): false;
-const filterable = props.filterable ? JSON.parse(props.filterable): false;
+const filterable = Boolean(props.remoteSourceUrl) || (props.filterable ? JSON.parse(props.filterable): false);
 const allowCreate = props.allowCreate ? JSON.parse(props.allowCreate): false;
 const grouped = props.group ? JSON.parse(props.group): false;
-const options = JSON.parse(props.options).reduce((acc, item) => {
+const getOptionsProp = () => JSON.parse(props.options).reduce((acc, item) => {
     if (!grouped) {
         acc.push(item);
         return acc;
@@ -41,12 +41,27 @@ const options = JSON.parse(props.options).reduce((acc, item) => {
     }
     return acc;
 }, []);
+const options = ref(getOptionsProp());
 const wrapperRef = ref(null);
 
 const handleValueChange = (value) => {
     props.emitValueChange({
         value,
     });
+};
+
+const remoteMethod = async (query) => {
+    if (!query) return;
+    
+    const url = new URL(props.remoteSourceUrl);
+    url.searchParams.append("q", query);
+    const response = await fetch(url.href, {
+        headers: {
+        Accept: "application/json",
+    },
+    });
+    const data = await response.json();
+    options.value = data.map(item => (typeof item === "string" ? { value: item, label: item }: item));
 };
 
 onMounted(() => {
@@ -59,6 +74,10 @@ onMounted(() => {
         }
     }
 })
+
+watchEffect(() => {
+    options.value = getOptionsProp();
+});
 </script>
 
 <script>
@@ -92,6 +111,8 @@ export const DATA_TEST_ID = {
                 :max-collapse-tags="parseInt(maxCollapseTags ?? 0)"
                 :size="size"
                 :data-testid="DATA_TEST_ID.SELECT_ELEMENT"
+                :remote-method="remoteMethod"
+                :remote="Boolean(remoteSourceUrl)"
             >
                 <el-option-group 
                     v-if="grouped"
@@ -111,7 +132,7 @@ export const DATA_TEST_ID = {
                 </el-option-group>
                 <el-option 
                     v-else
-                    v-for="item in JSON.parse(props.options)"
+                    v-for="item in options"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value"
