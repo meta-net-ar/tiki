@@ -30,11 +30,11 @@ class Tiki_Render_Editable
             $this->label = $parameters['label'];
         }
 
-        if (empty($parameters['field']['id']) || empty($parameters['field']['id'])) {
-            throw new Exception(tr('Internal error: mandatory parameter field is missing'));
+        if (empty($parameters['field'])) {
+            $this->field = ['id' => null, 'type' => null];
+        } else {
+            $this->field = $parameters['field'];
         }
-
-        $this->field = $parameters['field'];
 
         if ($this->field['type'] != 'form' && empty($parameters['object_store_url'])) {
             throw new Exception(tr('Internal error: mandatory parameter object_store_url is missing'));
