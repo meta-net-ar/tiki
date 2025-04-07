@@ -12,9 +12,9 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2025-01-02, the community has:
+As of 2025-04-07, the community has:
   * 683 members on SourceForge.net,
-  * 179 of those people who made at least one code commit
+  * 177 of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
 from subversion repository by the following script:
@@ -94,8 +94,8 @@ Number of Commits: 2
 
 Nickname: Elifeleti Mukisa Dan
 First Commit: Fri Sep 13 22:11:41 2024 +0000
-Last Commit: Fri Sep 13 22:11:41 2024 +0000
-Number of Commits: 1
+Last Commit: Fri Mar 28 13:08:45 2025 +0000
+Number of Commits: 2
 
 Nickname: Elvis Ansima
 First Commit: Tue Aug 15 02:46:19 2023 +0000
@@ -249,8 +249,8 @@ Number of Commits: 5
 
 Nickname: Merci Jacob
 First Commit: Tue Oct 24 03:24:56 2023 +0000
-Last Commit: Mon Nov 20 06:39:42 2023 +0000
-Number of Commits: 4
+Last Commit: Sun Mar 30 20:00:48 2025 +0000
+Number of Commits: 5
 
 Nickname: Mike KOTA
 First Commit: Mon Jul 15 15:28:24 2019 +0200
@@ -299,8 +299,8 @@ Number of Commits: 58
 
 Nickname: Rodriguez Nyiringabo
 First Commit: Fri Apr 29 13:46:30 2022 +0000
-Last Commit: Thu Jan 2 23:03:31 2025 +0200
-Number of Commits: 22
+Last Commit: Mon Apr 7 17:30:52 2025 +0100
+Number of Commits: 28
 
 Nickname: Sabiduria
 First Commit: Wed Dec 12 12:39:44 2018 +0200
@@ -754,8 +754,6 @@ SF Role: Developer
 Nickname: ccardinal
 Name: Ccardinal
 First Commit: 2013-07-14
-Last Commit: 2013-07-14
-Number of Commits: 2
 SF Role: Developer
 
 Nickname: cdrwhite
@@ -1847,7 +1845,7 @@ Nickname: lindonb
 Name: lindon
 First Commit: 2009-05-10
 Last Commit: Thu Sep 3 22:47:16 2020 -0400
-Number of Commits: 1743
+Number of Commits: 1742
 SF Role: Admin, Developer
 
 Nickname: llunax
@@ -1879,7 +1877,7 @@ Nickname: lphuberdeau
 Name: Louis-Philippe Huberdeau
 First Commit: 2004-04-10
 Last Commit: Wed Feb 18 17:41:34 2015 +0000
-Number of Commits: 893
+Number of Commits: 892
 SF Role: Developer
 
 Nickname: lrrcenter
@@ -1992,7 +1990,7 @@ Nickname: marclaporte
 Name: Marc Laporte
 First Commit: 2003-11-28
 Last Commit: Thu Nov 14 04:34:48 2019 +0000
-Number of Commits: 114
+Number of Commits: 113
 SF Role: Admin
 
 Nickname: marcmont
@@ -2447,7 +2445,7 @@ Nickname: patrick-proulx
 Name: Patrick Proulx
 First Commit: 2013-07-14
 Last Commit: Thu May 18 17:08:16 2017 +0000
-Number of Commits: 218
+Number of Commits: 217
 SF Role: Developer
 
 Nickname: patrickallard
@@ -3018,8 +3016,6 @@ SF Role: Developer
 Nickname: thierrygervais
 Name: Thierry
 First Commit: 2013-07-14
-Last Commit: 2013-07-14
-Number of Commits: 1
 SF Role: Developer
 
 Nickname: thomasmars
@@ -3108,8 +3104,8 @@ SF Role: Developer
 Nickname: ursuleacv
 Name: Ursuleac Valentin
 First Commit: 2013-07-14
-Last Commit: 2013-07-15
-Number of Commits: 2
+Last Commit: Mon Jul 15 18:32:37 2013 +0000
+Number of Commits: 1
 SF Role: Developer
 
 Nickname: uxeric
