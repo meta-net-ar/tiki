@@ -84,11 +84,40 @@ class WikiParser_ParsableMarkdown extends ParserLib
             $data = $this->autolinks($data);
         }
 
+        /**
+         * extract Markdown code blocks to be processed later
+         * This regex matches code blocks that:
+         * - start with a fence of 3 or more backticks or tildes, also allows up to three spaces before opening,
+         * - language identifier (info string) is optional on the opening line and can contain anything,
+         * - end with a matching fence of the same character as at start,
+         * - allows up to three spaces before both opening and closing fences.
+         *
+         * Note: the first capturing group contains the opening fence itself.
+         * The fenced block content is matched by the middle non-capturing part
+         * and is preserved through the full match.
+         *
+         * Reference: https://spec.commonmark.org/0.31.2/#fenced-code-blocks
+         * */
+        $pattern = '/^(?: {0,3})([`~])\1{2,}([^`\r\n]*)?\r?\n(?:[\s\S]*?)(?:\r?\n(?: {0,3})\1{1,})/m';
+        preg_match_all($pattern, $data, $matches);
+        $list_code = [];
+        foreach ($matches[0] as $match) {
+            $hash = '§' . md5(uniqid()) . '§';
+            $data = str_replace($match, $hash, $data);
+            $list_code[] = [
+                'value' => $match,
+                'hash' => $hash
+            ];
+        }
         // wiki page links and external links are handled in Tiki-syntax to allow sister sites and other semantic linking
         $data = $this->parse_data_wikilinks($data, false, $this->option['wysiwyg']);
         $data = $this->parse_data_externallinks($data, false);
         $data = preg_replace(';~hc~(.*?)~/hc~;s', '<!-- $1 -->', $data);
 
+        // restore code blocks
+        foreach ($list_code as $code) {
+            $data = str_replace($code['hash'], $code['value'], $data);
+        }
         // converter/parser expects UTF-8, try to cleanup invalid characters
         $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 
