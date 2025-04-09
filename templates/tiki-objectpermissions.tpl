@@ -225,7 +225,7 @@
                     {foreach item=group from=$eponymous_groups}
                     <tr>
                         <td class="checkbox-cell">
-                            <input type="checkbox" class="form-check-input" name="eponymous_group_filter[]" value="{$group.id}" {if $group.in_group_filter == 'y'}checked{/if}>
+                            <input type="checkbox" class="form-check-input" name="eponymous_group_filter[]" value="{$group.id}"{if $group.in_group_filter == 'y'} checked{/if}>
                         </td>
                         <td class="group">{$group.groupName|escape}</td>
                         <td class="desc">{$group.groupDesc|escape}</td>

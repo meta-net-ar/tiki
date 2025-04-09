@@ -34,7 +34,7 @@ $inputConfiguration = [
             'initial'                   => 'alpha',
             'find'                      => 'groupname',
             'group'                     => 'groupname',
-            'create_epoynmous_groups'   => 'text',
+            'create_eponymous_groups'   => 'text',
             'show_eponymous'            => 'word',
         ],
     ]
@@ -122,7 +122,7 @@ if (isset($_REQUEST['clean']) && $access->checkCsrf()) {
 }
 
 if ($prefs['eponymousGroups'] === 'y') {
-    if (! empty($_REQUEST['create_epoynmous_groups'])) {
+    if (! empty($_REQUEST['create_eponymous_groups'])) {
         $perms = Perms::get();
         if (! $perms->admin) {
             Feedback::error(tr('Insufficient permissions to execute the requested action.'));

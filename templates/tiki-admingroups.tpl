@@ -19,7 +19,7 @@
             {if $prefs.eponymousGroups eq 'y'}
                 <form method="post" class="d-inline">
                     {ticket}
-                    <input type="hidden" name="create_epoynmous_groups" value="1">
+                    <input type="hidden" name="create_eponymous_groups" value="1">
                     <button type="submit" class="btn btn-primary" title="{tr}Create eponymous groups for users that don't have ones created. Useful if you turn on the feature after existing users have been created or registered.{/tr}">
                         {icon name="plus"} {tr}Create Eponymous Groups{/tr}
                     </button>
@@ -46,7 +46,7 @@
                 <div class="mb-3 row">
                     <div class="col-md-12">
                         <label for="show_eponymous">{tr}Show eponymous groups in this list{/tr}</label>
-                        <input class="form-check-input" type="checkbox" name="show_eponymous" id="show_eponymous" {if $show_eponymous eq 'y'} checked="checked"{/if} onclick="window.location.href='?show_eponymous=' + (this.checked ? 'y' : 'n')">
+                        <input class="form-check-input" type="checkbox" name="show_eponymous" id="show_eponymous"{if $show_eponymous eq 'y'} checked="checked"{/if} onclick="window.location.href='?show_eponymous=' + (this.checked ? 'y' : 'n')">
                     </div>
                 </div>
             {/if}
