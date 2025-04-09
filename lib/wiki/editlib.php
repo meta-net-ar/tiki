@@ -1626,6 +1626,9 @@ class EditLib
             }, $data);
             $data = preg_replace('/^;:/m', '', $data);
 
+            // extract replace Markdown code with plugin code
+            $this->replaceMarkdownCodeToPluginCode($data);
+
             // Preserve user mentions
             $data = $parserlib->parse_tagged_users($data, function ($u, $m) use (&$hashed) {
                 $hash = $this->pushToHashed($hashed, $m[0]);
@@ -2151,5 +2154,25 @@ class EditLib
         }
 
         return $style;
+    }
+
+    /**
+     * extract and replace Markdown code with plugin code
+     * @param string $data
+     *
+     * @return void
+     */
+    public function replaceMarkdownCodeToPluginCode(string &$data) {
+        $pattern = '/```([a-zA-Z]+)+\r?\n(.*?\r?\n)```/';
+        preg_match_all($pattern, $data, $matches);
+        $data = preg_replace_callback($pattern, function ($m) {
+            $caption = $m[1];
+            $content = $m[2];
+            return <<<PLUGIN
+{CODE(colors="$caption")}
+$content
+{CODE}
+PLUGIN;
+        }, $data);
     }
 }
