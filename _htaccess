@@ -208,8 +208,8 @@ FileETag none
 
     # -- Profiles Repository -- #
     # Set the parentId (here set as 1) to the Id of the category containing your profile pages.
-    # Enable feature_wiki and feature_categories in your Tiki settings.
-    # Enable tiki_p_view_category in Tiki for anonymous to be a repository.
+    # Enable feature_wiki_export, feature_wiki and feature_categories in your Tiki settings.
+    # Enable tiki_p_view_category and tiki_p_export_wiki in Tiki for anonymous to be a repository.
     # Read more: http://doc.tiki.org/Profiles
     #RewriteRule ^profiles$             tiki-browse_categories.php?find=&deep=on&type=wiki+page&parentId=1&sort_mode=name_asc&plain&maxRecords=1000000 [L]
 

@@ -213,7 +213,11 @@ class Tiki_Profile
 
             return self::fromFile($path, $profile);
         } else {
-            $url = "$domain/api/wiki/zip?pages=" . urlencode($profile);
+            if (self::$developerMode) {
+                $url = "$domain/tiki-export_wiki_pages.php?latest=1&page=" . urlencode($profile);
+            } else {
+                $url = "$domain/tiki-export_wiki_pages.php?page=" . urlencode($profile);
+            }
 
             return self::fromUrl($url);
         }

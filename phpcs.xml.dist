@@ -27,6 +27,7 @@
     <exclude-pattern>*/lib/sheet/ole.php</exclude-pattern>
     <exclude-pattern>*/lib/sheet/ole/*</exclude-pattern>
     <exclude-pattern>*/lib/soap/nusoap/*</exclude-pattern>
+    <exclude-pattern>*/lib/tar.class.php</exclude-pattern>
     <exclude-pattern>*/lib/tikihelp/js/*</exclude-pattern>
     <exclude-pattern>*/lib/tikihelp/menu/*</exclude-pattern>
     <exclude-pattern>*/lib/webmail/mimeDecode.php</exclude-pattern>

@@ -2109,6 +2109,17 @@ function prefs_feature_list($partial = false)
                 'textFilter' => 'picture',
             ],
         ],
+        'feature_wiki_export' => [
+            'name' => tra('Export'),
+            'description' => tra('Users can export individual pages and structure pages content as a file (requires tiki_p_admin_wiki permission).'),
+            'help' => 'XML-Wiki-Import-Export',
+            'type' => 'flag',
+            'default' => 'n',
+            'permission' => [
+                'permType' => 'wiki',
+                'textFilter' => 'export',
+            ],
+        ],
         'feature_wikiwords' => [
             'name' => tra('WikiWords'),
             'description' => tra('Automatically convert "CamelCase" words into wiki links.'),

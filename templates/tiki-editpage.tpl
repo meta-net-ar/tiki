@@ -442,6 +442,14 @@
                                 </div>
                             </div>
                         {/if}
+                        {if $prefs.feature_wiki_export eq 'y' and $tiki_p_export_wiki eq 'y'}
+                            <div class="mb-3 row">
+                                <label for="" class="col-md-4 col-form-label">{tr}Export page{/tr}</label>
+                                <div class="col-md-8">
+                                    <a href="tiki-export_wiki_pages.php?page={$page|escape:"url"}&amp;all=1" class="btn btn-primary">{icon name="export"} {tr}Export all versions{/tr}</a>
+                                </div>
+                            </div>
+                        {/if}
                         {if !isset($wysiwyg) || $wysiwyg neq 'y'}
                             {if $prefs.feature_wiki_attachments == 'y' and ($tiki_p_wiki_attach_files eq 'y' or $tiki_p_wiki_admin_attachments eq 'y')}
                                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">

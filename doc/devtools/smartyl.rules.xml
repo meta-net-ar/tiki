@@ -53,6 +53,7 @@
 
         <!-- There are a number of tasks in the templates, adding the current list here, so we ignore only the existing -->
         <rule name="Commenting.Todo.CommentFound">
+            <pattern>templates/tiki-export_comment_xml.tpl</pattern>
             <pattern>templates/tiki-index_p.tpl</pattern>
         </rule>
         <rule name="Commenting.Todo.TaskFound">

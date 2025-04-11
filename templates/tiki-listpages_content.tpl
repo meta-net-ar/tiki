@@ -469,6 +469,9 @@
                     <option value="unlock_pages" >{tr}Unlock{/tr}</option>
                 {/if}
                 {if $tiki_p_admin eq 'y'}
+                    <option value="zip">{tr}Download zipped file{/tr}</option>
+                {/if}
+                {if $tiki_p_admin eq 'y'}
                     <option value="title">{tr}Add page name as page header{/tr}</option>
                 {/if}
 

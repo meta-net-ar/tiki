@@ -41,6 +41,10 @@
             {/if}
         {/if}
 
+        {if $prefs.feature_wiki_export eq 'y' and ( $tiki_p_admin_wiki eq 'y' or $tiki_p_export_wiki eq 'y' )}
+            {button _keepall='y' href="tiki-export_wiki_pages.php" page=$page _type="link" _class="dropdown-item" _text="{tr}Export{/tr}"}
+        {/if}
+
         {if $prefs.feature_wiki_discuss eq 'y' && $show_page eq 'y' && $tiki_p_forum_post eq 'y' && ( empty($prefs.wiki_discuss_visibility) || $prefs.wiki_discuss_visibility eq 'button')}
             {capture assign=wiki_discussion_string}
                 {include file='wiki-discussion.tpl'} [tiki-index.php?page={$page|escape:url}|{$page}]

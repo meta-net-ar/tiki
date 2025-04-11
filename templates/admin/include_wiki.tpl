@@ -150,6 +150,10 @@
                                 {preference name=wiki_forum_id}
                                 {preference name=wiki_discuss_visibility}
                             </div>
+                        {preference name=feature_wiki_export}
+                            <div class="adminoptionboxchild col-md-8 offset-sm-4" id="feature_wiki_export_childcontainer">
+                                {button href="tiki-export_wiki_pages.php" _text="{tr}Export Wiki Pages{/tr}"}
+                            </div>
                         {preference name=geo_locate_wiki}
                         {preference name=feature_history}
                             <div class="adminoptionboxchild" id="feature_history_childcontainer">
@@ -422,6 +426,19 @@
                         </div>
                     </div>
                 </fieldset>
+            </div>
+            <div class="adminoptionbox clearfix">
+                <fieldset class="mb-3 w-100">
+                    <legend class="h3">{tr}Dump files{/tr}</legend>
+                    {tr}Dump files archive wiki pages for various usages such as off-line browsing or distribution on optical disks.{/tr}
+                    {remarksbox type="warning" title="{tr}Warning{/tr}"}
+                    {tr}The HTML files generated may refer to files not included in the dump.{/tr} {tr}Dumps do not include files attached to wiki pages.{/tr}
+                    {if $isDump}<li>{tr}Dumping will overwrite the preexisting dump.{/tr}</li>{/if}
+                    {/remarksbox}
+                    <input type="submit" class="btn btn-primary btn-sm" name="createdump" value="{tr}Create Dump File{/tr}">
+                    <input type="submit" class="btn btn-primary btn-sm" name="downloaddump" value="{tr}Download Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
+                    <input type="submit" class="btn btn-primary btn-sm" name="removedump" data-bs-target="_blank" value="{tr}Remove Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
+            </fieldset>
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">

@@ -4226,6 +4226,7 @@ lib/svg-edit_tiki/index.php -text
 lib/taglines/index.php -text
 lib/taglines/taglinelib.php -text
 lib/tail/index.php -text
+lib/tar.class.php -text
 lib/tasks/index.php -text
 lib/tasks/tasklib.php -text
 lib/templates/index.php -text
@@ -4952,6 +4953,7 @@ lib/wiki-plugins/wikiplugin_youtube.php -text
 lib/wiki-plugins/wikiplugin_zotero.php -text
 lib/wiki-plugins/wikiplugin_zoterolist.php -text
 lib/wiki/editlib.php -text
+lib/wiki/exportlib.php -text
 lib/wiki/flaggedrevisionlib.php -text
 lib/wiki/histlib.php -text
 lib/wiki/index.php -text
@@ -4960,6 +4962,7 @@ lib/wiki/quantifylib.php -text
 lib/wiki/renderlib.php -text
 lib/wiki/semanticlib.php -text
 lib/wiki/wikilib.php -text
+lib/wiki/xmllib.php -text
 lib/wizard/index.php -text
 lib/wizard/pages/admin_advanced.php -text
 lib/wizard/pages/admin_auto_toc.php -text
@@ -6099,6 +6102,8 @@ templates/tiki-edit_topic.tpl -text
 templates/tiki-edit_translation.tpl -text
 templates/tiki-editpage.tpl -text
 templates/tiki-export-sheets.tpl -text
+templates/tiki-export_comment_xml.tpl -text
+templates/tiki-export_page_xml.tpl -text
 templates/tiki-export_tracker_item.tpl -text
 templates/tiki-export_users.tpl -text
 templates/tiki-faq_questions.tpl -text
@@ -6117,6 +6122,7 @@ templates/tiki-graph-sheets.tpl -text
 templates/tiki-history_sheets.tpl -text
 templates/tiki-import-sheets.tpl -text
 templates/tiki-import_structuredtext.tpl -text
+templates/tiki-import_xml_zip.tpl -text
 templates/tiki-importer.tpl -text
 templates/tiki-index_p.tpl -text
 templates/tiki-information.tpl -text
@@ -7985,6 +7991,7 @@ themes/yeti/templates/index.php -text
 /tiki-export_sheet.php -text
 /tiki-export_tracker.php -text
 /tiki-export_tracker_monitor.php -text
+/tiki-export_wiki_pages.php -text
 /tiki-faq_questions.php -text
 /tiki-featured_link.php -text
 /tiki-file_archives.php -text
@@ -8011,6 +8018,7 @@ themes/yeti/templates/index.php -text
 /tiki-image_gallery_rss.php -text
 /tiki-import_sheet.php -text
 /tiki-import_structuredtext.php -text
+/tiki-import_xml_zip.php -text
 /tiki-importer.php -text
 /tiki-index.php -text
 /tiki-index_p.php -text

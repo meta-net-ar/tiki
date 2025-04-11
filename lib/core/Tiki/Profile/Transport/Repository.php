@@ -15,16 +15,23 @@ class Tiki_Profile_Transport_Repository implements Tiki_Profile_Transport_Interf
 
     public function getPageContent($pageName)
     {
-        // Get page content directly from database
-        $info = TikiLib::lib('tiki')->get_page_info($pageName);
+        $exportUrl = dirname($this->url) . '/tiki-export_wiki_pages.php?'
+            . http_build_query([ 'page' => $pageName ]);
 
-        if ($info && isset($info['data'])) {
-            $content = $info['data'];
-            $content = str_replace("\r", '', $content);
+        $content = TikiLib::lib('tiki')->httprequest($exportUrl);
+        $content = str_replace("\r", '', $content);
+        $begin = strpos($content, "\n\n");
+
+        if ($begin !== false) {
+            $content = substr($content, $begin + 2);
+
+            // This allows compatibility with Tiki 8 and below, which export page content HTML-escaped. This should not be done for Tiki 9 and above and should be removed once only these are supported (after Tiki 6 reaches EOL).
+            $content = htmlspecialchars_decode($content);
+
             return $content;
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     public function getPageParsed($pageName)

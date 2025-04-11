@@ -20,6 +20,29 @@ class StructLib extends TikiLib
 
         $this->displayLanguageOrder = [];
     }
+    public function s_export_structure($structure_id)
+    {
+        global $exportlib, $tikidomain;
+        global $dbTiki;
+        include_once('lib/wiki/exportlib.php');
+        include_once('lib/tar.class.php');
+        $page_info = $this->s_get_structure_info($structure_id);
+        $page_name = $page_info['pageName'];
+        $zipname   = $page_name . '.zip';
+        $tar = new tar();
+        $pages = $this->s_get_structure_pages($page_info['page_ref_id']);
+        foreach ($pages as $page) {
+            $data = $exportlib->export_wiki_page($page['pageName'], 0);
+            $tar->addData($page['pageName'], $data, $this->now);
+        }
+        $dump = EXPORT_DUMP_PATH;
+        if ($tikidomain) {
+            $dump .= "/$tikidomain";
+        }
+        $tar->toTar("$dump/$page_name.tar", false);
+        header("location: $dump/$page_name.tar");
+        return '';
+    }
     public function s_export_structure_tree($structure_id, $level = 0)
     {
         $structure_tree = $this->get_subtree($structure_id);

@@ -27,6 +27,7 @@
         <input type="submit" class="btn btn-primary" value="{tr}OK{/tr}">
     </form>
     <br>
+    <a href="tiki-import_xml_zip.php">Import wiki pages in an XML Zip file from another Tiki</a>
 
 {elseif isset($softwareSpecificOptions)}
     <h2>Options:</h2>

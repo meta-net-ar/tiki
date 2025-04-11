@@ -6004,6 +6004,15 @@ class UsersLib extends TikiLib
                 'scope' => 'global',
             ],
             [
+                'name' => 'tiki_p_export_wiki',
+                'description' => tra('Can export wiki pages using the export feature'),
+                'level' => 'admin',
+                'type' => 'wiki',
+                'admin' => false,
+                'prefs' => ['feature_wiki_export'],
+                'scope' => 'object',
+            ],
+            [
                 'name' => 'tiki_p_export_pdf',
                 'description' => tra('Can export to PDF'),
                 'level' => 'basic',
