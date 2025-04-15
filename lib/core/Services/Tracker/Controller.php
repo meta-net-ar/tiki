@@ -2174,7 +2174,7 @@ class Services_Tracker_Controller
                 $input->offsetSet('start', $this->readDate($input, 'start'));
             }
 
-            if ($input->end->int()) {
+            if ($input->endDate->text()) {
                 $input->offsetSet('end', $this->readDate($input, 'end'));
             }
 
