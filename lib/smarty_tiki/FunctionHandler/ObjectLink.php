@@ -374,7 +374,7 @@ class ObjectLink extends Base
             }
         }
         // Check if 'threadId' key exists in $comment array before accessing it
-        return array_key_exists('threadId', $comment) && isset($comment['threadId']) ? "<a href='tiki-view_forum_thread.php?threadId=" . $comment['threadId'] . "'>" . $comment['title'] . "</a>" : "<span>" . $comment['title'] . "</span>";
+        return array_key_exists('threadId', $comment) && isset($comment['threadId']) ? "<a href='tiki-view_forum_thread.php?threadId=" . $comment['threadId'] . "'>" . smarty_modifier_escape($comment['title']) . "</a>" : "<span>" . smarty_modifier_escape($comment['title']) . "</span>";
     }
 
     public function smartyFunctionObjectLinkEmail($template, $object)
