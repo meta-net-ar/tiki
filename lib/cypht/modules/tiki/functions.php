@@ -437,3 +437,17 @@ if (! hm_exists('bind_tracker_item_update_event')) {
         }, ['imap' => $imap, 'form' => $form, 'msg_ids' => $msg_ids]);
     }
 }
+
+/**
+ * @subpackage tiki/functions
+ * @return string ensure file was saved before removing it from remote mailbox
+ */
+if (! hm_exists('append_to_msg_headers')) {
+    function append_to_msg_headers($headers, $link)
+    {
+        $link = ' | ' . $link;
+        $headers = preg_replace("#<div class=\"move_to_location\"></div>#", $link . "\\0", $headers);
+
+        return $headers;
+    }
+}
