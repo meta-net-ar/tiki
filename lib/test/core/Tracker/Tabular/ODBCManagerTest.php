@@ -7,8 +7,8 @@
 
 namespace Tiki\Tests\Tracker\Tabular;
 
-use \PHPUnit\Framework\TestCase;
-use \Tracker\Tabular\ODBCManager;
+use PHPUnit\Framework\TestCase;
+use Tracker\Tabular\ODBCManager;
 use ReflectionClass;
 
 class ODBCManagerTest extends TestCase
