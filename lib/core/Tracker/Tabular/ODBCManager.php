@@ -110,6 +110,9 @@ class ODBCManager
             $row = $this->fillFieldsFromConfig($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
                 unset($chunk[$pk]);
+                if (empty($chunk)) {
+                    continue;
+                }
                 $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                     return "\"{$k}\" = ?";
                 }, array_keys($chunk))) . " WHERE \"{$pk}\" = ?";
@@ -323,20 +326,68 @@ class ODBCManager
                     }
                     continue;
                 }
-                if (isset($mapping['~replace~']) && ! isset($found[$mapping['~replace~']])) {
+                if (isset($mapping['~replace~']) && ! isset($found[$mapping['~replace~']]) && isset($row[$mapping['~replace~']])) {
                     $found[$mapping['~replace~']] = false;
                 }
+                $match_or_all = function ($replace, $local) {
+                    if ($replace == $local) {
+                        return true;
+                    }
+                    if ('~all:' . $replace . '~' == $local) {
+                        return true;
+                    }
+                    if (preg_match('/^~all:(.*)~$/', $local, $m)) {
+                        $replace_arr = preg_split('/\s*,\s*/', $replace);
+                        $local_arr = preg_split('/\s*,\s*/', $m[1]);
+                        sort($replace_arr);
+                        sort($local_arr);
+                        if ($replace_arr == $local_arr) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
                 foreach ($mapping as $remote => $local) {
-                    if (isset($row[$field]) && ($row[$field] == $local || '~all:' . $row[$field] . '~' == $local)) {
+                    if (isset($row[$field]) && $match_or_all($row[$field], $local)) {
                         $row[$field] = $remote;
                         $found[$field] = true;
                         break;
                     }
-                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && ($row[$mapping['~replace~']] == $local || '~all:' . $row[$mapping['~replace~']] . '~' == $local)) {
+                    if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $match_or_all($row[$mapping['~replace~']], $local)) {
                         $row[$field] = $remote;
                         $row[$mapping['~replace~']] = '';
                         $found[$mapping['~replace~']] = true;
                         break;
+                    }
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if ($exists) {
+                    foreach ($this->config['value_mappings'] as $field => $mapping) {
+                        if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~'] && ! isset($row[$field])) {
+                            $row[$field] = '';
+                            foreach ($mapping as $remote => $local) {
+                                if (preg_match("/^~([^:]*)~$/", $local, $m) && ! isset($row[$m[1]])) {
+                                    $row[$m[1]] = '';
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                }
+                foreach ($this->config['value_mappings'] as $field => $mapping) {
+                    if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
+                        foreach ($mapping as $remote => $local) {
+                            if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                                $row[$m[1]] = $row[$orig_field];
+                                $row[$field] = $remote;
+                                $row[$orig_field] = '';
+                                $found[$orig_field] = true;
+                            }
+                        }
+                        if (! isset($row[$field])) {
+                            $row[$field] = '';
+                        }
                     }
                 }
             }
@@ -347,13 +398,19 @@ class ODBCManager
                 foreach ($this->config['value_mappings'] as $field => $mapping) {
                     if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~']) {
                         foreach ($mapping as $remote => $local) {
-                            if (preg_match("/^~(.*)~$/", $local, $m) && isset($row[$m[1]])) {
+                            if (preg_match("/^~([^:]*)~$/", $local, $m)) {
                                 $row[$m[1]] = $row[$orig_field];
                                 $row[$field] = $remote;
                                 $row[$orig_field] = '';
+                                $found[$orig_field] = true;
                             }
                         }
                     }
+                }
+            }
+            foreach ($found as $orig_field => $exists) {
+                if (! $exists && isset($row[$orig_field])) {
+                    $row[$orig_field] = '';
                 }
             }
         }
@@ -393,6 +450,8 @@ class ODBCManager
                                 $local = $row[$m[1]];
                             } elseif ($m[1] == 'all' && ! empty($m[2])) {
                                 $local = substr($m[2], 1);
+                            } else {
+                                $local = '';
                             }
                         }
                         if (! empty($mapping['~replace~'])) {
