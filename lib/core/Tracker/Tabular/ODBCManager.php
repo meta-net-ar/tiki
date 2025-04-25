@@ -190,7 +190,7 @@ class ODBCManager
             }, array_keys($existing), $existing));
             $rs = odbc_prepare($conn, $sql);
             $params = array_map(function ($v) {
-                return empty($v) && $v !== '0' ? null : $v;
+                return empty($v) && $v !== '0' && $v !== 0 ? null : $v;
             }, array_values($chunk));
             $params = array_merge($params, array_filter(array_values($existing)));
             odbc_execute($rs, $params);
@@ -369,7 +369,7 @@ class ODBCManager
                     if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $match_or_all($row[$mapping['~replace~']], $local)) {
                         $temp_values[$field] = $remote;
                         if (empty($found[$mapping['~replace~']])) {
-                            $temp_values[$mapping['~replace~']] = '';
+                            $temp_values[$mapping['~replace~']] = $remote == '-1' ? '0' : '';
                         }
                         $found[$mapping['~replace~']] = true;
                         break;
@@ -383,7 +383,7 @@ class ODBCManager
                 if ($exists) {
                     foreach ($this->config['value_mappings'] as $field => $mapping) {
                         if (isset($mapping['~replace~']) && $orig_field == $mapping['~replace~'] && ! isset($row[$field])) {
-                            $row[$field] = '';
+                            $row[$field] = ($row[$orig_field] === '-1' || $row[$orig_field] === '0') ? '0' : '';
                             foreach ($mapping as $remote => $local) {
                                 if (preg_match("/^~([^:]*)~$/", $local, $m) && ! isset($row[$m[1]])) {
                                     $row[$m[1]] = '';
