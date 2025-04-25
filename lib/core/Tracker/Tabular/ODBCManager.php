@@ -119,7 +119,7 @@ class ODBCManager
                 $rs = odbc_prepare($conn, $sql);
                 if ($rs) {
                     $params = array_map(function ($v) {
-                        return empty($v) && $v !== '0' ? null : $v;
+                        return empty($v) && $v !== '0' && $v !== 0 ? null : $v;
                     }, array_values($chunk));
                     $params[] = $id;
                     odbc_execute($rs, $params);
