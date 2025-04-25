@@ -312,10 +312,18 @@ class ODBCManager
                             $id = $result[$mapping['valueField']] ?? null;
                         }
                         if (! $id) {
-                            $rs = odbc_prepare($conn, "INSERT INTO {$mapping['table']} (\"{$mapping['loginField']}\", \"{$mapping['realnameField']}\") values (?, ?)");
+                            $fields = [$mapping['loginField'], $mapping['realnameField']];
+                            if (isset($mapping['additionalFields']) && is_array($mapping['additionalFields'])) {
+                                $fields = array_merge($fields, array_keys($mapping['additionalFields']));
+                            }
+                            $rs = odbc_prepare($conn, "INSERT INTO {$mapping['table']} (\"" . implode('","', $fields) . "\") values (" . implode(',', array_fill(0, count($fields), '?')) . ")");
                             if ($rs) {
                                 $name = TikiLib::lib('tiki')->get_user_preference($login, 'realName', '');
-                                odbc_execute($rs, [$login, $name]);
+                                $values = [$login, $name];
+                                if (isset($mapping['additionalFields']) && is_array($mapping['additionalFields'])) {
+                                    $values = array_merge($values, array_values($mapping['additionalFields']));
+                                }
+                                odbc_execute($rs, $values);
                                 $rs = odbc_exec($conn, "SELECT * FROM {$mapping['table']} WHERE \"{$mapping['valueField']}\" = @@IDENTITY");
                                 if ($result = odbc_fetch_array($rs)) {
                                     $id = $result[$mapping['valueField']] ?? null;

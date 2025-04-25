@@ -37,7 +37,7 @@ class Manager
 
     public function create($name, $trackerId, $odbc_config = [])
     {
-        $this->validateOdbcConfig($odbc_config);
+        $this->validateOdbcConfig($odbc_config, []);
         return $this->table->insert([
             'name' => $name,
             'trackerId' => $trackerId,
@@ -60,7 +60,9 @@ class Manager
 
     public function update($tabularId, $name, array $fields, array $filters, array $config, array $odbc_config = [], array $api_config = [])
     {
-        $this->validateOdbcConfig($odbc_config);
+        $info = $this->table->fetchFullRow(['tabularId' => $tabularId]);
+        $info['odbc_config'] = ! empty($info['odbc_config']) ? json_decode($info['odbc_config'], true) : [];
+        $this->validateOdbcConfig($odbc_config, $info['odbc_config']);
         return $this->table->update([
             'name' => $name,
             'format_descriptor' => json_encode($fields),
@@ -317,7 +319,7 @@ class Manager
         }
     }
 
-    protected function validateOdbcConfig(&$odbc_config): void
+    protected function validateOdbcConfig(&$odbc_config, $old_config): void
     {
         try {
             if (! empty($odbc_config['permanent_values'])) {
@@ -332,8 +334,9 @@ class Manager
                 }
             }
         } catch (Exception $e) {
-            Feedback::error(tr("Failed parsing Remote Permanent Values field: %0", $e->getMessage()));
-            $odbc_config['permanent_values'] = [];
+            Feedback::error(tr("Failed parsing Remote Permanent Values field: %0. Changes were not saved.", $e->getMessage()));
+            $odbc_config = $old_config;
+            return;
         }
         try {
             if (! empty($odbc_config['value_mappings'])) {
@@ -346,15 +349,16 @@ class Manager
                         throw new Exception('invalid format');
                     }
                     foreach ($mapping as $remote => $local) {
-                        if (! is_scalar($remote) || ! is_scalar($local)) {
+                        if (! is_scalar($remote) || (! is_scalar($local) && ! is_array($local))) {
                             throw new Exception('invalid format');
                         }
                     }
                 }
             }
         } catch (Exception $e) {
-            Feedback::error(tr("Failed parsing Field Value Mappings field: %0", $e->getMessage()));
-            $odbc_config['value_mappings'] = [];
+            Feedback::error(tr("Failed parsing Field Value Mappings field: %0. Changes were not saved.", $e->getMessage()));
+            $odbc_config = $old_config;
+            return;
         }
     }
 }
