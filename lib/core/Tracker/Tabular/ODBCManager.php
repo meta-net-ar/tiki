@@ -297,6 +297,7 @@ class ODBCManager
         }
         if (! empty($this->config['value_mappings'])) {
             $found = [];
+            $temp_values = [];
             foreach ($this->config['value_mappings'] as $field => $mapping) {
                 if (isset($mapping['type']) && $mapping['type'] === 'user') {
                     $login = $row[$field] ?? null;
@@ -352,22 +353,31 @@ class ODBCManager
                         if ($replace_arr == $local_arr) {
                             return true;
                         }
+                    } elseif (strstr($replace, ',')) {
+                        if (in_array($local, preg_split('/\s*,\s*/', $replace))) {
+                            return true;
+                        }
                     }
                     return false;
                 };
                 foreach ($mapping as $remote => $local) {
                     if (isset($row[$field]) && $match_or_all($row[$field], $local)) {
-                        $row[$field] = $remote;
+                        $temp_values[$field] = $remote;
                         $found[$field] = true;
                         break;
                     }
                     if (! empty($mapping['~replace~']) && isset($row[$mapping['~replace~']]) && $match_or_all($row[$mapping['~replace~']], $local)) {
-                        $row[$field] = $remote;
-                        $row[$mapping['~replace~']] = '';
+                        $temp_values[$field] = $remote;
+                        if (empty($found[$mapping['~replace~']])) {
+                            $temp_values[$mapping['~replace~']] = '';
+                        }
                         $found[$mapping['~replace~']] = true;
                         break;
                     }
                 }
+            }
+            foreach ($temp_values as $field => $val) {
+                $row[$field] = $val;
             }
             foreach ($found as $orig_field => $exists) {
                 if ($exists) {
@@ -429,6 +439,7 @@ class ODBCManager
     {
         $userslib = TikiLib::lib('user');
         if (! empty($this->config['value_mappings'])) {
+            $temp_values = [];
             foreach ($this->config['value_mappings'] as $field => $mapping) {
                 if (! isset($row[$field])) {
                     continue;
@@ -457,19 +468,36 @@ class ODBCManager
                             if (isset($row[$m[1]])) {
                                 $local = $row[$m[1]];
                             } elseif ($m[1] == 'all' && ! empty($m[2])) {
-                                $local = substr($m[2], 1);
+                                $local = explode(',', substr($m[2], 1));
                             } else {
                                 $local = '';
                             }
                         }
                         if (! empty($mapping['~replace~'])) {
-                            $row[$mapping['~replace~']] = $local;
+                            if (! isset($temp_values[$mapping['~replace~']])) {
+                                $temp_values[$mapping['~replace~']] = [];
+                            }
+                            if (is_array($local)) {
+                                $temp_values[$mapping['~replace~']] = array_merge($temp_values[$mapping['~replace~']], $local);
+                            } else {
+                                $temp_values[$mapping['~replace~']][] = $local;
+                            }
                         } else {
-                            $row[$field] = $local;
+                            if (! isset($temp_values[$field])) {
+                                $temp_values[$field] = [];
+                            }
+                            if (is_array($local)) {
+                                $temp_values[$field] = array_merge($temp_values[$field], $local);
+                            } else {
+                                $temp_values[$field][] = $local;
+                            }
                         }
                         break;
                     }
                 }
+            }
+            foreach ($temp_values as $field => $val) {
+                $row[$field] = implode(',', array_unique($val));
             }
         }
         return $row;

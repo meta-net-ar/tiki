@@ -73,8 +73,8 @@ class ODBCManagerTest extends TestCase
     public function testLocationAllConversion()
     {
         $result = $this->fillFieldsFromConfig->invoke($this->mock, ['location1' => 'Venice,San Francisco,London,Paris,Sydney']);
-        $this->assertEquals('', $result['location1']);
-        $this->assertEquals('', $result['location2']);
+        $this->assertEquals('1', $result['location1']);
+        $this->assertEquals('1', $result['location2']);
         $this->assertEquals('1', $result['location6']);
     }
 
@@ -82,8 +82,8 @@ class ODBCManagerTest extends TestCase
     {
         $result = $this->fillFieldsFromConfig->invoke($this->mock, ['location1' => 'London,Paris']);
         $this->assertEquals('', $result['location1']);
-        $this->assertEquals('', $result['location4']);
-        $this->assertEquals('', $result['location5']);
+        $this->assertEquals('1', $result['location4']);
+        $this->assertEquals('1', $result['location5']);
     }
 
     public function testTypeConversion()
