@@ -117,7 +117,10 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractField implement
         if ($this->getOption('itemId') == 'itemId') {
             $value = $this->getItemId();
         } elseif (is_null($oldValue)) {
-            $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            $value = $this->syncFromSource();
+            if ($value === false) {
+                $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            }
             if (! $value) {
                 $value = $this->getOption('start', 1);
             } else {
@@ -288,5 +291,31 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractField implement
                 Feedback::warning(tr('Note: %0 auto-increment item values updated', $count));
             }
         }
+    }
+
+    private function syncFromSource()
+    {
+        $definition = $this->getTrackerDefinition();
+        $tabularId = $definition->getConfiguration('tabularSync');
+        if (empty($tabularId)) {
+            return false;
+        }
+        $tabular = TikiLib::lib('tabular');
+        $info = $tabular->getInfo($tabularId);
+        if (empty($info['tabularId'])) {
+            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+            return false;
+        }
+        if (empty($info['odbc_config'])) {
+            return false;
+        }
+        $schema = $tabular->getSchema($definition, $info);
+        foreach ($schema->getColumns() as $column) {
+            if ($column->getField() === $this->getConfiguration('permName')) {
+                $odbc_manager = new Tracker\Tabular\ODBCManager($info['odbc_config']);
+                return $odbc_manager->nextValue($column->getRemoteFIeld()) - 1;
+            }
+        }
+        return false;
     }
 }

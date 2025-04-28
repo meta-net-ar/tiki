@@ -233,8 +233,12 @@ class ODBCManager
         $conn = $this->getConnection();
         $sql = "SELECT \"{$field}\" FROM {$this->config['table']} WHERE \"{$field}\" = ?";
         $rs = odbc_prepare($conn, $sql);
-        odbc_execute($rs, [$value]);
-        $exists = odbc_num_rows($rs) > 0;
+        if ($rs) {
+            odbc_execute($rs, [$value]);
+            $exists = odbc_num_rows($rs) > 0;
+        } else {
+            $exists = false;
+        }
         $this->stopErrorHandler();
         return $exists;
     }
@@ -245,8 +249,10 @@ class ODBCManager
         $conn = $this->getConnection();
         $sql = "SELECT MAX(CAST(\"$field\" AS INT)) as last from {$this->config['table']} WHERE ISNUMERIC(\"$field\") = 1";
         $rs = odbc_prepare($conn, $sql);
-        odbc_execute($rs, []);
-        $result = odbc_fetch_array($rs);
+        if ($rs) {
+            odbc_execute($rs, []);
+            $result = odbc_fetch_array($rs);
+        }
         $this->stopErrorHandler();
         if (empty($result['last'])) {
             return 1;
