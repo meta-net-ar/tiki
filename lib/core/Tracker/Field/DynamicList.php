@@ -451,7 +451,7 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
 
     public function canHaveMultipleValues()
     {
-        return (bool) $this->trackerField->getOption("selectMultipleValues");
+        return (bool) $this->getOption("selectMultipleValues");
     }
 
     public function getPossibleItemValues()
