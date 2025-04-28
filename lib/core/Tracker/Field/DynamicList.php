@@ -443,10 +443,9 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
     public function getItemList()
     {
         return TikiLib::lib('trk')->get_all_items(
-            $this->trackerField->getOption('trackerId'),
-            $this->trackerField->getOption('listFieldIdThere'),
-            $this->trackerField->getOption('statusThere', 'opc'),
-            []
+            $this->getOption('trackerId'),
+            $this->getOption('listFieldIdThere'),
+            $this->getOption('statusThere', 'opc')
         );
     }
 
