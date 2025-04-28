@@ -571,7 +571,7 @@
                                 <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
                             </tr>
                                 {foreach $filterCollection->getFilters() as $idx => $filter}
-                                    <tr>
+                                    <tr data-applied_value="{$filter->getAppliedValue()|json_encode|escape}">
                                         <td>
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">{icon name=sort}</span>
