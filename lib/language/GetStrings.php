@@ -69,6 +69,14 @@ class Language_GetStrings
     protected $baseDir;
 
     /**
+     * Indicates whether to skip the removal of old or unused strings from the language files.
+     * When set to true, old or unused strings will not be removed.
+     *
+     * @var bool
+     */
+    protected $skipRemove = false;
+
+    /**
      * Class construct.
      *
      * The following are valid $options:
@@ -110,6 +118,10 @@ class Language_GetStrings
             $this->setLanguages($options['lang']);
         } else {
             $this->setLanguages();
+        }
+
+        if (isset($options['skipRemove'])) {
+            $this->skipRemove = true;
         }
     }
 
@@ -285,7 +297,7 @@ class Language_GetStrings
         foreach ($this->languages as $lang) {
             $filePath = $this->baseDir . '/lang/' . $lang . '/' . $this->fileName;
             $writeFile = $this->writeFileFactory->factory($filePath);
-            $writeFile->writeStringsToFile($strings, $this->outputFiles, $lang);
+            $writeFile->writeStringsToFile($strings, $this->outputFiles, $lang, $this->skipRemove);
         }
     }
 

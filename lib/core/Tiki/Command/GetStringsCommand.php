@@ -89,6 +89,12 @@ class GetStringsCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'eg. filename=language_r.php'
+            )
+            ->addOption(
+                'skip-remove',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip removing the old or unused strings from the language files.'
             );
     }
 
@@ -125,6 +131,7 @@ class GetStringsCommand extends Command
             $includeFiles = explode(',', $input->getOption('include'));
         }
         $options['fileName'] = $input->getOption('filename') ?: null;
+        $options['skipRemove'] = $input->getOption('skip-remove') ?: null;
 
         $getStrings = new Language_GetStrings(new Language_CollectFiles(), new Language_WriteFile_Factory(), $options);
 

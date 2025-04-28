@@ -55,12 +55,21 @@ class Language_WriteFile
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
+     * @param bool $skipRemove whether to skip removing the old or unused strings from the language files
      * @return null
      */
-    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "")
+    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $skipRemove = false)
     {
         if (empty($strings)) {
             return false;
+        }
+
+        $backupTranslations = [];
+        if ($skipRemove) {
+            // If the language file is not empty, we need to backup the translations
+            // to restore them later
+            include($this->filePath);
+            $backupTranslations = $lang ?? [];
         }
 
         // backup original language file
@@ -90,6 +99,16 @@ class Language_WriteFile
             $entries[$string['name']] = $string;
         }
 
+        foreach ($backupTranslations as $key => $value) {
+            if (array_key_exists($key, $entries)) {
+                $entries[$key]['translation'] = $value;
+            } else {
+                $entries[$key] = [
+                    'name' => $key,
+                    'translation' => $value,
+                ];
+            }
+        }
 
         $handle = fopen($this->tmpFilePath, 'w');
 
