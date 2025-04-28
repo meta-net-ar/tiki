@@ -517,9 +517,9 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
             ->setLabel($name)
             ->setControl(new Tracker\Filter\Control\ObjectSelector("tf_{$permName}_os", [
                 'type' => 'trackeritem',
-                'tracker_status' => implode(' OR ', str_split($this->trackerField->getOption('statusThere', 'opc'), 1)),
-                'tracker_id' => $this->trackerField->getOption('trackerId'),
-                '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->trackerField->getOption('trackerId'))),
+                'tracker_status' => implode(' OR ', str_split($this->getOption('statusThere', 'opc'), 1)),
+                'tracker_id' => $this->getOption('trackerId'),
+                '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->getOption('trackerId'))),
             ]))
             ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey, $multivalue) {
                 $value = $control->getValue();
@@ -539,9 +539,9 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
                 "tf_{$permName}_ms",
                 [
                     'type' => 'trackeritem',
-                    'tracker_status' => implode(' OR ', str_split($this->trackerField->getOption('statusThere', 'opc'), 1)),
-                    'tracker_id' => $this->trackerField->getOption('trackerId'),
-                    '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->trackerField->getOption('trackerId'))),
+                    'tracker_status' => implode(' OR ', str_split($this->getOption('statusThere', 'opc'), 1)),
+                    'tracker_id' => $this->getOption('trackerId'),
+                    '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->getOption('trackerId'))),
                 ],
                 true
             ))  // for multi
