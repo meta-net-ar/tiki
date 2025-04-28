@@ -460,20 +460,6 @@ $("input[name=ins_' . $filterFieldIdHere . '], select[name=ins_' . $filterFieldI
         return $this->getItemList();
     }
 
-    public function getItemList()
-    {
-        return TikiLib::lib('trk')->get_all_items(
-            $this->getOption('trackerId'),
-            $this->getOption('listFieldIdThere'),
-            $this->getOption('statusThere', 'opc')
-        );
-    }
-
-    public function getPossibleItemValues()
-    {
-        return $this->getItemList();
-    }
-
     /**
      * Get tabular schema
      * @return Schema
