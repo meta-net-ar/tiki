@@ -1,5 +1,6 @@
 <script setup>
-import store from "../store";
+import useMessageStore from "../store";
+const store = useMessageStore();
 
 const props = defineProps({
     parentId: {
@@ -20,7 +21,6 @@ function addMsg() {
         message: $("#message-" + props.parentId + " textarea[name='message']").val(),
         date: new Date().toLocaleString(),
     });
-    store.state.identifier = +new Date();
 }
 
 

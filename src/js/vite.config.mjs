@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -140,20 +141,19 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
-            }
+            },
         },
         build: {
             outDir: resolve(__dirname, "../../public/generated/js"),
             emptyOutDir: true,
             minify: mode === "production",
-            sourcemap: mode === "production",
+            sourcemap: mode !== "production", //We want the sourcemaps in dev, for .vue, .scss, etc.
             cssCodeSplit: true,
             // emit manifest so PHP can find the hashed files
             manifest: true,
             target: "es2022", //https://caniuse.com/?search=es2022 Who cares about IE these days...
             optimizeDeps: {
-                disabled: false,
-                include: ['@event-calendar/core'],
+                include: ["@event-calendar/core"],
                 //If you ever need to debug a dependency and see your changes do this (ref: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7):
                 //exclude: ["svelte"],
             },
@@ -233,12 +233,12 @@ export default defineConfig(({ command, mode }) => {
              * by consulting the linked issue and confirming that the fix is included in the
              * version of Bootstrap used by the project.
              */
-             preprocessorOptions: {
+            preprocessorOptions: {
                 scss: {
-                    api: 'modern-compiler', // or "modern", "legacy"
-                    silenceDeprecations: ['mixed-decls'],
+                    api: "modern-compiler", // or "modern", "legacy"
+                    silenceDeprecations: ["mixed-decls"],
                 },
-            }
+            },
         },
         plugins: [
             vue({
@@ -248,6 +248,7 @@ export default defineConfig(({ command, mode }) => {
                     },
                 },
             }),
+            vueDevTools(),
 
             //These are re-bundled files that need to be read at runtime
 
@@ -399,8 +400,8 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/recordrtc",
                     },
                     {
-                        src : "node_modules/interactjs/dist/*",
-                        dest : "vendor_dist/interactjs/dist",
+                        src: "node_modules/interactjs/dist/*",
+                        dest: "vendor_dist/interactjs/dist",
                     },
                     {
                         src: "node_modules/dompurify/dist/purify.(es|min)*",
@@ -499,7 +500,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/ol",
                     },
                     {
-                        src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js","node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
+                        src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js", "node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
                         dest: "vendor_dist/ol-layerswitcher/dist",
                     },
                     {
@@ -528,7 +529,7 @@ export default defineConfig(({ command, mode }) => {
                     },
                     {
                         src: "node_modules/reveal.js/dist/*",
-                        dest: "vendor_dist/reveal.js/dist"
+                        dest: "vendor_dist/reveal.js/dist",
                     },
                     {
                         src: "node_modules/select2/dist/js/select2.min.js",
@@ -563,7 +564,12 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/svg-pan-zoom/dist",
                     },
                     {
-                        src: ["node_modules/swagger-ui-dist/swagger-ui-bundle.js","node_modules/swagger-ui-dist/swagger-ui.css","node_modules/swagger-ui-dist/favicon-16x16.png","node_modules/swagger-ui-dist/favicon-32x32.png"],
+                        src: [
+                            "node_modules/swagger-ui-dist/swagger-ui-bundle.js",
+                            "node_modules/swagger-ui-dist/swagger-ui.css",
+                            "node_modules/swagger-ui-dist/favicon-16x16.png",
+                            "node_modules/swagger-ui-dist/favicon-32x32.png",
+                        ],
                         dest: "vendor_dist/swagger-ui-dist",
                     },
                     {
@@ -575,7 +581,15 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/tablesorter/dist/js/parsers",
                     },
                     {
-                        src: ["node_modules/tablesorter/dist/js/widgets/widget-columnSelector.min.js", "node_modules/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js", "node_modules/tablesorter/dist/js/widgets/widget-grouping.min.js", "node_modules/tablesorter/dist/js/widgets/widget-math.min.js", "node_modules/tablesorter/dist/js/widgets/widget-pager.min.js", "node_modules/tablesorter/dist/js/widgets/widget-output.min.js", "node_modules/tablesorter/dist/js/widgets/widget-sort2Hash.min.js"],
+                        src: [
+                            "node_modules/tablesorter/dist/js/widgets/widget-columnSelector.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-grouping.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-math.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-pager.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-output.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-sort2Hash.min.js",
+                        ],
                         dest: "vendor_dist/tablesorter/dist/js/widgets",
                     },
                     {
@@ -606,12 +620,12 @@ export default defineConfig(({ command, mode }) => {
             coverage: {
                 include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/jquery-tiki/ui-utils/handleDatePicker.js"],
                 exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
-                provider: 'istanbul'
+                provider: "istanbul",
             },
             server: {
                 deps: {
                     inline: [/element-plus/],
-                }
+                },
             },
         },
     };

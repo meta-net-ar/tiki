@@ -1,27 +1,21 @@
 <script setup>
+import { computed } from 'vue';
 import Replies from "./Replies.vue";
-import store from "../store";
+import useMessageStore from "../store";
+const store = useMessageStore();
+
 import Message from "./Message.vue";
-defineProps({
-    messages: {
-        type: Object,
-        default() {
-            return store.getters.getParentMessages;
-        }
-    },
-});
-</script>
-<script>
-export default {
-    name: 'Messages',
-};
+
+const messages = computed(() => store.getParentMessages)
 </script>
 
 <template>
     <div class="row">
-        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5 thread-replies' : item.parentId != 0}, 'col-md-12 thread-block']" v-for="item in messages">
+        <div :class="[{'card thread-card bg-body mt-5' : item.parentId == 0},{'ps-5 thread-replies' : item.parentId != 0}, 'col-md-12 thread-block']"
+            v-for="item in messages">
             <Message :item=item />
-            <Replies :item=item />
+            We have an infinite loop there
+            <!--<Replies :item=item />-->
         </div>
     </div>
 </template>

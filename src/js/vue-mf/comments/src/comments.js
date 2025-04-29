@@ -2,7 +2,7 @@ import singleSpaVue from "single-spa-vue";
 import singleSpaCss from "single-spa-css";
 import { createApp, h } from "vue";
 import App from "./App.vue";
-import store from "./store";
+import { createPinia } from "pinia";
 import "../custom.scss";
 
 const vueLifecycles = singleSpaVue({
@@ -16,7 +16,7 @@ const vueLifecycles = singleSpaVue({
         },
     },
     handleInstance: (app) => {
-        app.use(store);
+        app.use(createPinia());
     },
 });
 

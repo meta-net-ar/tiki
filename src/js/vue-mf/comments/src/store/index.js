@@ -1,4 +1,4 @@
-import { createStore } from "vuex";
+import { defineStore } from "pinia";
 
 var message1 =
     "We could enforce the title field only for the first post in new top-level threads, but not for follow-up replies. Otherwise, when you enforce that, people just make up random/inconsequential titles, or split their message into two sentence halves that are started by the title and completed by the comment, which is counterproductive. Having more titles than strictly needed adds visual noise and uses precious vertical space, which means more scrolling across long threads.";
@@ -12,9 +12,8 @@ var message7 = "Yeah, I forgot to tally about the possibility of someone branchi
 var message8 = "@RyanGosling @accounting_dept: This is the IRS. We’ve been trying to reach you about your car’s extended warranty";
 var message9 = "I need attention so I am subconsciously trying to get more by top posting.";
 
-export default createStore({
-    state: {
-        identifier: +new Date(),
+export default defineStore("messageStore", {
+    state: () => ({
         threads: [
             {
                 title: "There should be no titles in replies, only for the thread",
@@ -129,16 +128,16 @@ export default createStore({
                 date: "2024-07-3, 15:01",
             },
         ],
-    },
+    }),
     getters: {
         getThreads(state) {
             return state.threads;
         },
+        //I don't understand what this one does.  It looks like it returns thread starters - benoitg - 2025-04-29
         getParentMessages(state) {
-            var arr = state.threads;
             var key = "parentId";
             var response = [];
-            arr.forEach((item) => {
+            state.threads.forEach((item) => {
                 if (item[key] === 0) {
                     response.push(item);
                 }
@@ -147,14 +146,8 @@ export default createStore({
         },
     },
     actions: {
-        addMessage({ commit }, data)
-        {
-            commit("addMessage", data);
-        }
-    },
-    mutations: {
-        addMessage(state, data) {
-            let num = state.threads.length;
+        addMessage(data) {
+            let num = this.threads.length;
             var message = {
                 title: data.title,
                 messageId: num,
@@ -163,7 +156,7 @@ export default createStore({
                 message: data.message,
                 date: data.date,
             };
-            state.threads.push(message);
-        }
-    }
+            this.threads.push(message);
+        },
+    },
 });

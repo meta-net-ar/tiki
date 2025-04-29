@@ -1,35 +1,28 @@
 <script setup>
 import Messages from "./Messages.vue";
 import Message from "./Message.vue";
+import useMessageStore from "../store";
+const store = useMessageStore();
 
+function getDescendants(threadId) {
+    console.log("getDescendants:", threadId);
+    var arr = store.getThreads;
+    var key = "parentId";
+    var response = [];
+    arr.forEach(item => {
+        if (item[key] === threadId) {
+            console.log("getDescendants found:", item.messageId);
+            response.push(item);
+        }
+    });
+    return response;
+}
 defineProps({
     item: {
         type: Object,
         required: true,
     },
 });
-</script>
-<script>
-import store from "../store";
-
-export default {
-    name: 'Replies',
-    methods: {
-        getDescendants: function (threadId) {
-            var arr = store.getters.getThreads;
-            var key = "parentId";
-            var response = [];
-            arr.forEach(item => {
-                if (item[key] === threadId) {
-                    response.push(item);
-                }
-            });
-            return response;
-        }
-    },
-}
-
-
 </script>
 
 <template>
