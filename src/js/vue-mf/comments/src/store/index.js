@@ -14,6 +14,7 @@ var message9 = "I need attention so I am subconsciously trying to get more by to
 
 export default createStore({
     state: {
+        identifier: +new Date(),
         threads: [
             {
                 title: "There should be no titles in replies, only for the thread",
@@ -145,4 +146,24 @@ export default createStore({
             return response;
         },
     },
+    actions: {
+        addMessage({ commit }, data)
+        {
+            commit("addMessage", data);
+        }
+    },
+    mutations: {
+        addMessage(state, data) {
+            let num = state.threads.length;
+            var message = {
+                title: data.title,
+                messageId: num,
+                parentId: data.parentId,
+                author: data.author,
+                message: data.message,
+                date: data.date,
+            };
+            state.threads.push(message);
+        }
+    }
 });

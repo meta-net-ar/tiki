@@ -16,11 +16,11 @@
                             <SearchBar />
                             <p class="lead mt-5"><span class="fw-bold">10</span> comments in <span class="fw-bold">3</span> discussions in the last 3 months</p>
                             <p class="text-muted sub-lead"><span class="fw-bold">1 new comment</span> since your last visit</p>
-                            <Threads />
+                            <Messages :key="identifier" />
                             <h5 class="mt-5 mb-3">Start new discussion thread</h5>
                             <div class="row">
-                                <div class="col-md-8 mx-auto">
-                                    <MessageForm />
+                                <div id="message-0" class="col-md-8 mx-auto">
+                                    <ReplyForm :parentId=0 :author='`Angelo`' /><!-- Todo: Don't forget to change the author -->
                                 </div>
                             </div>
                         </div>
@@ -33,12 +33,25 @@
 </template>
 
 <script setup>
-    import Threads from "./components/Threads.vue";
+    import Messages from "./components/Messages.vue";
     import SearchBar from "./components/SearchBar.vue";
-    import MessageForm from "./components/MessageForm.vue";
+    import ReplyForm from "./components/ReplyForm.vue";
     import {provide} from "vue";
 
     provide('tr', tr)
+</script>
+
+<script>
+
+export default {
+    data() {
+        return {
+            identifier: +new Date()
+        };
+    }
+}
+
+
 </script>
 
 <style scoped>
