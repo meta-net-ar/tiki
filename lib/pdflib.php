@@ -403,13 +403,6 @@ class PdfGenerator
             if ($themePath) {
                 $themecss .= file_get_contents($themePath);
             }
-
-            $themecss .= "\nb,strong{font-weight:bold !important;}";
-            // preserving theme styles by removing media print styles to print what is shown on screen
-            $themecss = str_replace(["media print", "color : fff"], ["media p","color : #fff"], $themecss);
-            //  for bootstrap print hidden, screen hidden styles on divs
-            $printcss = file_get_contents('themes/base_files/css/printqueries.css');
-            $bodycss = '';
         }
         $bodyClass = 'tiki tiki-print print mpdf';
 
