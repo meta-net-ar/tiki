@@ -443,12 +443,29 @@ HTML;
             $cssStyles = str_replace(["background-color: #fff;","background:#fff;"], "background:none", $cssStyles);
         }
         //cover page checking
-        if ($pdfSettings['coverpage_text_settings'] != '' || ! empty($pdfSettings['coverpage_settings']) || ($pdfSettings['coverpage_image_settings'] != '' && $pdfSettings['coverpage_image_settings'] != 'off')) {
+        if (
+            ! empty($pdfSettings['coverpage_text_settings']) ||
+            ! empty($pdfSettings['coverpage_settings']) ||
+            (
+                ! empty($pdfSettings['coverpage_image_settings']) && $pdfSettings['coverpage_image_settings'] !== 'off'
+            )
+        ) {
             $coverPage = explode("|", $pdfSettings['coverpage_text_settings']);
-            $coverImage = $pdfSettings['coverpage_image_settings'] != 'off' ? $pdfSettings['coverpage_image_settings'] : '';
-            $mpdf->SetHTMLHeader();     //resetting header footer for cover page
-            $mpdf->SetHTMLFooter();
-            $mpdf->AddPage($pdfSettings['orientation'], '', '', '', '', 0, 0, 0, 0, 0, 0); //adding new page with 0 margins
+            $coverImage = $pdfSettings['coverpage_image_settings'] !== 'off' ? $pdfSettings['coverpage_image_settings'] : '';
+            //adding new page with 0 margins
+            $mpdf->AddPageByArray([
+                'orientation' => $pdfSettings['orientation'],
+                'margin_left' => 0,
+                'margin_right' => 0,
+                'margin_top' => 0,
+                'margin_bottom' => 0,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'odd-header-value' => '',
+                'even-header-value' => '',
+                'odd-footer-value' => '',
+                'even-footer-value' => '',
+            ]);
             $textColor = '';
             $textAlign = 'center';
             $textBgColor = '';
