@@ -165,7 +165,7 @@ if ($prefs['feature_display_my_to_others'] == 'y') {
     }
     if ($prefs['feature_trackers'] == 'y') {
         $trklib = TikiLib::lib('trk');
-        $user_items = $trklib->get_user_items($userwatch);
+        $user_items = $trklib->get_user_items($userwatch, false);
     }
     if ($prefs['feature_articles'] == 'y') {
         $artlib = TikiLib::lib('art');
