@@ -292,7 +292,19 @@ class PdfGenerator
             if ($pdfSettings['tocheading']) {
                 $tocpreHTML = htmlspecialchars("<h1>" . $pdfSettings['tocheading'] . "</h1>", ENT_QUOTES);
             }
-            $html = "<html><tocpagebreak toc-odd-footer-name=\"footer-without-pagination\"  toc-odd-footer-value=\"1\"" . $links . " toc-preHTML=\"" . $tocpreHTML . "\" toc-resetpagenum=\"1\" toc-suppress=\"on\" />" . $html . "</html>";
+            $html = <<<HTML
+<html>
+    <tocpagebreak
+        toc-odd-footer-name="footer-without-pagination"
+        toc-odd-footer-value="1"
+        $links
+        toc-preHTML="$tocpreHTML"
+        toc-resetpagenum="1"
+        toc-suppress="on"
+    />
+    $html
+</html>
+HTML;
         }
         $this->_parseHTML($html);
         $this->_getImages($html, $tempImgArr);
