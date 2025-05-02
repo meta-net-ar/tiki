@@ -366,7 +366,6 @@ class PdfGenerator
         // otherwise theme styles will be retained by theme css
         if ($pdfSettings['print_pdf_mpdf_printfriendly'] === 'y') {
             $printcss = file_get_contents('themes/base_files/css/printpdf.css'); // external css
-            $bodycss = 'tiki tiki-print'; //execluding theme css in case print friendly is set to yes.
         } else {
             //getting theme css
             $themeLib = TikiLib::lib('theme');
@@ -412,6 +411,7 @@ class PdfGenerator
             $printcss = file_get_contents('themes/base_files/css/printqueries.css');
             $bodycss = '';
         }
+        $bodyClass = 'tiki tiki-print print mpdf';
 
         $pdfPages = $this->getPDFPages($html, $pdfSettings);
         //adding css styles with first page content
@@ -422,8 +422,8 @@ class PdfGenerator
             '</style>';
 
         $cssStyles = str_replace(
-            [".tiki","opacity: 0;","page-break-inside: avoid;"],
-            ["","fill: #fff;opacity:0.3;stroke:black","page-break-inside: auto;"],
+            ["opacity: 0;","page-break-inside: avoid;"],
+            ["fill: #fff;opacity:0.3;stroke:black;","page-break-inside: auto;"],
             $allCss
         );
         //PDF import templates will not work if background color is set, need to replace in css
@@ -613,7 +613,7 @@ class PdfGenerator
                     $pdfPage['pageContent'] = $this->getHtmlLayout($pdfPage['pageContent']);
                     $this->_getImages($pdfPage['pageContent'], $tempImgArr);
 
-                    $mpdf->WriteHTML('<html><body class="' . $bodycss . '" style="margin:0px;padding:0px;">' . $cssStyles);
+                    $mpdf->WriteHTML('<html><head>' . $cssStyles . '</head><body class="' . $bodyClass . '" style="margin:0;padding:0;">');
                     $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
                     for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pdfLimit) {
