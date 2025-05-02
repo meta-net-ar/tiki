@@ -572,12 +572,25 @@ class PdfGenerator
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
                     }
-                    //Add the header to the first page
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "O");
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "E");
-                    $mpdf->AddPage($pdfPage['orientation'], '', $resetPage, '', '', $pdfPage['margin_left'], $pdfPage['margin_right'], $pdfPage['margin_top'], $pdfPage['margin_bottom'], $pdfPage['margin_header'], $pdfPage['margin_footer'], '', '', '', '', '', '', '', '', '', $pdfPage['pagesize']);
-                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? '')); //Add the header to other pages
-                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top')); //footer needs to be reset after page content is added
+                    //Add the header to the first page for both odd and even pages
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''));
+                    $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), 'E');
+                    $mpdf->AddPageByArray(
+                        [
+                            'orientation'   => $pdfPage['orientation'],
+                            'resetpagenum'  => $resetPage,
+                            'margin-left'   => $pdfPage['margin_left'],
+                            'margin-right'  => $pdfPage['margin_right'],
+                            'margin-top'    => $pdfPage['margin_top'],
+                            'margin-bottom' => $pdfPage['margin_bottom'],
+                            'margin-header' => $pdfPage['margin_header'],
+                            'margin-footer' => $pdfPage['margin_footer'],
+                            'sheet-size'    => $pdfPage['pagesize'],
+                        ]
+                    );
+                    // footer needs to be reset after page content is added
+                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top'));
+                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top'), 'E');
                     //checking watermark on page
                     $mpdf->SetWatermarkText($pdfPage['watermark']);
                     $mpdf->showWatermarkText = true;
