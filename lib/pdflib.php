@@ -472,7 +472,7 @@ class PdfGenerator
         }
         $pageNo = 1;
         $pagesTotal = 1;
-        $pdfLimit = ini_get('pcre.backtrack_limit');
+        $pcreBacktrackLimit = (int) ini_get('pcre.backtrack_limit');
         //end of coverpage generation
         foreach ($pdfPages as $pdfPage) {
             $resetPage = '';
@@ -622,8 +622,8 @@ class PdfGenerator
                     $mpdf->WriteHTML('<html><head>' . $cssStyles . '</head><body class="' . $bodyClass . '" style="margin:0;padding:0;">');
                     $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
-                    for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pdfLimit) {
-                        $content_slice = substr($pdfPage['pageContent'], $charLimit, $pdfLimit);
+                    for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pcreBacktrackLimit) {
+                        $content_slice = substr($pdfPage['pageContent'], $charLimit, $pcreBacktrackLimit);
                         if ($content_slice) {
                             $mpdf->WriteHTML($content_slice);
                         }
