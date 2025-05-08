@@ -66,7 +66,7 @@ class ODBCSource implements SourceInterface
     public function importSuccess()
     {
         $definition = $this->schema->getDefinition();
-        if ($definition->getConfiguration('tabularSyncModifiedField')) {
+        if ($definition->getConfiguration('tabularSyncModifiedField') && $definition->getConfiguration('tabularSyncLastImportSkipUpdate') !== 'y') {
             \TikiLib::lib('trk')->replace_tracker_option($definition->getConfiguration('trackerId'), 'tabularSyncLastImport', $this->last_import_time);
         }
     }

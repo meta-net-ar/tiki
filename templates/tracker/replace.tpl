@@ -580,6 +580,15 @@
                         {jscalendar id="tabularSyncLastImport" date=$tabularSyncLastImport fieldname="tabularSyncLastImport" showtime='y' isutc=0}
                     </div>
                 </div>
+                <div class="mb-3 form-check depends" data-on="tabularSyncModifiedField">
+                    <input type="checkbox" class="form-check-input" name="tabularSyncLastImportSkipUpdate" id="tabularSyncLastImportSkipUpdate" value="1" {if !empty($info.tabularSyncLastImportSkipUpdate) && $info.tabularSyncLastImportSkipUpdate eq 'y'} checked="checked"{/if}>
+                    <label for="tabularSyncLastImportSkipUpdate">
+                        {tr}Skip last import time update{/tr}
+                        <a class="tikihelp text-info" title="{tr}Choice:{/tr} {tr}By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                </div>
             {/accordion_group}
         {/if}
         {accordion_group title="{tr}Enable special behaviours{/tr}"}

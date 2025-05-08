@@ -127,3 +127,5 @@ properties:
     type: integer
   tabularSyncLastImport:
     type: integer
+  tabularSyncLastImportSkipUpdate:
+    type: string

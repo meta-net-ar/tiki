@@ -6969,6 +6969,7 @@ class TrackerLib extends TikiLib
             'tabularSync' => $input->tabularSync->int(),
             'tabularSyncModifiedField' => $input->tabularSyncModifiedField->int(),
             'tabularSyncLastImport' => $input->tabularSyncLastImport->int(),
+            'tabularSyncLastImportSkipUpdate' => $input->tabularSyncLastImportSkipUpdate->int() ? 'y' : 'n',
             'notifyOn' => $input->notifyOn->word() ? $input->notifyOn->word() : 'both',
             'relationshipBehaviour' => $input->relationshipBehaviour->text(),
         ];
