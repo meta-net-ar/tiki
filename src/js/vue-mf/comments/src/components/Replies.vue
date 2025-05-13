@@ -25,8 +25,18 @@ defineProps({
 });
 </script>
 
+<script>
+export default {
+    data() {
+        return {
+            identifier: +new Date()
+        };
+    }
+}
+</script>
+
 <template>
-    <Messages :messages=getDescendants(item.messageId) />
+    <Messages :key="identifier" :messages=getDescendants(item.messageId) />
 </template>
 
 <style scoped lang="scss">

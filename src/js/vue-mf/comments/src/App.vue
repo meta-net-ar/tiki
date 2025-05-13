@@ -16,7 +16,7 @@
                             <SearchBar />
                             <p class="lead mt-5"><span class="fw-bold">10</span> comments in <span class="fw-bold">3</span> discussions in the last 3 months</p>
                             <p class="text-muted sub-lead"><span class="fw-bold">1 new comment</span> since your last visit</p>
-                            <Messages :key="identifier" />
+                            <Messages :messages=msgs :key="identifier" />
                             <h5 class="mt-5 mb-3">Start new discussion thread</h5>
                             <div class="row">
                                 <div id="message-0" class="col-md-8 mx-auto">
@@ -39,6 +39,12 @@
     import {provide} from "vue";
 
     provide('tr', tr)
+
+    import { computed } from 'vue';
+    import useMessageStore from "./store";
+    const store = useMessageStore();
+
+    const msgs = computed(() => store.getParentMessages);
 </script>
 
 <script>
