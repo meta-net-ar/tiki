@@ -9,12 +9,11 @@
  */
 class Tiki_Hm_Sieve_Client_Factory
 {
-    public function init($user_config = null, $imap_account = null)
+    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
     {
         if (($imap_account && ! empty($imap_account['sieve_config_host'])) && $imap_account['sieve_config_host'] !== 'localhost') {
-            list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
-            $client = new PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-            $client->connect($imap_account['user'], $imap_account['pass'], @$imap_account['sieve_tls'], "", "PLAIN");
+            $factory = new Hm_Sieve_Client_Factory;
+            $client = $factory->init($user_config, $imap_account, $is_nux_supported);
         } else {
             $client = new Tiki_Hm_Sieve_Custom_Client($user_config, $imap_account['name'] ?? '');
         }
