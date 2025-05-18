@@ -2514,7 +2514,17 @@ class ParserLib extends TikiDb_Bridge
             $data = $this->protectSpecialChars($data, true);
         }
 
-        $need_autonumbering = ( preg_match('/^\!+[\-\+]?#/m', $data) > 0 );
+        // Check if syntax for auto-numbering is present
+        $numbering_syntax_present = ( preg_match('/^\!+[\-\+]?#/m', $data) > 0 );
+
+        // Check if multilevel numbering is enabled
+        $multilevel_numbering_enabled = isset($prefs['wiki_make_ordered_list_items_display_unique_numbers']) &&
+                                $prefs['wiki_make_ordered_list_items_display_unique_numbers'] === 'y';
+        // We always need basic auto-numbering if the syntax is present, but multilevel depends on the preference 'wiki_make_ordered_list_items_display_unique_numbers'
+        $need_autonumbering = $numbering_syntax_present;
+
+        // Initialize $nb_hdrs to ensure first heading gets correct numbering
+        $nb_hdrs = 0;
 
         global $anch;
         $anch = [];
@@ -2795,7 +2805,47 @@ class ParserLib extends TikiDb_Bridge
                                 $hdr_structure[$nb_hdrs][$h + $nb_last_hdr] = '1';
                             }
                         }
-                        $show_title_level[$hdrlevel] = preg_match('/^!+[\+\-]?#/', $line);
+                        // Check if this heading has numbering syntax
+                        $has_numbering_syntax = preg_match('/^!+[\+\-]?#/', $line);
+
+                        // Always enable basic numbering if syntax is present
+                        $show_title_level[$hdrlevel] = $has_numbering_syntax;
+
+                        // Handle numbering for all headings with # syntax
+                        // Special counter for headings with # syntax only
+                        static $numbered_headings_count = 0;
+
+                        if ($has_numbering_syntax) {
+                            // Increment counter only for headings with # syntax
+                            $numbered_headings_count++;
+
+                            if (!$multilevel_numbering_enabled) {
+                                // When multilevel numbering is disabled, use sequential numbers
+                                // This ensures simple sequential numbering (1,2,3) instead of hierarchical (1.1, 1.2)
+                                // Use the dedicated counter for numbered headings only
+                                $hdr_structure[$nb_hdrs] = [$numbered_headings_count];
+                            } else {
+                                // For multilevel numbering
+                                if ($hdrlevel == 1) {
+                                    // Level 1 headings should always have a number
+                                    // Use the dedicated counter for numbered headings
+                                    $hdr_structure[$nb_hdrs] = [$numbered_headings_count];
+                                } else if (empty($hdr_structure[$nb_hdrs])) {
+                                    // Make sure the structure is properly initialized
+                                    if ($numbered_headings_count == 1) {
+                                        // First heading with no structure yet
+                                        $hdr_structure[$nb_hdrs] = [1];
+                                    } else {
+                                        // Initialize with a default if empty
+                                        $hdr_structure[$nb_hdrs] = [1];
+                                    }
+                                }
+                            }
+                        } else {
+                            // For headings without # syntax, don't include them in the structure at all
+                            // This prevents them from affecting the numbering sequence
+                            $hdr_structure[$nb_hdrs] = [];
+                        }
 
                         // Update last_hdr info for the next header
                         $last_hdr = $hdr_structure[$nb_hdrs];
@@ -2818,12 +2868,15 @@ class ParserLib extends TikiDb_Bridge
 
                         // Store the title number to use only if it has to be shown (if the '#' char is used)
                         $current_title_num = '';
-                        if (isset($show_title_level[$hdrlevel]) && isset($hdr_structure[$nb_hdrs])) {
-                            $current_title_num = $show_title_level[$hdrlevel] ? implode('.', $hdr_structure[$nb_hdrs]) . '. ' : '';
+                        if (isset($show_title_level[$hdrlevel])) {
+                            // Make sure $hdr_structure is properly set for this heading
+                            if ($has_numbering_syntax) {
+                                // Set the title number based on the structure
+                                $current_title_num = $show_title_level[$hdrlevel] ? implode('.', $hdr_structure[$nb_hdrs]) . '. ' : '';
+                            }
                         }
 
                         $nb_hdrs++;
-
 
                         // Close open paragraph (lists already closed above)
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 0, 0);
