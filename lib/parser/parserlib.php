@@ -2805,21 +2805,89 @@ class ParserLib extends TikiDb_Bridge
                                 $hdr_structure[$nb_hdrs][$h + $nb_last_hdr] = '1';
                             }
                         }
+
                         // Check if this heading has numbering syntax
                         $has_numbering_syntax = preg_match('/^!+[\+\-]?#/', $line);
+
+                        // Check if this heading has reset numbering syntax (^)
+                        $has_reset_numbering = preg_match('/^!+[\+\-]?\^/', $line);
+
+                        // Check for combined reset and numbering syntax (^#)
+                        // This helps reset headings numbering to 0 on a wiki page
+                        $has_numbering_reset_syntax = preg_match('/^!+[\+\-]?\^#/', $line);
 
                         // Always enable basic numbering if syntax is present
                         $show_title_level[$hdrlevel] = $has_numbering_syntax;
 
                         // Handle numbering for all headings with # syntax
                         // Special counter for headings with # syntax only
+                        // Reset counter at the beginning of each page processing
                         static $numbered_headings_count = 0;
+                        static $seen_numbering_reset_syntax = false;
+
+                        // Initialize static variables to track headings across pages
+                        static $last_was_numbering_reset_syntax = false;
+                        static $heading_sequence = [];
+
+                        // Reset counter under certain conditions
+                        if ($nb_hdrs == 0) {
+                            // Reset at the beginning of page processing
+                            $numbered_headings_count = 0;
+                            $seen_numbering_reset_syntax = false;
+                            $last_was_numbering_reset_syntax = false;
+                            $heading_sequence = [];
+                        } elseif ($has_reset_numbering && ! $has_numbering_reset_syntax) {
+                            // Only reset counters for plain ^ syntax
+                            $numbered_headings_count = 0;
+                            $last_hdr = [];  // Also reset the structure
+                            $nb_last_hdr = 0;
+                            $seen_numbering_reset_syntax = false;
+                            $last_was_numbering_reset_syntax = false;
+                        } elseif ($has_numbering_reset_syntax) {
+                            // Special handling for ^# syntax - start a new sequence
+                            $numbered_headings_count = 0;
+                            $last_hdr = [];  // Reset the structure
+                            $nb_last_hdr = 0;
+                            $seen_numbering_reset_syntax = true;
+                            $last_was_numbering_reset_syntax = true;
+                            $heading_sequence = []; // Start a fresh sequence
+                            $heading_sequence[] = 1; // First heading gets 1
+                        }
 
                         if ($has_numbering_syntax) {
-                            // Increment counter only for headings with # syntax
-                            $numbered_headings_count++;
+                            // Combined ^# syntax - assign number 1 explicitly
+                            if ($has_numbering_reset_syntax) {
+                                $numbered_headings_count = 1;
+                                $hdr_structure = [];
+                                $hdr_structure[$nb_hdrs] = [1];
 
-                            if (!$multilevel_numbering_enabled) {
+                                // We'll use heading_sequence to track numbers in this sequence
+                                $heading_sequence = [1];
+                            }
+                            // After a ^# heading, increment from the sequence
+                            elseif ($last_was_numbering_reset_syntax) {
+                                // Second heading after combined gets number 2
+                                $numbered_headings_count = 2;
+                                $hdr_structure[$nb_hdrs] = [2];
+                                $heading_sequence[] = 2;
+
+                                // After handling the first heading after a reset, turn off the flag
+                                $last_was_numbering_reset_syntax = false;
+                            } // We're in a sequence started by ^#, continue it
+                            elseif ($seen_numbering_reset_syntax && ! empty($heading_sequence)) {
+                                // Increment the last number in the sequence
+                                $next_number = end($heading_sequence) + 1;
+                                $heading_sequence[] = $next_number;
+
+                                // Set the heading number
+                                $numbered_headings_count = $next_number;
+                                $hdr_structure[$nb_hdrs] = [$next_number];
+                            } // Normal behavior for other headings with # syntax
+                            else {
+                                $numbered_headings_count++;
+                            }
+
+                            if (! $multilevel_numbering_enabled) {
                                 // When multilevel numbering is disabled, use sequential numbers
                                 // This ensures simple sequential numbering (1,2,3) instead of hierarchical (1.1, 1.2)
                                 // Use the dedicated counter for numbered headings only
@@ -2868,11 +2936,43 @@ class ParserLib extends TikiDb_Bridge
 
                         // Store the title number to use only if it has to be shown (if the '#' char is used)
                         $current_title_num = '';
-                        if (isset($show_title_level[$hdrlevel])) {
-                            // Make sure $hdr_structure is properly set for this heading
-                            if ($has_numbering_syntax) {
-                                // Set the title number based on the structure
-                                $current_title_num = $show_title_level[$hdrlevel] ? implode('.', $hdr_structure[$nb_hdrs]) . '. ' : '';
+
+                        // For headings with combined ^# syntax, we want to ensure it gets number 1
+                        static $after_numbering_reset_syntax = false; // Track if we're right after a ^# syntax heading
+
+                        if ($has_numbering_reset_syntax) {
+                            $current_title_num = '1. ';
+                            // Also make sure show_title_level is enabled for this heading
+                            $show_title_level[$hdrlevel] = true;
+                            $after_numbering_reset_syntax = true; // Mark that the next heading should be 2
+                        }
+                        // For headings with just # syntax
+                        elseif ($has_numbering_syntax) {
+                            // Check if we're right after a ^# syntax heading
+                            if ($after_numbering_reset_syntax) {
+                                // Force this heading to be number 2
+                                $current_title_num = '2. ';
+                                $after_numbering_reset_syntax = false; // Reset the flag
+                            } else {
+                                // Normal numbering for other headings with # syntax
+                                if (is_array($hdr_structure[$nb_hdrs]) && !empty($hdr_structure[$nb_hdrs])) {
+                                    $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
+                                } elseif (!empty($hdr_structure[$nb_hdrs])) {
+                                    $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
+                                } elseif ($numbered_headings_count > 0) {
+                                    // Fallback to simple numbering if structure is empty
+                                    $current_title_num = $numbered_headings_count . '. ';
+                                }
+                            }
+                            // Make sure show_title_level is enabled for this heading
+                            $show_title_level[$hdrlevel] = true;
+                        }
+                        // For other headings that have numbering enabled but not via # syntax
+                        elseif (isset($show_title_level[$hdrlevel]) && $show_title_level[$hdrlevel]) {
+                            if (is_array($hdr_structure[$nb_hdrs]) && !empty($hdr_structure[$nb_hdrs])) {
+                                $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
+                            } elseif (!empty($hdr_structure[$nb_hdrs])) {
+                                $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
                             }
                         }
 
@@ -2895,7 +2995,12 @@ class ParserLib extends TikiDb_Bridge
                         $anchor = '';
                         $aclose = '';
                         $aclose2 = '';
-                        $addremove = $show_title_level[$hdrlevel] ? 1 : 0; // If needed, also remove '#' sign from title beginning
+                        // If needed, also remove '#' or '^' sign from title beginning
+                        if ($has_numbering_reset_syntax) {
+                            $addremove = 2; // Remove both ^ and # characters
+                        } else {
+                            $addremove = ($show_title_level[$hdrlevel] || $has_reset_numbering) ? 1 : 0;
+                        }
 
                         // May be special signs present after '!'s?
                         $divstate = substr($line, $hdrlevel, 1);
