@@ -2514,13 +2514,13 @@ class ParserLib extends TikiDb_Bridge
             $data = $this->protectSpecialChars($data, true);
         }
 
-        // Check if syntax for auto-numbering is present
+        // Check if syntax # for auto-numbering is present in the data
         $numbering_syntax_present = ( preg_match('/^\!+[\-\+]?#/m', $data) > 0 );
 
         // Check if multilevel numbering is enabled
         $multilevel_numbering_enabled = isset($prefs['wiki_make_ordered_list_items_display_unique_numbers']) &&
                                 $prefs['wiki_make_ordered_list_items_display_unique_numbers'] === 'y';
-        // We always need basic auto-numbering if the syntax is present, but multilevel depends on the preference 'wiki_make_ordered_list_items_display_unique_numbers'
+        // We need basic auto-numbering if the syntax is present, but multilevel depends on the preference 'wiki_make_ordered_list_items_display_unique_numbers'
         $need_autonumbering = $numbering_syntax_present;
 
         // Initialize $nb_hdrs to ensure first heading gets correct numbering
@@ -2813,7 +2813,8 @@ class ParserLib extends TikiDb_Bridge
                         $has_reset_numbering = preg_match('/^!+[\+\-]?\^/', $line);
 
                         // Check for combined reset and numbering syntax (^#)
-                        // This helps reset headings numbering to 0 on a wiki page
+                        // This helps reset headings numbering to 0 when the combined syntax is used
+                        // And directly set the current heading number to 1, useful for the first heading after a reset
                         $has_numbering_reset_syntax = preg_match('/^!+[\+\-]?\^#/', $line);
 
                         // Always enable basic numbering if syntax is present
@@ -2821,8 +2822,8 @@ class ParserLib extends TikiDb_Bridge
 
                         // Handle numbering for all headings with # syntax
                         // Special counter for headings with # syntax only
-                        // Reset counter at the beginning of each page processing
                         static $numbered_headings_count = 0;
+                        // Reset counter at the beginning of each page processing
                         static $seen_numbering_reset_syntax = false;
 
                         // Initialize static variables to track headings across pages
@@ -2863,9 +2864,7 @@ class ParserLib extends TikiDb_Bridge
 
                                 // We'll use heading_sequence to track numbers in this sequence
                                 $heading_sequence = [1];
-                            }
-                            // After a ^# heading, increment from the sequence
-                            elseif ($last_was_numbering_reset_syntax) {
+                            } elseif ($last_was_numbering_reset_syntax) { // // After a ^# heading, increment from the sequence
                                 // Second heading after combined gets number 2
                                 $numbered_headings_count = 2;
                                 $hdr_structure[$nb_hdrs] = [2];
@@ -2873,8 +2872,7 @@ class ParserLib extends TikiDb_Bridge
 
                                 // After handling the first heading after a reset, turn off the flag
                                 $last_was_numbering_reset_syntax = false;
-                            } // We're in a sequence started by ^#, continue it
-                            elseif ($seen_numbering_reset_syntax && ! empty($heading_sequence)) {
+                            } elseif ($seen_numbering_reset_syntax && ! empty($heading_sequence)) { // We're in a sequence started by ^#, continue it
                                 // Increment the last number in the sequence
                                 $next_number = end($heading_sequence) + 1;
                                 $heading_sequence[] = $next_number;
@@ -2882,8 +2880,7 @@ class ParserLib extends TikiDb_Bridge
                                 // Set the heading number
                                 $numbered_headings_count = $next_number;
                                 $hdr_structure[$nb_hdrs] = [$next_number];
-                            } // Normal behavior for other headings with # syntax
-                            else {
+                            } else { // Normal behavior for other headings with # syntax
                                 $numbered_headings_count++;
                             }
 
@@ -2898,7 +2895,7 @@ class ParserLib extends TikiDb_Bridge
                                     // Level 1 headings should always have a number
                                     // Use the dedicated counter for numbered headings
                                     $hdr_structure[$nb_hdrs] = [$numbered_headings_count];
-                                } else if (empty($hdr_structure[$nb_hdrs])) {
+                                } elseif (empty($hdr_structure[$nb_hdrs])) {
                                     // Make sure the structure is properly initialized
                                     if ($numbered_headings_count == 1) {
                                         // First heading with no structure yet
@@ -2945,19 +2942,17 @@ class ParserLib extends TikiDb_Bridge
                             // Also make sure show_title_level is enabled for this heading
                             $show_title_level[$hdrlevel] = true;
                             $after_numbering_reset_syntax = true; // Mark that the next heading should be 2
-                        }
-                        // For headings with just # syntax
-                        elseif ($has_numbering_syntax) {
+                        } elseif ($has_numbering_syntax) { // For headings with just # syntax
                             // Check if we're right after a ^# syntax heading
                             if ($after_numbering_reset_syntax) {
-                                // Force this heading to be number 2
+                                // Force this heading to be number 2, as ^# set current heading to 1
                                 $current_title_num = '2. ';
                                 $after_numbering_reset_syntax = false; // Reset the flag
                             } else {
                                 // Normal numbering for other headings with # syntax
-                                if (is_array($hdr_structure[$nb_hdrs]) && !empty($hdr_structure[$nb_hdrs])) {
+                                if (is_array($hdr_structure[$nb_hdrs]) && ! empty($hdr_structure[$nb_hdrs])) {
                                     $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
-                                } elseif (!empty($hdr_structure[$nb_hdrs])) {
+                                } elseif (! empty($hdr_structure[$nb_hdrs])) {
                                     $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
                                 } elseif ($numbered_headings_count > 0) {
                                     // Fallback to simple numbering if structure is empty
@@ -2966,12 +2961,10 @@ class ParserLib extends TikiDb_Bridge
                             }
                             // Make sure show_title_level is enabled for this heading
                             $show_title_level[$hdrlevel] = true;
-                        }
-                        // For other headings that have numbering enabled but not via # syntax
-                        elseif (isset($show_title_level[$hdrlevel]) && $show_title_level[$hdrlevel]) {
-                            if (is_array($hdr_structure[$nb_hdrs]) && !empty($hdr_structure[$nb_hdrs])) {
+                        } elseif (isset($show_title_level[$hdrlevel]) && $show_title_level[$hdrlevel]) { // For other headings that have numbering enabled but not via # syntax
+                            if (is_array($hdr_structure[$nb_hdrs]) && ! empty($hdr_structure[$nb_hdrs])) {
                                 $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
-                            } elseif (!empty($hdr_structure[$nb_hdrs])) {
+                            } elseif (! empty($hdr_structure[$nb_hdrs])) {
                                 $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
                             }
                         }
