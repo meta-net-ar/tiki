@@ -17,7 +17,7 @@
                 <div class="separator">{tr}Nothing has changed{/tr}</div>
             {else}
                 {if $use_jquery_ui eq "y"}
-                    {assign var=fragment value=1}
+                    {$fragment=1}
                     <div class="tabs" data-name="since_last_visit_new_{$moduleId}">
                         <ul class="nav nav-tabs">
                             {foreach key=pos item=slvn_item from=$slvn_info.items}
@@ -59,12 +59,12 @@
                                             {/if}
                                         </a>
                                     </li>
-                                    {assign var=fragment value=$fragment+1}
+                                    {$fragment=$fragment+1}
                                 {/if}
                             {/foreach}
                         </ul>
                     </div>
-                    {assign var=fragment value=1}
+                    {$fragment=1}
                     {jq}
                     // Add CSS to hide non-active tabs content by default
                     $('<style>')
@@ -118,7 +118,7 @@
                         {if $use_jquery_ui eq "y"}
                             <div id="fragment-{$fragment}" class="tab-pane{if $fragment eq 1} active{/if}">
                         {/if}
-                        {assign var=cname value=$slvn_item.cname}
+                        {$cname=$slvn_item.cname}
                         
                         {* Comments section *}
                         {if $pos eq 'comments'}
@@ -159,9 +159,9 @@
                                     {if $pos eq 'trackers' or $pos eq 'utrackers'}
                                         {****** Parse out the trackers *****}
                                         {foreach key=tp item=tracker from=$slvn_item.tid}
-                                            {assign var=tcname value=$tracker.cname}
+                                            {$tcname=$tracker.cname}
                                             <div class="separator" style="margin-left: 10px; display:{if !isset($cookie.$showcname) or $cookie.$showcname eq 'y'}{$default_folding}{else}{$opposite_folding}{/if};">
-                                                {assign var=showtcname value="show_"|cat:$tcname}
+                                                {$showtcname="show_"|cat:$tcname}
                                                 <a class="separator" href="javascript:flip('{$tcname}');">{$tracker.count}&nbsp;{$tracker.label|escape}</a>
                                                 <div id="{$tcname}" style="display:{if !isset($cookie.$showtcname) or $cookie.$showtcname eq 'y'}{$default_folding}{else}{$opposite_folding}{/if};">
                                                     {if $nonums != 'y'}<ol>{else}<ul>{/if}
@@ -196,7 +196,7 @@
                         {/if}
                         {if $use_jquery_ui eq "y"}
                             </div>
-                            {assign var=fragment value=$fragment+1}
+                            {$fragment=$fragment+1}
                         {/if}
                     {/if}
                 {/foreach}

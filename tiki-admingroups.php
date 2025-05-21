@@ -274,11 +274,11 @@ if (! empty($_REQUEST["group"])) {
     $smarty->assign('memberslist', $memberslist);
 
     //banned members of a group
-    $bannedOffset = isset($_REQUEST['bannedOffset']) ? $_REQUEST['bannedOffset'] : 0;
-    $bannedMax = isset($_REQUEST['bannedMax']) ? $_REQUEST['bannedMax'] : $prefs['maxRecords'];
+    $bannedOffset = $_REQUEST['bannedOffset'] ?? 0;
+    $bannedMax = $_REQUEST['bannedMax'] ?? $prefs['maxRecords'];
     if (empty($_REQUEST['bannedSort'])) {
         $bannedSort = ['source_itemId' => 'asc'];
-    } elseif (! empty($_REQUEST['bannedSort']) && substr($_REQUEST['bannedSort'], -4) === 'desc') {
+    } elseif (substr($_REQUEST['bannedSort'], -4) === 'desc') {
         $bannedSort = ['source_itemId' => 'desc'];
     } else {
         $bannedSort = ['source_itemId' => 'asc'];

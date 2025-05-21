@@ -11,6 +11,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 $groupList = null;
 $is_token_access = false;
+$view_as_visitor = false;
 if ($prefs['auth_token_access'] == 'y' && isset($_REQUEST['TOKEN'])) {
     require_once 'lib/auth/tokens.php';
     $token = $_REQUEST['TOKEN'];
@@ -39,10 +40,16 @@ if ($prefs['auth_token_access'] == 'y' && isset($_REQUEST['TOKEN'])) {
 
     $tokenlib = AuthTokens::build($prefs);
     if ($groups = $tokenlib->getGroups($token, $_SERVER['PHP_SELF'], $tokenParams)) {
-         $groupList = $groups;
-         $detailtoken = $tokenlib->getToken($token);
-         $is_token_access = true;
-
+        $groupList = $groups;
+        $detailtoken = $tokenlib->getToken($token);
+        $is_token_access = true;
+        if (isset($tokenParams['view_as_visitor'])) {
+            $view_as_visitor = TikiFilter::get('bool')->filter($tokenParams['view_as_visitor']);
+        }
+        if ($user and $user != 'anonymous') {
+            $smarty->assign('is_token_access', true);
+            $smarty->assign('view_as_visitor', $view_as_visitor);
+        }
          /**
           * Shared 'File download' case
           */
@@ -118,7 +125,11 @@ Perms::set($perms);
 $_permissionContext = new Perms_Context($user, false);
 
 if ($groupList) {
-    $_permissionContext->overrideGroups($groupList);
+    if ($view_as_visitor) {
+        $_permissionContext->overrideGroups($groupList);
+    } else {
+        $_permissionContext->overrideGroups(array_merge($groupList, $_permissionContext->getGroupList()));
+    }
 }
 
 $_permissionContext->activate(true);

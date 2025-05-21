@@ -18,8 +18,8 @@
       </ul>
     {/if}
     {if $parent_info}
-      {if $parent_info.page_alias}{assign var=link_title value=$parent_info.page_alias}
-      {else}{assign var=link_title value=$parent_info.pageName}
+      {if $parent_info.page_alias}{$link_title=$parent_info.page_alias}
+      {else}{$link_title=$parent_info.pageName}
       {/if}
        <div class="wayfinder wayfinder-up">
       <a class="wayfinder-up" href="{sefurl page=$parent_info.pageName structure=$home_info.pageName page_ref_id=$parent_info.page_ref_id}" title="{tr}Parent page{/tr}">
@@ -28,8 +28,8 @@
          </div>
     {/if}
     {if $nextsibling_info and $nextsibling_info.page_ref_id}
-      {if $nextsibling_info.page_alias}{assign var=nextsibling_title value=$nextsibling_info.page_alias}
-      {else}{assign var=nextsibling_title value=$nextsibling_info.pageName}{/if}
+      {if $nextsibling_info.page_alias}{$nextsibling_title=$nextsibling_info.page_alias}
+      {else}{$nextsibling_title=$nextsibling_info.pageName}{/if}
        <div class="wayfinder wayfinder-next">
       <a class="wayfinder-next" href="{sefurl page=$nextsibling_info.pageName structure=$home_info.pageName page_ref_id=$nextsibling_info.page_ref_id}" title="{tr}Next page in this series{/tr}">
         <span class="link-direction">{icon name="arrow-circle-right"} {tr}Next Page:{/tr} </span>
@@ -37,8 +37,8 @@
          </div>
     {/if}
     {if $prevsibling_info and $prevsibling_info.page_ref_id}
-        {if $prevsibling_info.page_alias}{assign var=prevsibling_title value=$prevsibling_info.page_alias}
-        {else}{assign var=prevsibling_title value=$prevsibling_info.pageName}
+        {if $prevsibling_info.page_alias}{$prevsibling_title=$prevsibling_info.page_alias}
+        {else}{$prevsibling_title=$prevsibling_info.pageName}
         {/if}
          <div class="wayfinder wayfinder-previous">
         <a class="wayfinder-previous" href="{sefurl page=$prevsibling_info.pageName structure=$home_info.pageName page_ref_id=$prevsibling_info.page_ref_id}" title="{tr}Previous page in this series{/tr}">

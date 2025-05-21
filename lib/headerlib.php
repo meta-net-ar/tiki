@@ -1052,7 +1052,7 @@ class HeaderLib
                     } elseif (empty($js['src'])) {
                         trigger_error("The src attribute is empty. Offending tag: " . $tag, E_USER_WARNING);
                     } else {
-                        array_push($js_script, (string)$js['src']);
+                        $js_script[] = (string)$js['src'];
                     }
                 }
             }

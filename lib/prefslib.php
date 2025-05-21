@@ -9,8 +9,6 @@ use Tiki\Package\ComposerManager;
 class PreferencesLib
 {
     private const DEFAULT_HIDDEN_PREFERENCES = [
-        'feature_editcss',
-        'feature_edit_templates',
         'feature_purifier',
         'smarty_security_dirs',
         'tiki_allow_trust_input',

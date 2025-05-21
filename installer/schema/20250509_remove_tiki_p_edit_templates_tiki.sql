@@ -1,0 +1,1 @@
+DELETE FROM `tiki_menu_options` WHERE `perm` = 'tiki_p_edit_templates';

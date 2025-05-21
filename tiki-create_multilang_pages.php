@@ -138,7 +138,6 @@ function get_pages_to_create()
 function check_for_existence_of_pages($pages_to_create)
 {
     $tikilib = TikiLib::lib('tiki');
-    $semantic = TikiLib::lib('semantic');
     $non_existant_pages = [];
     $existing_pages = [];
 

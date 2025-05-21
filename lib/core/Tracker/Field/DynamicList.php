@@ -332,9 +332,6 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
                 }
             }
 
-            if (jqueryTiki.select2) {
-                $ddl.trigger("change.select2");
-            }
             $ddl.trigger("change");
             $ddl.parent().tikiModal();
         } // callback

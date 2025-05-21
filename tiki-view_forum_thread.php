@@ -267,13 +267,11 @@ if (empty($thread_info)) { // this should be moved up as $thread_info could be n
     //thread might be missing due to a successful delete of a post
     if (! empty($_SESSION['tikifeedback'][0]['deleted_forumId'])) {
         $forumId = $_SESSION['tikifeedback'][0]['deleted_forumId'];
-    } elseif (! empty($forumId)) {
-        Feedback::error(tr('Thread %0 does not exist.', $comments_parentId));
     }
-    if (! empty($forumId)) {
-        TikiLib::lib('access')->redirect('tiki-view_forum.php?forumId=' . $forumId);
-    } else {
+    if (empty($forumId)) {
         Feedback::errorAndDie(tr('Thread %0 does not exist.', $comments_parentId), \Laminas\Http\Response::STATUS_CODE_409);
+    } else {
+        TikiLib::lib('access')->redirect('tiki-view_forum.php?forumId=' . $forumId);
     }
 }
 
@@ -294,7 +292,6 @@ $comments_vars = [
 
 $comments_prefix_var = 'forum:';
 $comments_objectId = $comments_prefix_var . $forumId;
-//$comments_object_var = 'forumId';
 if ($prefs['feature_forum_process_inbound_mail_in_cron'] !== 'y' && ! empty($forum_info["inbound_pop_server"])) {
     $commentslib->process_inbound_mail($forumId);
 }

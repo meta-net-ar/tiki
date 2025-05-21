@@ -10,7 +10,7 @@
     {query _type='form_input'}
 {/if}
 
-{assign var=numbercol value=2}
+{$numbercol=2}
 
         <div class="{if $js}table-responsive{/if} comment-table"> {*the table-responsive class cuts off dropdown menus *}
 <table class="table table-striped table-hover">
@@ -18,28 +18,28 @@
         {if $comments}
             <td>
                 {select_all checkbox_names='checked[]' aria-label='{tr}Select all{/tr}'}
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
             </td>
         {/if}
         <td></td>
 
         {foreach key=headerKey item=headerName from=$headers}
             <th>
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
                 {self_link _sort_arg="sort_mode" _sort_field=$headerKey}{tr}{$headerName}{/tr}{/self_link}
             </th>
         {/foreach}
 
         {if $tiki_p_admin_comments eq 'y' and $prefs.feature_comments_moderation eq 'y'}
             <th>
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
                 {self_link _sort_arg="sort_mode" _sort_field='approved'}{tr}Approval{/tr}{/self_link}
             </th>
         {/if}
         <td></td>
     </tr>
 
-    {section name=ix loop=$comments}{assign var=id value=$comments[ix].threadId}
+    {section name=ix loop=$comments}{$id=$comments[ix].threadId}
         <tr class="{cycle}{if $prefs.feature_comments_moderation eq 'y'} post-approved-{$comments[ix].approved}{/if}">
             <td class="checkbox-cell"><div class="form-check"><input type="checkbox" class="form-check-input" name="checked[]" value="{$id}" {if isset($rejected[$id]) }checked="checked"{/if}></div></td>
             <td class="action">
@@ -97,7 +97,7 @@
                 {/actions}
             </td>
 
-            {foreach key=headerKey item=headerName from=$headers}{assign var=val value=$comments[ix].$headerKey}
+            {foreach key=headerKey item=headerName from=$headers}{$val=$comments[ix].$headerKey}
                 <td {if $headerKey eq 'data'}{popup caption=$comments[ix].title|escape:"javascript"|escape:"html" text=$comments[ix].parsed}{/if}>
                     <span> {* span is used for some themes CSS opacity on some cells content *}
                         {if $headerKey eq 'title'}
@@ -150,7 +150,7 @@
                     {strip}
                         {foreach from=$more_info_headers key=headerKey item=headerName}
                             {if (isset($comments[ix].$headerKey))}
-                                {assign var=val value=$comments[ix].$headerKey}
+                                {$val=$comments[ix].$headerKey}
                                 <action>
                                     <b>{tr}{$headerName}{/tr}</b>: {$val}<br />
                                 </action>

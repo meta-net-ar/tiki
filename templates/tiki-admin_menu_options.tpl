@@ -69,7 +69,7 @@
                                             {/if}
 
                                             {if $prefs.feature_userlevels eq 'y' and not empty($option.userlevel)}
-                                                {assign var=it value=$option.userlevel}
+                                                {$it=$option.userlevel}
                                                 <dt>{tr}User Level:{/tr}</dt>
                                                 <dd>{$prefs.userlevels.$it}</dd>
                                             {/if}

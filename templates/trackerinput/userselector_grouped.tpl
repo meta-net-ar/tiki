@@ -74,7 +74,7 @@
                     .text(opt.label)
                     .appendTo($('#user_selector_{{$field.fieldId}}'));
             });
-            $selector.val(selected).trigger("change.select2");
+            $selector.val(selected);
             const fieldName = "{{$field.html_name}}";
             const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + fieldName + "\']");
             if (elementPlusTransfer?.shadowRoot) {

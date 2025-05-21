@@ -23,6 +23,8 @@ $mailinlib = TikiLib::lib('mailin');
 $accs = $mailinlib->list_active_mailin_accounts(0, -1, 'account_desc', '');
 
 // foreach account
+$mailin_results = [];
+
 foreach ($accs['data'] as $acc) {
     if (empty($acc['account'])) {
         continue;
@@ -30,8 +32,18 @@ foreach ($accs['data'] as $acc) {
 
     $account = MailIn\Account::fromDb($acc);
     try {
-        $account->check();
+        $summary = $account->check();
+        $mailin_results[] = [
+            'account' => $acc['account'],
+            'summary' => $summary,
+            'status' => 'success',
+        ];
     } catch (Exception $e) {
         Feedback::error($e->getMessage());
+        $mailin_results[] = [
+            'account' => $acc['account'],
+            'error' => $e->getMessage(),
+            'status' => 'error',
+        ];
     }
 }

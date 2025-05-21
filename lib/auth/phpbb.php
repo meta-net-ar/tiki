@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-// Tikiwiki authentication backend for phpBB3 with adodb
+// Tikiwiki authentication backend for phpBB3
 // By Jacob 'jacmoe2' Moen 10 Dec 2009
 // Based on:
 // Mediawiki authentication plugin for phpBB3 with mysql4
@@ -14,6 +14,7 @@ require_once('lib/auth/PasswordHash.php');
 
 // some definitions for helping with authentication
 // Er, what about definition clashes ?
+// @Todo: Make sure there is no definition clash
 define("PHPBB_INVALID_CREDENTIALS", -21);
 define("PHPBB_INVALID_SYNTAX", -23);
 define("PHPBB_NO_SUCH_USER", -25);
@@ -50,17 +51,12 @@ class TikiPhpBBLib
         $dbuser = $prefs['auth_phpbb_dbuser'];
         $dbpasswd = $prefs['auth_phpbb_dbpasswd'];
         $dbname = $prefs['auth_phpbb_dbname'];
-        $dbtype = 'mysql';//$prefs['auth_phpbb_dbtype'];
 
-        // Force autoloading
-        if (! class_exists('ADOConnection')) {
-            return false;
+        try {
+            $dbconnection = new PDO("mysql:$dbhost;dbname=$dbname", $dbuser, $dbpasswd);
+        } catch (PDOException $e) {
+            throw new Exception(tr("Error connecting with PHPBB service: %0", $e->getMessage()));
         }
-
-
-        $dbconnection = NewADOConnection($dbtype);
-        $dbconnection->Connect($dbhost, $dbuser, $dbpasswd, $dbname);
-
         if ($dbconnection) {
             return $dbconnection;
         }
@@ -78,18 +74,22 @@ class TikiPhpBBLib
     {
         global $prefs;
 
-        $dbconnection = $this->connectdb();
-        $username = $dbconnection->Quote($username);
-
-        // MySQL queries are case insensitive anyway
-        $query = "select username from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = lcase('" . $username . "')";
-        /** @var ADORecordSet $result */
-        $result = $dbconnection->Execute($query);
-        if ($result === false) {
-            die('AuthPhpBB : Query failed: ' . $dbconnection->ErrorMsg());
+        if (! $this->connectdb()) {
+            return false;
         }
 
-        return $result->RecordCount() > 0;
+        $dbconnection = $this->connectdb();
+
+        // MySQL queries are case insensitive anyway
+        $query = "select username from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = ?";
+
+        $sth = $dbconnection->prepare($query);
+        $sth->execute([strtolower($username)]);
+        $result = $sth->fetch(PDO::FETCH_ASSOC);
+        if (! $result) {
+            die('AuthPhpBB : User not found: ' . $result->errorInfo());
+        }
+        return ! empty($result['username']);
     }
 
     /**
@@ -105,52 +105,39 @@ class TikiPhpBBLib
         global $prefs;
 
         $dbconnection = $this->connectdb();
-        $username = $dbconnection->Quote($username);
 
-        $query = "select user_password from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = lcase('" . $username . "')";
-        $result = $dbconnection->Execute($query);
-        if ($result === false) {
-            die('AuthPhpBB : Query failed: ' . $dbconnection->ErrorMsg());
+        $query = "select user_password from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = ?";
+        $sth = $dbconnection->prepare($query);
+        $sth->execute([strtolower($username)]);
+        $result = $sth->fetch(PDO::FETCH_ASSOC);
+
+        if (! $result) {
+            die('AuthPhpBB : Authentication failed: ' . $result->errorInfo());
         }
 
-        if ($result->RecordCount() == 0) {
-            return false;
-        } else {
-        // TODO: check for phpBB version here, and select a different hasher, if needed.
-        // This one is hardcoded for phpbb3
-            $PasswordHasher = new PasswordHash(8, true);
-
-            if ($PasswordHasher->CheckPassword($password, $result->fields[0])) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        $PasswordHasher = new PasswordHash(8, true);
+        return $PasswordHasher->CheckPassword($password, $result['user_password']);
     }
 
     /**
-    * Returns a users email from the phpbb3 user table.
-    * @param Username $username
+    * Returns a user's email from the phpbb3 user table.
+    * @param string $username
     * @access public
-    * @return email or 0
+    * @return string user's email or 0
     */
-    public function grabEmail(&$username)
+    public function grabEmail($username)
     {
         global $prefs;
         $dbconnection = $this->connectdb();
-        $username = $dbconnection->Quote($username);
 
         // Just add email
-        $query = "select user_email from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = lcase('" . $username . "')";
-        $result = $dbconnection->Execute($query);
-        if ($result === false) {
-            die('AuthPhpBB : Query failed: ' . $dbconnection->ErrorMsg());
+        $query = "select user_email from " . $prefs['auth_phpbb_table_prefix'] . "users where lcase(username) = ?";
+        $sth = $dbconnection->prepare($query);
+        $sth->execute([strtolower($username)]);
+        $result = $sth->fetch(PDO::FETCH_ASSOC);
+        if (! $result) {
+            die('AuthPhpBB : Cannot grab email: ' . $result->errorInfo());
         }
-
-        if ($result->RecordCount() > 0) {
-            return $result->field[0];
-        }
-
-        return 0;
+        return $result['user_email'] ?? 0;
     }
 }

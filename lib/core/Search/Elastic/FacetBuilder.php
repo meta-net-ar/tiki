@@ -9,12 +9,14 @@ class Search_Elastic_FacetBuilder
     private $count;
     private $mainKey;
     private $histogramInterval;
+    private $index;
 
-    public function __construct($count = 10, $useAggregations = false, $useSpecificInterval = false)
+    public function __construct($count = 10, $useAggregations = false, $useSpecificInterval = false, $index = null)
     {
         $this->count = $count;
         $this->mainKey = $useAggregations ? 'aggregations' : 'facets';
         $this->histogramInterval = $useSpecificInterval ? 'calendar_interval' : 'interval';
+        $this->index = $index;
     }
 
     public function build(array $facets)
@@ -36,9 +38,14 @@ class Search_Elastic_FacetBuilder
     private function buildFacet(Search_Query_Facet_Interface $facet)
     {
         $type = $facet->getType();
+        $field = $facet->getField();
+
+        if ($this->index && $this->index->hasSortKeywordField($field)) {
+            $field .= '.sort';
+        }
 
         $out = [
-            'field' => $facet->getField(),
+            'field' => $field,
         ];
 
         if ($type === 'date_histogram') {

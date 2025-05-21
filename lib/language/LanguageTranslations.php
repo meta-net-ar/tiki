@@ -151,10 +151,10 @@ class LanguageTranslations extends TikiDb_Bridge
 
                 $boundVariables = [$translatedStr, 1, $userId, $tikilib->now];
                 if ($generalDefinedByCaller) {
-                    array_push($boundVariables, $general);
+                    $boundVariables[] = $general;
                 }
-                array_push($boundVariables, $originalStr, $this->lang);
-
+                $boundVariables[] = $originalStr;
+                $boundVariables[] = $this->lang;
                 $result = $this->query($query, $boundVariables);
             }
         }

@@ -452,7 +452,7 @@ class TWVersion
             $relements = explode('.', $line);
             if (isset($relements[0]) && is_numeric($relements[0])) { // Avoid issues with empty lines
                 $line = rtrim($line);
-                $count = array_push($this->releases, $line);
+                $this->releases[] = $line;
                 if ($relements[0] == $velements[0]) {
                     $this->latestMinorRelease = $line;
                 } elseif ($relements[0] > $velements[0]) {

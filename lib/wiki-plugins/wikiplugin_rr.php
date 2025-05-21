@@ -373,22 +373,20 @@ function wikiplugin_rr_info()
 
 function wikiplugin_rr($data, $params)
 {
-    global $smarty, $trklib, $tikilib, $prefs, $dbversion_tiki, $tikidomainslash, $user, $tiki_p_edit;
+    global $smarty, $trklib, $tikilib, $prefs, $tikidomainslash, $user, $tiki_p_edit;
 
     include_once(TIKI_CONFIG_PATH . '/tiki-db.php'); // to set up multitiki etc if there ($tikidomain)
 
     # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers.
     $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
-    if ($dbversion_tiki >= 7.0) {
-        // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
-        if (
-            stripos($data, '&lt;') !== false ||
-                    stripos($data, '&gt;') !== false ||
-                    stripos($data, '&quot;') !== false
-        ) { // add more bad entities here
-            $data = $tikilib->htmldecode($data);
-        }
+    // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
+    if (
+        stripos($data, '&lt;') !== false ||
+        stripos($data, '&gt;') !== false ||
+        stripos($data, '&quot;') !== false
+    ) { // add more bad entities here
+        $data = $tikilib->htmldecode($data);
     }
 
     if ($params["security"] == 0) {
@@ -573,11 +571,7 @@ function wikiplugin_rr($data, $params)
 
         if (empty($info['filetype']) || $info['filetype'] == 'application/x-octetstream' || $info['filetype'] == 'application/octet-stream') {
             include_once('lib/mime/mimelib.php');
-            if ($dbversion_tiki < 9.0) {
-                    $info['filetype'] = tiki_get_mime($filepath, 'application/octet-stream'); # Old code not working after Tiki9 r42542: http://code.tiki.org/Commit+42542.
-            } else {
-                    $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
-            }
+            $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
         }
 
         $type = $info["filetype"];
@@ -608,10 +602,8 @@ function wikiplugin_rr($data, $params)
     } else {
         // do nothing
     }
-    if ($dbversion_tiki >= 7.0) {
-        # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
-        $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
-    }
+    # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
+    $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
     // Find age of previous cache
     $cache_last_modif = @filemtime($r_html);
@@ -734,12 +726,7 @@ function wikiplugin_rr($data, $params)
                 $ret .= ' <input type="hidden" name="rrefresh" value="y" >';
             }
         }
-        if ($dbversion_tiki >= 13.0) {
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
-        } else {
-            // Maybe this should be an input tag with maybe still the image
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<img src=img/icons/arrow_refresh.png alt=Refresh Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></a> </form>';
-        }
+        $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
     }
 
     // Surround plugin with actual div and class, for styling purpose
@@ -748,20 +735,11 @@ function wikiplugin_rr($data, $params)
     // Check for Tiki version, to apply parsing of content or not (behavior changed in Tiki7, it seems)
     // Right now, the behavior seems the almost the same one on 7+ and <7, but just in case, I leave this version check in place,
     // since some changes are expected sooner or later..., so I leave this as an easy place holder (and proof-of-concept of working version check
-    if ($dbversion_tiki >= 7.0) {
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } else {    // case for Tiki versions earlier than 7.0, where content is parsed by default
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, []);
-            // return $ret;
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } // end of check for Tiki version
+    if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
+        return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
+    } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
+        return $ret;
+    }
 }
 
 

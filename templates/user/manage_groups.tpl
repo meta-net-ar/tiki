@@ -32,7 +32,7 @@
                     {/if}
                 {/section}
             </select>
-            {if $prefs.jquery_select2 !== 'y'}
+            {if $prefs.elementplus_select !== 'y'}
                 <div class="form-text">
                     {tr}Use Ctrl+Click or Command+Click to select multiple options{/tr}
                 </div>
@@ -51,7 +51,6 @@ $("input[name=add_remove]").on("change", function () {
                 $(this).prop("disabled", ! mode).css("opacity", ! mode ? .3 : 1);
             }
         });
-        $("#select_groups").trigger("change.select2");
     }
 }).trigger("change");
             {/jq}

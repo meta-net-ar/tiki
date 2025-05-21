@@ -189,8 +189,7 @@
         --bs-card-bg: var(--bs-body-bg);
     }
     .form-control,
-    .form-select,
-    .select2-container--bootstrap-5 .select2-dropdown {
+    .form-select {
         background-color: var(--bs-body-bg);
 //        --tiki-input-bg: purple; Test value: this works.
     }

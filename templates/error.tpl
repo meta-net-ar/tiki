@@ -12,7 +12,7 @@ close();
  * Usually available variables : $errortitle, $msg, $errortype
  * If $commenttype is 'note' and $msg is set, the $msg will be shown in a nicer non-treatening remarksbox
  *}
-{if !isset($errortype)}{assign var='errortype' value=''}{/if}
+{if !isset($errortype)}{$errortype=''}{/if}
 {capture assign=mid_data}
 
     {if ($errortype eq "402")}
@@ -22,9 +22,9 @@ close();
     {else}
 
         {if ($errortype eq 401 || $errortype eq 403) && empty($user) and $prefs.permission_denied_login_box eq 'y'} {* permission denied *}
-            {assign var='errortitle' value="{tr}Please log in{/tr}"}
+            {$errortitle="{tr}Please log in{/tr}"}
         {else}
-            {assign var='errortitle' value="{tr}Error{/tr}"}
+            {$errortitle="{tr}Error{/tr}"}
         {/if}
 
         {if $errortype eq "404" and isset($file_error)}

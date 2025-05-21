@@ -23,7 +23,7 @@ class SmartyTikiErrorHandler
             $activation['skipped'] = false;
             $activation['previousErrorHandler'] = $previousErrorHandler;
         }
-        array_push($this->activationStack, $activation);
+        $this->activationStack[] = $activation;
     }
 
     /**

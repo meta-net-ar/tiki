@@ -17,9 +17,3 @@
     margin-right: 1rem;
 }
 
-// Increase height to compensate for theme's extra padding
-.tiki .select2-container--bootstrap-5 .select2-selection {
-    min-height: calc(2.2em + 0.75rem + 2px);
-    border-radius: 0 !important;
-}
-

@@ -14,7 +14,7 @@
     {button href="tiki-list_integrator_repositories.php" class="btn btn-info" _icon_name="list" _text="{tr}List{/tr}"}
     {button href="tiki-admin_integrator.php" class="btn btn-primary" _icon_name="create" _text="{tr}New{/tr}"}
     {if isset($repID) and $repID ne '0'}
-        {assign var=thisrepID value=$repID|escape}
+        {$thisrepID=$repID|escape}
         {button href="tiki-integrator.php?repID=$thisrepID" class="btn btn-primary" _icon_name="view" _text="{tr}View{/tr}"}
     {/if}
 </div>

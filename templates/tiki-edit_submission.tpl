@@ -112,7 +112,7 @@
         <label class="col-sm-3 col-form-label">{tr}Author rating{/tr}</label>
         <div class="col-sm-7">
             <select name='rating' class="form-control">
-                {assign var="ratings" value=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
+                {$ratings=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
                 {foreach from=$ratings item=val}
                     <option value="{$val}" {if $rating == $val}selected="selected"{/if}>{$val}</option>
                 {/foreach}
@@ -269,8 +269,8 @@
 
     {if isset($all_attributes)}
         {foreach from=$all_attributes item=att key=attname}
-        {assign var='attid' value=$att.itemId|replace:'.':'_'}
-        {assign var='attfullname' value=$att.itemId}
+        {$attid=$att.itemId|replace:'.':'_'}
+        {$attfullname=$att.itemId}
         <div class="mb-3 row" id={$attid} {if $types.$type.$attid eq 'y'}style="display:;"{else}style="display:none;"{/if}>
             <label class="col-sm-3 col-form-label">{$attname|escape}</label>
             <div class="col-sm-7">

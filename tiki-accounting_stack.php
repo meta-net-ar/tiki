@@ -122,7 +122,7 @@ if (isset($_POST['action'])) {
         }
         if (is_numeric($result)) {
             if (isset($_POST['statementId'])) {
-                $accountinglib->updateStatementStack($bookId, $_POST['statementId'], $result);
+                $accountinglib->updateStatementStack($bookId, $_POST['statementId']);
             }
             $stackId = 0; //success means we can create a new entry
         }

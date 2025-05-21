@@ -46,7 +46,7 @@ class DrawflowHardwareIOStateSetting implements DrawflowActionInterface
         <div class='{$this->node_identifier} draggable-node'>
             <div class='text-center'><span><span data-icon-name='microchip'></span>&nbsp;" . tra("Hardware I/O State Setting") . "</span></div>
             <input type='text' df-{$this->node_df_identifier}-io-id class='form-control' placeholder='" . tra("Enter I/O ID (based on your hardware lib configuration)") . "'>
-            <select df-{$this->node_df_identifier}-io-state class='noselect2'>
+            <select df-{$this->node_df_identifier}-io-state>
                 <option value='ON'>" . tra('ON') . "</option>
                 <option value='OFF'>" . tra('OFF') . "</option>
             </select>

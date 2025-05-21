@@ -758,7 +758,7 @@ class CategLib extends ObjectLib
         $requiredResult = array_filter($requiredResult, function ($res) use ($validObjectTypes, &$invalidTypes) {
             $check = in_array($res['type'], $validObjectTypes);
             if (! $check) {
-                array_push($invalidTypes, $res);
+                $invalidTypes[] = $res;
             }
             return $check;
         });
@@ -1024,7 +1024,7 @@ class CategLib extends ObjectLib
      * Removes the object with the given identifer from the category with the given identifier
      * @param $catObjectId
      * @param $categId
-     * @return bool|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return bool|TikiDb_Pdo_Result
      * @throws Exception
      */
     public function remove_object_from_category($catObjectId, $categId)
@@ -1036,7 +1036,7 @@ class CategLib extends ObjectLib
      * Removes the object with the given identifier from the categories specified in the $categIds array. The array contains category identifiers.
      * @param $catObjectId
      * @param $categIds
-     * @return bool|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return bool|TikiDb_Pdo_Result
      * @throws Exception
      */
     public function remove_object_from_categories($catObjectId, $categIds)

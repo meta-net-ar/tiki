@@ -1500,7 +1500,7 @@ class AccountingLib extends LogsLib
                 $bindvars = [$id];
                 if ($bookIdName === $tablesWhitelist[$table]['bookIdName']) {
                     $query .= " AND $bookIdName = ?";
-                    array_push($bindvars, $bookId);
+                    $bindvars[] = $bookId;
                 }
 
                 $res = $this->query($query, $bindvars);

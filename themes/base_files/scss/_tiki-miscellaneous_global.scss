@@ -412,7 +412,7 @@ span.btn-link {
     margin-right: 2px;
 }
 
-.include-icon .form-select, .include-icon .select2-container--bootstrap-5 {
+.include-icon .form-select {
     width: calc(100% - #{$btn-padding-x}*2 - 20px) !important;
     display: inline-block;
     margin-right: 2px;
@@ -420,6 +420,12 @@ span.btn-link {
 
 .form-check-label .btn, ul.relation-list .btn {
     --bs-btn-padding-y: 0;
+}
+
+// Make the links clickable in stretched-link elements (e.g., in PluginListExecute simple list)
+.stretched-link a {
+    position: relative;
+    z-index: 2;
 }
 
 //date picker dropdowns

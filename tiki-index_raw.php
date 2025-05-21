@@ -67,13 +67,13 @@ if (! in_array($page, $_SESSION["breadCrumb"])) {
         array_shift($_SESSION["breadCrumb"]);
     }
 
-    array_push($_SESSION["breadCrumb"], $page);
+    $_SESSION["breadCrumb"][] = $page;
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION["breadCrumb"]);
 
     unset($_SESSION["breadCrumb"][$pos]);
-    array_push($_SESSION["breadCrumb"], $page);
+    $_SESSION["breadCrumb"][] = $page;
 }
 
 // Now increment page hits since we are visiting this page

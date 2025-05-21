@@ -40,7 +40,7 @@
             if ($('#autosave_preview:visible').length === 0) {
                 if (!ajaxPreviewWindow) {
                     setCookie("preview_diff_style", "", "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
-                    $("#preview_diff_style").val("").trigger("change.select2");
+                    $("#preview_diff_style").val("");
                     $('#autosave_preview').slideDown('slow', function(){ ajax_preview( 'editwiki', autoSaveId, true );});
                 }
             } else {
@@ -185,7 +185,7 @@
                                         {tr}Version:{/tr} <em>{tr}No diff yet{/tr}</em> - <em>{tr}No comment{/tr}</em>
                                     {/if}
                                     {if count($diff_summaries) gt 1}
-                                        {assign var=diff_version value=$diff.version}
+                                        {$diff_version=$diff.version}
                                         {icon name="next" onclick="\$('input[name=oldver]').val($diff_version);\$('#editpageform').trigger('submit');return false;" title=":{tr}View{/tr}" style="cursor: pointer"}
                                     {/if}
                                 </li>
@@ -442,14 +442,6 @@
                                 </div>
                             </div>
                         {/if}
-                        {if $prefs.feature_wiki_export eq 'y' and $tiki_p_export_wiki eq 'y'}
-                            <div class="mb-3 row">
-                                <label for="" class="col-md-4 col-form-label">{tr}Export page{/tr}</label>
-                                <div class="col-md-8">
-                                    <a href="tiki-export_wiki_pages.php?page={$page|escape:"url"}&amp;all=1" class="btn btn-primary">{icon name="export"} {tr}Export all versions{/tr}</a>
-                                </div>
-                            </div>
-                        {/if}
                         {if !isset($wysiwyg) || $wysiwyg neq 'y'}
                             {if $prefs.feature_wiki_attachments == 'y' and ($tiki_p_wiki_attach_files eq 'y' or $tiki_p_wiki_admin_attachments eq 'y')}
                                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">
@@ -626,8 +618,8 @@
                                     {foreach from=$poll_rated item=rating}
                                         <div>
                                             <a href="tiki-admin_poll_options.php?pollId={$rating.info.pollId}">{$rating.info.title}</a>
-                                            {assign var=thispage value=$page|escape:"url"}
-                                            {assign var=thispoll_rated value=$rating.info.pollId}
+                                            {$thispage=$page|escape:"url"}
+                                            {$thispoll_rated=$rating.info.pollId}
                                             {button href="?page=$thispage&amp;removepoll=$thispoll_rated" _text="{tr}Disable{/tr}"}
                                         </div>
                                     {/foreach}

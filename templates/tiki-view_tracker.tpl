@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title url=$trackerId|sefurl:'tracker' adm="trackers"}{tr}{$tracker_info.name}{/tr}{/title}
 {if !empty($tracker_info.description)}
     {if $tracker_info.descriptionIsParsed eq 'y'}
@@ -107,7 +108,7 @@
                             <li class="dropdown-item">
                                 <a id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();" role="button">
                                     {icon name="link"} {tr}Get a short URL{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                                 </a>
                             </li>
                         {/if}
@@ -198,13 +199,13 @@
                             </tr>
 
                             {* ------- Items loop --- *}
-                            {assign var=itemoff value=0}
+                            {$itemoff=0}
 
                             {section name=user loop=$items}
                                 <tr>
                                     {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
                                         <td class="icon">
-                                            {assign var=ustatus value=$items[user].status|default:"c"}
+                                            {$ustatus=$items[user].status|default:"c"}
                                             {icon name=$status_types.$ustatus.iconname iclass='tips' ititle=":{$status_types.$ustatus.label}"}
                                         </td>
                                     {/if}
@@ -305,7 +306,7 @@
                                         </td>
                                     {/if}
                                 </tr>
-                                {assign var=itemoff value=$itemoff+1}
+                                {$itemoff=$itemoff+1}
                             {/section}
                         </table>
                     </div>

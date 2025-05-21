@@ -19,7 +19,7 @@ class ContributionLib extends TikiLib
      * @param        $name
      * @param string $description
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return TikiDb_Pdo_Result
      */
     public function add_contribution($name, $description = '')
     {
@@ -54,7 +54,7 @@ class ContributionLib extends TikiLib
     /**
      * @param $contributionId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_contribution($contributionId)
     {

@@ -152,7 +152,6 @@ function execute_module_translation()
 
 function smarty_assign_default_target_lang($src_lang, $targ_lang_requested, $existing_translations, $user_langs)
 {
-    global $tracer;
     $multilinguallib = TikiLib::lib('multilingual');
     $smarty = TikiLib::lib('smarty');
 

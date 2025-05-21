@@ -37,9 +37,6 @@ if (! isset($_REQUEST["sheetId"])) {
     $info = [];
     $smarty->assign('headtitle', tra('Spreadsheets'));
 } else {
-    if (isset($_REQUEST['edit_mode']) && $_REQUEST['edit_mode'] == 1) {
-        $cookietab = 2;
-    }
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         try {
             $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
@@ -93,7 +90,7 @@ if (isset($_REQUEST["edit_mode"]) && $_REQUEST["edit_mode"]) {
         $smarty->assign('title', $info["title"]);
         $smarty->assign('description', $info["description"]);
         $smarty->assign('creator', $info['author']);
-        $smarty->assign('parentSheetId', isset($info['parentSheetId']) ? $info['parentSheetId'] : 0);
+        $smarty->assign('parentSheetId', $info['parentSheetId'] ?? 0);
         $info = $sheetlib->get_sheet_layout($_REQUEST["sheetId"]);
         $smarty->assign('className', $info["className"]);
         $smarty->assign('headerRow', $info["headerRow"]);
@@ -130,7 +127,7 @@ if (isset($_REQUEST["edit"])) {
         $_REQUEST["sheetId"],
         $_REQUEST["title"],
         $_REQUEST["description"],
-        isset($_REQUEST['creator']) ? $_REQUEST['creator'] : $user,
+        $_REQUEST['creator'] ?? $user,
         $_REQUEST['parentSheetId'],
         $_REQUEST
     );

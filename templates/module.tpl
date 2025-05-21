@@ -1,16 +1,16 @@
 {* Module layout with controls *}
-{if !isset($module_position)}{assign var=module_position value=''}{/if}
-{if !isset($module_ord)}{assign var=module_ord value=''}{/if}
+{if !isset($module_position)}{$module_position==''}{/if}
+{if !isset($module_ord)}{$module_ord==''}{/if}
 {capture name=name}{$module_name|replace:"+":"_"|cat:$module_position|cat:$module_ord|escape}{/capture}
 
 {if !empty($module_params.topclass)}<div class="{$module_params.topclass}">{/if}
 
 {if $module_nobox neq 'y'}
-{if !isset($moduleId)}{assign var=moduleId value=' '}{/if}
+{if !isset($moduleId)}{$moduleId=' '}{/if}
 <div id="module_{$moduleId}"
-    class="card box-{$module_name} module"{if !empty($tpl_module_style)} style="{$tpl_module_style}"{/if}>
-    {if $module_decorations ne 'n'}
-        <div class="card-header" {if !empty($module_params.bgcolor)} style="background-color:{$module_params.bgcolor};"{/if}>
+    class="card box-{$module_name} {if $module_decorations eq 'n'}no-decorations{/if} module" {if !empty($tpl_module_style) or $module_decorations eq 'n'}style="{$tpl_module_style}  {if $module_decorations eq 'n'}border-color: transparent !important; background: transparent;{/if} "{/if}>
+   {* {if $module_decorations ne 'n'} *} {* Code updated so module title isn't affected by $module_decorations (actually it already wasn't).  *}
+        <div class="card-header" {if !empty($module_params.bgcolor)} style="background-color:{$module_params.bgcolor};"{/if} {if $module_decorations eq 'n'}style="border-color: transparent !important; background: transparent !important; padding-bottom: 0 !important;"{/if}>
             {if ($module_notitle ne 'y' && !empty($module_title)) || ($module_flip eq 'y') || $prefs.menus_items_icons eq 'y'}
                 <h3 class="card-title">
                     {if $module_notitle ne 'y' && !empty($module_title)}
@@ -38,7 +38,7 @@
                         </div>
                     {/if}
                 </h3>
-            {/if}
+           {* {/if} *}
         </div>
     {elseif $module_notitle ne 'y'}{* means when module decorations are set to 'n' don't render the card-header wrapper as above *}
     {if $module_flip eq 'y'}

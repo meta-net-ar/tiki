@@ -41,7 +41,7 @@ if ($action == 'delete' && $tokenId > 0) {
 }
 
 if ($action == 'add') {
-    $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_URL);
     $entry = parse_url($url, PHP_URL_PATH);
     $groups = $_POST['groups'];
     $sanitizedGroups = array_map(function ($group) {
@@ -51,12 +51,7 @@ if ($action == 'add') {
     $query = parse_url($url, PHP_URL_QUERY);
 
     if (! empty($query)) {
-        $query = explode('&', $query);
-
-        foreach ($query as $element) {
-            list($key, $value) = explode('=', $element);
-            $parameters[$key] = $value;
-        }
+        parse_str($query, $parameters); // Automatically handles arrays and key-value pairs
     }
 
     $arguments = [];

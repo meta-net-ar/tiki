@@ -254,11 +254,11 @@ class MenuLib extends TikiLib
             if ($option['type'] === 's' || $option['type'] === 'r') {
                 array_splice($current_parents_branch, 0);
                 $option['parent'] = 0;
-                array_push($current_parents_branch, $option['optionId']);
+                $current_parents_branch[] = $option['optionId'];
             } elseif (is_numeric($option['type'])) {
                 array_splice($current_parents_branch, (int) $option['type']);
                 $option['parent'] = $parentId;
-                array_push($current_parents_branch, $option['optionId']);
+                $current_parents_branch[] = $option['optionId'];
             } elseif ($option['type'] === 'o') {
                 $option['parent'] = $parentId;
             } elseif ($option['type'] === '-') {

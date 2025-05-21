@@ -41,6 +41,11 @@ class Perms_Context
         $this->groupList = $groupList;
     }
 
+    public function getGroupList()
+    {
+        return $this->groupList;
+    }
+
     public function activate($globalize = false)
     {
         global $user, $globalperms;

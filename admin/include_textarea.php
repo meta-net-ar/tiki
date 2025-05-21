@@ -69,7 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     if (! empty($_POST['alias_delete']) && $access->checkCsrf()) {
         // TODO add confirmation
-        WikiPlugin_Negotiator_Wiki_Alias::delete($_POST['alias_delete']);
+        $pluginAliasName = $_POST['alias_delete'];
+        WikiPlugin_Negotiator_Wiki_Alias::delete($pluginAliasName);
+        $successMsg = tr('Plugin alias %0 successfully deleted', htmlspecialchars($pluginAliasName));
+        Feedback::success($successMsg);
         $pluginsAlias = WikiPlugin_Negotiator_Wiki_Alias::getList();
     }
     if (
@@ -78,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         && (getCookie('admin_textarea', 'tabs') == '#contentadmin_textarea-plugin_alias')
     ) {
         // tab=3 is plugins alias tab (TODO improve)
+        $isUpdate = isset($pluginsAlias[$_POST['plugin_alias']]) ? true : false;
         $info = [
             'implementation' => $_POST['implementation'],
             'description' => [
@@ -175,6 +179,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach (glob(WIKIPLUGIN_CACHE_FILES_GLOB) as $file) {
             unlink($file);
         }
+
+        if ($isUpdate) {
+            $successMsg = tr('Plugin alias %0 successfully updated', htmlspecialchars($_POST['plugin_alias']));
+        } else {
+            $successMsg = tr('Plugin alias %0 successfully created', htmlspecialchars($_POST['plugin_alias']));
+        }
+        Feedback::success($successMsg);
 
         $pluginsAlias = WikiPlugin_Negotiator_Wiki_Alias::getList();
     }

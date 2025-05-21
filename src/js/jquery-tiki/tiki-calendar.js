@@ -255,9 +255,10 @@ $.fn.setupEventCalendar = function (eventCalendarParams) {
                         });
                     },
                     eventDrop: function (info) {
+                        // All the time must be cons
                         $.post($.service("calendar", "move"), {
                             calitemId: info.event.id,
-                            delta: info.delta,
+                            delta: info.delta.seconds,
                         });
                     },
                     height: "auto",

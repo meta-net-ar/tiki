@@ -4,13 +4,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/tikiimporter_testcase.php');
-require_once(__DIR__ . '/../../importer/tikiimporter_blog.php');
+namespace Tiki\Lib\Test\Importer;
+
+use TikiImporter_Blog;
 
 /**
  * @group importer
  */
-class TikiImporterBlogTest extends TikiImporter_TestCase
+class BlogTest extends AbstractImporterTestCase
 {
     public $obj;
     protected function setUp(): void

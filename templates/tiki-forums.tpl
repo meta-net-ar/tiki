@@ -104,11 +104,11 @@
         </thead>
         {/block}
         <tbody>
-            {assign var=section_old value=""}
+            {$section_old=""}
             {section name=user loop=$channels}
-                {assign var=section value=$channels[user].section}
+                {$section=$channels[user].section}
                 {if $section ne $section_old}
-                    {assign var=section_old value=$section}
+                    {$section_old=$section}
                     <td class="third info" colspan="{$numbercol}">{tr}{$section|escape}{/tr}</td>
                 {/if}
                 {block name=forumrow}

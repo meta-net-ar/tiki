@@ -88,10 +88,10 @@ function isMonitorRestrited()
     $tikiMonitorRestriction = ! empty($prefs['monitor_restricted_ips']) ? explode(',', preg_replace('/\s+/', '', $prefs['monitor_restricted_ips'])) : [];
     $sIpToCheck = null;
     if (! empty($tikiMonitorRestriction)) {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && ! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        if (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $aListIp = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $sIpToCheck = $aListIp[0];
-        } elseif (isset($_SERVER['REMOTE_ADDR']) && ! empty($_SERVER['REMOTE_ADDR'])) {
+        } elseif (! empty($_SERVER['REMOTE_ADDR'])) {
             $sIpToCheck = $_SERVER['REMOTE_ADDR'];
         }
     }

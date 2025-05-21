@@ -35,11 +35,15 @@
             </div>
             {jq}$("#name").on("change", function() {
     if ($("#name").val()) {
-        if (! $("#fieldPrefix").val()) {
-            $("#fieldPrefix").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+        const prefix = $("#fieldPrefix")
+        if (! prefix.val()) {
+            prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+            prefix.next('el-input').attr("value", prefix.val());
         }
-        if (! $("#permName").val()) {
-            $("#permName").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+        const permName = $("#permName")
+        if (! permName.val()) {
+            permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+            permName.next('el-input').attr("value", permName.val());
         }
     }
 });{/jq}
@@ -602,9 +606,18 @@
                         </a>
                     </label>
                     <div style="width: 100%">
-                        {if empty($info.tabularSyncLastImport)}{assign var="tabularSyncLastImport" value="0"}{else}{assign var="tabularSyncLastImport" value=$info.tabularSyncLastImport}{/if}
+                        {if empty($info.tabularSyncLastImport)}{$tabularSyncLastImport="0"}{else}{$tabularSyncLastImport=$info.tabularSyncLastImport}{/if}
                         {jscalendar date=$tabularSyncLastImport fieldname="tabularSyncLastImport" showtime='y' timezone=$displayTimezone}
                     </div>
+                </div>
+                <div class="mb-3 form-check depends" data-on="tabularSyncModifiedField">
+                    <input type="checkbox" class="form-check-input" name="tabularSyncLastImportSkipUpdate" id="tabularSyncLastImportSkipUpdate" value="1" {if !empty($info.tabularSyncLastImportSkipUpdate) && $info.tabularSyncLastImportSkipUpdate eq 'y'} checked="checked"{/if}>
+                    <label for="tabularSyncLastImportSkipUpdate">
+                        {tr}Skip last import time update{/tr}
+                        <a class="tikihelp text-info" title="{tr}Choice:{/tr} {tr}By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
                 </div>
             {/accordion_group}
         {/if}

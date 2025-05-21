@@ -50,7 +50,7 @@ function module_current_activity($mod_reference, $module_params)
     foreach ($results as $res) {
         $activity = $res["semName"];
         if (isset($data[$activity])) {
-            array_push($data[$activity]["users"], $res["user"]);
+            $data[$activity]["users"][] = $res["user"];
         } else {
             $data[$activity] = ["type" => $res["objectType"], "users" => [$res["user"]]];
         }

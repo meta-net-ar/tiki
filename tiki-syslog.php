@@ -105,7 +105,6 @@ foreach ($list['data'] as &$row) {
 }
 $smarty->assign_by_ref('count', $list['count']);
 $smarty->assign('list', $list['data']);
-$smarty->assign('api_tiki', $api_tiki);
 $urlquery['sort_mode'] = $sort_mode;
 $urlquery['find'] = $find;
 $smarty->assign_by_ref('urlquery', $urlquery);

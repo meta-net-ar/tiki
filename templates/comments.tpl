@@ -154,7 +154,7 @@
                     {if $prefs.direct_pagination eq 'y' && $display eq ''}
                         <br>
                         {section loop=$comments_count_pages name=foo}
-                            {assign var=selector_offset value=$smarty.section.foo.index|times:$comments_per_page}
+                            {$selector_offset=$smarty.section.foo.index|times:$comments_per_page}
                             <a class="prevnext" href="{$comments_complete_father}comments_threshold={$comments_threshold}&amp;comments_parentId={$comments_parentId}&amp;comments_offset={$selector_offset}{$thread_sort_mode_param}&amp;comments_per_page={$comments_per_page}&amp;thread_style={$thread_style}">
                             {$smarty.section.foo.index_next}</a>&nbsp;
                         {/section}
@@ -174,7 +174,7 @@
 {block name=post_form}
 {if $tiki_p_forum_post eq 'y'}
     {if $thread_is_locked eq 'y'}
-        {assign var='lock_text' value="{tr}This thread is locked{/tr}"}
+        {$lock_text="{tr}This thread is locked{/tr}"}
         {remarksbox type="note" title="{tr}Note{/tr}" icon="lock"}{$lock_text}{/remarksbox}
     {else}
         <div id="form">
@@ -261,7 +261,7 @@
                     </div>
 
                     {if ($forum_info.att eq 'att_all') or ($forum_info.att eq 'att_admin' and ($tiki_p_admin_forum eq 'y' or $forum_info.moderator == $user)) or ($forum_info.att eq 'att_perm' and $tiki_p_forum_attach eq 'y')}
-                        {assign var='can_attach_file' value='y'}
+                        {$can_attach_file='y'}
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label" for="userfile1">
                                 {tr}Attach a file{/tr}
@@ -277,7 +277,7 @@
                     {/if}
 
                     {if $prefs.feature_antibot eq 'y'}
-                        {assign var='showmandatory' value='y'}
+                        {$showmandatory='y'}
                         {include file='antibot.tpl' td_style="formcolor"}
                     {/if}
 
@@ -310,7 +310,7 @@
                         </div>
                     </div>
                 </form>
-                {assign var=tips_title value="{tr}Posting replies{/tr}"}
+                {$tips_title="{tr}Posting replies{/tr}"}
 
             </div>{* id {$postclass} or {$postclass}open *}
         {/if}{* else $thread_is_locked *}

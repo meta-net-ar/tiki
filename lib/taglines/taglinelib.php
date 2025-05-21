@@ -49,7 +49,7 @@ class TagLineLib extends TikiLib
      * @param $cookieId
      * @param $cookie
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function replace_cookie($cookieId, $cookie)
     {
@@ -70,7 +70,7 @@ class TagLineLib extends TikiLib
     /**
      * @param $cookieId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_cookie($cookieId)
     {
@@ -95,7 +95,7 @@ class TagLineLib extends TikiLib
     }
 
     /**
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_all_cookies()
     {

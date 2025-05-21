@@ -240,7 +240,7 @@ if (
 
 $newsletterfiles = [];
 if (isset($_REQUEST['newsletterfile'])) {
-    $newsletterfiles_post = isset($_REQUEST['newsletterfile']) && is_array($_REQUEST['newsletterfile']) ? $_REQUEST['newsletterfile'] : [];
+    $newsletterfiles_post = is_array($_REQUEST['newsletterfile']) ? $_REQUEST['newsletterfile'] : [];
     foreach ($newsletterfiles_post as $k => $id) {
         $f = [];
         if ((strlen($id) == 32) && preg_match('/^[0-9a-f]{32}$/', $id)) { // this is a valid md5 hash, so the file was just saved at preview time
@@ -381,7 +381,7 @@ if (isset($_REQUEST["save"])) {
     // Now send the newsletter to all the email addresses and save it in sent_newsletters
     $info['datatxt'] = $_REQUEST['datatxt'];
     $smarty->assign('presend', 'y');
-    $subscribers = isset($subscribers) ? $subscribers : $nllib->get_all_subscribers($_REQUEST["nlId"], "");
+    $subscribers = $subscribers ?? $nllib->get_all_subscribers($_REQUEST["nlId"], "");
     $smarty->assign('nlId', $_REQUEST["nlId"]);
     $smarty->assign('datatxt', $_REQUEST["datatxt"]);
     $parsed = '';
@@ -567,7 +567,7 @@ if (isset($_REQUEST['resume'])) {
 
 // Article Clipping
 $articleClip = '';
-if (isset($nl_info) && $nl_info["allowArticleClip"] == 'y' && empty($articleClip)) {
+if (isset($nl_info) && $nl_info["allowArticleClip"] == 'y') {
     if ($nl_info["autoArticleClip"] == 'y' || isset($_REQUEST["clipArticles"])) {
         $articleClip = $nllib->clip_articles($_REQUEST["nlId"]);
         // prevent clearing of keyed in info if any

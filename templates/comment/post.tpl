@@ -62,7 +62,7 @@
                 </div>
                 <div class="card-footer">
                     {if $prefs.feature_antibot eq 'y'}
-                        {assign var='showmandatory' value='y'}
+                        {$showmandatory='y'}
                         {include file='antibot.tpl'}
                     {/if}
                     <input type="hidden"  name="return_url" value="{$return_url|escape}">

@@ -212,8 +212,8 @@ foreach ($qtlist as $name) {
     }
     $tag->setDomElementId('dummy');
 
-    $wys = strlen($tag->getWysiwygToken(false)) ? 'qt-wys' : '';
-    $wyswik = strlen($tag->getWysiwygWikiToken('dummy', false)) ? 'qt-wyswik' : '';
+    $wys = strlen($tag->getWysiwygToken()) ? 'qt-wys' : '';
+    $wyswik = strlen($tag->getWysiwygWikiToken()) ? 'qt-wyswik' : '';
     $test_html = $tag->getWikiHtml();
     $wiki = strlen($test_html) > 0 ? 'qt-wiki' : '';
     $wiki = strpos($test_html, 'qt-sheet') !== false ? 'qt-sheet' : $wiki;
@@ -235,8 +235,8 @@ foreach ($qtlist as $name) {
     }
 
     $label = htmlspecialchars($label);
-    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken(false) . '" />';
-    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax('dummy')) . '" />';
+    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken() . '" />';
+    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax()) . '" />';
     $label .= '<input type="hidden" name="type" value="' . $tag->getType() . '" />';
     $label .= '<input type="hidden" name="label" value="' . $tag->getLabel() . '" />';
 
@@ -257,7 +257,7 @@ foreach ($qtlist as $name) {
         $visible = (strpos($wiki, 'qt-sheet') !== false);
     }
 
-    $text_label = $tag->getLabel($name);
+    $text_label = $tag->getLabel();
 
     $qtelement[$name] = [
         'name' => $name,

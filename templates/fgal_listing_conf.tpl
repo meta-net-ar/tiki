@@ -24,7 +24,7 @@
             <div class="col-sm-8 offset-sm-4">
                 <div class="form-check">
                     <label class="form-check-label" for="fgal_{$key}{if isset($fgal_ext)}{$fgal_ext}{/if}">
-                        {assign var='pref_name' value="fgal_$key"}
+                        {$pref_name="fgal_$key"}
                         <input
                             type="checkbox"
                             id="fgal_{$key}"

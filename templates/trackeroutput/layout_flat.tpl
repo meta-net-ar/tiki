@@ -1,13 +1,13 @@
 <dl class="row mx-0">
     {if $tracker_info.showStatus eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')}
-        {assign var=ustatus value=$info.status|default:"p"}
+        {$ustatus=$info.status|default:"p"}
         <dt title="{tr}Status{/tr}" class="col-sm-3">{tr}Status{/tr}</dt>
         <dd class="col-sm-9">
             {icon name=$status_types.$ustatus.iconname}
             {$status_types.$ustatus.label}
         </dd>
     {/if}
-    {assign var=stick value="n"}
+    {$stick="n"}
 
     {foreach from=$fields key=ix item=cur_field}
         {if !($tracker_info.doNotShowEmptyField eq 'y' and isset($cur_field.field_is_empty) and $cur_field.field_is_empty) and $cur_field.visibleInViewMode eq 'y'}

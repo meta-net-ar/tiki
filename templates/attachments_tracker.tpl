@@ -48,10 +48,10 @@
     <div class="table-responsive">
         <table class="table">
             <tr>
-                {assign var='nbcols' value=2}
+                {$nbcols = 2}
                 <th class="auto">&nbsp;</th>
                 {section name=ix loop=$attfields}
-                    {assign var='nbcols' value=$nbcols+1}
+                    {$nbcols = $nbcols+1}
                     <th class="auto">{tr}{$attfields[ix]}{/tr}</th>
                 {/section}
                 <th>&nbsp;</th>
@@ -60,7 +60,7 @@
                 <tr>
                     <td nowrap="nowrap" class="auto">
                         {if $attextra eq 'y'}
-                            {assign var=link value='tiki-view_tracker_more_info.php?attId='|cat:$atts[ix].attId}
+                            {$link='tiki-view_tracker_more_info.php?attId='|cat:$atts[ix].attId}
                             <a class="tablename tips" href="#" title=":{tr}more info{/tr}" onclick="javascript:window.open('{$link}','','menubar=no,toolbar=no,location=no,directories=no,status=no,scrollbars=yes,resizable=yes,width=450,height=600');" role="button">
                                 {icon name="information" alt="{tr}more info{/tr}"}
                             </a>

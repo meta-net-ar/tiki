@@ -1375,7 +1375,7 @@ class nusoap_xmlschema extends nusoap_base  {
                 $this->xdebug("do nothing for element $name");
             break;
             case 'complexType':
-                array_push($this->complexTypeStack, $this->currentComplexType);
+                $this->complexTypeStack[] =  $this->currentComplexType;
                 if(isset($attrs['name'])){
                     // TODO: what is the scope of named complexTypes that appear
                     //       nested within other c complexTypes?
@@ -1401,7 +1401,6 @@ class nusoap_xmlschema extends nusoap_base  {
                     $name = $this->CreateTypeName($this->currentElement);
                     $this->xdebug('processing unnamed complexType for element ' . $this->currentElement . ' named ' . $name);
                     $this->currentComplexType = $name;
-                    //$this->currentElement = false;
                     $this->complexTypes[$this->currentComplexType] = $attrs;
                     $this->complexTypes[$this->currentComplexType]['typeClass'] = 'complexType';
                     // This is for constructs like
@@ -1411,7 +1410,7 @@ class nusoap_xmlschema extends nusoap_base  {
                     //                        minOccurs="0" maxOccurs="unbounded" />
                     //                </sequence>
                     //            </complexType>
-                    if(isset($attrs['base']) && preg_match('/:Array$/',$attrs['base'])){
+                    if(isset($attrs['base']) && str_ends_with($attrs['base'], ':Array')){
                         $this->xdebug('complexType is unusual array');
                         $this->complexTypes[$this->currentComplexType]['phpType'] = 'array';
                     } else {
@@ -1421,7 +1420,7 @@ class nusoap_xmlschema extends nusoap_base  {
                 $this->complexTypes[$this->currentComplexType]['simpleContent'] = 'false';
             break;
             case 'element':
-                array_push($this->elementStack, $this->currentElement);
+                $this->elementStack[] = $this->currentElement;
                 if (!isset($attrs['form'])) {
                     if ($this->currentComplexType) {
                         $attrs['form'] = $this->schemaInfo['elementFormDefault'];
@@ -1547,7 +1546,7 @@ class nusoap_xmlschema extends nusoap_base  {
                 }
             break;
             case 'simpleType':
-                array_push($this->simpleTypeStack, $this->currentSimpleType);
+                $this->simpleTypeStack[] = $this->currentSimpleType;
                 if(isset($attrs['name'])){
                     $this->xdebug("processing simpleType for name " . $attrs['name']);
                     $this->currentSimpleType = $attrs['name'];

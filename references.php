@@ -246,9 +246,7 @@ if (isset($_REQUEST['action']) && isset($ref_id)) {
             $details = $referenceslib->get_reference_from_id($id);
             foreach ($details['data'][0] as $key => $data) {
                 if ($details['data'][0][$key] == null) {
-                    if (! $details['data'][0][$key]) {
-                        $details['data'][0][$key] = '';
-                    }
+                    $details['data'][0][$key] = '';
                 }
             }
 

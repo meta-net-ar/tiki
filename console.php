@@ -146,7 +146,7 @@ function custom_error_handler($number, $message, $file, $line): void
         }
         // Fatal Errors
         // throw an Error Exception, to be handled by whatever Exception handling logic is available in this context
-        if (in_array($number, [E_USER_ERROR, E_RECOVERABLE_ERROR]) && $error_is_enabled) {
+        if (in_array($number, [E_USER_ERROR, E_RECOVERABLE_ERROR])) {
             throw $exception;
         }
 

@@ -281,6 +281,8 @@ class Services_Search_CustomSearchController
                 } else {
                     $query->filterContent($config['_value'], $config['_field']);
                 }
+            } elseif ($config['type'] == 'ignore') {
+                return;
             } else {
                 if ($config['type'] == 'select' && ! empty($config['multiple']) && ! empty($config['_operator'])) {
                     $value = str_replace(' ', " {$config['_operator']} ", $value);

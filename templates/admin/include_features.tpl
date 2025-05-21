@@ -193,7 +193,6 @@
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="jQuery_plugins_and_add-ons"> {tr}jQuery plugins and add-ons{/tr}  <a href="#jQuery_plugins_and_add" class="heading-link" aria-label="{tr}jQuery {/tr}">{icon name="link"}</a></h4></legend>
-                {preference name=feature_jquery_autocomplete}
                 {preference name=feature_jquery_reflection}
                 <div class="adminoptionbox">
                     {preference name=jquery_smartmenus_enable}
@@ -207,12 +206,6 @@
                 {preference name=feature_jquery_ui}
                 {preference name=feature_jquery_validation}
                 {preference name=feature_jquery_zoom}
-                <div class="adminoptionbox">
-                    {preference name=jquery_select2}
-                    <div class="adminoptionboxchild">
-                        {preference name=jquery_select2_sortable label="{tr}Select2 sortable multiselect{/tr}"}
-                    </div>
-                </div>
                 {preference name=jquery_fitvidjs}
                 <div class="adminoptionboxchild" id="jquery_fitvidjs_childcontainer">
                     {preference name=jquery_fitvidjs_additional_domains}

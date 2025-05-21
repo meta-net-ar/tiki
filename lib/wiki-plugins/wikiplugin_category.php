@@ -276,8 +276,11 @@ function wikiplugin_category($data, $params)
         $sort = '';
     }
 
-    $types = implode("+", $types);
-    $types = (isset($types)) ? strtolower($types) : "*";
+    if (isset($types) && is_array($types)) {
+        $types = strtolower(implode("+", $types));
+    } else {
+        $types = "*";
+    }
 
     $id = (! empty($id)) ? $id : 'current'; // use current category if none is given
 

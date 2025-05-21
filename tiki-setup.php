@@ -606,23 +606,6 @@ if (typeof $.fn.button.noConflict === "function") {
     //      $headerlib->add_cssfile('vendor_bundled/vendor/jquery/jquery-ui-themes/themes/' . $prefs['feature_jquery_ui_theme'] . '/jquery-ui.css');
     //  }
     }
-
-    if ($prefs['feature_jquery_autocomplete'] == 'y') {
-        $headerlib->add_css(
-            '.ui-autocomplete-loading { background: white url("img/spinner.gif") right center no-repeat; }'
-        );
-    }
-    $headerlib->add_jsfile(JQUERY_UI_TIMEPICKER_ADDON_DIST_PATH . '/jquery-ui-timepicker-addon.min.js');
-    $headerlib->add_cssfile(JQUERY_UI_TIMEPICKER_ADDON_DIST_PATH . '/jquery-ui-timepicker-addon.min.css');
-}
-if ($prefs['jquery_select2'] == 'y') {
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.js");
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.css");
-    if (Language::isRTL()) {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.rtl.min.css');
-    } else {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css');
-    }
 }
 if ($prefs['jquery_fitvidjs'] == 'y') {
     $customSelectors = \Tiki\Lib\FitVidJs\FitVidJs::getCustomSelector();

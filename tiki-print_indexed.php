@@ -74,7 +74,7 @@ class ObjectList // {{{
                 break;
         }
 
-        if ($renderer && $renderer->isValid()) {
+        if ($renderer->isValid()) {
             $index = ++$this->lastIndex;
             $this->renderers[$index] = $renderer;
 
@@ -251,11 +251,12 @@ class ObjectRenderer_TrackerItem extends ObjectRenderer // {{{
      */
     public function getIndexValue($key)
     {
-        switch ($key) {
-            case 'title':
-                return $this->getTitle();
-        }
+        return match ($key) {
+            'title' => $this->getTitle(),
+            default => null,
+        };
     }
+
 
     /**
      * @return mixed
@@ -267,6 +268,7 @@ class ObjectRenderer_TrackerItem extends ObjectRenderer // {{{
                 return $field['value'];
             }
         }
+        return null;
     }
 }
 // }}}
@@ -319,10 +321,10 @@ class ObjectRenderer_Wiki extends ObjectRenderer // {{{
      */
     public function getIndexValue($key)
     {
-        switch ($key) {
-            case 'title':
-                return $this->info['pageName'];
+        if ($key == 'title') {
+            return $this->info['pageName'];
         }
+        return null;
     }
 }
 // }}}

@@ -64,7 +64,7 @@
     {if isset($smarty.get.page) && isset($schedulers_amount)}
         <div class="ms-3">
             {if $schedulers_amount eq 0}
-                {assign var="console_command" value="list:execute {$smarty.get.page} <action>"|urlencode}
+                {$console_command="list:execute {$smarty.get.page} <action>"|urlencode}
                 <a href="tiki-admin_schedulers.php?task=ConsoleCommandTask&console_command={$console_command}&add=1">{tr}Create scheduler{/tr}</a>
             {elseif $schedulers_amount eq 1}
                 <a href="tiki-admin_schedulers.php?scheduler={$scheduler_id}">{tr}View scheduler{/tr}</a>

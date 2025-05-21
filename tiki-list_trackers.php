@@ -75,8 +75,6 @@ if (isset($_REQUEST['trackerIds'])) {
     $trackers_data = $filtered_trackers;
     //This is set to space because : Make the clear button visible to show users that it is the filter.
     $find = ' ';
-} else {
-    $trackers_data = $trackers["data"];
 }
 
 foreach ($trackers_data as &$tracker) {
@@ -90,7 +88,7 @@ foreach ($trackers_data as &$tracker) {
 
     // Get tracker options and set wiki_only status
     $tracker_info = $trklib->get_tracker_options($tracker['trackerId']);
-    $tracker['wiki_only'] = isset($tracker_info['adminOnlyViewEditItem']) ? $tracker_info['adminOnlyViewEditItem'] : 'n';
+    $tracker['wiki_only'] = $tracker_info['adminOnlyViewEditItem'] ?? 'n';
 
     // Could be used with object_perms_summary.tpl instead of the above but may be less performant
     //  $objectperms = Perms::get('tracker', trackerId);

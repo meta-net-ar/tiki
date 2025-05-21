@@ -10,7 +10,7 @@ class MemcacheSession implements SessionHandlerInterface
     private $lib;
 
     /**
-     * Set up the session cache, hijacking handlers from ADODB_Session
+     * Set up the session cache, hijacking handlers from Session
      * presumably already in place.
      */
     public function init()

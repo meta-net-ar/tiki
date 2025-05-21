@@ -110,7 +110,7 @@ describe("applyInput", () => {
         expect($("body").html()).toBe(input.prop("outerHTML"));
     });
 
-    test.each([["change", ["new value"]], ["input", ["new value"]], ["input"], ["blur"], ["focus"]])(
+    test.each([["change", ["new value"]], ["input", ["new value"]], ["input", ["input value"]], ["blur"], ["focus"], ["keyup"], ["keydown"]])(
         "handles correctly the %s event",
         async (eventName, eventDetail) => {
             applyInput();
@@ -128,6 +128,7 @@ describe("applyInput", () => {
             await window.happyDOM.waitUntilComplete();
 
             const elInput = $(`el-input#${input.attr("element-plus-ref")}`);
+            elInput.val("updated value");
 
             const event = $.Event(eventName, { detail: eventDetail });
             elInput.trigger(event);
@@ -137,6 +138,8 @@ describe("applyInput", () => {
             expect(eventHandler).toHaveBeenCalled();
             if (eventDetail) {
                 expect(input.val()).toBe(eventDetail[0]);
+            } else {
+                expect(input.val()).toBe(elInput.val());
             }
         }
     );

@@ -37,7 +37,7 @@
 <form name="checkform" method="get">
     {ticket}
     <input type="hidden" name="maxRecords" value="{$maxRecords|escape}">
-    {assign var=numbercol value=1}
+    {$numbercol=1}
     <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
         <table class="table">
             <tr>
@@ -47,72 +47,72 @@
                     </td>
                 {/if}
                 {if $prefs.art_list_title eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='title'}{tr}Title{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_id eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='articleId'}{tr}Id{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_type eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='type'}{tr}Type{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_topic eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='topicName'}{tr}Topic{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_date eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate'}{tr}Publish Date{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_visible eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th><span>{tr}Visible{/tr}</span></th>
                 {/if}
                 {if $prefs.art_list_lang eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='lang'}{tr}Language{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_author eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='author'}{tr}User{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_authorName eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='authorName'}{tr}Author{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_rating eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th class="text-end">
                         {self_link _sort_arg='sort_mode' _sort_field='rating'}{tr}Rating{/tr}{/self_link}
                     </th>
                 {/if}
                 {if $prefs.art_list_usersRating eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th class="text-end">
                         {self_link _sort_arg='sort_mode' _sort_field='usersRating'}{tr}Users rating{/tr}{/self_link}
                     </th>
                 {/if}
                 {if $prefs.art_list_reads eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th class="text-end">
                         {self_link _sort_arg='sort_mode' _sort_field='nbreads'}{tr}Reads{/tr}{/self_link}
                     </th>
                 {/if}
                 {if $prefs.art_list_size eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th class="text-end">{self_link _sort_arg='sort_mode' _sort_field='size'}{tr}Size{/tr}{/self_link}</th>
                 {/if}
                 {if $prefs.art_list_img eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{tr}Image{/tr}</th>
                 {/if}
                 {if $prefs.art_list_ispublished eq 'y' and $tiki_p_edit_article eq 'y'}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='ispublished'}{tr}Published{/tr}{/self_link}</th>
                 {/if}
                 {if $tiki_p_edit_article eq 'y' or $tiki_p_remove_article eq 'y' or isset($oneEditPage) or $tiki_p_read_article}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <td></td> {* Changed from th to prevent ARIA empty header error *}
                 {/if}
             </tr>

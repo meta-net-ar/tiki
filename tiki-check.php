@@ -636,14 +636,14 @@ if ($s) {
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => 'MySQLi',
-        'message' => tra('The recommended PDO database driver/abstraction layer cannot be found. The MySQLi driver is available, though, so the database connection will fall back to the AdoDB abstraction layer that is bundled with Tiki.')
+        'message' => tra('The recommended PDO database driver/abstraction layer cannot be found. The MySQLi driver is available.')
     );
 } elseif (extension_loaded('mysql')) {
     $php_properties['DB Driver'] = array(
         'fitness' => tra('unsure'),
         'fitness_status' => FITNESS_STATUS_UNSURE,
         'setting' => 'MySQL',
-        'message' => tra('The recommended PDO database driver/abstraction layer cannot be found. The MySQL driver is available, though, so the database connection will fall back to the AdoDB abstraction layer that is bundled with Tiki.')
+        'message' => tra('The recommended PDO database driver/abstraction layer cannot be found. The MySQL driver is available.')
     );
 } else {
     $php_properties['DB Driver'] = array(
@@ -2125,7 +2125,7 @@ if ($connection || ! $standalone) {
     if ($isSSL) {
         $msg = tra('MySQL SSL connection is active');
         $s = 'ON';
-    } elseif ($haveMySQLSSL && ! $isSSL) {
+    } elseif ($haveMySQLSSL) {
         $msg = tra('MySQL connection is not encrypted');
         $s = 'OFF';
     } else {

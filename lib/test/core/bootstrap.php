@@ -21,13 +21,10 @@ function tra($string)
 require __DIR__ . '/../../../vendor_bundled/vendor/autoload.php';
 
 $tikidomain = '';
-$api_tiki = null;
 require 'db/local.php';
 
-if ($api_tiki === 'pdo' && extension_loaded("pdo")) {
+if (extension_loaded("pdo")) {
     require_once('db/tiki-db-pdo.php');
-} else {
-    require_once('db/tiki-db-adodb.php');
 }
 
 $db = TikiDb::get();

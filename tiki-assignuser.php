@@ -86,8 +86,7 @@ if (isset($_REQUEST["action"])) {
             if (! $userlib->group_exists($_REQUEST["group"])) {
                 Feedback::error(tr('Invalid group'));
             } elseif (
-                $tiki_p_admin_users == 'y'
-                || ($tiki_p_admin_users == 'y' && array_key_exists($_REQUEST["group"], $groups))
+                $tiki_p_admin_users == 'y' || array_key_exists($_REQUEST["group"], $groups)
             ) {
                 $result = $userlib->assign_user_to_group($_REQUEST["assign_user"], $_REQUEST["group"]);
                 if ($result && $result->numRows()) {

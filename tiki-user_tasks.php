@@ -148,8 +148,8 @@ if (isset($_REQUEST['update_percentage']) && isset($_REQUEST['task_perc'])) {
         $tasklib->update_task_percentage($task, $user, $perc);
     }
 }
-if (isset($_REQUEST['update_tasks'])) {
-    if (($_REQUEST['action'] == 'move_marked_to_trash') && isset($_REQUEST['task'])) {
+if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'move_marked_to_trash')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_task_as_trash($task, $user);
@@ -170,7 +170,7 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'open_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'open_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->open_task($task, $user);
@@ -191,7 +191,7 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'complete_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'complete_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->mark_complete_task($task, $user);
@@ -212,13 +212,13 @@ if (isset($_REQUEST['update_tasks'])) {
             }
         }
     }
-    if (($_REQUEST['action'] == 'remove_marked_from_trash') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'remove_marked_from_trash')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->unmark_task_as_trash($task, $user);
         }
     }
-    if (($_REQUEST['action'] == 'waiting_marked') && isset($_REQUEST['task'])) {
+    if (($_REQUEST['action'] == 'waiting_marked')) {
         $access->checkCsrf();
         foreach (array_keys($_REQUEST['task']) as $task) {
             $tasklib->waiting_task($task, $user);
@@ -266,7 +266,7 @@ if (isset($_REQUEST['reload'])) {
         $tikilib->set_user_preference($user, 'tasks_maxRecords', $_REQUEST['tasks_maxRecords']);
     }
 }
-if ($task_admin and isset($_REQUEST["admin_mode"]) and $task_admin) {
+if ($task_admin and isset($_REQUEST["admin_mode"])) {
     $admin_mode = true;
     $_SESSION['admin_mode'] = true;
 }

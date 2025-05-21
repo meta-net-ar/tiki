@@ -344,9 +344,6 @@ if (isset($_REQUEST['send'])) {
         } //report != y
 
         $smarty->assign('errortype', 'no_redirect_login');
-        /*if ($ok && $report == 'y') {
-            $access->redirect($_REQUEST['url'], tra('Your link was sent.'));
-        }*/
         $smarty->assign('sent', true);
         $smarty->assign('back_url', $_REQUEST['back_url']);
 
@@ -383,7 +380,6 @@ $smarty->display('tiki.tpl');
 function checkAddresses($recipients, $error = true)
 {
     global $errors, $prefs, $user;
-    $userlib = TikiLib::lib('user');
     $registrationlib = TikiLib::lib('registration');
     $logslib = TikiLib::lib('logs');
 
@@ -392,8 +388,6 @@ function checkAddresses($recipients, $error = true)
     if (! is_array($recipients)) {
         $recipients = preg_split('/(,|;)/', $recipients);
     }
-
-    $ok = true;
 
     foreach ($recipients as &$recipient) {
         $recipient = trim($recipient);
@@ -604,10 +598,8 @@ function sendMessage($recipients, $subject)
  */
 function postForum($forumId, $subject)
 {
-    global $errors, $prefs, $user;
+    global $errors;
     global $feedbacks;
-    $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $commentslib = TikiLib::lib('comments');
 

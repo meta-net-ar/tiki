@@ -234,7 +234,10 @@ class AuthTokens
         $slugmanager = TikiLib::lib('slugmanager');
         foreach ($a as $key => $value) {
             $value2 = $b[$key] ?? '';
-            if (! empty($value2) || $value != $value2) {
+            if ($key == 'view_as_visitor') {
+                continue;
+            }
+            if ((empty($value2) || $value != $value2)) {
                 if ($key == 'page' && $slugmanager->normalizeToDash($value) == $slugmanager->normalizeToDash($value2)) {
                     continue;
                 }

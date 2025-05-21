@@ -30,12 +30,11 @@ $find = $_REQUEST['find'] ?? '';
 $averageStatOffset = $_REQUEST['average_stat_offset'] ?? 0;
 $maximumStatOffset = $_REQUEST['maximum_stat_offset'] ?? 0;
 $maximumStatOrder = $_REQUEST['maximum_stat_order'] ?? 'DESC';
+$averageStatOrder = $_REQUEST['average_stat_order'] ?? 'DESC';
+$orderType = 'average_stat_order';
 if (! empty($_REQUEST['no_of_requests'])) {
-    $averageStatOrder = $_REQUEST['no_of_requests'] ?? 'DESC';
+    $averageStatOrder = $_REQUEST['no_of_requests'];
     $orderType = 'no_of_requests';
-} else {
-    $averageStatOrder = $_REQUEST['average_stat_order'] ?? 'DESC';
-    $orderType = 'average_stat_order';
 }
 
 $smarty->assign('performance_stats_lib', $performanceLib);

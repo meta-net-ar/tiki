@@ -1,6 +1,9 @@
 // Redundant for .module.card, but needed when nobox=y.
 .module {
     position: relative;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
 }
 
 header.container,
@@ -269,7 +272,8 @@ li.login_link ul li a {
 }
 
 .siteloginbar_popup img {
-    height: 24px;
+    border-radius: var(--bs-border-radius);
+    height: 2.5rem;
 }
 
 .navbar-form .siteloginbar_poppedup .form-control,

@@ -581,7 +581,7 @@
                                     <a href="javascript:sql_failed()">{tr}Display details.{/tr}</a>
                             <div id="sql_failed_log" style="display:none">
                             <p><span class="text-warning">{tr}During an upgrade, it is normal to have SQL failures resulting with <strong>Table already exists</strong> messages.{/tr}</span></p>
-                            {assign var='patch' value=''}
+                            {$patch=''}
                             {foreach from=$installer->queries.failed item=item}
                             {if $patch ne $item[2]}
                             {if $patch ne ''}
@@ -591,7 +591,7 @@
                                 <input type="checkbox" name="validPatches[]" value="{$item[2]|escape}" id="ignore_{$item[2]|escape}">
                                 <label class="col-form-label" for="ignore_{$item[2]|escape}">{$item[2]|escape}</label>
                             </p>
-                            {assign var='patch' value=$item[2]}
+                            {$patch=$item[2]}
                             <textarea rows="6" cols="80">
                                     {/if}
                                 {$item[0]}

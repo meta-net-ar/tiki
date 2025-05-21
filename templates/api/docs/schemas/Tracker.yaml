@@ -366,12 +366,14 @@ properties:
   tabularSyncModifiedField:
     type: integer
     description: |
-      Whether to synchronize the modified field of tabular data. Possible values are:
-      - `0`: Do not synchronize the modified field of tabular data.
-      - `1`: Synchronize the modified field of tabular data.
+      Choose one of the tracker fields if remote items update its value every time a change happens. This will ensure only updated items get synchronized when importing from remote source.
   tabularSyncLastImport:
     type: integer
     description: |
-      Whether to synchronize the last import of tabular data. Possible values are:
-      - `0`: Do not synchronize the last import of tabular data.
-      - `1`: Synchronize the last import of tabular data.
+      This tracks the last date/time when this tracker was synchronized with remote source. Subsequent import-export imports will only fetch content newer than this date. Reset to something in the past if you want to re-import.
+  tabularSyncLastImportSkipUpdate:
+    type: string
+    description: |
+      By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above. Possible values:
+      - `y`: skips resetting the last import time
+      - `n`: doesn't skip

@@ -42,7 +42,7 @@ class Scheduler_Task_TikiCheckerCommandTask extends Scheduler_Task_CommandTask
                             if (! empty($listusers)) {
                                 foreach ($listusers['data'] as $user) {
                                     if (! in_array($user['email'], $recipients)) {
-                                        array_push($recipients, $user['email']);
+                                        $recipients[] = $user['email'];
                                         $subject = ! empty($tikilib->get_preference('browsertitle')) ? tra("Tiki Updates: ") . $tikilib->get_preference('browsertitle') : tra("Tiki Updates");
 
                                         // Send mail

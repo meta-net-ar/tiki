@@ -24,7 +24,7 @@
                 </a> </label>
             {$headerlib->add_jsfile("lib/jquery_tiki/tiki-connect.js")}
 
-            {assign var="provideFeedback" value="y" scope="root"}
+            {$provideFeedback="y" scope="root"}
         </div>
         {/if}
     </div>
@@ -44,7 +44,7 @@
         <div class="form-check  form-switch mb-2 d-flex justify-content-between">
             <label class="form-check-label" for="showOnLogin">{tr}Show on admin log-in{/tr}</label>
             <input type="checkbox" aria-label="{tr}Select{/tr}" class="form-check-input mt-2" id="showOnLogin" name="showOnLogin" {if isset($showOnLogin) AND $showOnLogin eq true}checked="checked"{/if}>
-            {assign var="showOnLoginDisplayed" value="y" scope="root"}
+            {$showOnLoginDisplayed="y" scope="root"}
         </div>
         {/if}
         <div class="btn-group">
@@ -60,7 +60,7 @@
     <div class="col-sm-12 text-center">
         {if !isset($showWizardPageTitle) or $showWizardPageTitle neq 'y'}
             <h1 class="adminWizardPageTitle">{$pageTitle}</h1>
-            {assign var="showWizardPageTitle" value="y" scope="root"}
+            {$showWizardPageTitle="y" scope="root"}
         {/if}
     </div>
 </div>

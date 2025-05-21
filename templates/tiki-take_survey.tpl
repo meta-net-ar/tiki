@@ -35,27 +35,27 @@
                 {elseif $questions[ix].type eq 't'}
                     <div class="quizoptions">
                         {if !empty($questions[ix].cols)}
-                            {assign var='textcols' value=$questions[ix].cols}
+                            {$textcols=$questions[ix].cols}
                         {else}
-                            {assign var='textcols' value=80}
+                            {$textcols=80}
                         {/if}
                         <div class="d-flex flex-row flex-wrap align-items-center">
                             <input type="text" size="{$textcols}" name="{$questionId}" value="{$answer}" class="form-control">
                         </div>
                     </div>
                 {elseif $questions[ix].type eq 'x'}
-                    {assign var='area' value=$questions[ix].questionId}
+                    {$area=$questions[ix].questionId}
 
                     {if $questions[ix].explode.0 > 0}
-                        {assign var='textrows' value=$questions[ix].explode.0}
+                        {$textrows=$questions[ix].explode.0}
                     {else}
-                        {assign var='textrows' value=20}
+                        {$textrows=20}
                     {/if}
 
                     {if $questions[ix].explode.1 > 0}
-                        {assign var='textcols' value=$questions[ix].explode.1}
+                        {$textcols=$questions[ix].explode.1}
                     {else}
-                        {assign var='textcols' value=80}
+                        {$textcols=80}
                     {/if}
                     {if !empty($questions[ix].explode.2)}
                         {$showToolBars = ($questions[ix].explode.2 neq 'n')}
@@ -83,7 +83,7 @@
                         {/section}
                     </div>
                 {elseif $questions[ix].type eq 'r' or $questions[ix].type eq 's'}
-                    {assign var="max" value={$questions[ix].options}}
+                    {$max={$questions[ix].options}}
                     <div class="range_container">
                     <input type="range" min="1" max="{$max}" name="{$questionId}" value="{$answer}" class="range_slider">
                     <div class="range_selector">

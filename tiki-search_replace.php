@@ -39,8 +39,6 @@ $searchtext = '';
 $replacetext = '';
 if (! empty($_REQUEST['replacetext'])) {
     $replacetext = $_REQUEST['replacetext'];
-} else {
-    $replacetext = '';
 }
 if (! empty($_REQUEST['searchtext'])) {
     $searchtext = $_REQUEST['searchtext'];

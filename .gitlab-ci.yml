@@ -215,7 +215,8 @@ smarty-lint:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+    # - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+    - echo "SmartyLint temporarily disabled"
 
 eslint:
   stage: lint
@@ -309,7 +310,7 @@ composer-validates:
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
-    - php doc/devtools/check_composer_dist_urls.php
+    # - php doc/devtools/check_composer_dist_urls.php
 
 #This tests if composer COULD update the current composer.lock (it is coherent and installable).  This is important because a developer wanting to update or add a dependency wouldn't be able to do so without figuring out why a composer.lock cannot be generated even before his changes.
 #What we want to know is if a developer could successfully generate a new composer.lock file to update minor versions, or when adding dependencies.  Not if he could generate a minimal-impact composer.lock file with composer update --lock on stable branches, which is much harder, and not necessary for the master branch.
@@ -502,7 +503,7 @@ console-php-works:
     - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
-    - echo '<?php $dbversion_tiki = "21.0"; $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always

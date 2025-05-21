@@ -54,14 +54,6 @@ if ($tiki_p_edit_structures == 'y') {
         $access->checkCsrf();
         $structlib->s_remove_page($_REQUEST["rremovex"], true, empty($_REQUEST['page']) ? '' : $_REQUEST['page']);
     }
-    if (isset($_REQUEST['export'])) {
-        $access->checkCsrf(false, true);
-        $structure_info = $structlib->s_get_structure_info($_REQUEST['export']);
-        if ($prefs['feature_wiki_export'] != 'y' || $tiki_p_admin_wiki != 'y' || ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
-            Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
-        }
-        $structlib->s_export_structure($_REQUEST['export']);
-    }
     if (isset($_REQUEST['zip']) && $tiki_p_admin == 'y') {
         $access->checkCsrf(false, true);
         include_once('lib/wiki/xmllib.php');
@@ -69,10 +61,8 @@ if ($tiki_p_edit_structures == 'y') {
         $zipFile = 'dump/xml.zip';
         $config['debug'] = false;
         if ($xmllib->export_pages(null, $_REQUEST['zip'], $zipFile, $config)) {
-            if (! $config['debug']) {
-                header("location: $zipFile");
-                die;
-            }
+            header("location: $zipFile");
+            die;
         } else {
             $smarty->assign('error', $xmllib->get_error());
         }
@@ -200,7 +190,7 @@ if ($tiki_p_edit_structures == 'y') {
                         }
                     } elseif ($prefs['feature_wiki_categorize_structure'] == 'y') {
                         // page that is added is categorized
-                        if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || isset($_REQUEST["cat_categorize"]) && $_REQUEST["cat_categorize"] != 'on') {
+                        if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || $_REQUEST["cat_categorize"] != 'on') {
                             // alert that current pages are categorized
                             $alert_to_remove_cats[] = $cat_name;
                         } else {

@@ -1,7 +1,7 @@
 {*<div class="tocnav row mx-0 justify-content-between">*}
 <nav class="nav-breadcrumb" aria-label="breadcrumb">
         <ol class="breadcrumb mt-2 me-3 p-1 d-inline-flex justify-content-start align-content-center">
-            {if $home_info}{if !empty($home_info.page_alias)}{assign var=icon_title value=$home_info.page_alias}{else}{assign var=icon_title value=$home_info.pageName}{/if}
+            {if $home_info}{if !empty($home_info.page_alias)}{$icon_title=$home_info.page_alias}{else}{$icon_title=$home_info.pageName}{/if}
                 {if $prefs.feature_wiki_structure_drilldownmenu eq 'y'}
                     <span class="dropdown">
                         <a class="btn dropdown-toggle structure-home me-3" role="button" id="dropdownStructure" data-bs-toggle="dropdown" data-hover="dropdown">
@@ -15,17 +15,17 @@
                     {self_link page=$home_info.pageName structure=$home_info.pageName page_ref_id=$home_info.page_ref_id _title="{tr}Structure:{/tr}$icon_title" _class="tips"}{icon name="home"}{/self_link}
                 {/if}
             {/if}
-            {if $prev_info and $prev_info.page_ref_id}{if !empty($prev_info.page_alias)}{assign var=icon_title value=$prev_info.page_alias}{else}{assign var=icon_title value=$prev_info.pageName}{/if}
+            {if $prev_info and $prev_info.page_ref_id}{if !empty($prev_info.page_alias)}{$icon_title=$prev_info.page_alias}{else}{$icon_title=$prev_info.pageName}{/if}
                 <a href="{sefurl page=$prev_info.pageName structure=$home_info.pageName page_ref_id=$prev_info.page_ref_id}" class="tips" title="{tr}Previous page:{/tr}{$icon_title}">
                     {icon name="caret-left"}
                 </a>
             {/if}
-            {if $parent_info}{if !empty($parent_info.page_alias)}{assign var=icon_title value=$parent_info.page_alias}{else}{assign var=icon_title value=$parent_info.pageName}{/if}
+            {if $parent_info}{if !empty($parent_info.page_alias)}{$icon_title=$parent_info.page_alias}{else}{$icon_title=$parent_info.pageName}{/if}
                 <a href="{sefurl page=$parent_info.pageName structure=$home_info.pageName page_ref_id=$parent_info.page_ref_id}" class="tips" title="{tr}Parent page:{/tr}{$icon_title}">
                     {icon name="up"}
                 </a>
             {/if}
-            {if $next_info and $next_info.page_ref_id}{if !empty($next_info.page_alias)}{assign var=icon_title value=$next_info.page_alias}{else}{assign var=icon_title value=$next_info.pageName}{/if}
+            {if $next_info and $next_info.page_ref_id}{if !empty($next_info.page_alias)}{$icon_title=$next_info.page_alias}{else}{$icon_title=$next_info.pageName}{/if}
                 <a href="{sefurl page=$next_info.pageName structure=$home_info.pageName page_ref_id=$next_info.page_ref_id}" class="tips" title="{tr}Next page:{/tr}{$icon_title}">
                     {icon name="caret-right"}
                 </a>

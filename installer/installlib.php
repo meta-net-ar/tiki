@@ -31,10 +31,8 @@ function has_tiki_db_20()
  * @param $pass_tiki
  * @param $dbs_tiki
  * @param string $client_charset
- * @param string $api_tiki
- * @param string $dbversion_tiki
  */
-function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset = '', $api_tiki = '', $dbversion_tiki = 'current')
+function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset = '')
 {
     global $local;
     if ($dbs_tiki && $user_tiki) {
@@ -44,19 +42,11 @@ function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_
         $dbs_tiki = addslashes($dbs_tiki);
         $fw = fopen($local, 'w');
         $filetowrite = "<?php\n";
-        if ($dbversion_tiki == 'current') {
-            require_once 'lib/setup/twversion.class.php';
-            $twversion = new TWVersion();
-            $dbversion_tiki = $twversion->getBaseVersion();
-        }
-        $filetowrite .= "\$dbversion_tiki='" . $dbversion_tiki . "';\n";
         $filetowrite .= "\$host_tiki='" . $host_tiki . "';\n";
         $filetowrite .= "\$user_tiki='" . $user_tiki . "';\n";
         $filetowrite .= "\$pass_tiki='" . $pass_tiki . "';\n";
         $filetowrite .= "\$dbs_tiki='" . $dbs_tiki . "';\n";
-        if (! empty($api_tiki)) {
-            $filetowrite .= "\$api_tiki='" . $api_tiki . "';\n";
-        }
+
         if (! empty($client_charset)) {
             $filetowrite .= "\$client_charset='$client_charset';\n";
         }
@@ -67,7 +57,6 @@ function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_
         $filetowrite .= "// \$client_charset='utf8mb4';\n";
         $filetowrite .= "// See http://tiki.org/ReleaseNotes5.0#Known_Issues and http://doc.tiki.org/Understanding+Encoding for more info\n\n";
         $filetowrite .= "// If your php installation does not not have pdo extension\n";
-        $filetowrite .= "// \$api_tiki = 'adodb';\n\n";
         $filetowrite .= "// Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration\n";
         $filetowrite .= "// \$system_configuration_file = '/etc/tiki.ini.php';\n";
         $filetowrite .= "// \$system_configuration_identifier = 'example.com';\n\n";
@@ -254,10 +243,9 @@ $PHP_CONFIG_FILE_PATH/php.ini or $httpd_conf.
 
 // Try to see if we have an admin account
 /**
- * @param $api_tiki
  * @return string
  */
-function has_admin($api_tiki)
+function has_admin()
 {
     $query = "select hash from users_users where login='admin'";
     $res = false;
@@ -372,7 +360,7 @@ function list_disable_accounts()
  * @param $dbTiki
  * @return bool|int
  */
-function initTikiDB(&$api, $host, $user, $pass, $dbname, $client_charset, &$dbTiki)
+function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
 {
     $initializer = new TikiDb_Initializer();
     $initializer->setInitializeCallback(

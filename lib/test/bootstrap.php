@@ -17,7 +17,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 
 require_once 'vendor_bundled/vendor/autoload.php';
 
-global $local_php, $api_tiki, $style_base;
+global $local_php, $style_base;
 $local_php = __DIR__ . '/local.php';
 
 if (! is_file($local_php)) {
@@ -25,20 +25,11 @@ if (! is_file($local_php)) {
         "\nSee lib/test/local.php.dist for further instructions\n\n");
 }
 
-$api_tiki = 'adodb';
 require_once($local_php);
 
 $style_base = 'skeleton';
 
-// Force autoloading
-if (! class_exists('ADOConnection')) {
-    die('AdoDb not found.');
-}
-
-$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
-
 $initializer = new TikiDb_Initializer();
-$initializer->setPreferredConnector($api_tiki);
 $db = $initializer->getConnection(
     [
         'host' => $host_tiki,

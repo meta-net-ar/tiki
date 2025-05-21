@@ -20,9 +20,6 @@ grant all privileges on tiki_accep_test.* TO 'tiki_tester'@'localhost' identifie
 See https://dev.tiki.org/Tiki-Unit-Testing for more info
 
 */
-$api_tiki = 'pdo';
-
-$dbversion_tiki = '22.0';
 $host_tiki = 'localhost';
 $user_tiki = 'tiki_tester';
 $pass_tiki = 'tiki_tester_pass';

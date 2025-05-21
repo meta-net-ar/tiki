@@ -31,11 +31,6 @@ class TrackerRules extends Base
 {
     public function handle($params, Template $template)
     {
-
-        // FIXME temporary workaround for chosen which seems to lose the event bindings
-        TikiLib::lib('header')->add_js('jqueryTiki.select2 = false; jqueryTiki.select2_sortable = false;');
-        // possible route towards a fix is here: https://stackoverflow.com/q/38716371/2459703
-
         return TikiLib::lib('vuejs')->getFieldRules($params);
     }
 }

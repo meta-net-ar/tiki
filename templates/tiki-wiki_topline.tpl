@@ -132,7 +132,7 @@
                 {/if}
 
                 {* all single-action icons under one dropdown*}
-                {assign var="hasPageAction" value="0"}
+                {$hasPageAction="0"}
                 {capture name="pageActions"}
                     {if ! $js}<ul><li>{/if}
                     <a class="btn btn-outline-secondary btn-sm opacity-75 dropdown-toggle" data-bs-toggle="dropdown" href="#"  title="{tr}Page actions{/tr}" role="button">
@@ -151,12 +151,12 @@
                         {if $pdf_export eq 'y' and $pdf_warning eq 'n' and $prefs["feature_wiki_print"] eq 'y'}
                             <a class="dropdown-item generate-pdf" href="tiki-print.php?{query _keepall='y' display="pdf" page=$page}">
                                 {icon name="pdf"} {tr} PDF{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {elseif $tiki_p_admin eq "y" and $pdf_warning eq 'y'}
                             <a href="tiki-admin.php?page=packages" target="_blank" class="dropdown-item text-danger" title="{tr}Warning:mPDF Package Missing{/tr}">
                                 {icon name="warning"} {tr} PDF{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if !($prefs.flaggedrev_approval neq 'y' or ! $revision_approval or $lastVersion eq $revision_displayed)}
@@ -168,7 +168,7 @@
                             {if $editable and ($tiki_p_edit eq 'y' or $page|lower eq 'sandbox') and $beingEdited ne 'y' and $machine_translate_to_lang eq ''}
                                 <a class="dropdown-item" {ajax_href template="tiki-editpage.tpl"}tiki-editpage.php?page={$page|escape:"url"}{if !empty($page_ref_id) and (empty($needsStaging) or $needsStaging neq 'y')}&amp;page_ref_id={$page_ref_id}{/if}{/ajax_href}>
                                         {icon name="edit"} {tr}Edit{/tr}
-                                        {assign var="hasPageAction" value="1"}</a>
+                                        {$hasPageAction="1"}</a>
                                 {if $prefs.wiki_edit_icons_toggle eq 'y' and ($prefs.wiki_edit_plugin eq 'y' or $prefs.wiki_edit_section eq 'y')}
                                     {jq}
                                         $("#wiki_plugin_edit_view").on("click", function () {
@@ -192,7 +192,7 @@
                                     {/jq}
                                     <a class="dropdown-item" href="#" role="button" id="wiki_plugin_edit_view" title="{tr}Click to toggle on/off{/tr}">
                                         <span class="align-items-center text-with-toggle"><span class="text">{icon name='plugin' iclass="d-inline"} <span class="mx-1">{tr}Edit icons{/tr}</span> </span> {icon iclass="toggle-icon" name="toggle-off"}</span>
-                                            {assign var="hasPageAction" value="1"}
+                                            {$hasPageAction="1"}
                                         </a>
                                 {/if}
                             {/if}
@@ -200,7 +200,7 @@
                                 {if $prefs.wysiwyg_inline_editing eq 'y' and $prefs.feature_wysiwyg eq 'y'}
                                     <a class="dropdown-item" href="#" role="button" id="wysiwyg_inline_edit" title="{tr}Click to toggle on/off{/tr}">
                                             <span class="d-flex align-items-center text-with-toggle"><span class="text flex-fill me-3">{icon name='edit'} {tr}Inline edit{/tr} ({tr}Wysiwyg{/tr})</span> {icon iclass="toggle-icon" name="toggle-off"} {icon iclass="toggle-icon d-none" name="toggle-on"}</span>
-                                            {assign var="hasPageAction" value="1"}
+                                            {$hasPageAction="1"}
                                     </a>
                                 {/if}
                             {/if}
@@ -208,19 +208,19 @@
                         {if $cached_page eq 'y'}
                             <a class="dropdown-item" href="{$page|sefurl:'wiki':'with_next'}refresh=1">
                                     {icon name="refresh"} {tr}Refresh{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if $prefs.feature_wiki_print eq 'y' and $tiki_p_print eq 'y'}
                             <a class="dropdown-item" href="tiki-print.php?{query _keepall='y' page=$page}">
                                     {icon name="print"} {tr}Print{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if $prefs.feature_share eq 'y' && $tiki_p_share eq 'y'}
                             <a class="dropdown-item" href="tiki-share.php?url={$smarty.server.REQUEST_URI|escape:'url'}">
                                     {icon name="share"} {tr}Share{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                             </a>
                         {/if}
                         {* if we want a ShareThis icon and we show it under the single-action icons dropdown singl-click *}
@@ -241,7 +241,7 @@
                         {if $prefs.sefurl_short_url eq 'y'}
                             <a class="dropdown-item" id="short_url_link" href="#" role="button" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                                     {icon name="link"} {tr}Get a short URL{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if !empty($user) and $prefs.feature_notepad eq 'y' and $tiki_p_notepad eq 'y'}
@@ -253,7 +253,7 @@
                                 <input type="hidden" name="savenotepad" value=1>
                                 <button type="submit" name="page" value={$page|escape:"url"} class="tips dropdown-item">
                                     {icon name="notepad"} {tr}Save to notepad{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                                 </button>
                             </form>
                         {/if}
@@ -270,25 +270,25 @@
                                     <input type="hidden" name="watch_event" value="wiki_page_changed">
                                     <button type="submit" name="page" value={$page|escape:"url"} class="tips dropdown-item">
                                         {icon name="watch"} {tr}Monitor page{/tr}
-                                        {assign var="hasPageAction" value="1"}
+                                        {$hasPageAction="1"}
                                     </button>
                                 </form>
                             {else}
                                 <a class="dropdown-item" href="tiki-index.php?page={$page|escape:"url"}&amp;watch_event=wiki_page_changed&amp;watch_object={$page|escape:"url"}&amp;watch_action=remove{if $structure eq 'y'}&amp;structure={$home_info.pageName|escape:'url'}{/if}" class="icon">
                                         {icon name="stop-watching"} {tr}Stop monitoring page{/tr}
-                                        {assign var="hasPageAction" value="1"}
+                                        {$hasPageAction="1"}
                                 </a>
                             {/if}
                             {if $structure eq 'y' and $tiki_p_watch_structure eq 'y'}
                                 {if $user_watching_structure ne 'y'}
                                     <a class="dropdown-item" href="tiki-index.php?page={$page|escape:"url"}&amp;watch_event=structure_changed&amp;watch_object={$page_info.page_ref_id}&amp;watch_action=add_desc&amp;structure={$home_info.pageName|escape:'url'}">
                                             {icon name="watch"} {tr}Monitor sub-structure{/tr}
-                                            {assign var="hasPageAction" value="1"}
+                                            {$hasPageAction="1"}
                                     </a>
                                 {else}
                                     <a class="dropdown-item" href="tiki-index.php?page={$page|escape:"url"}&amp;watch_event=structure_changed&amp;watch_object={$page_info.page_ref_id}&amp;watch_action=remove_desc&amp;structure={$home_info.pageName|escape:'url'}">
                                             {icon name="stop-watching"} {tr}Stop monitoring sub-structure{/tr}
-                                            {assign var="hasPageAction" value="1"}
+                                            {$hasPageAction="1"}
                                     </a>
                                 {/if}
                             {/if}
@@ -296,24 +296,24 @@
                         {if $prefs.feature_group_watches eq 'y' and ( $tiki_p_admin_users eq 'y' or $tiki_p_admin eq 'y' )}
                             <a href="tiki-object_watches.php?objectId={$page|escape:"url"}&amp;watch_event=wiki_page_changed&amp;objectType=wiki+page&amp;objectName={$page|escape:"url"}&amp;objectHref={'tiki-index.php?page='|cat:$page|escape:"url"}" class="dropdown-item">
                                     {icon name="watch-group"} {tr}Group monitor{/tr}
-                                    {assign var="hasPageAction" value="1"}
+                                    {$hasPageAction="1"}
                                 </a>
                             {if $structure eq 'y'}
                                 <a class="dropdown-item" href="tiki-object_watches.php?objectId={$page_info.page_ref_id|escape:"url"}&amp;watch_event=structure_changed&amp;objectType=structure&amp;objectName={$page|escape:"url"}&amp;objectHref={'tiki-index.php?page_ref_id='|cat:$page_ref_id|escape:"url"}" class="icon">
                                         {icon name="watch-group"} {tr}Group monitor structure{/tr}
-                                        {assign var="hasPageAction" value="1"}
+                                        {$hasPageAction="1"}
                                 </a>
                             {/if}
                         {/if}
                         {if $prefs.feature_webdav eq 'y'}
                             <a class="dropdown-item" href="javascript:open_webdav('{$page|virtual_path:'wiki page'|escape:'javascript'|escape}')" class="icon">
                                 {icon name="file-archive-open"} {tr}Open in WebDAV{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if $user and $prefs.user_favorites eq 'y'}
                             {favorite type="wiki page" object=$page button_classes="dropdown-item icon"}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                         {/if}
                     </div>
                     {if ! $js}</li></ul>{/if}

@@ -102,7 +102,7 @@ class LDAPFilter
                 $subfilters = [];
                 while (preg_match('/^(\(.+?\))(.*)/', $remaining_component, $matches)) {
                     $remaining_component = $matches[2];
-                    array_push($subfilters, LDAPFilter::parse($matches[1]));
+                    $subfilters[] = LDAPFilter::parse($matches[1]);
                 }
 
                 // combine subfilters using the logical operator

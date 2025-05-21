@@ -16,26 +16,26 @@
                     <tr>
                         {section name=d loop=$daysnames_abr}
                             {if !empty($cell[w][d].date)}
-                                {assign var=date value=$cell[w][d].date}
+                                {$date=$cell[w][d].date}
                             {elseif !empty($cell[w][d].day)}
-                                {assign var=date value=$cell[w][d].day}
+                                {$date=$cell[w][d].day}
                             {/if}
                             {if isset($date)}
                                 {if in_array($viewmode, array('bimester', 'trimester', 'quarter', 'semester', 'year'))}
                                     {if in_array($prefs.display_field_order, array('DMY', 'DYM', 'YDM'))}
-                                        {assign var=day_cursor value=$date|tiki_date_format:"%d-%m"}
+                                        {$day_cursor=$date|tiki_date_format:"%d-%m"}
                                     {else}
-                                        {assign var=day_cursor value=$date|tiki_date_format:"%m-%d"}
+                                        {$day_cursor=$date|tiki_date_format:"%m-%d"}
                                     {/if}
                                 {elseif $viewmode eq 'day' and (!$cell[w][d].focus)}
                                     {$day_cursor = ''}
                                 {else}
-                                    {assign var=day_cursor value=$date|tiki_date_format:"%d"}
+                                    {$day_cursor=$date|tiki_date_format:"%d"}
                                 {/if}
-                                {assign var=month_cursor value=$date|tiki_date_format:"%m"}
+                                {$month_cursor=$date|tiki_date_format:"%m"}
                             {/if}
-                            {assign var=day_today value=$smarty.now|tiki_date_format:"%d"}
-                            {assign var=month_today value=$smarty.now|tiki_date_format:"%m"}
+                            {$day_today=$smarty.now|tiki_date_format:"%d"}
+                            {$month_today=$smarty.now|tiki_date_format:"%m"}
 
                             {if isset($cell[w][d].focus) and $cell[w][d].focus}
                                 {cycle values="odd,even" print=false}
@@ -46,9 +46,9 @@
                                 and ((isset($cell[w][d].items[0].modifiable) and $cell[w][d].items[0].modifiable eq "y")
                                 || $cell[w][d].items[0].visible eq 'y')} calmodfocus{/if}" style="font-size:0.8em; width=14%">
                                 {if isset($cell[w][d].over)}
-                                    {assign var=over value=$cell[w][d].over}
+                                    {$over=$cell[w][d].over}
                                 {elseif isset($cell[w][d].items[0])}
-                                    {assign var=over value=$cell[w][d].items[0].over}{else}{assign var=over value=""}
+                                    {$over=$cell[w][d].items[0].over}{else}{$over=""}
                                 {/if}
                                 {if isset($cell[w][d].items[0]) and ((isset($cell[w][d].items[0].modifiable)
                                     and $cell[w][d].items[0].modifiable eq "y") || $cell[w][d].items[0].visible eq 'y')}

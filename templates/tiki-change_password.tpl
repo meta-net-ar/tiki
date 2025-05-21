@@ -2,7 +2,7 @@
     {title}{tr}Your account has been validated.{/tr}{/title}
     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}{tr}You have to choose a password to use this account.{/tr}{/remarksbox}
 {else}
-    {assign var='new_user_validation' value='n'}
+    {$new_user_validation='n'}
 {/if}
 <div class="row">
     <div class="col-md-10 offset-md-1">

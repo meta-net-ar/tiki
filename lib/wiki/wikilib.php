@@ -1343,7 +1343,7 @@ class WikiLib extends TikiLib
      *
      * @param $page
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function lock_page($page)
     {

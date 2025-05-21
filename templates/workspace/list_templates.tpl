@@ -1,4 +1,4 @@
-{assign var="listTemplate" value=$list}
+{$listTemplate=$list}
 {*
     We assign $list to another name before calling the extends line below because
     the extends line below comes with another variable $list, which is also an array

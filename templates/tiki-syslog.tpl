@@ -1,9 +1,7 @@
 {title help="System Log"}{tr}Tiki Logs{/tr}{/title}
 
 <div class="t_navbar mb-4">
-    {if $api_tiki == 'adodb'}
-        <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
-    {/if}
+    <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
     {if $prefs.feature_actionlog == 'y'}
         <a href="tiki-admin_actionlog.php#Report" class="btn btn-link" title="{tr}Export through Action Log{/tr}">{icon name="upload"} {tr}Export through Action Log{/tr}</a>
     {/if}

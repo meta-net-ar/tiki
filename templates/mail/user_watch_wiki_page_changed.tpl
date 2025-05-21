@@ -33,8 +33,8 @@
 
 {section name=ix loop=$mail_diffdata}
 {if $mail_diffdata[ix].type == "diffheader"}
-{assign var="oldd" value=$mail_diffdata[ix].old}
-{assign var="newd" value=$mail_diffdata[ix].new}
+{$oldd=$mail_diffdata[ix].old}
+{$newd=$mail_diffdata[ix].new}
 
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 @@ {tr _0=$oldd _1=$newd}-Lines: %0 changed to +Lines: %1{/tr} @@

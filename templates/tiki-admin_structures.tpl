@@ -122,14 +122,6 @@
                                             </action>
                                         {/if}
 
-                                        {if $prefs.feature_wiki_export eq 'y' and $channels[ix].admin_structure eq 'y'}
-                                            <action>
-                                                <a href="tiki-admin_structures.php?export={$channels[ix].page_ref_id|escape:"url"}">
-                                                    {icon name="export" _menu_text='y' _menu_icon='y' alt="{tr}Export pages{/tr}"}
-                                                </a>
-                                            </action>
-                                        {/if}
-
                                         {if $pdf_export eq 'y'}
                                             <action>
                                                 <a href="tiki-print_multi_pages.php?printstructures=%255B%2522{$channels[ix].page_ref_id}%2522%255D&amp;display=pdf&amp;print=pdf">

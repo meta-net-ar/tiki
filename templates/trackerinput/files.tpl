@@ -1,7 +1,7 @@
 {if $field.excessBehavior === 'split'}
-    {assign var=actual_limit value=100}
+    {$actual_limit=100}
 {else}
-    {assign var=actual_limit value=$field.limit|default:100}
+    {$actual_limit=$field.limit|default:100}
 {/if}
 <div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}" data-namefilter="{$field.namefilter|escape}" data-namefilter-error="{$field.namefilterError|escape}">
     {if (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem !== 'y') || (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem === 'y' && $field.canCreateGallery)}

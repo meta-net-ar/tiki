@@ -70,10 +70,6 @@ if ($output["data"] == "EMPTY") {
         $titleId = "name";
         $readrepl = $prefs['fgal_podcast_dir'] . "%s";
         $id = "podcast_filename";
-    } else {
-        $id = "fileId";
-        $titleId = "filename";
-        $readrepl = "tiki-download_file.php?$id=%s";
     }
 
     $changes = $filegallib->get_files(0, $prefs['feed_file_gallery_max'], $dateId . '_desc', '', $galleryIds);

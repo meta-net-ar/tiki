@@ -1,33 +1,33 @@
 <div class="tikimenu{if isset($menu_info.structure) && $menu_info.structure eq 'y'} structuremenu{/if}">
-    {assign var=opensec value='0'}
-    {assign var=sep value=''}
+    {$opensec='0'}
+    {$sep=''}
 
     {foreach key=pos item=chdata from=$menu_channels}
         {if not empty($chdata.position)}
-            {assign var=cname value=$menu_info.menuId|cat:'__'|cat:$chdata.position}
+            {$cname=$menu_info.menuId|cat:'__'|cat:$chdata.position}
         {else}
-            {assign var=cname value=$menu_info.menuId}
+            {$cname=$menu_info.menuId}
         {/if}
         {* ----------------------------- section *}
         {if $chdata.type ne 'o' and $chdata.type ne '-'}
 
             {if $opensec > 0}
-                {assign var=sectionType value=$chdata.type}
+                {$sectionType=$chdata.type}
                 {if $sectionType eq 's' or $sectionType eq 'r'}
-                    {assign var=sectionType value=0}
+                    {$sectionType=0}
                 {/if}
                 {if $opensec > $sectionType}
-                    {assign var=m value=$opensec-$sectionType}
+                    {$m=$opensec-$sectionType}
                     {section loop=$menu_channels name=close max=$m}
                         </div>
                     {/section}
-                    {assign var=opensec value=$sectionType}
+                    {$opensec=$sectionType}
                 {/if}
             {/if}
 
             <div class="separator{$sep}{if isset($chdata.selected) and $chdata.selected} selected{/if}{if isset($chdata.selectedAscendant) and $chdata.selectedAscendant} selectedAscendant{/if}">
                 {if $sep eq 'line'}
-                    {assign var=sep value=''}
+                    {$sep=''}
                 {/if}
                 {if $prefs.feature_menusfolderstyle eq 'y'}
                     {$expanded = 'file-archive-open'}
@@ -88,7 +88,7 @@
                 </a>
             </div> {* separator *}
 
-            {assign var=opensec value=$opensec+1}
+            {$opensec=$opensec+1}
             {if $menu_info.type eq 'e' or $menu_info.type eq 'd'}
                 <div class="menuSection" style="display:{if $open === 'inline'}block{else}none{/if}" id='menu{$cname}'>
             {else}
@@ -107,15 +107,15 @@
                 </a>
             </div>
             {if $sep eq 'line'}
-                {assign var=sep value=''}
+                {$sep=''}
             {/if}
 
         {* ----------------------------- separator *}
         {elseif $chdata.type eq '-'}
             {if $opensec > 0}
-                </div>{assign var=opensec value=$opensec-1}
+                </div>{$opensec=$opensec-1}
             {/if}
-            {assign var=sep value="line"}
+            {$sep="line"}
         {/if}
     {/foreach}
 
@@ -123,6 +123,6 @@
         {section loop=$menu_channels name=close max=$opensec}
             </div>
         {/section}
-        {assign var=opensec value=0}
+        {$opensec=0}
     {/if}
 </div>

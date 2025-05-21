@@ -70,8 +70,8 @@
                         {if $diffdata}
                             {section name=ix loop=$diffdata}
                                 {if $diffdata[ix].type == "diffheader"}
-                                    {assign var="oldd" value=$diffdata[ix].old}
-                                    {assign var="newd" value=$diffdata[ix].new}
+                                    {$oldd=$diffdata[ix].old}
+                                    {$newd=$diffdata[ix].new}
                                     <br><div class="diffheader">@@ {tr}-Lines: {$oldd} changed to +Lines: {$newd}{/tr} @@</div>
                                 {elseif $diffdata[ix].type == "diffdeleted"}
                                     <div class="diffdeleted">

@@ -171,15 +171,6 @@ $prefs['lang_use_db'] = 'n';
 // Which step of the installer
 if (empty($_POST['install_step'])) {
     $install_step = '0';
-
-    if (isset($_REQUEST['setdbversion'])) {
-        // Sets dbversion_tiki when installing the WebDeploy package
-        $db = fopen('db/' . $tikidomainslash . 'local.php', 'a');
-        require_once 'lib/setup/twversion.class.php';
-        $TWV = new TWVersion();
-        fwrite($db, "\n\$dbversion_tiki='" . $TWV->getBaseVersion() . "';\n");
-        fclose($db);
-    }
 } else {
     $install_step = $_POST['install_step'];
 
@@ -315,20 +306,6 @@ if ($errors) {
 // if local then build dsn and try to connect
 //   then get con or nocon
 
-//adodb settings
-
-if (! defined('ADODB_FORCE_NULLS')) {
-    define('ADODB_FORCE_NULLS', 1);
-}
-
-if (! defined('ADODB_ASSOC_CASE')) {
-    define('ADODB_ASSOC_CASE', 2);
-}
-
-if (! defined('ADODB_CASE_ASSOC')) { // typo in adodb's driver for sybase? // so do we even need this without sybase? What's this?
-    define('ADODB_CASE_ASSOC', 2);
-}
-
 require_once('lib/tikilib.php');
 
 // Get list of available languages
@@ -346,38 +323,21 @@ $dbconn = (TikiDb::isAvailable()) ? TikiDb::get() : false;
 $installer = null;
 if (file_exists($local)) {
     // include the file to get the variables
-    $default_api_tiki = $api_tiki;
-    $api_tiki = '';
     include $local;
     if (! $client_charset_forced = isset($client_charset)) {
         $client_charset = '';
     }
-    $previousDbApi = $api_tiki;
-    if (empty($api_tiki)) {
-        $api_tiki_forced = false;
-        $api_tiki = $default_api_tiki;
-        if (! empty($dbversion_tiki) && $dbversion_tiki[0] < 4) {
-            $previousDbApi = 'adodb'; // AdoDB was the default DB abstraction layer before 4.0
-        }
-    } else {
-        $api_tiki_forced = true;
-    }
-
-    unset($default_api_tiki);
 
     // In case of replication, ignore it during installer.
     unset($shadow_dbs, $shadow_user, $shadow_pass, $shadow_host);
-    if ($dbversion_tiki == '1.10') {
-        $dbversion_tiki = '2.0';
-    }
 
     $dbconn = false;
     $smarty->assign('resetdb', 'n');
-    if ($dbconn = initTikiDB($api_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
+    if ($dbconn = initTikiDB($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
         $smarty->assign('resetdb', isset($_POST['reset']) ? 'y' : 'n');
         $installer = Installer::getInstance();
         if (! $client_charset_forced) {
-            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, ($api_tiki_forced ? $api_tiki : ''), $dbversion_tiki);
+            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, '');
             $logslib->add_log('install', 'database credentials written to file with hostname=' . $host_tiki
                 . '; dbname=' . $dbs_tiki . '; dbuser=' . $user_tiki);
         }
@@ -405,7 +365,7 @@ if (file_exists($local)) {
 }
 
 if ($dbconn && has_tiki_db()) {
-    $admin_acc = has_admin($api_tiki);
+    $admin_acc = has_admin();
 }
 
 if ($admin_acc == 'n') {
@@ -451,7 +411,6 @@ if (
             && ! empty($_POST['root_pass'])
         ) {
             $dbconn = initTikiDB(
-                $api_tiki,
                 $_POST['host'],
                 $_POST['root_user'],
                 $_POST['root_pass'],
@@ -461,7 +420,6 @@ if (
             );
         } else {
             $dbconn = initTikiDB(
-                $api_tiki,
                 $_POST['host'],
                 $_POST['user'],
                 $_POST['pass'],
@@ -481,7 +439,7 @@ if (
             }
             write_local_php($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['name'], $client_charset);
 
-            // TODO: it is not possible to add_log if we don't have tables created
+            // TODO: it is not possible to add_log if we don't have tables created => Maybe log to a file for now, and to database after
             //$logslib->add_log('install', 'database credentials updated with hostname=' . $_POST['host'] . '; dbname='
             //  . $_POST['name'] .'; dbuser=' . $_POST['user']);
 
@@ -527,7 +485,7 @@ if ($dbconn) {
         }
         update_preferences($prefs);
         $smarty->assign('admin_email', get_admin_email());
-        $smarty->assign('upgradefix', (empty($dbversion_tiki) || $dbversion_tiki[0] < 4) ? 'y' : 'n');
+        $smarty->assign('upgradefix', 'y');
     }
     $smarty->assign('tikidb_is20', has_tiki_db_20());
 }
@@ -838,7 +796,6 @@ var jqueryTiki = new Object();
 jqueryTiki.ui = false;
 jqueryTiki.ui_theme = "";
 jqueryTiki.tooltips = false;
-jqueryTiki.autocomplete = false;
 jqueryTiki.reflection = false;
 jqueryTiki.tablesorter = false;
 jqueryTiki.colorbox = false;

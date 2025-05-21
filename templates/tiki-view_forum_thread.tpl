@@ -82,7 +82,7 @@
                 {if $prefs.sefurl_short_url eq 'y'}
                     <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                         {icon name="link"} {tr}Get a short URL{/tr}
-                        {assign var="hasPageAction" value="1"}
+                        {$hasPageAction="1"}
                     </a>
                 {/if}
                 {if $prefs.feature_forum_topics_archiving eq 'y' && $tiki_p_admin_forum eq 'y'}
@@ -125,9 +125,9 @@
 
 
 {if $openpost eq 'y'}
-    {assign var="postclass" value="forumpostopen"}
+    {$postclass="forumpostopen"}
 {else}
-    {assign var="postclass" value="forumpost"}
+    {$postclass="forumpost"}
 {/if}
 
 <section class="top_post">

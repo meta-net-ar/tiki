@@ -93,7 +93,31 @@ function wikiplugin_list_info()
                     ['text' => tra('No'), 'value' => 'n'],
                     ['text' => tra('Yes'), 'value' => 'y']
                 ]
-            ]
+            ],
+            'carousel_height' => [
+                'required' => false,
+                'name' => tra('Carousel Height'),
+                'description' => tra('Set how the carousel height should be handled. Choose "Tallest Image" to match the tallest slide (default), "Variable Height" to let each image define its own height, or "Custom Height" to enter a fixed pixel value.'),
+                'filter' => 'text',
+                'default' => 'tallest',
+                'since' => '29.0',
+                'options' => [
+                    ['text' => tra('Tallest Image'), 'value' => 'tallest'],
+                    ['text' => tra('Variable Height'), 'value' => 'variable'],
+                    ['text' => tra('Custom Height'), 'value' => 'custom'],
+                ],
+            ],
+            'custom_height' => [
+                'required' => false,
+                'name' => tra('Custom Height'),
+                'description' => tra('Specify the fixed height of the carousel in pixels. Enter numbers only, without "px". For example: 400.'),
+                'filter' => 'int',
+                'default' => 500,
+                'depends' => [
+                    'field' => 'carousel_height',
+                    'value' => 'custom',
+                ],
+            ],
         ],
     ];
 }

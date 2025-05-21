@@ -82,7 +82,7 @@ class Importer extends Comments
 
             $pid = 0;
             if ($row['parentId'] != 0 && ! $hash[$row['parentId']]) {
-                array_push($fHash, $row);
+                $fHash[] = $row;
                 $fPosts2++;
                 continue;
             } elseif ($row['parentId'] != 0) {
@@ -182,11 +182,11 @@ class Importer extends Comments
                 if (strpos($field, 'NULL') !== false && strlen($field) == 4) {
                     $field = null;
                 }
-                array_push($fields, $field);
+                $fields[] = $field;
                 $record = substr($record, $a + 1);
             }
         }
-        array_push($fields, $record);
+        $fields[] = $record;
 
         return $fields;
     }
@@ -226,7 +226,7 @@ class Importer extends Comments
                     $a = substr($fL, 3);
                     $b = strpos($a, '`');
                     $c = substr($a, 0, $b);
-                    array_push($headings, $c);
+                    $headings[] = $c;
                     $fL = fgets($fH);
                 }
             }
@@ -287,7 +287,7 @@ class Importer extends Comments
                                 for ($z = 0, $zcount_fields = count($fields); $z < $zcount_fields; $z++) {
                                     $rec[$headings[$z]] = $fields[$z];
                                 }
-                                array_push($thash, $rec);
+                                $thash[] = $rec;
                             }
                         }
                     }
@@ -330,7 +330,7 @@ class Importer extends Comments
                 $forum['id'] = $fields['forumId'];
                 $forum['name'] = $fields['name'];
                 $forum['comments'] = $fields['comments'];
-                array_push($forums, $forum);
+                $forums[] = $forum;
             } else {
                 return -1;
             }

@@ -37,7 +37,7 @@
                             {/if}
                         </td>
                         <td>
-                            <select name="notification~{$option.hash|escape}" class="noselect2 form-select">
+                            <select name="notification~{$option.hash|escape}" class="form-select">
                                 {foreach $priorities as $priority => $info}
                                     <option value="{$priority|escape}" {if $priority eq $option.priority}selected{/if}>{$info.label|escape}</option>
                                 {/foreach}

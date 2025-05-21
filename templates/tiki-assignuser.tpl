@@ -1,4 +1,4 @@
-{assign var=escuser value=$assign_user|escape:url}
+{$escuser=$assign_user|escape:url}
 {title}{tr _0=$assign_user}Assign User %0 to Groups{/tr}{/title}
 
 <div class="t_navbar btn-group mb-3">

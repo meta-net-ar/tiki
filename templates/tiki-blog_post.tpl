@@ -6,7 +6,7 @@
     {/if}
 
     {if $blogId gt 0}
-        {assign var=thisblog value=$blogId|sefurl:blog}
+        {$thisblog=$blogId|sefurl:blog}
         {button href=$thisblog class="btn btn-info" _text="{tr}View Blog{/tr}"}
     {/if}
 

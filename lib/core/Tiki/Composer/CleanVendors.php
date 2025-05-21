@@ -35,20 +35,12 @@ class CleanVendors
     {
         $vendors = rtrim($event->getComposer()->getConfig()->get('vendor-dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
-        self::remove($vendors . 'jquery/jquery-sheet', [
-            'jquery-1.10.2.min.js', 'jquery-ui', 'parser.php', 'parser/formula/formula.php'
-        ]);
+        // self::remove($vendors . 'jquery/jquery-sheet', [
+        //     'jquery-1.10.2.min.js', 'jquery-ui', 'parser.php', 'parser/formula/formula.php'
+        // ]);
 
-        self::remove($vendors . 'jquery-plugins/reflection-jquery', 'src');
+        // self::remove($vendors . 'jquery-plugins/reflection-jquery', 'src');
         self::remove($vendors . 'studio-42/elfinder', ['files', 'elfinder.html']);
-
-        self::remove($vendors . 'adodb/adodb-php', [
-            'cute_icons_for_site', 'session/adodb-sess.txt', 'scripts', 'pear/readme.Auth.txt',
-            'datadict/datadict', 'session/session', 'adodb/adodb/perf/perf',
-            'adodb/adodb/drivers/drivers', 'adodb-active-recordx.inc.php',
-            'drivers/adodb-informix.inc.php', 'perf/perf-informix.inc.php',
-            'datadict/datadict-informix.inc.php'
-        ]);
 
         self::remove($vendors . 'jason-munro/cypht', 'hm3.sample.ini');
         self::remove($vendors . 'league/commonmark', 'CHANGELOG-0.x.md');

@@ -62,7 +62,7 @@
                                                 <td>{$requests[ix].timestamp|tiki_short_time}</td>
                                                 <td>
                                                     {if $status eq 'online'}
-                                                        {assign var=thereqId value=$requests[ix].reqId}
+                                                        {$thereqId=$requests[ix].reqId}
                                                         <a class="btn btn-outline-success" class="link" {jspopup href="tiki-live_support_chat_window.php?reqId=$thereqId&amp;role=operator"}>{tr}Accept{/tr}</a>
                                                         <a class="btn btn-outline-primary" class="link" {jspopup href="tiki-live_support_chat_window.php?reqId=$thereqId&amp;role=observer"}>{tr}Join{/tr}</a>
                                                     {else}

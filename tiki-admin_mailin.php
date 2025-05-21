@@ -42,7 +42,7 @@ if (isset($_REQUEST['mailin_autocheck'])) {
                 $prefs['mailin_autocheckFreq']
             ));
         } else {
-            Feedback::warning(sprintf(tra('Automatic Mail-in accounts checking disabled')));
+            Feedback::warning(tra('Automatic Mail-in accounts checking disabled'));
         }
     }
 }
@@ -61,7 +61,7 @@ if ($checkPackage == 'y') {
 } else {
     $message = $errorMessageToAppend;
     $message .= tr('To use Fieldslinker Tiki needs the philippemarcmeyer/fieldslinker package. If you do not have permission to install this package, ask the site administrator.');
-    Feedback::warning(sprintf(tra($message)));
+    Feedback::warning(tra($message));
 }
 
 $smarty->assign('mailin_types', $mailinlib->list_available_types());

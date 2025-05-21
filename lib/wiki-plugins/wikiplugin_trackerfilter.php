@@ -260,9 +260,6 @@ function wikiplugin_trackerfilter($data, $params)
                         return true;
                     });'
     );
-    if ($prefs['jquery_select2'] === 'y') {
-        $headerlib->add_css('@media (min-width: 768px) { .tiki #col1 .trackerfilter form .table-responsive { overflow-x: visible; overflow-y: visible; }} /* jquery_select2 specific: edit this in wikiplugin_trackerfilter.php */');
-    } // TODO: move the CSS to less and add class html attribute in wikiplugin_trackerfilter.tpl instead
 
     if (! empty($_REQUEST['tracker_filters']) && count($_REQUEST['tracker_filters']) > 0) {
         foreach ($_REQUEST['tracker_filters'] as $tf_vals) {

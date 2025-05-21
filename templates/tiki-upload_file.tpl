@@ -1,30 +1,30 @@
 {if !empty($filegals_manager) and !isset($smarty.request.simpleMode)}
-    {assign var=simpleMode value='y'}
+    {$simpleMode='y'}
 {else}
-    {assign var=simpleMode value='n'}
+    {$simpleMode='n'}
 {/if}
 {title help="File Galleries" admpage="fgal"}{if $editFileId}{tr}Edit File:{/tr} {$fileInfo.filename}{else}{tr}Upload File{/tr}{/if}{/title}
 {if !empty($galleryId) or (isset($galleries) and count($galleries) > 0 and $tiki_p_list_file_galleries eq 'y') or (isset($uploads) and count($uploads) > 0)}
     <div class="t_navbar mb-4">
         {if !empty($galleryId) and !isset($insertion_syntax)}
-            {assign var=btnHref value="tiki-list_file_gallery.php"}
+            {$btnHref="tiki-list_file_gallery.php"}
             {if isset($allowedMimeTypes)}
-                {assign var=btnHref value=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
+                {$btnHref=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
             {/if}
             {button galleryId="$galleryId" href=$btnHref class="btn btn-primary" _text="{tr}Browse Gallery{/tr}"}
         {/if}
         {if isset($galleries) and count($galleries) > 0 and $tiki_p_list_file_galleries eq 'y'}
             {if !empty($filegals_manager)}
-                {assign var=fgmanager value=$filegals_manager|escape}
-                {assign var=btnHref value="tiki-list_file_gallery.php?filegals_manager=$fgmanager"}
+                {$fgmanager=$filegals_manager|escape}
+                {$btnHref="tiki-list_file_gallery.php?filegals_manager=$fgmanager"}
                 {if isset($allowedMimeTypes)}
-                    {assign var=btnHref value=$btnHref|cat:"&allowedMimeTypes="|cat:$allowedMimeTypes}
+                    {$btnHref=$btnHref|cat:"&allowedMimeTypes="|cat:$allowedMimeTypes}
                 {/if}
                 {button href=$btnHref|escape class="btn btn-info" _text="{tr}List Galleries{/tr}"}
             {else}
-                {assign var=btnHref value="tiki-list_file_gallery.php"}
+                {$btnHref="tiki-list_file_gallery.php"}
                 {if isset($allowedMimeTypes)}
-                    {assign var=btnHref value=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
+                    {$btnHref=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
                 {/if}
                 {button href=$btnHref class="btn btn-info" _text="{tr}List Galleries{/tr}"}
             {/if}

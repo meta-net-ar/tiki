@@ -439,7 +439,7 @@ $fieldFactory = $definition->getFieldFactory();
 
 $rateFieldId = $definition->getRateField();
 if (isset($tracker_info['useRatings']) and $tracker_info['useRatings'] == 'y' and $tiki_p_tracker_vote_ratings == 'y') {
-    if ($user and $tiki_p_tracker_vote_ratings == 'y' and isset($rateFieldId) and isset($_REQUEST['ins_' . $rateFieldId])) {
+    if ($user and isset($rateFieldId) and isset($_REQUEST['ins_' . $rateFieldId])) {
         $trklib->replace_rating($trackerId, $itemId, $rateFieldId, $user, $_REQUEST['ins_' . $rateFieldId]);
         header('Location: tiki-view_tracker_item.php?trackerId=' . $trackerId . '&itemId=' . $itemId);
         die;
@@ -507,7 +507,7 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["save_return"]) || isset($_REQUE
         if (count($field_errors['err_mandatory']) == 0 && count($field_errors['err_value']) == 0) {
             $smarty->assign('input_err', '0'); // no warning to display
             if ($prefs['feature_groupalert'] == 'y') {
-                $groupalertlib->Notify(isset($_REQUEST['listtoalert']) ? $_REQUEST['listtoalert'] : '', "tiki-view_tracker_item.php?itemId=" . $itemId);
+                $groupalertlib->Notify($_REQUEST['listtoalert'] ?? '', "tiki-view_tracker_item.php?itemId=" . $itemId);
             }
             $access->checkCsrf();
             if (! isset($_REQUEST["edstatus"]) or ($tracker_info["showStatus"] != 'y' and $tiki_p_admin_trackers != 'y')) {

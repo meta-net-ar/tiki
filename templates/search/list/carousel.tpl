@@ -1,7 +1,29 @@
-{* changes 24.01.2021 by bob_romoxi *}
+{* changes 24.01.2021 by bob_romoxi, updated 15.05.2025 for height control *}
 {* if for controls and pagination *}
 {if $carousel and not empty($carousel.id)}{$containerId = $carousel.id}{else}{$containerId = 'wp_list_carousel'}{/if}
 {if $carousel and not empty($carousel.mode)}{$mode = $carousel.mode}{else}{$mode = ''}{/if}
+
+{* Determine height behavior *}
+{if $carousel and not empty($carousel.height)}{$heightMode = $carousel.height}{else}{$heightMode = 'tallest'}{/if}
+
+<style>
+    #{$containerId} .carousel-inner {
+        display: flex;
+        align-items: center;
+        {if $heightMode eq 'tallest'}
+            /* Height set by JS */
+        {elseif $heightMode eq 'variable'}
+            height: auto;
+        {else}  
+            height: {$heightMode}px;
+        {/if}
+    }
+    #{$containerId} .carousel-item p {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+
 <div id="{$containerId}" class="carousel slide {$mode}" data-bs-ride="carousel"
         {if $carousel and $carousel.interval} data-bs-interval="{$carousel.interval}"{/if}
         {if $carousel and isset($carousel.pause)} data-pause="{$carousel.pause}"{/if}
@@ -56,4 +78,38 @@
 </div>
 {if not empty($carousel.pagination) and $carousel.pagination neq 'n'}
     {pagination_links resultset=$results}{/pagination_links}
+{/if}
+
+{if $heightMode eq 'tallest'}
+    {jq}
+        $(document).ready(function() {
+            const $carousel = $("#{{$containerId}}");
+            const $images = $carousel.find('.carousel-item img');
+            let maxHeight = 0;
+            let loadedCount = 0;
+
+            const checkAllLoadedAndSetHeight = function() {
+                loadedCount++;
+                if (loadedCount === $images.length) {
+                    $images.each(function() {
+                        maxHeight = Math.max(maxHeight, $(this).height());
+                    });
+                    $carousel.find('.carousel-inner').css('height', maxHeight + 'px');
+                }
+            };
+
+            $images.each(function() {
+                const $img = $(this);
+                if (this.complete) {
+                    checkAllLoadedAndSetHeight();
+                } else {
+                    $img.on('load', checkAllLoadedAndSetHeight)
+                        .on('error', function() {
+                            console.error('Image failed to load:', $img.attr('src'));
+                            checkAllLoadedAndSetHeight();
+                        });
+                }
+            });
+        });
+    {/jq}
 {/if}

@@ -297,20 +297,15 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
 
     $tikilib->set_user_preference($userwatch, 'remember_closed_rboxes', empty($_POST['remember_closed_rboxes']) ? 'n' : 'y');
 
-    $email_isPublic = isset($_POST['email_isPublic']) ? $_POST['email_isPublic'] : 'n';
+    $email_isPublic = $_POST['email_isPublic'] ?? 'n';
     $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);
     $tikilib->set_user_preference($userwatch, 'mailCharset', $_POST['mailCharset']);
     // Custom fields
     foreach ($customfields as $custpref => $prefvalue) {
-        if (isset($_POST[$customfields[$custpref]['prefName']])) {
-            $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
+        $prefName = $prefvalue['prefName'];
+        if (isset($_POST[$prefName])) {
+            $tikilib->set_user_preference($userwatch, $prefName, $_POST[$prefName]);
         }
-    }
-    // Custom fields
-    foreach ($customfields as $custpref => $prefvalue) {
-        // print $customfields[$custpref]['prefName'];
-        // print $_REQUEST[$customfields[$custpref]['prefName']];
-        $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
     }
 
     if (isset($_POST['mess_maxRecords'])) {
@@ -476,7 +471,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             $cryptlib = TikiLib::lib('crypt');
             $cryptlib->onChangeUserPassword($_POST["pass"], $_POST["pass1"]);
         }
-        Feedback::success(sprintf(tra('Password has been changed')));
+        Feedback::success(tra('Password has been changed'));
     }
 }
 
@@ -665,8 +660,8 @@ $smarty->assign('usertrackerId', $usertrackerId);
 $smarty->assign('useritemId', $useritemId);
 // Custom fields
 foreach ($customfields as $custpref => $prefvalue) {
-    $customfields[$custpref]['value'] = $tikilib->get_user_preference($userwatch, $customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
-    $smarty->assign($customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
+    $prefvalue['value'] = $tikilib->get_user_preference($userwatch, $prefvalue['prefName'], $prefvalue['value']);
+    $smarty->assign($prefvalue['prefName'], $prefvalue['value']);
 }
 if ($prefs['feature_messages'] == 'y' && $tiki_p_messages == 'y') {
     $unread = $tikilib->user_unread_messages($userwatch);

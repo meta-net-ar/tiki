@@ -1,6 +1,6 @@
 {* Module layout with controls *}
-{if !isset($module_position)}{assign var=module_position value=''}{/if}
-{if !isset($module_ord)}{assign var=module_ord value=''}{/if}
+{if !isset($module_position)}{$module_position=''}{/if}
+{if !isset($module_ord)}{$module_ord=''}{/if}
 {capture name=name}{$module_name|replace:"+":"_"|cat:$module_position|cat:$module_ord|escape}{/capture}
 
 {if !empty($module_params.topclass)}<div class="{$module_params.topclass}">{/if}
@@ -9,7 +9,7 @@
         {if $prefs.feature_layoutshadows eq 'y'}
             <div class="box-shadow">{$prefs.box_shadow_start}
         {/if}
-        {if !isset($moduleId)}{assign var=moduleId value=' '}{/if}
+        {if !isset($moduleId)}{$moduleId=' '}{/if}
         <div id="module_{$moduleId}"
              class="card box-{$module_name} module"{if !empty($tpl_module_style)} style="{$tpl_module_style}"{/if}>
             {if $module_decorations ne 'n'}

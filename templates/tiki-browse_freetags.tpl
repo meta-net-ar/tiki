@@ -107,7 +107,7 @@
             <div class="freetagsort card-footer">
                 <div class="text-center">
                     {if empty($maxPopular)}
-                        {assign var=maxPopular value=50+$prefs.freetags_browse_amount_tags_in_cloud}
+                        {$maxPopular=50+$prefs.freetags_browse_amount_tags_in_cloud}
                     {/if}
                     <a class='more' href="{$smarty.server.SCRIPT_NAME}?{query maxPopular=$maxPopular tagString=$tagString}">{tr}More Popular Tags{/tr}</a>
                 </div>
@@ -120,63 +120,63 @@
             </div>
         </div>
     {/if}
-    {assign var=cpt value=0}
+    {$cpt=0}
     {capture name="browse"}
         {if $type eq $objectType}
-            {assign var=thisclass value='active'}
+            {$thisclass='active'}
         {else}
-            {assign var=thisclass value=''}
+            {$thisclass=''}
         {/if}
         {if $broaden eq ''}
-            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+            {$thisbroaden="&amp;broaden=$broaden"}
         {else}
-            {assign var=thisbroaden value=''}
-            {assign var=broaden value="&amp;broaden=$broaden"}
+            {$thisbroaden=''}
+            {$broaden="&amp;broaden=$broaden"}
         {/if}
         <div class="btn-group btn-toolbar mb-4">
             {button _text="{tr}All{/tr}" _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type="}
             {foreach item=objectType from=$objects_with_freetags}
                 {foreach item=sect key=key from=$sections_enabled}
                     {if isset($sect.objectType) and $sect.objectType eq $objectType and $objectType neq 'blog post'}
-                        {assign var=feature_label value=$objectType|ucwords}
+                        {$feature_label=$objectType|ucwords}
                         {if $type eq $objectType}
-                            {assign var=thisclass value='active'}
+                            {$thisclass='active'}
                         {else}
-                            {assign var=thisclass value=''}
+                            {$thisclass=''}
                         {/if}
                         {if $broaden eq ''}
-                            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden="&amp;broaden=$broaden"}
                         {else}
-                            {assign var=thisbroaden value=''}
-                            {assign var=broaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden=''}
+                            {$broaden="&amp;broaden=$broaden"}
                         {/if}
-                        {assign var=thistype value=$objectType|escape:'url'}
+                        {$thistype=$objectType|escape:'url'}
                         {capture name="fl"}{tr}{$feature_label}{/tr}{/capture}
                         {button _text=$smarty.capture.fl _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type=$thistype"}
-                        {assign var=cpt value=$cpt+1}
+                        {$cpt=$cpt+1}
                     {/if}
                     {if isset($sect.itemObjectType) and $sect.itemObjectType eq $objectType}
                         {if $objectType eq 'tracker %d'}
-                            {assign var=feature_label value='Tracker Item'}
-                            {assign var=objectType value='trackerItem'}
+                            {$feature_label='Tracker Item'}
+                            {$objectType='trackerItem'}
                         {else}
-                            {assign var=feature_label value=$objectType|ucwords}
+                            {$feature_label=$objectType|ucwords}
                         {/if}
                         {if $type eq $objectType}
-                            {assign var=thisclass value='active'}
+                            {$thisclass='active'}
                         {else}
-                            {assign var=thisclass value=''}
+                            {$thisclass=''}
                         {/if}
                         {if $broaden eq ''}
-                            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden="&amp;broaden=$broaden"}
                         {else}
-                            {assign var=thisbroaden value=''}
-                            {assign var=broaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden=''}
+                            {$broaden="&amp;broaden=$broaden"}
                         {/if}
-                        {assign var=thistype value=$objectType|escape:'url'}
+                        {$thistype=$objectType|escape:'url'}
                         {capture name="fl"}{tr}{$feature_label}{/tr}{/capture}
                         {button _text=$smarty.capture.fl _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type=$thistype"}
-                        {assign var=cpt value=$cpt+1}
+                        {$cpt=$cpt+1}
                     {/if}
                 {/foreach}
             {/foreach}

@@ -1741,17 +1741,6 @@ function prefs_feature_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
         ],
-        'feature_editcss' => [
-            'name' => tra('Edit CSS'),
-            'description' => tra('Edit CSS files directly in the browser.'),
-            'type' => 'flag',
-            'help' => 'Edit-CSS',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'perspective' => false,
-            'tags' => ['experimental'],
-            'default' => 'n',
-            'view' => 'tiki-edit_css.php',
-        ],
         'feature_theme_control' => [
             'name' => tra('Theme Control'),
             'description' => tra('Assign different themes to various sections, categories, and objects.'),
@@ -1762,30 +1751,6 @@ function prefs_feature_list($partial = false)
             ],
             'default' => 'n',
             'view' => 'tiki-theme_control.php',
-        ],
-        'feature_view_tpl' => [
-            'name' => tra('Tiki template viewing'),
-            'type' => 'flag',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'help' => 'View-Templates',
-            'keywords' => tra('template'),
-            'tags' => ['experimental'],
-            'perspective' => false,
-            'default' => 'n',
-        ],
-        'feature_edit_templates' => [
-            'name' => tra('Edit templates'),
-            'type' => 'flag',
-            'help' => 'Edit-Templates',
-            'warning' => tr('May not be functional in Tiki 14+'),
-            'keywords' => tra('template'),
-            'perspective' => false,
-            'dependencies' => [
-                'feature_view_tpl',
-            ],
-            'default' => 'n',
-            'view' => 'tiki-edit_templates.php',
-            'tags' => ['experimental'],
         ],
         'feature_custom_html_head_content' => [
             'name' => tra('Custom HTML head content'),
@@ -1909,20 +1874,6 @@ function prefs_feature_list($partial = false)
             'hint' => tra('Additional div elements for shadows, radiused corners or other decorative styling'),
             'type' => 'flag',
             'default' => 'n',
-        ],
-        'feature_jquery_autocomplete' => [
-            'name' => tra('jQuery Autocomplete'),
-            'description' => tra('Provides various dropdown menus on many text input boxes for page names, user names, groups, tags, etc.'),
-            'type' => 'flag',
-            'help' => 'JQuery#Autocomplete',
-            'dependencies' => [
-                'feature_jquery_ui',
-            ],
-            'conflicts' => [
-                'elementplus_autocomplete',
-            ],
-            'default' => 'n',   // autocomplete on pages in QuickEdit (more coming soon)
-            'tags' => ['deprecated'],
         ],
         'feature_jquery_reflection' => [
             'name' => tra('Reflection'),

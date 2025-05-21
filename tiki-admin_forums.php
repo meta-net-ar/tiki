@@ -117,7 +117,6 @@ if (isset($_REQUEST['lock']) && isset($_REQUEST['forumId'])) {
     }
 }
 if ($prefs['feature_multilingual'] === 'y') {
-    $languages = [];
     $langLib = TikiLib::lib('language');
     $languages = $langLib->list_languages();
     $smarty->assign_by_ref('languages', $languages);
@@ -126,46 +125,6 @@ if ($prefs['feature_multilingual'] === 'y') {
 }
 
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
-    $_REQUEST['useMail'] = isset($_REQUEST['useMail']) ? 'y' : 'n';
-    $useMail = $_REQUEST['useMail'];
-    $_REQUEST['usePruneUnreplied'] = isset($_REQUEST['usePruneUnreplied']) ? 'y' : 'n';
-    $usePruneUnreplied = $_REQUEST['usePruneUnreplied'];
-    $_REQUEST['controlFlood'] = isset($_REQUEST['controlFlood']) ? 'y' : 'n';
-    $controlFlood = $_REQUEST['controlFlood'];
-    $_REQUEST['usePruneOld'] = isset($_REQUEST['usePruneOld']) ? 'y' : 'n';
-    $usePruneOld = $_REQUEST['usePruneOld'];
-    $_REQUEST['vote_threads'] = isset($_REQUEST['vote_threads']) ? 'y' : 'n';
-    $_REQUEST['outbound_mails_for_inbound_mails'] = isset($_REQUEST['outbound_mails_for_inbound_mails']) ? 'y' : 'n';
-    $_REQUEST['outbound_mails_reply_link'] = isset($_REQUEST['outbound_mails_reply_link']) ? 'y' : 'n';
-    $_REQUEST['topics_list_reads'] = isset($_REQUEST['topics_list_reads']) ? 'y' : 'n';
-    $_REQUEST['topics_list_replies'] = isset($_REQUEST['topics_list_replies']) ? 'y' : 'n';
-    $_REQUEST['show_description'] = isset($_REQUEST['show_description']) ? 'y' : 'n';
-    $_REQUEST['is_flat'] = isset($_REQUEST['is_flat']) ? 'y' : 'n';
-    $_REQUEST['topic_summary'] = isset($_REQUEST['topic_summary']) ? 'y' : 'n';
-    $_REQUEST['topic_smileys'] = isset($_REQUEST['topic_smileys']) ? 'y' : 'n';
-    $_REQUEST['ui_avatar'] = isset($_REQUEST['ui_avatar']) ? 'y' : 'n';
-    $_REQUEST['ui_rating_choice_topic'] = isset($_REQUEST['ui_rating_choice_topic']) ? 'y' : 'n';
-    $_REQUEST['ui_flag'] = isset($_REQUEST['ui_flag']) ? 'y' : 'n';
-    $_REQUEST['ui_email'] = isset($_REQUEST['ui_email']) ? 'y' : 'n';
-    $_REQUEST['ui_posts'] = isset($_REQUEST['ui_posts']) ? 'y' : 'n';
-    $_REQUEST['ui_level'] = isset($_REQUEST['ui_level']) ? 'y' : 'n';
-    $_REQUEST['ui_online'] = isset($_REQUEST['ui_online']) ? 'y' : 'n';
-    $_REQUEST['topics_list_pts'] = isset($_REQUEST['topics_list_pts']) ? 'y' : 'n';
-    $_REQUEST['topics_list_lastpost'] = isset($_REQUEST['topics_list_lastpost']) ? 'y' : 'n';
-    $_REQUEST['topics_list_lastpost_title'] = isset($_REQUEST['topics_list_lastpost_title']) ? 'y' : 'n';
-    $_REQUEST['topics_list_lastpost_avatar'] = isset($_REQUEST['topics_list_lastpost_avatar']) ? 'y' : 'n';
-    $_REQUEST['topics_list_author'] = isset($_REQUEST['topics_list_author']) ? 'y' : 'n';
-    $_REQUEST['topics_list_author_avatar'] = isset($_REQUEST['topics_list_author_avatar']) ? 'y' : 'n';
-    $_REQUEST['att_list_nb'] = isset($_REQUEST['att_list_nb']) ? 'y' : 'n';
-    if (empty($_REQUEST['threadOrdering'])) {
-        $_REQUEST['threadOrdering'] = '';
-    }
-    if (empty($_REQUEST['threadStyle'])) {
-        $_REQUEST['threadStyle'] = '';
-    }
-    if (empty($_REQUEST['commentsPerPage'])) {
-        $_REQUEST['commentsPerPage'] = '';
-    }
     if (empty($_REQUEST['image'])) {
         $_REQUEST['image'] = '';
     }
@@ -176,72 +135,18 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     if (substr($_REQUEST["att_store_dir"], -1) != "\\" && substr($_REQUEST["att_store_dir"], -1) != "/" && $_REQUEST["att_store_dir"] != "") {
         $_REQUEST["att_store_dir"] .= "/";
     }
-
-    $_REQUEST['forumLanguage'] = htmlspecialchars(isset($_REQUEST["forumLanguage"]) ? $_REQUEST["forumLanguage"] : '');
-
+    $_REQUEST['forumLanguage'] = htmlspecialchars($_REQUEST["forumLanguage"] ?? '');
     $tx = TikiDb::get()->begin();
-    $fid = $commentslib->replace_forum(
-        [
-            'forumId' => $_REQUEST["forumId"],
-            'name' => $_REQUEST["name"],
-            'description' => $_REQUEST["description"] ?? "",
-            'controlFlood' => $controlFlood ?? 'n',
-            'floodInterval' => $_REQUEST["floodInterval"] ?? 120,
-            'moderator' => $_REQUEST["moderator"] ?? 'admin',
-            'mail' => $_REQUEST["mail"] ?? '',
-            'useMail' => $useMail ?? 'n',
-            'usePruneUnreplied' => $usePruneUnreplied ?? 'n',
-            'pruneUnrepliedAge' => $_REQUEST["pruneUnrepliedAge"] ?? 2592000,
-            'usePruneOld' => $usePruneOld ?? 'n',
-            'pruneMaxAge' => $_REQUEST["pruneMaxAge"] ?? 259200,
-            'topicsPerPage' => $_REQUEST["topicsPerPage"] ?? 10,
-            'topicOrdering' => $_REQUEST["topicOrdering"] ?? 'lastPost_desc',
-            'threadOrdering' => $_REQUEST["threadOrdering"] ?? '',
-            'section' => $_REQUEST["section"] ?? '',
-            'topics_list_reads' => $_REQUEST['topics_list_reads'] ?? 'y',
-            'topics_list_replies' => $_REQUEST['topics_list_replies'] ?? 'y',
-            'topics_list_pts' => $_REQUEST['topics_list_pts'] ?? 'n',
-            'topics_list_lastpost' => $_REQUEST['topics_list_lastpost'] ?? 'y',
-            'topics_list_author' => $_REQUEST['topics_list_author'] ?? 'y',
-            'vote_threads' => $_REQUEST['vote_threads'] ?? 'n',
-            'show_description' => $_REQUEST['show_description'] ?? 'n',
-            'inbound_pop_server' => $_REQUEST['inbound_pop_server'] ?? '',
-            'inbound_pop_port' => $_REQUEST['inbound_pop_port'] ?? 110,
-            'inbound_pop_user' => $_REQUEST['inbound_pop_user'] ?? '',
-            'inbound_pop_password' => $_REQUEST['inbound_pop_password'] ?? '',
-            'outbound_address' => trim($_REQUEST['outbound_address']) ?? '',
-            'outbound_mails_for_inbound_mails' => $_REQUEST['outbound_mails_for_inbound_mails'] ?? '',
-            'outbound_mails_reply_link' => $_REQUEST['outbound_mails_reply_link'] ?? 'n',
-            'outbound_from' => $_REQUEST['outbound_from'] ?? '',
-            'topic_smileys' => $_REQUEST['topic_smileys'] ?? 'n',
-            'topic_summary' => $_REQUEST['topic_summary'] ?? 'n',
-            'ui_avatar' => $_REQUEST['ui_avatar'] ?? 'y',
-            'ui_rating_choice_topic' => $_REQUEST['ui_rating_choice_topic'] ?? 'y',
-            'ui_flag' => $_REQUEST['ui_flag'] ?? 'y',
-            'ui_posts' => $_REQUEST['ui_posts'] ?? 'n',
-            'ui_level' => $_REQUEST['ui_level'] ?? 'n',
-            'ui_email' => $_REQUEST['ui_email'] ?? 'n',
-            'ui_online' => $_REQUEST['ui_online'] ?? 'n',
-            'approval_type' => $_REQUEST['approval_type'] ?? 'all_posted',
-            'moderator_group' => $_REQUEST['moderator_group'] ?? '',
-            'forum_password' => $_REQUEST['forum_password'] ?? '',
-            'forum_use_password' => $_REQUEST['forum_use_password'] ?? 'n',
-            'att' => $_REQUEST['att'] ?? 'att_no',
-            'att_store' => $_REQUEST['att_store'] ?? 'db',
-            'att_store_dir' => $_REQUEST['att_store_dir'] ?? '',
-            'att_max_size' => $_REQUEST['att_max_size'] ?? 1000000,
-            'forum_last_n' => $_REQUEST['forum_last_n'] ?? 0,
-            'commentsPerPage' => $_REQUEST['commentsPerPage'] ?? '',
-            'threadStyle' => $_REQUEST['threadStyle'] ?? '',
-            'is_flat' => $_REQUEST['is_flat'] ?? 'n',
-            'att_list_nb' => $_REQUEST['att_list_nb'] ?? 'n',
-            'topics_list_lastpost_title' => $_REQUEST['topics_list_lastpost_title'] ?? 'y',
-            'topics_list_lastpost_avatar' => $_REQUEST['topics_list_lastpost_avatar'] ?? 'n',
-            'topics_list_author_avatar' => $_REQUEST['topics_list_author_avatar'] ?? 'n',
-            'forumLanguage' => $_REQUEST['forumLanguage'] ?? '',
-            'parentId' => $_REQUEST["parentId"] ?? 0
-        ]
-    );
+
+    $input = [];
+    foreach ($commentslib->getForumDefaultsInfo() as $key => $default) {
+        $value = $_REQUEST[$key] ?? $default;
+        if ($key == 'outbound_address') {
+            $value = trim($value);
+        }
+        $input[$key] = $value ;
+    }
+    $fid = $commentslib->replace_forum($input);
 
     if ($fid) {
         Feedback::success(tr('Forum saved'));
@@ -251,7 +156,6 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
 
     $attributelib = TikiLib::lib('attribute');
     $attributelib->set_attribute('forum', $fid, 'tiki.object.image', (int) $_REQUEST['image']);
-
     $cat_type = 'forum';
     $cat_objid = $fid;
     $cat_desc = substr($_REQUEST["description"], 0, 200);
@@ -271,7 +175,7 @@ if (
     $newForumId = $commentslib->duplicate_forum(
         $_REQUEST['duplicate_forumId'],
         $_REQUEST['duplicate_name'],
-        isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+        $_REQUEST['description'] ?? ''
     );
     if ($newForumId) {
         Feedback::success(tr('Forum duplicated'));
@@ -281,7 +185,7 @@ if (
     if (isset($_REQUEST['dupCateg']) && $_REQUEST['dupCateg'] == 'on' && $prefs['feature_categories'] == 'y') {
         $categlib = TikiLib::lib('categ');
         $cats = $categlib->get_object_categories('forum', $_REQUEST['forumId']);
-        $catObjectId = $categlib->add_categorized_object('forum', $newForumId, isset($_REQUEST['description']) ? $_REQUEST['description'] : '', $_REQUEST['name'], "tiki-view_forum.php?forumId=$newForumId");
+        $catObjectId = $categlib->add_categorized_object('forum', $newForumId, $_REQUEST['description'] ?? '', $_REQUEST['name'], "tiki-view_forum.php?forumId=$newForumId");
         foreach ($cats as $cat) {
             $categlib->categorize($catObjectId, $cat);
         }
@@ -294,68 +198,17 @@ if (
 }
 if ($_REQUEST["forumId"]) {
     $info = $commentslib->get_forum($_REQUEST["forumId"]);
-
     $attributelib = TikiLib::lib('attribute');
     $attributes = $attributelib->get_attributes('forum', $_REQUEST['forumId']);
-    $info['image'] = isset($attributes['tiki.object.image']) ? $attributes['tiki.object.image'] : '';
+    $info['image'] = $attributes['tiki.object.image'] ?? '';
 } else {
     $info = [];
-    $info["name"] = '';
-    $info["description"] = '';
-    $info["controlFlood"] = 'n';
-    $info["floodInterval"] = 120;
-    $info["moderator"] = 'admin';
-    $info["section"] = '';
-    $info["mail"] = '';
-    $info["topicsPerPage"] = 10;
-    $info["useMail"] = 'n';
-    $info["topicOrdering"] = 'lastPost_desc';
-    $info["threadOrdering"] = '';
-    $info["threadStyle"] = '';
-    $info["commentsPerPage"] = '';
-    $info["usePruneUnreplied"] = 'n';
-    $info["pruneUnrepliedAge"] = 60 * 60 * 24 * 30;
-    $info["usePruneOld"] = 'n';
-    $info["pruneMaxAge"] = 60 * 60 * 24 * 30;
-    $info["topics_list_replies"] = 'y';
-    $info["show_description"] = 'n';
-    $info["outbound_address"] = '';
-    $info["outbound_mails_for_inbound_mails"] = 'n';
-    $info["outbound_mails_reply_link"] = 'n';
-    $info["outbound_from"] = '';
-    $info["inbound_pop_server"] = '';
-    $info["inbound_pop_port"] = 110;
-    $info["inbound_pop_user"] = '';
-    $info["inbound_pop_password"] = '';
-    $info["topic_summary"] = 'n';
-    $info["topic_smileys"] = 'n';
-    $info["ui_avatar"] = 'y';
-    $info["ui_rating_choice_topic"] = 'n';
-    $info["ui_flag"] = 'y';
-    $info["ui_posts"] = 'n';
-    $info['ui_level'] = 'n';
-    $info["ui_email"] = 'n';
-    $info["ui_online"] = 'n';
-    $info["approval_type"] = 'all_posted';
-    $info["moderator_group"] = '';
-    $info['forum_password'] = '';
-    $info['forum_use_password'] = 'n';
-    $info['att'] = 'att_no';
-    $info['att_store'] = 'db';
-    $info['att_store_dir'] = '';
-    $info['att_max_size'] = 1000000;
-    $info['att_list_nb'] = 'n';
-    $info["topics_list_reads"] = 'y';
-    $info["topics_list_pts"] = 'n';
-    $info["topics_list_lastpost"] = 'y';
-    $info['topics_list_lastpost_title'] = 'y';
-    $info['topics_list_lastpost_avatar'] = 'n';
-    $info["topics_list_author"] = 'y';
-    $info['topics_list_author_avatar'] = 'n';
-    $info["vote_threads"] = 'n';
-    $info["forum_last_n"] = 0;
-    $info["is_flat"] = 'n';
-    $info["forumLanguage"] = '';
+    foreach ($commentslib->getForumDefaultsInfo() as $key => $default) {
+        if (in_array($key, ['parentId', 'forumId'])) {
+            continue;
+        }
+        $info[$key] = $default ;
+    }
     $info['image'] = '';
 }
 $smarty->assign('forumId', $_REQUEST["forumId"]);
@@ -368,29 +221,13 @@ foreach ($info as $key => $value) {
         $smarty->assign($key, $value);
     }
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = $prefs['forums_ordering'];
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$sort_mode = $_REQUEST["sort_mode"] ?? $prefs['forums_ordering'];
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (isset($_REQUEST['numrows'])) {
-    $maxRecords = $_REQUEST['numrows'];
-} else {
-    $maxRecords = $prefs['maxRecords'];
-}
+$maxRecords = $_REQUEST['numrows'] ?? $prefs['maxRecords'];
 $channels = $commentslib->list_forums($offset, $maxRecords, $sort_mode, $find, $_REQUEST['parentId']);
 if ($_REQUEST['parentId'] > 0) {
     $forumParent = $commentslib->get_forum($_REQUEST['parentId']);
@@ -462,10 +299,10 @@ $smarty->assign_by_ref('maxAttachSize', $maxAttachSize);
 $oneday = 60 * 60 * 24;
 
 $prune_values = [
-    1 * $oneday => '1' . ' ' . tra('day'),
-    2 * $oneday => '2' . ' ' . tra('days'),
-    5 * $oneday => '5' . ' ' . tra('days'),
-    7 * $oneday => '7' . ' ' . tra('days'),
+    $oneday      => '1' . ' ' . tra('day'),
+    2 * $oneday  => '2' . ' ' . tra('days'),
+    5 * $oneday  => '5' . ' ' . tra('days'),
+    7 * $oneday  => '7' . ' ' . tra('days'),
     15 * $oneday => '15' . ' ' . tra('days'),
     30 * $oneday => '30' . ' ' . tra('days'),
     60 * $oneday => '60' . ' ' . tra('days'),
@@ -482,15 +319,7 @@ $flood_values = [
     120 => '2' . ' ' . tra('mins'),
 ];
 
-$smarty->assign(
-    'flood_options',
-    [
-        15 => '15' . ' ' . tra('secs'),
-        30 => '30' . ' ' . tra('secs'),
-        60 => '1' . ' ' . tra('min'),
-        120 => '2' . ' ' . tra('mins')
-    ]
-);
+$smarty->assign('flood_options', $flood_values);
 
 $smarty->assign(
     'approval_options',

@@ -200,7 +200,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
     {if empty($tpl)}
                         </tbody>
                     {if (!empty($computedFields) || isset($tstotals)) and $items|@count gt 0}
-                        {assign var=itemoff value=0}
+                        {$itemoff=0}
                         <tfoot>
                             {if ($tstotals) && $tsOn}
                                 {include file="tablesorter/totals.tpl" nofoot="y" fieldcount="{$fieldcount}" precols="{$precols}" postcols="{$postcols}"}
@@ -286,7 +286,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
 {/capture}
 
 
-    {assign var=itemoff value=0}
+    {$itemoff=0}
     {if empty($tpl)}
         <tbody>
     {/if}
@@ -316,9 +316,9 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                     </table>
                 </div>
             {/capture}
-            {assign var=showpopup value='y'}
+            {$showpopup='y'}
         {else}
-            {assign var=showpopup value='n'}
+            {$showpopup='n'}
         {/if}
 
 
@@ -340,7 +340,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                 {/if}
 
 {* ------------------------------------ *}
-                {if !isset($list_mode)}{assign var=list_mode value="y"}{/if}
+                {if !isset($list_mode)}{$list_mode="y"}{/if}
                 {foreach from=$items[user].field_values item=field}
                     {if $field.isPublic eq 'y' and ($field.isHidden eq 'n' or $field.isHidden eq 'c'
                         or $field.isHidden eq 'p' or $field.isHidden eq 'a' or $perms.tiki_p_admin_trackers eq 'y') and $field.type ne 'x' and $field.type ne 'h'
@@ -350,7 +350,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                             {if $rowurl}<a href="{$rowurl|replacei:'#itemId':$items[user].itemId}" {$tdastyle}>{/if}
                                     {if $field.isHidden eq 'c' and $fieldr and $perms.tiki_p_admin_trackers ne 'y'}
                                         {elseif isset($perms)}
-                                            {assign var="output" value={trackeroutput 
+                                            {$output={trackeroutput
                                                 item=$items[user]
                                                 field=$field
                                                 list_mode=$list_mode
@@ -366,7 +366,7 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                                                 {$output}
                                             </span>
                                         {else}
-                                            {assign var="output" value={trackeroutput 
+                                            {$output={trackeroutput
                                                 item=$items[user]
                                                 field=$field
                                                 list_mode=$list_mode
@@ -420,10 +420,10 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                     </td>
                 {/if}
             </tr>
-            {assign var=itemoff value=$itemoff+1}
+            {$itemoff=$itemoff+1}
         {else}{* a pretty tpl *}
 {* ------------------------------------ *}
-            {assign var=itemoff value=$itemoff+1}
+            {$itemoff=$itemoff+1}
             {include file='tracker_pretty_item.tpl' fields=$items[user].field_values item=$items[user] wiki=$tpl}
             {trackerheader level=-1 title='' inTable=''}
         {/if}

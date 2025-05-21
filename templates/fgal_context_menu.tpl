@@ -32,7 +32,7 @@
             </div>
         {/if}
         {if $prefs.feature_webdav eq 'y'}
-            {assign var=virtual_path value=$file.id|virtual_path:'filegal'}
+            {$virtual_path=$file.id|virtual_path:'filegal'}
             <a style="behavior: url(#default#AnchorClick);" href="{$virtual_path}" folder="{$virtual_path}">
                 {icon name="file-archive-open"}{tr}Open as WebFolder{/tr}
             </a>
@@ -119,9 +119,9 @@
                 <a href="{$file.id|sefurl:file}">
             {/if}
                 {if $prefs.feature_file_galleries_save_draft eq 'y' and $file.nbDraft gt 0}
-                    {assign var=download_action_title value="{tr}Download current version{/tr}"}
+                    {$download_action_title="{tr}Download current version{/tr}"}
                 {else}
-                    {assign var=download_action_title value="{tr}Download{/tr}"}
+                    {$download_action_title="{tr}Download{/tr}"}
                 {/if}
                 {icon _menu_text=$menu_text _menu_icon=$menu_icon name='floppy' alt="$download_action_title"}
             </a>
@@ -133,23 +133,23 @@
 
         {if $gal_info.archives gt -1}
             {if isset($file.nbArchives) and $file.nbArchives gt 0}
-                {assign var=nb_archives value=$file.nbArchives}
+                {$nb_archives=$file.nbArchives}
                 <a href="tiki-file_archives.php?fileId={$file.fileId}{if !empty($filegals_manager)}&amp;filegals_manager={$filegals_manager|escape}{/if}">
                     {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr} ($nb_archives)"}
                 </a>
             {else}
                 {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr}"}
             {/if}
-            {assign var=replace_action_title value="{tr}Upload new version{/tr}"}
+            {$replace_action_title="{tr}Upload new version{/tr}"}
         {else}
-            {assign var=replace_action_title value="{tr}Replace{/tr}"}
+            {$replace_action_title="{tr}Replace{/tr}"}
         {/if}
 
         {if $prefs.feature_file_galleries_save_draft eq 'y'}
             {if $file.nbDraft gt 0}
-                {assign var=replace_action_title value="{tr}Replace draft{/tr}"}
+                {$replace_action_title="{tr}Replace draft{/tr}"}
             {else}
-                {assign var=replace_action_title value="{tr}Upload draft{/tr}"}
+                {$replace_action_title="{tr}Upload draft{/tr}"}
             {/if}
         {/if}
         {* can edit if I am admin or the owner of the file or the locker of the file or if I have the perm to edit file on this gallery *}
@@ -237,7 +237,7 @@
         {/if}
 
         {if $prefs.feature_webdav eq 'y'}
-            {assign var=virtual_path value=$file.fileId|virtual_path}
+            {$virtual_path=$file.fileId|virtual_path}
 
             {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _onclick="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
                 {if $prefs.feature_file_galleries_save_draft eq 'y'}

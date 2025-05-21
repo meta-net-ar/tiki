@@ -123,10 +123,10 @@ class Services_Utilities
         return ! TikiLib::lib('access')->isActionPost() || ! isset($_POST['confirmForm']) || $_POST['confirmForm'] !== 'y';
     }
 
-    public function isActionPost()
+    public function isActionPost($unsetTicket = null)
     {
         $access = TikiLib::lib('access');
-        return $access->isActionPost() && $access->checkCsrf(null, null, null, null, null, 'services');
+        return $access->isActionPost() && $access->checkCsrf(null, null, null, $unsetTicket, null, 'services');
     }
 
     public function setTicket()

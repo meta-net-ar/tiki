@@ -224,11 +224,7 @@ invalidHandler: function(event, validator) {
         $container.animate({
             scrollTop: containerScrollTop + $scrollElement.offset().top - offset - ($(window).height() / 2)
         }, 1000, function () {
-            if ($firstError.is("select") && jqueryTiki.select2) {
-                $firstError.select2("focus");
-            } else {
-                $firstError.trigger("focus");
-            }
+            $firstError.trigger("focus");
         });
     }
 }

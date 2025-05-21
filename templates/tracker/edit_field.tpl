@@ -40,12 +40,12 @@
                     </div>
                 {/if}
             {/if}
-            {assign var="groupInputCounter" value=0} {*  use to set different id to group's select multiple input *}
+            {$groupInputCounter=0} {*  use to set different id to group's select multiple input *}
             {foreach from=$info.params key=param item=def}
                 <div class="mb-3 mx-0">
                     <label for="option~{$param|escape}" class="col-form-label">{$def.name|escape}</label>
                     {if $def.separator && $def.options && $def.profile_reference == 'group'}
-                        {assign var="groupInputCounter" value=$groupInputCounter+1}
+                        {$groupInputCounter=$groupInputCounter+1}
                         <select id="user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}" size="{$def.countgrps}" multiple name="option~{$param|escape}[]" class="form-select" style="width: 100%">
                             {foreach from=$def.options["groupName"] key=val item=label}
                                 {if $label != 'Anonymous' && $label != 'Registered'}
@@ -130,17 +130,6 @@
                     {/jq}
                     {/if}
                 </div>
-                {jq}
-                    if (jqueryTiki.select2) {
-                        var users{{$field.fieldId}} = {{$data.users|json_encode}};
-                        $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}").select2(); // Ensure Select2 is initialized
-                        $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}").on("change", function() {
-                            var $group_selector = $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}");
-                            var group_selected = $group_selector.val();
-                            $group_selector.val(group_selected).trigger("change.select2");
-                        }).trigger("change");
-                    }
-                {/jq}
             {/foreach}
         {/accordion_group}
 

@@ -294,14 +294,14 @@
                         <th>{tr}Participants:{/tr}</th>
                         <td>
                             <p>
-                                {assign var="emailString" value=""}
+                                {$emailString=""}
                                 {if $calitem.participants|@count}
                                     <ul>
                                     {foreach $calitem.participants as $person}
                                         {if $emailString}
-                                            {assign var="emailString" value="{$emailString}, {$person.email}"}
+                                            {$emailString="{$emailString}, {$person.email}"}
                                         {else}
-                                            {assign var="emailString" value=$person.email}
+                                            {$emailString=$person.email}
                                         {/if}
                                         <li>
                                             {$person.username|userlink}

@@ -103,10 +103,6 @@ h1.pagetitle > a {
   color: $primary;
 }
 
-.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered .select2-selection__placeholder {
-    color: #616A70 !important;
-}
-
 // Dark mode
 .card {
     border-color: var(--tiki-card-border-color); //$light-border-subtle-dark;

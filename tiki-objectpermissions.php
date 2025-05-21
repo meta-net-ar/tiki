@@ -223,7 +223,7 @@ if (isset($_REQUEST['group'])) {
 
 // Process the form to assign a new permission to this object
 if (isset($_REQUEST['assign']) && ! isset($_REQUEST['quick_perms']) && $access->checkCsrf(true)) {
-    if (isset($_REQUEST['perm']) && ! empty($_REQUEST['perm'])) {
+    if (! empty($_REQUEST['perm'])) {
         foreach ($_REQUEST['perm'] as $group => $gperms) {
             foreach ($gperms as $perm) {
                 if ($tiki_p_admin_objects != 'y' && ! $userlib->user_has_perm_on_object($user, $_REQUEST['objectId'], $_REQUEST['objectType'], $perm)) {

@@ -38,6 +38,7 @@ $inputConfiguration = [
             'offset'               => 'int',         //get
             'edit_module'          => 'bool',        //post
             'moduleId'             => 'int',         //post
+            'menuId'               => 'int',         //get
         ],'staticKeyFiltersForArrays' => [
             'assign_params'        => 'striptags',   //post
             'groups'               => 'groupname',   //post
@@ -124,6 +125,15 @@ if (! empty($_REQUEST['edit_assign'])) {
     $smarty->assign_by_ref('info', $info);
     if (! $info['name']) {
         $smarty->assign('assign_selected', $_REQUEST['edit_assign']);
+    }
+
+    if (! empty($_REQUEST['menuId']) && $info['name'] === 'menu') {
+        $params = [];
+        if (! empty($info['params'])) {
+            parse_str($info['params'], $params);
+        }
+        $params['id'] = $_REQUEST['menuId'];
+        $info['params'] = http_build_query($params, '', '&');
     }
 
     $modinfo = $modlib->get_module_info($info['name']);

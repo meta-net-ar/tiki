@@ -78,7 +78,7 @@
                     {/foreach}
                 {/foreach}
                 {if $smarty.foreach.line.last and $rowCount gt 1}
-                    {assign var=total value=$smarty.foreach.line.total+1}
+                    {$total=$smarty.foreach.line.total+1}
                     </ul>
                     <label for="row-{$total|escape}">{tr}Row{/tr}&nbsp;{$total}</label>
                     <ul id="row-{$total|escape}" class="navbar card d-flex flex-row justify-content-start p-1 mb-3">
@@ -127,7 +127,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="tool_type">{tr}Type:{/tr}</label>
-                                <select name="tool_type" id="tool_type" class="form-control noselect2">
+                                <select name="tool_type" id="tool_type" class="form-control">
                                     <option value="Inline">Inline</option>
                                     <option value="Block">Block</option>
                                     <option value="LineBased">LineBased</option>
@@ -149,7 +149,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="tool_plugin">{tr}Plugin name:{/tr}</label>
-                                <select name="tool_plugin" id="tool_plugin" class="form-control mb-2 noselect2">
+                                <select name="tool_plugin" id="tool_plugin" class="form-control mb-2">
                                     <option value="">{tr}None{/tr}</option>
                                     {foreach from=$plugins key=plugin item=info}
                                         <option value="{$plugin|escape}">{$info.name|escape}</option>

@@ -50,7 +50,7 @@
             {if $prefs.sefurl_short_url eq 'y'}
                 <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();" role="button">
                         {icon name="link"} {tr}Get a short URL{/tr}
-                        {assign var="hasPageAction" value="1"}
+                        {$hasPageAction="1"}
                 </a>
             {/if}
             {if $tiki_p_admin eq 'y' || $tiki_p_assign_perm_blog eq 'y'}

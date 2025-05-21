@@ -33,8 +33,4 @@
     $(document).on('ready.object_selector', function (event, container) {
         $(container).find('.basic-selector').addClass('d-none');
     });
-
-    if (jqueryTiki.select2) {
-        $('#tracker_selector .object-selector').find('.form-select').tiki('select2');
-    }
 {/jq}

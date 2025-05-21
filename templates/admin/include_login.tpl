@@ -139,6 +139,7 @@
                     </div>
                 </div>
                 {preference name=user_force_avatar_upload}
+                {preference name=user_default_avatar_style}
                 {preference name=tracker_force_fill}
                 <div class="adminoptionboxchild" id="tracker_force_fill_childcontainer">
                     {preference name=tracker_force_tracker_id}

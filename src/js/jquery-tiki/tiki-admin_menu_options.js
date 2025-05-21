@@ -134,8 +134,7 @@ $(function () {
             .find("input,select")
             .on("change", function () {
                 $previewForm.trigger("submit");
-            })
-            .trigger("change.select2");
+            });
 
         $("#col1").tikiModal();
 

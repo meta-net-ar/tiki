@@ -1,6 +1,6 @@
 {strip}
 {* param item, fields, wiki(wiki:page or tpl:tpl), list_mode, perms, default_group, listfields *}
-{if !isset($list_mode)}{assign var=list_mode value="n"}{/if}
+{if !isset($list_mode)}{$list_mode="n"}{/if}
 {foreach from=$fields item=field}
     {if $field.type ne 'x'
         and (empty($listfields) or in_array($field.fieldId, $listfields))

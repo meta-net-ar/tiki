@@ -186,9 +186,9 @@
                         {foreach from=$main_admin_icons key=page item=info}
 
                             {if !empty($info.disabled)}
-                                {assign var=class value="admbox advanced btn btn-primary disabled"}
+                                {$class="admbox advanced btn btn-primary disabled"}
                             {else}
-                                {assign var=class value="admbox basic btn btn-primary"}
+                                {$class="admbox basic btn btn-primary"}
                                 <div class="swiper-slide">
                                     {* TODO: Buttons are forced to be squares, not fluid. Labels which exceed 2 lines will be cut. *}
                                     <a href="{if !empty($info.url)}{$info.url}{else}tiki-admin.php?page={$page}{/if}" alt="{$info.title} {$info.description}" class="d-flex flex-column justify-content-center align-items-center btn-primary  {if !empty($info.disabled)}disabled-clickable{/if}" title="{$info.title|escape}{if !empty($info.disabled)} ({tr}Disabled{/tr}){/if}|{$info.description}">

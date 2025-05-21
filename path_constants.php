@@ -177,7 +177,6 @@ const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
 const FONTAWESOME_CSS_SRC_PATH = 'node_modules/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/webfonts';
-const JQUERY_UI_TIMEPICKER_ADDON_DIST_PATH = 'public/generated/js/vendor_dist/jquery-ui-timepicker-addon/dist';
 const MINICART_DIST_PATH = 'public/generated/js/vendor_dist/minicart/dist';
 const OL_PATH = 'public/generated/js/vendor_dist/ol'; // 'ol' was formerly called 'openlayers'
 const OL_LAYERSWITCHER_DIST_PATH = 'public/generated/js/vendor_dist/ol-layerswitcher/dist';

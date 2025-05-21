@@ -22,7 +22,7 @@ class FlinksLib extends TikiLib
      * @param int    $position
      * @param string $type
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function add_featured_link($url, $title, $description = '', $position = 0, $type = 'f')
     {
@@ -35,7 +35,7 @@ class FlinksLib extends TikiLib
     /**
      * @param $url
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_featured_link($url)
     {
@@ -50,7 +50,7 @@ class FlinksLib extends TikiLib
      * @param int    $position
      * @param string $type
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function update_featured_link($url, $title, $description, $position = 0, $type = 'f')
     {
@@ -61,7 +61,7 @@ class FlinksLib extends TikiLib
     /**
      * @param $url
      *
-     * @return bool|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function add_featured_link_hit($url)
     {

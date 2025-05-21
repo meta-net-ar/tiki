@@ -146,7 +146,7 @@ class CookieConsentLib
      * @param string $category The category to check (e.g., 'analytics').
      * @return bool True if the category is explicitly allowed (true), false otherwise.
      */
-    private static function isCategoryAllowed(string $category)
+    public static function isCategoryAllowed(string $category)
     {
         if (! array_key_exists($category, self::getCookieCategories())) {
             throw new \InvalidArgumentException('Invalid category.');

@@ -64,7 +64,7 @@
                                     {$last = $filter.opts[io].name}
                                 {/section}
                             </select>
-                            {if $filter.format eq 'm' and $prefs.jquery_select2 neq 'y'}{remarksbox type='tip' title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}{/if}
+                            {if $filter.format eq 'm' and $prefs.elementplus_select neq 'y'}{remarksbox type='tip' title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}{/if}
     {*------<,> operator *}
                         {elseif $filter.format eq '<' or $filter.format eq '>' or $filter.format eq '<=' or $filter.format eq '>=' or $filter.format eq 'f' or $filter.format eq 'j'}
                             {if $filter.field.type eq 'f' or $filter.field.type eq 'j'}
@@ -133,7 +133,6 @@
                                     $container.find('option:selected').each(function(){
                                         $(this).prop('selected', false);
                                     });
-                                    $container.find('select').trigger("change.select2");
 
                                     var val = $(this).val();
                                     $target = $('[name="f_{{$filter.fieldId}}"]').val(val);
@@ -144,7 +143,6 @@
                                     // Reset other values
                                     var $select = $('select[name="other_filter_{{$filter.fieldId}}"]')
                                     $select.val('');
-                                    $select.trigger("change.select2");
 
                                     var val = $(this).val();
                                     $target = $('[name="f_{{$filter.fieldId}}"]').val(val);

@@ -73,6 +73,11 @@
                                         {icon name="copy" _menu_text='y' _menu_icon='y' alt="{tr}Clone{/tr}"}
                                     </a>
                                 </action>
+                                <action>
+                                    <a href="tiki-admin_modules.php?edit_assign={$module_assign_id}&menuId={$channels[user].menuId}&cookietab=2#content_admin_modules1-2">
+                                        {icon name="plus" _menu_text='y' _menu_icon='y' alt="{tr}Add as a module{/tr}"}
+                                    </a>
+                                </action>
                             {/if}
                         {/strip}
                     {/actions}

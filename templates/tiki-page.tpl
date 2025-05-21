@@ -1,4 +1,4 @@
-{assign var=thispageName value=$pageName|escape:"url"}
+{$thispageName=$pageName|escape:"url"}
 
 {if $type eq 'd'}
     <iframe width='0' height='0' frameborder="0" src="tiki-page_loader.php?refresh={$refresh}&amp;pageName={$thispageName}">{tr}Browser not supported{/tr}</iframe>

@@ -108,7 +108,7 @@ class BlogLib extends TikiDb_Bridge
             $join = '';
             $where = '';
         }
-        array_push($bindvars, $blogId);
+        $bindvars[] = $blogId;
         if (! empty($where)) {
             $where = '1=1 ' . $where . ' AND ';
         }

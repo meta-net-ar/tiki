@@ -48,14 +48,14 @@ describe("Input", () => {
                 "prefix-icon": null,
                 "suffix-icon": null,
                 clearable: false,
-                autocomplete: true,
+                autocomplete: "on",
             }),
             null
         );
         expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
     });
 
-    test("renders correctly with all props", () => {
+    test("renders correctly with all props", async () => {
         const givenProps = {
             value: "foo",
             placeholder: "foo",
@@ -68,7 +68,7 @@ describe("Input", () => {
             _emit: vi.fn(),
         };
 
-        render(Input, { props: givenProps });
+        const { rerender } = render(Input, { props: givenProps });
 
         expect(screen.getByTestId(DATA_TEST_ID.INPUT)).to.exist;
         expect(ElInput).toHaveBeenCalledWith(
@@ -83,9 +83,23 @@ describe("Input", () => {
             }),
             null
         );
+
+        // Should correctly rerender the the value prop changes
+        await rerender({
+            ...givenProps,
+            value: "bar",
+        });
+
+        expect(ElInput).toHaveBeenCalledWith(
+            expect.objectContaining({
+                modelValue: "bar",
+            }),
+            null
+        );
+        expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: "bar", __v_isRef: true }) });
     });
 
-    test.each([["input", "bar"], ["change", "bar"], ["focus"], ["blur"], ["enter"]])(
+    test.each([["input", "bar"], ["change", "bar"], ["focus"], ["blur"], ["enter"], ["keyUp"], ["keyDown"]])(
         "emits the %s event to the context when it is triggered from within the element",
         async (...params) => {
             const givenProps = {
@@ -116,7 +130,7 @@ describe("Input", () => {
                 await fireEvent[params[0]](input);
             }
 
-            expect(givenProps._emit).toHaveBeenCalledWith(...params);
+            expect(givenProps._emit).toHaveBeenCalledWith(...[params[0].toLowerCase()].concat(params.slice(1)));
         }
     );
 });

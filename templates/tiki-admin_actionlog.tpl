@@ -231,7 +231,7 @@
                             {if $prefs.feature_banning eq 'y'}
                                 <th>
                                     {select_all checkbox_names='checked[]'}
-                                    {assign var=numbercol value=$numbercol+1}
+                                    {$numbercol=$numbercol+1}
                                 </th>
                             {/if}
                             <th>
@@ -299,7 +299,7 @@
                                     {/if}
                                 </td>
                                 {if $reportCateg eq '' and $showCateg eq 'y'}
-                                    <td>{assign var=ic value=$actionlog.categId}{$categNames[$ic]|escape}</td>
+                                    <td>{$ic=$actionlog.categId}{$categNames[$ic]|escape}</td>
                                 {/if}
                                 <td class="text">{tr}{$actionlog.ip}{/tr}</td>
                                 <td class="{if !empty($actionlog.add)} diffadded{/if}">{if $actionlog.add or $actionlog.add eq '0'}{$actionlog.add}{else}&nbsp;{/if}</td>

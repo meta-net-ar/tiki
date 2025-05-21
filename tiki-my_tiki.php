@@ -22,8 +22,6 @@ if (isset($_REQUEST["view_user"])) {
         } else {
             Feedback::errorAndDie(tra("You do not have permission to view other users data"), \Laminas\Http\Response::STATUS_CODE_403);
         }
-    } else {
-        $userwatch = $user;
     }
 }
 $smarty->assign('userwatch', $userwatch);

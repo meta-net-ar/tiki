@@ -118,7 +118,7 @@ function wikiplugin_swiper_info()
                 'name' => tr('Height'),
                 'description' => tr('Enter height of slider in px or %, default min height 100px, max height will adjust with content'),
                 'filter' => 'word',
-                'default' => '100px',
+                'default' => '',
                 'since' => '19.0'
             ],
             'titleColor' => [
@@ -404,6 +404,19 @@ function wikiplugin_swiper($data, $params)
         }
     }
     $params = array_merge($defaults, $params);
+
+    // Handle swiper height
+    $heightMode = 'tallest';
+    $heightCSS = '';
+
+    if ($params['autoHeight'] === 'y') {
+        $heightMode = 'variable';
+        $heightCSS = 'height: auto;';
+    } else if (! empty($params['height']) && preg_match('/^\d+(px|%)$/', $params['height'])) {
+        $heightMode = 'custom';
+        $heightCSS = 'height: ' . $params['height'] . ';';
+    }
+
     if ($params['autoPlay'] != 'n') {
         $autoplayDelay = $params['autoPlayDelay'] * 1000;
         $autoPlay = 'autoplay: {
@@ -528,7 +541,7 @@ function wikiplugin_swiper($data, $params)
         $breakpoints = 'breakpointsInverse: true, breakpoints: { 320: { slidesPerView: ' . $slidesPerViewMobile . '},768: {slidesPerView: ' . $slidesPerViewTab . '},1024: {slidesPerView: ' . $slidesPerView . '}},';
     }
     $swiperSettings = str_replace(["'y'","'n'"], ["'true'","'false'"], $swiperSettings);
-    $headerlib->add_css('#swiper-container' . $uid . ' {width: ' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;} #swiper-container' . $uid . ' .swiper-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';min-height:' . $params['height'] . ';text-align: center;width:100%;overflow:hidden;} .gallery-top {height: 80%;width: 100%;}.gallery-thumbs {height: 20%;box-sizing: border-box;padding: 10px 0;}.gallery-thumbs img {max-height:120px;height:120px;width:auto;  margin-bottom:2%;cursor:pointer}.gallery-thumbs .swiper-slide {width: 25%; height: 100%;opacity: 0.4;}.gallery-thumbs .swiper-slide-active {opacity: 1;} #swiper-container' . $uid . ' .swiper-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . '} .slide-content' . $uid . '{min-width:60%;position:absolute;' . $params['slideContentPostion'] . ';background:' . $params['slideContentBg'] . ';padding:1%;text-align:left}  .parallax-bg { position: absolute;left: 0;top: 0;width: 130%;height: 100%;-webkit-background-size: cover;background-size: cover;background-position: center;} .swiper-slide img{max-width:100%}' . $fadeEffectCSS);
+    $headerlib->add_css('#swiper-container' . $uid . ' {position: relative; display: flex; align-items: center; overflow: hidden; ' . $heightCSS . 'width: ' . $params['width'] . ';background:' . $params['background'] . ';margin-bottom:20px;} #swiper-container' . $uid . ' .swiper-slide {font-size:' . $params['descriptionSize'] . ';color:' . $params['descriptionColor'] . ';text-align: center;width:100%;overflow:hidden;} .gallery-top {height: 80%;width: 100%;}.gallery-thumbs {height: 20%;box-sizing: border-box;padding: 10px 0;overflow: hidden;}.gallery-thumbs img {max-height:120px;height:120px;width:auto;  margin-bottom:2%;cursor:pointer}.gallery-thumbs .swiper-slide {width: 25%; height: 100%;opacity: 0.4;}.gallery-thumbs .swiper-slide-active {opacity: 1;} #swiper-container' . $uid . ' .swiper-slide h1{font-size:' . $params['titleSize'] . ';color:' . $params['titleColor'] . '} .slide-content' . $uid . '{min-width:60%;position:absolute;' . $params['slideContentPostion'] . ';background:' . $params['slideContentBg'] . ';padding:1%;text-align:left}  .parallax-bg { position: absolute;left: 0;top: 0;width: 130%;height: 100%;-webkit-background-size: cover;background-size: cover;background-position: center;} .swiper-slide img{max-width:100%}' . $fadeEffectCSS);
     $thumbnails = '';
     $thumbclass = '';
     $swiperOpts = '';
@@ -589,6 +602,42 @@ function wikiplugin_swiper($data, $params)
             ' . $navigation . '
      
             });' . $creativeRandomEffect . $thumbAfter;
+
+    // Add JavaScript for tallest height mode
+    if ($heightMode === 'tallest') {
+        $swiperOpts .= '
+        $(document).ready(function() {
+            const $swiper = $("#swiper-container' . $uid . '");
+            const $images = $swiper.find(".swiper-slide img");
+            let maxHeight = 0;
+            let loadedCount = 0;
+
+            const checkAllLoadedAndSetHeight = function() {
+                loadedCount++;
+                if (loadedCount === $images.length) {
+                    $images.each(function() {
+                        maxHeight = Math.max(maxHeight, $(this).height());
+                    });
+                    $swiper.css("height", maxHeight + "px");
+                }
+            };
+
+            $images.each(function() {
+                const $img = $(this);
+                if (this.complete) {
+                    checkAllLoadedAndSetHeight();
+                } else {
+                    $img.on("load", checkAllLoadedAndSetHeight)
+                        .on("error", function() {
+                            console.error("Image failed to load:", $img.attr("src"));
+                            checkAllLoadedAndSetHeight();
+                        });
+                }
+            });
+        });
+        ';
+    }
+
     if ($params['sliderPosition'] == 'abovetopbar') {
         $headerlib->add_css("#swiper-container" . $uid . "{visibility:hidden;}");
         $swiperOpts .= 'var container=$(".container").first();$("#swiper-container' . $uid . '").insertBefore( container );$("#gallery-thumbs' . $uid . '").insertAfter( "#swiper-container' . $uid . '" );';

@@ -322,6 +322,7 @@ $(window).on("load", function(){
 
     public function action_editor_settings($input)
     {
+        TikiLib::lib('header')->add_js_module('import handleSettings from "@jquery-tiki/tiki-editor_settings"; handleSettings();');
         return [
             'title' => tr('Editor Settings'),
             'domId' => $input->domId->word(),
@@ -334,7 +335,7 @@ $(window).on("load", function(){
     {
         global $tikilib;
         $editor = $input->editor->word();
-        $syntax = $input->syntax->word();
+        $syntax = $input->syntax->word() ?: 'tiki';
         $data = $input->data->none();
         $page_name = $input->page->pagename();
         $converted = $data;

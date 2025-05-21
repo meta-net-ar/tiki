@@ -401,7 +401,7 @@
         {if isset($userinfo.userId) && $userinfo.userId}
             {capture assign=add_edit_user_tablabel}{tr}Edit user{/tr} <i>{$userinfo.login|escape}</i>{/capture}
         {else}
-            {assign var=add_edit_user_tablabel value="{tr}Add a New User{/tr}"}
+            {$add_edit_user_tablabel="{tr}Add a New User{/tr}"}
         {/if}
 
         {tab name="{$add_edit_user_tablabel}"}
@@ -414,7 +414,7 @@
             {/if}
             {if isset($userinfo.userId) && $userinfo.userId}
                 <h2>{tr}Edit user{/tr} {$userinfo.login|escape}</h2>
-                {assign var=thisloginescaped value=$userinfo.login|escape:'url'}
+                {$thisloginescaped=$userinfo.login|escape:'url'}
                 {if $userinfo.login ne 'admin' and $userinfo.editable}
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}

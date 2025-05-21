@@ -272,6 +272,20 @@ class Search_Formatter_Builder
             if (isset($params['button_label'])) { // custom label on submit button for list actions (used by PluginListExecute)
                 $outputData['label'] = $params['button_label'];
             }
+            if (! empty($params['carousel_height'])) {
+                if ($params['carousel_height'] === 'custom') {
+                    if (! empty($params['custom_height']) && is_numeric($params['custom_height'])) {
+                        $outputData['carousel']['height'] = (int) $params['custom_height'];
+                    } else {
+                        $outputData['carousel']['height'] = 'tallest';
+                    }
+                } else {
+                    $outputData['carousel']['height'] = $params['carousel_height'];
+                }
+            } else {
+                $outputData['carousel']['height'] = 'tallest';
+            }
+
             if (strstr($arguments['template'], 'table')) {
                 $outputData['sticky'] = $sticky = isset($params['allowStickyHeaders']) && $params['allowStickyHeaders'] == 'y' ? true : false;
                 if (isset($arguments['downloadable'])) {

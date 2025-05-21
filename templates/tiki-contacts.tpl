@@ -102,7 +102,7 @@
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
 <table class="table table-striped table-hover">
     <tr>
-        {assign var=numbercol value=4}
+        {$numbercol=4}
         <th>
             <a href="tiki-contacts.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'firstName_desc'}firstName_asc{else}firstName_desc{/if}">{tr}First Name{/tr}</a>
         </th>
@@ -118,18 +118,18 @@
         {foreach from=$exts item=ext key=k}
             {if $ext.show eq 'y'}
                 <th>
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <a>{$ext.tra}</a>
                 </th>
             {/if}
         {/foreach}
 
         {if $view eq 'list'}
-            {assign var=numbercol value=$numbercol+1}
+            {$numbercol=$numbercol+1}
             <th>{tr}Groups{/tr}</th>
         {/if}
 
-        {assign var=numbercol value=$numbercol+1}
+        {$numbercol=$numbercol+1}
         <th></th>
     </tr>
 

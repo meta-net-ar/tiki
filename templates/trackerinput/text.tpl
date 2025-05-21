@@ -18,7 +18,7 @@
         {if !empty($field.options_map.append)}
             <span class="input-group-text">{$field.options_map.append}</span>
         {/if}
-        {if $field.options_map.autocomplete eq 'y' and $prefs.feature_jquery_autocomplete eq 'y'}
+        {if $field.options_map.autocomplete eq 'y' and $prefs.elementplus_autocomplete eq 'y'}
             {autocomplete element="#"|cat:$field.ins_id|replace:"[":"_"|replace:"]":"" type="trackervalue"
                     options="trackerId:"|cat:$field.trackerId|cat:",fieldId:"|cat:$field.fieldId}
         {/if}
@@ -42,7 +42,7 @@
                 <span class="input-group-text">{$field.options_map.append}</span>
             {/if}
 
-            {if $field.options_map.autocomplete eq 'y' and $prefs.feature_jquery_autocomplete eq 'y'}
+            {if $field.options_map.autocomplete eq 'y' and $prefs.elementplus_autocomplete eq 'y'}
                 {autocomplete element="#`$ling.id`" type="trackervalue"
                     options="trackerId:`$field.trackerId`,fieldId:`$field.fieldId`"}
             {/if}

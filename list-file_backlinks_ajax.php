@@ -9,7 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-if ($prefs['feature_file_galleries'] != 'y' || $prefs['feature_jquery_autocomplete'] != 'y') {
+if ($prefs['feature_file_galleries'] != 'y' || $prefs['elementplus_autocomplete'] != 'y') {
     /* echo '{}'; */
     exit;
 }

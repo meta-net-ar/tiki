@@ -104,7 +104,7 @@ foreach ($rawcals['data'] as $calendar) {
     $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
     $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
 
-    $canEditAnything = $calendar['perms']->add_events || $calendar['perms']->add_events;
+    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
 }
 
 $rawsubs = $calendarlib->get_subscriptions($user);
@@ -134,11 +134,11 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
     if (! empty($user)) {
         $tikilib->set_user_preference($user, 'default_calendars', serialize($_SESSION['CalendarViewGroups']));
     }
-} elseif (! isset($_SESSION['CalendarViewGroups']) || ! empty($_REQUEST['allCals'])) {
+} elseif (! isset($_SESSION['CalendarViewGroups'])) {
     $use_default_calendars = true;
 } elseif (isset($_REQUEST["refresh"]) and ! isset($_REQUEST["calIds"])) {
     $_SESSION['CalendarViewGroups'] = [];
-} elseif (! empty($user) || ! isset($_SESSION['CalendarViewGroups'])) {
+} elseif (! empty($user)) {
     $use_default_calendars = true;
 }
 
@@ -190,13 +190,13 @@ if (isset($_REQUEST["find"])) {
 }
 $smarty->assign('find', $find);
 
-if (isset($_REQUEST['mon']) && ! empty($_REQUEST['mon'])) {
+if (! empty($_REQUEST['mon'])) {
     $request_month = $_REQUEST['mon'];
 }
-if (isset($_REQUEST['day']) && ! empty($_REQUEST['day'])) {
+if (! empty($_REQUEST['day'])) {
     $request_day = $_REQUEST['day'];
 }
-if (isset($_REQUEST['year']) && ! empty($_REQUEST['year'])) {
+if (! empty($_REQUEST['year'])) {
     $request_year = $_REQUEST['year'];
 }
 
@@ -221,27 +221,59 @@ $viewdays = array_map("correct_start_day", array_unique($viewdays));
 $viewdays2 = array_values($viewdays);
 
 if (! empty($_REQUEST['generate_availability'])) {
-    $ranges = [];
-    foreach ($viewdays as $day) {
-        $ranges[$day] = [[$minHourOfDay, 0], [$maxHourOfDay, 0]];
+    try {
+        if (empty($viewdays) || ! is_array($viewdays)) {
+            throw new Exception(tr('Invalid view days parameter'));
+        }
+        if (empty($focusdate) || ! is_numeric($focusdate)) {
+            throw new Exception(tr('Invalid focus date'));
+        }
+        $ranges = [];
+        foreach ($viewdays as $day) {
+            if (! is_numeric($day)) {
+                continue;
+            }
+            $ranges[$day] = [
+                [(int)$minHourOfDay, 0], [(int)$maxHourOfDay, 0]
+            ];
+        }
+        $busy_list = [];
+        $weekday = TikiLib::date_format('%w', $focusdate);
+        $week_start = $focusdate;
+        if ($weekday > 0) {
+            $week_start -= $weekday * 86400;
+        }
+        $week_end = $week_start + (7 * 86400) - 1;
+        $week_events = $calendarlib->list_raw_items(
+            $_SESSION['CalendarViewGroups'],
+            $user,
+            $week_start,
+            $week_end,
+            0,
+            -1
+        );
+        foreach ($week_events as $week_event) {
+            if (empty($week_event['start']) || empty($week_event['end'])) {
+                continue;
+            }
+            $dow = TikiLib::date_format("%w", $week_event['start']);
+            $start_time = TikiLib::date_format("%H %i", $week_event['start']);
+            $end_time = TikiLib::date_format("%H %i", $week_event['end']);
+            if (empty($start_time) || empty($end_time)) {
+                continue;
+            }
+            list($sh, $sm) = explode(' ', $start_time);
+            list($eh, $em) = explode(' ', $end_time);
+            $busy_list[] = [$dow, [$sh, $sm], [$eh, $em]];
+        }
+        $nlgen = new NLGen\Grammars\Availability\AvailabilityGenerator();
+        $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
+        $smarty->assign('nlg_availability', $nlg_availability);
+    } catch (Exception $e) {
+        error_log("Availability generation error: " . $e->getMessage());
+        Feedback::error($e->getMessage());
+        $smarty->assign('nlg_availability', '');
     }
-    $busy_list = [];
-    $weekday = TikiLib::date_format('%w', $focusdate);
-    $week_start = $focusdate;
-    if ($weekday > 0) {
-        $week_start -= $weekday * 86400;
-    }
-    $week_end = $week_start + 7 * 86400 - 1;
-    $week_events = $calendarlib->list_raw_items($_SESSION['CalendarViewGroups'], $user, $week_start, $week_end, 0, -1);
-    foreach ($week_events as $week_event) {
-        $dow = TikiLib::date_format("%w", $week_event['start']);
-        [$sh, $sm] = explode(' ', TikiLib::date_format("%H %i", $week_event['start']));
-        [$eh, $em] = explode(' ', TikiLib::date_format("%H %i", $week_event['end']));
-        $busy_list[] = [$dow, [$sh, $sm], [$eh, $em]];
-    }
-    $nlgen = new NLGen\Grammars\Availability\AvailabilityGenerator();
-    $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
-    $smarty->assign('nlg_availability', $nlg_availability);
 }
 
 if (isset($_REQUEST['sort_mode'])) {

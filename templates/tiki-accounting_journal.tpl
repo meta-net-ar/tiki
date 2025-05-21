@@ -30,7 +30,7 @@
         {foreach from=$journal item=j}
             {cycle values="odd,even" assign="style"}
             {section name=posts loop=$j.maxcount}
-                {assign var='i' value=$smarty.section.posts.iteration-1}
+                {$i=$smarty.section.posts.iteration-1}
                 {if $i == 0}
                     <tr class="{$style}">
                         <td class="journal{if $j.journalCancelled==1}Deleted{/if}" rowspan="{$j.maxcount}" style="text-align:right">{$j.journalId}</td>

@@ -162,7 +162,6 @@ $eyes_curr = add_watch_icons(
     $_REQUEST['parentId'],
     $deep,
     $user,
-    null
 );
 $smarty->assign_by_ref('eyes_curr', $eyes_curr);
 
@@ -176,7 +175,6 @@ foreach ($ctall as &$c) {
         $c['categId'],
         $deep,
         $user,
-        $c['name']
     );
     $c['eyes'] = $eyes;
 }
@@ -326,7 +324,7 @@ if (isset($_GET['plain'])) {                // used by profile repositories to l
  * @param $user
  * @return bool|string
  */
-function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $deep, $user, $name)
+function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $deep, $user)
 {
     global $prefs;
     if (! $user || $prefs["feature_user_watches"] != 'y') {
@@ -336,7 +334,6 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     $categlib = TikiLib::lib('categ');
     $smarty = TikiLib::lib('smarty');
 
-    $section = 'categories';
     $nodesc = count($descendants);
     $watch_desc = 'n';
     $watch_this = 'n';
@@ -424,8 +421,6 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
         if ($usercatwatch['object'] == $categid) {
             $watch_this = 'y';
             break;
-        } else {
-            $watch_this = 'n';
         }
     }
     if ($categid == 0) {
@@ -437,12 +432,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     }
     //group watches
     if ($prefsgroups == 'y' && ($tiki_p_admin_users == 'y' || $tiki_p_admin == 'y')) {
-        $objName = '';
-        if ($categid == 0) {
-            $objName = 'Top';
-        } else {
-            $objName = $categlib->get_category_path_string_with_root($categid);
-        }
+        $objName = $categid == 0 ? 'Top' : $categlib->get_category_path_string_with_root($categid);
         $eyesgroup = '<a href="tiki-object_watches.php?' . 'objectId=' . $categid
             . '&amp;watch_event=category_changed&amp;objectType=Category&amp;objectName=' . urlencode($objName)
             . '&amp;objectHref=tiki-browse_categories.php?parentId=' . $categid . '&amp;deep=' . $deep . '">'

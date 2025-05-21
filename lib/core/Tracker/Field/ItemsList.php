@@ -216,9 +216,6 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         function(data, status) {
             $ddl = $("div[name=' . $this->getInsertId() . ']");
             $ddl.html(data);
-            if (jqueryTiki.select2) {
-                $ddl.trigger("change.select2");
-            }
             $ddl.trigger("change");
         }
     );
@@ -338,7 +335,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
         $baseKey = $this->getBaseKey();
-        $items = $this->getItemIds();
+        $items = $this->getItemIds(false);
 
         $list = $this->getItemLabels($items);
         $listtext = implode(' ', $list);
@@ -680,7 +677,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
         return $collection;
     }
 
-    private function getItemIds()
+    private function getItemIds($useCache = true)
     {
         $trklib = TikiLib::lib('trk');
         $trackerId = (int) $this->getOption('trackerId');
@@ -758,7 +755,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
             if (! $itemId) {
                 $items = [];
             } else {
-                $items = $trklib->get_items_list($trackerId, $filterFieldIdThere, $itemId, $status, $multiple, $sortFieldIds);
+                $items = $trklib->get_items_list($trackerId, $filterFieldIdThere, $itemId, $status, $multiple, $sortFieldIds, $useCache);
             }
         } else {
             // when this is an item link or dynamic item list field, localvalue contains the target itemId
@@ -808,7 +805,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                 foreach ($theUsers as $theUser) {
                     $items = array_merge(
                         $items,
-                        $trklib->get_items_list($trackerId, $filterFieldIdThere, $theUser, $status, false, $sortFieldIds)
+                        $trklib->get_items_list($trackerId, $filterFieldIdThere, $theUser, $status, false, $sortFieldIds, $useCache)
                     );
                 }
 
@@ -825,7 +822,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                 foreach ($categories as $category) {
                     $items = array_merge(
                         $items,
-                        $trklib->get_items_list($trackerId, $filterFieldIdThere, $category, $status, true, $sortFieldIds)
+                        $trklib->get_items_list($trackerId, $filterFieldIdThere, $category, $status, true, $sortFieldIds, $useCache)
                     );
                 }
 
@@ -854,7 +851,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
             }
             // Skip nulls
             if ($localValue) {
-                $items = $trklib->get_items_list($trackerId, $filterFieldIdThere, $localValue, $status, false, $sortFieldIds);
+                $items = $trklib->get_items_list($trackerId, $filterFieldIdThere, $localValue, $status, false, $sortFieldIds, $useCache);
             } else {
                 $items = [];
             }

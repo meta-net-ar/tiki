@@ -45,13 +45,13 @@ class Multilingual_Aligner_ShortestPathFinder
         $nodes = [];
         foreach (array_keys($distanceMatrix) as $originNode) {
             if (! in_array($originNode, $nodes)) {
-                array_push($nodes, $originNode);
+                $nodes[] = $originNode;
             }
 
             $distancesFromThisNode = $distanceMatrix[$originNode];
             foreach (array_keys($distancesFromThisNode) as $destinationNode) {
                 if (! in_array($destinationNode, $nodes)) {
-                    array_push($nodes, $destinationNode);
+                    $nodes[] = $destinationNode;
                 }
             }
         }

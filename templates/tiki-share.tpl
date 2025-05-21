@@ -127,8 +127,8 @@
                             {tr}Recipient(s){/tr}
                         </label>
                         <div class="col-sm-9">
-                            {if $prefs.feature_jquery_autocomplete == 'y'}
-                                {user_selector contact='true' user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
+                            {if $prefs.elementplus_select == 'y'}
+                                {user_selector contact='true' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma and a space{/tr}
                                 </span>
@@ -329,8 +329,8 @@
                             {tr}User(s){/tr}
                         </label>
                         <div class="col-sm-9">
-                            {if $prefs.feature_jquery_autocomplete == 'y'}
-                                {user_selector user = '' editable='y' multiple='true' name='messageto' style='width:99%' user_selector_threshold=0}
+                            {if $prefs.elementplus_select == 'y'}
+                                {user_selector user = '' lazy=true editable='y' multiple='true' name='messageto' style='width:99%' user_selector_threshold=0}
                             {else}
                                 <input class="form-control" type="text" class="form-control" name="messageto" value="{$messageto|escape}">
                             {/if}

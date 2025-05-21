@@ -130,10 +130,6 @@ class Rules
             $js .= "\n";
         }
 
-        if ($prefs['jquery_select2'] === 'y') {
-            $js .= "  \$(document).trigger('change.select2');\n";
-        }
-
         if ($actions || $else) {
             $js = '$("' . implode(',', $selectors) . '").on("change", function () {' . $js . "}).trigger('change');\n";
         } else {

@@ -95,38 +95,6 @@ if ($useDefaultPrefs) {
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);
 
-/*
-    require_once('lib/wizard/pages/changes_ui.php');
-    $pages[] = new ChangesWizardUI();
-
-    require_once('lib/wizard/pages/changes_novice_admin_assistance.php');
-    $pages[] = new ChangesWizardNoviceAdminAssistance();
-
-    require_once('lib/wizard/pages/changes_trackers.php');
-    $pages[] = new ChangesWizardTrackers();
-
-    require_once('lib/wizard/pages/changes_permissions_and_logs.php');
-    $pages[] = new ChangesWizardPermissionsAndLogs();
-
-    require_once('lib/wizard/pages/changes_others.php');
-    $pages[] = new ChangesWizardOthers();
-
-    require_once('lib/wizard/pages/changes_new_in_13.php');
-    $pages[] = new ChangesWizardNewIn13();
-
-    require_once('lib/wizard/pages/changes_new_in_14.php');
-    $pages[] = new ChangesWizardNewIn14();
-
-    require_once('lib/wizard/pages/changes_new_in_15.php');
-    $pages[] = new ChangesWizardNewIn15();
-
-    require_once('lib/wizard/pages/changes_new_in_16.php');
-    $pages[] = new ChangesWizardNewIn16();
-
-    require_once('lib/wizard/pages/changes_new_in_17.php');
-    $pages[] = new ChangesWizardNewIn17();
-*/
-
     require_once('lib/wizard/pages/changes_new_in_26.php');
     $pages[] = new ChangesWizardNewIn26();
 
@@ -246,9 +214,6 @@ foreach ($pages as $page) {
         $url .= '&amp;use-changes-wizard=1';
     }
     $cnt = $stepNr + 1;
-//  if ($stepNr == 1 && $useChangesWizard) {
-//      $toc .= '<div class="list-group-item font-italic">' . tra("New in Tiki 12 (LTS)") . '</div>';
-//  }
     if ($cnt <= 9) {
         $cnt = '&nbsp;&nbsp;' . $cnt;
     }

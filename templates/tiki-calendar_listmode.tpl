@@ -8,7 +8,7 @@
         </tr>
 
         {foreach from=$listevents item=event}
-            {assign var=calendarId value=$event.calendarId}
+            {$calendarId=$event.calendarId}
             <tr class="{cycle}{if $event.start <= $smarty.now and $event.end >= $smarty.now} selected{/if} vevent">
                 <td class="date">
                     <div class="row">

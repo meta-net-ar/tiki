@@ -362,8 +362,8 @@
                 <fieldset>
                     <legend>{tr}Attributes{/tr}</legend>
                     {foreach from=$all_attributes item=att key=attname}
-                        {assign var='attid' value=$att.itemId|replace:'.':'_'}
-                        {assign var='attfullname' value=$att.itemId}
+                        {$attid=$att.itemId|replace:'.':'_'}
+                        {$attfullname=$att.itemId}
                         <div class="mb-3 row" id={$attid}{if $types.$type.$attid eq 'y'}style="display:;"{else}style="display:none;"{/if}>
                             <label class="col-form-label col-md-4" for="{$attfullname|escape}">{$attname|escape}</label>
                             <div class="col-md-8">

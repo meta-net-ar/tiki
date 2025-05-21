@@ -17,15 +17,15 @@
 
         {* Checkboxes *}
         {if $file.isgal eq 1}
-            {assign var=checkname value=$subgal_checkbox_name|default:'subgal'}
+            {$checkname=$subgal_checkbox_name|default:'subgal'}
         {else}
-            {assign var=checkname value=$file_checkbox_name|default:'file'}
+            {$checkname=$file_checkbox_name|default:'file'}
         {/if}
         {if $prefs.fgal_checked neq 'n' and isset($smarty.request.$checkname) and $smarty.request.$checkname
             and in_array($file.id,$smarty.request.$checkname)}
-            {assign var=is_checked value='y'}
+            {$is_checked='y'}
         {else}
-            {assign var=is_checked value='n'}
+            {$is_checked='n'}
         {/if}
 
         {* show files and subgals in browsing view *}
@@ -66,11 +66,11 @@
                 {if $show_infos eq 'y'}
                     <div class="thumbinfos">
                         {foreach from=$fgal_listing_conf item=item key=propname}
-                            {assign var=key_name_len value=$prefs.fgal_browse_name_max_length}
+                            {$key_name_len=$prefs.fgal_browse_name_max_length}
                             {if isset($item.key)}
-                                {assign var=key_name value=$item.key}
+                                {$key_name=$item.key}
                             {else}
-                                {assign var=key_name value="show_$propname"}
+                                {$key_name="show_$propname"}
                             {/if}
                             {if isset($gal_info.$key_name)
                                 and ( $gal_info.$key_name eq 'y'
@@ -80,27 +80,27 @@
                                 )
                             }
                                 {if isset($file.$propname)}
-                                    {assign var=propval value=$file.$propname|escape}
+                                    {$propval=$file.$propname|escape}
                                 {/if}
                                 {* Format property values *}
                                 {if $propname eq 'id' or $propname eq 'name'}
                                     {if $propname eq 'name' and $propval eq '' and $gal_info.show_name eq 'n'}
                                         {* show the filename if only name should be displayed but is empty *}
-                                        {assign var=propval value=$file.filename|truncate:$key_name_len}
-                                        {assign var=propval value="<a class='fgalname namealias' $link>$propval</a>"}
+                                        {$propval=$file.filename|truncate:$key_name_len}
+                                        {$propval="<a class='fgalname namealias' $link>$propval</a>"}
                                     {else}
-                                        {assign var=propval value="<a class='fgalname' $link>$propval</a>"}
+                                        {$propval="<a class='fgalname' $link>$propval</a>"}
                                     {/if}
                                 {elseif $propname eq 'created' or $propname eq 'lastModif'}
-                                    {assign var=propval value=$propval|tiki_short_date}
+                                    {$propval=$propval|tiki_short_date}
                                 {elseif $propname eq 'last_user' or $propname eq 'author' or $propname eq 'creator'}
-                                    {assign var=propval value=$propval|userlink}
+                                    {$propval=$propval|userlink}
                                 {elseif $propname eq 'size'}
-                                    {assign var=propval value=$propval|kbsize:true}
+                                    {$propval=$propval|kbsize:true}
                                 {elseif $propname eq 'description' and $gal_info.max_desc gt 0}
-                                    {assign var=propval value=$propval|truncate:$gal_info.max_desc:"...":false|nl2br}
+                                    {$propval=$propval|truncate:$gal_info.max_desc:"...":false|nl2br}
                                 {elseif $propname eq 'lockedby' and $propval neq ''}
-                                    {assign var=propval value=$propval|userlink}
+                                    {$propval=$propval|userlink}
                                 {/if}
 
                                 {if $propname eq 'name'}

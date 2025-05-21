@@ -708,7 +708,6 @@ class SheetLib extends TikiLib
             $grid->import($handler);
 
             $childSheetIds = $this->get_related_sheet_ids($grid->id);
-            $i = 0;
             $grids = [$grid];
             foreach ($childSheetIds as $childSheetId) {
                 $handler = new TikiSheetDatabaseHandler($childSheetId, $date);
@@ -716,8 +715,7 @@ class SheetLib extends TikiLib
                 $childSheet = new TikiSheet();
                 $childSheet->import($handler);
 
-                array_push($grids, $childSheet);
-                $i++;
+                $grids[] = $childSheet;
             }
             return $grids;
         };

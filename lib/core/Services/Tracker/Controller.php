@@ -2426,7 +2426,8 @@ class Services_Tracker_Controller
                     }
                 }
                 if (! $has_initial_version) {
-                    array_push($history['data'], ["version" => 0, "fieldId" => null, "value" => "", "user" => $item_info['createdBy'], "lastModif" => $item_info['created'], "new" => ""]);
+                    $history['data'][] = ["version"   => 0, "fieldId" => null, "value" => "", "user" => $item_info['createdBy'],
+                                          "lastModif" => $item_info['created'], "new" => ""];
                 }
             } else {
                 throw new Services_Exception(tra('This tracker item either has been deleted or is not found.'), 404);

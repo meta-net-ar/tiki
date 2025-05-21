@@ -151,7 +151,7 @@ if (! empty($fileId)) {
     }
     if (isset($_REQUEST['lockedby']) && $fileInfo['lockedby'] != $_REQUEST['lockedby']) {
         if (empty($fileInfo['lockedby'])) {
-            $message = tra(sprintf('The file has been unlocked meanwhile'));
+            $message = tra('The file has been unlocked meanwhile');
         } else {
             $message = tra(sprintf('The file has been locked by %s', $fileInfo['lockedby']));
         }

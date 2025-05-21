@@ -4,9 +4,6 @@
         {if $prefs.feature_theme_control eq y}
             {button _text="{tr}Theme Control{/tr}" href="tiki-theme_control.php" _class="btn-sm btn-link tikihelp" _icon_name="file-image-o"}
         {/if}
-        {if $prefs.feature_editcss eq 'y' and $tiki_p_create_css eq 'y'}
-            {button _text="{tr}Edit CSS{/tr}" _class="btn-sm" href="tiki-edit_css.php"}
-        {/if}
         {include file='admin/include_apply_top.tpl'}
     </div>
     {tabset name="admin_look"}
@@ -511,19 +508,6 @@
             <fieldset>
                 <legend class="h3">{tr}Editing{/tr}</legend>
                 {preference name=theme_customizer}
-                {preference name=feature_editcss}
-                {preference name=feature_view_tpl}
-                {if $prefs.feature_view_tpl eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}View Templates{/tr}"}
-                    </div>
-                {/if}
-                {preference name=feature_edit_templates}
-                {if $prefs.feature_edit_templates eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}Edit Templates{/tr}"}
-                    </div>
-                {/if}
             </fieldset>
             <hr>
         {/tab}

@@ -1,4 +1,6 @@
 {if !$ts.ajax}
+
+    {include file='token_view_actions.tpl'}
     {block name=title}
         {title help="forums" admpage="forums" url=$forum_info.forumId|sefurl:'forum'}{$forum_info.name}{/title}
     {/block}
@@ -8,7 +10,7 @@
     {/if}
 
     <div class="t_navbar mb-4">
-        {assign var=thisforum_info value=$forum_info.forumId}
+        {$thisforum_info=$forum_info.forumId}
         {if ($tiki_p_forum_post_topic eq 'y' and ($prefs.feature_wiki_discuss ne 'y' or $prefs.$forumId ne $prefs.wiki_forum_id)) or $tiki_p_admin_forum eq 'y'}
             {if !isset($comments_threadId) or $comments_threadId eq 0}
                 {button href="tiki-view_forum.php?openpost=1&amp;forumId=$thisforum_info&amp;comments_threadId=0&amp;comments_threshold=$comments_threshold&amp;comments_offset=$comments_offset&amp;thread_sort_mode=$thread_sort_mode&amp;comments_per_page=$comments_per_page" _onclick='$("#forumpost").show();return false;' _icon_name="create" _type="primary" class="btn btn-primary" _text="{tr}New Topic{/tr}"}
@@ -115,7 +117,7 @@
                 {if $prefs.sefurl_short_url eq 'y'}
                     <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                             {icon name="link"} {tr}Get a short URL{/tr}
-                            {assign var="hasPageAction" value="1"}
+                            {$hasPageAction="1"}
                         </a>
                 {/if}
             </div>
@@ -476,11 +478,11 @@
             </thead>
         {/block}
         <tbody>
-        {assign var=section_old value=""}
+        {$section_old=""}
         {section name=user loop=$channels}
-            {assign var=section value=$channels[user].section}
+            {$section=$channels[user].section}
             {if $section ne $section_old}
-                {assign var=section_old value=$section}
+                {$section_old=$section}
                 <td class="third info" colspan="{$numbercol}">{tr}{$section|escape}{/tr}</td>
             {/if}
             {block name=forumrow}
@@ -730,9 +732,9 @@
             <tbody>
                 {section name=ix loop=$comments_coms}
                     {if $userinfo && $comments_coms[ix].lastPost > $userinfo.lastLogin}
-                        {assign var="newtopic" value="_new"}
+                        {$newtopic="_new"}
                     {else}
-                        {assign var="newtopic" value=""}
+                        {$newtopic=""}
                     {/if}
                     {block name=forumrow}
                     <tr>
@@ -743,8 +745,8 @@
                         {/if}
                         <td class="icon">
                             {if $newtopic neq ''}
-                                {assign var=nticon value=$newtopic}
-                                {assign var=ntalt value="-{tr}New{/tr}"}
+                                {$nticon=$newtopic}
+                                {$ntalt="-{tr}New{/tr}"}
                             {/if}
                             {if $comments_coms[ix].type eq 'n'}
                                 {tr}Normal{/tr}
@@ -922,9 +924,9 @@
                 <tr>
                     <td>
                         {if $last_comments[ix].parentId eq 0}
-                            {assign var="idt" value=$last_comments[ix].threadId}
+                            {$idt=$last_comments[ix].threadId}
                         {else}
-                            {assign var="idt" value=$last_comments[ix].parentId}
+                            {$idt=$last_comments[ix].parentId}
                         {/if}
                         <a class="forumname" href="tiki-view_forum_thread.php?comments_parentId={$idt}&amp;topics_threshold={$comments_threshold}&amp;topics_offset={math equation="x + y" x=$comments_offset y=$smarty.section.ix.index}&amp;topics_sort_mode={$thread_sort_mode}&amp;topics_find={$comments_find}&amp;forumId={$forum_info.forumId}">{$last_comments[ix].title|escape}</a>
                     </td>

@@ -38,7 +38,7 @@ if ($prefs['fgal_use_db'] == 'y' && (empty($podCastGallery) || ! $podCastGallery
     if ($memory_limit > 0) {
         // Estimate available memory for file upload.
         // The result is divided by 3, because the file has to be stored twice in memory :
-        //    one copy when reading the file, and two other modified copies in ADODB when adding quotes to the query variables
+        //    one copy when reading the file, and two other modified copies in DB when adding quotes to the query variables
         //    ( due to functions like mysqli_real_escape_string that takes 200% more memory)
         // We also reduce of a memory size of 3 MB (which is an approximation too) that may be necessary for other tasks to work
         //

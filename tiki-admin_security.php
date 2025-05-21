@@ -17,13 +17,6 @@ if ($prefs['feature_file_galleries'] == 'y' && ! empty($prefs['fgal_use_dir']) &
         'message' => tra('The Path to store files in the filegallery should be outside the tiki root directory')
     ];
 }
-if ($prefs['feature_edit_templates'] == 'y') {
-    $tikisettings['edit_templates'] = [
-        'risk' => tra('unsafe') ,
-        'setting' => tra('Enabled') ,
-        'message' => tra('The feature "Edit Templates" is switched on. Do not allow anyone you cannot trust to use this feature. It can easily be used to inject php code.')
-    ];
-}
 if ($prefs['wikiplugin_snarf'] == 'y') {
     $tikisettings['wikiplugin_snarf'] = [
         'risk' => tra('unsafe') ,
@@ -304,7 +297,7 @@ $secdb_severity = [
 function md5_check_dir($dir, &$result, $vcs_diff = [])
 {
  // save all suspicious files in $result
-    global $tikilib, $tiki_versions, $tikipath;
+    global $tikilib, $tiki_versions;
     $c_tiki_versions = count($tiki_versions);
     $query = "select * from `tiki_secdb` where `filename`=?";
     $d = dir($dir);
@@ -323,13 +316,11 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
                 $is_tikifile = false;
                 $is_tikiver = [];
                 $valid_tikiver = [];
-                $severity = 0;
                 // we could avoid the following with a second sql, but i think, this is faster.
                 while ($res = $dbresult->FetchRow()) {
                     $is_tikifile = true; // we know the filename ... probably modified
                     if ($res['md5_value'] == $md5val) {
                         $is_tikiver[] = $res['tiki_version']; // found
-                        $severity = $res['severity'];
                     }
                     $k = array_search($res['tiki_version'], $tiki_versions);
                     if ($k > 0) {
@@ -341,30 +332,27 @@ function md5_check_dir($dir, &$result, $vcs_diff = [])
                         }
                     }
                 }
-                if ($is_tikifile == false) {
+                if (! $is_tikifile) {
                     if ($vcs_diff && isset($vcs_diff[substr($entry, 2)]) && $vcs_diff[substr($entry, 2)] !== 'unversioned') {
                         $result[$entry] = tra('This Tiki file differs from the VCS repository version. Check if this file was uploaded and if it is dangerous.');
                     } else {
                         $result[$entry] = tra('This is not a Tiki file. Check if this file was uploaded and if it is dangerous.');
                     }
-                } elseif ($is_tikifile == true && count($is_tikiver) == 0) {
+                } elseif (count($is_tikiver) == 0) {
                     $result[$entry] = tra('This is a modified File. Cannot check version. Check if it is dangerous.');
                 } else {
                     // check if we have a most recent valid version
                     $most_recent = false;
                     for ($i = $c_tiki_versions; $i > 0; $i--) { // search $valid_tikiver top to down to find the most recent version
                         if (isset($valid_tikiver[$i])) {
-                            if ($valid_tikiver[$i] == false) {
-                                //$most_recent stays false. we break
-                                break;
-                            } else {
+                            if ($valid_tikiver[$i]) {
                                 $most_recent = true; // in this case we have found the most recent version. good
-                                break;
                             }
+                            break;
                         }
                     }
                     // use result of most_recent to decide
-                    if ($most_recent == false) {
+                    if (! $most_recent) {
                         $result[$entry] = tra('This file is from another Tiki version: ') . implode(' ' . tra('or') . ' ', $is_tikiver);
                     }
                 }

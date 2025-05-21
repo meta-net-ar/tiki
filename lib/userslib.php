@@ -756,8 +756,7 @@ class UsersLib extends TikiLib
         } elseif ($auth_saml) {
             // next see if we need to check SAML
             if (
-                isset($_SESSION['samlUserdata']) && ! empty($_SESSION['samlUserdata']) ||
-                isset($_SESSION['samlNameId']) && ! empty($_SESSION['samlNameId'])
+                ! empty($_SESSION['samlUserdata']) || ! empty($_SESSION['samlNameId'])
             ) {
                 $saml_username = $saml_email = '';
                 $saml_groups = [];
@@ -2379,8 +2378,10 @@ class UsersLib extends TikiLib
             $mid .= $mid == '' ? ' where' : ' and';
             $mid .= ' (uu.`email` like ? or  uu.`login` like ?)';
             $mmid = $mid;
-            array_push($bindvars, '%' . $email . '%', '%' . $find . '%');
-            array_push($mbindvars, '%' . $email . '%', '%' . $find . '%');
+            $bindvars[] = '%' . $email . '%';
+            $bindvars[] = '%' . $find . '%';
+            $mbindvars[] = '%' . $email . '%';
+            $mbindvars[] = '%' . $find . '%';
         } elseif (! empty($email) && empty($find)) {
             $mid .= $mid == '' ? ' where' : ' and';
             $mid .= ' uu.`email` like ?';
@@ -2591,7 +2592,7 @@ class UsersLib extends TikiLib
      * @param      $group
      * @param bool $bulk
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function remove_user_from_group($user, $group, $bulk = false)
@@ -6384,15 +6385,6 @@ class UsersLib extends TikiLib
                 'scope' => 'global',
             ],
             [
-                'name' => 'tiki_p_create_css',
-                'description' => tra('Can create a new CSS file (style sheet) appended with -user'),
-                'level' => 'registered',
-                'type' => 'tiki',
-                'admin' => false,
-                'prefs' => ['feature_editcss'],
-                'scope' => 'global',
-            ],
-            [
                 'name' => 'tiki_p_detach_translation',
                 'description' => tra('Can remove the association between two pages in a translation set'),
                 'level' => 'editors',
@@ -6436,15 +6428,6 @@ class UsersLib extends TikiLib
                 'type' => 'tiki',
                 'admin' => false,
                 'prefs' => [],
-                'scope' => 'global',
-            ],
-            [
-                'name' => 'tiki_p_edit_templates',
-                'description' => tra('Can edit site templates'),
-                'level' => 'admin',
-                'type' => 'tiki',
-                'admin' => false,
-                'prefs' => ['feature_edit_templates'],
                 'scope' => 'global',
             ],
             [
@@ -6536,15 +6519,6 @@ class UsersLib extends TikiLib
                 'type' => 'tiki',
                 'admin' => false,
                 'prefs' => ['feature_stats'],
-                'scope' => 'global',
-            ],
-            [
-                'name' => 'tiki_p_view_templates',
-                'description' => tra('Can view site templates'),
-                'level' => 'admin',
-                'type' => 'tiki',
-                'admin' => false,
-                'prefs' => ['feature_edit_templates'],
                 'scope' => 'global',
             ],
             [
@@ -6915,7 +6889,7 @@ class UsersLib extends TikiLib
      * @param      $group
      * @param bool $bulk
      *
-     * @return bool|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return bool|Tiki\TikiDb\PdoResult
      * @throws Services_Exception
      */
     public function assign_user_to_group($user, $group, $bulk = false)
@@ -7140,6 +7114,8 @@ class UsersLib extends TikiLib
                 ]
             );
         }
+
+        TikiLib::lib('userprefs')->set_user_avatar($user, 'l', 'dicebear/' . $prefs['user_default_avatar_style'], $user, null, null, null, false);
 
         if (empty($groups)) {
             $this->assign_user_to_group($user, 'Registered');
@@ -8758,6 +8734,9 @@ class UsersLib extends TikiLib
     {
         $finalusers = [];
         foreach ($usrs as $u) {
+            if (empty($u)) {
+                continue;
+            }
             $u = trim($u);
             if (! $u) {
                 continue;

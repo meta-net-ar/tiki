@@ -344,14 +344,6 @@
                                             {/if}
                                             <a class="dropdown-item" href="tiki-admin_dsn.php">
                                                 {icon name="key"} <span class="ms-1">{tr}DSN/Content Authentication{/tr}</span> </a>
-                                            {if $prefs.feature_editcss eq "y" and $tiki_p_create_css eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_css.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit CSS{/tr}</span> </a>
-                                            {/if}
-                                            {if $prefs.feature_view_tpl eq "y" and $prefs.feature_edit_templates eq "y" and $tiki_p_edit_templates eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_templates.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit TPL{/tr}</span> </a>
-                                            {/if}
                                             {if $prefs.cachepages eq "y" and $tiki_p_admin eq "y"}
                                                 <a class="dropdown-item" href="tiki-list_cache.php">
                                                     {icon name="external-link-square-alt"} <span class="ms-1">{tr}External Pages Cache{/tr}</span> </a>

@@ -528,7 +528,7 @@
 </form>
 
 <h2 class="showhide_heading" id="Tiki_Security">{tr}Tiki Security{/tr}<a href="#Tiki_Security" class="heading-link" aria-label="{tr}Tiki Security{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
-{assign var=sensitive_data_box_title value="{tr}Sensitive Data Exposure{/tr}"}
+{$sensitive_data_box_title="{tr}Sensitive Data Exposure{/tr}"}
 {if $sensitive_data_detected_files}
 {remarksbox type='error' title="{$sensitive_data_box_title}" close='n'}
     <p>{tr}Tiki detected that there are temporary files in the db folder which may expose credentials or other sensitive information.{/tr}</p>

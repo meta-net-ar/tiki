@@ -23,15 +23,14 @@ $test_TikiAcceptanceTestDBRestorer->restoreDB($argv[1]);
 $local_php = 'db/local.php';
 
 require_once('installer/installlib.php');
-
-// Force autoloading
-if (! class_exists('ADOConnection')) {
-    die('AdoDb not found.');
-}
+$dbTiki = null;
 
 include $local_php;
-$dbTiki = ADONewConnection('mysqli');
-$dbTiki->Connect($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki);
+try {
+    $dbTiki = new PDO("mysql:host=$host_tiki;dbname=$dbs_tiki", $user_tiki, $pass_tiki);
+} catch (Exception $e) {
+    die(tra("Error while connecting using PDO" . $e->getMessage()));
+}
 $installer = Installer::getInstance();
 $installer->update();
 

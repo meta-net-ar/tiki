@@ -1102,6 +1102,13 @@ class Services_User_Controller
         TikiLib::lib('access')->check_user($user);
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
+            if ($input->isAvatar->bool()) {
+                $avatarLibName = $input->avatarLibName->text();
+                $avatarName = $input->avatarName->text();
+                $avatarType = $input->avatarType->text();
+                TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                return true;
+            }
             if (empty($_FILES['userfile']['name'])) {
                 $errormsg = tra('You must select an avatar to upload.');
                 throw new Services_Exception($errormsg, 400);

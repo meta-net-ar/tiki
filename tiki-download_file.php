@@ -52,18 +52,20 @@ $zip = false;
 $error = '';
 
 if (! $skip) {
-    if (isset($_REQUEST['fileId']) && ! is_array($_REQUEST['fileId'])) {
-        if (isset($_GET['draft'])) {
-            $info = \Tiki\FileGallery\FileDraft::id($_REQUEST['fileId'])->getParams();
+    if (isset($_REQUEST['fileId'])) {
+        if (! is_array($_REQUEST['fileId'])) {
+            if (isset($_GET['draft'])) {
+                $info = \Tiki\FileGallery\FileDraft::id($_REQUEST['fileId'])->getParams();
+            } else {
+                $info = $filegallib->get_file($_REQUEST['fileId']);
+            }
         } else {
-            $info = $filegallib->get_file($_REQUEST['fileId']);
+            $zipName = $_REQUEST['zipName'] ?? '';
+            $info = $filegallib->zip($_REQUEST['fileId'], $error, $zipName);
+            $zip = true;
         }
     } elseif (isset($_REQUEST['galleryId']) && isset($_REQUEST['name'])) {
         $info = $filegallib->get_file_by_name($_REQUEST['galleryId'], $_REQUEST['name']);
-    } elseif (isset($_REQUEST['fileId']) && is_array($_REQUEST['fileId'])) {
-        $zipName = $_REQUEST['zipName'] ?? '';
-        $info = $filegallib->zip($_REQUEST['fileId'], $error, $zipName);
-        $zip = true;
     } elseif (! empty($_REQUEST['randomGalleryId'])) {
         $info = $filegallib->get_file(0, $_REQUEST['randomGalleryId']);
     } elseif (! empty($_GET['data'])) {
@@ -337,12 +339,12 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                         $icon_x = $_GET['max'];
                         $icon_y = $_GET['max'];
                     } else {
-                        $icon_x = isset($_GET['x']) ? $_GET['x'] : 0;
-                        $icon_y = isset($_GET['y']) ? $_GET['y'] : 0;
+                        $icon_x = $_GET['x'] ?? 0;
+                        $icon_y = $_GET['y'] ?? 0;
                     }
 
                     $ext = pathinfo($info['filename']); // TODO replace with mimelib functions
-                    $format = isset($ext['extension']) ? $ext['extension'] : $format;
+                    $format = $ext['extension'] ?? $format;
                     $content = $tmp->icon($format, $icon_x, $icon_y);
                     $format = $tmp->getIconDefaultFormat();
                     $info['filetype'] = 'image/' . $format;

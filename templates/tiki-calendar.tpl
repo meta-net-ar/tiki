@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title admpage="calendar"}
     {if $displayedcals|@count eq 1}
     {tr}Calendar:{/tr} {$calendars[$displayedcals[0]].displayName|escape}
@@ -165,7 +166,7 @@
     <div class="categbar">
         {tr}Watched by categories:{/tr}
         {section name=i loop=$watching_categories}
-            {assign var=thiswatchingcateg value=$watching_categories[i].categId}
+            {$thiswatchingcateg=$watching_categories[i].categId}
             {button href="tiki-browse_categories.php?parentId=$thiswatchingcateg" _text=$watching_categories[i].name|escape}
             &nbsp;
         {/section}
@@ -173,9 +174,9 @@
     {/if}
 
     {if $prefs.display_12hr_clock eq 'y'}
-        {assign var="timeFormat" value=true}
+        {$timeFormat=true}
     {else}
-        {assign var="timeFormat" value=false}
+        {$timeFormat=false}
     {/if}
     {if $viewlist eq 'list'}
         {include file='tiki-calendar_listmode.tpl'}

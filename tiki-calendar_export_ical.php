@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\TikiInit;
 
 require_once('tiki-setup.php');
 
@@ -136,8 +135,6 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
         echo trim($csv);
     } else {
         // create ical with sabre/dav
-
-        $userlb = TikiLib::get('Users');
 
         $vcalendar = new Sabre\VObject\Component\VCalendar();
 

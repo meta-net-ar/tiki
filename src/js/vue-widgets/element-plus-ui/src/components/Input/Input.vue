@@ -3,6 +3,8 @@ import { ref, watchEffect } from 'vue';
 import * as Icons from '@element-plus/icons-vue';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps(["_emit", "_expose", "placeholder", "value", "prefixIcon", "suffixIcon", "clearable", "showPassword", "autocomplete", "name", "disabled", "isInvalid", "type", "prependText", "appendText"]);
 const showPassword = props.showPassword === "true";
 const clearable = props.clearable === "true";
@@ -16,6 +18,7 @@ props._expose({ value: modelValue });
 
 watchEffect(() => {
     isInvalid.value = props.isInvalid === "true";
+    modelValue.value = props.value;
 });
 </script>
 
@@ -26,7 +29,7 @@ export const DATA_TEST_ID = {
 </script>
 
 <template>
-    <ConfigWrapper locale="en">
+    <ConfigWrapper language="en">
         <div 
             :class="{ 'invalid': isInvalid }"
         >
@@ -37,7 +40,7 @@ export const DATA_TEST_ID = {
                 :suffix-icon="suffixIcon"
                 :clearable="clearable"
                 :show-password="showPassword"
-                :autocomplete="autocomplete ?? true"
+                :autocomplete="autocomplete ?? 'on'"
                 :name="name"
                 :disabled="disabled"
                 :type="type"
@@ -46,6 +49,8 @@ export const DATA_TEST_ID = {
                 @blur="() => _emit('blur')"
                 @focus="() => _emit('focus')"
                 @keyup.enter="() => _emit('enter')"
+                @keyup="() => _emit('keyup')"
+                @keydown="() => _emit('keydown')"
                 :data-testid="DATA_TEST_ID.INPUT"
             >
                 <template #prepend v-if="prependText">{{ prependText }}</template>

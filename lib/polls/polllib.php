@@ -128,7 +128,7 @@ class PollLib extends PollLibShared
     }
 
     /**
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function set_last_poll()
     {
@@ -139,7 +139,7 @@ class PollLib extends PollLibShared
     }
 
     /**
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function close_all_polls()
     {
@@ -150,7 +150,7 @@ class PollLib extends PollLibShared
     }
 
     /**
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function active_all_polls()
     {
@@ -161,7 +161,7 @@ class PollLib extends PollLibShared
     /**
      * @param $optionId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_poll_option($optionId)
     {

@@ -15,20 +15,20 @@
 <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
     <table class="table table-striped table-hover">
         <tr>
-            {assign var=numbercol value=1}
+            {$numbercol=1}
             <th>
                 <a href="tiki-list_quizzes.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'name_desc'}name_asc{else}name_desc{/if}">{tr}Quiz{/tr}</a>
             </th>
-            {assign var=numbercol value=$numbercol+1}
+            {$numbercol=$numbercol+1}
             <th>
                 <a href="tiki-list_quizzes.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'timeLimit_desc'}timeLimit_asc{else}timeLimit_desc{/if}">{tr}Time Limit{/tr}</a>
             </th>
-            {assign var=numbercol value=$numbercol+1}
+            {$numbercol=$numbercol+1}
             <th>
                 {tr}Questions{/tr}
             </th>
             {if ($tiki_p_admin eq 'y' or $tiki_p_admin_quizzes eq 'y' or $tiki_p_view_quiz_stats eq 'y')}
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
                 <th></th>
             {/if}
         </tr>

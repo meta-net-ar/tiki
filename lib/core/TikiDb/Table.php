@@ -5,13 +5,12 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\TikiDb\AdoDbResult;
 use Tiki\TikiDb\PdoResult;
 use Tiki\TikiDb\SanitizeEncoding;
 
 class TikiDb_Table
 {
-    /** @var Tiki\TikiDb\PdoDb|Tiki\TikiDb\AdoDb $db */
+    /** @var Tiki\TikiDb\PdoDb $db */
     protected $db;
     protected $tableName;
     protected $autoIncrement;
@@ -97,7 +96,7 @@ class TikiDb_Table
      * Deletes a single record from the table matching the provided conditions.
      * Conditions use exact matching. Multiple conditions will result in AND matching.
      * @param array $conditions
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function delete(array $conditions)
     {
@@ -112,7 +111,7 @@ class TikiDb_Table
      * This query will update a single record.
      * @param array $values
      * @param array $conditions
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function update(array $values, array $conditions)
     {
@@ -123,7 +122,7 @@ class TikiDb_Table
      * @param array $values
      * @param array $conditions
      * @param null $limit
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function updateMultiple(array $values, array $conditions, $limit = null)
     {
@@ -145,7 +144,7 @@ class TikiDb_Table
      * The method works just like delete, except that it does not have the one record
      * limitation.
      * @param array $conditions
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function deleteMultiple(array $conditions)
     {
@@ -297,7 +296,7 @@ class TikiDb_Table
      * @param null  $orderClause
      * @param null  $joinClause
      */
-    public function query(array $fields = [], array $conditions = [], $numrows = -1, $offset = -1, $orderClause = null, $joinClause = null, array $options = []): PdoResult|AdoDbResult|false
+    public function query(array $fields = [], array $conditions = [], $numrows = -1, $offset = -1, $orderClause = null, $joinClause = null, array $options = []): PdoResult|false
     {
         $result = $this->buildSelect($fields, $conditions, $orderClause, $joinClause);
         return $this->db->scrollableQuery($result['query'], $result['bindvars'], $numrows, $offset, $this->errorMode, options: $options);

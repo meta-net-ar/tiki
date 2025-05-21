@@ -243,7 +243,7 @@ function batchImportUsers()
 
     if (count($discarded)) {
         foreach ($discarded as $key => $value) {
-            $df[] = $discarded[$key]['login'] . ' (' . $discarded[$key]['reason'] . ')';
+            $df[] = $value['login'] . ' (' . $value['reason'] . ')';
         }
         Feedback::warning(['mes' => $df, 'title' => tr('%0 users not added', count($discarded))]);
     }

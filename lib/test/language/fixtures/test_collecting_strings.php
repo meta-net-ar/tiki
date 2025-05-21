@@ -47,22 +47,22 @@ if (isset($_REQUEST['page'])) {
         $admintitle = 'Features'; //get_strings tra('Features')
         $description = 'Enable/disable Tiki features here, but configure them elsewhere'; //get_strings tra('Enable/disable Tiki features here, but configure them elsewhere')
         $helpUrl = 'Features+Admin';
-        include_once('tiki-admin_include_features.php');
+        include_once('admin/include_features.php');
     } elseif ($adminPage === 'general') {
         $admintitle = 'General'; //get_strings tra('General')
         $description = 'General preferences and settings'; //get_strings tra('General preferences and settings')
         $helpUrl = 'General+Admin';
-        include_once('tiki-admin_include_general.php');
+        include_once('admin/include_general.php');
     } elseif ($adminPage === 'login') {
         $admintitle = 'Login'; //get_strings tra('Login')
         $description = 'User registration, login and authentication'; //get_strings tra('User registration, login and authentication')
         $helpUrl = 'Login+Config';
-        include_once('tiki-admin_include_login.php');
+        include_once('admin/include_login.php');
     } elseif ($adminPage === 'wiki') {
         $admintitle = tra('Wiki');
         $description = tra('Wiki settings');
         $helpUrl = 'Wiki+Config';
-        include_once('tiki-admin_include_wiki.php');
+        include_once('admin/include_wiki.php');
     } else {
         $helpUrl = '';
     }

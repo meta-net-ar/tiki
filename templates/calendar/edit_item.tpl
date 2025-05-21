@@ -165,9 +165,9 @@
                 <label class="col-form-label col-sm-3">{tr}Start - End{/tr}</label>
                 <div class="col-sm-7 start">
                     {if $calitem.allday}
-                        {assign var="showtime" value="n"}
+                        {$showtime="n"}
                     {else}
-                        {assign var="showtime" value="y"}
+                        {$showtime="y"}
                     {/if}
                     {jscalendar id="event-datetime" date=$calitem.start enddate=$calitem.end fieldname="calitem[start]" showtime=$showtime endfieldname="calitem[end]" showtimezone="n" timezone=$displayTimezone}
                 </div>
@@ -183,8 +183,10 @@
                 $('#allday').on('change', function() {
                     if ($(this).is(':checked')) {
                         $('#event-datetime').attr('type', 'daterange');
+                        $('#event-datetime').attr('format', 'YYYY-MM-DD');
                     } else {
                         $('#event-datetime').attr('type', 'datetimerange');
+                        $('#event-datetime').attr('format', 'YYYY-MM-DD HH:mm');
                     }
                 });
                 {/jq}
@@ -213,9 +215,9 @@
                     <label class="col-form-label col-sm-3">{tr}Status{/tr}</label>
                     <div class="col-sm-9">
                         {if (! empty($calitem))}
-                            {assign var="selected" value="{$calitem.status}"}
+                            {$selected="{$calitem.status}"}
                         {else}
-                            {assign var="selected" value="{$calendar.defaulteventstatus}"}
+                            {$selected="{$calendar.defaulteventstatus}"}
                         {/if}
                         {html_options class="form-control" name='calitem[status]' output=$calendar.eventstatusoutput values=$calendar.eventstatus selected=$selected}
                     </div>
@@ -327,7 +329,7 @@
                 <div class="mb-3 row" id="calorg">
                     <label class="col-form-label col-sm-3">{tr}Organized by{/tr}</label>
                     <div class="col-sm-9">
-                        {user_selector name='calitem[organizers]' select=$calitem.organizers multiple='true' allowNone='y' editable='y' realnames = 'n'}
+                        {user_selector name='calitem[organizers][]' select=$calitem.organizers multiple='true' allowNone='y' editable='y' realnames = 'n'}
                     </div>
                 </div> {* / .mb-3.row *}
             {/if}
@@ -336,7 +338,7 @@
                     <label class="col-form-label col-sm-3">{tr}Participants{/tr}</label>
                     <div class="col-sm-9">
                         {if isset($calitem.participants)}
-                            {user_selector name='participants' select=$calitem.selected_participants multiple='true' allowNone='y' editable='y' realnames='n'}
+                            {user_selector name='participants[]' select=$calitem.selected_participants multiple='true' allowNone='y' editable='y' realnames='n'}
                             <br>
                             <div class="row">
                                 <div class="col-sm-9">
@@ -359,7 +361,7 @@
                                     <tr class="d-none" id="participant-template-row">
                                         <td class="username"></td>
                                         <td>
-                                            <select class="form-control noselect2" name="calitem[participant_partstat]">
+                                            <select class="form-control" name="calitem[participant_partstat]">
                                                 <option value="NEEDS-ACTION">{tr}NEEDS-ACTION{/tr}</option>
                                                 <option value="ACCEPTED">{tr}ACCEPTED{/tr}</option>
                                                 <option value="TENTATIVE">{tr}TENTATIVE{/tr}</option>
@@ -367,7 +369,7 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <select class="form-control noselect2" name="calitem[participant_roles]">
+                                            <select class="form-control" name="calitem[participant_roles]">
                                                 <option value="0">{tr}Chair{/tr}</option>
                                                 <option value="1">{tr}Required participant{/tr}</option>
                                                 <option value="2">{tr}Optional participant{/tr}</option>
@@ -440,15 +442,15 @@
         </div> {* /.form-contents *}
         <div class="submit">
             <input type="hidden" id="act" name="act" value="">
-            <input type="submit" class="btn btn-secondary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
-            <input type="submit" class="btn btn-primary {if $prefilled}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
+            <input type="submit" class="btn btn-secondary cleanable-false" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
+            <input type="submit" class="btn btn-primary cleanable-false {if $prefilled}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
             {if $tiki_p_add_events eq 'y' and empty($saveas) and not empty($calitemId)}
-                <input type="submit" class="btn btn-secondary" name="saveas" data-alt_controller="calendar" data-alt_action="copy_item"
+                <input type="submit" class="btn btn-secondary cleanable-false" name="saveas" data-alt_controller="calendar" data-alt_action="copy_item"
                        onclick="needToConfirm=false" value="{tr}Copy to a new event{/tr}">
             {/if}
             {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
-                       class="btn btn-danger" onclick="needToConfirm=false;" value="{tr}Delete event{/tr}">
+                       class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" value="{tr}Delete event{/tr}">
             {/if}
             {if $recurrence.id}
                 <div class="dropdown">

@@ -114,6 +114,21 @@ foreach ($channels['data'] as $i => $channel) {
 $smarty->assign_by_ref('count', $channels['count']);
 $smarty->assign_by_ref('channels', $channels['data']);
 
+$modlib = TikiLib::lib('mod');
+$assigned_modules = $modlib->get_assigned_modules();
+$module_assign_id = null;
+
+foreach ($assigned_modules as $zone => $modules) {
+    foreach ($modules as $module) {
+        if (isset($module['name']) && strtolower($module['name']) === 'menu') {
+            $module_assign_id = $module['moduleId'];
+            break 2;
+        }
+    }
+}
+
+$smarty->assign('module_assign_id', $module_assign_id);
+
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 // Display the template

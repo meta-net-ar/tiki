@@ -720,7 +720,7 @@ class Tracker_Item
         }
         foreach ($data as $permName => $value) {
             $field = $this->definition->getField($permName);
-            if ($field && ($field['type'] == 'l' || $field['type'] == 'REL')) {
+            if ($field && ($field['type'] == 'l' || $field['type'] == 'REL') && (empty($value) || is_string($value))) {
                 $handler = $this->definition->getFieldFactory()->getHandler($field, $fieldData);
                 $data[$permName] = $handler->getItemValues();
             }

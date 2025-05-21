@@ -1067,7 +1067,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     public function setHPagebreaks($breaks)
     {
         foreach($breaks as $break) {
-            array_push($this->_hbreaks,$break);
+            $this->_hbreaks[] = $break;
         }
     }
     
@@ -1081,7 +1081,7 @@ class Spreadsheet_Excel_Writer_Worksheet extends Spreadsheet_Excel_Writer_BIFFwr
     public function setVPagebreaks($breaks)
     {
         foreach($breaks as $break) {
-            array_push($this->_vbreaks,$break);
+            $this->_vbreaks[] = $break;
         }
     }
     

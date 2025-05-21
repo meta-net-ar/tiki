@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title help="Newsletters"}{tr}Newsletters{/tr}{/title}
 
 {if $tiki_p_admin_newsletters eq "y"}

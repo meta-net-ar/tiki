@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\DiagramHelper;
-use Tiki\TikiDb\AdoDb;
 use Tiki\TikiDb\PdoDb;
 use Tiki\Lib\Wiki\ConvertToTiki9;
 use Tiki\TikiInit;
@@ -583,22 +582,9 @@ class TikiLib extends TikiDb_Bridge
                 $dbhost = $info['host'];
                 $database = $info['database'];
 
-                $api_tiki = null;
                 require TIKI_CONFIG_FILE_PATH;
-                if (isset($api_tiki) &&  $api_tiki == 'adodb') {
-                    // Force autoloading
-                    if (! class_exists('ADOConnection')) {
-                        return null;
-                    }
-
-                    $dbsqlplugin = ADONewConnection($dbdriver);
-                    if ($dbsqlplugin->NConnect($dbhost, $dbuserid, $dbpassword, $database)) {
-                        $connectionMap[$name] = new AdoDb($dbsqlplugin);
-                    }
-                } else {
-                    $dbsqlplugin = new PDO("$dbdriver:host=$dbhost;dbname=$database", $dbuserid, $dbpassword);
-                    $connectionMap[$name] = new PdoDb($dbsqlplugin);
-                }
+                $dbsqlplugin = new PDO("$dbdriver:host=$dbhost;dbname=$database", $dbuserid, $dbpassword);
+                $connectionMap[$name] = new TikiDb_Pdo($dbsqlplugin);
             }
             return $connectionMap[$name];
         } catch (Exception $e) {
@@ -874,7 +860,7 @@ class TikiLib extends TikiDb_Bridge
     /**
      * @param $id
      *
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return bool|Tiki\TikiDb\PdoResult
      */
     public function remove_user_watch_by_id($id)
     {
@@ -889,7 +875,7 @@ class TikiLib extends TikiDb_Bridge
     /**
      * @param $id
      *
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_group_watch_by_id($id)
     {
@@ -904,7 +890,7 @@ class TikiLib extends TikiDb_Bridge
      * @param string $type  = 'wiki page'
      * @param string $email = ''
      *
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_user_watch($user, $event, $object, $type = 'wiki page', $email = '')
     {
@@ -1068,6 +1054,15 @@ class TikiLib extends TikiDb_Bridge
             ]
         );
     }
+
+    public function removeInlineSyntaxTags($text)
+    {
+        if (str_starts_with($text, '{syntax')) {
+            return preg_replace('/^\{syntax[^}]*}/i', '', $text);
+        }
+        return $text;
+    }
+
 
     /*shared*/
     /**
@@ -1541,7 +1536,7 @@ class TikiLib extends TikiDb_Bridge
      * @param string $float
      * @return string
      */
-    public function get_user_avatar($user, $float = '')
+    public function get_user_avatar($user, $float = '', $avatarRenderSize = 'small')
     {
         global $prefs;
 
@@ -1553,7 +1548,7 @@ class TikiLib extends TikiDb_Bridge
             $res = $user;
             $user = $user['login'];
         } else {
-            $res = $this->table('users_users')->fetchRow(['login', 'avatarType', 'avatarLibName', 'email'], ['login' => $user]);
+            $res = $this->table('users_users')->fetchRow(['login', 'avatarType', 'avatarLibName', 'email', 'avatarName'], ['login' => $user]);
         }
 
         if (! $res) {
@@ -1591,6 +1586,18 @@ class TikiLib extends TikiDb_Bridge
 
         switch ($type) {
             case 'l':
+                if (substr($libname, 0, 8) == 'dicebear') {
+                    TikiLib::lib('header')->add_js_module(<<<JS
+                        import { renderAvatars } from 'avatar-generator';
+                        renderAvatars();
+                    JS);
+
+                    $seed = $res['avatarName'];
+                    $style = explode('/', $libname)[1];
+                    return <<<HTML
+                        <div class="dicebear-avatar" data-seed="{$seed}" data-style="{$style}" data-size="{$avatarRenderSize}"></div>
+                    HTML;
+                }
                 if ($libname) {
                     $ret = '<img class="user-profile-picture rounded" width="45" height="45" src="' . $libname . '" ' . $style . ' alt="' . $username . '">';
                 }
@@ -2601,7 +2608,7 @@ class TikiLib extends TikiDb_Bridge
             ]
         );
         if ($prefs['session_storage'] == 'db') {
-            // clean up adodb sessions as well in case adodb session garbage collection not working
+            // clean up db sessions as well in case session garbage collection not working
             $sessions = $this->table('sessions');
 
             $sessions->deleteMultiple(['expiry' => $sessions->lesserThan($oldy)]);
@@ -4632,7 +4639,7 @@ class TikiLib extends TikiDb_Bridge
      * @param $name
      * @param $value
      *
-     * @return bool|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return bool|Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function set_user_preference($my_user, $name, $value)

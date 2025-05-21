@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\WikiPlugin\Fixture\MockTrackerField;
+use Tiki\WikiPlugin\Fixture\Table;
+
 function wikiplugin_fitnesse_info()
 {
     return [
@@ -27,7 +31,7 @@ function wikiplugin_fitnesse_info()
 function wikiplugin_fitnesse($data, $params)
 {
     $runner = Tracker_Field_Math::getRunner();
-    $mock = new FixtureMockTrackerField();
+    $mock = new MockTrackerField();
     $runner->mockFunction('tracker-field', $mock);
 
     $fixtures = [
@@ -51,7 +55,7 @@ function wikiplugin_fitnesse($data, $params)
             $replace = call_user_func($fixtures[$fixture], $body, new JitFilter($arguments));
             $table->replaceWith($replace);
         } else {
-            $data = new FixtureTable($body);
+            $data = new Table($body);
             $table->replaceWith('__' . tr('Fixture not found: %0', $fixture) . "__\n$data");
         }
     }
@@ -62,7 +66,7 @@ function wikiplugin_fitnesse($data, $params)
 
 function wp_fixture_tracker_math($data, $params)
 {
-    $table = new FixtureTable($data);
+    $table = new Table($data);
     $trackerId = $params->trackerId->int();
     $tracker = Tracker_Definition::get($trackerId);
 
@@ -115,7 +119,7 @@ function wp_fixture_tracker_math($data, $params)
 
 function wp_fixture_tracker_data($data, $params, $mock)
 {
-    $table = new FixtureTable($data);
+    $table = new Table($data);
     $headings = $table->getHeadings();
 
     $trackerId = $params->trackerId->int();
@@ -148,112 +152,4 @@ function wp_fixture_tracker_data($data, $params, $mock)
     }
 
     return $table;
-}
-
-class FixtureTable implements Iterator
-{
-    private $title;
-    private $headings = [];
-    private $data = [];
-    private $position = 0;
-
-    public function __construct($string)
-    {
-        $lines = explode("\n", $string);
-        $lines = array_map(function ($line) {
-            return array_map('trim', explode('|', $line));
-        }, $lines);
-
-        $this->headings = array_shift($lines);
-        $length = count($this->headings);
-        $this->data = array_map(function ($line) use ($length) {
-            return array_pad($line, $length, null);
-        }, $lines);
-    }
-
-    public function __toString()
-    {
-        $lines = $this->data;
-        array_unshift($lines, array_map(function ($entry) {
-            return "__{$entry}__";
-        }, $this->headings));
-
-        if ($this->title) {
-            array_unshift($lines, [$this->title]);
-        }
-        return "||" . implode("\n", array_map(function ($line) {
-            return implode(' | ', $line);
-        }, $lines)) . "||";
-    }
-
-    public function getHeadings()
-    {
-        return $this->headings;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-    }
-
-    public function rewind(): void
-    {
-        $this->position = 0;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function current()
-    {
-        return array_map(function ($value) {
-            return str_replace('%%%', "\n", $value);
-        }, $this->data[$this->position]);
-    }
-
-    #[\ReturnTypeWillChange]
-    public function key()
-    {
-        return $this->position;
-    }
-
-    public function next(): void
-    {
-        ++$this->position;
-    }
-
-    public function valid(): bool
-    {
-        return isset($this->data[$this->position]);
-    }
-
-    public function setValue($pos, $value, $color = null)
-    {
-        if ($color) {
-            $value = "~~$color:$value~~";
-        }
-
-        $this->data[$this->position][$pos] = str_replace("\n", '%%%', $value);
-    }
-}
-
-class FixtureMockTrackerField extends Tiki_Formula_Function_TrackerField
-{
-    private $data = [];
-
-    public function fetchValue($object, $field, $default)
-    {
-        if (isset($this->data[$object][$field])) {
-            return $this->data[$object][$field];
-        } else {
-            return $default;
-        }
-    }
-
-    public function addValues($id, array $data)
-    {
-        if (! isset($this->data[$id])) {
-            $this->data[$id] = $data;
-        } else {
-            $this->data[$id] = array_merge($this->data[$id], $data);
-        }
-    }
 }

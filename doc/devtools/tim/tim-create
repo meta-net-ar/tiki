@@ -144,7 +144,6 @@ create()
     log "Creating local.php"
     cat > $INSTANCE_DIR/db/local.php <<EOF
 <?php
-\$dbversion_tiki='$([ ! -z $GITBRANCH ] && echo $GITBRANCH)';
 \$host_tiki='localhost';
 \$user_tiki='tiki';
 \$pass_tiki='password';

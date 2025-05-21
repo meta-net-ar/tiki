@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, shallowRef } from 'vue';
 import getBasePath from '../helpers/getBasePath';
 
 const props = defineProps({
@@ -9,7 +9,7 @@ const props = defineProps({
     },
 });
 
-const locale = ref(null);
+const locale = shallowRef(null);
 
 const loadLocale = async (localeName) => {
     try {

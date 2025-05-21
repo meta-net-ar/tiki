@@ -8,7 +8,7 @@
 {/if}
 {if $tiki_p_admin_users eq 'y'}
     <div class="t_navbar btn-group mb-3">
-        {assign var=thisuser value=$userinfo.login}
+        {$thisuser=$userinfo.login}
         {button href="tiki-assignuser.php?assign_user=$thisuser" _type="link" _text="{tr}Assign Group{/tr}"}
         {button href="tiki-user_information.php?view_user=$thisuser" _type="link" _text="{tr}User Information{/tr}"}
     </div>
@@ -244,7 +244,7 @@
                             </label>
                             <div class="col-md-8">
                                 <select id="mytheme" name="mytheme" class="form-select">
-                                    {assign var="userwatch_themeoption" value="{$userwatch_theme}{if $userwatch_themeOption}/{$userwatch_themeOption}{/if}"}
+                                    {$userwatch_themeoption="{$userwatch_theme}{if $userwatch_themeOption}/{$userwatch_themeOption}{/if}"}
                                     <option value="" class="text-muted bg-info">{tr}Site theme{/tr} ({$prefs.theme}{if !empty($prefs.theme_option)}/{$prefs.theme_option}{/if})</option>
                                     {foreach from=$available_themesandoptions key=theme item=theme_name}
                                         <option value="{$theme|escape}" {if $userwatch_themeoption eq $theme}selected="selected"{/if}>{$theme_name|ucwords}</option>

@@ -373,7 +373,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $builder = new Search_Elastic_OrderBuilder($this);
             $orderPart = $builder->build($query->getSortOrder());
 
-            $builder = new Search_Elastic_FacetBuilder($this->facetCount, $this->connection->getVersion() >= 2.0, $this->connection->getVersion() >= 8.0);
+            $builder = new Search_Elastic_FacetBuilder($this->facetCount, $this->connection->getVersion() >= 2.0, $this->connection->getVersion() >= 8.0, $this);
             $facetPart = $builder->build($query->getFacets());
 
             if ($this->connection->getVersion() >= 6.0 && $query->getSortOrder()->hasField(Search\Query\Order::FIELD_SCORE)) {
@@ -802,6 +802,15 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
     {
         $mapping = $this->getFieldMapping($field);
         if (! empty($mapping->type) && in_array($mapping->type, ['text', 'keyword'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasSortKeywordField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping->type) && $mapping->type == 'text' && isset($mapping->fields->sort) && $mapping->fields->sort->type == 'keyword') {
             return true;
         }
         return false;

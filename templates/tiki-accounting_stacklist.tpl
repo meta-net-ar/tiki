@@ -33,7 +33,7 @@
                 </td>
                 <td class="journal"{if $s.maxcount>1} rowspan="{$s.maxcount}"{/if} style="text-align:right">{$s.stackDate|date_format:"%Y-%m-%d"}</td>
                 <td class="journal"{if $s.maxcount>1} rowspan="{$s.maxcount}"{/if}>{$s.stackDescription|escape}</td>
-            {section name=posts loop=$s.maxcount}{assign var='i' value=$smarty.section.posts.iteration-1}
+            {section name=posts loop=$s.maxcount}{$i=$smarty.section.posts.iteration-1}
                 {if !$smarty.section.posts.first}<tr class="{$style}">{/if}
                     <td class="journal" style="text-align:right">{if $i<$s.debitcount}{$s.debit[$i].stackItemAccountId}{/if}&nbsp;</td>
                     <td class="journal" style="text-align:right">

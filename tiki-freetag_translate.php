@@ -37,7 +37,7 @@ $freetaglib = TikiLib::lib('freetag');
 $multilinguallib = TikiLib::lib('multilingual');
 
 // Check for invalid or missing objId and non-admin user permissions
-function handleError($message, $smarty)
+function handleError($message)
 {
     Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_401);
 }
@@ -46,14 +46,14 @@ if (! empty($cat_objId)) {
     $name = $tikilib->get_page_name_from_id($cat_objId);
     if (! $name) {
         $error_message = tra("Invalid or missing objId");
-        handleError($error_message, $smarty);
+        handleError($error_message);
     }
     $info = $tikilib->get_page_info($name);
 } else {
     $error_message = $tiki_p_admin_freetags != 'y'
         ? tra("You do not have the permission that is needed to use this feature")
         : tra("Invalid or missing objId");
-    handleError($error_message, $smarty);
+    handleError($error_message);
 }
 
 // Assign Values to Smarty

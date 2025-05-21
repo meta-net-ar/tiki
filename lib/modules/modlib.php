@@ -195,7 +195,7 @@ class ModLib extends TikiLib
     /**
      * @param $moduleId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_up($moduleId)
     {
@@ -206,7 +206,7 @@ class ModLib extends TikiLib
     /**
      * @param $moduleId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_down($moduleId)
     {
@@ -219,7 +219,7 @@ class ModLib extends TikiLib
      *
      * @param $moduleId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_left($moduleId)
     {
@@ -232,7 +232,7 @@ class ModLib extends TikiLib
      *
      * @param $moduleId
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function module_right($moduleId)
     {
@@ -322,7 +322,7 @@ class ModLib extends TikiLib
     /**
      * @param $name
      *
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function remove_user_module($name)
@@ -833,7 +833,7 @@ class ModLib extends TikiLib
             if ($dh = opendir(MODULES_PATH)) {
                 while (($file = readdir($dh)) !== false) {
                     if (preg_match("/^mod-func-.*\.php$/", $file)) {
-                        array_push($files, $file);
+                        $files[] = $file;
                     }
                 }
                 closedir($dh);
@@ -912,8 +912,8 @@ class ModLib extends TikiLib
                     'section' => 'appearance',
                 ],
                 'decorations' => [
-                    'name' => tra('Title, background, etcs'),
-                    'description' => 'y|n ' . tra('Show module decorations'),
+                    'name' => tra('Backgrounds and Borders (if specified by the theme)'),
+                    'description' => 'y|n ' . tra('Default: "y". "n": show only title and content.'),
                     'section' => 'appearance',
                 ],
                 'notitle' => [
@@ -1012,7 +1012,7 @@ class ModLib extends TikiLib
                 ],
                 'flip' => [
                     'name' => tra('Flip'),
-                    'description' => tra('y|yc|n Users can open and close the module. y: module initially open. yc: module initially closed. n: module always open (default).'),
+                    'description' => tra('y|yc|n Users can open and close the module. "y": module initially open. "yc": module initially closed. "n": module always open (default).'),
                     'filter' => 'alpha',
                     'section' => 'appearance',
                 ],

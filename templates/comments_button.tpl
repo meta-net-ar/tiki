@@ -1,32 +1,32 @@
 {if $comments_count gt 0}
-    {assign var=thisbuttonclass value='highlight'}
+    {$thisbuttonclass='highlight'}
 {else}
-    {assign var=thisbuttonclass value=''}
+    {$thisbuttonclass=''}
 {/if}
 {if $comments_count == 0 or ($tiki_p_read_comments == 'n' and $tiki_p_post_comments == 'y')}
-    {assign var=thistext value="{tr}Add Comment{/tr}"}
+    {$thistext="{tr}Add Comment{/tr}"}
 {elseif $comments_count == 1}
-    {assign var=thistext value="{tr}1 comment{/tr}"}
+    {$thistext="{tr}1 comment{/tr}"}
 {else}
-    {assign var=thistext value="$comments_count&nbsp;{tr}Comments{/tr}"}
+    {$thistext="$comments_count&nbsp;{tr}Comments{/tr}"}
 {/if}
 {if isset($pagemd5)}
-    {assign var=thisflipid value="comzone$pagemd5"}
+    {$thisflipid="comzone$pagemd5"}
 {else}
-    {assign var=thisflipid value="comzone"}
+    {$thisflipid="comzone"}
 {/if}
 {if $comments_show eq 'y' or $show_comzone eq 'y'}
-    {assign var=flip_open value='y'}
+    {$flip_open='y'}
 <noscript>
     {button comzone="hide" _anchor="comments" _auto_args="comzone,*" _class=$thisbuttonclass _text=$thistext _flip_hide_text='y' _flip_default_open=$flip_open}
 </noscript>
 {elseif $comments_show eq 'n'}
-    {assign var=flip_open value='n'}
+    {$flip_open='n'}
 <noscript>
     {button comzone="show" _anchor="comments" _auto_args="comzone,*" _class=$thisbuttonclass _text=$thistext _flip_hide_text='n' _flip_default_open=$flip_open}
 </noscript>
 {else}
-    {assign var=flip_open value=$prefs.wiki_comments_displayed_default}
+    {$flip_open=$prefs.wiki_comments_displayed_default}
 <noscript>
     {button comzone="show" _anchor="comments" _auto_args="comzone,*" _class=$thisbuttonclass _text=$thistext _flip_hide_text='n' _flip_default_open=$flip_open}
 </noscript>

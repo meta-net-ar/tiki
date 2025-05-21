@@ -107,6 +107,7 @@
     "src/js/tiki-vue-sfc-loader",
     "src/js/vue-mf/*",
     "src/js/vue-widgets/*",
-    "src/scss"
+    "src/scss",
+    "src/js/avatar-generator"
   ]
 }

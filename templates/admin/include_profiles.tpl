@@ -1,4 +1,4 @@
-{assign var="baseURI" value="{$smarty.server.REQUEST_URI}"}
+{$baseURI="{$smarty.server.REQUEST_URI}"}
 {$headerlib->add_jsfile("lib/jquery_tiki/tiki-profile.js")}
 
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
@@ -64,30 +64,30 @@
                     </div>
                     <div class="col-sm-6">
                             {remarksbox type="info" title="{tr}Suggested Profiles{/tr}" close="n"}
-                                {assign var=profilesFilterUrlStart value="tiki-admin.php?categories%5B%5D="}
-                                {assign var=profilesFilterUrlMid value='.x&categories%5B%5D='}
-                                {assign var=profilesFilterUrlEnd value='&repository=http%3A%2F%2Fprofiles.tiki.org%2Fprofiles&page=profiles&preloadlist=y&list=List#step2'}
+                                {$profilesFilterUrlStart="tiki-admin.php?categories%5B%5D="}
+                                {$profilesFilterUrlMid='.x&categories%5B%5D='}
+                                {$profilesFilterUrlEnd='&repository=http%3A%2F%2Fprofiles.tiki.org%2Fprofiles&page=profiles&preloadlist=y&list=List#step2'}
 
                                 <p>
-                                    {assign var=profilesFilterUrlFeaturedProfiles value='Featured+profiles'}
+                                    {$profilesFilterUrlFeaturedProfiles='Featured+profiles'}
                                     <a href="{$profilesFilterUrlStart}{$tikiMajorVersion}{$profilesFilterUrlMid}{$profilesFilterUrlFeaturedProfiles}{$profilesFilterUrlEnd}" class="alert-link">{tr}Featured Site Profiles{/tr}</a>
                                     <br>{tr}Featured Site Profiles is a list of applications that are maintained by the Tiki community and are a great way to get started.{/tr}
                                 </p>
 
                                 <p>
-                                    {assign var=profilesFilterUrlFullProfiles value='Full+profile+(out+of+the+box+%26+ready+to+go)'}
+                                    {$profilesFilterUrlFullProfiles='Full+profile+(out+of+the+box+%26+ready+to+go)'}
                                     <a href="{$profilesFilterUrlStart}{$tikiMajorVersion}{$profilesFilterUrlMid}{$profilesFilterUrlFullProfiles}{$profilesFilterUrlEnd}" class="alert-link">{tr}Full Profiles{/tr}</a>
                                     <br>{tr}Full Profiles are full featured out of the box solutions.{/tr}
                                 </p>
 
                                 <p>
-                                    {assign var=profilesFilterUrlMiniProfiles value='Mini-profile+(can+be+included+in+other)'}
+                                    {$profilesFilterUrlMiniProfiles='Mini-profile+(can+be+included+in+other)'}
                                     <a href="{$profilesFilterUrlStart}{$tikiMajorVersion}{$profilesFilterUrlMid}{$profilesFilterUrlMiniProfiles}{$profilesFilterUrlEnd}" class="alert-link">{tr}Mini Profiles{/tr}</a>
                                     <br>{tr}Mini Profiles will configure specific features and are a great way to add more functionality to an existing configuration.{/tr}
                                 </p>
 
                                 <p>
-                                    {assign var=profilesFilterUrlLearningProfiles value='Learning+profile+(just+to+show+off+feature)'}
+                                    {$profilesFilterUrlLearningProfiles='Learning+profile+(just+to+show+off+feature)'}
                                     <a href="{$profilesFilterUrlStart}{$tikiMajorVersion}{$profilesFilterUrlMid}{$profilesFilterUrlLearningProfiles}{$profilesFilterUrlEnd}" class="alert-link">{tr}Learning Profiles{/tr}</a>
                                     <br>{tr}Learning Profiles will allow you to quickly evaluate specific features in Tiki.{/tr}
                                 </p>
@@ -109,10 +109,10 @@
                         {foreach key=k item=profile from=$result}
                             <tr id="profile-{$k}">
                                 {if $profile.name == $show_details_for}
-                                    {assign var="show_details_for_profile_num" value="$k"}
-                                    {assign var="show_details_for_fullname" value=$profile.name|escape}
-                                    {assign var="show_details_for_domain" value=$profile.domain|escape}
-                                    {assign var="show_details_for_event" value={ticket mode=get}}
+                                    {$show_details_for_profile_num="$k"}
+                                    {$show_details_for_fullname=$profile.name|escape}
+                                    {$show_details_for_domain=$profile.domain|escape}
+                                    {$show_details_for_event={ticket mode=get}}
                                     {$show=true}
                                     <td>{$profile.name|escape}: {tr}See profile info below (may take a few seconds to load){/tr}.</td>
                                 {else}
@@ -200,7 +200,7 @@
                                                 {if empty($data.default)}
                                                     ('')
                                                 {else}
-                                                    {if is_array($data.default)}{assign var=default  value=$data.default|join:', '}{else}{assign var=default value=$data.default}{/if}
+                                                    {if is_array($data.default)}{$default=$data.default|join:', '}{else}{$default=$data.default}{/if}
                                                     ('{$default|truncate:20:"...":true|escape}')
                                                 {/if}
                                             {else}

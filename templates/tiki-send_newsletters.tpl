@@ -367,48 +367,48 @@
             </form>
         {/tab}
 
-        {assign var=name value="{tr _0=$count_drafts}Drafts (%0){/tr}"}
+        {$name="{tr _0=$count_drafts}Drafts (%0){/tr}"}
         {tab name=$name}
         {* --- tab with drafts --- *}
-            {assign var=channels value=$drafts}
-            {assign var=view_editions value='n'}
-            {assign var=offset value=$dr_offset}
-            {assign var=next_offset value=$dr_next_offset}
-            {assign var=prev_offset value=$dr_prev_offset}
-            {assign var=actual_page value=$dr_actual_page}
-            {assign var=pages_count value=$dr_count_pages}
-            {assign var=cur value='dr'}
-            {assign var=bak value='ed'}
-            {assign var=sort_mode value=$dr_sort_mode}
-            {assign var=sort_mode_bak value=$ed_sort_mode}
-            {assign var=offset value=$dr_offset}
-            {assign var=offset_bak value=$ed_offset}
-            {assign var=find value=$dr_find}
-            {assign var=find_bak value=$ed_find}
-            {assign var=tab value=2}
+            {$channels=$drafts}
+            {$view_editions='n'}
+            {$offset=$dr_offset}
+            {$next_offset=$dr_next_offset}
+            {$prev_offset=$dr_prev_offset}
+            {$actual_page=$dr_actual_page}
+            {$pages_count=$dr_count_pages}
+            {$cur='dr'}
+            {$bak='ed'}
+            {$sort_mode=$dr_sort_mode}
+            {$sort_mode_bak=$ed_sort_mode}
+            {$offset=$dr_offset}
+            {$offset_bak=$ed_offset}
+            {$find=$dr_find}
+            {$find_bak=$ed_find}
+            {$tab=2}
             <h2>{$name}</h2>
             {include file='sent_newsletters.tpl'}
         {/tab}
 
-        {assign var=name value="{tr _0=$count_editions}Sent Editions (%0){/tr}"}
+        {$name="{tr _0=$count_editions}Sent Editions (%0){/tr}"}
         {tab name=$name}
         {* --- tab with editions --- *}
-            {assign var=channels value=$editions}
-            {assign var=view_editions value='y'}
-            {assign var=offset value=$ed_offset}
-            {assign var=next_offset value=$ed_next_offset}
-            {assign var=prev_offset value=$ed_prev_offset}
-            {assign var=actual_page value=$ed_actual_page}
-            {assign var=pages_count value=$ed_count_pages}
-            {assign var=cur value='ed'}
-            {assign var=bak value='dr'}
-            {assign var=sort_mode value=$ed_sort_mode}
-            {assign var=sort_mode_bak value=$dr_sort_mode}
-            {assign var=offset value=$ed_offset}
-            {assign var=offset_bak value=$dr_offset}
-            {assign var=find value=$ed_find}
-            {assign var=find_bak value=$dr_find}
-            {assign var=tab value=3}
+            {$channels=$editions}
+            {$view_editions='y'}
+            {$offset=$ed_offset}
+            {$next_offset=$ed_next_offset}
+            {$prev_offset=$ed_prev_offset}
+            {$actual_page=$ed_actual_page}
+            {$pages_count=$ed_count_pages}
+            {$cur='ed'}
+            {$bak='dr'}
+            {$sort_mode=$ed_sort_mode}
+            {$sort_mode_bak=$dr_sort_mode}
+            {$offset=$ed_offset}
+            {$offset_bak=$dr_offset}
+            {$find=$ed_find}
+            {$find_bak=$dr_find}
+            {$tab=3}
             <h2>{$name}</h2>
             {include file='sent_newsletters.tpl'}
         {/tab}

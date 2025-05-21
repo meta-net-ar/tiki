@@ -69,7 +69,7 @@ if (substr($msg, 0, 1) == '/') {
             if (! isset($_SESSION['minichat_channels'])) {
                 initchannelssession($chans);
             }
-            $k = array_search($words[1], $_SESSION['minichat_channels']);
+            $k = in_array($words[1], $_SESSION['minichat_channels']);
             if ($k === false) {
                 $_SESSION['minichat_channels'][] = $words[1];
             }

@@ -37,11 +37,11 @@
                                 data-box="shadowbox[slideshow];type=img"
                                 {if ($caption)}
                                     {if ($caption eq 'd')}
-                                        {assign var="itemcaption" value="{$file.description}"}
+                                        {$itemcaption="{$file.description}"}
                                     {elseif ($caption eq 'n')}
-                                        {assign var="itemcaption" value="{$file.name}"}
+                                        {$itemcaption="{$file.name}"}
                                     {elseif ($caption eq 'f')}
-                                        {assign var="itemcaption" value="{$file.filename}"}
+                                        {$itemcaption="{$file.filename}"}
                                     {/if}
                                     title="{$itemcaption}">{$itemcaption}
                                 {/if}

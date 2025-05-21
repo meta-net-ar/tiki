@@ -126,5 +126,5 @@
         </div>
     {/if}
 </form>
-{if $mess_maxRecords ne ''}{assign var=maxRecords value=$mess_maxRecords}{else}{assign var=maxRecords value=$prefs.maxRecords}{/if}
+{if $mess_maxRecords ne ''}{$maxRecords=$mess_maxRecords}{else}{$maxRecords=$prefs.maxRecords}{/if}
 {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}

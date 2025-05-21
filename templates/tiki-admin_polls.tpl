@@ -15,9 +15,9 @@
 {tabset}
 
     {if $pollId eq '0'}
-        {assign var='title' value="{tr}Create poll{/tr}"}
+        {$title="{tr}Create poll{/tr}"}
     {else}
-        {assign var='title' value="{tr}Edit poll{/tr}"}
+        {$title="{tr}Edit poll{/tr}"}
     {/if}
     {tab name=$title}
         <h2>{$title}</h2>
@@ -105,12 +105,12 @@
         {/if}
         <div class="{if $js}table-responsive{/if} poll-table"> {* table-responsive class cuts off css drop-down menus *}
             <table class="table table-striped table-hover">
-                {assign var=numbercol value=8}
+                {$numbercol=8}
                 <tr>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='pollId' title="{tr}ID{/tr}"}{tr}ID{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='title' title="{tr}Title{/tr}"}{tr}Title{/tr}{/self_link}</th>
-                    {if $prefs.poll_list_categories eq 'y'}<th>{tr}Categories{/tr}</th>{assign var=numbercol value=$numbercol+1}{/if}
-                    {if $prefs.poll_list_objects eq 'y'}<th>{tr}Objects{/tr}</th>{assign var=numbercol value=$numbercol+1}{/if}
+                    {if $prefs.poll_list_categories eq 'y'}<th>{tr}Categories{/tr}</th>{$numbercol=$numbercol+1}{/if}
+                    {if $prefs.poll_list_objects eq 'y'}<th>{tr}Objects{/tr}</th>{$numbercol=$numbercol+1}{/if}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='active' title="{tr}Active{/tr}"}{tr}Active{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='votes' title="{tr}Votes{/tr}"}{tr}Votes{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate' title="{tr}Publish{/tr}"}{tr}Publish{/tr}{/self_link}</th>

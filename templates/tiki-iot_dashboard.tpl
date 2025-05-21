@@ -123,7 +123,7 @@
                                         <div class="mb-3">
                                             <div class="d-flex gap-5 flex-wrap">
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="widget-select">
+                                                    <select class="form-select mb-3" name="widget-select">
                                                         <option selected>{tr}Please select the widget{/tr}</option>
                                                         <option value="sensor-input">{tr}Sensor Input{/tr}</option>
                                                         <option value="led">{tr}Led (IO state){/tr}</option>
@@ -136,7 +136,7 @@
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="data-source-select">
+                                                    <select class="form-select mb-3" name="data-source-select">
                                                         <option selected>{tr}Please select the data source{/tr}</option>
                                                         {foreach from=$app.tracker_fields.data item=field}
                                                             <option value="{$field.permName}">{$field.name}</option>
@@ -148,7 +148,7 @@
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="widget-icon-select">
+                                                    <select class="form-select mb-3" name="widget-icon-select">
                                                         <option selected>{tr}Please specify the widget icon{/tr}</option>
                                                         {foreach from=$iconset item=data}
                                                             <option value='{icon name=$data.id}'>{$data.id}</option>

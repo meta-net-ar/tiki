@@ -116,10 +116,10 @@ if ($view == 'admin') {
 
         if (isset($_REQUEST['edit_mode'])) {
             // We are in the edit file gallery page
-            $fgal_options[$k_gal]['value'] = isset($gal_info[$k_gal]) ? $gal_info[$k_gal] : null;
+            $fgal_options[$k_gal]['value'] = $gal_info[$k_gal] ?? null;
         } else {
             // normal gallery view
-            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : (isset($prefs[$k_prefs]) ? $prefs[$k_prefs] : null);
+            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : ($prefs[$k_prefs] ?? null);
         }
     }
 }

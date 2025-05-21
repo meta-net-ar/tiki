@@ -69,7 +69,7 @@ class BanLib extends TikiLib
 
     /**
      * @param $banId
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return TikiDb_Pdo_Result
      */
     public function remove_rule($banId)
     {
@@ -265,7 +265,7 @@ class BanLib extends TikiLib
      * @param $use_dates
      * @param $message
      * @param $sections
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return TikiDb_Pdo_Result
      */
     public function replace_rule($banId, $mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $sections, $attempt = 0)
     {

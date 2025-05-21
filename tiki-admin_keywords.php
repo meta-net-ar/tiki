@@ -23,7 +23,7 @@ $access->check_permission('tiki_p_admin_wiki');
  * @param        $page
  * @param string $keywords
  *
- * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+ * @return Tiki\TikiDb\PdoResult
  * @throws Exception
  */
 function set_keywords($page, $keywords = "")
@@ -91,13 +91,13 @@ $limit = $prefs['maxRecords'];
 $offset = isset($_REQUEST['offset']) ? (int)$_REQUEST['offset'] : 0;
 
 if (
-    (isset($_REQUEST['save_keywords']) && isset($_REQUEST['new_keywords']) && isset($_REQUEST['page']) && $access->checkCsrf())
-    || (isset($_REQUEST['remove_keywords']) && isset($_REQUEST['page']) && $access->checkCsrf(true))
+    isset($_REQUEST['page']) && ((isset($_REQUEST['save_keywords']) && isset($_REQUEST['new_keywords']) && $access->checkCsrf())
+    || (isset($_REQUEST['remove_keywords']) && $access->checkCsrf(true)))
 ) {
     //Set page and new_keywords var for both remove_keywords and
     //save_keywords actions at the same time
-    ( isset($_REQUEST['page']) ) ? $page = $_REQUEST['page'] : $page = $_REQUEST['page'];
-    ( isset($_REQUEST['new_keywords']) ) ? $new_keywords = $_REQUEST['new_keywords'] : $new_keywords = "";
+    $page = $_REQUEST['page'];
+    $new_keywords = $_REQUEST['new_keywords'] ?? '';
 
     $result = set_keywords($page, $new_keywords);
 
@@ -111,7 +111,7 @@ if (
     }
 }
 
-if (isset($_REQUEST['page'], $_REQUEST['remove_keywords']) && ! $_REQUEST['remove_keywords']) {
+if (! empty($_REQUEST['page']) && isset($_REQUEST['remove_keywords']) && ! $_REQUEST['remove_keywords']) {
     $page_keywords = get_keywords($_REQUEST['page']);
 
     $smarty->assign('edit_keywords', $page_keywords['keywords']);

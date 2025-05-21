@@ -84,12 +84,12 @@
         </tr>
         {section name=changes loop=$listpages}
             {if $actual eq $listpages[changes].publishDate}
-                {assign var=class value=third}
+                {$class=third}
             {else}
                 {if $actual > $listpages[changes].publishDate}
-                    {assign var=class value=odd}
+                    {$class=odd}
                 {else}
-                    {assign var=class value=even}
+                    {$class=even}
                 {/if}
             {/if}
             <tr class="{$class}">

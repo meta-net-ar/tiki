@@ -162,12 +162,12 @@
                 <div class="col-sm-9">
                     <textarea name="content" id="content" class="form-control" rows="12">{$bodyContent|escape}</textarea>
                     {if is_array($info.body)}
-                        {assign var="bodyDescription" value=$info.body.description}
+                        {$bodyDescription=$info.body.description}
                         {if $info.body.depends}
                             {registerFieldDependency dependantFieldId="content" dependencyField=$info.body.depends.field dependencyValue=$info.body.depends.value}
                         {/if}
                     {else}
-                        {assign var="bodyDescription" value=$info.body}
+                        {$bodyDescription=$info.body}
                     {/if}
                     <div class="description">{$bodyDescription}</div>
                 </div>

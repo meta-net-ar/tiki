@@ -130,7 +130,7 @@ class Menu extends Base
                         $level = $element['sectionLevel'];
                         // Creates new branch at level 0
                         if ($level === 0) {
-                            array_push($structured, $element);
+                            $structured[] = $element;
                             continue;
                         }
 
@@ -146,7 +146,7 @@ class Menu extends Base
 
                         // Pushes the element at the end of selected element children.
                         if (! empty($branch['children'])) {
-                            array_push($branch['children'], $element);
+                            $branch['children'][] = $element;
                         } else {
                             $branch['children'] = [$element];
                         }

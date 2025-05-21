@@ -329,7 +329,7 @@ if (isset($_REQUEST["recategorize"]) && $prefs['feature_wiki_categorize_structur
                 }
             } else {
                 // page that is added is categorized
-                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || isset($_REQUEST["cat_categorize"]) && $_REQUEST["cat_categorize"] != 'on') {
+                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || $_REQUEST["cat_categorize"] != 'on') {
                     if ($_REQUEST["cat_override"] == "on") {
                         $categlib->uncategorize_object($cat_type, $cat_objid);
                     } else {

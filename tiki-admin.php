@@ -46,39 +46,6 @@ function add_feedback($name, $message, $st, $num = null)
 }
 
 /**
- * simple_set_toggle
- *
- * @param mixed $feature
- * @access public
- * @return void
- * @throws Exception
- */
-function simple_set_toggle($feature)
-{
-    global $prefs;
-    $logslib = TikiLib::lib('logs');
-    $tikilib = TikiLib::lib('tiki');
-    if (isset($_REQUEST[$feature]) && $_REQUEST[$feature] == 'on') {
-        if ((! isset($prefs[$feature]) || $prefs[$feature] != 'y')) {
-            // not yet set at all or not set to y
-            if ($tikilib->set_preference($feature, 'y')) {
-                add_feedback($feature, tr('%0 enabled', $feature), 1, 1);
-                $logslib->add_action('feature', $feature, 'system', 'enabled');
-            }
-        }
-    } else {
-        if ((! isset($prefs[$feature]) || $prefs[$feature] != 'n')) {
-            // not yet set at all or not set to n
-            if ($tikilib->set_preference($feature, 'n')) {
-                add_feedback($feature, tr('%0 disabled', $feature), 0, 1);
-                $logslib->add_action('feature', $feature, 'system', 'disabled');
-            }
-        }
-    }
-    TikiLib::lib('cache')->invalidate('allperms');
-}
-
-/**
  * simple_set_value
  *
  * @param mixed $feature
@@ -440,7 +407,6 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
                 || file_exists(__DIR__ . '/vendor/bombayworks/zendframework1/library/Zend/Config.php')) //ZF1
             && (file_exists(__DIR__ . '/vendor/smarty/smarty/libs/Smarty.class.php') //Smarty
                 || file_exists(__DIR__ . '/vendor/smarty/smarty/distribution/libs/Smarty.class.php')) //Smarty
-            && file_exists(__DIR__ . '/vendor/adodb/adodb/adodb.inc.php') //Adodb
         )
     ) {
         $vendorAutoloadIgnored = false;

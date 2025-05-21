@@ -1126,7 +1126,7 @@ function TextToQuestions($text)
         $text = array_slice($text, NextBlank($text));
         if (count($lines) > 0) {
             $question = new HW_QuizQuestionMultipleChoice($lines);
-            array_push($questions, $question);
+            $questions[] = $question;
         }
     }
     return $questions;
@@ -1203,7 +1203,7 @@ class HW_QuizQuestionMultipleChoice extends HW_QuizQuestion
             } else {
                 $a = ['text' => $line,'correct' => 0];
             }
-            array_push($this->choices, $a);
+            $this->choices[] = $a;
         }
     }
 
@@ -1215,12 +1215,12 @@ class HW_QuizQuestionMultipleChoice extends HW_QuizQuestion
     public function to_text($show_answer = false)
     {
         $lines = [];
-        array_push($lines, $this->question);
+        $lines[] = $this->question;
         foreach ($this->choices as $choice) {
             if ($show_answer && $choice['correct']) {
-                array_push($lines, "*" . $choice['text']);
+                $lines[] = "*" . $choice['text'];
             } else {
-                array_push($lines, " " . $choice['text']);
+                $lines[] = " " . $choice['text'];
             }
         }
         return $lines;
@@ -1316,13 +1316,13 @@ class HW_QuizQuestionYesNo extends HW_QuizQuestion
     {
         // Export the question to an array of text lines.
         $lines = [];
-        array_push($lines, $this->question);
+        $lines[] = $this->question;
         if ($this->answer == 1) {
-            array_push($lines, " Yes");
+            $lines[] = " Yes";
         } elseif ($this->answer == 0) {
-            array_push($lines, " No");
+            $lines[] = " No";
         } else {
-            array_push($lines, " Unknown");
+            $lines[] = " Unknown";
         }
         return $lines;
     }

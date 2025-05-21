@@ -60,8 +60,8 @@
                 <tr>
                     {section name=i loop=$tabs}
                         <td>
-                            {assign var=thistabshref value=$tabs[i].button_href}
-                            {assign var=thistabscaption value=$tabs[i].button_caption}
+                            {$thistabshref=$tabs[i].button_href}
+                            {$thistabscaption=$tabs[i].button_caption}
                             {button _onclick=$thistabshref _text=$thistabscaption _ajax="n"}
                         </td>
                     {/section}

@@ -26,7 +26,7 @@ if (! empty($_REQUEST['lang'])) {
 include_once('lib/init/tra.php');
 
 $local_php = TikiInit::getCredentialsFile();
-global $default_api_tiki, $api_tiki, $dbversion_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $tikidomain, $tikidomainslash, $dbfail_url;
+global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $tikidomain, $tikidomainslash, $dbfail_url;
 $re = false;
 if (file_exists($local_php)) {
     $re = include($local_php);
@@ -38,8 +38,6 @@ if (! isset($client_charset)) {
 }
 
 $credentials = [
-    'api_tiki' => empty($api_tiki) ? $default_api_tiki : $api_tiki,
-    'api_tiki_forced' => ! empty($api_tiki),
     'primary' => false,
     'shadow' => false,
 ];
@@ -154,10 +152,6 @@ if ($re === false) {
     return;
 }
 
-if ($dbversion_tiki == '1.10') {
-    $dbversion_tiki = '2.0';
-}
-
 /**
  *
  */
@@ -229,7 +223,6 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
 }
 
 $initializer = new TikiDb_Initializer();
-$initializer->setPreferredConnector($credentials['api_tiki']);
 $initializer->setInitializeCallback(
     function ($db) {
         global $db_table_prefix, $common_users_table_prefix;

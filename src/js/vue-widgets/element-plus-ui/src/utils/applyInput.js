@@ -60,15 +60,18 @@ export default function applyInput() {
                     $(this).val(event.detail?.[0]);
                     $(this).trigger("input");
                 });
-                elementPlusUi.on("blur", () => {
-                    $(this).trigger("blur");
+
+                ["blur", "focus", "keyup", "keydown"].forEach((event) => {
+                    elementPlusUi.on(event, () => {
+                        $(this).trigger(event);
+                        $(this).val(elementPlusUi.val());
+                    });
                 });
-                elementPlusUi.on("focus", () => {
-                    $(this).trigger("focus");
-                });
+
                 elementPlusUi.on("enter", () => {
                     if ($(this).attr("type") === "search") {
                         $(this).closest("form").trigger("submit");
+                        $(this).val(elementPlusUi.val());
                     }
                 });
             });

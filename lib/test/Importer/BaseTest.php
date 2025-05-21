@@ -4,24 +4,28 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/tikiimporter_testcase.php');
-require_once(__DIR__ . '/../../importer/tikiimporter.php');
+namespace Tiki\Lib\Test\Importer;
+
+use Tiki\Lib\Test\Importer\Helper\FirstChild;
+use Tiki\Lib\Test\Importer\Helper\GranSon;
+use TikiImporter;
+
 /**
  * @group importer
  */
-class TikiImporterTest extends TikiImporter_TestCase
+class BaseTest extends AbstractImporterTestCase
 {
     public function testGetOptions(): void
     {
         $expectedResult = [['name' => 'name'],
                                 ['name' => 'otherName'],
                                 ['secondName' => 'something']];
-        $object = new TikiImporterGranSon();
+        $object = new GranSon();
         $this->assertEquals($expectedResult, $object->getOptions());
 
         $expectedResult = [['name' => 'someName', 'property1' => 'someProperty'],
                                 ['name' => 'differentName', 'property' => 'anotherProperty']];
-        $object = new TikiImporterFirstChild();
+        $object = new FirstChild();
         $this->assertEquals($expectedResult, $object->getOptions());
     }
 
@@ -37,40 +41,5 @@ class TikiImporterTest extends TikiImporter_TestCase
     {
         $this->assertNull(TikiImporter::displayPhpUploadError(-1), 'Should return null if invalid code passed as param');
         $this->assertEquals('No file was uploaded.', TikiImporter::displayPhpUploadError(4));
-    }
-}
-
-
-// dummy classes to test the TikiImporter::getOptions()
-
-class TikiImporterFirstChild extends TikiImporter
-{
-    public static function importOptions(): array
-    {
-        return [
-            ['name' => 'someName', 'property1' => 'someProperty'],
-            ['name' => 'differentName', 'property' => 'anotherProperty']
-        ];
-    }
-}
-
-class TikiImporterSecondChild extends TikiImporter
-{
-    public static function importOptions(): array
-    {
-        return [
-            ['name' => 'otherName'],
-            ['secondName' => 'something']
-        ];
-    }
-}
-
-class TikiImporterGranSon extends TikiImporterSecondChild
-{
-    public static function importOptions(): array
-    {
-         return [
-             ['name' => 'name']
-         ];
     }
 }

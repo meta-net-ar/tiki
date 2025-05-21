@@ -88,7 +88,7 @@ if (isset($_POST['book']) && $access->checkCsrf(true)) {
     );
     if (is_numeric($result)) {
         if (isset($_POST['statementId'])) {
-            $accountinglib->updateStatement($bookId, $_POST['statementId'], $result);
+            $accountinglib->updateStatement($bookId, $_POST['statementId']);
         }
     }
 } else {

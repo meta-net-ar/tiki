@@ -342,12 +342,12 @@ if (isset($source)) {
         $source = $rversion;
     }
     if ($source == $info["version"] || $source == 0) {
-        $smarty->assign('sourced', $info["data"]);
+        $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($info["data"]));
         $smarty->assign('source', $info['version']);
     } else {
         $version = $histlib->get_version($page, $source);
         if ($version) {
-            $smarty->assign('sourced', $version["data"]);
+            $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($version["data"]));
             $smarty->assign('source', $source);
         }
     }

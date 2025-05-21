@@ -4,14 +4,18 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/tikiimporter_testcase.php');
-require_once(__DIR__ . '/../../importer/tikiimporter_wiki_mediawiki.php');
-require_once(__DIR__ . '/../../tikilib.php');
+namespace Tiki\Lib\Test\Importer;
+
+use DOMDocument;
+use ImporterParserException;
+use PEAR_Error;
+use Text_Wiki_Mediawiki;
+use TikiImporter_Wiki_Mediawiki;
 
 /**
  * @group importer
  */
-class TikiImporterWikiMediawikiTest extends TikiImporter_TestCase
+class WikiMediawikiTest extends AbstractImporterTestCase
 {
     public $obj;
     protected function setUp(): void

@@ -1,6 +1,6 @@
 {* ==> put in this file what is not displayed in the layout (javascript, debug..)*}
 {foreach [1, 2, 3] as $modal}
-    {assign var='modalId' value=($modal eq 1) ? 'bootstrap-modal' : "bootstrap-modal-{$modal}"}
+    {$modalId=($modal == 1) ? 'bootstrap-modal' : "bootstrap-modal-{$modal}"}
     <div id={$modalId} class="modal fade footer-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title-{$modalId}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

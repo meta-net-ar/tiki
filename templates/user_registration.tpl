@@ -27,9 +27,9 @@
         <div class="col-sm-8 offset-sm-4">
             {remarksbox type="note" title="{tr}Note{/tr}"}
                 {if $prefs.feature_wiki_protect_email eq 'y'}
-                    {assign var=sender_email value=$prefs.sender_email|default:"this domain"|escape:'hexentity'}
+                    {$sender_email=$prefs.sender_email|default:"this domain"|escape:'hexentity'}
                 {else}
-                    {assign var=sender_email value=$prefs.sender_email|default:"this domain"|escape}
+                    {$sender_email=$prefs.sender_email|default:"this domain"|escape}
                 {/if}
                 {tr _0="$sender_email"}If you use an email filter, be sure to add %0 to your accepted list{/tr}
             {/remarksbox}
@@ -68,6 +68,8 @@
                         );
                         return;
                     }
+                } else {
+                    this.submit();
                 }
             });
         {/jq}

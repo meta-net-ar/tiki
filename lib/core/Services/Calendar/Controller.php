@@ -390,13 +390,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 if ($input->offsetExists('todate')) {
                     // set the correct day clicked on
                     $dateNow->setDate($input->todate->int());
+                    $hour = $dateNow->date->format('H');
                 }
                 $tz = date_default_timezone_get();
                 date_default_timezone_set($displayTimezone);
                 $start = mktime(
                     $hour,
-                    0,
-                    0,
+                    $dateNow->date->format('i'),
+                    $dateNow->date->format('s'),
                     $dateNow->date->format('m'),
                     $dateNow->date->format('d'),
                     $dateNow->date->format('Y')

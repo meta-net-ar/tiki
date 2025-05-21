@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title help="Spreadsheet"}{$title}{/title}
 
 <div class="description form-text">

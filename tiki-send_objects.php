@@ -137,8 +137,8 @@ if (isset($_REQUEST['send'])) {
     $_REQUEST['path'] = preg_replace('/^\/?/', '/', $_REQUEST['path']);
     $_REQUEST['site'] = parse_url($_REQUEST['site'], PHP_URL_HOST);
     $client = new XML_RPC_Client($_REQUEST['path'], $_REQUEST['site'], 80);
-    $client->return_type = 'xml';
-    $client->setDebug((isset($_REQUEST['dbg']) && $_REQUEST['dbg'] == 'on') ? true : false);
+    $client->setOption('return_type', 'xml');
+    $client->setDebug(isset($_REQUEST['dbg']) && $_REQUEST['dbg'] == 'on');
     foreach ($sendstructures as $structure) {
         $spages = $structlib->s_get_structure_pages($structure);
         $pos = 0;

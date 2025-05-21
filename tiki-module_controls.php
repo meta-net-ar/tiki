@@ -55,7 +55,7 @@ foreach ($actions as $action => $settings) {
         }
         $method = $settings['method'];
         $result = $usermoduleslib->$method($_REQUEST[$action], $user);
-        /** @var Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult $result */
+        /** @var Tiki\TikiDb\PdoResult $result */
         if ($result && $result->numRows()) {
             Feedback::success($settings['success']);
         } else {

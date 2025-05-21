@@ -120,7 +120,7 @@ if (isset($_REQUEST["blogId"]) && $_REQUEST["blogId"] > 0) {
     $smarty->assign('alwaysOwner', $data["always_owner"]);
 }
 
-if (isset($_REQUEST["heading"]) and $tiki_p_edit_templates == 'y') {
+if (isset($_REQUEST["heading"])) {
     // Sanitization cleanup
     $heading = preg_replace('/st<x>yle="[^"]*"/', 'style_dangerous', $_REQUEST["heading"]);
 } elseif (! isset($data["heading"])) {
@@ -132,7 +132,7 @@ if (isset($_REQUEST["heading"]) and $tiki_p_edit_templates == 'y') {
     $heading = $data["heading"];
 }
 
-if (isset($_REQUEST["post_heading"]) and $tiki_p_edit_templates == 'y') {
+if (isset($_REQUEST["post_heading"])) {
     // Sanitization cleanup
     $post_heading = preg_replace('/st<x>yle="[^"]*"/', 'style_dangerous', $_REQUEST["post_heading"]);
 } elseif (! isset($data["post_heading"])) {

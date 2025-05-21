@@ -126,9 +126,6 @@ class AdminWizardLookAndFeel extends Wizard
                 optionDropDown.attr('disabled',true);
             }
             optionDropDown.trigger("change");
-            if (jqueryTiki.select2) {
-                optionDropDown.trigger("change.select2");
-            }
         }).trigger("change");
         optionDropDown.on("change", function() {
             if (showPreview !== undefined) {

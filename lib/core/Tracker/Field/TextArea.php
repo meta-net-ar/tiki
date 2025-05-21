@@ -298,7 +298,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                 if (isset($extra['text'])) {
                     $value = $extra['text'];
                 } elseif ($lang && isset($value[$lang])) {
-                    $value = $lang;
+                    $value = $value[$lang];
                 }
 
                 return $value;
@@ -354,6 +354,12 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                 ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
                 ->setRenderTransform($plain($lang))
                 ;
+            $schema->addNew($permName, 'wiki-html')
+                ->setLabel(tr('%0 (%1)', $name, $lang))
+                ->setReadOnly(true)
+                ->addIncompatibility($permName, 'current')
+                ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
+                ->setRenderTransform($render($lang));
 
             foreach ($prefs['available_languages'] as $lang) {
                 $schema->addNew($permName, $lang)
@@ -375,6 +381,17 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                         $info['fields'][$permName][$lang] = $value;
                     })
                     ;
+
+                $schema->addNew($permName, "$lang-wiki-html")
+                    ->setLabel(tr('%0 (%1)', $name, $lang))
+                    ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
+                    ->addIncompatibility($permName, 'current')
+                    ->addIncompatibility($permName, 'current-raw')
+                    ->addIncompatibility($permName, $lang)
+                    ->setRenderTransform($render($lang))
+                    ->setParseIntoTransform(function (&$info, $value) use ($permName, $lang) {
+                        $info['fields'][$permName][$lang] = TikiLib::lib('edit')->parseToWiki($value);
+                    });
             }
         }
 

@@ -175,7 +175,6 @@
     .part_desc, .part_size, .download_link { margin-left: 25px; }
     .msg_part_icon { padding: 0; margin-left: 5px; }
     .msg_headers td { padding-right: 35px; }
-    .noselect2 { display: none !important; }
 
     .advanced_search_form {
         input[type="radio"], input[type="checkbox"] { margin-right: 5px; }
@@ -193,7 +192,6 @@
         .flags { width: 170px; }
     }
 
-    .select2-container { margin-bottom: 0; width: auto !important; }
     .message_list .combined_sort, .message_list .combined_sort + el-select { display: inline-block; margin-left: 10px; width: 150px; }
 
     .folders li, .inner_list li {
@@ -390,7 +388,6 @@
         .msg_text_inner { width: 100%; padding: 15px !important; }
         .msg_parts { table-layout: auto; }
         .msg_controls { position: relative; left: 0 !important; height: auto; padding-top: 0; }
-        .select2-container { min-width: 100px; }
         #list_controls_menu { background-color: var(--bs-body-bg); }
         #list_controls_menu.show { justify-content: center; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }

@@ -70,48 +70,6 @@ if (isset($_POST['rmvunusedpic']) && $access->checkCsrf()) {
 }
 //*** end state-changing actions
 
-if (isset($_REQUEST['createdump'])) {
-    include('lib/tar.class.php');
-    error_reporting(E_ERROR | E_WARNING);
-    $adminlib->dump();
-    if (is_file($path)) {
-        Feedback::success(tr('Dump created at %0', '<em>' . $path . '</em>'));
-    } else {
-        Feedback::error(tra('Dump was not created. Please check permissions for the storage/ directory.'));
-    }
-}
-
-if (isset($_REQUEST['removedump'])) {
-    @unlink($path);
-    if (! is_file($path)) {
-        Feedback::success(tr('Dump file %0 removed.', '<em>' . $path . '</em>'));
-    } else {
-        Feedback::error(tr('Dump file %0 was not removed.', '<em>' . $path . '</em>'));
-    }
-}
-
-if (isset($_REQUEST['downloaddump'])) {
-    global $tikidomain;
-    // Check existence
-    if ($tikidomain) {
-        $file = "storage/$tikidomain/dump_wiki.tar";
-    } else {
-        $file = $path;
-    }
-
-    if (is_file($file)) {
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($file));
-        readfile($file);
-        exit;
-    }
-}
-
 if ($prefs['feature_wiki_attachments'] === 'y') {
     if ($prefs['feature_use_fgal_for_wiki_attachments'] === 'y') {
         // check for legacy attachments

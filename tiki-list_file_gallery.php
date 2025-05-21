@@ -1084,7 +1084,7 @@ if (! empty($_REQUEST['find_lastModif']) && ! empty($_REQUEST['find_lastModif_un
 if (! empty($_REQUEST['find_lastDownload']) && ! empty($_REQUEST['find_lastDownload_unit'])) {
     $find['lastDownload'] = $tikilib->now - ($_REQUEST['find_lastDownload'] * $_REQUEST['find_lastDownload_unit']);
 }
-if (! empty($_REQUEST['find_fileType']) && ! empty($_REQUEST['find_fileType'])) {
+if (! empty($_REQUEST['find_fileType'])) {
     include_once('lib/mime/mimetypes.php');
     global $mimetypes;
     $find['fileType'] = $mimetypes[$_REQUEST['find_fileType']];
@@ -1129,7 +1129,7 @@ if ($prefs['feature_categories'] == 'y') {
     }
 
     // load categories for find
-    if ($prefs['feature_categories'] == 'y' && ! isset($_REQUEST['edit_mode'])) {
+    if (! isset($_REQUEST['edit_mode'])) {
         $categlib = TikiLib::lib('categ');
         $categories = $categlib->getCategories();
         $smarty->assign_by_ref('categories', $categories);
@@ -1196,7 +1196,7 @@ if (isset($_GET['slideshow'])) {
         } else {
             $syntax = '';
         }
-        $with_archive = (isset($gal_info['archives']) && $gal_info['archives'] == '-1') ? false : true;
+        $with_archive = ! ((isset($gal_info['archives']) && $gal_info['archives'] == '-1'));
 
         if ($view == 'page' && isset($_REQUEST['fileId'])) {
             try {
@@ -1247,7 +1247,7 @@ if (isset($_GET['slideshow'])) {
             }
         }
         if ($view == 'page') {
-            $smarty->assign('maxWidth', isset($_REQUEST['maxWidth']) ? $_REQUEST['maxWidth'] : '300px');
+            $smarty->assign('maxWidth', $_REQUEST['maxWidth'] ?? '300px');
             //need to convert fileId to an offset to bring up a specific file for page view
             $smarty->assign('maxRecords', 1);
             $smarty->assign(
@@ -1322,7 +1322,7 @@ if ($prefs['feature_user_watches'] == 'y') {
                     $_REQUEST['watch_event'],
                     $_REQUEST['watch_object'],
                     'File Gallery',
-                    (isset($_REQUEST['galleryName']) ? $_REQUEST['galleryName'] : ''),
+                    ($_REQUEST['galleryName'] ?? ''),
                     "tiki-list_file_gallery.php?galleryId=$galleryId"
                 );
                 if ($result) {

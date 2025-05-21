@@ -31,7 +31,7 @@
         </div>
     {/if}
     {if $prefs.feature_webdav eq 'y'}
-        {assign var=virtual_path value=$file.fileId|virtual_path}
+        {$virtual_path=$file.fileId|virtual_path}
 
         {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _onclick="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
             {if $prefs.feature_file_galleries_save_draft eq 'y'}

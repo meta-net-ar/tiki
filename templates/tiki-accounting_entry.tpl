@@ -92,7 +92,7 @@ var account='';
                 </tr>
                 </thead>
                 <tbody>
-                {section name=debit loop=$debitAccount}{assign var='i' value=$smarty.section.debit.iteration-1}
+                {section name=debit loop=$debitAccount}{$i=$smarty.section.debit.iteration-1}
                     <tr {if $i==0}id="Row_StartDebit" {/if}>
                         <td>
                             <input class="form-control" type="text" name="debitText[]" value="{$debitText[$i]}">
@@ -128,7 +128,7 @@ var account='';
                 </tr>
                 </thead>
                 <tbody>
-                {section name=credit loop=$creditAccount}{assign var='i' value=$smarty.section.credit.iteration-1}
+                {section name=credit loop=$creditAccount}{$i=$smarty.section.credit.iteration-1}
                     <tr {if $i==0}id="Row_StartCredit" {/if}>
                         <td>
                             <input class="form-control" type="text" name="creditText[]" value="{$creditText[$i]}">

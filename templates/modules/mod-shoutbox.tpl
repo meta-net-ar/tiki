@@ -33,12 +33,12 @@
 
         {section loop=$shout_msgs name=ix}
             <div class="shoutboxmodmsg">
-                {assign var=userlink value=$shout_msgs[ix].user|userlink:"linkmodule"}
+                {$userlink=$shout_msgs[ix].user|userlink:"linkmodule"}
                 {capture name=date}{strip} {* Print date *}
                     {$shout_msgs[ix].timestamp|tiki_short_time}, {$shout_msgs[ix].timestamp|tiki_short_date}
                 {/strip}{/capture}
                 {* Show user message in style according to 'tooltip' module parameter *}
-                {assign var=cdate value=$smarty.capture.date}
+                {$cdate=$smarty.capture.date}
                 {if $tooltip == 1}{* TODO: Improve $userlink modifier one day to handle other attibutes better? *}
                     <b>{strip}{$userlink|replace:"\" href=":"&lt;br /&gt;&lt;em&gt;{tr}Shout date:{/tr} $cdate&lt;/em&gt;\" href="}{/strip}</b>:
                 {else}

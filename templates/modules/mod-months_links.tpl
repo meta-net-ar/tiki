@@ -1,9 +1,9 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="months_links" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
-{assign var=i value=0 }
+{$i=0 }
 {if $feature eq 'cms'}
-    {assign var=itemlink value='tiki-read_article.php?articleId='}
+    {$itemlink='tiki-read_article.php?articleId='}
 {else}
-    {assign var=itemlink value='tiki-view_blog_post.php?postId='}
+    {$itemlink='tiki-view_blog_post.php?postId='}
 {/if}
 <script type="text/javascript" >
 <!--
@@ -23,10 +23,10 @@
 {modules_list list=$archives nonums='y'}
     {foreach from=$archives key=year_number item=year_data}
         {if $year_expanded == 0 }
-            {assign var=year_expanded value=$year_number }
+            {$year_expanded=$year_number }
         {/if}
         {if $year_number == $year_expanded }
-            {assign var=i value=$i+1}
+            {$i=$i+1}
             <li class='archivedate expanded' id='ml-li-{$module_id}-{$i}' >
                 <a class="toggle" href="javascript:void();" >
                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >○</span>
@@ -36,7 +36,7 @@
                 <ul id='ml-sub-{$module_id}-{$i}' >
                     {foreach from=$year_data.monthlist key=month_name item=month_data}
                         {if $month_name == $month_expanded }
-                            {assign var=i value=$i+1}
+                            {$i=$i+1}
                             <li class='archivedate expanded' id='ml-{$module_id}-{$i}' >
                                 <a class="toggle" href="javascript:mlchange('{$module_id}-{$i}')" >
                                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >▼</span>
@@ -52,7 +52,7 @@
                                 </ul>
                             </li>
                         {else}
-                            {assign var=i value=$i+1}
+                            {$i=$i+1}
                             <li class='archivedate collapsed' id='ml-{$module_id}-{$i}' >
                                 <a class="toggle" href="javascript:mlchange('{$module_id}-{$i}')" >
                                     <span class="zippy " id='ml-icon-{$module_id}-{$i}'>►</span>
@@ -72,7 +72,7 @@
                 </ul>
             </li>
         {else}
-            {assign var=i value=$i+1}
+            {$i=$i+1}
             <li class='archivedate collapsed' id='ml-li-{$module_id}-{$i}' >
                 <a class="toggle" href="{$year_data.link}" >
                     <span class="zippy " id='ml-icon-{$module_id}-{$i}' >●</span>

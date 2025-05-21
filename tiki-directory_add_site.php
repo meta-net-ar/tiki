@@ -61,21 +61,22 @@ if (isset($parent_info) && $user) {
 // Now get the path to the parent category
 $path = $dirlib->dir_get_category_path_admin($_REQUEST["parent"]);
 $smarty->assign_by_ref('path', $path);
-// If no site is being edited set it to zero
-$_REQUEST["siteId"] = 0;
-$smarty->assign('siteId', $_REQUEST["siteId"]);
-// If we are editing an existing category then get the category information
-// If not initialize the information to zero
+
+$_REQUEST["siteId"] = $_REQUEST["siteId"] ?? 0;
+$info = [];
 if ($_REQUEST["siteId"]) {
     $info = $dirlib->dir_get_site($_REQUEST["siteId"]);
-} else {
-    $info = [];
+}
+
+if (empty($info)) {
     $info["name"] = '';
     $info["description"] = '';
     $info["url"] = '';
     $info["country"] = 'None';
     $info["isValid"] = 'y';
 }
+
+$smarty->assign('siteId', $_REQUEST["siteId"]);
 $smarty->assign_by_ref('info', $info);
 $smarty->assign('save', 'n');
 // Replace (add or edit) a site

@@ -1093,9 +1093,6 @@ function edit_custom_mode(el,id,name,icon){
                 optionDropDown.attr('disabled',true);
             }
             optionDropDown.trigger("change");
-            if (jqueryTiki.select2) {
-                optionDropDown.trigger("change:select2");
-            }
         }).trigger("change");
         optionDropDown.on("change", function() {
             if (showPreview !== undefined) {

@@ -34,8 +34,7 @@ if ($prefs['feature_wiki_structure'] === 'y') {
         $structure_id = (int)$mailinNewStruct;
 
         if ($structure_id > 0) {
-            $retrieve_data = false;
-            $info = $tikilib->get_page_info($mailinParNew, $retrieve_data);
+            $info = $tikilib->get_page_info($mailinParNew, false);
             if ($info == false) {
                 $page_id = null;
             } else {
@@ -81,8 +80,7 @@ if ($prefs['feature_wiki_structure'] === 'y') {
         $body_pattern = $_REQUEST['mailinBodyPatt' . $i];
         $structure_id = (int) $_REQUEST['mailinStruct' . $i];
 
-        $retrieve_data = false;
-        $info = $tikilib->get_page_info($_REQUEST['mailinPar' . $i], $retrieve_data);
+        $info = $tikilib->get_page_info($_REQUEST['mailinPar' . $i], false);
         if ($info === false) {
             $page_id = null;
         } else {

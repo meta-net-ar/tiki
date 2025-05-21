@@ -101,7 +101,7 @@ function validate($params)
         return new XML_RPC_Response(0, 101, $msg);
     }
 
-    list($isvalid, $dummy, $error) = $userlib->validate_user($login, $pass);
+    [$isvalid] = $userlib->validate_user($login, $pass);
 
     if (! $isvalid) {
         $msg = tra('Invalid username or password');
@@ -266,10 +266,9 @@ function cookie_check($params)
 }
 
 /**
- * @param $params
  * @return XML_RPC_Response
  */
-function get_version($params)
+function get_version()
 {
     global $version;
     return new XML_RPC_Response(new XML_RPC_Value($version, 'int'));

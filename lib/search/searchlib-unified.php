@@ -628,7 +628,6 @@ class UnifiedSearchLib
         $files['console'] = $this->getLogFilename(2);
         $resultLines = [];
         foreach ($files as $type => $filename) {
-            $count = 1;
             $handle = fopen($filename, "r");
             if ($handle) {
                 $resultLines[$type]['logs'] = [];
@@ -636,9 +635,8 @@ class UnifiedSearchLib
                 while (($line = fgets($handle)) !== false) {
                     $pos = strpos($line, $needle);
                     if (empty($needle) || $pos !== false) {
-                        array_push($resultLines[$type]['logs'], $line);
+                        $resultLines[$type]['logs'][] = $line;
                     }
-                    $count++;
                 }
                 fclose($handle);
             }

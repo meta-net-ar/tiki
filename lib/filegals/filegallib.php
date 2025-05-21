@@ -328,7 +328,7 @@ class FileGalLib extends TikiLib
      * @param $fileInfo
      * @param string $galInfo
      * @param bool $disable_notifications
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function remove_file($fileInfo, $galInfo = '', $disable_notifications = false)
@@ -394,7 +394,7 @@ class FileGalLib extends TikiLib
      * @param int $fileId
      * @param string $user
      * @param bool $skip_actual
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_draft($fileId, $user = null, $skip_actual = false)
     {
@@ -425,7 +425,7 @@ class FileGalLib extends TikiLib
      * Validate draft and replace real file
      *
      * @param int $fileId
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      * @global string $user
      */
@@ -454,7 +454,7 @@ class FileGalLib extends TikiLib
     /**
      * @param $file
      * @param $gallery
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function set_file_gallery($file, $gallery)
     {
@@ -474,7 +474,7 @@ class FileGalLib extends TikiLib
      * @param int  $id        ID of gallery to be removed or file in the gallery to be removed
      * @param int  $galleryId The parent gallery of the gallery to be removed
      * @param bool $recurse
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function remove_file_gallery($id, $galleryId = 0, $recurse = true)
@@ -548,7 +548,7 @@ class FileGalLib extends TikiLib
     /**
      * @param $galleryId
      * @param $new_parent_id
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     public function move_file_gallery($galleryId, $new_parent_id)
@@ -848,7 +848,7 @@ class FileGalLib extends TikiLib
     /**
      * @param $id
      * @param $params
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function update_file($id, $params)
     {
@@ -1187,7 +1187,7 @@ class FileGalLib extends TikiLib
      *
      * @param $fileId
      * @param $user
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function lock_file($fileId, $user)
     {
@@ -1198,7 +1198,7 @@ class FileGalLib extends TikiLib
      * Unlock a file
      *
      * @param $fileId
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function unlock_file($fileId)
     {
@@ -2188,7 +2188,7 @@ class FileGalLib extends TikiLib
     /**
      * Sets default options for file galleries from global preferences
      * @param $fgalIds
-     * @return Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return Tiki\TikiDb\PdoResult
      */
     public function setDefault($fgalIds)
     {
@@ -2807,8 +2807,8 @@ class FileGalLib extends TikiLib
         }
         $need_everything = ( $with_subgals_size && ( $sort_mode == 'size_asc' || $sort_mode == 'filesize_asc' ) );
         if (! $need_everything) {
-            $numQuery = preg_replace("/^SELECT.*?FROM/", "SELECT COUNT(*) FROM", $query);
-            $numQuery = preg_replace("/ ORDER BY .*$/", "", $numQuery);
+            $numQuery = preg_replace("/ ORDER BY .*$/", "", $query);
+            $numQuery = "SELECT COUNT(*) FROM (" . $numQuery . ") AS grouped";
             $numResults = $this->getOne($numQuery, $bindvars);
             $limit = $offset == -1 ? 0 : $offset;
             $limit .= ', ' . ($maxRecords == -1 ? PHP_INT_MAX : $maxRecords);
@@ -3125,7 +3125,7 @@ class FileGalLib extends TikiLib
 
     /**
      * @param $params
-     * @return bool|Tiki\TikiDb\AdoDbResult|Tiki\TikiDb\PdoResult
+     * @return bool|Tiki\TikiDb\PdoResult
      * @throws Exception
      */
     private function actionHandlerRemoveFile($params)
@@ -4144,7 +4144,7 @@ class FileGalLib extends TikiLib
      *
      *      'refresh'           Extract metadata from the file and update database
      *
-     * @return      array|Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult     $metadata   array of metadata is returned if
+     * @return      array|Tiki\TikiDb\PdoResult     $metadata   array of metadata is returned if
      *      action is 'get_array', otherwise result class
      */
     public function metadataAction($fileId, $action = 'get_array')

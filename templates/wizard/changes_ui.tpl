@@ -49,7 +49,6 @@
             {preference name=feature_jquery_zoom}
             {preference name=feature_jquery_carousel} {icon name='warning' alt="{tr}Experimental{/tr}" ititle="{tr}Experimental{/tr}"}
             {preference name=feature_jquery_tablesorter} {icon name='warning' alt="{tr}Experimental{/tr}" ititle="{tr}Experimental{/tr}"}
-            {preference name=jquery_select2}
             {preference name=jquery_fitvidjs}
         </fieldset>
     </div>

@@ -43,7 +43,6 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
 {
     global $prefs, $need_lang;
     $editlib = TikiLib::lib('edit');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
     if (! $page_info) {
@@ -122,7 +121,6 @@ function execute_module_translation()
 
 function possibly_set_pagedata_to_pretranslation_of_source_page()
 {
-    global $tracer;
     $multilinguallib = TikiLib::lib('multilingual');
     $smarty = TikiLib::lib('smarty');
     $editlib = TikiLib::lib('edit');
@@ -351,8 +349,8 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
     $editpageconflict = 'n';
     $beingEdited = 'n';
     $semUser = '';
-    $u = $user ? $user : 'anonymous';
-    if (! empty($page) && ($page !== 'sandbox' || $page === 'sandbox' && $tiki_p_admin === 'y')) {
+    $u = $user ?: 'anonymous';
+    if (! empty($page) && ($page !== 'sandbox' || $tiki_p_admin === 'y')) {
         if (! isset($_REQUEST['save'])) {
             if (
                 $serviceLib->internal('semaphore', 'is_set', ['object_id' => $page]) &&
@@ -431,7 +429,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
     $mimelib = new mime();
     $output = $mimelib->decode($data);
     $parts = [];
-    parse_output($output, $parts, 0);
+    parse_output($output, $parts);
     $last_part = '';
     $last_part_ver = 0;
     usort($parts, 'compare_import_versions');
@@ -679,7 +677,7 @@ if (isset($info['wiki_cache'])) {
     $smarty->assign('wiki_cache', $prefs['wiki_cache']);
 }
 
-if (isset($info["flag"]) ? $info["flag"] === 'L' : false && ! $wikilib->is_editable($page, $user, $info)) {
+if (! empty($info["flag"]) && $info["flag"] === 'L' && ! $wikilib->is_editable($page, $user, $info)) {
     Feedback::errorAndDie(tra("The page cannot be edited because it is locked"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
@@ -953,8 +951,7 @@ if (isset($_REQUEST["lang"])) {
 
 $smarty->assign('lang', $pageLang);
 if ($prefs['feature_urgent_translation'] === 'y') {
-    $urgent_allowed = true;
-    $smarty->assign('urgent_allowed', $urgent_allowed);
+    $smarty->assign('urgent_allowed', true);
 }
 if (isset($_REQUEST['translation_critical'])) {
     $smarty->assign('translation_critical', 1);
@@ -1030,11 +1027,11 @@ $smarty->assign_by_ref('parsed', $parsed);
  * @param $parts
  * @param $i
  */
-function parse_output(&$obj, &$parts, $i)
+function parse_output(&$obj, &$parts)
 {
     if (! empty($obj['parts'])) {
         foreach ($obj['parts'] as $index => $part) {
-            parse_output($part, $parts, $index);
+            parse_output($part, $parts);
         }
     } elseif ($obj['type'] === 'application/x-tikiwiki') {
         $aux["body"] = $obj['body'];
@@ -1692,7 +1689,6 @@ if (
             $prefs['feature_wiki_icache'] === 'y' ||
             $prefs['feature_contribution'] === 'y' ||
             $prefs['feature_wiki_structure'] === 'y' ||
-            $prefs['wiki_feature_copyrights'] === 'y' ||
             ($tiki_p_admin_wiki === 'y' && $prefs['wiki_authors_style_by_page'] === 'y')) ||    // end not sandbox
         ($prefs['feature_wiki_description'] === 'y' || $prefs['metatag_pagedesc'] === 'y') ||
         $prefs['feature_wiki_footnotes'] === 'y' ||

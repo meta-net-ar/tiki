@@ -1,7 +1,7 @@
 {title admpage="wiki" url='tiki-pagehistory.php?page='|cat:$page|escape}{tr}History:{/tr} {$page}{/title}
 
 <div class="t_navbar mb-4">
-    {assign var=thispage value=$page|escape:url}
+    {$thispage=$page|escape:url}
     {button href="{$page|sefurl}" _class="btn-info" _text="{tr}View published page{/tr}" _icon_name="view"}
     {if $editable}
         {button href="tiki-editpage.php?page=$thispage" class="btn btn-primary" _text="{tr}Edit published page{/tr}" _icon_name="edit"}

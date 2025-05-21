@@ -77,10 +77,6 @@ function check_individual($user, $blogId, $permName)
 function getUserInfo($params)
 {
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
-
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $usernamep = $params->getParam(1);
     $username = $usernamep->scalarval();
     $passwordp = $params->getParam(2);
@@ -114,11 +110,8 @@ function getUserInfo($params)
 function newPost($params)
 {
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
 
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $blogidp = $params->getParam(1);
     $blogid = $blogidp->scalarval();
     $usernamep = $params->getParam(2);
@@ -127,8 +120,6 @@ function newPost($params)
     $password = $passwordp->scalarval();
     $passp = $params->getParam(4);
     $content = $passp->scalarval();
-    $passp = $params->getParam(5);
-    $publish = $passp->scalarval();
 
     // Fix for w.bloggar
     preg_match('/<title>(.*)</title>/', $content, $title);
@@ -152,7 +143,6 @@ function newPost($params)
             return new XML_RPC_Response(0, 101, 'User is not allowed to post');
         }
 
-        $bloglib = TikiLib::lib('blog');
         $blog_info = $bloglib->get_blog($blogid);
 
         if ($blog_info['public'] != 'y') {
@@ -176,11 +166,8 @@ function newPost($params)
 function editPost($params)
 {
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
 
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $blogidp = $params->getParam(1);
     $postid = $blogidp->scalarval();
     $usernamep = $params->getParam(2);
@@ -189,8 +176,6 @@ function editPost($params)
     $password = $passwordp->scalarval();
     $passp = $params->getParam(4);
     $content = $passp->scalarval();
-    $passp = $params->getParam(5);
-    $publish = $passp->scalarval();
 
     // Fix for w.bloggar
     preg_match('/<title>(.*)</title>/', $content, $title);
@@ -240,19 +225,14 @@ function editPost($params)
 function deletePost($params)
 {
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
 
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $blogidp = $params->getParam(1);
     $postid = $blogidp->scalarval();
     $usernamep = $params->getParam(2);
     $username = $usernamep->scalarval();
     $passwordp = $params->getParam(3);
     $password = $passwordp->scalarval();
-    $passp = $params->getParam(4);
-    $publish = $passp->scalarval();
 
     // Now check if the user is valid and if the user can post a submission
     list($ok, $username, $e) = $userlib->validate_user($username, $password);
@@ -292,8 +272,6 @@ function getPost($params)
     $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
 
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $blogidp = $params->getParam(1);
     $postid = $blogidp->scalarval();
     $usernamep = $params->getParam(2);
@@ -353,9 +331,6 @@ function getRecentPosts($params)
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
-
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $blogidp = $params->getParam(1);
     $blogid = $blogidp->scalarval();
     $usernamep = $params->getParam(2);
@@ -423,16 +398,10 @@ function getRecentPosts($params)
  */
 function getUserBlogs($params)
 {
-    $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $bloglib = TikiLib::lib('blog');
-
-    $appkeyp = $params->getParam(0);
-    $appkey = $appkeyp->scalarval();
     $usernamep = $params->getParam(1);
     $username = $usernamep->scalarval();
-    $passwordp = $params->getParam(2);
-    $password = $passwordp->scalarval();
 
     $arrayVal = [];
 

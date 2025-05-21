@@ -263,7 +263,7 @@ if ($_REQUEST["comments_threadId"] > 0) {
             $comment_info["data"] = "\n> " . $comment_info["data"];
         }
     }
-    $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : $comment_info['data']);
+    $smarty->assign('comment_data', $_REQUEST['comments_data'] ?? $comment_info['data']);
 
     if (! array_key_exists("title", $comment_info)) {
         if (array_key_exists("comments_title", $_REQUEST)) {

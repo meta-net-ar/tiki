@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title}{if $parentId ne 0}{tr}Category:{/tr} {$p_info.name}{else}{tr}Categories{/tr}{/if}{/title}
 
 {if $parentId and $p_info.description}

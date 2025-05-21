@@ -116,8 +116,7 @@ function exportMermaidER(string $title, array $entities, array $relationships, b
         }o  o{  Zero or more (no upper limit)
         }|  |{  One or more (no upper limit)
         */
-        $relationshipValue = '';
-        $relationshipValue .= $leftMax > 1 ? '}' : '|';
+        $relationshipValue = $leftMax > 1 ? '}' : '|';
         $relationshipValue .= $leftMin === 0 ? 'o' : '|';
         $relationshipValue .= '..';//For now in tiki all relationships are non-identifying
         $relationshipValue .= $rightMin === 0 ? 'o' : '|';

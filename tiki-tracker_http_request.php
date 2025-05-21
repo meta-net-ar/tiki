@@ -151,11 +151,10 @@ foreach ($remoteItemIds as $remoteItemId) {
 
     // @TODO although it should be checked by the fieldhandler, verify that permissions on itemId level are respected. i.e restricted by a category field etc.
     // however: something like this does not work: $permObject = $tikilib->get_perm_object($remoteItemId, 'trackeritem');
-    $hasPermission = true;
-    if (! $hasPermission) {
-        continue;
-    }
-
+    //    $hasPermission = true;
+    //    if (! $hasPermission) {
+    //        continue;
+    //    }
     $listFieldThere = array_merge($listFieldThere, ['value' => $itemInfo[$listFieldIdThere]]);
     $handler = $trklib->get_field_handler($listFieldThere, $itemInfo);
     // do not inherit showlinks settings from remote items.

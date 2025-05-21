@@ -213,8 +213,6 @@ $('#source-form').each(function () {
                 $.each(entries, function (k, v) {
                     $(form.existing).append($('<option class="added"/>').text(v));
                 });
-
-                $(form.existing).trigger("change.select2");
             });
         },
         addPostRow = function (name, value, cl) {
@@ -236,7 +234,7 @@ $('#source-form').each(function () {
                 var id = data.identifier;
                 $(form.existing).val(id);
                 $(form.identifier).val(id);
-                $(form.method).val(data.method).trigger("change").trigger("change.select2");
+                $(form.method).val(data.method).trigger("change");
                 $(form.url).val(data.url);
                 $(form.user).val(data.user);
 
@@ -337,7 +335,6 @@ $('#source-form').each(function () {
             }
 
             $(form.existing).val(data.identifier).trigger("change");
-            $(form.existing).trigger("change.select2");
         }, 'json')
         .done(function (data) {
             location.href = location.href.replace(/\?.*$/, "") + '?identifier=' + encodeURIComponent(data.identifier);

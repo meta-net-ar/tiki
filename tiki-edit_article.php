@@ -268,7 +268,7 @@ if (isset($_REQUEST['ispublished'])) {
 $errors = false;
 if (empty($_REQUEST['emails']) || $prefs['feature_cms_emails'] != 'y') {
     $emails = '';
-} elseif (! empty($_REQUEST['emails'])) {
+} else {
     $emails = explode(',', $_REQUEST['emails']);
     foreach ($emails as $email) {
         if (! validate_email($email, $prefs['validateEmail'])) {

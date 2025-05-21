@@ -237,9 +237,9 @@
     {/tab}
 
     {if $calendarId gt 0}
-        {assign var="edtab" value="{tr}Edit Calendar{/tr}"}
+        {$edtab="{tr}Edit Calendar{/tr}"}
     {else}
-        {assign var="edtab" value="{tr}Create Calendar{/tr}"}
+        {$edtab="{tr}Create Calendar{/tr}"}
     {/if}
     {tab name=$edtab}
         <h2>{$edtab}</h2>
@@ -606,9 +606,9 @@
     {/tab}
 
     {if $subscription.subscriptionId gt 0}
-        {assign var="subtab" value="{tr}Edit Subscription{/tr}"}
+        {$subtab="{tr}Edit Subscription{/tr}"}
     {else}
-        {assign var="subtab" value="{tr}Create Subscription{/tr}"}
+        {$subtab="{tr}Create Subscription{/tr}"}
     {/if}
     {tab name=$subtab}
         <h2>{$subtab}</h2>

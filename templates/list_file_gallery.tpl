@@ -57,18 +57,18 @@
             {if isset($file_info)}<input type="hidden" name="fileId" value="{$file_info.fileId|escape}">{/if}
             {if isset($page)}<input type="hidden" name="page" value="{$page|escape}">{/if}
             {if isset($view)}<input type="hidden" name="view" value="{$view|escape}">{/if}
-            {assign var=nbCols value=0}
-            {assign var=other_columns value=''}
-            {assign var=other_columns_selected value=''}
+            {$nbCols=0}
+            {$other_columns=''}
+            {$other_columns_selected=''}
             {if $view eq 'browse' or $view eq 'page'}
-                {assign var=show_infos value='y'}
+                {$show_infos='y'}
                 {if $view eq 'page'}
                     {include file='fgal_view_page.tpl'}
                 {else}
                     {include file='browse_file_gallery.tpl'}
                 {/if}
             {else}
-                {assign var=show_infos value='n'}
+                {$show_infos='n'}
                 {include file='list_file_gallery_content.tpl'}
             {/if}
             {if (isset($files) && $files

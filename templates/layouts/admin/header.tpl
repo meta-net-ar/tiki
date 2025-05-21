@@ -50,7 +50,7 @@
     {/capture}
     {if isset($structure) and $structure eq 'y'} {* get the alias name if item is a wiki page and it is in a structure *}
         {section loop=$structure_path name=ix}
-        {assign var="aliasname" value={$structure_path[ix].page_alias}}
+        {$aliasname={$structure_path[ix].page_alias}}
         {/section}
     {/if}
     {if $prefs.site_title_location eq 'only'}

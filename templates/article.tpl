@@ -50,8 +50,7 @@
 
         <div class="{if $isfloat eq 'y'}float-start me-3{else}flex-shrink-0 me-2 ms-2{/if}">
             {capture name=imgTitle}{if $show_image_caption eq 'y' and $image_caption}{$image_caption|escape}{elseif isset($topicName)}{tr}{$topicName}{/tr}{/if}{/capture}
-            {assign var="big_image" value=$prefs.art_header_text_pos eq 'below' && $list_image_x > 0}
-
+            {$big_image = ($prefs.art_header_text_pos == 'below' && $list_image_x > 0)}
             {* Show either a topic name, image OR a custom image (if there is a custom image or a topic). If a topic is set, link to it even if we show a custom image. *}
             {if $topicId}
                 <a href="tiki-view_articles.php?topic={$topicId}" class="{if $useImage eq 'y' and $hasImage neq 'y'}{else}thumbnail{/if}{if $big_image} cboxElement{/if}" title="{if $show_image_caption and $image_caption}{$image_caption|escape}{else}{tr}List all articles of the same topic{/tr}{if $topicName ne ''} ({tr}{$topicName|escape}{/tr}){/if}{/if}"

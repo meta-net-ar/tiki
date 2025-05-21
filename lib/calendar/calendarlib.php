@@ -1520,7 +1520,7 @@ class CalendarLib extends TikiLib
     /**
      * @param $calendarId
      * @param $days
-     * @return Tiki\TikiDb\PdoResult|Tiki\TikiDb\AdoDbResult
+     * @return TikiDb_Pdo_Result
      */
     public function cleanEvents($calendarId, $days)
     {
@@ -1723,24 +1723,15 @@ class CalendarLib extends TikiLib
             $daysnames[] = tra('Sunday');
             $daysnames_abr[] = tra('SU');
         }
-        array_push(
-            $daysnames,
-            tra('Monday'),
-            tra('Tuesday'),
-            tra('Wednesday'),
-            tra('Thursday'),
-            tra('Friday'),
-            tra('Saturday')
-        );
-        array_push(
-            $daysnames_abr,
-            tra('MO'),
-            tra('TU'),
-            tra('WE'),
-            tra('TH'),
-            tra('FR'),
-            tra('SA')
-        );
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        foreach ($days as $day) {
+            $daysnames[] = tra($day);
+        }
+        $days_abr = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+        foreach ($days_abr as $day_abr) {
+            $daysnames_abr[] = tra($day_abr);
+        }
+
         if ($firstDayofWeek != 0) {
             $daysnames[] = tra('Sunday');
             $daysnames_abr[] = tra('SU');

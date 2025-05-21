@@ -11,7 +11,7 @@
                 targetListTitle=$field.options_map.targetListTitle filterable=$field.options_map.filterable
                 filterPlaceholder=$field.options_map.filterPlaceholder ordering=$field.options_map.ordering cardinalityParam=$field.validationParam validationMessage=$field.validationMessage}
     {else}
-        {if $field.options_array[1] eq 'm' and $prefs.jquery_select2 neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
+        {if $field.options_array[1] eq 'm' and $prefs.elementplus_select neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
         <select name="{$field.html_name}"{if $field.options_array[1] eq 'm'} multiple="multiple"{/if} class="form-select">
             {if $field.options_array[1] eq 'd' and (empty($field.value[0]) or $field.isMandatory ne 'y')}
                 <option value=""></option>
@@ -26,7 +26,7 @@
 {else}
     <div class="input-group col-md-12">
         {foreach key=ku item=iu from=$categories name=eforeach}
-            {assign var=fcat value=$iu.categId}
+            {$fcat=$iu.categId}
             <div class="col-md-4">
                 <label for="cat{$iu.categId}" class="{if $field.options_array[1] eq "radio"}radio{else}checkbox{/if}">
                     <input id="cat{$iu.categId|escape}_hidden" type="hidden" name="cat_managed_{$field.html_name}" value="{$iu.categId|escape}">

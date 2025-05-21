@@ -1,7 +1,7 @@
 {title}{tr}Copy page:{/tr} {$page}{/title}
 
 <div class="t_navbar">
-    {assign var=thispage value=$page|escape:url}
+    {$thispage=$page|escape:url}
     {button href="tiki-index.php?page=$thispage" _text="{tr}View page{/tr}"}
 </div>
 
@@ -66,7 +66,7 @@
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label"></label>
         <div class="col-sm-7">
-            <input type="submit" class="btn btn-primary btn-sm" name="copy" value="{tr}Copy{/tr}">
+            <input type="submit" class="btn btn-primary btn-sm" name="copy" value="{tr}Duplicate{/tr}">
         </div>
     </div>
 </form>

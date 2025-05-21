@@ -14,9 +14,6 @@ if (php_sapi_name() != 'cli') {
     die("This server can only be started from the command line.");
 }
 
-use Ratchet\MessageComponentInterface;
-use Ratchet\ConnectionInterface;
-
 use Tiki\Realtime\Chat;
 use Tiki\Realtime\Console;
 use Tiki\Realtime\Ping;

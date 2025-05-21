@@ -116,7 +116,7 @@ $smarty->assign_by_ref('gender', $gender);
 $smarty->assign_by_ref('userbreadCrumb', $userbreadCrumb);
 $homePage = $tikilib->get_user_preference($userwatch, 'homePage', '');
 $smarty->assign_by_ref('homePage', $homePage);
-$avatar = $tikilib->get_user_avatar($userwatch);
+$avatar = $tikilib->get_user_avatar($userwatch, '', 'large');
 $smarty->assign('avatar', $avatar);
 $user_information = $tikilib->get_user_preference($userwatch, 'user_information', 'public');
 $smarty->assign('user_information', $user_information);
@@ -159,7 +159,7 @@ if ($prefs['feature_display_my_to_others'] == 'y') {
     }
     if ($prefs['feature_trackers'] == 'y') {
         $trklib = TikiLib::lib('trk');
-        $user_items = $trklib->get_user_items($userwatch);
+        $user_items = $trklib->get_user_items($userwatch, false);
     }
     if ($prefs['feature_articles'] == 'y') {
         $artlib = TikiLib::lib('art');

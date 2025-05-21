@@ -93,18 +93,14 @@ if (
     && $access->checkCsrf(true)
 ) {
     $i = 0;
-    $i = 0;
     foreach ($_REQUEST['checked'] as $id) {
         if (strpos($id, 'user') === 0) {
             $result = $tikilib->remove_user_watch_by_id(substr($id, 4));
-            if ($result && $result->numRows()) {
-                $i++;
-            }
         } else {
             $result = $tikilib->remove_group_watch_by_id(substr($id, 5));
-            if ($result && $result->numRows()) {
-                $i++;
-            }
+        }
+        if ($result && $result->numRows()) {
+            $i++;
         }
     }
     $checkedCount = count($_REQUEST['checked']);
@@ -112,7 +108,7 @@ if (
         $msg = $i == 1 ? tr('One mail notification events deleted') : tr('%0 mail notifications events deleted', $i);
         Feedback::success(tr($msg));
     } elseif ($i < $checkedCount) {
-        Feedback::error('%0 of %1 selected mail notification events deleted', $i, $checkedCount);
+        Feedback::error(tr('%0 of %1 selected mail notification events deleted', $i, $checkedCount));
     }
 }
 if (! isset($_REQUEST["sort_mode"])) {

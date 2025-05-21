@@ -162,12 +162,6 @@
                 <a class="dropdown-item" href="tiki-admin_routes.php">{tr}Custom Routes{/tr}</a>
             {/if}
             <a class="dropdown-item" href="tiki-admin_dsn.php">{tr}DSN/Content Authentication{/tr}</a>
-            {if $prefs.feature_editcss eq "y" and $tiki_p_create_css eq "y"}
-                <a class="dropdown-item" href="tiki-edit_css.php">{tr}Edit CSS{/tr}</a>
-            {/if}
-            {if $prefs.feature_view_tpl eq "y" and $prefs.feature_edit_templates eq "y" and $tiki_p_edit_templates eq "y"}
-                <a class="dropdown-item" href="tiki-edit_templates.php">{tr}Edit TPL{/tr}</a>
-            {/if}
             {if $prefs.cachepages eq "y" and $tiki_p_admin eq "y"}
                 <a class="dropdown-item" href="tiki-list_cache.php">{tr}External Pages Cache{/tr}</a>
             {/if}

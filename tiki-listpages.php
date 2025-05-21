@@ -87,9 +87,7 @@ if (
 
 if ($prefs['feature_multilingual'] == 'y' && isset($_REQUEST['lang']) && isset($_REQUEST['term_srch'])) {
     $multilinguallib = TikiLib::lib('multilingual');
-    if (isset($_REQUEST['term_srch'])) {
-        $multilinguallib->storeCurrentTermSearchLanguageInSession($_REQUEST['lang']);
-    }
+    $multilinguallib->storeCurrentTermSearchLanguageInSession($_REQUEST['lang']);
     $smarty->assign('template_name', $_REQUEST['create_new_pages_using_template_name']);
 }
 
@@ -168,7 +166,7 @@ if (! empty($multiprint_pages)) {
 
     if ($prefs['feature_multilingual'] == 'y') {
         $smarty->assign('find_lang', '');
-        if (((! isset($_REQUEST['lang']) ) || (isset($_REQUEST['lang']) && $_REQUEST['lang'] != ''))) {
+        if (((! isset($_REQUEST['lang']) ) || ($_REQUEST['lang'] != ''))) {
             $filter = setLangFilter($filter);
         }
         $smarty->assign('find_langOrphan', '');
@@ -464,7 +462,7 @@ if (! empty($multiprint_pages)) {
     }
 
     if ($access->is_serializable_request()) {
-        $autocomplete_is_enabled = $prefs['feature_jquery_autocomplete'] == 'y' || $prefs['elementplus_autocomplete'] == 'y';
+        $autocomplete_is_enabled = $prefs['elementplus_autocomplete'] == 'y';
         if (isset($_REQUEST['listonly']) && ($autocomplete_is_enabled)) {
             $pages = [];
             foreach ($listpages['data'] as $page) {
@@ -544,7 +542,7 @@ function setLangFilter($filter)
     $smarty = TikiLib::lib('smarty');
 
     $lang = $multilinguallib->currentPageSearchLanguage();
-    if (isset($_REQUEST['listonly']) && $prefs['feature_jquery_autocomplete'] == 'y' && strlen($lang) > 2) {
+    if (isset($_REQUEST['listonly']) && $prefs['elementplus_autocomplete'] == 'y' && strlen($lang) > 2) {
         $lang = substr($lang, 0, 2);        // for autocomplete - use only language filter, not culture as well
     }
     // Without this condition, default listing is empty and language filter shows any language

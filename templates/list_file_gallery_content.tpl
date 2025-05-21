@@ -1,14 +1,14 @@
 {if empty($sort_arg)}
-    {assign var='sort_arg' value='sort_mode'}
+    {$sort_arg='sort_mode'}
 {/if}
 <div class="table-responsive">
     <table class="table">
         <tr>
             {if !empty($files) and $gal_info.show_checked ne 'n' and ($tiki_p_admin_file_galleries eq 'y' or $tiki_p_upload_files eq 'y')}
                 {if isset($nbCols)}
-                    {assign var=nbCols value=$nbCols+1}
+                    {$nbCols=$nbCols+1}
                 {else}
-                    {assign var=nbCols value=1}
+                    {$nbCols=1}
                 {/if}
                 <td class="checkbox-cell"> {* th changed to td to avoid ARIA empty header error  *}
                     {select_all checkbox_names='file[],subgal[]'}
@@ -18,9 +18,9 @@
             {if ( $prefs.use_context_menu_icon eq 'y' or $prefs.use_context_menu_text eq 'y' )
                 and (!isset($gal_info.show_action) or $gal_info.show_action eq 'y')}
                 {if isset($nbCols)}
-                    {assign var=nbCols value=$nbCols+1}
+                    {$nbCols++}
                 {else}
-                    {assign var=nbCols value=1}
+                    {$nbCols = 1}
                 {/if}
                 <td style="width: 1em">&nbsp; {* th changed to td to avoid ARIA empty header error  *}
 
@@ -39,15 +39,15 @@
 
             {foreach from=$fgal_listing_conf item=item key=propname}
                 {if isset($item.key)}
-                    {assign var=key_name value=$item.key}
+                    {$key_name=$item.key}
                 {else}
-                    {assign var=key_name value="show_$propname"}
+                    {$key_name="show_$propname"}
                 {/if}
 
                 {if isset($gal_info.$key_name) and $gal_info.$key_name eq 'o'}
-                    {assign var=show_infos value='y'}
+                    {$show_infos='y'}
                     {if $sort_mode eq $propname|cat:'_asc' or $sort_mode eq $propname|cat:'_desc'}
-                        {assign var=other_columns_selected value=$propname}
+                        {$other_columns_selected=$propname}
                     {else}
                         {capture assign=other_columns}
                             {if isset($other_columns)}
@@ -60,26 +60,26 @@
 
                 {if isset($gal_info.$key_name) and ( $gal_info.$key_name eq 'y' or $gal_info.$key_name eq 'i'
                     or $gal_info.$key_name eq 'a' or $propname eq 'name' )}
-                    {assign var=propval value=$item.name}
-                    {assign var=link_title value=''}
-                    {assign var=td_args value=''}
+                    {$propval=$item.name}
+                    {$link_title=''}
+                    {$td_args=''}
 
                     {if $gal_info.$key_name eq 'i' or $propname eq 'type' or ( $propname eq 'lockedby'
                         and $gal_info.$key_name eq 'a')}
                         {if isset($item.icon)}
-                            {assign var=propicon value=$item.icon}
+                            {$propicon=$item.icon}
                         {else}
-                            {assign var=propval value=$item.name[0]}
+                            {$propval=$item.name[0]}
                             {/if}
-                        {assign var=link_title value=$item.name}
-                        {assign var=td_args value=$td_args|cat:' style="width: 1em;text-align:center"'}
+                        {$link_title=$item.name}
+                        {$td_args=$td_args|cat:' style="width: 1em;text-align:center"'}
                     {/if}
 
                     {if $propname eq 'name' and ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'f' )}
                         {if isset($nbCols)}
-                            {assign var=nbCols value=$nbCols+1}
+                            {$nbCols=$nbCols+1}
                         {else}
-                            {assign var=nbCols value=1}
+                            {$nbCols=1}
                         {/if}
                         <th{$td_args}>
                             {self_link _sort_arg=$sort_arg _sort_field='filename'}
@@ -92,9 +92,9 @@
                         or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' )) and ($propname neq 'description'
                         or $gal_info.show_name neq 'n')}
                         {if isset($nbCols)}
-                            {assign var=nbCols value=$nbCols+1}
+                            {$nbCols=$nbCols+1}
                         {else}
-                            {assign var=nbCols value=1}
+                            {$nbCols=1}
                         {/if}
                         <th{$td_args}>
                             {self_link _sort_arg=$sort_arg _sort_field=$propname _title=":$link_title" _class='tips'}
@@ -123,9 +123,9 @@
 
             {if !empty($other_columns_selected)}
                 {if isset($nbCols)}
-                    {assign var=nbCols value=$nbCols+1}
+                    {$nbCols=$nbCols+1}
                 {else}
-                    {assign var=nbCols value=1}
+                    {$nbCols=1}
                 {/if}
                 <th>
                     {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.name}
@@ -137,9 +137,9 @@
             {if ( $prefs.use_context_menu_icon neq 'y' and $prefs.use_context_menu_text neq 'y' )
                 or (isset($gal_info.show_action) && $gal_info.show_action eq 'y')}
                 {if isset($nbCols)}
-                    {assign var=nbCols value=$nbCols+1}
+                    {$nbCols=$nbCols+1}
                 {else}
-                    {assign var=nbCols value=1}
+                    {$nbCols=1}
                 {/if}
                 <th>
                     {tr}Actions{/tr}
@@ -148,9 +148,9 @@
 
             {if ( !empty($other_columns) or !empty($other_columns_selected))}
                 {if isset($nbCols)}
-                    {assign var=nbCols value=$nbCols+1}
+                    {$nbCols=$nbCols+1}
                 {else}
-                    {assign var=nbCols value=1}
+                    {$nbCols=1}
                 {/if}
                 <th style="width: 1em">
                     {if !empty($other_columns)}
@@ -186,24 +186,24 @@
                     {/if}
                 {/strip}{/capture}
 
-                {assign var=nb_over_infos value=0}
+                {$nb_over_infos=0}
                 {capture name=over_infos}
                     {strip}
                         <table class="table table-condensed">
                             {foreach item=prop key=propname from=$fgal_listing_conf}
                                 {if isset($item.key)}
-                                    {assign var=propkey value=$item.key}
+                                    {$propkey=$item.key}
                                 {else}
-                                    {assign var=propkey value="show_$propname"}
+                                    {$propkey="show_$propname"}
                                 {/if}
                                 {if not empty($files[changes].$propname)}
                                     {if $propname == 'share' && isset($files[changes].share.data)}
                                         {foreach item=tmp_prop key=tmp_propname from=$files[changes].share.data}
                                             {$email[]=$tmp_prop.email}
                                         {/foreach}
-                                        {if $email and is_array($email)}{assign var=propval value=$email|join:','}{/if}
+                                        {if $email and is_array($email)}{$propval=$email|join:','}{/if}
                                     {else}
-                                        {assign var=propval value=$files[changes].$propname}
+                                        {$propval=$files[changes].$propname}
                                     {/if}
                                 {else}
                                     {$propval = ''}
@@ -211,34 +211,34 @@
                                 {* Format property values *}
                                 {if isset($propname) and ($propname eq 'created' or $propname eq 'lastModif' or $propname eq 'lastDownload')}
                                     {if empty($propval)}
-                                        {assign var=propval value=''}
+                                        {$propval=''}
                                     {else}
                                         {if isset($gal_info.show_modtimedate) && $gal_info.show_modtimedate eq 'y'}
-                                            {assign var=propval value=$propval|tiki_long_datetime}
+                                            {$propval=$propval|tiki_long_datetime}
                                         {else}
-                                            {assign var=propval value=$propval|tiki_long_date}
+                                            {$propval=$propval|tiki_long_date}
                                         {/if}
                                     {/if}
                                 {elseif $propname eq 'last_user' or $propname eq 'author' or $propname eq 'creator'}
-                                    {assign var=propval value=$propval|username}
+                                    {$propval=$propval|username}
                                 {elseif $propname eq 'size'}
-                                    {assign var=propval value=$propval|kbsize:true}
+                                    {$propval=$propval|kbsize:true}
                                 {elseif $propname eq 'ocr_state'}
                                     {if $propval === '1'}
-                                        {assign var=propval value='{tr}Finished processing{/tr}'}
+                                        {$propval='{tr}Finished processing{/tr}'}
                                     {elseif $propval === '2'}
-                                        {assign var=propval value='{tr}Currently processing{/tr}'}
+                                        {$propval='{tr}Currently processing{/tr}'}
                                     {elseif $propval === '3'}
-                                        {assign var=propval value='{tr}Queued for processing{/tr}'}
+                                        {$propval='{tr}Queued for processing{/tr}'}
                                     {elseif $propval === '4'}
-                                        {assign var=propval value='{tr}Processing stalled{/tr}'}
+                                        {$propval='{tr}Processing stalled{/tr}'}
                                     {else}
-                                        {assign var=propval value='{tr}No scheduled processing{/tr}'}
+                                        {$propval='{tr}No scheduled processing{/tr}'}
                                     {/if}
                                 {elseif $propname eq 'backlinks' and ! empty($files[changes].nbBacklinks)}
-                                    {assign var=propval value=$files[changes].nbBacklinks}
+                                    {$propval=$files[changes].nbBacklinks}
                                 {elseif $propname eq 'description'}
-                                    {assign var=propval value=$propval|nl2br}
+                                    {$propval=$propval|nl2br}
                                 {/if}
 
                                 {if isset($gal_info.$propkey) and ( $gal_info.$propkey eq 'a' or $gal_info.$propkey eq 'o' )}
@@ -250,7 +250,7 @@
                                             {$propval|escape}
                                         </td>
                                     </tr>
-                                    {assign var=nb_over_infos value=$nb_over_infos+1}
+                                    {$nb_over_infos=$nb_over_infos+1}
                                 {/if}
                             {/foreach}
                         </table>
@@ -258,27 +258,27 @@
                 {/capture}
 
                 {if $nb_over_infos gt 0}
-                    {assign var=over_infos value=$smarty.capture.over_infos}
+                    {$over_infos=$smarty.capture.over_infos}
                 {else}
-                    {assign var=over_infos value=''}
+                    {$over_infos=''}
                 {/if}
 
-                {assign var=nb_over_share value=0}
+                {$nb_over_share=0}
                 {capture name=over_share}
                     {strip}
                         {if ! empty($files[changes].share.data)}
                             {foreach item=prop key=propname from=$files[changes].share.data}
                                 <b>{$prop.email}</b>: {$prop.visit} / {$prop.maxhits}<br>
-                                {assign var=nb_over_share value=$nb_over_share+1}
+                                {$nb_over_share=$nb_over_share+1}
                             {/foreach}
                         {/if}
                     {/strip}
                 {/capture}
 
                 {if $nb_over_share gt 0}
-                    {assign var=over_share value=$smarty.capture.over_share}
+                    {$over_share=$smarty.capture.over_share}
                 {else}
-                    {assign var=over_share value=''}
+                    {$over_share=''}
                 {/if}
 
 
@@ -287,9 +287,9 @@
                 {if $gal_info.show_checked ne 'n' and ($tiki_p_admin_file_galleries eq 'y' or $tiki_p_upload_files eq 'y')}
                     <td class="checkbox-cell">
                         {if isset($files[changes].isgal) && $files[changes].isgal eq 1}
-                            {assign var='checkname' value='subgal'}
+                            {$checkname='subgal'}
                         {else}
-                            {assign var='checkname' value='file'}
+                            {$checkname='file'}
                         {/if}
                         <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="{$checkname}[]" value="{$files[changes].id|escape}"
                         {if isset($smarty.request.$checkname) and $smarty.request.$checkname
@@ -321,9 +321,9 @@
 
                 {foreach from=$fgal_listing_conf item=item key=propname}
                     {if isset($item.key)}
-                        {assign var=key_name value=$item.key}
+                        {$key_name=$item.key}
                     {else}
-                        {assign var=key_name value="show_$propname"}
+                        {$key_name="show_$propname"}
                     {/if}
 
                     {if isset($gal_info.$key_name)
@@ -333,7 +333,7 @@
                         )
                     }
                         {if isset($files[changes].$propname)}
-                            {assign var=propval value=$files[changes].$propname|escape}
+                            {$propval=$files[changes].$propname|escape}
                         {/if}
                         {* build link *}
                         {capture assign=link}
@@ -352,7 +352,7 @@
                                 {else}
                                     {if !empty($filegals_manager)}
                                         href="#" title="{tr}Click here to use the file{/tr}"
-                                        {assign var=mimeRegex value="#`$allowedMimeTypes|replace:'*': '.'`#"}
+                                        {$mimeRegex="#`$allowedMimeTypes|replace:'*': '.'`#"}
                                         {if ! isset($allowedMimeTypes) || (isset($files[changes].type) && preg_match($mimeRegex, $files[changes].type))}
                                             onclick="window.opener.insertAt('{$filegals_manager}',processFgalSyntax('{$files[changes]|json_encode:JSON_HEX_QUOT|replace:'"':'&quot;'|replace:'\u0022':'\\\u0022'}'), false, false, true);checkClose();return false;"
                                         {/if}
@@ -382,43 +382,43 @@
                         {if $propname eq 'id' or $propname eq 'name'}
                             {if $propname eq 'name' and $propval eq '' and $gal_info.show_name eq 'n'}
                                 {* show the filename if only name should be displayed but is empty *}
-                                {assign var=propval value=$files[changes].filename}
-                                {assign var=propval value="<a class='fgalname namealias' $link>$propval</a>"}
+                                {$propval=$files[changes].filename}
+                                {$propval="<a class='fgalname namealias' $link>$propval</a>"}
                             {else}
-                                {assign var=propval value="<a class='fgalname' $link>$propval</a>"}
+                                {$propval="<a class='fgalname' $link>$propval</a>"}
                             {/if}
                             {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description neq 'n'}
                                 {if $gal_info.max_desc gt 0}
-                                    {assign var=desc value=$files[changes].description|truncate:$gal_info.max_desc:"...":false|nl2br}
+                                    {$desc=$files[changes].description|truncate:$gal_info.max_desc:"...":false|nl2br}
                                 {else}
-                                    {assign var=desc value=$files[changes].description|nl2br}
+                                    {$desc=$files[changes].description|nl2br}
                                 {/if}
-                                {assign var=propval value="$propval<br><span class=\"description\">`$desc`</span>"}
+                                {$propval="$propval<br><span class=\"description\">`$desc`</span>"}
                             {/if}
                         {elseif $propname eq 'created' or $propname eq 'lastModif' or $propname eq 'lastDownload'}
                             {if empty($propval)}
-                                {assign var=propval value=''}
+                                {$propval=''}
                             {else}
                                 {if isset($gal_info.show_modtimedate) && $gal_info.show_modtimedate eq 'y'}
-                                    {assign var=propval value=$propval|tiki_short_datetime}
+                                    {$propval=$propval|tiki_short_datetime}
                                 {else}
-                                    {assign var=propval value=$propval|tiki_short_date}
+                                    {$propval=$propval|tiki_short_date}
                                 {/if}
                             {/if}
                         {elseif $propname eq 'last_user' or $propname eq 'author' or $propname eq 'creator'}
-                            {assign var=propval value=$propval|userlink}
+                            {$propval=$propval|userlink}
                         {elseif $propname eq 'size'}
-                            {assign var=propval value=$propval|kbsize:true}
+                            {$propval=$propval|kbsize:true}
                         {elseif $propname eq 'type'}
                             {if isset($files[changes].isgal) && $files[changes].isgal eq 1}
                                 {capture assign=propval}{icon name='file-archive-open' class=''}{/capture}
                             {else}
-                                {assign var=propval value=$files[changes].filename|iconify:$files[changes].type}
+                                {$propval=$files[changes].filename|iconify:$files[changes].type}
                             {/if}
                         {elseif $propname eq 'description' and $gal_info.max_desc gt 0}
-                            {assign var=propval value=$propval|truncate:$gal_info.max_desc:"...":false|nl2br}
+                            {$propval=$propval|truncate:$gal_info.max_desc:"...":false|nl2br}
                         {elseif $propname eq 'description'}
-                            {assign var=propval value=$propval|nl2br}
+                            {$propval=$propval|nl2br}
                         {elseif $propname eq 'ocr_state'}
                             {if $propval === '1'}
                                 {capture assign=propval}{icon style='outline' name='check-circle' title='{tr}Finished processing{/tr}'}{/capture}
@@ -433,30 +433,30 @@
                             {/if}
                         {elseif $propname eq 'lockedby' and $propval neq ''}
                             {if $gal_info.show_lockedby eq 'i' or $gal_info.show_lockedby eq 'a'}
-                                {assign var=propval value=$propval|username}
+                                {$propval=$propval|username}
                                 {capture assign=propval}{icon name='lock' class='tips' title=":{tr}Locked by-{/tr} "|cat:$propval}{/capture}
                             {else}
-                                {assign var=propval value=$propval|userlink}
+                                {$propval=$propval|userlink}
                             {/if}
                         {elseif $propname eq 'backlinks'}
                             {if empty($files[changes].nbBacklinks)}
-                                {assign var=propval value=''}
+                                {$propval=''}
                             {else}
-                                {assign var=propval value=$files[changes].nbBacklinks}
-                                {assign var=fid value=$files[changes].id}
-                                {assign var=propval value="<a class='ajaxtips' href='list-file_backlinks_ajax.php?fileId=$fid' data-ajaxtips='list-file_backlinks_ajax.php?fileId=$fid'>$propval</a>"}
+                                {$propval=$files[changes].nbBacklinks}
+                                {$fid=$files[changes].id}
+                                {$propval="<a class='ajaxtips' href='list-file_backlinks_ajax.php?fileId=$fid' data-ajaxtips='list-file_backlinks_ajax.php?fileId=$fid'>$propval</a>"}
                             {/if}
                         {elseif $propname eq 'deleteAfter'}
                             {if empty($files[changes].deleteAfter)}
-                                {assign var=propval value="-"}
+                                {$propval="-"}
                             {else}
-                                {assign var=limitdate value=$files[changes].deleteAfter+$files[changes].lastModif}
-                                {assign var=propval value=$limitdate|tiki_remaining_days_from_now:$prefs.short_date_format}
+                                {$limitdate=$files[changes].deleteAfter+$files[changes].lastModif}
+                                {$propval=$limitdate|tiki_remaining_days_from_now:$prefs.short_date_format}
                             {/if}
                         {elseif $propname eq 'share'}
                             {if isset($files[changes].share)}
-                                {assign var=share_string value=$files[changes].share.string}
-                                {assign var=share_nb value=$files[changes].share.nb}
+                                {$share_string=$files[changes].share.string}
+                                {$share_nb=$files[changes].share.nb}
                                 {capture assign=share_capture}
                                     {strip}
                                         <a class='fgalname tips' title="{tr}Share{/tr}" href='#' {popup fullhtml=1 text=$over_share left=true trigger="click"} style='cursor:help'>
@@ -464,20 +464,20 @@
                                         </a> ({$share_nb}) {$share_string}
                                     {/strip}
                                 {/capture}
-                                {assign var=propval value=$share_capture}
+                                {$propval=$share_capture}
                             {/if}
                             {elseif $propname eq 'hits'}
                             {if $prefs.fgal_list_hits eq 'y'}
                                 {if $prefs.fgal_list_ratio_hits eq 'y'}
-                                    {assign var=hits value=$files[changes].hits}
-                                    {assign var=maxhits value=$files[changes].maxhits}
+                                    {$hits=$files[changes].hits}
+                                    {$maxhits=$files[changes].maxhits}
                                     {if $maxhits <= 0}
-                                        {assign var=propval value=$hits}
+                                        {$propval=$hits}
                                     {else}
-                                        {assign var=propval value="$hits / <b>$maxhits</b>"}
+                                        {$propval="$hits / <b>$maxhits</b>"}
                                     {/if}
                                 {else}
-                                    {assign var=propval value=$files[changes].hits}
+                                    {$propval=$files[changes].hits}
                                 {/if}
                             {/if}
                         {/if}
@@ -488,7 +488,7 @@
                         {/if}
 
                         {if !empty($other_columns_selected) and $propname eq $other_columns_selected}
-                            {assign var=other_columns_selected_val value=$propval}
+                            {$other_columns_selected_val=$propval}
                         {else}
                             {if !(empty($galleryId) and $propname eq 'lockedby') and ($propname neq 'name'
                                 or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' ))

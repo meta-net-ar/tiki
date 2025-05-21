@@ -59,8 +59,11 @@
                             <td>{$token.maxhits}</td>
                             <td>
                                 {foreach $token.parameters as $key => $value}
-                                    {$key}={$value}
-                                    <br>
+                                    {if is_array($value)}
+                                        {$key}=[{$value|join:","}]<br>
+                                    {else}
+                                        {$key}={$value}<br>
+                                    {/if}
                                 {/foreach}
                             </td>
                             <td>{$token.groups}</td>

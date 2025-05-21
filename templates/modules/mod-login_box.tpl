@@ -158,8 +158,8 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
 });
 {/jq}
 {if !isset($tpl_module_title)}{* Left for performance, since tiki-login_scr.php includes this template directly. *}
-    {assign var=tpl_module_title value="{tr}Log in{/tr}"}
-    {if !isset($module_params)}{assign var=module_params value=' '}{/if}
+    {$tpl_module_title="{tr}Log in{/tr}"}
+    {if !isset($module_params)}{$module_params=' '}{/if}
     {if isset($nobox)}{$module_params.nobox = $nobox}{/if}
     {if isset($style)}{$module_params.style = $style}{/if}
 {/if}
@@ -246,12 +246,17 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
             <span style="white-space: nowrap">{$user|userlink}</span> <a href="tiki-logout.php" title="{tr}Log out{/tr}">{tr}Log out{/tr}</a>
         {elseif $mode eq "popup"}
             <div class="siteloginbar_popup dropdown float-sm-end me-auto" role="group">
-                <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}{$user|avatarize:n:n:n:n}{/if}
-                    {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
-                    {if (!isset($module_params.show_user_avatar) || $module_params.show_user_avatar neq 'y') and (!isset($module_params.show_user_name) || $module_params.show_user_name neq 'y')}{tr}Log out{/tr}{/if}
-                    <span class="sr-only">{tr}Toggle dropdown{/tr}</span>
-                </button>
+                {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}
+                    <div class="dropdown-toggle login_link mod-login-avatar" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {$user|avatarize:n:n:n:n}
+                    </div>
+                {else}
+                    <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
+                        {if (!isset($module_params.show_user_avatar) || $module_params.show_user_avatar neq 'y') and (!isset($module_params.show_user_name) || $module_params.show_user_name neq 'y')}{tr}Log out{/tr}{/if}
+                        <span class="sr-only">{tr}Toggle dropdown{/tr}</span>
+                    </button>
+                {/if}
                 {if empty($module_params.menu_id)}
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="tiki-user_information.php" title="{tr}My Account{/tr}">
@@ -297,7 +302,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
     {else}
         <div id="login_form_div">
-        {assign var='close_tags' value=''}
+        {$close_tags=''}
         {if $mode eq "popup"}
             <div class="siteloginbar_popup dropdown btn-group float-sm-end drop-left">
                 <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -334,7 +339,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         </div>
         {/if}
         <div class="user my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
-            {if !isset($module_logo_instance)}{assign var=module_logo_instance value=' '}{/if}
+            {if !isset($module_logo_instance)}{$module_logo_instance=' '}{/if}
             <label class="form-label" for="login-user_{$module_logo_instance}">
                 {if $prefs.login_is_email eq 'y'}
                     {tr}Email{/tr}

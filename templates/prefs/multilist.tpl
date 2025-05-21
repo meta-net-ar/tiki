@@ -9,7 +9,7 @@
             {/foreach}
         </select>
         {include file="prefs/shared-form-text.tpl"}
-        {if $prefs.jquery_select2 neq 'y'}
+        {if $prefs.elementplus_select neq 'y'}
             {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}
         {/if}
     </div>

@@ -4,6 +4,8 @@ import Sortable from "sortablejs";
 import { sortOptions } from '../../helpers/select/sortable';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps(['options', 'placeholder', 'emitValueChange', 'value', 'multiple', 'isInvalid', 'max', 'clearable', 'collapseTags', 'filterable', 'allowCreate', 'maxCollapseTags', 'ordering', 'group', 'language', 'size', 'remoteSourceUrl']);
 
 const modelValue = ref(JSON.parse(props.value));

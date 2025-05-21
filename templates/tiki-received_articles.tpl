@@ -69,7 +69,7 @@
             <label class="col-form-label col-sm-3">{tr}Rating{/tr}</label>
             <div class="col-sm-7">
                 <select name='rating' class="form-control">
-                    {assign var="ratings" value=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
+                    {$ratings=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
                     {foreach from=$ratings item=val}
                         <option value="{$val}" {if $rating == $val}selected="selected"{/if}>{$val}</option>
                     {/foreach}

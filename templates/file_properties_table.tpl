@@ -2,9 +2,9 @@
 <table class="table">
     {foreach item=prop key=propname from=$fgal_listing_conf}
         {if isset($item.key)}
-            {assign var=propkey value=$item.key}
+            {$propkey=$item.key}
         {else}
-            {assign var=propkey value="show_$propname"}
+            {$propkey="show_$propname"}
         {/if}
         {if isset($file.$propname)}
             {if $propname == 'share' && isset($file.share.data)}
@@ -12,34 +12,34 @@
                 {foreach item=tmp_prop key=tmp_propname from=$file.share.data}
                     {$email[]=$tmp_prop.email}
                 {/foreach}
-                {assign var=propval value=$email|join:','}
+                {$propval=$email|join:','}
             {else}
-                {assign var=propval value=$file.$propname}
+                {$propval=$file.$propname}
             {/if}
         {/if}
         {* Format property values *}
         {if $propname eq 'created' or $propname eq 'lastModif' or $propname eq 'lastDownload'}
-            {assign var=propval value=$propval|tiki_long_date}
+            {$propval=$propval|tiki_long_date}
         {elseif $propname eq 'last_user' or $propname eq 'author' or $propname eq 'creator'}
-            {assign var=propval value=$propval|username|replace:'&amp;':'&'}
+            {$propval=$propval|username|replace:'&amp;':'&'}
         {elseif $propname eq 'size'}
-            {assign var=propval value=$propval|kbsize:true}
+            {$propval=$propval|kbsize:true}
         {elseif $propname eq 'description'}
-            {assign var=propval value=$propval|nl2br}
+            {$propval=$propval|nl2br}
         {elseif $propname eq 'parentId'}
             {$propval = $propval|sefurl:'filegallery'}
             {$propval = "<a href='$propval'>`$gal_info.name`</a>"}
         {elseif $propname eq 'ocr_state'}
             {if $propval === '1'}
-                {assign var=propval value='{tr}Finished processing{/tr}'}
+                {$propval='{tr}Finished processing{/tr}'}
             {elseif $propval === '2'}
-                {assign var=propval value='{tr}Currently processing{/tr}'}
+                {$propval='{tr}Currently processing{/tr}'}
             {elseif $propval === '3'}
-                {assign var=propval value='{tr}Queued for processing{/tr}'}
+                {$propval='{tr}Queued for processing{/tr}'}
             {elseif $propval === '4'}
-                {assign var=propval value='{tr}Processing stalled{/tr}'}
+                {$propval='{tr}Processing stalled{/tr}'}
             {else}
-                {assign var=propval value='{tr}No scheduled processing{/tr}'}
+                {$propval='{tr}No scheduled processing{/tr}'}
             {/if}
         {/if}
 

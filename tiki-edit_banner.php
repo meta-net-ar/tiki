@@ -173,8 +173,8 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     }
     $fromDate = mktime(0, 0, 0, $_REQUEST["fromDate_Month"], $_REQUEST["fromDate_Day"], $_REQUEST["fromDate_Year"]);
     $toDate = mktime(0, 0, 0, $_REQUEST["toDate_Month"], $_REQUEST["toDate_Day"], $_REQUEST["toDate_Year"]);
-    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"] . '';
-    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"] . '';
+    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"];
+    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"];
     $smarty->assign('fromDate', $fromDate);
     $smarty->assign('toDate', $toDate);
     $smarty->assign('fromTime', $_REQUEST["fromTimeHour"] . ':' . $_REQUEST["fromTimeMinute"]);

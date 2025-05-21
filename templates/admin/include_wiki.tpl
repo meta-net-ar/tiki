@@ -429,19 +429,6 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend class="h3">{tr}Dump files{/tr}</legend>
-                    {tr}Dump files archive wiki pages for various usages such as off-line browsing or distribution on optical disks.{/tr}
-                    {remarksbox type="warning" title="{tr}Warning{/tr}"}
-                    {tr}The HTML files generated may refer to files not included in the dump.{/tr} {tr}Dumps do not include files attached to wiki pages.{/tr}
-                    {if $isDump}<li>{tr}Dumping will overwrite the preexisting dump.{/tr}</li>{/if}
-                    {/remarksbox}
-                    <input type="submit" class="btn btn-primary btn-sm" name="createdump" value="{tr}Create Dump File{/tr}">
-                    <input type="submit" class="btn btn-primary btn-sm" name="downloaddump" value="{tr}Download Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
-                    <input type="submit" class="btn btn-primary btn-sm" name="removedump" data-bs-target="_blank" value="{tr}Remove Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
-            </fieldset>
-            </div>
-            <div class="adminoptionbox clearfix">
-                <fieldset class="mb-3 w-100">
                     <legend class="h3">{tr}Mass replace and page permissions report{/tr}</legend>
                     <div class="adminoptionbox clearfix">
                         {button href="tiki-search_replace.php" _text="{tr}Mass search and replace{/tr}" _icon_name="exchange-alt" _type="primary"}

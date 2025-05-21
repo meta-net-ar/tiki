@@ -116,6 +116,7 @@ export default defineConfig(({ command, mode }) => {
     );
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
+        "avatar-generator": resolve(__dirname, "avatar-generator/index.js"),
         "color-picker": resolve("node_modules/@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"),
         "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
@@ -182,7 +183,6 @@ export default defineConfig(({ command, mode }) => {
                     "jquery-ui",
                     "jquery-validation",
                     /^moment\/.+/,
-                    "select2",
                     "pivottablejs",
                     "reveal.js",
                     "sortablejs",
@@ -497,14 +497,6 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-ui/dist",
                     },
                     {
-                        src: ["node_modules/jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.css", "node_modules/jquery-ui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"],
-                        dest: "vendor_dist/jquery-ui-timepicker-addon/dist",
-                    },
-                    {
-                        src: ["node_modules/jquery-ui-timepicker-addon/dist/i18n/jquery-ui-timepicker-addon-i18n.min.js"],
-                        dest: "vendor_dist/jquery-ui-timepicker-addon/dist/i18n",
-                    },
-                    {
                         src: "node_modules/jquery-validation/dist/*",
                         dest: "vendor_dist/jquery-validation/dist",
                     },
@@ -555,18 +547,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/reveal.js/dist/*",
                         dest: "vendor_dist/reveal.js/dist"
-                    },
-                    {
-                        src: "node_modules/select2/dist/js/select2.min.js",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2/dist/css/select2.min.css",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2-bootstrap-5-theme/dist/*.min.css",
-                        dest: "vendor_dist/select2-bootstrap-5-theme/dist",
                     },
                     {
                         src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
@@ -661,7 +641,7 @@ export default defineConfig(({ command, mode }) => {
             globals: true,
             environment: "happy-dom",
             coverage: {
-                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/wysiwyg/**/*.js", "src/js/jquery-tiki/ui-utils/handle*.js"],
+                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/wysiwyg/**/*.js", "src/js/avatar-generator/**/*.js", "src/js/jquery-tiki/ui-utils/handle*.js"],
                 exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
                 provider: 'istanbul'
             },

@@ -4,15 +4,19 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\FileGallery\File;
+namespace Tiki\Lib\Test\Importer;
 
-require_once(__DIR__ . '/tikiimporter_testcase.php');
-require_once(__DIR__ . '/../../importer/tikiimporter_blog_wordpress.php');
+use DOMDocument;
+use Laminas\Http\Client as HttpClient;
+use Laminas\Http\Client\Adapter\Test as HttpClientAdapterTest;
+use Tiki\FileGallery\File;
+use TikiDb;
+use TikiImporter_Blog_Wordpress;
 
 /**
  * @group importer
  */
-class TikiImporterBlogWordpressTest extends TikiImporter_TestCase
+class BlogWordpressTest extends AbstractImporterTestCase
 {
     public $obj;
 
@@ -480,7 +484,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
         ob_start();
 
         $last_id = TikiDb::get()->getOne('SELECT max(fileId) FROM tiki_files');
-        $adapter = new Laminas\Http\Client\Adapter\Test();
+        $adapter = new HttpClientAdapterTest();
 
         $adapter->setResponse(
             "HTTP/1.1 200 OK" . "\r\n" .
@@ -490,7 +494,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
             'empty content'
         );
 
-        $client = new Laminas\Http\Client();
+        $client = new HttpClient();
         $client->setAdapter($adapter);
 
         $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
@@ -536,10 +540,10 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
             ->getMock();
         $file->expects($this->exactly(0))->method('replace');
 
-        $adapter = new Laminas\Http\Client\Adapter\Test();
+        $adapter = new HttpClientAdapterTest();
         $adapter->setNextRequestWillFail(true);
 
-        $client = new Laminas\Http\Client();
+        $client = new HttpClient();
         $client->setAdapter($adapter);
 
         $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')
@@ -565,7 +569,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
             ->onlyMethods(['replace'])
             ->getMock();
         $file->expects($this->exactly(0))->method('replace');
-        $adapter = new Laminas\Http\Client\Adapter\Test();
+        $adapter = new HttpClientAdapterTest();
 
         $adapter->setResponse(
             "HTTP/1.1 404 NOT FOUND" . "\r\n" .
@@ -575,7 +579,7 @@ Estou a disposição para te ajudar com mais informações. Abraços, Rodrigo.',
             'empty content'
         );
 
-        $client = new Laminas\Http\Client();
+        $client = new HttpClient();
         $client->setAdapter($adapter);
 
         $obj = $this->getMockBuilder('TikiImporter_Blog_Wordpress')

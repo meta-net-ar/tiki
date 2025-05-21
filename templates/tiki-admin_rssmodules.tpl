@@ -144,9 +144,9 @@
     {/tab}
 
     {if $rssId > 0}
-        {assign var="feedEditLabel" value="{tr}Edit Feed{/tr}"}
+        {$feedEditLabel="{tr}Edit Feed{/tr}"}
     {else}
-        {assign var="feedEditLabel" value="{tr}Create Feed{/tr}"}
+        {$feedEditLabel="{tr}Create Feed{/tr}"}
     {/if}
     {tab name=$feedEditLabel}
         <h2>{$feedEditLabel}

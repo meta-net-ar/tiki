@@ -1,9 +1,5 @@
 {
     "PSR1.Classes.ClassDeclaration.MissingNamespace": {
-        "tiki-webservices.php": {
-            "class:Tiki_ComplexType": true,
-            "class:Tiki_WebServices": true
-        },
         "tiki-print_indexed.php": {
             "class:ObjectList": true,
             "class:ObjectRenderer": true,
@@ -783,11 +779,9 @@
         "lib\/core\/Search\/GlobalSource\/RelationSource.php": {
             "class:Search_GlobalSource_RelationSource": true
         },
-        "lib\/core\/Search\/ResultSet\/WikiBuilder.php": {
-            "class:Search_ResultSet_WikiBuilder": true
-        },
-        "lib\/core\/Search\/ResultSet\/FacetFilter.php": {
-            "class:Search_ResultSet_FacetFilter": true
+        "lib\/core\/TikiDb\/Pdo.php": {
+            "class:TikiDb_Pdo_Result": true,
+            "class:TikiDb_Pdo": true
         },
         "lib\/core\/Search\/ResultSet\/SnippetHelper.php": {
             "class:Search_ResultSet_SnippetHelper": true
@@ -798,11 +792,8 @@
         "lib\/core\/Search\/Elastic\/OrderBuilder.php": {
             "class:Search_Elastic_OrderBuilder": true
         },
-        "lib\/core\/Search\/Elastic\/Prefilter.php": {
-            "class:Search_Elastic_Prefilter": true
-        },
-        "lib\/core\/Search\/Elastic\/Index.php": {
-            "class:Search_Elastic_Index": true
+        "lib\/core\/TikiDb\/MasterSlaveDispatch.php": {
+            "class:TikiDb_MasterSlaveDispatch": true
         },
         "lib\/core\/Search\/Elastic\/FacetBuilder.php": {
             "class:Search_Elastic_FacetBuilder": true
@@ -1747,9 +1738,6 @@
         "lib\/core\/TikiDb\/Initializer\/Pdo.php": {
             "class:TikiDb_Initializer_Pdo": true
         },
-        "lib\/core\/TikiDb\/Initializer\/Adodb.php": {
-            "class:TikiDb_Initializer_Adodb": true
-        },
         "lib\/core\/TikiDb\/Bridge.php": {
             "class:TikiDb_Bridge": true
         },
@@ -2284,28 +2272,6 @@
         "lib\/test\/rating\/AggregationTest.php": {
             "class:Rating_AggregationTest": true
         },
-        "lib\/test\/importer\/TikiImporterTest.php": {
-            "class:TikiImporterTest": true,
-            "class:TikiImporterFirstChild": true,
-            "class:TikiImporterSecondChild": true,
-            "class:TikiImporterGranSon": true
-        },
-        "lib\/test\/importer\/TikiImporterBlogWordpressTest.php": {
-            "class:TikiImporterBlogWordpressTest": true
-        },
-        "lib\/test\/importer\/tikiimporter_testcase.php": {
-            "class:TikiImporter_TestCase": true
-        },
-        "lib\/test\/importer\/TikiImporterBlogTest.php": {
-            "class:TikiImporterBlogTest": true
-        },
-        "lib\/test\/importer\/TikiImporterWikiTest.php": {
-            "class:TikiImporterWikiTest": true,
-            "class:TikiImporter_Wiki_InsertPage_Test": true
-        },
-        "lib\/test\/importer\/TikiImporterWikiMediawikiTest.php": {
-            "class:TikiImporterWikiMediawikiTest": true
-        },
         "lib\/test\/Calendar\/CalRecurrenceTest.php": {
             "class:Calendar_CalRecurrenceTest": true
         },
@@ -2530,6 +2496,18 @@
         },
         "lib\/test\/core\/Search\/Elastic\/PrefilterTest.php": {
             "class:Search_Elastic_PrefilterTest": true
+        },
+        "lib\/core\/Search\/ResultSet\/FacetFilter.php": {
+            "class:Search_ResultSet_FacetFilter": true
+        },
+        "lib\/core\/Search\/Elastic\/Prefilter.php": {
+            "class:Search_Elastic_Prefilter": true
+        },
+        "lib\/core\/Search\/Elastic\/Index.php": {
+            "class:Search_Elastic_Index": true
+        },
+        "lib\/core\/Search\/ResultSet\/WikiBuilder.php": {
+            "class:Search_ResultSet_WikiBuilder": true
         },
         "lib\/test\/core\/Search\/Elastic\/SearchElasticQueryRepository.php": {
             "class:SearchElasticQueryRepository": true
@@ -3568,14 +3546,17 @@
         "lib\/taglines\/taglinelib.php": {
             "class:TagLineLib": true
         },
-        "lib\/webmail\/tikimaillib.php": {
-            "class:TikiMail": true
+        "lib\/core\/Search\/Formatter\/Transform\/DynamicLoader.php": {
+            "class:Search_Formatter_Transform_DynamicLoaderWrapper": true
+        },
+        "lib\/webmail\/addressbooklib.php": {
+            "class:AddressBookLib": true
         },
         "lib\/webmail\/contactlib.php": {
             "class:ContactLib": true
         },
-        "lib\/webmail\/addressbooklib.php": {
-            "class:AddressBookLib": true
+        "lib\/webmail\/tikimaillib.php": {
+            "class:TikiMail": true
         },
         "lib\/serializedlist.php": {
             "class:SerializedList": true
@@ -3654,31 +3635,11 @@
         "lib\/wiki-plugins\/wikiplugin_backlinks.php": {
             "class:WikiPluginBackLinks": true
         },
-        "lib\/wiki-plugins\/wikiplugin_dbreport.php": {
-            "class:WikipluginDBReportToken": true,
-            "class:WikipluginDBReportField": true,
-            "class:WikipluginDBReportString": true,
-            "class:WikipluginDBReportContent": true,
-            "class:WikipluginDBReportText": true,
-            "class:WikipluginDBReportStyle": true,
-            "class:WikipluginDBReportLink": true,
-            "class:WikipluginDBReportCell": true,
-            "class:WikipluginDBReportLine": true,
-            "class:WikipluginDBReportTable": true,
-            "class:WikipluginDBReportGroup": true,
-            "class:WikipluginDBReportParameter": true,
-            "class:WikipluginDBReportFail": true,
-            "class:WikipluginDBReport": true
-        },
         "lib\/wiki-plugins\/wikiplugin_prefdoc.php": {
             "class:PrefsDoc": true
         },
         "lib\/wiki-plugins\/wikiplugin_trackerquerytemplate.php": {
             "class:dataToFieldHandler": true
-        },
-        "lib\/wiki-plugins\/wikiplugin_fitnesse.php": {
-            "class:FixtureTable": true,
-            "class:FixtureMockTrackerField": true
         },
         "lib\/wiki-plugins\/wikiplugin_titlesearch.php": {
             "class:WikiPluginTitleSearch": true
@@ -3872,10 +3833,6 @@
         }
     },
     "Squiz.Classes.ValidClassName.NotCamelCaps": {
-        "tiki-webservices.php": {
-            "Tiki_ComplexType": true,
-            "Tiki_WebServices": true
-        },
         "tiki-print_indexed.php": {
             "ObjectRenderer_TrackerItem": true,
             "ObjectRenderer_Wiki": true,
@@ -3923,6 +3880,15 @@
         },
         "lib\/core\/Category\/Manipulator.php": {
             "Category_Manipulator": true
+        },
+        "lib\/core\/Math\/Formula\/Runner.php": {
+            "Math_Formula_Runner": true
+        },
+        "lib\/core\/Math\/Formula\/Exception.php": {
+            "Math_Formula_Exception": true
+        },
+        "lib\/core\/Math\/Formula\/Currency.php": {
+            "Math_Formula_Currency": true
         },
         "lib\/core\/WikiParser\/PluginDefinition.php": {
             "WikiParser_PluginDefinition": true
@@ -4497,14 +4463,9 @@
         "lib\/core\/Math\/Formula\/Tokenizer.php": {
             "Math_Formula_Tokenizer": true
         },
-        "lib\/core\/Math\/Formula\/Currency.php": {
-            "Math_Formula_Currency": true
-        },
-        "lib\/core\/Math\/Formula\/Exception.php": {
-            "Math_Formula_Exception": true
-        },
-        "lib\/core\/Math\/Formula\/Runner.php": {
-            "Math_Formula_Runner": true
+        "lib\/core\/TikiDb\/Pdo.php": {
+            "TikiDb_Pdo_Result": true,
+            "TikiDb_Pdo": true
         },
         "lib\/core\/IDS\/Rule.php": {
             "IDS_Rule": true
@@ -4515,11 +4476,8 @@
         "lib\/core\/Search\/ContentFilter\/VersionNumber.php": {
             "Search_ContentFilter_VersionNumber": true
         },
-        "lib\/core\/Search\/FacetProvider.php": {
-            "Search_FacetProvider": true
-        },
-        "lib\/core\/Search\/GlobalSource\/Static.php": {
-            "Search_GlobalSource_Static": true
+        "lib\/core\/TikiDb\/MasterSlaveDispatch.php": {
+            "TikiDb_MasterSlaveDispatch": true
         },
         "lib\/core\/Search\/GlobalSource\/SocialSource.php": {
             "Search_GlobalSource_SocialSource": true
@@ -4568,6 +4526,12 @@
         },
         "lib\/core\/Search\/GlobalSource\/RelationSource.php": {
             "Search_GlobalSource_RelationSource": true
+        },
+        "lib\/core\/Search\/GlobalSource\/Static.php": {
+            "Search_GlobalSource_Static": true
+        },
+        "lib\/core\/Search\/FacetProvider.php": {
+            "Search_FacetProvider": true
         },
         "lib\/core\/Search\/ResultSet\/WikiBuilder.php": {
             "Search_ResultSet_WikiBuilder": true
@@ -5527,9 +5491,6 @@
         "lib\/core\/TikiDb\/Initializer\/Pdo.php": {
             "TikiDb_Initializer_Pdo": true
         },
-        "lib\/core\/TikiDb\/Initializer\/Adodb.php": {
-            "TikiDb_Initializer_Adodb": true
-        },
         "lib\/core\/TikiDb\/Bridge.php": {
             "TikiDb_Bridge": true
         },
@@ -6009,12 +5970,6 @@
         },
         "lib\/test\/rating\/AggregationTest.php": {
             "Rating_AggregationTest": true
-        },
-        "lib\/test\/importer\/tikiimporter_testcase.php": {
-            "TikiImporter_TestCase": true
-        },
-        "lib\/test\/importer\/TikiImporterWikiTest.php": {
-            "TikiImporter_Wiki_InsertPage_Test": true
         },
         "lib\/test\/Calendar\/CalRecurrenceTest.php": {
             "Calendar_CalRecurrenceTest": true
@@ -6624,9 +6579,6 @@
         }
     },
     "PSR1.Classes.ClassDeclaration.MultipleClasses": {
-        "tiki-webservices.php": {
-            "class:Tiki_WebServices": true
-        },
         "tiki-print_indexed.php": {
             "class:ObjectRenderer": true,
             "class:ObjectRenderer_TrackerItem": true,
@@ -6657,14 +6609,6 @@
             "class:CacheLibFileSystem": true,
             "class:CacheLibMemcache": true,
             "class:CacheLibNoCache": true
-        },
-        "lib\/test\/importer\/TikiImporterTest.php": {
-            "class:TikiImporterFirstChild": true,
-            "class:TikiImporterSecondChild": true,
-            "class:TikiImporterGranSon": true
-        },
-        "lib\/test\/importer\/TikiImporterWikiTest.php": {
-            "class:TikiImporter_Wiki_InsertPage_Test": true
         },
         "lib\/test\/core\/Search\/FormatterTest.php": {
             "class:Search_FormatterTest_HighlightHelper": true
@@ -6718,24 +6662,6 @@
             "class:OIntegrate_Converter_TikiToHtml": true,
             "class:OIntegrate_Converter_Indexer": true
         },
-        "lib\/wiki-plugins\/wikiplugin_dbreport.php": {
-            "class:WikipluginDBReportField": true,
-            "class:WikipluginDBReportString": true,
-            "class:WikipluginDBReportContent": true,
-            "class:WikipluginDBReportText": true,
-            "class:WikipluginDBReportStyle": true,
-            "class:WikipluginDBReportLink": true,
-            "class:WikipluginDBReportCell": true,
-            "class:WikipluginDBReportLine": true,
-            "class:WikipluginDBReportTable": true,
-            "class:WikipluginDBReportGroup": true,
-            "class:WikipluginDBReportParameter": true,
-            "class:WikipluginDBReportFail": true,
-            "class:WikipluginDBReport": true
-        },
-        "lib\/wiki-plugins\/wikiplugin_fitnesse.php": {
-            "class:FixtureMockTrackerField": true
-        },
         "lib\/sheet\/grid.php": {
             "class:TikiSheet": true,
             "class:TikiSheetDataHandler": true,
@@ -6758,9 +6684,6 @@
         }
     },
     "PSR1.Methods.CamelCapsMethodName.NotCamelCaps": {
-        "tiki-webservices.php": {
-            "Tiki_WebServices::test_complex": true
-        },
         "tiki-check.php": {
             "BenchmarkPhp::test_benchmark": true,
             "BenchmarkPhp::test_math": true,
@@ -9788,25 +9711,37 @@
             "WikiPluginBackLinks::get_item_field_id": true,
             "WikiPluginBackLinks::list_backlinks_from_tracker_items": true
         },
-        "lib\/wiki-plugins\/wikiplugin_dbreport.php": {
-            "WikipluginDBReportToken::type_name": true,
-            "WikipluginDBReportContent::parse_text": true,
-            "WikipluginDBReportContent::append_field": true,
-            "WikipluginDBReportContent::append_variable": true,
-            "WikipluginDBReportContent::append_string": true,
-            "WikipluginDBReportStyle::html_start": true,
-            "WikipluginDBReportStyle::html_end": true,
-            "WikipluginDBReportLink::html_start": true,
-            "WikipluginDBReportLink::html_end": true,
-            "WikipluginDBReportLink::html_onclick": true,
-            "WikipluginDBReportLine::row_html": true,
-            "WikipluginDBReportTable::line_row_html": true,
-            "WikipluginDBReportTable::header_row_html": true,
-            "WikipluginDBReportTable::record_row_html": true,
-            "WikipluginDBReportTable::footer_row_html": true,
-            "WikipluginDBReportGroup::check_break": true,
-            "WikipluginDBReportGroup::start_html": true,
-            "WikipluginDBReportGroup::end_html": true
+        "lib\/core\/WikiPlugin\/DBReport\/Content.php": {
+            "Content::parse_text": true,
+            "Content::append_field": true,
+            "Content::append_variable": true,
+            "Content::append_string": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Style.php": {
+            "Style::html_start": true,
+            "Style::html_end": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Link.php": {
+            "Link::html_start": true,
+            "Link::html_end": true,
+            "Link::html_onclick": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Line.php": {
+            "Line::row_html": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Table.php": {
+            "Table::line_row_html": true,
+            "Table::header_row_html": true,
+            "Table::record_row_html": true,
+            "Table::footer_row_html": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Group.php": {
+            "Group::check_break": true,
+            "Group::start_html": true,
+            "Group::end_html": true
+        },
+        "lib\/core\/WikiPlugin\/DBReport\/Token.php": {
+            "Token::type_name": true
         },
         "lib\/wiki-plugins\/wikiplugin_mcalendar.php": {
             "MCalendar::Maya": true

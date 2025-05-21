@@ -891,52 +891,6 @@ class Services_Wiki_Controller
     }
 
     /**
-     * Listpages "perform with checked" action to zip pages
-     *
-     * @param $input
-     * @return array
-     * @throws Exception
-     * @throws Services_Exception
-     * @throws Services_Exception_Denied
-     */
-    public function action_zip($input)
-    {
-        Services_Exception_Denied::checkGlobal('admin');
-        $util = new Services_Utilities();
-        //first pass - show confirm modal popup
-        if ($util->notConfirmPost()) {
-            $util->setVars($input, $this->filters, 'checked');
-            if ($util->itemsCount > 0) {
-                if ($util->itemsCount === 1) {
-                    $msg = tr('Download a zipped file of the following page?');
-                } else {
-                    $msg = tr('Download a zipped file of the following pages?');
-                }
-                return $util->confirm($msg, tra('Zip'));
-            } else {
-                Services_Utilities::modalException(tra('No pages were selected. Please select one or more pages.'));
-            }
-        //after confirm submit - perform action
-        } elseif ($util->checkCsrf()) {
-            $util->setVars($input, $this->filters, 'items');
-            include_once('lib/wiki/xmllib.php');
-            $xmllib = new XmlLib();
-            $zipFile = 'dump/xml.zip';
-            $config['debug'] = false;
-            if ($xmllib->export_pages($util->items, null, $zipFile, $config)) {
-                if (! $config['debug']) {
-                    global $base_url;
-                    return ['url' => $base_url . $zipFile];
-                }
-            } else {
-                Feedback::error(['mes' => $xmllib->get_error()]);
-            }
-            //return to page
-            return Services_Utilities::closeModal();
-        }
-    }
-
-    /**
      * Listpages "perform with checked" action to add page name as title to pages
      *
      * @param $input

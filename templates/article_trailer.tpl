@@ -38,12 +38,12 @@
                         {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
                             <a class="dropdown-item" href="tiki-print_article.php?articleId={$articleId}&display=pdf">
                                 {icon name="pdf"} {tr} &nbsp;PDF{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {elseif $tiki_p_admin eq "y" and $pdf_warning eq 'y'}
                             <a href="tiki-admin.php?page=packages" target="_blank" class="dropdown-item text-danger" title="{tr}Warning:mPDF Package Missing{/tr}">
                                 {icon name="warning"} {tr} PDF{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if $prefs.user_favorites eq 'y'}
@@ -72,7 +72,7 @@
                         {if $prefs.sefurl_short_url eq 'y'}
                             <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();" role="button">
                                 {icon name="link"} {tr}Get a short URL{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         {/if}
                         {if $tiki_p_remove_article eq 'y'}

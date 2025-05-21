@@ -87,8 +87,9 @@ class Tiki_Text_Diff_Renderer extends Text_Diff_Renderer
 function diff2($page1, $page2, $type = 'sidediff')
 {
     global $tikilib, $prefs;
+    $page1 = $tikilib->removeInlineSyntaxTags($page1);
+    $page2 = $tikilib->removeInlineSyntaxTags($page2);
     if ($type == 'htmldiff') {
-        //$search = "#(<[^>]+>|\s*[^\s<]+\s*|</[^>]+>)#";
         $search = "#(<[^>]+>|[,\"':\s]+|[^\s,\"':<]+|</[^>]+>)#";
         preg_match_all($search, $page1, $out, PREG_PATTERN_ORDER);
         $page1 = $out[0];

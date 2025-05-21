@@ -15,7 +15,6 @@ if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
 }
 
 use Tiki\Command\ConsoleSetupException;
-use Tiki\TikiDb\AdoDb;
 use Tiki\TikiDb\PdoDb;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
@@ -28,7 +27,7 @@ if (empty($_SERVER['REQUEST_URI'])) {
     $_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
 }
 if (empty($_SERVER['SERVER_NAME'])) {
-    $_SERVER['SERVER_NAME'] = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'] ?? '';
 }
 
 
@@ -160,7 +159,7 @@ $patterns['hash'] = "/^[a-z0-9]*$/"; // for hash reqId in live support
 $patterns['url'] = "/^(https?:\/\/)?[^<>\"]*$/";
 
 // IIS always sets the $_SERVER['HTTPS'] value (on|off)
-$noSSLActive = ! isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'off');
+$noSSLActive = ! isset($_SERVER['HTTPS']) || ($_SERVER['HTTPS'] == 'off');
 if (isset($prefs['session_protected']) && $prefs['session_protected'] == 'y' && $noSSLActive && php_sapi_name() != 'cli') {
     header("Location: https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}");
     exit;
@@ -189,16 +188,14 @@ if (isset($prefs['session_storage']) && $prefs['session_storage'] == 'db') {
         $db->getReal();
     }
 
-    if ($db instanceof AdoDb) {
-        require_once('lib/tikisession-adodb.php');
-    } elseif ($db instanceof PdoDb) {
+    if ($db instanceof TikiDb_Pdo) {
         require_once('lib/tikisession-pdo.php');
     }
 } elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && TikiLib::lib("memcache")->isEnabled()) {
     require_once('lib/tikisession-memcache.php');
 }
 
-if (! isset($prefs['session_cookie_name']) || empty($prefs['session_cookie_name'])) {
+if (empty($prefs['session_cookie_name'])) {
     $prefs['session_cookie_name'] = session_name();
 }
 
@@ -278,7 +275,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
                  * This is an extremely rare occurence that is hard to reproduce by nature.
                  */
                 if (isset($_SESSION['extra_validation'])) {
-                    $cookie = isset($_COOKIE[$extra_cookie_name]) ? $_COOKIE[$extra_cookie_name] : null;
+                    $cookie = $_COOKIE[$extra_cookie_name] ?? null;
 
                     if ($cookie !== $_SESSION['extra_validation']) {
                         TikiLib::lib('logs')->add_log('system', 'session cookie validation failed');
@@ -301,9 +298,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
                     unset($sequence);
                 }
             }
-        } catch (Laminas\Session\Exception\ExceptionInterface $e) {
-            // Ignore
-        } catch (Laminas\Stdlib\Exception\InvalidArgumentException $e) {
+        } catch (Laminas\Session\Exception\ExceptionInterface | Laminas\Stdlib\Exception\InvalidArgumentException $e) {
             // Ignore
         }
 

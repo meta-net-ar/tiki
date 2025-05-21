@@ -102,11 +102,7 @@ const addFormValidation = (formId, tracker) => {
                     },
                     1000,
                     function () {
-                        if ($firstError.is("select") && jqueryTiki.select2) {
-                            $firstError.select2("focus");
-                        } else {
-                            $firstError.trigger("focus");
-                        }
+                        $firstError.trigger("focus");
                     }
                 );
             }

@@ -721,7 +721,7 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
                 // Add a new FORMAT
                 $hash_num_formats[$num_format]  = $index;
                 $this->_formats[$i]->_num_format = $index;
-                array_push($num_formats,$num_format);
+                $num_formats[] = $num_format;
                 $index++;
             }
         }
