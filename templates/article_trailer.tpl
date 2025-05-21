@@ -10,7 +10,7 @@
                 ({$size} {tr}bytes{/tr})
             {/if}
         </span>
-        <div class="actions hidden-print float-end">
+        <div class="actions d-print-none float-end">
             <div class="btn-group">
                 {if $prefs.feature_multilingual eq 'y' and $lang and $prefs.show_available_translations eq 'y'}
                     {include file='translated-lang.tpl' object_type='article'}
