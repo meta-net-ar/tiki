@@ -180,7 +180,8 @@ class Services_File_Controller
             throw new Services_Exception(tr($message), 406);
         }
         $util = new Services_Utilities();
-        if ($util->isActionPost()) {
+        // skip unsetting the CSRF ticket as multiple files might be dropped in the dropzone
+        if ($util->isActionPost(false)) {
             if ($fileId) {
                 $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title);
             } else {
