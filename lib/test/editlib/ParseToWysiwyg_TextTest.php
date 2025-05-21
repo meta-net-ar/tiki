@@ -25,6 +25,7 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         global $prefs;
         // restore preference default state
         $prefs['feature_use_three_colon_centertag'] = 'n';
+        $prefs['wiki_make_ordered_list_items_display_unique_numbers'] = 'n';
     }
 
 
@@ -185,6 +186,10 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
      */
     public function testNumberedHeadings(): void
     {
+        global $prefs;
+        // Enable multilevel numbering for this test
+        $prefs['wiki_make_ordered_list_items_display_unique_numbers'] = 'y';
+
         $inData = '!#Heading Level 1';
         $ex = '<h1 class="showhide_heading d-flex justify-content-start" id="Heading_Level_1">1. Heading Level&nbsp;1</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
