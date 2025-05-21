@@ -84,7 +84,7 @@ foreach ($rawcals['data'] as $calendar) {
     $minHourOfDay = min($minHourOfDay, (int)(($calendar['startday'] ?? 0) / 3600));
     $maxHourOfDay = max($maxHourOfDay, (int)((($calendar['endday'] ?? 0) + 1) / 3600));
 
-    $canEditAnything = $calendar['perms']->add_events || $calendar['perms']->add_events;
+    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
 }
 
 
