@@ -187,6 +187,13 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                                 "null_value" => 0.0,
                                 "ignore_malformed" => true,
                             ],
+                            "facet" => $this->connection->getVersion() >= 5 ?
+                            [
+                                "type" => "keyword",
+                                "ignore_above" => 1000,
+                            ] : [
+                                "type" => "string",
+                            ],
                         ],
                     ];
                     if ($entry instanceof Search_Type_SimpleText) {
@@ -680,10 +687,10 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         return false;
     }
 
-    public function hasSortKeywordField($field)
+    public function hasFacetField($field)
     {
         $mapping = $this->getFieldMapping($field);
-        if (! empty($mapping->type) && $mapping->type == 'text' && isset($mapping->fields->sort) && $mapping->fields->sort->type == 'keyword') {
+        if (! empty($mapping->type) && $mapping->type == 'text' && isset($mapping->fields->facet)) {
             return true;
         }
         return false;

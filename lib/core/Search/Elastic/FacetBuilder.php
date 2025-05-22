@@ -40,8 +40,8 @@ class Search_Elastic_FacetBuilder
         $type = $facet->getType();
         $field = $facet->getField();
 
-        if ($this->index && $this->index->hasSortKeywordField($field)) {
-            $field .= '.sort';
+        if ($this->index && $this->index->hasFacetField($field)) {
+            $field .= '.facet';
         }
 
         $out = [
