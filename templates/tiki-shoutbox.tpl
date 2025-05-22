@@ -36,7 +36,7 @@
             <div class="col-md-9">
                 <textarea class="form-control" name="message" id="message">{$message|escape}</textarea>
                 {if $prefs.feature_socialnetworks eq 'y' && $user neq ''}
-                    {if $prefs.socialnetworks_twitter_consumer_key neq ''}
+                    {if $prefs.socialnetworks_twitter_client_id neq ''}
                         <div class="form-check">
                             <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" name="tweet" id="tweet" value='1'>

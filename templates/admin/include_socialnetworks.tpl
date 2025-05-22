@@ -186,8 +186,8 @@
                     </p>
                 {/remarksbox}
                 <div class="adminoptionbox">
-                    {preference name=socialnetworks_twitter_consumer_key}
-                    {preference name=socialnetworks_twitter_consumer_secret}
+                    {preference name=socialnetworks_twitter_client_id}
+                    {preference name=socialnetworks_twitter_client_secret}
                 </div>
             </fieldset>
             <fieldset>

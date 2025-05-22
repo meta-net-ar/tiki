@@ -1,196 +1,227 @@
 <?php
 
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-//
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class OAuthLib extends TikiDb_Bridge
 {
+    private $providers = [];
+
+    /**
+     * Check if a token is already stored
+     */
     public function is_authorized($provider_key)
     {
         return ! is_null($this->retrieve_token($provider_key));
     }
 
+    /**
+     * Handle OAuth API request with GET, POST, PATCH or DELETE using stored token
+     */
     public function do_request($provider_key, $arguments)
     {
-        $configuration = $this->get_configuration($provider_key);
+        $token = $this->retrieve_token($provider_key);
+        $url = $arguments['url'];
+        $method = isset($arguments['post']) ? 'POST'
+                : (isset($arguments['patch']) ? 'PATCH'
+                : (isset($arguments['delete']) ? 'DELETE' : 'GET'));
 
-        if (! $configuration) {
-            return false;
+        $client = TikiLib::lib('tiki')->get_http_client($url);
+
+        if (is_string($token)) {
+            $client->setHeaders(['Authorization' => 'Bearer ' . $token]);
         }
 
-        $access = $this->retrieve_token($provider_key);
+        $client->setMethod($method);
 
-        if (is_object($access)) {
-            $client = $access->getHttpClient($configuration);
-
-            if (isset($configuration['secretAsGet'])) {
-                $client->getRequest()->getQuery()->set($configuration['secretAsGet'], $access->getTokenSecret());
-            }
-        } else {
-            $client = TikiLib::lib('tiki')->get_http_client();
+        if (! empty($arguments['get'])) {
+            $client->setParameterGet($arguments['get']);
         }
 
-        $client->setUri($arguments['url']);
-
-        if (isset($configuration['oauth2Token'])) {
-            $client->getRequest()->getQuery()->set('access_token', $configuration['oauth2Token']);
-        }
-
-        if (isset($arguments['post'])) {
-            $client->setMethod(Laminas\Http\Request::METHOD_POST);
-            foreach ($arguments['post'] as $key => $value) {
-                $client->getRequest()->getPost()->set($key, $value);
-            }
-        }
-
-        if (isset($arguments['patch'])) {
-            $client->setMethod(Laminas\Http\Request::METHOD_PATCH);
-            foreach ($arguments['patch'] as $key => $value) {
-                $client->getRequest()->getPost()->set($key, $value);
-            }
-        }
-
-        if (isset($arguments['get'])) {
-            foreach ($arguments['get'] as $key => $value) {
-                $client->getRequest()->getQuery()->set($key, $value);
-            }
-        }
-
-        if (isset($arguments['delete'])) {
-            $client->setMethod(Laminas\Http\Request::METHOD_DELETE);
+        if (! empty($arguments['post'])) {
+            $client->setParameterPost($arguments['post']);
+        } elseif (! empty($arguments['patch'])) {
+            $client->setRawBody(json_encode($arguments['patch']));
+            $client->setHeaders(['Content-Type' => 'application/json']);
         }
 
         try {
-            $response = $client->send();
-
-            return $response;
-        } catch (Laminas\Http\Exception\ExceptionInterface $e) {
+            return $client->send();
+        } catch (\Exception $e) {
+            error_log("OAuth request failed for $provider_key: " . $e->getMessage());
             return null;
         }
     }
 
+    /**
+     * Start OAuth request flow (redirects to provider)
+     */
     public function request_token($provider_key)
     {
         try {
-            $consumer = $this->get_consumer($provider_key);
+            $provider = $this->get_consumer($provider_key);
 
-            if ($consumer) {
-                $_SESSION['OAUTH_REQUEST_' . $provider_key] = serialize($consumer->getRequestToken());
-                $consumer->redirect();
+            if ($provider instanceof \League\OAuth1\Client\Server\Server) {
+                $tempCredentials = $provider->getTemporaryCredentials();
+                $_SESSION['OAUTH_REQUEST_' . $provider_key] = serialize($tempCredentials);
+                $authUrl = $provider->getAuthorizationUrl($tempCredentials);
+            } else {
+                $authUrl = $provider->getAuthorizationUrl();
+                $_SESSION['OAUTH_STATE_' . $provider_key] = $provider->getState();
             }
-        } catch (Laminas\Oauth\Exception\ExceptionInterface $e) {
-            $oauth_ex = $e->getPrevious();
-            $prevErr = '';
-            if ($oauth_ex != null) {
-                $prevErr = $oauth_ex->getMessage();
-            }
-            die($e->getMessage() . '. Origin: ' . $prevErr);
+
+            header('Location: ' . $authUrl);
+            exit;
+        } catch (\Exception $e) {
+            error_log("OAuth request_token error for $provider_key: " . $e->getMessage());
+            return false;
         }
     }
 
+    /**
+     * Handle callback and exchange code for access token
+     */
     public function request_access($provider_key)
     {
-        $consumer = $this->get_consumer($provider_key);
-        $key = 'OAUTH_REQUEST_' . $provider_key;
+        try {
+            $provider = $this->get_consumer($provider_key);
 
-        if ($consumer && isset($_SESSION[$key])) {
-            try {
-                $accessToken = $consumer->getAccessToken($_GET, unserialize($_SESSION[$key]));
-
-                $this->store_token($provider_key, $accessToken);
-
-                unset($_SESSION[$key]);
-            } catch (Laminas\OAuth\Exception\ExceptionInterface $e) {
-                $oauth_ex = $e->getPrevious();
-                $prevErr = '';
-                if ($oauth_ex != null) {
-                    $prevErr = $oauth_ex->getMessage();
+            if ($provider instanceof \League\OAuth1\Client\Server\Server) {
+                $temp = @unserialize($_SESSION['OAUTH_REQUEST_' . $provider_key]);
+                if (! $temp) {
+                    throw new \RuntimeException("Missing OAuth1 temp credentials for $provider_key");
                 }
-                die($e->getMessage() . '. Origin: ' . $prevErr);
+
+                $token = $provider->getTokenCredentials(
+                    $temp,
+                    $_GET['oauth_token'],
+                    $_GET['oauth_verifier']
+                );
+            } else {
+                if (
+                    empty($_GET['code']) ||
+                    empty($_GET['state']) ||
+                    $_GET['state'] !== ($_SESSION['OAUTH_STATE_' . $provider_key] ?? null)
+                ) {
+                    throw new \RuntimeException("Invalid or missing OAuth2 state/code for $provider_key");
+                }
+
+                $token = $provider->getAccessToken('authorization_code', [
+                    'code' => $_GET['code']
+                ]);
             }
+
+            $this->store_token($provider_key, $token instanceof \League\OAuth2\Client\Token\AccessTokenInterface ? $token->getToken() : $token);
+
+            unset($_SESSION['OAUTH_REQUEST_' . $provider_key], $_SESSION['OAUTH_STATE_' . $provider_key]);
+            return true;
+        } catch (\Exception $e) {
+            error_log("OAuth request_access error for $provider_key: " . $e->getMessage());
+            return false;
         }
     }
 
+    /**
+     * Store token in user preference
+     */
     private function store_token($provider_key, $accessToken)
     {
-        $tikilib = TikiLib::lib('tiki');
-
-        $tikilib->set_preference('oauth_token_' . $provider_key, serialize($accessToken));
+        TikiLib::lib('tiki')->set_preference('oauth_token_' . $provider_key, is_string($accessToken) ? $accessToken : serialize($accessToken));
     }
 
-    private function retrieve_token($provider_key)
+    /**
+     * Retrieve token from preference
+     */
+    public function retrieve_token($provider_key)
     {
-        $config = $this->get_configuration($provider_key);
-
-        if (! empty($config['oauth2Token'])) {
-            return $config['oauth2Token'];
-        }
-
-        if (! empty($config['accessToken']) && ! empty($config['accessTokenSecret'])) {
-            $token = new Laminas\OAuth\Token\Access();
-            $token->setParams(
-                [
-                    'oauth_token' => $config['accessToken'],
-                    'oauth_token_secret' => $config['accessTokenSecret'],
-                ]
-            );
-
-            return $token;
-        }
-        $tikilib = TikiLib::lib('tiki');
-
-        $token = $tikilib->get_preference('oauth_token_' . $provider_key);
-
-        return $token ? unserialize($token) : null;
+        $stored = TikiLib::lib('tiki')->get_preference('oauth_token_' . $provider_key);
+        return $this->isSerialized($stored) ? @unserialize($stored) : $stored;
     }
 
+    private function isSerialized($data)
+    {
+        return is_string($data) && preg_match('/^O:\d+:"/', $data);
+    }
+
+    /**
+     * Return OAuth config array per provider
+     */
     private function get_configuration($provider_key)
     {
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         $servicelib = TikiLib::lib('service');
-        $callback = $servicelib->getUrl(
-            [
-                'controller' => 'oauth',
-                'action' => 'callback',
-                'oauth_callback' => $provider_key,
-            ]
-        );
+        $callback = $tikilib->tikiUrl($servicelib->getUrl([
+            'controller' => 'oauth',
+            'action' => 'callback',
+            'oauth_callback' => $provider_key,
+        ]));
 
-        switch ($provider_key) {
-            case 'vimeo':
-                return [
-                'callbackUrl' => $tikilib->tikiUrl($callback),
-                'siteUrl' => 'https://api.vimeo.com/oauth',
-                'requestTokenUrl' => 'https://api.vimeo.com/oauth/request_token',
-                'accessTokenUrl' => 'https://api.vimeo.com/oauth/access_token',
-                'authorizeUrl' => 'https://api.vimeo.com/oauth/authorize',
-                'consumerKey' => $prefs['vimeo_consumer_key'],
-                'consumerSecret' => $prefs['vimeo_consumer_secret'],
-                'oauth2Token' => $prefs['vimeo_access_token'],
-                ];
-            case 'zotero':
-                return [
-                'callbackUrl' => $tikilib->tikiUrl($callback),
-                'siteUrl' => 'https://www.zotero.org/oauth',
-                'requestTokenUrl' => 'https://www.zotero.org/oauth/request',
-                'accessTokenUrl' => 'https://www.zotero.org/oauth/access',
-                'authorizeUrl' => 'https://www.zotero.org/oauth/authorize',
-                'consumerKey' => $prefs['zotero_client_key'],
-                'consumerSecret' => $prefs['zotero_client_secret'],
-                'secretAsGet' => 'key', // Tiki-specific
-                ];
-        }
+        return [
+            'twitter' => [
+                'clientId' => $prefs['socialnetworks_twitter_client_id'],
+                'clientSecret' => $prefs['socialnetworks_twitter_client_secret'],
+                'redirectUri' => $callback,
+            ],
+            'vimeo' => [
+                'clientId' => $prefs['vimeo_consumer_key'],
+                'clientSecret' => $prefs['vimeo_consumer_secret'],
+                'redirectUri' => $callback,
+            ],
+            'zotero' => [
+                'identifier' => $prefs['zotero_client_key'],
+                'secret' => $prefs['zotero_client_secret'],
+                'callback_uri' => $callback,
+            ],
+        ][$provider_key] ?? null;
     }
 
+    /**
+     * Instantiate and memoize OAuth consumer/provider
+     */
     private function get_consumer($provider_key)
     {
-        if ($configuration = $this->get_configuration($provider_key)) {
-            $consumer = new Laminas\OAuth\Consumer($configuration);
-            $httpClient = TikiLib::lib('tiki')->get_http_client();
-            $consumer->setHttpClient($httpClient);
-            return $consumer;
+        if (! isset($this->providers[$provider_key])) {
+            $config = $this->get_configuration($provider_key);
+
+            if (! $config) {
+                throw new \RuntimeException("Missing configuration for OAuth provider: $provider_key");
+            }
+
+            switch ($provider_key) {
+                case 'twitter':
+                    $this->providers[$provider_key] = new \League\OAuth2\Client\Provider\GenericProvider([
+                        'clientId' => $config['clientId'],
+                        'clientSecret' => $config['clientSecret'],
+                        'redirectUri' => $config['redirectUri'],
+                        'urlAuthorize' => 'https://twitter.com/i/oauth2/authorize',
+                        'urlAccessToken' => 'https://api.twitter.com/2/oauth2/token',
+                        'urlResourceOwnerDetails' => 'https://api.twitter.com/2/users/me',
+                        'scopes' => ['tweet.read', 'users.read', 'offline.access'], // Twitter v2 scopes
+                    ]);
+                    break;
+
+                case 'vimeo':
+                    $this->providers[$provider_key] = new \League\OAuth2\Client\Provider\GenericProvider([
+                        'clientId' => $config['clientId'],
+                        'clientSecret' => $config['clientSecret'],
+                        'redirectUri' => $config['redirectUri'],
+                        'urlAuthorize' => 'https://api.vimeo.com/oauth/authorize',
+                        'urlAccessToken' => 'https://api.vimeo.com/oauth/access_token',
+                        'urlResourceOwnerDetails' => 'https://api.vimeo.com/me',
+                    ]);
+                    break;
+
+                case 'zotero':
+                    $this->providers[$provider_key] = new \Tiki\OAuth\Provider\Zotero($config);
+                    break;
+
+                default:
+                    throw new \RuntimeException("Unsupported OAuth provider: $provider_key");
+            }
         }
+
+        return $this->providers[$provider_key];
     }
 }
