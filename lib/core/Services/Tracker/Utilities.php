@@ -232,6 +232,7 @@ class Services_Tracker_Utilities
             $properties['rules'] ?? $field['rules'] ?? null,
             $properties['encryptionKeyId'] ?? $field['encryptionKeyId'] ?? null,
             $properties['excludeFromNotification'] ?? $field['excludeFromNotification'] ?? null,
+            $properties['updateLastModif'] ?? $field['updateLastModif'] ?? null,
             $properties['visibleInViewMode'] ?? $field['visibleInViewMode'] ?? null,
             $properties['visibleInEditMode'] ?? $field['visibleInEditMode'] ?? null,
             $properties['visibleInHistoryMode'] ?? ($field['visibleInHistoryMode'] ?? null)

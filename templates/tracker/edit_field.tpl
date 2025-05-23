@@ -291,6 +291,16 @@
                 </div>
             </div>
             <div class="mb-3 mx-0">
+                <label for="type" class="col-form-label">{tr}Modifications impact last modification info{/tr}</label>
+                <select name="update_lastmodif" class="form-select"  data-original="{$field.updateLastModif}">
+                    <option value="1" {if $field.updateLastModif eq 'y' or !isset($field.updateLastModif)}selected="selected"{/if}>{tr}Yes{/tr}</option>
+                    <option value="0" {if $field.updateLastModif eq 'n'}selected="selected"{/if}>{tr}No{/tr}</option>
+                </select>
+                <div class="form-text">
+                    {tr}When this field is modified, should it update the item's last modification date and user?{/tr}
+                </div>
+            </div>
+            <div class="mb-3 mx-0">
                 <label for="type" class="col-form-label">{tr}Visible in view mode{/tr}</label>
                 <select name="visible_in_view_mode" class="form-select"  data-original="{$field.visibleInViewMode}">
                     <option value="0" {if $field.visibleInViewMode eq 'n'}selected="selected"{/if}>{tr}No{/tr}</option>
