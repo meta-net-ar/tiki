@@ -62,6 +62,8 @@ add_output('ajax_hm_folders', 'tiki_contacts_page_link', true, 'tiki', 'logout_m
 add_handler('compose', 'check_for_tiki_redirect', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'add_file_attachment', true, 'smtp', 'load_smtp_servers_from_config', 'before');
 add_handler('compose', 'tiki_load_smtp_is_imap_forward', true, 'smtp', 'load_smtp_is_imap_forward', 'after');
+add_handler('compose', 'post_imap_save_sent', true, 'tiki', 'imap_unflag_on_send', 'after');
+add_output('compose', 'post_imap_save_sent', true, 'tiki', 'compose_form_end', 'before');
 
 /* message page calendar invitation hooks */
 add_handler('ajax_imap_message_content', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
@@ -220,6 +222,9 @@ add_handler('ajax_imap_unread', 'tiki_process_imap_unread', true, 'tiki', 'imap_
 add_handler('settings', 'process_tiki_run_sieve_filters_on_imap_unread', true, 'tiki', 'save_user_settings', 'before');
 add_output('settings', 'tiki_run_sieve_filters_on_imap_unread_setting', true, 'tiki', 'enable_gmail_contacts_module_setting', 'after');
 
+setup_base_ajax_page('ajax_tiki_msg_tracker_items', 'tiki');
+add_handler('ajax_tiki_msg_tracker_items', 'get_msg_tracker_items', true, 'tiki');
+
 return [
   'allowed_pages' => [
     'groupmail',
@@ -242,6 +247,7 @@ return [
     'ajax_tiki_tracker_info',
     'ajax_tiki_sieve_get_mailboxes',
     'info',
+    'ajax_tiki_msg_tracker_items',
   ],
   'allowed_get' => [
     'tiki_download_message' => FILTER_VALIDATE_BOOLEAN,
@@ -263,6 +269,10 @@ return [
     'tracker_data' => [FILTER_DEFAULT, false],
     'mailboxes' => [FILTER_UNSAFE_RAW, false],
     'msg_headers' => [FILTER_UNSAFE_RAW, false],
+    'msg_uid' => [FILTER_UNSAFE_RAW, false],
+    'list_path' => [FILTER_UNSAFE_RAW, false],
+    'tracker_items' => [FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY],
+    'error' => [FILTER_UNSAFE_RAW, false],
   ],
   'allowed_post' => [
     'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -301,5 +311,6 @@ return [
     'imap_account' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'tiki_archive_replied' => FILTER_VALIDATE_INT,
     'tiki_run_sieve_filters_on_imap_unread' => FILTER_VALIDATE_INT,
+    'lookup' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
   ]
 ];

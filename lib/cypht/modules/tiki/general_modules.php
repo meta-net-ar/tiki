@@ -453,3 +453,67 @@ class Hm_Output_enable_gmail_contacts_module_setting extends Hm_Output_Module
         return '<tr class="general_setting"><td><label class="form-check-label">' . tr('Enable Gmail Contacts Module') . '</label></td><td><input class="form-check-input" type="checkbox" name="tiki_enable_gmail_contacts_module" value="1" ' . ($enable_gmail_contacts_module ? 'checked >' . $reset : '>') . '</td></tr>';
     }
 }
+
+/**
+ *
+ */
+class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $msgUid = $this->get('sent_msg_uid');
+
+        if (! $msgUid) {
+            return;
+        }
+
+        $subject = $this->request->post['compose_subject'];
+        $body = $this->request->post['compose_body'];
+
+        $keywords = [$subject];
+
+        foreach (explode(' ', $subject) as $word) {
+            $keywords[] = $word;
+        }
+
+        foreach (explode(' ', $body) as $word) {
+            $keywords[] = $word;
+        }
+        $keywords = array_unique($keywords);
+
+        $this->session->set('keywords', $keywords);
+        $this->session->set('msg_uid', $msgUid);
+        $this->session->set('imap_server_id', $this->get('sent_imap_id'));
+    }
+}
+
+class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $keywords = $this->session->get('keywords');
+        $msgUid = $this->session->get('msg_uid');
+        $imapServerId = $this->session->get('imap_server_id');
+
+        $this->session->set('keywords', '');
+        $this->session->set('msg_uid', '');
+        $this->session->set('imap_server_id', '');
+
+        if (isset($this->request->post['lookup'])) {
+            $items = TikiLib::lib('trk')->getItemsByKeyword([$this->request->post['lookup']], 'EF');
+            $this->out('tracker_items', $items);
+            return;
+        }
+
+        if (! $keywords || ! $msgUid || ! $imapServerId) {
+            $this->out('error', 'No sent message found');
+            return;
+        }
+
+        $items = TikiLib::lib('trk')->getItemsByKeyword($keywords, 'EF');
+
+        $this->out('tracker_items', $items);
+        $this->out('msg_uid', $msgUid);
+        $this->out('list_path', "imap_$imapServerId" . '_' . bin2hex("Sent"));
+    }
+}
