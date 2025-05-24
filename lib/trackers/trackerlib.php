@@ -1142,6 +1142,58 @@ class TrackerLib extends TikiLib
         return $ret2;
     }
 
+    public function getItemsByKeyword($keywords = [], $filterFieldType = '')
+    {
+        $bindvars = array_map(function ($keyword) {
+            return '%' . $keyword . '%';
+        }, $keywords);
+
+        $query = "select ttif.`itemId` , ttif.`value`, ttif.`fieldId`, tti.`trackerId` FROM `tiki_tracker_items` tti,`tiki_tracker_item_fields` ttif ";
+
+        $conditions = array_fill(0, count($keywords), 'ttif.`value` like ?');
+
+        $query .= " WHERE (" . implode(' or ', $conditions) . ") ";
+
+        $filterFieldTypes = $this->get_fields_by_type($filterFieldType);
+        if (count($filterFieldTypes)) {
+            $filterInTrackerIds = array_map(function ($field) {
+                return $field['trackerId'];
+            }, $filterFieldTypes);
+            $query .= " and (" . implode(' or ', array_fill(0, count($filterInTrackerIds), 'tti.`trackerId` = ?')) . ") ";
+            $bindvars = array_merge($bindvars, $filterInTrackerIds);
+        }
+
+        $query .= " and tti.`itemId` = ttif.`itemId` order by `value`";
+
+        $items = $this->fetchAll($query, $bindvars);
+
+        $items = array_map(function ($item) use ($filterFieldTypes) {
+            $item['title'] = $this->get_isMain_value($item['trackerId'], $item['itemId']);
+
+            if (count($filterFieldTypes)) {
+                // override the fieldId to the value of the given filterFieldType
+                $field = array_filter($filterFieldTypes, function ($field) use ($item) {
+                    return $field['trackerId'] == $item['trackerId'];
+                });
+                $field = reset($field);
+                $item['fieldId'] = $field['fieldId'];
+            }
+
+            return $item;
+        }, $items);
+
+        // remove duplicates
+        $items = array_reduce($items, function ($carry, $item) {
+            if (! isset($carry[$item['itemId']])) {
+                $carry[$item['itemId']] = $item;
+            }
+            return $carry;
+        }, []);
+        $items = array_values($items);
+
+        return $items;
+    }
+
     public function need_to_check_categ_perms($allfields = '')
     {
         global $prefs;
