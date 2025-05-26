@@ -113,7 +113,7 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
         $isReadonly = $this->getOption('readonly') === 'y';
 
         // 1) If there *is* a submitted value, and override is allowed, keep it:
-        if (!empty($value) && !$isReadonly) {
+        if (! empty($value) && ! $isReadonly) {
             return ['value' => (string)$value];
         }
 
