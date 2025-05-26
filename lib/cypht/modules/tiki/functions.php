@@ -454,3 +454,32 @@ if (! hm_exists('append_to_msg_headers')) {
         return $headers;
     }
 }
+
+function find_relevant_tracker_items($keywords)
+{
+    $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+    $trackerIds = array_unique(array_map(function ($field) {
+        return $field['trackerId'];
+    }, $fields));
+
+    $input = new JitFilter([
+        'filter' => [
+            'content' => $keywords,
+            'tracker_id' => implode(' OR ', $trackerIds),
+        ]
+    ]);
+
+    $searchService = new Services_Search_Controller();
+    $resultSet = $searchService->action_lookup($input)['resultset'];
+
+    $resultSet->applyTransform(function (&$item) use ($fields) {
+        $fields = array_filter($fields, function ($f) use ($item) {
+            return $f['trackerId'] == $item['parent_id'];
+        });
+        $field = reset($fields);
+        $item['field_id'] = $field['fieldId'];
+        return $item;
+    });
+
+    return $resultSet->jsonSerialize()['result'];
+}

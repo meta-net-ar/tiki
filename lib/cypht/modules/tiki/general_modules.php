@@ -500,8 +500,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         $this->session->set('imap_server_id', '');
 
         if (isset($this->request->post['lookup'])) {
-            $items = TikiLib::lib('trk')->getItemsByKeyword([$this->request->post['lookup']], 'EF');
-            $this->out('tracker_items', $items);
+            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup']));
             return;
         }
 
@@ -510,9 +509,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
             return;
         }
 
-        $items = TikiLib::lib('trk')->getItemsByKeyword($keywords, 'EF');
-
-        $this->out('tracker_items', $items);
+        $this->out('tracker_items', find_relevant_tracker_items(implode(',', $keywords)));
         $this->out('msg_uid', $msgUid);
         $this->out('list_path', "imap_$imapServerId" . '_' . bin2hex("Sent"));
     }
