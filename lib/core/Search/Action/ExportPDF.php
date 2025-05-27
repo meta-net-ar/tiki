@@ -54,7 +54,7 @@ class Search_Action_ExportPDF implements Search_Action_Action
                 $filename = $input['filename'] ?? $pageName;
                 unset($input['filename']);
 
-                $pdfContent = $this->getPDFAttachment($pageName, $input);
+                $pdfContent = $this->getPDFContent($pageName, $input);
 
                 $size = strlen($pdfContent);
 
@@ -118,16 +118,18 @@ class Search_Action_ExportPDF implements Search_Action_Action
      * Generates a PDF attachment for the specified wiki page.
      * FIXME Refactor with \Search_Action_EmailAction::getPDFAttachment
      *
-     * @param string $pageName The name of the wiki page for which to generate the PDF.
+     * @param string    $pageName The name of the wiki page for which to generate the PDF.
+     * @param array     $input    Array of input values from the `params` parameter
      *
-     * @return array|false Returns the generated PDF attachment as an array. If the user does not have
-     *                     view permissions, an empty array is returned. If an error occurs during PDF
-     *                     generation or the page does not exist, returns false.
+     * @return string Returns the generated PDF attachment as a string.
+     *         If the user does not have view permissions, an empty string is returned.
+     *         If an error occurs during PDF generation or the page does not exist, returns empty string.
+     * @throws Exception
      */
-    private function getPDFAttachment($pageName, $input)
+    private function getPDFContent(string $pageName, array $input): string
     {
         if (! Perms::get('wiki page', $pageName)->view) {
-            return [];
+            return '';
         }
 
         require_once('tiki-setup.php');
@@ -135,7 +137,7 @@ class Search_Action_ExportPDF implements Search_Action_Action
         $generator = new PdfGenerator();
         if (! empty($generator->error)) {
             Feedback::error($generator->error);
-            return false;
+            return '';
         } else {
             $params = [
                 'page' => $pageName,
@@ -143,10 +145,10 @@ class Search_Action_ExportPDF implements Search_Action_Action
             ];
             $params = array_merge($input, $params);
 
-            // If the page doesn't exist then display an error
+            // If the page doesn't exist, then display an error
             if (! ($info = TikiLib::lib('tiki')->get_page_info($pageName))) {
                 Feedback::error(sprintf(tra('Page %s cannot be found'), $pageName));
-                return false;
+                return '';
             }
 
             $oldGet = $_GET;
