@@ -13,7 +13,7 @@ use Ramsey\Uuid\Uuid;
  * Letter key: ~uuid~
  * Generates and stores a universally unique identifier (UUID) for each tracker item.
  */
-class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
+class Tracker_Field_Uuid extends Tracker_Field_AutoIncrement implements \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -75,7 +75,7 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
                         ],
                         'legacy_index' => 3,
                     ],
-                    'update_existing' => [
+                    'update' => [
                         'name'        => tr('Backfill Existing Items'),
                         'description' => tr('Generate UUIDs for items created before this field was added'),
                         'default'     => 'n',
@@ -89,13 +89,6 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
                 ],
             ],
         ];
-    }
-
-    public function getFieldData(array $requestData = []): array
-    {
-        $insertId = $this->getInsertId();
-        $value = $requestData[$insertId] ?? $this->getValue();
-        return ['value' => $value];
     }
 
     public function renderInput($context = []): string
@@ -169,7 +162,7 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function handleFieldSave($data)
     {
-        if ($this->getOption('update_existing') !== 'y') {
+        if ($this->getOption('update') !== 'y') {
             return;
         }
 
@@ -203,33 +196,6 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
         }
     }
 
-    public function getFilterCollection(): \Tracker\Filter\Collection
-    {
-        $filters  = new Tracker\Filter\Collection($this->getTrackerDefinition());
-        $permName = $this->getConfiguration('permName');
-        $baseKey  = $this->getBaseKey();
-
-        $filters->addNew($permName, 'lookup')
-            ->setLabel($this->getConfiguration('name'))
-            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_lookup"))
-            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
-                $val = $control->getValue();
-                if ($val) {
-                    $query->filterIdentifier($val, $baseKey);
-                }
-            });
-
-        return $filters;
-    }
-
-    public function getDocumentPart(Search_Type_Factory_Interface $typeFactory): array
-    {
-        $baseKey = $this->getBaseKey();
-        return [
-            $baseKey => $typeFactory->identifier($this->getValue()),
-        ];
-    }
-
     public function getProvidedFields(): array
     {
         return [$this->getBaseKey()];
@@ -244,51 +210,38 @@ class Tracker_Field_Uuid extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function isValid(array $ins_fields_data): bool
     {
-        // get the submitted or existing value
         $insertId = $this->getInsertId();
         $value    = $ins_fields_data[$insertId] ?? $this->getValue();
 
-        // empty is OK (we’ll generate a UUID on save)
         if ($value === '' || $value === null) {
             return true;
         }
 
-        // basic format check
         if (! Uuid::isValid($value)) {
+            Feedback::error(tr('The provided value is not a valid UUID.'));
             return false;
         }
 
-        try {
-            /** @var UuidInterface $uuidObj */
-            $uuidObj = Uuid::fromString(strtolower($value));
-        } catch (\Throwable $e) {
-            return false;
+        // Check for uniqueness in the tracker
+        $itemId    = $this->getItemId() ?: 0;
+        $db = TikiDb::get();
+        $existing = $db->table('tiki_tracker_item_fields')
+            ->fetchMap(
+                'itemId',
+                'value',
+                [
+                    'fieldId'   => $this->getConfiguration('fieldId'),
+                    'value'     => $value,
+                ]
+            );
+        if (isset($existing[$itemId]) && $existing[$itemId] === $value) {
+            return true;
         }
-
-        $configured = (int) $this->getOption('version', 4);
-        if ($uuidObj->getFields()->getVersion() !== $configured) {
+        if (! empty($existing)) {
+            Feedback::error(tr('This UUID is already in use by another item in this tracker.'));
             return false;
         }
 
         return true;
-    }
-
-    public function getTabularSchema()
-    {
-        $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
-
-        $permName = $this->getConfiguration('permName');
-        $name = $this->getConfiguration('name');
-
-        $schema->addNew($permName, 'default')
-            ->setLabel($name)
-            ->setRenderTransform(function ($value) {
-                return $value;
-            })
-            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-                $info['fields'][$permName] = $value;
-            });
-
-        return $schema;
     }
 }
