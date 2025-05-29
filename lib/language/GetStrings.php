@@ -77,6 +77,14 @@ class Language_GetStrings
     protected $skipRemove = false;
 
     /**
+     * Indicates whether to include database strings.
+     * When set to y or yes, translatable strings from the tiki_pages database table (wiki pages) will be included.
+     *
+     * @var bool
+     */
+    protected $includeDatabase = false;
+
+    /**
      * Class construct.
      *
      * The following are valid $options:
@@ -122,6 +130,10 @@ class Language_GetStrings
 
         if (isset($options['skipRemove'])) {
             $this->skipRemove = true;
+        }
+
+        if (isset($options['includeDatabase'])) {
+            $this->includeDatabase = true;
         }
     }
 
@@ -247,6 +259,72 @@ class Language_GetStrings
     }
 
     /**
+     * Collects translatable strings from the database, specifically from the 'data' field of the 'tiki_pages' table.
+     *
+     * This method searches for strings marked for translation using specific patterns:
+     *   - {tr}...{/tr} or {tr [args]}...{/tr}
+     *   - {TR()}...{TR}
+     * It also cleans up the content by removing or processing Smarty comments and wiki comments to avoid extracting
+     * non-translatable text.
+     *
+     * @return array An array of unique strings extracted for translation.
+     */
+    public function collectStringsFromDatabase()
+    {
+        $regexes = [
+            // Only extract {tr} ... {/tr} in tiki_pages data field
+            // Also match {tr [args]} ...{/tr}
+            '/\{tr(?:\s+[^\}]*)?\}(.+?)\{\/tr\}/s', // {tr} ... {/tr}
+            // Only match {TR()} ... {TR}
+            '/\{TR\(\)\}(.*?)\{TR\}/s',
+        ];
+
+
+        $cleanupRegexes = [
+            // Do not translate text in Wiki comments: {* Smarty comment *}
+            // except if it is an string marked {*get_strings {tr}string{/tr} *}
+            '/\{\*get_strings(.*?)\*\}/s' => '$1',
+            '/\{\*.*?\*\}/s' => '', // Smarty comment
+            // ~tc~This is a wiki comment. ~/tc~
+            '/~tc~(.*?)~\/tc~/s' => '',
+        ];
+
+        $tikilib = \TikiLib::lib('tiki');
+        $query = "SELECT `data`, `pageName`, `pageSlug` FROM `tiki_pages` WHERE `data` IS NOT NULL";
+        $result = $tikilib->fetchAll($query);
+
+        global $prefs;
+        $filesStrings = [];
+        foreach ($result as $row) {
+            $pageSlug = $row['pageSlug'];
+            if (empty($pageSlug)) {
+                $pageSlug = TikiLib::lib('slugmanager')->generate($prefs['wiki_url_scheme'] ?: 'dash', $row['pageName'], $prefs['url_only_ascii'] === 'y');
+            }
+
+            $file = $row['data'];
+            foreach ($cleanupRegexes as $regex => $replacement) {
+                $file = preg_replace($regex, $replacement, $file);
+            }
+
+            $pageStrings = [];
+            foreach ($regexes as $regex) {
+                $matches = [];
+                preg_match_all($regex, $file, $matches);
+                if (! empty($matches[1])) {
+                    $pageStrings = array_merge($pageStrings, $matches[1]);
+                }
+            }
+
+            if (! empty($pageStrings)) {
+                // Remove duplicates for this page
+                $filesStrings[$pageSlug] = array_values(array_unique($pageStrings));
+            }
+        }
+
+        return $filesStrings;
+    }
+
+    /**
      * Loop through a list of files and
      * calls $this->collectStrings() for each
      * file. Return a list of translatable strings
@@ -266,6 +344,11 @@ class Language_GetStrings
             foreach ($files as $file) {
                 $filesStrings[$file] = $this->collectStrings($file);
             }
+        }
+
+        if ($this->includeDatabase) {
+            $dataFromDatabase = $this->collectStringsFromDatabase();
+            $filesStrings = array_merge($filesStrings, $dataFromDatabase);
         }
 
         // join strings collected per file into a single array

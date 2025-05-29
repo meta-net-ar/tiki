@@ -73,6 +73,12 @@ class GetStringsCommand extends Command
                 tra('Directories that should be excluded from searching')
             )
             ->addOption(
+                'include-database',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Include strings from the tiki_pages database table (wiki pages). Applies only to _custom language files, not core files. eg. include-database=yes'
+            )
+            ->addOption(
                 'include',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -132,6 +138,7 @@ class GetStringsCommand extends Command
         }
         $options['fileName'] = $input->getOption('filename') ?: null;
         $options['skipRemove'] = $input->getOption('skip-remove') ?: null;
+        $options['includeDatabase'] = $input->getOption('include-database') ?: null;
 
         $getStrings = new Language_GetStrings(new Language_CollectFiles(), new Language_WriteFile_Factory(), $options);
 
