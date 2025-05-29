@@ -129,6 +129,9 @@ class GetStringsCommand extends Command
             // when a custom base dir is set, default $includeFiles and $excludeDirs are not used
             $includeFiles = [];
             $excludeDirs = [];
+
+            // Handle includeDatabase option when using a custom baseDir (applies only to custom language files).
+            $options['includeDatabase'] = $input->getOption('include-database') ?: null;
         }
         if ($input->getOption('exclude')) {
             $excludeDirs = explode(',', $input->getOption('exclude'));
@@ -138,7 +141,6 @@ class GetStringsCommand extends Command
         }
         $options['fileName'] = $input->getOption('filename') ?: null;
         $options['skipRemove'] = $input->getOption('skip-remove') ?: null;
-        $options['includeDatabase'] = $input->getOption('include-database') ?: null;
 
         $getStrings = new Language_GetStrings(new Language_CollectFiles(), new Language_WriteFile_Factory(), $options);
 
