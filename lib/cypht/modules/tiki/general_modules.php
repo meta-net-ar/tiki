@@ -531,7 +531,7 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
             return;
         }
 
-        $this->out('tracker_items', find_relevant_tracker_items(implode(',', $keywords)));
+        $this->out('tracker_items', find_relevant_tracker_items(implode(' or ', $keywords)));
         $this->out('msg_uid', $msgUid);
         $this->out('list_path', "imap_$imapServerId" . '_' . bin2hex("Sent"));
     }

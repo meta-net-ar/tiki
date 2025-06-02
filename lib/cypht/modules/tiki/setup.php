@@ -225,6 +225,9 @@ add_output('settings', 'tiki_run_sieve_filters_on_imap_unread_setting', true, 't
 setup_base_ajax_page('ajax_tiki_msg_tracker_items', 'tiki');
 add_handler('ajax_tiki_msg_tracker_items', 'get_msg_tracker_items', true, 'tiki');
 
+setup_base_page('ajax_tiki_auto_move_reply_to_tracker', 'tiki');
+add_handler('ajax_tiki_auto_move_reply_to_tracker', 'auto_move_reply_to_tracker', true, 'tiki');
+
 return [
   'allowed_pages' => [
     'groupmail',
@@ -248,6 +251,7 @@ return [
     'ajax_tiki_sieve_get_mailboxes',
     'info',
     'ajax_tiki_msg_tracker_items',
+    'ajax_tiki_auto_move_reply_to_tracker',
   ],
   'allowed_get' => [
     'tiki_download_message' => FILTER_VALIDATE_BOOLEAN,

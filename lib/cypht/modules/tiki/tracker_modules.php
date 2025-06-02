@@ -211,15 +211,20 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         $new_values = [];
         foreach ($msgs as $key => $msg) {
             $headers = $headers_array[$key];
-            if ($this->session->get('page_id')) {
-                $msg = "X-Tiki-Source: " . $this->session->get('page_id') . "\r\n" . $msg;
+            $content = '';
+            if (isset($this->request->post['auto_move']) && $this->request->post['auto_move']) {
+                $content .= "X-Auto-Move-Reply: 1\r\n";
             }
+            if ($this->session->get('page_id')) {
+                $content .= "X-Tiki-Source: " . $this->session->get('page_id') . "\r\n";
+            }
+            $content .= $msg;
 
             $new_values[] = [
                 'name' => ! empty($headers['Message-ID']) ? $headers['Message-ID'] : $headers['Subject'],
-                'size' => strlen($msg),
+                'size' => strlen($content),
                 'type' => 'message/rfc822',
-                'content' => $msg
+                'content' => $content
             ];
         }
 
@@ -240,6 +245,37 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
             return;
         } else {
             Hm_Msgs::add('Messages moved');
+        }
+    }
+}
+
+class Hm_Handler_auto_move_reply_to_tracker extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if (! array_key_exists('in_reply_to', $this->request->post) || ! $this->request->post['in_reply_to']) {
+            return;
+        }
+
+        $inReplyTo = $this->request->post['in_reply_to'];
+        $items = find_relevant_tracker_items($inReplyTo, 'message_ids');
+        $item = reset($items);
+
+        if (! $item) {
+            return;
+        }
+
+        $trackerDefinition = Tracker_Definition::get($item['parent_id']);
+        $itemdata = Tracker_Item::fromId($item['object_id'])->getData();
+        $emailFieldHandler = $trackerDefinition->getFieldFactory()->getHandler($trackerDefinition->getField($item['field_id']), $itemdata);
+        $values = $emailFieldHandler->getFieldData();
+
+        if (in_array($inReplyTo, $values['autoMoveReplies'])) {
+            $this->out('auto_move', true);
+            $this->out('item_id', $item['object_id']);
+            $this->out('field_id', $item['field_id']);
+        } else {
+            $this->out('auto_move', false);
         }
     }
 }

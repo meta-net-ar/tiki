@@ -1401,6 +1401,13 @@ class UnifiedSearchLib
             unset($filter['range']);
         }
 
+        if (isset($filter['multivalue']) && is_array($filter['multivalue'])) {
+            foreach ($filter['multivalue'] as $field => $value) {
+                $query->filterMultivalue($value, $field);
+            }
+            unset($filter['multivalue']);
+        }
+
         unset($filter['type']);
         unset($filter['categories']);
         unset($filter['deep']);

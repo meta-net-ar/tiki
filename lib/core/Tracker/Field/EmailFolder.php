@@ -158,6 +158,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
         // Obtain the information from the database for display
         $emails = [];
+        $autoMoveReplies = [];
         foreach ($fileIds as $folder => $files) {
             $emails[$folder] = [];
             foreach ($files as $fileId) {
@@ -169,6 +170,10 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                     continue;
                 }
                 $emails[$folder][] = $email;
+
+                if ($email['auto_move_reply']) {
+                    $autoMoveReplies[] = explode('@', $email['message_id'])[0];
+                }
             }
         }
 
@@ -188,6 +193,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             'emails' => $emails,
             'count' => count($fileIds, COUNT_RECURSIVE),
             'value' => $value,
+            'autoMoveReplies' => $autoMoveReplies,
         ];
     }
 
@@ -366,12 +372,14 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $dates = [];
         $senders = [];
         $recipients = [];
+        $messageIds = [];
         foreach ($emails as $folder => $folder_emails) {
             foreach ($folder_emails as $email) {
                 $subjects[] = $email['subject'];
                 $dates[] = $email['date'];
                 $senders[] = $email['sender'];
                 $recipients[] = $email['recipient'];
+                $messageIds[] = explode('@', $email['message_id'])[0];
             }
         }
 
@@ -381,6 +389,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates" => $typeFactory->multivalue($dates),
             "{$baseKey}_senders" => $typeFactory->multivalue($senders),
             "{$baseKey}_recipients" => $typeFactory->multivalue($recipients),
+            "{$baseKey}_message_ids" => $typeFactory->multivalue($messageIds),
         ];
         return $out;
     }
@@ -394,6 +403,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates",
             "{$baseKey}_senders",
             "{$baseKey}_recipients",
+            "{$baseKey}_message_ids",
         ];
         return $fields;
     }
@@ -407,6 +417,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates" => 'multivalue',
             "{$baseKey}_senders" => 'multivalue',
             "{$baseKey}_recipients" => 'multivalue',
+            "{$baseKey}_message_ids" => 'multivalue',
         ];
         return $fields;
     }
