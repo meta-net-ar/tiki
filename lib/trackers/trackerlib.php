@@ -472,13 +472,13 @@ class TrackerLib extends TikiLib
 
     /* experimental shared */
     /* trackerId is useless */
-    public function get_item_value($trackerId, $itemId, $fieldId)
+    public function get_item_value($trackerId, $itemId, $fieldId, $useCache = true)
     {
         global $prefs;
 
         static $cache = [];
         $cacheKey = "$fieldId.$itemId";
-        if (isset($cache[$cacheKey]) && ! defined('TIKI_IN_TEST')) {
+        if ($useCache && isset($cache[$cacheKey]) && ! defined('TIKI_IN_TEST')) {
             return $cache[$cacheKey];
         }
 

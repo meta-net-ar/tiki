@@ -525,14 +525,14 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
             }
             if ($fieldId = $definition->getRelationField($relation)) {
                 $itemId = $args['sourceobject'];
-                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId));
+                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId, false));
                 $other = $args['type'] . ':' . $args['object'];
-                if (! in_array($other, $value)) {
-                    if ($action == 'add') {
+                if ($action == 'add') {
+                    if (! in_array($other, $value)) {
                         $value[] = $other;
-                    } else {
-                        $value = array_diff($value, [$other]);
                     }
+                } else {
+                    $value = array_diff($value, [$other]);
                 }
                 if ($value != $old_value) {
                     $value = implode("\n", $value);
@@ -556,14 +556,14 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractField implements \Tr
             }
             if ($fieldId = $definition->getRelationField($relation)) {
                 $itemId = $args['object'];
-                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId));
+                $value = $old_value = explode("\n", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId, false));
                 $other = $args['sourcetype'] . ':' . $args['sourceobject'];
-                if (! in_array($other, $value)) {
-                    if ($action == 'add') {
+                if ($action == 'add') {
+                    if (! in_array($other, $value)) {
                         $value[] = $other;
-                    } else {
-                        $value = array_diff($value, [$other]);
                     }
+                } else {
+                    $value = array_diff($value, [$other]);
                 }
                 if ($value != $old_value) {
                     $value = implode("\n", $value);
