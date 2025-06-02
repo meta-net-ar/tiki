@@ -280,6 +280,37 @@ class Hm_Handler_auto_move_reply_to_tracker extends Hm_Handler_Module
     }
 }
 
+class Hm_Handler_auto_move_reply_to_tracker extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if (! array_key_exists('in_reply_to', $this->request->post) || ! $this->request->post['in_reply_to']) {
+            return;
+        }
+
+        $inReplyTo = $this->request->post['in_reply_to'];
+        $items = find_relevant_tracker_items($inReplyTo, 'message_ids');
+        $item = reset($items);
+
+        if (! $item) {
+            return;
+        }
+
+        $trackerDefinition = Tracker_Definition::get($item['parent_id']);
+        $itemdata = Tracker_Item::fromId($item['object_id'])->getData();
+        $emailFieldHandler = $trackerDefinition->getFieldFactory()->getHandler($trackerDefinition->getField($item['field_id']), $itemdata);
+        $values = $emailFieldHandler->getFieldData();
+
+        if (in_array($inReplyTo, $values['autoMoveReplies'])) {
+            $this->out('auto_move', true);
+            $this->out('item_id', $item['object_id']);
+            $this->out('field_id', $item['field_id']);
+        } else {
+            $this->out('auto_move', false);
+        }
+    }
+}
+
 /**
  * Marks a Tiki-stored message as answered
  * @subpackage tiki/handler
