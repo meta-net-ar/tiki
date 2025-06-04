@@ -1324,8 +1324,14 @@ function wikiplugin_tracker($data, $params)
             // Check if antibot question was submited with the form (for anonymous users)
             if ($prefs['feature_antibot'] == 'y' && empty($user) && ($registration != 'y' || $prefs["user_register_prettytracker"] != 'y')) {
                 if (! $captchalib->validate()) {
-                    Feedback::error($captchalib->getErrors());
-                    $field_errors['err_antibot'] = 'y';
+                    // if antibot question was not submited during the transaction, set error
+                    if (! (isset($_SESSION[$transactionName]) && $_SESSION[$transactionName]['captchaValidated'])) {
+                        Feedback::error($captchalib->getErrors());
+                        $field_errors['err_antibot'] = 'y';
+                    }
+                } else if (isset($transactionName) && ! empty($transactionName)) {
+                    // if transaction, set antibot session var to avoid revalidation
+                    $_SESSION[$transactionName]['captchaValidated'] = true;
                 }
             }
 
