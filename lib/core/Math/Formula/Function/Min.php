@@ -8,20 +8,31 @@ class Math_Formula_Function_Min extends Math_Formula_Function
 {
     public function evaluate($element)
     {
-        $out = $this->evaluateChild($element[0]);
+        $list = [];
 
         foreach ($element as $child) {
-            $evaluated = $this->evaluateChild($child);
+            $child = $this->evaluateChild($child);
+
+            if (is_array($child)) {
+                $list = array_merge($list, $child);
+            } else {
+                $list[] = $child;
+            }
+        }
+
+        $out = $list[0] ?? '';
+
+        foreach ($element as $child) {
             if ($out instanceof Math_Formula_Applicator) {
-                if ($out->moreThan($evaluated)) {
-                    $out = $evaluated;
+                if ($out->moreThan($child)) {
+                    $out = $child;
                 }
-            } elseif ($evaluated instanceof Math_Formula_Applicator) {
-                if ($evaluated->lessThan($out)) {
-                    $out = $evaluated;
+            } elseif ($child instanceof Math_Formula_Applicator) {
+                if ($child->lessThan($out)) {
+                    $out = $child;
                 }
             } else {
-                $out = min($out, $evaluated);
+                $out = min($out, $child);
             }
         }
 
