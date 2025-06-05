@@ -455,22 +455,39 @@ if (! hm_exists('append_to_msg_headers')) {
     }
 }
 
-function find_relevant_tracker_items($keywords)
+function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [])
 {
     $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
     $trackerIds = array_unique(array_map(function ($field) {
         return $field['trackerId'];
     }, $fields));
 
-    $input = new JitFilter([
-        'filter' => [
-            'content' => $keywords,
-            'tracker_id' => implode(' OR ', $trackerIds),
-        ]
-    ]);
+    $filter = [
+        'tracker_id' => implode(' OR ', $trackerIds),
+        'type' => 'trackeritem',
+    ];
+
+    if ($multivalueField) {
+        $filterField = implode(',', array_map(function ($f) use ($multivalueField) {
+                return "tracker_field_{$f['permName']}_{$multivalueField}";
+        }, $fields));
+        $filter['multivalue'] = [
+            $filterField => $keywords,
+        ];
+    } else {
+        $filter['content'] = $keywords;
+    }
+
+    $input = [
+        'filter' => $filter,
+    ];
+
+    foreach ($searchArgs as $key => $value) {
+        $input[$key] = $value;
+    }
 
     $searchService = new Services_Search_Controller();
-    $resultSet = $searchService->action_lookup($input)['resultset'];
+    $resultSet = $searchService->action_lookup(new JitFilter($input))['resultset'];
 
     $resultSet->applyTransform(function (&$item) use ($fields) {
         $fields = array_filter($fields, function ($f) use ($item) {

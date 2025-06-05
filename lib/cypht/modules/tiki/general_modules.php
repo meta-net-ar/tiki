@@ -500,7 +500,14 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
         $this->session->set('imap_server_id', '');
 
         if (isset($this->request->post['lookup'])) {
-            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup']));
+            $searchArgs = [];
+            if (isset($this->request->post['sort_mode'])) {
+                $searchArgs['sort_mode'] = $this->request->post['sort_mode'];
+            }
+            if (isset($this->request->post['limit'])) {
+                $searchArgs['maxRecords'] = $this->request->post['limit'];
+            }
+            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs));
             return;
         }
 

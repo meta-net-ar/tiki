@@ -121,6 +121,20 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                         'filter' => 'text',
                         'default' => '',
                     ],
+                    'useItemFolders' => [
+                        'name' => tr('Use Item Folders'),
+                        'description' => tr('Allow to add custom folders in individual tracker items.'),
+                        'filter' => 'int',
+                        'default' => '0',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'depends' => [
+                            'field' => 'useFolders',
+                            'value' => '1'
+                        ],
+                    ]
                 ],
             ],
         ];
@@ -290,6 +304,8 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
         $compose_path .= "page=compose&list_path=tracker_folder_" . $this->getItemId() . "_" . $this->getConfiguration('fieldId') . "&list_parent=tracker_" . $this->getTrackerDefinition()->getConfiguration('trackerId');
 
+        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/emailFolder";');
+
         return $this->renderTemplate('trackeroutput/email_folder.tpl', $context, [
             'emails' => $emails,
             'count' => $this->getConfiguration('count'),
@@ -298,6 +314,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 return $this->folderHandle($folder);
             }, preg_split('/\s*,\s*/', $this->getOption('openedFolders'))),
             'compose_path' => $compose_path,
+            'itemId' => $this->getItemId(),
         ]);
     }
 
@@ -326,6 +343,9 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             $this->archiveEmail($existing, $value['archive']);
         } elseif (isset($value['replace'])) {
             $this->updateDraftEmail($value['replace']);
+        } elseif (isset($value['newFolder'])) {
+            $folder = $this->folderHandle($value['newFolder']) . '_item_' . $this->getItemId();
+            $existing[$folder] = [];
         }
         return [
             'value' => json_encode($existing)
@@ -529,7 +549,24 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $handles = array_map(function ($folder) {
             return $this->folderHandle($folder);
         }, $custom);
-        return array_merge($folders, array_combine($handles, $custom));
+
+        $folders = array_merge($folders, array_combine($handles, $custom));
+
+        if ($this->trackerField->getOption('useItemFolders')) {
+            $value = $this->getValue();
+            $decoded = json_decode($value, true);
+            if ($decoded !== null) {
+                foreach ($decoded as $folder => $_) {
+                    $suffix = '_item_' . $this->getItemId();
+                    if (str_ends_with($folder, $suffix)) {
+                        $folderName = substr($folder, 0, -strlen($suffix));
+                        $folders[$folder] = $folderName;
+                    }
+                }
+            }
+        }
+
+        return $folders;
     }
 
     protected function folderHandle($folderName)
