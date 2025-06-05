@@ -22,7 +22,7 @@ class Math_Formula_Function_Min extends Math_Formula_Function
 
         $out = $list[0] ?? '';
 
-        foreach ($element as $child) {
+        foreach ($list as $child) {
             if ($out instanceof Math_Formula_Applicator) {
                 if ($out->moreThan($child)) {
                     $out = $child;
