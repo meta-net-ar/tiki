@@ -550,7 +550,7 @@
                         {remarksbox type=confirm title="{if isset($smarty.post.update)}{tr}Upgrade complete{/tr}{else}{tr}Installation complete{/tr}{/if}" close="n"}
                             <p>{tr}Your database has been configured and Tiki is ready to run!{/tr}
                                 {if isset($smarty.post.scratch)}
-                                    {tr _0="<strong>{$defaultpass}</strong>"}If this is your first install, your admin password is %0.{/tr}
+                                    {tr}If this is your first install, your admin password is <strong>admin</strong>.{/tr}
                                 {/if}
                                 {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                             </p>
@@ -607,9 +607,6 @@
                     <div class="text-center">
                         <input type="hidden" name="install_step" value="6">
                         <input type="hidden" name="install_type" value="{$install_type}">
-                        {if isset($smarty.post.scratch)}
-                            {$default_password_field}
-                        {/if}
                         <input type="submit" class="btn btn-primary" value=" {tr}Continue{/tr} ">
                         {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                         {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
@@ -810,9 +807,6 @@
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                             <input type="hidden" name="install_step" value="7">
                             <input type="hidden" name="install_type" value="{$install_type}">
-                            {if $install_type eq 'scratch'}
-                                {$default_password_field}
-                            {/if}
                             <input type="hidden" name="general_settings" value="y">
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
@@ -860,9 +854,6 @@
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                             <input type="hidden" name="install_step" value="8">
                             <input type="hidden" name="install_type" value="{$install_type}">
-                            {if $install_type eq 'scratch'}
-                                {$default_password_field}
-                            {/if}
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
                     </form>
@@ -884,7 +875,7 @@
 
                     <p>
                         {if $install_type eq 'scratch'}
-                            {tr _0="<strong>{$defaultpass}</strong>"}If this is your first install, your admin password is %0.{/tr}
+                            {tr}If this is your first install, your admin password is <strong>admin</strong>.{/tr}
                         {/if}
                         {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                     </p>
@@ -900,9 +891,6 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
-                                    {if $install_type eq 'scratch'}
-                                        {$default_password_field}
-                                    {/if}
                                     <input type="hidden" name="install_step" value="9">
                                     <input type="submit" value="{tr}Enter Tiki and Lock Installer{/tr} ({tr}Recommended{/tr})" class="btn btn-primary">
                                 </form>
@@ -914,9 +902,6 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
-                                    {if $install_type eq 'scratch'}
-                                        {$default_password_field}
-                                    {/if}
                                     <input type="hidden" name="install_step" value="9">
                                     <input type="submit" value="{tr}Enter Tiki Without Locking Installer{/tr}" class="btn btn-warning">
                                     <br><em><span class="text-warning">{icon name="warning"}</span> {tr}Not recommended due to security risk{/tr}.</em>

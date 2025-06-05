@@ -15,11 +15,7 @@ function has_tiki_db()
     global $installer;
     return $installer->tableExists('users_users');
 }
-function add_system_administrator($randompass)
-{
-    global $installer;
-    $installer->query("INSERT INTO users_users(email,login,hash,created,registrationDate) VALUES ('','admin', ?,UNIX_TIMESTAMP(),UNIX_TIMESTAMP())", [ password_hash($randompass, PASSWORD_DEFAULT) ]);
-}
+
 /**
  * @return bool
  */

@@ -3000,6 +3000,8 @@ CREATE TABLE `users_users` (
   KEY `registrationDate` (`registrationDate`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
+-- Administrator account
+INSERT INTO users_users(email,login,hash,created,registrationDate,avatarName,avatarType,avatarLibName) VALUES ('','admin','$2y$10$nzMJ64PLyjKqgKvqSvO/S.n8jtgAiRzmNMYPLq/TQVLfYIFa0xqkG',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),'admin','l','dicebear/initials');
 INSERT INTO tiki_user_preferences (user,`prefName`,value) VALUES ('admin','realName','System Administrator');
 INSERT INTO users_usergroups (`userId`, `groupName`) VALUES(1,'Admins');
 INSERT INTO users_grouppermissions (`groupName`, `permName`) VALUES ('Admins','tiki_p_admin');
