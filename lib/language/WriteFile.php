@@ -55,13 +55,18 @@ class Language_WriteFile
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
-     * @param bool $skipRemove whether to skip removing the old or unused strings from the language files
+     * @param string|null $baseDir base directory to use for the language file. If null, the base directory is not changed.
+     * @param bool $skipRemove whether to skip removing the old or unused strings from the language files. To skip, set to true. The existing translations in the destination file will not be overwritten or removed from the file if not found in the incoming translations.
      * @return null
      */
-    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $skipRemove = false)
+    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $baseDir = null, $skipRemove = false)
     {
+        global $lang;
         if (empty($strings)) {
             return false;
+        }
+        if (empty($baseDir)) {
+            $baseDir = getcwd();
         }
 
         $backupTranslations = [];
@@ -114,12 +119,21 @@ class Language_WriteFile
 
         if ($handle) {
             fwrite($handle, "<?php\n");
-            fwrite($handle, $this->fileHeader());
-            if ($language != "en") {
+
+            $isRootDir = ($baseDir == getcwd());
+            if ($isRootDir) {
+                fwrite($handle, $this->fileHeader());
+            }
+
+            if ($language != "en" && $isRootDir) {
                 fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
                 fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
             } else {
-                fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+                if ($isRootDir) {
+                    fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+                } else {
+                    fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+                }
             }
 
             foreach ($entries as $entry) {
@@ -127,8 +141,12 @@ class Language_WriteFile
             }
 
             fwrite($handle, ");\n");
-            if ($language != "en") {
+            if ($language != "en" && $isRootDir) {
                 fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
+            } else {
+                if (! $isRootDir) {
+                    fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
+                }
             }
             fclose($handle);
         }
