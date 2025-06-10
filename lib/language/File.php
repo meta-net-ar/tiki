@@ -122,6 +122,7 @@ class Language_File
      */
     public function getTranslations()
     {
+        $lang = [];
         require($this->filePath);
 
         if (isset($lang) && ! empty($lang)) {
