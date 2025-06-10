@@ -75,8 +75,8 @@ class GetStringsCommand extends Command
             ->addOption(
                 'include-database',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Include strings from the tiki_pages database table (wiki pages). Applies only to _custom language files, not core files. eg. include-database=yes'
+                InputOption::VALUE_NONE,
+                'Include strings from the tiki_pages database table (wiki pages). Applies only to _custom language files, not core files. eg. --include-database'
             )
             ->addOption(
                 'include',
@@ -100,7 +100,7 @@ class GetStringsCommand extends Command
                 'skip-remove',
                 null,
                 InputOption::VALUE_NONE,
-                'Skip removing the old or unused strings from the language files.'
+                'Skip removing the old or unused strings from the language files. eg. --skip-remove'
             );
     }
 
