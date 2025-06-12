@@ -125,10 +125,6 @@ class Language_File
         $lang = [];
         require($this->filePath);
 
-        if (isset($lang) && ! empty($lang)) {
-            return $lang;
-        } else {
-            return [];
-        }
+        return $lang;
     }
 }

@@ -61,7 +61,7 @@ class Language_WriteFile
      */
     public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $baseDir = null, $skipRemove = false)
     {
-        global $lang;
+        $lang = [];
         if (empty($strings)) {
             return false;
         }
