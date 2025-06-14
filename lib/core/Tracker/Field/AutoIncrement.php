@@ -23,7 +23,7 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
                 'prefs' => ['trackerfield_autoincrement'],
                 'tags' => ['advanced'],
                 'default' => 'n',
-                'supported_changes' => ['d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b'],
+                'supported_changes' => ['d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b', 'uuid'],
                 'params' => [
                     'start' => [
                         'name' => tr('Start'),
