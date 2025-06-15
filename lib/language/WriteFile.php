@@ -120,7 +120,7 @@ class Language_WriteFile
         if ($handle) {
             fwrite($handle, "<?php\n");
 
-            $isRootDir = ($baseDir == getcwd());
+            $isRootDir = $this->isRootDir($baseDir);
             if ($isRootDir) {
                 fwrite($handle, $this->fileHeader());
             }
@@ -223,5 +223,27 @@ TXT;
         }
 
         return $string;
+    }
+
+    /**
+     * Determines if the given directory path represents a root directory.
+     *
+     * This method checks whether a base directory path is considered a root directory
+     * by examining if it contains the '_custom/shared' path segment. Paths containing
+     * '_custom/shared' are not considered root directories.
+     *
+     * @param string $baseDir The base directory path to check
+     * @return bool Returns true if the directory is a root directory, false otherwise
+     */
+    protected function isRootDir($baseDir): bool
+    {
+        // Normalize path
+        $baseDir = preg_replace('#[/\\\\]+#', '/', $baseDir);
+
+        // If baseDir contains '_custom/shared', it's not root
+        if (strpos($baseDir, '_custom/shared') !== false) {
+            return false;
+        }
+        return true;
     }
 }
