@@ -181,6 +181,13 @@ if ($prefs['feature_endbody_code'] == 'y') {
         'message' => $risky_message
     ];
 }
+if ($prefs['smarty_enable_string_eval'] == 'y') {
+    $tikisettings['smarty_enable_string_eval'] = [
+        'risk' => tra('risky') ,
+        'setting' => tra('Enabled'),
+        'message' => $risky_message
+    ];
+}
 // Check if any of the mail-in accounts uses "Allow anonymous access"
 if ($prefs['feature_mailin'] == 'y') {
     $mailinlib = TikiLib::lib('mailin');

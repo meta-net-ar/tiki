@@ -737,7 +737,8 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
         "('browsertitle', 'server_domain', 'sender_email', 'https_login', 'https_port', " .
         "'feature_switch_ssl_mode', 'feature_show_stay_in_ssl_mode', 'language'," .
         "'use_proxy', 'proxy_host', 'proxy_port', 'proxy_user', 'proxy_pass'," .
-        "'error_reporting_level', 'error_reporting_adminonly', 'smarty_notice_reporting', 'log_tpl')"
+        "'error_reporting_level', 'error_reporting_adminonly', 'smarty_notice_reporting', 'log_tpl'," .
+        "'smarty_enable_string_eval')"
     );
 
     $query = "INSERT INTO `tiki_preferences` (`name`, `value`) VALUES"
@@ -760,6 +761,7 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
         . " ('log_tpl', '" . (isset($_POST['log_tpl']) && $_POST['log_tpl'] == 'on' ? 'y' : 'n') . "'),"
         . " ('feature_switch_ssl_mode', '$switch_ssl_mode'),"
         . " ('feature_show_stay_in_ssl_mode', '$show_stay_in_ssl_mode'),"
+        . " ('smarty_enable_string_eval', '" . (isset($_POST['smarty_enable_string_eval']) && $_POST['smarty_enable_string_eval'] == 'y' ? 'y' : 'n') . "'),"
         . " ('language', ?)";
 
 

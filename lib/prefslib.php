@@ -14,6 +14,7 @@ class PreferencesLib
         'tiki_allow_trust_input',
         'feature_create_webhelp',
         'scheduler_shell_command',
+        'smarty_enable_string_eval',
     ];
 
     private $data = [];
