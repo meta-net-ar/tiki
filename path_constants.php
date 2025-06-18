@@ -83,6 +83,8 @@ const SMARTY_DEFAULT_LAYOUT = 'social';
 /** Where are templates looked for in multitiki sites, etc. */
 const SMARTY_TEMPLATES_PATH_FRAGMENT = 'templates';
 
+/** Path to smarty configs - this is not actually used but needs to be a specific path, even if it doesn't exist because null value for smarty config dir gets converted to root path */
+const SMARTY_CONFIG_PATH = 'temp/configs';
 /** Path to store temporary files.  Use one of the more specific path if possible */
 const TEMP_PATH = 'temp';
 /** Temporary files that must be servable by the webserver */

@@ -450,14 +450,13 @@ if ( \$('#$id') ) {
         if (! empty($option)) {
             $this->setOptions($option);
         }
+        $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
+        $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $this->parse_wiki_argvariable($data);
         foreach ($args as &$arg) {
             $this->parse_wiki_argvariable($arg);
         }
-
-        $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
-        $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
 
         $outputFormat = 'wiki';
         if (isset($this->option['context_format'])) {

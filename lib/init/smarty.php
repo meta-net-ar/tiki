@@ -124,6 +124,15 @@ class Tiki_Security_Policy extends \Smarty\Security
         $this->disabled_modifiers = $disabled_modifiers;
         $this->secure_dir = array_merge($this->secure_dir, $dirs);
     }
+
+    /**
+     * Work around a bug in smarty where _updateResourceDir doesn't clear the values correctly when
+     * smarty templateDir has been updated
+     */
+    public function clearResourceDir()
+    {
+        $this->_resource_dir = [];
+    }
 }
 
 /**
@@ -178,7 +187,7 @@ class Smarty_Tiki extends \Smarty\Smarty
             new Smarty\Extension\DefaultExtension(),
         ]);
 
-        $this->setConfigDir(null);
+        $this->setConfigDir(TIKI_PATH . '/' . SMARTY_CONFIG_PATH);
         if (! isset($prefs['smarty_compilation'])) {
             $prefs['smarty_compilation'] = '';
         }

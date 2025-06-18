@@ -2280,6 +2280,15 @@ class ParserLib extends TikiDb_Bridge
                             }
                             break;
                     }
+                    // If 'inside_pretty' is set, we're including Smarty tpl from a wiki page via smarty/resource.wiki.php.
+                    // Since the parser won't HTML-encode in this context, we apply htmlentities manually.
+                    // Otherwise, in normal wiki parsing, protectSpecialChars is used early and unprotect is done later,
+                    // so we apply protectSpecialChars here to avoid double encoding.
+                    if ($this->option['inside_pretty'] ?? false) {
+                        $value = htmlentities($value ?? '', ENT_QUOTES);
+                    } else {
+                        $value = $this->protectSpecialChars($value ?? '');
+                    }
 
                     $needles[] = $arg[0];
                     $replacements[] = $value ?? '';
