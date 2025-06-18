@@ -831,10 +831,19 @@ class Smarty_Tiki extends \Smarty\Smarty
  */
     private function sanitizeTemplatePath($tpl_path)
     {
-        // Disallow eval usage for security reasons
-        if (strpos($tpl_path, 'eval:') !== false) {
-            throw new Exception('Template path contains forbidden eval expression.');
+        global $prefs;
+
+        if (isset($prefs['smarty_enable_string_eval']) && $prefs['smarty_enable_string_eval'] == 'n') {
+                // Block string templates
+            if (stripos($tpl_path, 'string:') === 0) {
+                throw new Exception("Template path uses forbidden Smarty resource: string:");
+            }
+             //Block eval templates
+            if (stripos($tpl_path, 'eval:') === 0) {
+                throw new Exception("Template path uses forbidden Smarty resource: eval:");
+            }
         }
+
         return $tpl_path;
     }
 }

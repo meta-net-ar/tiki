@@ -8,6 +8,7 @@ function wikiplugin_customsearch_info()
 {
     return [
         'name' => tra('Custom Search'),
+        'validate' => ['wiki', 'tpl'],
         'documentation' => 'PluginCustomSearch',
         'description' => tra('Create a custom search form for searching or listing items on the site'),
         'prefs' => ['wikiplugin_customsearch', 'wikiplugin_list', 'feature_search'],
@@ -133,7 +134,7 @@ function wikiplugin_customsearch_info()
             'trimlinefeeds' => [
                 'required' => false,
                 'name' => tra('Trim Linefeeds'),
-                'description' => tra('Remove the linefeeds added after each input which casues the wiki parser to add extra paragraphs.'),
+                'description' => tra('Remove the linefeeds added after each input which causes the wiki parser to add extra paragraphs.'),
                 'since' => '14.1',
                 'options' => [
                     ['text' => tra(''), 'value' => ''],

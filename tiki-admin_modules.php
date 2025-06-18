@@ -46,7 +46,7 @@ $inputConfiguration = [
 ];
 
 $section = 'admin';
-require_once('tiki-setup.php');
+require_once 'tiki-setup.php';
 
 $dcslib = TikiLib::lib('dcs');
 $bannerlib = TikiLib::lib('banner');
@@ -559,25 +559,36 @@ if ($prefs['feature_jquery_validation'] === 'y') {
             ],
             'um_data' => [
                 'required' => true,
-                'remote' => [
-                    'url' => 'validate-ajax.php',
-                    'type' => 'post',
-                    'data' => [
-                        'validator' => 'smarty',
-                        'input' => 'inputFunction',
-                        'parameter' => 'parameterFunction',
-                    ],
-                ],
             ],
         ],
         'submitHandler' => 'submitHandlerFunction',
     ];
+
+    // Add remote validator only if eval is allowed
+    if ($prefs['smarty_enable_string_eval'] === 'y') {
+        $rules['rules']['um_data']['remote'] = [
+            'url' => 'validate-ajax.php',
+            'type' => 'post',
+            'data' => [
+                'validator' => 'smarty',
+                'input' => 'inputFunction',
+                'parameter' => 'parameterFunction',
+            ],
+        ];
+    }
+
     $validationjs = '$("form[name=editusr]").validate(' . json_encode($rules) . ')';
     $validationjs = str_replace('"inputFunction"', 'function() { return $("#um_data").val(); }', $validationjs);
     $validationjs = str_replace('"parameterFunction"', 'function() { return $("#um_parse").val(); }', $validationjs);
-    $validationjs = str_replace('"submitHandlerFunction"', 'function(form, event){return process_submit(form, event);}', $validationjs);
+    $validationjs = str_replace(
+        '"submitHandlerFunction"',
+        'function(form, event){return process_submit(form, event);}',
+        $validationjs
+    );
+
     TikiLib::lib('header')->add_jq_onready($validationjs);
 }
+
 
 $sameurl_elements = ['offset', 'sort_mode', 'where', 'find'];
 
