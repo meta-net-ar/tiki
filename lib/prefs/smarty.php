@@ -112,5 +112,11 @@ function prefs_smarty_list()
             'default' => 0644,
             'keywords' => 'file perms templates',
         ],
+        'smarty_disable_string_eval' => [
+            'name' => tra('Smarty disable string or eval template'),
+            'description' => tra('Disables the use of string or eval template when activated by Administrators.'),
+            'type' => 'text',
+            'default' => 'no',
+        ],
     ];
 }
