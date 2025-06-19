@@ -120,20 +120,23 @@ class Language_WriteFile
         if ($handle) {
             fwrite($handle, "<?php\n");
 
-            $isRootDir = $this->isRootDir($baseDir);
-            if ($isRootDir) {
+            $isCustomDir = $this->isCustomDir($baseDir);
+            // Only write the file header for standard language files, not custom ones
+            if (! $isCustomDir) {
                 fwrite($handle, $this->fileHeader());
             }
 
-            if ($language != "en" && $isRootDir) {
+            // Determine which array variable to use and whether to include English base
+            if ($language != "en" && ! $isCustomDir) {
+                // For non-English languages in standard directories: include English base and use $lang_current
                 fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
                 fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+            } elseif (! $isCustomDir) {
+                // For English language in standard directories: use $lang
+                fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
             } else {
-                if ($isRootDir) {
-                    fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
-                } else {
-                    fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
-                }
+                // For custom directories (any language): use $lang_custom
+                fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
             }
 
             foreach ($entries as $entry) {
@@ -141,13 +144,17 @@ class Language_WriteFile
             }
 
             fwrite($handle, ");\n");
-            if ($language != "en" && $isRootDir) {
+            // Merge translations into the main $lang array
+            if ($language != "en" && ! $isCustomDir) {
+                // For non-English standard language files: merge current language translations with English base
                 fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
             } else {
-                if (! $isRootDir) {
+                if ($isCustomDir) {
+                    // For custom language files: merge custom translations with existing translations
                     fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
                 }
             }
+            // Note: For English standard language file, no merge is needed as $lang is used directly
             fclose($handle);
         }
 
@@ -226,24 +233,18 @@ TXT;
     }
 
     /**
-     * Determines if the given directory path represents a root directory.
-     *
-     * This method checks whether a base directory path is considered a root directory
-     * by examining if it contains the '_custom/shared' path segment. Paths containing
-     * '_custom/shared' are not considered root directories.
+     * Checks if the directory is a custom language directory.
      *
      * @param string $baseDir The base directory path to check
-     * @return bool Returns true if the directory is a root directory, false otherwise
+     * @return bool Returns true if custom directory, false otherwise
      */
-    protected function isRootDir($baseDir): bool
+    protected function isCustomDir($baseDir): bool
     {
-        // Normalize path
-        $baseDir = preg_replace('#[/\\\\]+#', '/', $baseDir);
-
-        // If baseDir contains '_custom/shared', it's not root
-        if (strpos($baseDir, '_custom/shared') !== false) {
-            return false;
+        $resolvedBaseDir = realpath($baseDir);
+        if ($resolvedBaseDir === false) {
+            $resolvedBaseDir = $baseDir;
         }
-        return true;
+
+        return strpos($resolvedBaseDir, '_custom') !== false;
     }
 }
