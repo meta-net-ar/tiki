@@ -875,5 +875,12 @@ function prefs_wiki_list($partial = false)
             'separator' => ',',
             'hint' => tra('Leave empty to show to all groups'),
         ],
+        'wiki_enable_multilevel_header_numbering' => [
+            'name' => tra('Enable multilevel header numbering'),
+            'description' => tra('When enabled, numbered headers will show hierarchical numbering (e.g., 1.1, 1.2, 2.1). When disabled, only simple sequential numbers will be shown.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['basic'],
+        ],
     ];
 }

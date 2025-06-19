@@ -19,15 +19,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $this->el = new EditLib();
     }
 
-
     protected function tearDown(): void
     {
         global $prefs;
         // restore preference default state
         $prefs['feature_use_three_colon_centertag'] = 'n';
-        $prefs['wiki_make_ordered_list_items_display_unique_numbers'] = 'n';
+        $prefs['wiki_enable_multilevel_header_numbering'] = 'n';
     }
-
 
     /**
      * Align divs 'left'
@@ -57,7 +55,6 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $out = $this->el->parseToWysiwyg($inData);
         $this->assertEquals($ex, $out);
     }
-
 
     /**
      * Align divs 'center'
@@ -107,7 +104,6 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $this->assertEquals($ex, $out);
     }
 
-
     /**
      * Align divs 'justify'
      *
@@ -123,7 +119,6 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $this->assertEquals($ex, $out);
     }
 
-
     /**
      * Align paragraphs 'left'
      *
@@ -138,7 +133,6 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $out = $this->el->parseToWysiwyg($inData);
         $this->assertEquals($ex, $out);
     }
-
 
     /**
      * Centered headings must use style attribute
@@ -188,7 +182,7 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
     {
         global $prefs;
         // Enable multilevel numbering for this test
-        $prefs['wiki_make_ordered_list_items_display_unique_numbers'] = 'y';
+        $prefs['wiki_enable_multilevel_header_numbering'] = 'y';
 
         $inData = '!#Heading Level 1';
         $ex = '<h1 class="showhide_heading d-flex justify-content-start" id="Heading_Level_1">1. Heading Level&nbsp;1</h1>';
