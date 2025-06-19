@@ -29,7 +29,7 @@ close();
 
         {if $errortype eq "404" and isset($file_error)}
             {remarksbox type='errors' title="{tr}File error{/tr}"}
-                {$file_error}
+                {$file_error|escape}
             {/remarksbox}
         {elseif $errortype eq "404" and isset($page)}
             {remarksbox type='errors' title=$errortitle}
@@ -59,12 +59,12 @@ close();
             {/if}
         {elseif $commenttype eq "note" and isset($msg)}
             {remarksbox type='note' title=$title}
-                {$msg}
+                {$msg|escape}
             {/remarksbox}
         {else}
             {if isset($token_error)}
                 {remarksbox type='errors' title="{tr}Token Error{/tr}"}
-                    {$token_error}
+                    {$token_error|escape}
                 {/remarksbox}
             {elseif ($errortype eq 401 || $errortype eq 403) && empty($user) and $prefs.permission_denied_login_box eq 'y'} {* permission denied *}
                 {remarksbox type='errors' title=$errortitle}
@@ -77,7 +77,7 @@ close();
                 {/remarksbox}
             {else}
                 {remarksbox type='errors' title=$errortitle}
-                    {$msg}
+                    {$msg|escape}
                     {if !empty($required_preferences)}
                         {remarksbox type='note' title="{tr}Settings{/tr}" close="n"}
                         <form method="post" action="tiki-admin.php" role="form" class="form">
@@ -97,7 +97,7 @@ close();
 
         {if isset($extraButton)}
             {remarksbox type='errors' title=$errortitle}
-            {$extraButton.comment}
+            {$extraButton.comment|escape}
             {button href=$extraButton.href _text=$extraButton.text}
             {/remarksbox}
         {/if}
