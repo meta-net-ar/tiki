@@ -2706,6 +2706,8 @@ class Services_Tracker_Controller
     public function action_import_items($input)
     {
         $trackerId = $input->trackerId->int();
+        $separator = $input->separator->text();
+        $fileIsTsv = ! ($separator == "," || $separator == ';');
 
         $perms = Perms::get('tracker', $trackerId);
         if (! $perms->admin_trackers) {
@@ -2723,6 +2725,11 @@ class Services_Tracker_Controller
                 throw new Services_Exception(tr('File upload failed.'), 400);
             }
 
+            if ($fileIsTsv) {
+                Services_Tracker_Utilities::parseTsvContentToCsv('importfile');
+                $separator = ',';
+            }
+
             if (! $fp = @ fopen($_FILES['importfile']['tmp_name'], "rb")) {
                 throw new Services_Exception(tr('Uploaded file could not be read.'), 500);
             }
@@ -2734,7 +2741,7 @@ class Services_Tracker_Controller
                 ($input->add_items->int() !== 1), // checkbox is "Create as new items" - param is replace_rows
                 $input->dateFormat->text(),
                 $input->encoding->text(),
-                $input->separator->text(),
+                $separator,
                 $input->updateLastModif->int(),
                 $input->convertItemLinkValues->int()
             );

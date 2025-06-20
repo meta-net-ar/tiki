@@ -543,7 +543,8 @@ class Services_Tracker_TabularController
     {
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
-        $trackerId = $info['trackerId'];
+        $separator = $input->separator->text();
+        $fileIsTsv = ! ($separator == "," || $separator == ';');
 
         Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
 
@@ -553,7 +554,11 @@ class Services_Tracker_TabularController
         $done = false;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            $source = $schema->getSource($_FILES['file']['tmp_name']);
+            if ($fileIsTSV) {
+                Services_Tracker_Utilities::parseTsvContentToCsv('file');
+                $separator = ',';
+            }
+            $source = $schema->getSource($_FILES['file']['tmp_name'], $separator);
             $writer = new TrackerWriter();
 
             return TikiLib::lib('tiki')->allocate_extra(
@@ -919,7 +924,14 @@ class Services_Tracker_TabularController
 
             if (is_uploaded_file($_FILES['file']['tmp_name'])) {
                 try {
-                    $delimiter = $input->delimiter->text() == 'comma' ? ',' : ';';
+                    $delimiter = ',';
+
+                    if ($input->delimiter->text() == 'semicolon') {
+                        $delimiter = ';';
+                    } elseif ($input->delimiter->text() == 'tab') {
+                        $delimiter = "\t";
+                    }
+
                     $source = new CsvSource($schema, $_FILES['file']['tmp_name'], $delimiter);
                     $writer = new TrackerWriter();
                     $done = $writer->write($source);
