@@ -2514,17 +2514,7 @@ class ParserLib extends TikiDb_Bridge
             $data = $this->protectSpecialChars($data, true);
         }
 
-        // Check if syntax # for auto-numbering is present in the data
-        $numbering_syntax_present = ( preg_match('/^\!+[\-\+]?#/m', $data) > 0 );
-
-        // Check if multilevel numbering is enabled
-        $multilevel_numbering_enabled = isset($prefs['wiki_enable_multilevel_header_numbering']) &&
-                                $prefs['wiki_enable_multilevel_header_numbering'] === 'y';
-        // We need basic auto-numbering if the syntax is present, but multilevel depends on the preference 'wiki_enable_multilevel_header_numbering'
-        $need_autonumbering = $numbering_syntax_present;
-
-        // Initialize $nb_hdrs to ensure first heading gets correct numbering
-        $nb_hdrs = 0;
+        $need_autonumbering = ( preg_match('/^\!+[\-\+]?#/m', $data) > 0 );
 
         global $anch;
         $anch = [];
@@ -2557,6 +2547,16 @@ class ParserLib extends TikiDb_Bridge
         // loop: process all lines
         $in_paragraph = 0;
         $in_empty_paragraph = 0;
+
+        $min_level = null;
+        foreach ($lines as $line) {
+            if (preg_match('/^(!+)[\+\-]?#/', $line, $m)) {
+                $level = strlen($m[1]);
+                if ($min_level === null || $level < $min_level) {
+                    $min_level = $level;
+                }
+            }
+        }
 
         foreach ($lines as $line) {
             // Add newlines between lines
@@ -2765,211 +2765,43 @@ class ParserLib extends TikiDb_Bridge
                     $hdrlevel = $tikilib->how_many_at_start($line, '!');
 
                     if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6 /* HTML has h1 to h6, but no h7 or above */) { // If the line starts with 1 to 6 exclamation marks ("!")
-                        /*
-                         * Handle headings autonumbering syntax (i.e. !#Text, !!#Text, ...)
-                         * Note :
-                         *    this needs to be done even if the current header has no '#'
-                         *    in order to generate the right numbers when they are not specified for every headers.
-                         *    This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1
-                         */
+                        if (preg_match('/^!+[\+\-]?#\)/', $line)) {
+                            $counters = [];
+                            $line = preg_replace('/(^!+[\+\-]?)(#)\)/', '$1$2', $line);
+                        }
 
-                        $line_lenght = strlen($line);
+                        $level = $hdrlevel;
 
-                        // Generate an array containing the squeleton of maketoc (based on headers levels)
-                        //   i.e. hdr_structure will contain something lile this :
-                        //     array( 1, 2, 2.1, 2.1.1, 2.1.2, 2.2, ... , X.Y.Z... )
-                        //
+                        // Normalize level (so the lowest becomes level 1)
+                        $relative_level = $level - $min_level + 1;
 
-                        $hdr_structure[$nb_hdrs] = [];
+                        // Reset deeper levels
+                        for ($i = $relative_level + 1; $i <= 10; $i++) {
+                            unset($counters[$i]);
+                        }
 
-                        // Generate the number (e.g. 1.2.1.1) of the current title, based on the previous title number :
-                        //   - if the current title deepest level is lesser than (or equal to)
-                        //     the deepest level of the previous title : then we increment the last level number,
-                        //   - else : we simply add new levels with value '1' (only if the previous level number was shown),
-                        //
-                        if ($nb_last_hdr > 0 && $hdrlevel <= $nb_last_hdr) {
-                            $hdr_structure[$nb_hdrs] = array_slice($last_hdr, 0, $hdrlevel);
-                            if (! empty($show_title_level[$hdrlevel]) || ! $need_autonumbering) {
-                                //
-                                // Increment the level number only if :
-                                //     - the last title of the same level number has a displayed number
-                                //  or - no title has a displayed number (no autonumbering)
-                                //
-                                $hdr_structure[$nb_hdrs][$hdrlevel - 1]++;
-                            }
+                        // Increment this level
+                        if (! isset($counters[$relative_level])) {
+                            $counters[$relative_level] = 1;
                         } else {
-                            if ($nb_last_hdr > 0) {
-                                $hdr_structure[$nb_hdrs] = $last_hdr;
-                            }
-                            for ($h = 0; $h < $hdrlevel - $nb_last_hdr; $h++) {
-                                $hdr_structure[$nb_hdrs][$h + $nb_last_hdr] = '1';
+                            $counters[$relative_level]++;
+                        }
+
+                        // Ensure parent levels exist (initialize with 1 if missing)
+                        for ($i = 1; $i < $relative_level; $i++) {
+                            if (! isset($counters[$i])) {
+                                $counters[$i] = 1;
                             }
                         }
 
-                        // Check if this heading has numbering syntax
-                        $has_numbering_syntax = preg_match('/^!+[\+\-]?#/', $line);
-
-                        // Check if this heading has reset numbering syntax `)`
-                        $has_reset_numbering = preg_match('/^!+[\+\-]?\)/', $line);
-
-                        // Check for combined reset and numbering syntax ())#
-                        // This helps reset headings numbering to 0 when the combined syntax is used
-                        // And directly set the current heading number to 1, useful for the first heading after a reset
-                        $has_numbering_reset_syntax = preg_match('/^!+[\+\-]?\)#/', $line);
-
-                        // Always enable basic numbering if syntax is present
-                        $show_title_level[$hdrlevel] = $has_numbering_syntax;
-
-                        // Handle numbering for all headings with # syntax
-                        // Special counter for headings with # syntax only
-                        static $numbered_headings_count = 0;
-                        // Reset counter at the beginning of each page processing
-                        static $seen_numbering_reset_syntax = false;
-
-                        // Initialize static variables to track headings across pages
-                        static $last_was_numbering_reset_syntax = false;
-                        static $heading_sequence = [];
-
-                        // Reset counter under certain conditions
-                        if ($nb_hdrs == 0) {
-                            // Reset at the beginning of page processing
-                            $numbered_headings_count = 0;
-                            $seen_numbering_reset_syntax = false;
-                            $last_was_numbering_reset_syntax = false;
-                            $heading_sequence = [];
-                        } elseif ($has_reset_numbering && ! $has_numbering_reset_syntax) {
-                            // Only reset counters for plain ^ syntax
-                            $numbered_headings_count = 0;
-                            $last_hdr = [];  // Also reset the structure
-                            $nb_last_hdr = 0;
-                            $seen_numbering_reset_syntax = false;
-                            $last_was_numbering_reset_syntax = false;
-                        } elseif ($has_numbering_reset_syntax) {
-                            // Special handling for )# syntax - start a new sequence
-                            $numbered_headings_count = 0;
-                            $last_hdr = [];  // Reset the structure
-                            $nb_last_hdr = 0;
-                            $seen_numbering_reset_syntax = true;
-                            $last_was_numbering_reset_syntax = true;
-                            $heading_sequence = []; // Start a fresh sequence
-                            $heading_sequence[] = 1; // First heading gets 1
+                        // Build numbering string
+                        $numbering = [];
+                        for ($i = 1; $i <= $relative_level; $i++) {
+                            $numbering[] = $counters[$i];
                         }
 
-                        if ($has_numbering_syntax) {
-                            // Combined )# syntax - assign number 1 explicitly
-                            if ($has_numbering_reset_syntax) {
-                                $numbered_headings_count = 1;
-                                $hdr_structure = [];
-                                $hdr_structure[$nb_hdrs] = [1];
+                        $current_title_num = implode('.', $numbering) . ".";
 
-                                // We'll use heading_sequence to track numbers in this sequence
-                                $heading_sequence = [1];
-                            } elseif ($last_was_numbering_reset_syntax) { // After a )# heading, increment from the sequence
-                                // Second heading after combined gets number 2
-                                $numbered_headings_count = 2;
-                                $hdr_structure[$nb_hdrs] = [2];
-                                $heading_sequence[] = 2;
-
-                                // After handling the first heading after a reset, turn off the flag
-                                $last_was_numbering_reset_syntax = false;
-                            } elseif ($seen_numbering_reset_syntax && ! empty($heading_sequence)) { // We're in a sequence started by )#, continue it
-                                // Increment the last number in the sequence
-                                $next_number = end($heading_sequence) + 1;
-                                $heading_sequence[] = $next_number;
-
-                                // Set the heading number
-                                $numbered_headings_count = $next_number;
-                                $hdr_structure[$nb_hdrs] = [$next_number];
-                            } else { // Normal behavior for other headings with # syntax
-                                $numbered_headings_count++;
-                            }
-
-                            if (! $multilevel_numbering_enabled) {
-                                // When multilevel numbering is disabled, use sequential numbers
-                                // This ensures simple sequential numbering (1,2,3) instead of hierarchical (1.1, 1.2)
-                                // Use the dedicated counter for numbered headings only
-                                $hdr_structure[$nb_hdrs] = [$numbered_headings_count];
-                            } else {
-                                // For multilevel numbering
-                                if ($hdrlevel == 1) {
-                                    // Level 1 headings should always have a number
-                                    // Use the dedicated counter for numbered headings
-                                    $hdr_structure[$nb_hdrs] = [$numbered_headings_count];
-                                } elseif (empty($hdr_structure[$nb_hdrs])) {
-                                    // Make sure the structure is properly initialized
-                                    if ($numbered_headings_count == 1) {
-                                        // First heading with no structure yet
-                                        $hdr_structure[$nb_hdrs] = [1];
-                                    } else {
-                                        // Initialize with a default if empty
-                                        $hdr_structure[$nb_hdrs] = [1];
-                                    }
-                                }
-                            }
-                        } else {
-                            // For headings without # syntax, don't include them in the structure at all
-                            // This prevents them from affecting the numbering sequence
-                            $hdr_structure[$nb_hdrs] = [];
-                        }
-
-                        // Update last_hdr info for the next header
-                        $last_hdr = $hdr_structure[$nb_hdrs];
-                        $nb_last_hdr = count($last_hdr);
-
-                        if (is_array($last_hdr)) {
-                            $current_title_real_num = implode('.', $last_hdr) . '. ';
-                        } else {
-                            $current_title_real_num = $last_hdr . '. ';
-                        }
-
-                        // Update the current title number to hide all parents levels numbers if the parent has no autonumbering
-                        $hideall = false;
-                        for ($j = $hdrlevel; $j > 0; $j--) {
-                            if ($hideall || empty($show_title_level[$j])) {
-                                unset($hdr_structure[$j - 1]);
-                                $hideall = true;
-                            }
-                        }
-
-                        // Store the title number to use only if it has to be shown (if the '#' char is used)
-                        $current_title_num = '';
-
-                        // For headings with combined )# syntax, we want to ensure it gets number 1
-                        static $after_numbering_reset_syntax = false; // Track if we're right after a )# syntax heading
-
-                        if ($has_numbering_reset_syntax) {
-                            $current_title_num = '1. ';
-                            // Also make sure show_title_level is enabled for this heading
-                            $show_title_level[$hdrlevel] = true;
-                            $after_numbering_reset_syntax = true; // Mark that the next heading should be 2
-                        } elseif ($has_numbering_syntax) { // For headings with just # syntax
-                            // Check if we're right after a )# syntax heading
-                            if ($after_numbering_reset_syntax) {
-                                // Force this heading to be number 2, as )# set current heading to 1
-                                $current_title_num = '2. ';
-                                $after_numbering_reset_syntax = false; // Reset the flag
-                            } else {
-                                // Normal numbering for other headings with # syntax
-                                if (is_array($hdr_structure[$nb_hdrs]) && ! empty($hdr_structure[$nb_hdrs])) {
-                                    $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
-                                } elseif (! empty($hdr_structure[$nb_hdrs])) {
-                                    $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
-                                } elseif ($numbered_headings_count > 0) {
-                                    // Fallback to simple numbering if structure is empty
-                                    $current_title_num = $numbered_headings_count . '. ';
-                                }
-                            }
-                            // Make sure show_title_level is enabled for this heading
-                            $show_title_level[$hdrlevel] = true;
-                        } elseif (isset($show_title_level[$hdrlevel]) && $show_title_level[$hdrlevel]) { // For other headings that have numbering enabled but not via # syntax
-                            if (is_array($hdr_structure[$nb_hdrs]) && ! empty($hdr_structure[$nb_hdrs])) {
-                                $current_title_num = implode('.', $hdr_structure[$nb_hdrs]) . '. ';
-                            } elseif (! empty($hdr_structure[$nb_hdrs])) {
-                                $current_title_num = $hdr_structure[$nb_hdrs] . '. ';
-                            }
-                        }
-
-                        $nb_hdrs++;
 
                         // Close open paragraph (lists already closed above)
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 0, 0);
@@ -2988,12 +2820,7 @@ class ParserLib extends TikiDb_Bridge
                         $anchor = '';
                         $aclose = '';
                         $aclose2 = '';
-                        // If needed, also remove '#' or ')' sign from title beginning
-                        if ($has_numbering_reset_syntax) {
-                            $addremove = 2; // Remove both ) and # characters
-                        } else {
-                            $addremove = ($show_title_level[$hdrlevel] || $has_reset_numbering) ? 1 : 0;
-                        }
+                        $addremove = 1; // If needed, also remove '#' sign from title beginning
 
                         // May be special signs present after '!'s?
                         $divstate = substr($line, $hdrlevel, 1);
