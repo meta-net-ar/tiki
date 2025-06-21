@@ -457,6 +457,7 @@ class ComposerManager
                         $fileInfo['replacedBy'] ?? [],
                         $fileInfo['scripts'] ?? [],
                         $fileInfo['actions'] ?? [],
+                        $fileInfo['repository'] ?? null,
                         $fileInfo['state'] ?? ComposerPackage::STATE_ACTIVE,
                         $packageInfo ? json_decode($packageInfo, true) : []
                     );

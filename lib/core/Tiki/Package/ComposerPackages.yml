@@ -193,3 +193,13 @@ TikiManager:
   requiredBy:
     - feature_tiki_manager
   requiredVersion: dev-master
+SignaturePDF:
+  licence: AGPL-3.0
+  licenceUrl: "https://github.com/mercihabam/signaturepdf/blob/master/LICENSE"
+  name: mercihabam/signaturepdf
+  repository:
+    type: vcs
+    url: "https://github.com/mercihabam/signaturepdf"
+  requiredBy:
+    - feature_pdf_signature
+  requiredVersion: dev-master

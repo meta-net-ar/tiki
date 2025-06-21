@@ -26,6 +26,7 @@ class ComposerPackage
     protected array $scripts;
     protected array $actions;
     protected array $metadata;
+    protected array|null $repository;
 
     /**
      * Sets the information related with this package, intended to be used in the constructor of the child class
@@ -39,6 +40,7 @@ class ComposerPackage
      * @param array $replacedBy
      * @param array $scripts
      * @param array $actions
+     * @param array $repository
      * @param string $state
      * @param array $metadata
      */
@@ -52,6 +54,7 @@ class ComposerPackage
         array $replacedBy = [],
         array $scripts = [],
         array $actions = [],
+        array|null $repository = null,
         string $state = self::STATE_ACTIVE,
         array $metadata = []
     ) {
@@ -66,6 +69,7 @@ class ComposerPackage
         $this->actions = $actions;
         $this->state = $state;
         $this->metadata = $metadata;
+        $this->repository = $repository;
     }
 
     /**
@@ -87,6 +91,7 @@ class ComposerPackage
             'actions' => $this->actions,
             'state' => $this->state,
             'metadata' => $this->metadata,
+            'repository' => $this->repository,
         ];
     }
 
@@ -199,5 +204,15 @@ class ComposerPackage
     public function getMetaData()
     {
         return $this->metadata;
+    }
+
+    /**
+     * Returns the repository information
+     *
+     * @return array
+     */
+    public function getRepository()
+    {
+        return $this->repository;
     }
 }
