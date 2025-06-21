@@ -203,3 +203,8 @@ SignaturePDF:
   requiredBy:
     - feature_pdf_signature
   requiredVersion: dev-master
+  scripts:
+    post-install-cmd:
+      - "Tiki\\Composer\\PatchSignaturepdf::setup"
+    post-update-cmd:
+      - "Tiki\\Composer\\PatchSignaturepdf::setup"
