@@ -10,11 +10,19 @@ use Composer\Script\Event;
 
 class PatchSignaturepdf
 {
+    private static function fixDS(string $path): string
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
     public static function setup(Event $event)
     {
-        $signaturepdf = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../../../signaturepdf/');
+        $signaturepdf = __DIR__ . self::fixDS('/../../../signaturepdf/');
         $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
 
-        copy($signaturepdf . 'config.ini', $vendors . str_replace('/', DIRECTORY_SEPARATOR, 'mercihabam/signaturepdf/config.ini'));
+        $packagePath = $vendors . self::fixDS('/mercihabam/signaturepdf/');
+        chmod($packagePath, 0755);
+
+        copy($signaturepdf . 'config.ini', self::fixDS($packagePath . '/config/config.ini'));
     }
 }
