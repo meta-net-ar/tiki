@@ -24,5 +24,23 @@ class PatchSignaturepdf
         chmod($packagePath, 0755);
 
         copy($signaturepdf . 'config.ini', self::fixDS($packagePath . '/config/config.ini'));
+
+        self::alterRoutes($packagePath);
+    }
+
+    public static function alterRoutes($packagePath)
+    {
+        $entryPoint = self::fixDS($packagePath . '/app.php');
+        $content = file_get_contents($entryPoint);
+
+        $content = preg_replace_callback(
+            '/(\$f3->route\(\s*\'[A-Z]+\s+\/)([^,\'"]*)([\'"],)/',
+            function ($matches) {
+                return $matches[1] . 'tiki-signaturepdf.php' . ($matches[2] ? '/' : '') . $matches[2] . $matches[3];
+            },
+            $content
+        );
+
+        file_put_contents($entryPoint, $content);
     }
 }
