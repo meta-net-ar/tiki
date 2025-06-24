@@ -168,13 +168,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
          */
         $prefs['feature_use_three_colon_centertag'] = 'n';
         $inData = '!#::Heading::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1. Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1.Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
 
         $prefs['feature_use_three_colon_centertag'] = 'y';
         $inData = '!#:::Heading:::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1. Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1.Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
     }
@@ -196,14 +196,14 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
 !!# title 2.1
 TEST;
         $ex = <<<EX
-<h1 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1<a href="#title_1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h1>
-<h2 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1<a href="#title_1.1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2<a href="#title_1.2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h4 class="showhide_heading d-flex justify-content-start" id="title_1.3">1.1.1.1. title&nbsp;1.3<a href="#title_1.3" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h4>
-<h5 class="showhide_heading d-flex justify-content-start" id="title_1.4">1.1.1.1.1. title&nbsp;1.4<a href="#title_1.4" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h5>
-<h6 class="showhide_heading d-flex justify-content-start" id="title_1.4_2">1.1.1.1.1.1. title&nbsp;1.4<a href="#title_1.4_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h6>
-<h1 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2<a href="#title_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h1>
-<h2 class="showhide_heading d-flex justify-content-start" id="title_2.1">2.1. title&nbsp;2.1<a href="#title_2.1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
+<h1 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.3">1.1.1.1. title&nbsp;1.3</h4>
+<h5 class="showhide_heading d-flex justify-content-start" id="title_1.4">1.1.1.1.1. title&nbsp;1.4</h5>
+<h6 class="showhide_heading d-flex justify-content-start" id="title_1.4_2">1.1.1.1.1.1. title&nbsp;1.4</h6>
+<h1 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_2.1">2.1. title&nbsp;2.1</h2>
 EX;
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
@@ -217,11 +217,11 @@ EX;
 !!!# title 2.1
 TEST;
         $ex = <<<EX
-<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1<a href="#title_1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h4 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1<a href="#title_1.1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h4>
-<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.2. title&nbsp;1.2<a href="#title_1.2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h4>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2<a href="#title_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_2.1">3. title&nbsp;2.1<a href="#title_2.1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h4>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.2. title&nbsp;1.2</h4>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2.1">3. title&nbsp;2.1</h3>
 EX;
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
@@ -234,10 +234,10 @@ EX;
 !!!# title 2
 TEST;
         $ex = <<<EX
-<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1<a href="#title_1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2<a href="#title_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_1_2">1. title&nbsp;1<a href="#title_1_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2. title&nbsp;2<a href="#title_2_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1_2">1. title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2. title&nbsp;2</h3>
 EX;
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
@@ -256,17 +256,16 @@ EX;
 !!!!!# Title 1.2.1.1.
 TEST;
         $ex = <<<EX
-<h1 class="showhide_heading d-flex justify-content-start" id="Unnumbered_Heading"> Unnumbered Heading<a href="#Unnumbered_Heading" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h1>
-<h2 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1<a href="#title_1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1<a href="#title_1.1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2<a href="#title_1.2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h4>
-<h2 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2<a href="#title_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2.1. title&nbsp;2<a href="#title_2_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<p>
-</p>
-<h3 class="showhide_heading d-flex justify-content-start" id="Title_1">1.1. Title&nbsp;1<a href="#Title_1" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h3 class="showhide_heading d-flex justify-content-start" id="Title_2">1.2. Title&nbsp;2<a href="#Title_2" class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h3>
-<h5 class="showhide_heading d-flex justify-content-start" id="Title_1.2.1.1.">1.2.1.1. Title&nbsp;1.2.1.1.<a href="#Title_1.2.1.1." class="heading-link" aria-label="heading link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h5>
+<h1 class="showhide_heading d-flex justify-content-start" id="Unnumbered_Heading"> Unnumbered Heading</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2</h4>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2.1. title&nbsp;2</h3>
+<br />
+<h3 class="showhide_heading d-flex justify-content-start" id="Title_1">1.1. Title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="Title_2">1.2. Title&nbsp;2</h3>
+<h5 class="showhide_heading d-flex justify-content-start" id="Title_1.2.1.1.">1.2.1.1. Title&nbsp;1.2.1.1.</h5>
 EX;
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
