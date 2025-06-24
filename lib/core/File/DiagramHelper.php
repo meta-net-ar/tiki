@@ -60,25 +60,26 @@ class DiagramHelper
     }
 
     /**
-     * Get an array of diagrams based on the XML content or file_id which will retrieve the File XML contents
-     * @param $identifier
-     * @param $page string Return specific page from the diagram
-     * @return array|bool
+     * Retrieve an array of diagrams from either XML content or a file ID.
+     *
+     * This function accepts either:
+     *  - an integer representing the ID of a file (the XML content will be loaded from that file), or
+     *  - a string containing the raw XML content directly.
+     *
+     * If a specific diagram page name is provided, only that page will be returned.
+     *
+     * @param int|string $identifier File ID (int) or raw XML string (string).
+     * @param string $page (optional) Name of the specific diagram page to return. If empty, all diagrams will be returned.
+     *
+     * @return array|bool Array of XML strings for each diagram, or false if the file is not found.
      */
     public static function getDiagramsFromIdentifier($identifier, $page = '')
     {
-        $rawXmlContent = $identifier;
-
         if (is_int($identifier)) {
-            $file = File::id($identifier);
-
-            if (empty($file)) {
-                return false;
-            }
-
-            $rawXmlContent = $file->getContents();
+            $diagramRoot = self::getDiagramsFromFileID($identifier, $page);
+        } else {
+            $diagramRoot = self::getDiagramsFromXmlString($identifier, $page);
         }
-        $diagramRoot = simplexml_load_string($rawXmlContent);
 
         if ($diagramRoot === false && ! empty($identifier)) {
             Feedback::error(tr('The provided diagram XML is not valid. Please check and validate the diagram structure.'));
@@ -97,6 +98,37 @@ class DiagramHelper
         }
 
         return $diagrams;
+    }
+
+    /**
+     * retrieve digram from Xml String
+     *
+     * @param string $rawXmlContent raw XML string (string).
+     * @param string $page (optional) Name of the specific diagram page to return. If empty, all diagrams will be returned.
+     * @return object
+     */
+    public static function getDiagramsFromXmlString(string $rawXmlContent, string $page = '')
+    {
+        return $diagramRoot = simplexml_load_string($rawXmlContent);
+    }
+
+    /**
+     * retrieve digram from a file ID
+     *
+     * @param int $identifier File ID (int).
+     * @param string $page (optional) Name of the specific diagram page to return. If empty, all diagrams will be returned.
+     * @return false|object
+     */
+    public static function getDiagramsFromFileID(int $identifier, string $page = '')
+    {
+        $file = File::id($identifier);
+
+        if (empty($file)) {
+            return false;
+        }
+
+        $rawXmlContent = $file->getContents();
+        return $diagramRoot = simplexml_load_string($rawXmlContent);
     }
 
     /**

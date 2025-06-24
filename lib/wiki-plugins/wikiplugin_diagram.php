@@ -33,7 +33,7 @@ function wikiplugin_diagram_info()
             'page' => [
                 'required' => false,
                 'name' => tr('page'),
-                'description' => tr('Page of the diagram that should be displayed.'),
+                'description' => tr('Page name of the diagram that should be displayed for multi-page diagram.'),
                 'since' => '',
                 'filter' => 'text',
             ],
@@ -99,11 +99,11 @@ function wikiplugin_diagram_info()
  */
 function wikiplugin_diagram($data, $params)
 {
-    global $tikilib, $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_upload_files;
-
+    global $tikilib, $user, $page, $wikiplugin_included_page, $prefs, $tiki_p_edit, $tiki_p_view;
     $template = $params['template'] ?? 0;
     $galleryId = $params['galleryId'] ?? (isset($params['fileName']) ? 1 : '');
     $fileName = $params['fileName'] ?? 'Diagram %page% %date%.drawio' ;
+    $escapedPage = htmlentities($page, ENT_COMPAT);
     $fileName = preg_replace('/\%page\%/', $page, $fileName);
     $fileName = preg_replace('/\%date\%/', date('Y-m-d'), $fileName);
 
@@ -168,7 +168,7 @@ function wikiplugin_diagram($data, $params)
         $message = $errorMessageToAppend;
         $message .= tr('To view diagrams Tiki needs the tikiwiki/diagram package. If you do not have permission to install this package, ask the site administrator.');
         Feedback::error($message);
-        return;
+        return '';
     }
 
     $headerlib = TikiLib::lib('header');
@@ -188,26 +188,66 @@ function wikiplugin_diagram($data, $params)
 
         if ($data === false) {
             Feedback::error(tr("Tiki wasn't able to find the file with id %0.", $fileId));
-            return;
+            return '';
         }
     }
 
-    $data = DiagramHelper::parseData($data);
+    $diagramXmlString = DiagramHelper::parseData($data);
     static $diagramIndex = 0;
     ++$diagramIndex;
 
+    //checking if user can see edit button
+    if (! empty($wikiplugin_included_page)) {
+        $sourcepage = $wikiplugin_included_page;
+    } else {
+        $sourcepage = $page;
+    }
+
+    //checking if user has edit permissions on the wiki page/file using the current permission library to obey global/categ/object perms
+    if (! empty($galleryId) && is_numeric($galleryId)) {
+        $type = 'file gallery';
+        $objectId = $_REQUEST['fileId'] ?? null;
+    } elseif (! empty($page)) {
+        $type = 'wiki page';
+        $objectId = $page;
+    } else {
+        throw new \RuntimeException('Missing or invalid galleryId and/or page');
+    }
+
+    $objectperms = Perms::get([
+        'type' => $type,
+        'object' => $objectId,
+    ]);
+
+    if ($type === 'file gallery' && empty($galleryId)) {
+        throw new LogicException("Invalid state: type is 'file gallery' but galleryId is empty.");
+    }
+
+    if ($objectperms->edit) {
+        $allowEdit = true;
+    } else {
+        $allowEdit = false;
+    }
+
+    if ($objectperms->view) {
+        $allowView = true;
+    } else {
+        $allowView = false;
+    }
+
+    //checking if the user has permissions on the wikipage to view the diagram
+    if ((! empty($page) && ! $allowView )) {
+        Feedback::error(tr('Tiki wasn\'t able to display the Diagram on page %1%0%3. Please check the %1%2%3 permission on this %4.', $escapedPage, '<code>', 'tiki_p_view', '</code>', '<a href="tiki-objectpermissions.php#contenttabs_objectpermissions-1">permission page</a>'));
+        return '';
+    }
+
     if (function_exists('simplexml_load_string')) {
-        $doc = simplexml_load_string($data);
+        $doc = simplexml_load_string($diagramXmlString);
         if ($doc !== false && ($doc->getName() != 'mxGraphModel' && $doc->getName() != 'mxfile')) {
             Feedback::error(tr("Tiki wasn't able to parse the Diagram. Please check the diagram XML data and structure."));
-            return;
-        } elseif (empty($data) || $doc === false) {
-            if ($tiki_p_upload_files != 'y') {
-                return;
-            }
-
+            return '';
+        } elseif (empty($diagramXmlString) || $doc === false) {
             $label = tra('Create New Diagram');
-            $page = htmlentities($page, ENT_COMPAT);
             $in = tr(" in ");
 
             $gals = $filegallib->list_file_galleries(0, -1, 'name_desc', $user);
@@ -235,7 +275,7 @@ function wikiplugin_diagram($data, $params)
             }
 
             if ($annotate && $infoImg = loadImageAnnotate($annotate)) {
-                $data = <<<XML
+                $diagramXmlString = <<<XML
 <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff">
   <root>
     <mxCell id="0"/>
@@ -246,8 +286,8 @@ function wikiplugin_diagram($data, $params)
   </root>
 </mxGraphModel>
 XML;
-                $data = DiagramHelper::parseData($data);
-                $data = base64_encode($data);
+                $diagramXmlStringParsed = DiagramHelper::parseData($diagramXmlString);
+                $diagramXmlStringEncoded = base64_encode($diagramXmlStringParsed);
             }
 
             if (! empty($galHtml)) {
@@ -273,7 +313,7 @@ XML;
                 <input type="hidden" name="page" value="$page"/>
                 <input type="hidden" name="template" value="$template"/>
                 <input type="hidden" name="fileName" value="$fileName"/>
-                <input type="hidden" name="xml" value='$data'/>
+                <input type="hidden" name="xml" value='$diagramXmlStringEncoded'/>
                 <input type="hidden" name="index" value="$diagramIndex"/>
             </p>
         </form>
@@ -282,31 +322,11 @@ EOF;
         }
     }
 
-    //checking if user can see edit button
-    if (! empty($wikiplugin_included_page)) {
-        $sourcepage = $wikiplugin_included_page;
-    } else {
-        $sourcepage = $page;
-    }
-
-    //checking if user has edit permissions on the wiki page/file using the current permission library to obey global/categ/object perms
-    if ($fileId) {
-        $objectperms = Perms::get(['type' => 'file', 'object' => $fileId]);
-    } else {
-        $objectperms = Perms::get([ 'type' => 'wiki page', 'object' => $sourcepage ]);
-    }
-
-    if ($objectperms->edit) {
-        $allowEdit = true;
-    } else {
-        $allowEdit = false;
-    }
-
-    $base_64_diagram = base64_encode($data);
+    $base_64_diagram = base64_encode($diagramXmlString);
 
     if (isset($params['wikiparse']) && $params['wikiparse'] == 1) {
         $parsedDiagrams = [];
-        $XMLDiagrams = simplexml_load_string($data);
+        $XMLDiagrams = simplexml_load_string($diagramXmlString);
 
         if ($XMLDiagrams->getName() == 'mxGraphModel') {
             $parsedDiagrams = ['<diagram id="' . uniqid() . '">' . DiagramHelper::parseDiagramWikiSyntax($XMLDiagrams) . '</diagram>'];
@@ -322,7 +342,7 @@ EOF;
         }
 
         $diagrams = $parsedDiagrams;
-        $data = '<mxfile>' . implode('', $diagrams) . '</mxfile>';
+        $diagramXmlString = '<mxfile>' . implode('', $diagrams) . '</mxfile>';
     }
 
     $slidePage = explode("/", $_SERVER['PHP_SELF']);
