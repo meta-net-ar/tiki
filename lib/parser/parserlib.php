@@ -2530,8 +2530,8 @@ class ParserLib extends TikiDb_Bridge
         $data = '';
         $listbeg = [];
         $divdepth = [];
-        $hdr_structure = [];
-        $show_title_level = [];
+        $numbering = [];
+        $counters = [];
         $last_hdr = [];
         $all_anchors = [];
         $nb_last_hdr = 0;
@@ -2771,37 +2771,41 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         $level = $hdrlevel;
+                        $current_title_real_num = '';
+                        $current_title_num = '';
 
-                        // Normalize level (so the lowest becomes level 1)
-                        $relative_level = $level - $min_level + 1;
+                        $support_numbering = preg_match('/^!+[\+\-]?#/', $line);
+                        if ($support_numbering) {
+                            // Normalize level (so the lowest becomes level 1)
+                            $relative_level = $level - $min_level + 1;
 
-                        // Reset deeper levels
-                        for ($i = $relative_level + 1; $i <= 10; $i++) {
-                            unset($counters[$i]);
-                        }
-
-                        // Increment this level
-                        if (! isset($counters[$relative_level])) {
-                            $counters[$relative_level] = 1;
-                        } else {
-                            $counters[$relative_level]++;
-                        }
-
-                        // Ensure parent levels exist (initialize with 1 if missing)
-                        for ($i = 1; $i < $relative_level; $i++) {
-                            if (! isset($counters[$i])) {
-                                $counters[$i] = 1;
+                            // Reset deeper levels
+                            for ($i = $relative_level + 1; $i <= 10; $i++) {
+                                unset($counters[$i]);
                             }
+
+                            // Increment this level
+                            if (! isset($counters[$relative_level])) {
+                                $counters[$relative_level] = 1;
+                            } else {
+                                $counters[$relative_level]++;
+                            }
+
+                            // Ensure parent levels exist (initialize with 1 if missing)
+                            for ($i = 1; $i < $relative_level; $i++) {
+                                if (! isset($counters[$i])) {
+                                    $counters[$i] = 1;
+                                }
+                            }
+
+                            $numbering = [];
+                            for ($i = 1; $i <= $relative_level; $i++) {
+                                $numbering[] = $counters[$i];
+                            }
+
+                            $current_title_num = implode('.', $numbering) . ".";
+                            $current_title_real_num = $current_title_num . ' ';
                         }
-
-                        // Build numbering string
-                        $numbering = [];
-                        for ($i = 1; $i <= $relative_level; $i++) {
-                            $numbering[] = $counters[$i];
-                        }
-
-                        $current_title_num = implode('.', $numbering) . ".";
-
 
                         // Close open paragraph (lists already closed above)
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 0, 0);
@@ -2820,7 +2824,10 @@ class ParserLib extends TikiDb_Bridge
                         $anchor = '';
                         $aclose = '';
                         $aclose2 = '';
-                        $addremove = 1; // If needed, also remove '#' sign from title beginning
+                        $addremove = 0;
+                        if ($support_numbering) {
+                            $addremove = 1; // If needed, also remove '#' sign from title beginning
+                        }
 
                         // May be special signs present after '!'s?
                         $divstate = substr($line, $hdrlevel, 1);
