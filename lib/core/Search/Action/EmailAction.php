@@ -229,10 +229,29 @@ class Search_Action_EmailAction implements Search_Action_Action
     private function dereference($email_or_username)
     {
         if (empty($email_or_username)) {
-            return null;
+            return [];
         }
-        $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        if (strpbrk($email_or_username, ',; ') !== false) {
+            $list = preg_split('/\s*[,;\s]\s*/', $email_or_username);
+            $res = [];
+            foreach ($list as $email_or_username) {
+                $res = array_merge($res, $this->dereference($email_or_username));
+            }
+            return array_filter($res);
+        }
+        $email_or_username = trim($this->stripNp($email_or_username));
+        if (preg_match_all('/([^<]*?)<([^@>]+@[^>]+)>/', $email_or_username, $m)) {
+            $emails = [];
+            foreach ($m[0] as $key => $_) {
+                $name = trim($m[1][$key], ",;\n\r\t ");
+                $emails[$name] = $m[2][$key];
+            }
+            return $emails;
+        } elseif (preg_match_all('/[^@]+@[^,;]+/', $email_or_username, $m)) {
+            return array_map(function ($email) {
+                return trim($email, ",;\n\r\t ");
+            }, $m[0]);
+        } elseif (strstr($email_or_username, '@')) {
             return [$email_or_username];
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
