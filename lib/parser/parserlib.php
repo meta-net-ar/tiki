@@ -2532,9 +2532,7 @@ class ParserLib extends TikiDb_Bridge
         $divdepth = [];
         $numbering = [];
         $counters = [];
-        $last_hdr = [];
         $all_anchors = [];
-        $nb_last_hdr = 0;
         $nb_hdrs = 0;
         $nb_lists = 0;
         $inTable = 0;
