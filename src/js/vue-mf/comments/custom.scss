@@ -54,14 +54,21 @@
 .message-footer .icon {
     color: #ffdb5e;
     font-size: 15px;
+    z-index: 9999;
+    position: relative;
 }
 
 .like, .dislike {
     font-size: smaller;
+    position: relative;
+    z-index: 9999;
 }
 
 .bottom-line {
     border-top: 2px dashed black;
+}
+.message-body {
+    padding: 10px 0px !important;
 }
 .message-body p {
     min-width: 400px;
@@ -72,15 +79,35 @@
 .thread-border {
     border-left: 0.01rem solid rgba(167, 167, 167, 0.3);
     position: absolute;
-    height: -webkit-fill-available;
+    //height: -webkit-fill-available;
     width: 10px;
     z-index: 999;
-    margin-bottom: 15px;
+    //margin-bottom: 15px;
 }
-.thread-border:hover {
+/*.thread-border:hover {
     border-left: 0.01rem solid rgba(0, 0, 0, 1);
+}*/
+.t-left-border-background {
+    position: absolute;
+    height: 48px;
+    width: 64px;
+    background-color: #fff;
+    border-radius: 10.5px;
+    left: 12px;
+    top: -42px;
+    z-index: 2;
 }
-.thread-replies .thread-border:before {
+.t-left-border {
+    position: absolute;
+    height: 36px;
+    width: 48px;
+    border: 1px solid rgba(167, 167, 167, 0.3);
+    border-radius: 10.5px;
+    left: 12px;
+    top: -24px;
+    z-index: 1;
+}
+/*.thread-replies .thread-border:before {
     content: "";
     display: block;
     width: 35px;
@@ -93,7 +120,7 @@
 }
 .thread-replies .thread-border:hover::before {
     background: #000000;
-}
+}*/
 .thread-messages:hover .d-thread-button-block, .thread-messages:hover .d-thread-button-block .btn {
     pointer-events: inherit;
     opacity: 1;
@@ -108,7 +135,7 @@
 }
 
 .thread-replies {
-    margin-top: -18px;
+    //margin-top: -18px;
 }
 
 div[id^="reply-block-"] {

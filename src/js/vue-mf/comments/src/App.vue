@@ -37,11 +37,10 @@
     import SearchBar from "./components/SearchBar.vue";
     import ReplyForm from "./components/ReplyForm.vue";
     import {provide} from "vue";
-
-    provide('tr', tr)
-
     import { computed } from 'vue';
     import useMessageStore from "./store";
+    provide('tr', tr)
+
     const store = useMessageStore();
 
     const msgs = computed(() => store.getParentMessages);

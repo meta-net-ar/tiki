@@ -5,13 +5,13 @@ import useMessageStore from "../store";
 const store = useMessageStore();
 
 function getDescendants(threadId) {
-    console.log("getDescendants:", threadId);
+    //console.log("getDescendants:", threadId);
     var arr = store.getThreads;
     var key = "parentId";
     var response = [];
     arr.forEach(item => {
         if (item[key] === threadId) {
-            console.log("getDescendants found:", item.messageId);
+            //console.log("getDescendants found:", item.messageId);
             response.push(item);
         }
     });

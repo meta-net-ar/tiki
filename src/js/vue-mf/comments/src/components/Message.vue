@@ -1,7 +1,7 @@
 <script setup>
 
 import ReplyForm from "./ReplyForm.vue";
-import {inject} from "vue";
+import {inject, onMounted} from "vue";
 
 import useMessageStore from "../store";
 const store = useMessageStore();
@@ -12,6 +12,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+});
+
+onMounted(() => {
+    store.drawMessagesTree();
 });
 
 function update(messageId) {
@@ -35,8 +39,10 @@ export default {
 </script>
 
 <template>
-    <div class="message-body card-body text-start">
-        <div class="thread-border"></div>
+    <div :id="'body-'+item.messageId" class="message-body card-body text-start">
+        <div :class="[{'t-left-border-background' : item.parentId !== 0}]"></div>
+        <div :class="[{'t-left-border' : item.parentId !== 0}]"></div>
+        <div :id="'border-'+item.messageId" class="thread-border"></div>
         <p class="small">
             <span class="border rounded-1 p-1 pr-3 bg-light message-author">
                 <img src="/img/icons/user.png"/>{{item.author}}
@@ -63,7 +69,7 @@ export default {
                     </div>
                 </div>
             </div>
-            <hr class="bottom-line mt-4 ms-2" v-if="item.parentId == 0">
+            <!--<hr class="bottom-line mt-4 ms-2" v-if="item.parentId == 0">-->
         </div>
     </div>
 </template>

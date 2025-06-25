@@ -199,5 +199,24 @@ export default defineStore("messageStore", {
             const index = this.threads.findIndex((element) => element.messageId === messageId);
             this.threads[index].dislike += 1;
         },
+        drawMessagesTree() {
+            //TODO: Manage the reply box height, change the height when the menu is collapse or not
+            var arr = this.threads;
+            arr.forEach((item) => {
+                let margins = 8;
+                let totalHeight = 0;
+                let lastChildHeight = 0;
+                if (item.parentId === 0) {
+                    margins = 18;
+                }
+                let parentBody = $("#body-" + item.messageId).parent(".thread-block");
+                totalHeight = parentBody.outerHeight();
+                parentBody.children("div.row").each(function () {
+                    lastChildHeight = $(this).children().last().outerHeight();
+                });
+                totalHeight -= lastChildHeight + margins;
+                $("#border-" + item.messageId).css("height", totalHeight);
+            });
+        },
     },
 });
