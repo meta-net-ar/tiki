@@ -262,7 +262,7 @@
         "ratchet/pawl": "^0.4.1",
         "robicch/jquery-gantt": "~6.3",
         "rubix/ml": "^2.1",
-        "sabre/dav": "~4.4.0",
+        "sabre/dav": "~4.7",
         "sentry/sentry": "^4.12",
         "slm/mail": "^4.2",
         "smalot/pdfparser": "^2.11",
