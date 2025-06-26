@@ -37,10 +37,17 @@ class IconGenerator
 
     public function generateIconArraysFromCss($bootstrapIcons, $fontAwesomeIcons): array
     {
+        //var_dump($fontAwesomeIcons);
         $bootstrapPattern = '/\.bi-([a-zA-Z0-9-]+)::before/';
-        $fontAwesomePattern = '/\.fa-([a-zA-Z0-9-]+)(::|:)before/';
-        //pattern to extract unicodes from file
-        $fontAwesomeUnicodePattern = '#content: "\\\(.*?)"; }#';
+        /**
+         * faClassPattern matches a selector starting with .fa- and faUnicodePattern
+         * asserts that within the upcoming block there exists a '--fa' property
+         * with the desired unicode value. We combine icon name and unicode value
+         * search to avoid non-icon classes from all.css as all of them start by .fa-
+        */
+        $faClassPattern = '\.fa-([\w-]+)';
+        $faUnicodePattern = '{--fa:["\']\\\\([a-f0-9]{2,5})["\'];}';
+        $fontAwesomePattern = "/{$faClassPattern}{$faUnicodePattern}/s";
 
         $bootstrapFinal = [];
         $fontAwesomeFinal = [];
@@ -50,9 +57,12 @@ class IconGenerator
         // Extract Bootstrap icons
         if ($bootstrapIcons) {
             $bootstrapMatches = [];
-            preg_match_all($bootstrapPattern, $bootstrapIcons, $bootstrapMatches);
+            $numMatches = preg_match_all($bootstrapPattern, $bootstrapIcons, $bootstrapMatches);
+            if ($numMatches < 1) {
+                throw new Exception("Unable to find any icons with pattern: $bootstrapPattern");
+            }
 
-            $bootstrapResult = $bootstrapMatches[1];
+            $bootstrapResult = $bootstrapMatches[1] ?? [];
             $bootstrapPhp = "<?php\n    global \$prefs; \n       \$prefs['bs_generated_icons'] = [";
             foreach ($bootstrapResult as $value) {
                 $name = str_replace('-', '_', $value);
@@ -66,28 +76,30 @@ class IconGenerator
         // Extract Font Awesome icons
         if ($fontAwesomeIcons) {
             $fontAwesomeMatches = [];
-            preg_match_all($fontAwesomePattern, $fontAwesomeIcons, $fontAwesomeMatches);
-            preg_match_all($fontAwesomeUnicodePattern, $fontAwesomeIcons, $fontAwesomeUnicodeMatches);
+
+            $numMatchesFA = preg_match_all($fontAwesomePattern, preg_replace('/\s+/', '', $fontAwesomeIcons), $fontAwesomeMatches);
+            if ($numMatchesFA < 1) {
+                throw new Exception("Unable to find any icons with pattern: $fontAwesomePattern");
+            }
+
             $fontAwesomeResult = $fontAwesomeMatches[1];
-            $fontAwesomeUnicodeResult = $fontAwesomeUnicodeMatches[1];
+            $fontAwesomeUnicodeResult = $fontAwesomeMatches[2];
+
             $fontAwesomePhp = "<?php\n    global \$prefs; \n      \$prefs['fa_generated_icons'] = [";
-            $line = 0;
-            foreach ($fontAwesomeResult as $value) {
-                $name = str_replace('-', '_', $value);
+            foreach ($fontAwesomeResult as $index => $iconName) {
+                $name = str_replace('-', '_', $iconName);
                 $fontAwesomeFinal[$name] = [
-                'id' => $value,
+                'id' => $iconName,
                 'prepend' => 'fas fa-',
-                'codeValue' => '#x' . $fontAwesomeUnicodeResult[$line]
+                'codeValue' => '#x' . ($fontAwesomeUnicodeResult[$index])
                 ];
                 $fontAwesomePhp .= "       '$name' => [ 
-                    'id' => '$value',
+                    'id' => '$iconName',
                     'prepend' => 'fas fa-'
                 ],\n";
-                $line++;
             }
             $fontAwesomePhp .= "];";
         }
-
         return [json_encode($bootstrapFinal), $bootstrapPhp, json_encode($fontAwesomeFinal), $fontAwesomePhp];
     }
 
