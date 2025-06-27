@@ -55,18 +55,18 @@ class Language_WriteFile
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
-     * @param string|null $baseDir base directory to use for the language file. If null, the base directory is not changed.
+     * @param string|null $targetDir directory where language files should be written (null means same as the current working directory)
      * @param bool $skipRemove whether to skip removing the old or unused strings from the language files. To skip, set to true. The existing translations in the destination file will not be overwritten or removed from the file if not found in the incoming translations.
      * @return null
      */
-    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $baseDir = null, $skipRemove = false)
+    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $targetDir = null, $skipRemove = false)
     {
         $lang = [];
         if (empty($strings)) {
             return false;
         }
-        if (empty($baseDir)) {
-            $baseDir = getcwd();
+        if (empty($targetDir)) {
+            $targetDir = getcwd();
         }
 
         $backupTranslations = [];
@@ -120,41 +120,14 @@ class Language_WriteFile
         if ($handle) {
             fwrite($handle, "<?php\n");
 
-            $isCustomDir = $this->isCustomDir($baseDir);
-            // Only write the file header for standard language files, not custom ones
-            if (! $isCustomDir) {
-                fwrite($handle, $this->fileHeader());
-            }
+            $isCustomDir = $this->isCustomDir($targetDir);
 
-            // Determine which array variable to use and whether to include English base
-            if ($language != "en" && ! $isCustomDir) {
-                // For non-English languages in standard directories: include English base and use $lang_current
-                fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
-                fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
-            } elseif (! $isCustomDir) {
-                // For English language in standard directories: use $lang
-                fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+            if ($isCustomDir) {
+                $this->writeCustomLanguageFile($handle, $entries, $outputFiles, $language);
             } else {
-                // For custom directories (any language): use $lang_custom
-                fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
+                $this->writeStandardLanguageFile($handle, $entries, $outputFiles, $language);
             }
 
-            foreach ($entries as $entry) {
-                fwrite($handle, $this->formatString($entry, $outputFiles, $language));
-            }
-
-            fwrite($handle, ");\n");
-            // Merge translations into the main $lang array
-            if ($language != "en" && ! $isCustomDir) {
-                // For non-English standard language files: merge current language translations with English base
-                fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
-            } else {
-                if ($isCustomDir) {
-                    // For custom language files: merge custom translations with existing translations
-                    fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
-                }
-            }
-            // Note: For English standard language file, no merge is needed as $lang is used directly
             fclose($handle);
         }
 
@@ -233,18 +206,71 @@ TXT;
     }
 
     /**
-     * Checks if the directory is a custom language directory.
+     * Write language strings for standard (non-custom) directories
      *
-     * @param string $baseDir The base directory path to check
-     * @return bool Returns true if custom directory, false otherwise
+     * @param resource $handle File handle to write to
+     * @param array $entries Language entries to write
+     * @param bool $outputFiles Whether to include file paths in output
+     * @param string $language Current language code
      */
-    protected function isCustomDir($baseDir): bool
+    protected function writeStandardLanguageFile($handle, array $entries, bool $outputFiles, string $language): void
     {
-        $resolvedBaseDir = realpath($baseDir);
-        if ($resolvedBaseDir === false) {
-            $resolvedBaseDir = $baseDir;
+        fwrite($handle, $this->fileHeader());
+
+        // Determine which array variable to use and whether to include English base
+        if ($language != "en") {
+            fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
+            fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
+        } else {
+            fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
         }
 
-        return strpos($resolvedBaseDir, '_custom') !== false;
+        foreach ($entries as $entry) {
+            fwrite($handle, $this->formatString($entry, $outputFiles, $language));
+        }
+
+        fwrite($handle, ");\n");
+
+        if ($language != "en") {
+            fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
+        }
+    }
+
+    /**
+     * Write language strings for custom directories
+     *
+     * @param resource $handle File handle to write to
+     * @param array $entries Language entries to write
+     * @param bool $outputFiles Whether to include file paths in output
+     * @param string $language Current language code
+     */
+    protected function writeCustomLanguageFile($handle, array $entries, bool $outputFiles, string $language): void
+    {
+        // For custom directories (any language): use $lang_custom
+        fwrite($handle, "\$lang_custom = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
+
+        foreach ($entries as $entry) {
+            fwrite($handle, $this->formatString($entry, $outputFiles, $language));
+        }
+
+        fwrite($handle, ");\n");
+
+        fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
+    }
+
+    /**
+     * Checks if the directory is a custom theme directory.
+     *
+     * @param string $dir The directory path to check
+     * @return bool Returns true if it's a custom theme directory, false otherwise
+     */
+    protected function isCustomDir($dir): bool
+    {
+        $resolvedDir = realpath($dir);
+        if ($resolvedDir === false) {
+            $resolvedDir = $dir;
+        }
+
+        return strpos($resolvedDir, '_custom') !== false;
     }
 }
