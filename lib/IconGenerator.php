@@ -62,7 +62,7 @@ class IconGenerator
                 throw new Exception("Unable to find any icons with pattern: $bootstrapPattern");
             }
 
-            $bootstrapResult = $bootstrapMatches[1] ?? [];
+            $bootstrapResult = $bootstrapMatches[1];
             $bootstrapPhp = "<?php\n    global \$prefs; \n       \$prefs['bs_generated_icons'] = [";
             foreach ($bootstrapResult as $value) {
                 $name = str_replace('-', '_', $value);
