@@ -5,16 +5,29 @@
     {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
-            {foreach key=st item=stdata from=$status_types}
-                <div>
-                    <div class="{$stdata.class}">
-                        {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
-                        <a href="{$trackerId|sefurl:tracker}{$sep}status={$stdata.statuslink}{if $filtervalue and !$filtervalue|is_array}&amp;filtervalue={$filtervalue|escape:"url"}{/if}{if $filtervalue|is_array}{$filtervalueencoded}{/if}{if $filterfield}&amp;filterfield={$filterfield|escape:"url"}{/if}{if $offset}&amp;offset={$offset}{/if}{if $sort_mode}&amp;sort_mode={$sort_mode}{/if}">
-                            {icon name="{$stdata.iconname}" ititle=":{tr}Toggle{/tr} {$stdata.label}" iclass='tips'}
-                        </a>
-                    </div>
-                </div>
-            {/foreach}
+            <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
+              {foreach key=st item=stdata from=$status_types}
+                <button
+                  type="submit"
+                  name="status"
+                  value="{$stdata.statuslink}"
+                  class="btn {if $status eq $stdata.statuslink}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
+                  aria-pressed="{if $status eq $stdata.statuslink}true{else}false{/if}"
+                >
+                  {icon name="{$stdata.iconname}"}
+                  <span>{$stdata.label}</span>
+                </button>
+              {/foreach}
+              <button
+                type="submit"
+                name="status"
+                value=""
+                class="btn btn-outline-danger"
+                aria-pressed="{if not $status}true{else}false{/if}"
+              >
+                {icon name="times"} <span>{tr}Reset{/tr}</span>
+              </button>
+            </div>
         {/if}
 
         <div class="w-25">
