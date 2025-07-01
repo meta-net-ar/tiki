@@ -57,7 +57,7 @@
         background-color: var(--bs-body-bg);
     }
     a:not(.btn), a.btn-link {
-        color: inherit !important;
+        color: var(--bs-link-color) !important;
         &:hover {
             color: var(--bs-link-hover-color) !important;
             text-decoration: inherit;
