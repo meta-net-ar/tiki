@@ -90,6 +90,7 @@ class Tiki_Security_Policy extends Smarty_Security
             'strip_tags',
             'stristr',
             'strpos',
+            'strtotime',
             'substr',
             'tra',
             'trim',
