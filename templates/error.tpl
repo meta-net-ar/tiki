@@ -59,7 +59,7 @@ close();
             {/if}
         {elseif $commenttype eq "note" and isset($msg)}
             {remarksbox type='note' title=$title}
-                {$msg|escape}
+                {$msg|safe_html}
             {/remarksbox}
         {else}
             {if isset($token_error)}
@@ -77,7 +77,7 @@ close();
                 {/remarksbox}
             {else}
                 {remarksbox type='errors' title=$errortitle}
-                    {$msg|escape}
+                    {$msg|safe_html}
                     {if !empty($required_preferences)}
                         {remarksbox type='note' title="{tr}Settings{/tr}" close="n"}
                         <form method="post" action="tiki-admin.php" role="form" class="form">
@@ -97,7 +97,7 @@ close();
 
         {if isset($extraButton)}
             {remarksbox type='errors' title=$errortitle}
-            {$extraButton.comment|escape}
+            {$extraButton.comment|safe_html}
             {button href=$extraButton.href _text=$extraButton.text}
             {/remarksbox}
         {/if}
