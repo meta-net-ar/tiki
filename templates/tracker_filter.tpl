@@ -6,6 +6,15 @@
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
             <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
+              <button
+                type="submit"
+                name="status"
+                value=""
+                class="btn {if not $status}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
+                aria-pressed="{if not $status}true{else}false{/if}"
+              >
+                {icon name="list"} <span>{tr}All{/tr}</span>
+              </button>
               {foreach key=st item=stdata from=$status_types}
                 <button
                   type="submit"
@@ -18,15 +27,6 @@
                   <span>{$stdata.label}</span>
                 </button>
               {/foreach}
-              <button
-                type="submit"
-                name="status"
-                value=""
-                class="btn btn-outline-danger"
-                aria-pressed="{if not $status}true{else}false{/if}"
-              >
-                {icon name="times"} <span>{tr}Reset{/tr}</span>
-              </button>
             </div>
         {/if}
 
