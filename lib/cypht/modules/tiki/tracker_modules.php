@@ -108,23 +108,17 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         if (preg_match("/^imap_(\w+)_(.+)/", $form['list_path'], $matches)) {
             $imap_server_id = $matches[1];
             $folder = hex2bin($matches[2]);
-            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (! $imap->authed()) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+            if (! $mailbox->authed()) {
                 Hm_Msgs::add('ERRCould not authenticate with mail server');
                 return;
             }
-            if (! $imap->select_folder($folder)) {
-                Hm_Msgs::add('ERRMailbox not found');
-                return;
-            }
-
 
             foreach ($msg_ids as $msg_id) {
-                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $msg_id);
+                list($msgs[], $headers_array[]) = get_message_data($mailbox, $folder, $msg_id);
             }
 
-            bind_tracker_item_update_event($imap, $form, $msg_ids);
+            bind_tracker_item_update_event($mailbox, $folder, $form, $msg_ids);
         } elseif (preg_match("/^tracker_folder_/", $form['list_path'], $matches)) {
             $email = tiki_parse_message($form['list_path'], $msg_ids[0]);
             if (! $email) {
@@ -177,28 +171,23 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                 $folder = hex2bin($full_path[3]);
 
                 if (! in_array($imap_server_id, array_keys($imaps))) {
-                    $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-                    $imap_data = Hm_IMAP_List::connect($imap_server_id, $cache);
+                    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
 
-                    if (! $imap_data->authed()) {
+                    if (! $mailbox->authed()) {
                         $errors++;
                         continue;
                     }
 
-                    $imaps[$imap_server_id] = $imap_data;
+                    $imaps[$imap_server_id] = $mailbox;
                 }
 
-                $imap = $imaps[$imap_server_id];
-                if (! $imap->select_folder($folder)) {
-                    $errors++;
-                    continue;
-                }
+                $mailbox = $imaps[$imap_server_id];
 
-                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $full_path[2]);
+                list($msgs[], $headers_array[]) = get_message_data($mailbox, $folder, $full_path[2]);
                 $ids[] = $full_path[2];
             }
             if (count($ids)) {
-                bind_tracker_item_update_event($imap, $form, $ids);
+                bind_tracker_item_update_event($mailbox, $folder, $form, $ids);
             }
         } else {
             Hm_Msgs::add('ERRMessage from this source could not be moved');
@@ -653,6 +642,9 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             return;
         }
 
+        $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
+        $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
+
         $this->out('msg_text_uid', $form['imap_msg_uid']);
         $this->out('msg_list_path', $this->request->post['list_path']);
         $part_num = false;
@@ -897,19 +889,17 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
                 foreach ($unreadMessages as $key => $msg) {
                     if ($msg['server_id'] == $idx) {
                         // Delete the message
-                        $cache = Hm_IMAP_List::get_cache($this->cache, $msg['server_id']);
-                        $imap = Hm_IMAP_List::connect($msg['server_id'], $cache);
-
-                        if ($imap->authed()) {
+                        $mailbox = Hm_IMAP_List::get_connected_mailbox($msg['server_id'], $this->cache);
+                        if ($mailbox->authed()) {
                             foreach ($filters as $filter) {
-                                $filterData = Tiki_Hm_Functions::processFilter($filter, $imap, $msg);
+                                $filterData = Tiki_Hm_Functions::processFilter($filter, $mailbox, $msg);
                                 if ($filterData['pass']) {
                                     $tempFolder = 'Tiki-Sieve-Rules-To-Be-Applied';
-                                    if (! count($imap->get_mailbox_status($tempFolder))) {
-                                        $imap->create_mailbox($tempFolder);
+                                    if (! count($mailbox->folder_exists($tempFolder))) {
+                                        $mailbox->create_folder($tempFolder);
                                     }
                                     // Move the message to temp folder
-                                    $imap->message_action('MOVE', [$msg['uid']], $tempFolder);
+                                    $mailbox->message_action($tempFolder, 'MOVE', [$msg['uid']], $tempFolder);
                                 }
                             }
                         }

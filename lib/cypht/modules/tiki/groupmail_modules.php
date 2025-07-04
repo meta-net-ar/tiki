@@ -57,7 +57,7 @@ class Hm_Handler_groupmail_fetch_messages extends Hm_Handler_Module
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->config, [hex2bin($folder)], $limit);
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, [hex2bin($folder)], $limit);
             $this->out('folder_status', $status);
             $this->out('groupmail_inbox_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -116,45 +116,18 @@ class Hm_Handler_take_groupmail extends Hm_Handler_Module
             return;
         }
 
-        $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-        $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-        if (! imap_authed($imap)) {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox->authed()) {
             return;
         }
 
-        $imap->read_only = $prefetch;
-        if (! $imap->select_mailbox(hex2bin($form['folder']))) {
+        $mailbox->set_read_only($prefetch);
+        if (! $mailbox->select_folder(hex2bin($form['folder']))) {
             return;
         }
 
-        $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
-        if (! $this->user_config->get('text_only_setting', false)) {
-            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'html', $msg_struct);
-            if (! $part) {
-                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
-            }
-        } else {
-            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
-        }
-
-        $struct = $imap->search_bodystructure($msg_struct, ['imap_part_number' => $part]);
-        $msg_struct_current = array_shift($struct);
-        if (! trim($msg_text)) {
-            if (is_array($msg_struct_current) && array_key_exists('subtype', $msg_struct_current)) {
-                if ($msg_struct_current['subtype'] == 'plain') {
-                    $subtype = 'html';
-                } else {
-                    $subtype = 'plain';
-                }
-                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', $subtype, $msg_struct);
-                $struct = $imap->search_bodystructure($msg_struct, ['imap_part_number' => $part]);
-                $msg_struct_current = array_shift($struct);
-            }
-        }
-        if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
-            $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
-        }
-        $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
+        list ($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], false, $this->user_config->get('text_only_setting', false));
+        $msg_headers = $imap->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
 
         global $prefs, $user;
 

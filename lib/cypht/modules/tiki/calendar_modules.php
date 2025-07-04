@@ -559,22 +559,9 @@ if (! hm_exists('get_calendar_part_imap')) {
         }
         list($success, $form) = $mod->process_form(['imap_server_id', 'imap_msg_uid', 'folder']);
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($mod->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (imap_authed($imap)) {
-                if ($imap->select_mailbox(hex2bin($form['folder']))) {
-                    $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
-                    if ($part !== false) {
-                        if ($part == 0) {
-                            $max = 500000;
-                        } else {
-                            $max = false;
-                        }
-                        $struct = $imap->search_bodystructure($msg_struct, ['imap_part_number' => $part]);
-                        $msg_struct_current = array_shift($struct);
-                        $event = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
-                    }
-                }
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $mod->cache);
+            if ($mailbox->authed()) {
+                $event = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, true)[2];
             }
         }
         $mod->out('calendar_method', $method);

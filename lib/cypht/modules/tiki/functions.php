@@ -199,29 +199,25 @@ if (! hm_exists('tiki_add_attached_images')) {
 if (! hm_exists('tiki_move_to_imap_server')) {
     function tiki_move_to_imap_server($email, $action, $dest_path, $hm_cache)
     {
-        $cache = Hm_IMAP_List::get_cache($hm_cache, $dest_path[1]);
-        $dest_imap = Hm_IMAP_List::connect($dest_path[1], $cache);
-        if ($dest_imap) {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($dest_path[1], $hm_cache);
+        if ($mailbox) {
             $file = Tiki\FileGallery\File::id($email['fileId']);
             $msg = $file->getContents();
-            if ($dest_imap->append_start(hex2bin($dest_path[2]), strlen($msg), true)) {
-                $dest_imap->append_feed($msg . "\r\n");
-                if ($dest_imap->append_end()) {
-                    if ($action == 'move') {
-                        $trk = TikiLib::lib('trk');
-                        $field = $trk->get_field_info($email['fieldId']);
-                        if (! $field) {
-                            return false;
-                        }
-                        $field['value'] = [
-                        'delete' => $email['fileId']
-                        ];
-                        $trk->replace_item($email['trackerId'], $email['itemId'], [
-                        'data' => [$field]
-                        ]);
+            if ($mailbox->store_message(hex2bin($dest_path[2]), $msg)) {
+                if ($action == 'move') {
+                    $trk = TikiLib::lib('trk');
+                    $field = $trk->get_field_info($email['fieldId']);
+                    if (! $field) {
+                        return false;
                     }
-                    return true;
+                    $field['value'] = [
+                        'delete' => $email['fileId']
+                    ];
+                    $trk->replace_item($email['trackerId'], $email['itemId'], [
+                        'data' => [$field]
+                    ]);
                 }
+                return true;
             }
         }
         return false;
@@ -390,8 +386,13 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             }
         }
         $res = "<div class=\"d-inline-block\">";
-        $res .= "<a class=\"hlink" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\">" . $mod->trans($title) . "</a>";
-        $res .= "<div class='" . $class . " dropdown-menu' style=\"display: none;\"><div class='move_to_title'>" . $mod->trans($dropdown_title) . "<span><a class=\"close_{$class}\" href='#'>X</a></span></div>" . implode("<br>\n", $field_list) . "</div></div>";
+        if ($class != 'move_to_trackers') {
+            $res .= "<a class=\"hlink dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
+            $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div>";
+        } else {
+            $res .= "<a class=\"hlink" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
+        }
+        $res .= "</div>";
 
         return $res;
     }
@@ -402,14 +403,14 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
  * @return string array message and headers
  */
 if (! hm_exists('get_message_data')) {
-    function get_message_data($imap, $folder, $msg_id)
+    function get_message_data($mailbox, $folder, $msg_id)
     {
-        $msg = $imap->get_message_content($msg_id, 0);
+        $msg = $mailbox->get_message_content($folder, $msg_id, 0);
         $msg = str_replace("\r\n", "\n", $msg);
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg) . "\r\n";
 
-        $headers = $imap->get_message_headers($folder, $msg_id);
+        $headers = $mailbox->get_message_headers($folder, $msg_id);
         if (! empty($headers['Flags'])) {
             $msg = "Flags: " . $headers['Flags'] . "\r\n" . $msg;
         }
@@ -423,18 +424,20 @@ if (! hm_exists('get_message_data')) {
  * @return string ensure file was saved before removing it from remote mailbox
  */
 if (! hm_exists('bind_tracker_item_update_event')) {
-    function bind_tracker_item_update_event($imap, $form, $msg_ids)
+    function bind_tracker_item_update_event($mailbox, $folder, $form, $msg_ids)
     {
         TikiLib::events()->bind('tiki.trackeritem.update', function ($args) {
-            $imap = $args['imap'];
+            $mailbox = $args['mailbox'];
+            $folder = $args['folder'];
             $form = $args['form'];
             $old = $args['old_values'][$form['tracker_field_id']];
             $new = $args['values'][$form['tracker_field_id']];
-            if (substr_count($old, ',') != substr_count($new, ',')) {
-                $imap->get_connection()->message_action('DELETE', $args['msg_ids']);
-                $imap->get_connection()->message_action('EXPUNGE', $args['msg_ids']);
+            if ($old != $new) {
+                foreach ($args['msg_ids'] as $msg_id) {
+                    $mailbox->delete_message($folder, $msg_id, false);
+                }
             }
-        }, ['imap' => $imap, 'form' => $form, 'msg_ids' => $msg_ids]);
+        }, ['mailbox' => $mailbox, 'folder' => $folder, 'form' => $form, 'msg_ids' => $msg_ids]);
     }
 }
 
@@ -446,7 +449,7 @@ if (! hm_exists('append_to_msg_headers')) {
     function append_to_msg_headers($headers, $link)
     {
         $link = ' | ' . $link;
-        $headers = preg_replace("#<div class=\"move_to_location\"></div>#", $link . "\\0", $headers);
+        $headers = preg_replace('#</ul><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
 
         return $headers;
     }
