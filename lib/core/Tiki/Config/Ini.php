@@ -41,8 +41,6 @@ class Ini
             throw new \RuntimeException("Failed to parse INI file: {$file}");
         }
 
-        $data = $this->expandDotNotationKeys($data);
-
         return $this->process($data);
     }
 
@@ -55,12 +53,6 @@ class Ini
     public function fromString(string $iniContent): array
     {
         $data = parse_ini_string($iniContent, true, INI_SCANNER_TYPED);
-        if ($data === false) {
-            throw new \RuntimeException("Failed to parse INI string.");
-        }
-
-        $data = $this->expandDotNotationKeys($data);
-
         return $this->process($data);
     }
 
@@ -127,43 +119,5 @@ class Ini
         $result = array_replace_recursive($result, $config[$section]);
 
         return $result;
-    }
-
-    /**
-     * Expand dot-notation keys into nested arrays
-     */
-    private function expandDotNotationKeys(array $data): array
-    {
-        $result = [];
-        foreach ($data as $section => $values) {
-            if (is_array($values)) {
-                if (! isset($result[$section]) || ! is_array($result[$section])) {
-                    $result[$section] = [];
-                }
-                foreach ($values as $key => $value) {
-                    $this->assignNestedKey($result[$section], $key, $value);
-                }
-            } else {
-                $result[$section] = $values;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Assign value using dot notation.
-     */
-    private function assignNestedKey(array $array, string $key, mixed $value): void
-    {
-        $keys = explode('.', $key);
-        while (count($keys) > 1) {
-            $k = array_shift($keys);
-            if (! isset($array[$k]) || ! is_array($array[$k])) {
-                $array[$k] = [];
-            }
-            $array = &$array[$k];
-        }
-        $array[array_shift($keys)] = $value;
     }
 }
