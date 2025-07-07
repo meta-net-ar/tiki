@@ -433,6 +433,13 @@
             td.icon { right: 5px; }
             td.action { right: -60px; }
         }
+        // Remove top padding from content cell and message list
+        .content_cell {
+            padding-top: 0px !important;
+        }
+        .message_list {
+            margin-top: 0px !important;
+        }
     }
 
     // Remove the fixed navbar as it will make Cypht navbar not visible
