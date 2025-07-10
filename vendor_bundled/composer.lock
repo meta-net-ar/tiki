@@ -2296,17 +2296,17 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.8",
+            "version": "v1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4"
+                "reference": "845e59954c5418db50f3c6a134eb587660331f6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/henrique-borba/php-sieve-manager/henrique-borba-php-sieve-manager-1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4-zip-e4708a.zip",
-                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4",
-                "shasum": "acc113ce6f4751c598a1f176f69362a9bb44d3c3"
+                "url": "https://composer.tiki.org/dist/henrique-borba/php-sieve-manager/henrique-borba-php-sieve-manager-845e59954c5418db50f3c6a134eb587660331f6e-zip-f98a2d.zip",
+                "reference": "845e59954c5418db50f3c6a134eb587660331f6e",
+                "shasum": "8c8f8ded1f38f0cd18bf5e13a42092a2a2f5d486"
             },
             "require": {
                 "php": ">=5.4"
@@ -2317,7 +2317,6 @@
                     "PhpSieveManager\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2337,8 +2336,8 @@
                 },
                 {
                     "name": "Marc Laporte",
-                    "homepage": "https://MarcLaporte.com",
-                    "role": "Maintainer"
+                    "role": "Maintainer",
+                    "homepage": "https://MarcLaporte.com"
                 }
             ],
             "description": "A modern (started in 2022) PHP library for the ManageSieve protocol (RFC5804) to create/edit Sieve scripts (RFC5228). Used by Cypht Webmail.",
@@ -2355,7 +2354,13 @@
                 "php",
                 "sieve"
             ],
-            "time": "2024-08-29T06:33:14+00:00"
+            "support": {
+                "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
+                "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki",
+                "source": "https://github.com/cypht-org/php-sieve-manager",
+                "chat": "https://gitter.im/cypht-org/community"
+            },
+            "time": "2025-03-25T17:14:17+00:00"
         },
         {
             "name": "hesammousavi/bootstrap-v4-rtl",
