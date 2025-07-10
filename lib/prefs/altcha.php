@@ -49,11 +49,20 @@ function prefs_altcha_list()
             ],
             'default' => 'medium',
         ];
+        $prefs['altcha_telemetry_url'] =[
+            'name' => tra('Altcha telemetry URL'),
+            'type' => 'text',
+            'description' => tra('Optional telemetry endpoint (e.g., Altcha Sentinel). Leave blank to disable telemetry.'),
+            'size' => 60,
+            'default' => '',
+            'keywords' => 'captcha altcha',
+        ];
     } else {
         $prefs['altcha_incompatible'] = [
             'name' => tra('Altcha Not Available'),
             'description' => tra('Altcha requires PHP 8.2 or later. Your current version is ') . PHP_VERSION,
             'type' => 'static',
+            'keywords' => 'captcha altcha',
         ];
     }
 

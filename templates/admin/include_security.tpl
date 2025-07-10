@@ -226,6 +226,7 @@
                         {preference name=altcha_site_url}
                         {preference name=altcha_theme}
                         {preference name=altcha_difficulty}
+                        {preference name=altcha_telemetry_url}
                     </div>
                 </div>
             </fieldset>
