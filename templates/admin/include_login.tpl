@@ -67,12 +67,21 @@
                     {preference name=http_referer_registration_check}
                     {preference name=email_detect_disposable}
                     <fieldset>
-                        <legend class="h3">{tr}CAPTCHA{/tr}</legend>
+                        <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                         {preference name=feature_antibot}
                         <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
-                            {preference name=captcha_wordLen}
-                            {preference name=captcha_width}
-                            {preference name=captcha_noise}
+                            <h4 class="mt-3">{tr}Classic CAPTCHA{/tr}</h4>
+                            <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                                {preference name=captcha_wordLen}
+                                {preference name=captcha_width}
+                                {preference name=captcha_noise}
+                                <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h4>
+                                {preference name=captcha_questions_active}
+                                <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
+                                    {preference name=captcha_questions}
+                                </div>
+                            </div>
+                            <h4 class="mt-4">{tr}Google reCAPTCHA{/tr}</h4>
                             {preference name=recaptcha_enabled}
                             <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
                                 {preference name=recaptcha_pubkey}
@@ -80,10 +89,14 @@
                                 {preference name=recaptcha_theme}
                                 {preference name=recaptcha_version}
                             </div>
-                            {preference name=captcha_questions_active}
-                            <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                                {preference name=captcha_questions}
+                            <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>
+                            {preference name=altcha_enabled}
+                            <div class="adminoptionboxchild" id="altcha_enabled_childcontainer">
+                                {preference name=altcha_site_url}
+                                {preference name=altcha_theme}
+                                {preference name=altcha_difficulty}
                             </div>
+                        </div>
                     </fieldset>
                     <legend class="h3">{tr}Group and tracker login settings{/tr}</legend>
                     <div class="adminoptionbox mb-3 row">

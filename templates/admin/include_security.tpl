@@ -197,12 +197,21 @@
                 {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
-                <legend class="h3">{tr}CAPTCHA{/tr}</legend>
+                <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                 {preference name=feature_antibot}
                 <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
-                    {preference name=captcha_wordLen}
-                    {preference name=captcha_width}
-                    {preference name=captcha_noise}
+                    <h4 class="mt-3">{tr}Classic CAPTCHA{/tr}</h4>
+                    <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                        {preference name=captcha_wordLen}
+                        {preference name=captcha_width}
+                        {preference name=captcha_noise}
+                        <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h4>
+                        {preference name=captcha_questions_active}
+                        <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
+                            {preference name=captcha_questions}
+                        </div>
+                    </div>
+                    <h4 class="mt-4">{tr}Google reCAPTCHA{/tr}</h4>
                     {preference name=recaptcha_enabled}
                     <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
                         {preference name=recaptcha_pubkey}
@@ -210,9 +219,13 @@
                         {preference name=recaptcha_theme}
                         {preference name=recaptcha_version}
                     </div>
-                    {preference name=captcha_questions_active}
-                    <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                        {preference name=captcha_questions}
+                    
+                    <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>
+                    {preference name=altcha_enabled}
+                    <div class="adminoptionboxchild" id="altcha_enabled_childcontainer">
+                        {preference name=altcha_site_url}
+                        {preference name=altcha_theme}
+                        {preference name=altcha_difficulty}
                     </div>
                 </div>
             </fieldset>
