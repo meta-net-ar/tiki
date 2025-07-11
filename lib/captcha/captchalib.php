@@ -5,6 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
+
+use AltchaOrg\Altcha\ChallengeOptions;
+use AltchaOrg\Altcha\Altcha as AltchaLib;
+
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
@@ -55,7 +59,9 @@ class Captcha
                 $type = 'questions';
             } elseif (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox')) {
                 $type = 'default';
-            } else {
+            } elseif (! empty($prefs['altcha_hmac_key']) && $prefs['altcha_enabled'] === 'y') {
+                $type = 'altcha';
+            }else {
                 $type = 'dumb';
             }
         }
@@ -128,6 +134,10 @@ class Captcha
 
             include_once('lib/captcha/Captcha_Questions.php');
             $this->captcha = new Captcha_Questions($questions);
+        } elseif ($type === 'altcha') {
+            $hmacKey = $prefs['altcha_hmac_key'];
+            $this->captcha = new AltchaLib($hmacKey);
+            $this->type = 'altcha';
         } else {        // implied $type==='dumb'
             $this->captcha = new Laminas\Captcha\Dumb();
             $this->captcha->setWordlen($prefs['captcha_wordLen']);
@@ -152,18 +162,28 @@ class Captcha
         }
 
         try {
-            $key = $this->captcha->generate();
-            if ($this->type == 'default' || $this->type == 'questions') {
-                // the following needed to keep session active for ajax checking
-                $session = $this->captcha->getSession();
-                $session->setExpirationHops(2, null, true);
-                $this->captcha->setSession($session);
-                $this->captcha->setKeepSession(false);
+            if ($this->type === 'altcha') {
+                $options = new ChallengeOptions(
+                    maxNumber: 50000,
+                    expires: (new \DateTimeImmutable())->add(new \DateInterval('PT10S'))
+                );
+                $key = $this->captcha->createChallenge($options);
+                $_SESSION['altcha_challenge'] = $key;
+                return $key;
+            } else {
+                $key = $this->captcha->generate();
+                if ($this->type == 'default' || $this->type == 'questions') {
+                    $session = $this->captcha->getSession();
+                    $session->setExpirationHops(2, null, true);
+                    $this->captcha->setSession($session);
+                    $this->captcha->setKeepSession(false);     
+                }
+                return $key;
             }
         } catch (Exception $e) {
-            Feedback::error($e->getMessage());
+        Feedback::error($e->getMessage());
         }
-        return $key;
+        
     }
 
     /** Return captcha ID
@@ -172,7 +192,14 @@ class Captcha
      */
     public function getId()
     {
-        return $this->captcha->getId();
+        if (method_exists($this->captcha, 'getId')) {
+            return $this->captcha->getId();
+        }
+
+        if ($this->type === 'altcha') {
+            return $_SESSION['altcha_challenge']['challenge'] ?? '';
+        }
+        return '';
     }
 
     /**
@@ -197,6 +224,22 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
                 return '<div id="captcha' . $id . '"></div>';
             } else {
                 return $this->captcha->render();
+            }
+        } elseif ($this->type === 'altcha') {
+            $challenge = $_SESSION['altcha_challenge'] ?? null;
+            if ($challenge) {
+                TikiLib::lib('header')->add_js('https://cdn.jsdelivr.net/npm/@altcha/browser@latest', 100);
+                return '<altcha-challenge algorithm="' 
+                . $challenge['algorithm']
+                . '" challenge="'
+                . $challenge['challenge']
+                . '" salt="'
+                . $challenge['salt']
+                . '" signature="'
+                . $challenge['signature']
+                . '"></altcha-challenge>';
+            } else {
+                return '<div>' . tra('Altcha challenge unavailable') . '</div>';
             }
         } else {
             if (in_array($this->type, ['recaptcha20', 'recaptcha30'])) {
@@ -245,6 +288,12 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
             ini_set('arg_separator.output', '&');
             $result = $this->captcha->isValid($input);
             ini_set('arg_separator.output', $oldVal);
+        }elseif ($this->type === 'altcha') {
+            $payload = $input['altcha'] ?? null;
+            if (!$payload) {
+                return false;
+            }
+            $result = $this->captcha->verifySolution($payload, true);
         } else {
             if (isset($input['captcha'])) {
                 $captchaInput = $input['captcha'];
@@ -271,7 +320,9 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
     public function getPath()
     {
         try {
-            return $this->captcha->getImgDir() . $this->captcha->getId() . $this->captcha->getSuffix();
+            if (method_exists($this->captcha, 'getImgDir')) {
+                return $this->captcha->getImgDir() . $this->captcha->getId() . $this->captcha->getSuffix();
+            }
         } catch (Exception $e) {
             Feedback::error($e->getMessage());
         }

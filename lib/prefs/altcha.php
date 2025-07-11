@@ -26,6 +26,14 @@ function prefs_altcha_list()
             'keywords' => 'captcha altcha',
             'default' => 'https://altcha.org',
         ];
+        $prefs['altcha_hmac_key']=[
+            'name' => tra('Altcha Hmac Key'),
+            'type' => 'text',
+            'description' => tra('Your Altcha Developper Secret Key'),
+            'size' => 60,
+            'default' => '',
+            'keywords' => 'captcha altcha',
+        ];
         $prefs['altcha_theme'] = [
             'name' => tra('Altcha theme'),
             'type' => 'list',
