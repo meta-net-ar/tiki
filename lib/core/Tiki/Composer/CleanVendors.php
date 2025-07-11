@@ -112,12 +112,207 @@ class CleanVendors
         'www',
     ];
 
+    private static int $deletedFiles = 0;
+    private static float $deletedSize = 0.0;
+
+    /**
+     * Unique affected packages set: ["vendor/package" => true]
+     */
+    private static array $affectedPackages = [];
+
+    private static array $deletedPaths = [];
+    private static float $startTime = 0.0;
+
+    private static bool $enableLog = false;
+    private static string $logFile = '';
+    private static string $jsonFile = '';
+    private static string $logDir = '';
+
     public static function clean(Event $event): void
     {
-        $vendors = rtrim($event->getComposer()->getConfig()->get('vendor-dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        self::resetCounters();
+        self::$startTime = microtime(true);
 
-        self::removeStandard($vendors);
-        self::addIndexFiles($vendors);
+        $io = $event->getIO();
+
+        $vendorsRoot = rtrim(
+            (string) $event->getComposer()->getConfig()->get('vendor-dir'),
+            DIRECTORY_SEPARATOR
+        ) . DIRECTORY_SEPARATOR;
+
+        // Parse options like --log, --log-file=..., --json-file=...
+        self::parseLogOptions($event);
+
+        $io->write('<info>Cleaning vendor directories...</info>');
+        self::logMessage('Starting vendor directories cleanup');
+
+        self::removeStandard($vendorsRoot, $vendorsRoot, $event);
+        self::addIndexFiles($vendorsRoot);
+
+        $executionTime = round(microtime(true) - self::$startTime, 2);
+        $deletedSizeMb = round(self::$deletedSize / (1024 * 1024), 2);
+        $depsCount = count(self::$affectedPackages);
+
+        $summary = sprintf(
+            '%d files (%.2f MB) removed from %d dependencies in %.2f seconds',
+            self::$deletedFiles,
+            $deletedSizeMb,
+            $depsCount,
+            $executionTime
+        );
+
+        // Console output
+        $io->write("<info>$summary</info>");
+        self::logMessage($summary);
+
+        if ($io->isVerbose()) {
+            $io->write('<comment>Deleted files:</comment>');
+            foreach (self::$deletedPaths as $path) {
+                $io->write("  $path");
+            }
+        }
+
+        // Log + JSON reports if enabled
+        if (self::$enableLog) {
+            self::writeLogDetails();
+            self::writeJsonReport($vendorsRoot, $summary, $executionTime, $deletedSizeMb, $depsCount);
+
+            $io->write("<info>Full report logged to: " . self::$logFile . "</info>");
+            $io->write("<info>JSON report saved to: " . self::$jsonFile . "</info>");
+        }
+    }
+
+    private static function resetCounters(): void
+    {
+        self::$deletedFiles = 0;
+        self::$deletedSize = 0.0;
+        self::$affectedPackages = [];
+        self::$deletedPaths = [];
+        self::$enableLog = false;
+        self::$logFile = '';
+        self::$jsonFile = '';
+        self::$logDir = '';
+        self::$startTime = 0.0;
+    }
+
+    /**
+     * Supports:
+     *  - --log (enables both .log and .json reports in temp/dev by default)
+     *  - --log-file=/path/to/file.log
+     *  - --json-file=/path/to/file.json
+     */
+    private static function parseLogOptions(Event $event): void
+    {
+        $args = (array) $event->getArguments();
+
+        if (! in_array('--log', $args, true)) {
+            return;
+        }
+
+        self::$enableLog = true;
+
+        $tikiRoot = dirname(dirname(dirname(dirname(__DIR__))));
+
+        // Default directory: temp/dev (as recommended)
+        self::$logDir = $tikiRoot . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'dev';
+
+        $logFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.log';
+        $jsonFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.json';
+
+        foreach ($args as $arg) {
+            if (is_string($arg) && str_starts_with($arg, '--log-file=')) {
+                $logFile = (string) substr($arg, strlen('--log-file='));
+            } elseif (is_string($arg) && str_starts_with($arg, '--json-file=')) {
+                $jsonFile = (string) substr($arg, strlen('--json-file='));
+            }
+        }
+
+        self::$logFile = self::normalizePath($logFile);
+        self::$jsonFile = self::normalizePath($jsonFile);
+
+        $logDir = dirname(self::$logFile);
+        $jsonDir = dirname(self::$jsonFile);
+
+        if (! is_dir($logDir)) {
+            @mkdir($logDir, 0755, true);
+        }
+        if (! is_dir($jsonDir)) {
+            @mkdir($jsonDir, 0755, true);
+        }
+
+        @file_put_contents(
+            self::$logFile,
+            "=== Vendor Cleanup Log ===\n" . date('Y-m-d H:i:s') . "\n\n"
+        );
+    }
+
+    private static function normalizePath(string $path): string
+    {
+        // Keep as-is if absolute, otherwise resolve relative to current working directory
+        if ($path === '') {
+            return $path;
+        }
+        $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+
+        // absolute on Unix
+        if (str_starts_with($path, DIRECTORY_SEPARATOR)) {
+            return $path;
+        }
+
+        // absolute on Windows (e.g. C:\)
+        if (preg_match('/^[A-Za-z]:\\\\/', $path) === 1) {
+            return $path;
+        }
+
+        return getcwd() . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+    }
+
+    private static function logMessage(string $message): void
+    {
+        if (! self::$enableLog || self::$logFile === '') {
+            return;
+        }
+        @file_put_contents(self::$logFile, $message . "\n", FILE_APPEND);
+    }
+
+    private static function writeLogDetails(): void
+    {
+        if (! self::$enableLog || self::$logFile === '') {
+            return;
+        }
+
+        $logContent = "\nDeleted files:\n";
+        foreach (self::$deletedPaths as $path) {
+            $logContent .= "- $path\n";
+        }
+
+        @file_put_contents(self::$logFile, $logContent, FILE_APPEND);
+    }
+
+    private static function writeJsonReport(
+        string $vendorsRoot,
+        string $summary,
+        float $executionTime,
+        float $deletedSizeMb,
+        int $depsCount
+    ): void {
+        if (! self::$enableLog || self::$jsonFile === '') {
+            return;
+        }
+
+        $data = [
+            'timestamp' => date('c'),
+            'vendorDir' => $vendorsRoot,
+            'summary' => $summary,
+            'deletedFiles' => self::$deletedFiles,
+            'deletedSizeMb' => $deletedSizeMb,
+            'affectedDependencies' => $depsCount,
+            'durationSeconds' => $executionTime,
+            'deletedPaths' => self::$deletedPaths,
+            'affectedPackages' => array_keys(self::$affectedPackages),
+        ];
+
+        @file_put_contents(self::$jsonFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     private static function addIndexFiles(string $path): void
@@ -130,34 +325,161 @@ class CleanVendors
 
         $path = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $path), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
-        if (empty(glob($path . '*', GLOB_NOSORT | GLOB_NOESCAPE | GLOB_BRACE))) {
+        // If directory is empty (including hidden files), add index.php
+        if (self::isDirEmpty($path)) {
             $indexPath = $path . 'index.php';
             if (! file_exists($indexPath)) {
-                file_put_contents($indexPath, "<?php\nexit;\n");
+                @file_put_contents($indexPath, "<?php\nexit;\n");
             }
+            return;
         }
 
         $dirs = glob($path . '{,.}*[!.]', GLOB_MARK | GLOB_BRACE | GLOB_ONLYDIR);
+        if (! $dirs) {
+            return;
+        }
+
         foreach ($dirs as $dir) {
             $dir = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $dir), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-            if (! array_filter($excludeDirs, fn($item) => str_contains($dir, $item))) {
+            if (! array_filter($excludeDirs, fn($item) => str_contains(str_replace(DIRECTORY_SEPARATOR, '/', $dir), $item))) {
                 self::addIndexFiles($dir);
             }
         }
     }
 
-    private static function removeStandard(string $base): void
+    private static function isDirEmpty(string $dir): bool
+    {
+        if (! is_dir($dir)) {
+            return true;
+        }
+
+        $handle = @opendir($dir);
+        if (! $handle) {
+            return false;
+        }
+
+        while (($entry = readdir($handle)) !== false) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            closedir($handle);
+            return false;
+        }
+
+        closedir($handle);
+        return true;
+    }
+
+    private static function removeStandard(string $base, string $vendorsRoot, Event $event): void
     {
         $fs = new FileSystem();
         $files = glob($base . '{,.}*[!.]', GLOB_MARK | GLOB_BRACE);
+
+        if (! $files) {
+            return;
+        }
+
         foreach ($files as $file) {
             $file = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $file), DIRECTORY_SEPARATOR);
-            $filename = strtolower(basename($file));
-            if (in_array($filename, self::$standardFiles, true)) {
-                $fs->remove($file);
-            } elseif (is_dir($file)) {
-                self::removeStandard($file);
+
+            // Matching supports basename AND path tails like ".github/workflows"
+            if (self::isStandardPath($file)) {
+                $packageName = self::extractPackageName($file, $vendorsRoot);
+
+                try {
+                    $size = is_dir($file) ? self::getDirectorySize($file) : (float) @filesize($file);
+                    $fs->remove($file);
+
+                    self::$deletedFiles++;
+                    self::$deletedSize += (float) $size;
+                    self::$deletedPaths[] = $file;
+
+                    if ($packageName) {
+                        self::$affectedPackages[$packageName] = true;
+                    }
+                } catch (Exception $e) {
+                    $errorMsg = sprintf('Error deleting %s: %s', $file, $e->getMessage());
+                    $event->getIO()->writeError("<error>$errorMsg</error>");
+                    self::logMessage("ERROR: $errorMsg");
+                }
+
+                continue;
+            }
+
+            if (is_dir($file)) {
+                self::removeStandard($file . DIRECTORY_SEPARATOR, $vendorsRoot, $event);
             }
         }
+    }
+
+    private static function isStandardPath(string $path): bool
+    {
+        $basename = strtolower(basename($path));
+        if (in_array($basename, self::$standardFiles, true)) {
+            return true;
+        }
+
+        // also match entries like ".github/workflows" by checking path tail
+        $norm = strtolower(str_replace(DIRECTORY_SEPARATOR, '/', $path));
+
+        foreach (self::$standardFiles as $entry) {
+            // exact tail match:
+            // ".../.github/workflows" or ".../docs"
+            if (str_ends_with($norm, '/' . $entry) || $norm === $entry) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Extract "vendor/package" from an absolute path under vendor-dir.
+     */
+    private static function extractPackageName(string $path, string $vendorsRoot): ?string
+    {
+        $path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $vendorsRoot = rtrim($vendorsRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        if (strpos($path, $vendorsRoot) !== 0) {
+            return null;
+        }
+
+        $relative = substr($path, strlen($vendorsRoot)); // e.g. symfony/console/...
+        $relative = trim($relative, DIRECTORY_SEPARATOR);
+
+        if ($relative === '') {
+            return null;
+        }
+
+        $parts = array_values(array_filter(explode(DIRECTORY_SEPARATOR, $relative)));
+        if (count($parts) >= 2) {
+            return $parts[0] . '/' . $parts[1];
+        }
+
+        return null;
+    }
+
+    private static function getDirectorySize(string $directory): float
+    {
+        $size = 0.0;
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                /** @var \SplFileInfo $file */
+                if ($file->isFile()) {
+                    $size += (float) $file->getSize();
+                }
+            }
+        } catch (Exception $e) {
+            // If size calculation fails, don't block cleanup
+            return 0.0;
+        }
+
+        return $size;
     }
 }
