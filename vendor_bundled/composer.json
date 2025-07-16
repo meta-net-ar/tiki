@@ -65,8 +65,6 @@
         "    A more actively maintained alternative would be ",
         "    https://github.com/gsteel/akismet, but would require code changes",
         "",
-        "  pear/xml_rpc: has been replaced by phpxmlrpc/phpxmlrpc.",
-        "",
         "NOTABLE TRANSITIVE DEPENDENCIES NOTES:",
         "  Try to document here packages that:",
         "    -  Are here just to lock the version used by another package",
