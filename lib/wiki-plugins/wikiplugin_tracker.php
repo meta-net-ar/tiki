@@ -925,10 +925,8 @@ function wikiplugin_tracker($data, $params)
         }
     }
 
-    if (isset($preview)) {
-        if (empty($preview)) {
-            $preview = 'Preview';
-        }
+    if (! isset($preview)) {
+        $preview = 'Preview';
     } else {
         unset($_REQUEST['tr_preview']);
     }
