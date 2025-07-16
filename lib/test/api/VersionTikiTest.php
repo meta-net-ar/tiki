@@ -5,12 +5,16 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-class VersionTikiTest extends TikiTestCase
+/**
+ * @group api-integration
+ */
+class VersionTikiTest extends ApiTestCase
 {
     private $lib;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->lib = TikiLib::lib('version');
     }
 
