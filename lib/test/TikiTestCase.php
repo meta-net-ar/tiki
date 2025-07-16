@@ -26,8 +26,6 @@ abstract class TikiTestCase extends TestCase
      */
     private $warnings = [];
 
-    private $db;
-
     protected function ensureDefaultGalleryExists()
     {
         $filegallib = TikiLib::lib('filegal');
