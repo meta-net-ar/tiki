@@ -72,8 +72,12 @@ class ODBCManager
         }
         if (! empty($this->config['permanent_values'])) {
             foreach ($this->config['permanent_values'] as $field => $value) {
-                $sql .= " AND \"$field\" = ?";
-                $bind[] = $value;
+                if ($value == 'not null') {
+                    $sql .= " AND \"$field\" IS NOT NULL";
+                } else {
+                    $sql .= " AND \"$field\" = ?";
+                    $bind[] = $value;
+                }
             }
         }
         if ($bind) {
@@ -298,7 +302,9 @@ class ODBCManager
     {
         if (! empty($this->config['permanent_values'])) {
             foreach ($this->config['permanent_values'] as $field => $value) {
-                $row[$field] = $value;
+                if ($value != 'not null') {
+                    $row[$field] = $value;
+                }
             }
         }
         if (! empty($this->config['value_mappings'])) {
