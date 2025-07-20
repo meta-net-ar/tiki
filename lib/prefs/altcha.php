@@ -18,49 +18,10 @@ function prefs_altcha_list()
             'type' => 'flag',
             'default' => 'n',
         ];
-        $prefs['altcha_site_url'] = [
-            'name' => tra('Altcha URL'),
-            'type' => 'text',
-            'description' => tra('Base URL of the Altcha service. Example: https://altcha.org or your self-hosted instance.'),
-            'size' => 60,
-            'keywords' => 'captcha altcha',
-            'default' => 'https://altcha.org',
-        ];
         $prefs['altcha_hmac_key']=[
             'name' => tra('Altcha Hmac Key'),
             'type' => 'text',
             'description' => tra('Your Altcha Developper Secret Key'),
-            'size' => 60,
-            'default' => '',
-            'keywords' => 'captcha altcha',
-        ];
-        $prefs['altcha_theme'] = [
-            'name' => tra('Altcha theme'),
-            'type' => 'list',
-            'keywords' => 'captcha altcha',
-            'description' => tra('Choose a visual theme for the Altcha widget.'),
-            'options' => [
-                'light' => tra('Light'),
-                'dark' => tra('Dark'),
-            ],
-            'default' => 'light',
-        ];
-        $prefs['altcha_difficulty'] = [
-            'name' => tra('Difficulty level'),
-            'type' => 'list',
-            'keywords' => 'captcha altcha',
-            'description' => tra('Select the complexity of the Altcha challenge.'),
-            'options' => [
-                'easy' => tra('Easy'),
-                'medium' => tra('Medium'),
-                'hard' => tra('Hard'),
-            ],
-            'default' => 'medium',
-        ];
-        $prefs['altcha_telemetry_url'] =[
-            'name' => tra('Altcha telemetry URL'),
-            'type' => 'text',
-            'description' => tra('Optional telemetry endpoint (e.g., Altcha Sentinel). Leave blank to disable telemetry.'),
             'size' => 60,
             'default' => '',
             'keywords' => 'captcha altcha',
