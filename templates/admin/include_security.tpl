@@ -214,10 +214,7 @@
                     <h4 class="mt-4">{tr}Google reCAPTCHA{/tr}</h4>
                     {preference name=recaptcha_enabled}
                     <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
-                        {preference name=recaptcha_pubkey}
-                        {preference name=recaptcha_privkey}
-                        {preference name=recaptcha_theme}
-                        {preference name=recaptcha_version}
+                        {preference name=altcha_hmac_key}
                     </div>
                     
                     <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>

@@ -19,7 +19,7 @@ $type = $captchalib->type;
 
 if ($type === 'altcha') {
     header('Content-Type: application/json');
-    if (!empty($challenge)) {
+    if (! empty($challenge)) {
         echo json_encode($challenge);
     } else {
         echo json_encode(['error' => 'Altcha challenge not generated.']);
@@ -34,4 +34,3 @@ if ($type === 'altcha') {
     echo json_encode($captcha);
     exit;
 }
-

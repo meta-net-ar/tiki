@@ -18,7 +18,7 @@ function prefs_altcha_list()
             'type' => 'flag',
             'default' => 'n',
         ];
-        $prefs['altcha_hmac_key']=[
+        $prefs['altcha_hmac_key'] = [
             'name' => tra('Altcha Hmac Key'),
             'type' => 'text',
             'description' => tra('Your Altcha Developper Secret Key'),
@@ -37,5 +37,3 @@ function prefs_altcha_list()
 
     return $prefs;
 }
-
-

@@ -176,14 +176,13 @@ class Captcha
                     $session = $this->captcha->getSession();
                     $session->setExpirationHops(2, null, true);
                     $this->captcha->setSession($session);
-                    $this->captcha->setKeepSession(false);     
+                    $this->captcha->setKeepSession(false);
                 }
                 return $key;
             }
         } catch (Exception $e) {
-        Feedback::error($e->getMessage());
+            Feedback::error($e->getMessage());
         }
-        
     }
 
     /** Return captcha ID
@@ -275,9 +274,9 @@ class Captcha
             ini_set('arg_separator.output', '&');
             $result = $this->captcha->isValid($input);
             ini_set('arg_separator.output', $oldVal);
-        }elseif ($this->type === 'altcha') {
+        } elseif ($this->type === 'altcha') {
             $payload = $input['altcha'] ?? null;
-            if (!$payload) {
+            if (! $payload) {
                 return false;
             }
             $result = $this->captcha->verifySolution($payload, true);
@@ -327,10 +326,10 @@ class Captcha
             'missingValue' => tra('Empty CAPTCHA value'),
             'badCaptcha' => tra('You have mistyped the anti-bot verification code. Please try again.')
         ];
-        if($this->type === 'altcha' ){
+        if ($this->type === 'altcha' ) {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
             return;
-        } if (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        } elseif (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
         } else {
             $errors['missingID'] = tra('CAPTCHA ID field is missing');
@@ -345,7 +344,7 @@ class Captcha
      */
     public function getErrors()
     {
-        if ($this->type === 'altcha'){
+        if ($this->type === 'altcha') {
             return '<br />' . tr('Invalid Captcha.');
         }
         return implode('<br />', $this->captcha->getMessages());

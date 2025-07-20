@@ -92,10 +92,7 @@
                             <h4 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h4>
                             {preference name=altcha_enabled}
                             <div class="adminoptionboxchild" id="altcha_enabled_childcontainer">
-                                {preference name=altcha_site_url}
-                                {preference name=altcha_theme}
-                                {preference name=altcha_difficulty}
-                                {preference name=altcha_telemetry_url}
+                                {preference name=altcha_hmac_key}
                             </div>
                         </div>
                     </fieldset>
