@@ -55,13 +55,13 @@ class Captcha
                 } else {
                     $type = 'recaptcha';
                 }
+            } elseif (! empty($prefs['altcha_hmac_key']) && $prefs['altcha_enabled'] === 'y') {
+                $type = 'altcha';
             } elseif ($prefs['captcha_questions_active'] == 'y' && ! empty($prefs['captcha_questions'])) {
                 $type = 'questions';
             } elseif (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox')) {
                 $type = 'default';
-            } elseif (! empty($prefs['altcha_hmac_key']) && $prefs['altcha_enabled'] === 'y') {
-                $type = 'altcha';
-            }else {
+            } else {
                 $type = 'dumb';
             }
         }
@@ -195,10 +195,6 @@ class Captcha
         if (method_exists($this->captcha, 'getId')) {
             return $this->captcha->getId();
         }
-
-        if ($this->type === 'altcha') {
-            return $_SESSION['altcha_challenge']['challenge'] ?? '';
-        }
         return '';
     }
 
@@ -217,10 +213,10 @@ class Captcha
                 $params = json_encode($this->captcha->getService()->getOptions());
                 $id = 1;
                 TikiLib::lib('header')->add_js('
-Recaptcha.create("' . $this->captcha->getSiteKey() . '",
-    "captcha' . $id . '",' . $params . '
-  );
-', 100);
+                    Recaptcha.create("' . $this->captcha->getSiteKey() . '",
+                    "captcha' . $id . '",' . $params . '
+                    );
+                ', 100);
                 return '<div id="captcha' . $id . '"></div>';
             } else {
                 return $this->captcha->render();
@@ -228,16 +224,7 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
         } elseif ($this->type === 'altcha') {
             $challenge = $_SESSION['altcha_challenge'] ?? null;
             if ($challenge) {
-                TikiLib::lib('header')->add_js('https://cdn.jsdelivr.net/npm/@altcha/browser@latest', 100);
-                return '<altcha-challenge algorithm="' 
-                . $challenge['algorithm']
-                . '" challenge="'
-                . $challenge['challenge']
-                . '" salt="'
-                . $challenge['salt']
-                . '" signature="'
-                . $challenge['signature']
-                . '"></altcha-challenge>';
+                return '<altcha-widget challengeurl="antibot.php"></altcha-widget>';
             } else {
                 return '<div>' . tra('Altcha challenge unavailable') . '</div>';
             }
@@ -340,13 +327,14 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
             'missingValue' => tra('Empty CAPTCHA value'),
             'badCaptcha' => tra('You have mistyped the anti-bot verification code. Please try again.')
         ];
-
-        if (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if($this->type === 'altcha' ){
+            $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
+            return;
+        } if (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
         } else {
             $errors['missingID'] = tra('CAPTCHA ID field is missing');
         }
-
         $this->captcha->setMessages($errors);
     }
 
@@ -357,6 +345,9 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
      */
     public function getErrors()
     {
+        if ($this->type === 'altcha'){
+            return '<br />' . tr('Invalid Captcha.');
+        }
         return implode('<br />', $this->captcha->getMessages());
     }
 
