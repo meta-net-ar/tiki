@@ -26,7 +26,7 @@ class ApiTestServer
             return true;
         }
 
-        // Simple command: php -S localhost:8000 route.php
+        // Command: php -S localhost:8000 route.php
         $command = sprintf(
             'php -S %s:%d route.php > /dev/null 2>&1 & echo $!',
             self::$serverHost,

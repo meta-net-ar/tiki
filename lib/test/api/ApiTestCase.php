@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-require_once __DIR__ . '/ApiTestServer.php';
+require_once(dirname(__FILE__) . '/ApiTestServer.php');
 use GuzzleHttp\Client;
 
 abstract class ApiTestCase extends TikiTestCase
@@ -21,6 +21,11 @@ abstract class ApiTestCase extends TikiTestCase
     private $db;
 
     /**
+     * Static property to hold the admin API token for the test session
+     */
+    private static $adminApiToken = null;
+
+    /**
      * Returns the base URL for API requests.
      * Always uses the test server for API integration tests.
      *
@@ -28,7 +33,6 @@ abstract class ApiTestCase extends TikiTestCase
      */
     protected function getBaseUrl()
     {
-        // For API integration tests, always use the test server
         if (ApiTestServer::isRunning()) {
             return ApiTestServer::getBaseUrl() . '/api/';  // Add /api/ with trailing slash for proper Guzzle URL combination
         }
@@ -44,13 +48,21 @@ abstract class ApiTestCase extends TikiTestCase
     {
         parent::setUpBeforeClass();
 
-        if (!self::$testServerInitialized) {
+        if (! self::$testServerInitialized) {
             if (ApiTestServer::start()) {
                 echo "API test server started successfully at " . ApiTestServer::getBaseUrl() . "\n";
 
                 if (ApiTestServer::waitForReady(10)) {
                     echo "API test server is ready for requests\n";
                     self::$testServerInitialized = true;
+
+                    // Create reusable admin API token for the test session
+                    $tokenlib = \TikiLib::lib('api_token');
+                    $token = $tokenlib->createToken([
+                        'type' => 'manual',
+                        'user' => 'admin'
+                    ]);
+                    self::$adminApiToken = $token['token'];
                 } else {
                     throw new \RuntimeException("API test server failed to become ready within timeout");
                 }
@@ -65,9 +77,7 @@ abstract class ApiTestCase extends TikiTestCase
      */
     public static function tearDownAfterClass(): void
     {
-        if (self::$testServerInitialized) {
-            echo "\n=== Stopping API Test Server ===\n";
-            
+        if (self::$testServerInitialized) {            
             if (ApiTestServer::stop()) {
                 echo "API test server stopped successfully\n";
             } else {
@@ -137,28 +147,6 @@ abstract class ApiTestCase extends TikiTestCase
     }
 
     /**
-     * Check if we're running in CI environment
-     * 
-     * @return bool
-     */
-    protected function isRunningInCI(): bool
-    {
-        return ! empty($_ENV['CI']) || ! empty($_ENV['GITLAB_CI']);
-    }
-
-    /**
-     * Skip test if not in appropriate environment
-     * 
-     * @param string $reason Reason for skipping
-     */
-    protected function skipIfNotIntegrationEnvironment($reason = 'Integration tests require appropriate environment setup'): void
-    {
-        if (! $this->isRunningInCI() && ! ApiTestServer::isRunning()) {
-            $this->markTestSkipped($reason);
-        }
-    }
-
-    /**
      * Get authentication token for API requests
      * 
      * @param string $permission Permission level
@@ -167,46 +155,12 @@ abstract class ApiTestCase extends TikiTestCase
     protected function getToken($permission = 'Admins'): string
     {
         if ($permission === 'Admins') {
-            return '3ce13e7dae6b6028c39b7576afcecdfb3e7f60e6176c51399b4933ca4f5613c9';
+            if (self::$adminApiToken === null) {
+                throw new \RuntimeException('Admin API token not initialized.');
+            }
+            return self::$adminApiToken;
         } else {
-            return 'yyyyyyyyyyyyyyyyyy'; // TODO: Add token for other permission levels
-        }
-    }
-
-    // OAuth2-specific methods for API integration testing
-    protected function getOAuth2AccessToken($clientId = 'test_client', $clientSecret = 'test_secret', $scopes = []): string
-    {
-        // TODO: Needs to Implement real OAuth2 flow
-        return 'oauth2_test_token_' . time();
-    }
-
-    protected function getOAuth2PublicKey(): array
-    {
-        $response = $this->makeHttpRequest('GET', '/oauth/public-key', 'Admins');
-        $this->assertEquals(200, $response->getStatusCode());
-        
-        $data = json_decode($response->getBody(), true);
-        $this->assertArrayHasKey('key', $data);
-        $this->assertNotEmpty($data['key']);
-        
-        return $data;
-    }
-
-    protected function verifyOAuth2Token($token): bool
-    {
-        try {
-            $client = new Client([
-                'base_uri' => $this->getBaseUrl(),
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $token,
-                    'Content-Type' => 'application/json',
-                ],
-            ]);
-
-            $response = $client->request('GET', 'version');
-            return $response->getStatusCode() === 200;
-        } catch (Exception $e) {
-            return false;
+            return 'xxxxxxxxxxxxxxxxxxxxxxx'; // TODO: Add token for other permission levels
         }
     }
 
@@ -222,33 +176,5 @@ abstract class ApiTestCase extends TikiTestCase
         foreach ($tables as $table) {
             $this->db->query("TRUNCATE TABLE $table");
         }
-    }
-
-    protected function createTestOAuth2Client($clientId = 'test_client', $clientSecret = 'test_secret', $config = []): array
-    {
-        $defaultConfig = [
-            'client_id' => $clientId,
-            'client_secret' => $clientSecret,
-            'redirect_uri' => 'http://localhost/callback',
-            'grant_types' => 'authorization_code,client_credentials',
-            'scope' => 'read write',
-            'user' => null
-        ];
-        
-        $clientConfig = array_merge($defaultConfig, $config);
-        
-        $db = TikiDb::get();
-        $db->query(
-            "INSERT INTO tiki_oauthserver_clients (name, client_id, client_secret, redirect_uri, user) VALUES (?, ?, ?, ?, ?)",
-            [
-                'Test Client',
-                $clientConfig['client_id'],
-                $clientConfig['client_secret'], 
-                $clientConfig['redirect_uri'],
-                $clientConfig['user']
-            ]
-        );
-        
-        return $clientConfig;
     }
 }
