@@ -317,5 +317,9 @@ return [
     'tiki_archive_replied' => FILTER_VALIDATE_INT,
     'tiki_run_sieve_filters_on_imap_unread' => FILTER_VALIDATE_INT,
     'lookup' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'tracker_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'auto_move' => FILTER_VALIDATE_BOOLEAN,
   ]
 ];

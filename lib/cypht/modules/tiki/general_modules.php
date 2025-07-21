@@ -468,7 +468,6 @@ class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
         }
 
         $subject = $this->request->post['compose_subject'];
-        $body = $this->request->post['compose_body'];
 
         $keywords = [$subject];
 
@@ -476,9 +475,8 @@ class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
             $keywords[] = $word;
         }
 
-        foreach (explode(' ', $body) as $word) {
-            $keywords[] = $word;
-        }
+        $keywords = array_map('trim', $keywords);
+        $keywords = array_filter($keywords);
         $keywords = array_unique($keywords);
 
         $this->session->set('keywords', $keywords);
@@ -517,6 +515,12 @@ class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
             }
             if (isset($this->request->post['limit'])) {
                 $searchArgs['maxRecords'] = $this->request->post['limit'];
+            }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['tracker_id'] = $this->request->post['tracker_id'];
+            }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['field_id'] = $this->request->post['field_id'];
             }
             $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs));
             return;

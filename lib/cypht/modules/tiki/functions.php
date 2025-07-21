@@ -371,6 +371,7 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             return '';
         }
         $field_list = [];
+        $fields_without_folders = [];
         foreach ($fields as $field) {
             $tracker = $trk->get_tracker($field['trackerId']);
             $handler = $trk->get_field_handler($field);
@@ -384,6 +385,7 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             } else {
                 $field_list[] = "<a href='#' class='object_selector_trigger dropdown-item' data-tracker='{$field['trackerId']}' data-field='{$field['fieldId']}' data-folder='inbox'>{$tracker['name']} - {$field['name']}</a>";
             }
+            $fields_without_folders[] = ['tracker_id' => $field['trackerId'], 'field_id' => $field['fieldId'], 'title' => "{$tracker['name']} - {$field['name']}"];
         }
         $res = "<div class=\"d-inline-block\">";
         if ($class != 'move_to_trackers') {
@@ -457,45 +459,60 @@ if (! hm_exists('append_to_msg_headers')) {
 
 function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [])
 {
-    $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
-    $trackerIds = array_unique(array_map(function ($field) {
-        return $field['trackerId'];
-    }, $fields));
+    global $prefs;
 
-    $filter = [
-        'tracker_id' => implode(' OR ', $trackerIds),
-        'type' => 'trackeritem',
-    ];
+    $lib = TikiLib::lib('unifiedsearch');
+    $query = new Search_Query();
+    $lib->initQuery($query);
+    $query->filterType('trackeritem');
+
+    $query->setOrder($searchArgs['sort_mode'] ?? 'title_asc');
+    $query->setRange(0, $searchArgs['maxRecords'] ?? $prefs['maxRecords']);
+
+    if (! empty($searchArgs['tracker_id'])) {
+        $result = TikiLib::lib('trk')->list_tracker_fields($searchArgs['tracker_id']);
+        $fields = $result['data'];
+        if (! empty($searchArgs['field_id'])) {
+            $fields = array_filter($fields, function ($field) use ($searchArgs) {
+                return $field['fieldId'] == $searchArgs['field_id'];
+            });
+        }
+        $query->filterIdentifier($searchArgs['tracker_id'], 'tracker_id');
+    } else {
+        $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+        $trackerIds = array_unique(array_map(function ($field) {
+            return $field['trackerId'];
+        }, $fields));
+        $query->filterContent(implode(' OR ', $trackerIds), 'tracker_id');
+    }
 
     if ($multivalueField) {
         $filterField = implode(',', array_map(function ($f) use ($multivalueField) {
                 return "tracker_field_{$f['permName']}_{$multivalueField}";
         }, $fields));
-        $filter['multivalue'] = [
-            $filterField => $keywords,
-        ];
+        $query->filterMultivalue($filterField, $keywords);
     } else {
-        $filter['content'] = $keywords;
+        $subq = $query->getSubQuery('keywords');
+        foreach (explode(' ', $keywords) as $keyword) {
+            $subq->filterContent($keyword);
+        }
     }
 
-    $input = [
-        'filter' => $filter,
-    ];
+    $resultSet = $query->search($lib->getIndex());
 
-    foreach ($searchArgs as $key => $value) {
-        $input[$key] = $value;
-    }
-
-    $searchService = new Services_Search_Controller();
-    $resultSet = $searchService->action_lookup(new JitFilter($input))['resultset'];
-
-    $resultSet->applyTransform(function (&$item) use ($fields) {
-        $fields = array_filter($fields, function ($f) use ($item) {
-            return $f['trackerId'] == $item['parent_id'];
+    $resultSet->applyTransform(function ($item) use ($fields) {
+        $filtered = array_filter($fields, function ($f) use ($item) {
+            return $f['trackerId'] == $item['tracker_id'];
         });
-        $field = reset($fields);
-        $item['field_id'] = $field['fieldId'];
-        return $item;
+        if ($field = reset($filtered)) {
+            $item['field_id'] = $field['fieldId'];
+        }
+        return [
+            'object_id' => $item['object_id'],
+            'tracker_id' => $item['tracker_id'],
+            'field_id' => $item['field_id'] ?? 0,
+            'title' => $item['title'],
+        ];
     });
 
     return $resultSet->jsonSerialize()['result'];
