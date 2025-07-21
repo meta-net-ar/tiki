@@ -350,6 +350,25 @@ $inclusion = null;
 // This portion may need to vary depending on the webserver/configuration
 
 switch (PHP_SAPI) {
+    case 'cli-server':
+        // PHP built-in development server
+        $requestUri = $_SERVER['REQUEST_URI'];        
+        $path = ltrim($requestUri, '/');
+
+        // Only match /api/* endpoints
+        if (preg_match('|^api/(.*)$|', $path, $parts)) {
+            // Route to tiki-api.php
+            $_GET['route'] = $parts[1];
+            include __DIR__ . '/tiki-api.php';
+            exit;
+        }
+
+        // If not an API endpoint, return 404
+        header('HTTP/1.0 404 Not Found');
+        header('Content-Type: text/plain; charset=utf-8');
+        echo "API endpoint not found.";
+        exit;
+        break;
     case 'apache2handler':
     default:
         // Fix $_SERVER['REQUEST_URI', which is ASCII encoded on IIS
