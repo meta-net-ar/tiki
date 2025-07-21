@@ -392,7 +392,7 @@ function wikiplugin_pivottable($data, $params)
 
     $headerlib = TikiLib::lib('header');
     $headerlib->add_cssfile(PIVOTTABLE_DIST_PATH . '/pivot.css');
-    $headerlib->add_jsfile(PIVOTTABLE_DIST_PATH . '/pivot.min.js', true);
+    $headerlib->add_jsfile(PIVOTTABLE_DIST_PATH . '/pivot.js', true);
     $headerlib->add_jsfile(PLOTLYJS_DIST_PATH . '/plotly-cartesian.min.js', true);
     $headerlib->add_jsfile(SUBTOTAL_DIST_PATH . '/subtotal.min.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-pivottable.js', true);

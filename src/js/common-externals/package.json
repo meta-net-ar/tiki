@@ -44,6 +44,7 @@
     "signature_pad": "^5.0.4",
     "smartmenus": "^2.0.0-alpha.1",
     "timeago": "^1.6.7",
+    "patch-package": "^8.0.0",
     "pivottable": "^2.23.0",
     "plotly.js": "^1.58.4",
     "reveal.js": "5.1.0",
