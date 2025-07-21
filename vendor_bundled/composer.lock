@@ -4316,6 +4316,146 @@
             "time": "2025-12-30T11:30:39+00:00"
         },
         {
+            "name": "laminas/laminas-mail",
+            "version": "2.22.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laminas/laminas-mail.git",
+                "reference": "1d307ff65328c00117c6d90ba0084fdd0fc2bd5c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laminas/laminas-mail/zipball/1d307ff65328c00117c6d90ba0084fdd0fc2bd5c",
+                "reference": "1d307ff65328c00117c6d90ba0084fdd0fc2bd5c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "laminas/laminas-loader": "^2.8.0",
+                "laminas/laminas-mime": "^2.10.0",
+                "laminas/laminas-stdlib": "^3.11.0",
+                "laminas/laminas-validator": "^2.23.0",
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0",
+                "symfony/polyfill-intl-idn": "^1.26.0",
+                "symfony/polyfill-mbstring": "^1.16.0",
+                "webmozart/assert": "^1.11.0"
+            },
+            "require-dev": {
+                "laminas/laminas-coding-standard": "~2.5.0",
+                "laminas/laminas-crypt": "^3.9.0",
+                "laminas/laminas-db": "^2.16",
+                "laminas/laminas-servicemanager": "^3.20",
+                "phpunit/phpunit": "^9.5.26",
+                "psalm/plugin-phpunit": "^0.18.4",
+                "symfony/process": "^6.0.11",
+                "vimeo/psalm": "^5.1"
+            },
+            "suggest": {
+                "laminas/laminas-crypt": "^3.8 Crammd5 support in SMTP Auth",
+                "laminas/laminas-servicemanager": "^3.16 when using SMTP to deliver messages"
+            },
+            "type": "library",
+            "extra": {
+                "laminas": {
+                    "component": "Laminas\\Mail",
+                    "config-provider": "Laminas\\Mail\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laminas\\Mail\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Provides generalized functionality to compose and send both text and MIME-compliant multipart e-mail messages",
+            "homepage": "https://laminas.dev",
+            "keywords": [
+                "laminas",
+                "mail"
+            ],
+            "support": {
+                "chat": "https://laminas.dev/chat",
+                "docs": "https://docs.laminas.dev/laminas-mail/",
+                "forum": "https://discourse.laminas.dev",
+                "issues": "https://github.com/laminas/laminas-mail/issues",
+                "rss": "https://github.com/laminas/laminas-mail/releases.atom",
+                "source": "https://github.com/laminas/laminas-mail"
+            },
+            "funding": [
+                {
+                    "url": "https://funding.communitybridge.org/projects/laminas-project",
+                    "type": "community_bridge"
+                }
+            ],
+            "abandoned": "symfony/mailer",
+            "time": "2023-01-18T08:33:48+00:00"
+        },
+        {
+            "name": "laminas/laminas-mime",
+            "version": "2.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laminas/laminas-mime.git",
+                "reference": "08cc544778829b7d68d27a097885bd6e7130135e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laminas/laminas-mime/zipball/08cc544778829b7d68d27a097885bd6e7130135e",
+                "reference": "08cc544778829b7d68d27a097885bd6e7130135e",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-stdlib": "^2.7 || ^3.0",
+                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0"
+            },
+            "conflict": {
+                "zendframework/zend-mime": "*"
+            },
+            "require-dev": {
+                "laminas/laminas-coding-standard": "~2.4.0",
+                "laminas/laminas-mail": "^2.19.0",
+                "phpunit/phpunit": "~9.5.25"
+            },
+            "suggest": {
+                "laminas/laminas-mail": "Laminas\\Mail component"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Laminas\\Mime\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Create and parse MIME messages and parts",
+            "homepage": "https://laminas.dev",
+            "keywords": [
+                "laminas",
+                "mime"
+            ],
+            "support": {
+                "chat": "https://laminas.dev/chat",
+                "docs": "https://docs.laminas.dev/laminas-mime/",
+                "forum": "https://discourse.laminas.dev",
+                "issues": "https://github.com/laminas/laminas-mime/issues",
+                "rss": "https://github.com/laminas/laminas-mime/releases.atom",
+                "source": "https://github.com/laminas/laminas-mime"
+            },
+            "funding": [
+                {
+                    "url": "https://funding.communitybridge.org/projects/laminas-project",
+                    "type": "community_bridge"
+                }
+            ],
+            "abandoned": "symfony/mime",
+            "time": "2023-11-02T16:47:19+00:00"
+        },
+        {
             "name": "laminas/laminas-recaptcha",
             "version": "3.8.0",
             "source": {
@@ -11833,6 +11973,194 @@
             "time": "2026-04-23T12:50:03+00:00"
         },
         {
+            "name": "slm/mail",
+            "version": "v4.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Webador/SlmMail.git",
+                "reference": "4ff677e750c8282efa5a18140e10890f670ca966"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Webador/SlmMail/zipball/4ff677e750c8282efa5a18140e10890f670ca966",
+                "reference": "4ff677e750c8282efa5a18140e10890f670ca966",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-http": "^2.8",
+                "laminas/laminas-mail": "^2.9",
+                "laminas/laminas-mime": "^2.8",
+                "laminas/laminas-servicemanager": "^3.11",
+                "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^3.208.4",
+                "doctrine/instantiator": "^1.3",
+                "guzzlehttp/guzzle": "^7.4",
+                "laminas/laminas-config": "^3.3",
+                "laminas/laminas-i18n": "^2.10",
+                "laminas/laminas-log": "^2.12",
+                "laminas/laminas-modulemanager": "^2.8",
+                "laminas/laminas-mvc": "^3.1",
+                "laminas/laminas-serializer": "^2.9",
+                "laminas/laminas-view": "^2.11",
+                "phpunit/phpunit": "^9.6.5",
+                "psr/container": "^1.0 || ^2.0",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "If you need to use Amazon SES"
+            },
+            "type": "library",
+            "extra": {
+                "laminas": {
+                    "component": "SlmMail",
+                    "config-provider": "SlmMail\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SlmMail\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Roel van Duijnhoven",
+                    "email": "roel@jouwweb.nl",
+                    "homepage": "https://www.jouwweb.nl"
+                },
+                {
+                    "name": "Jurian Sluiman",
+                    "email": "jurian@juriansluiman.nl",
+                    "homepage": "http://juriansluiman.nl"
+                },
+                {
+                    "name": "Michaël Gallego",
+                    "email": "mic.gallego@gmail.com",
+                    "homepage": "http://www.michaelgallego.fr"
+                }
+            ],
+            "description": "Integration of various email service providers in the Laminas\\Mail",
+            "homepage": "https://github.com/Webador/SlmMail",
+            "keywords": [
+                "elastic email",
+                "elasticemail",
+                "email",
+                "laminas",
+                "mailgun",
+                "mandrill",
+                "mezzio",
+                "postage",
+                "postmark",
+                "send grid",
+                "sendgrid",
+                "transactional email"
+            ],
+            "support": {
+                "issues": "https://github.com/Webador/SlmMail/issues",
+                "source": "https://github.com/Webador/SlmMail/tree/v4.7.0"
+            },
+            "time": "2023-11-20T07:27:47+00:00"
+        },
+        {
+            "name": "slm/mail",
+            "version": "v4.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Webador/SlmMail.git",
+                "reference": "4ff677e750c8282efa5a18140e10890f670ca966"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Webador/SlmMail/zipball/4ff677e750c8282efa5a18140e10890f670ca966",
+                "reference": "4ff677e750c8282efa5a18140e10890f670ca966",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-http": "^2.8",
+                "laminas/laminas-mail": "^2.9",
+                "laminas/laminas-mime": "^2.8",
+                "laminas/laminas-servicemanager": "^3.11",
+                "php": "~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^3.208.4",
+                "doctrine/instantiator": "^1.3",
+                "guzzlehttp/guzzle": "^7.4",
+                "laminas/laminas-config": "^3.3",
+                "laminas/laminas-i18n": "^2.10",
+                "laminas/laminas-log": "^2.12",
+                "laminas/laminas-modulemanager": "^2.8",
+                "laminas/laminas-mvc": "^3.1",
+                "laminas/laminas-serializer": "^2.9",
+                "laminas/laminas-view": "^2.11",
+                "phpunit/phpunit": "^9.6.5",
+                "psr/container": "^1.0 || ^2.0",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "If you need to use Amazon SES"
+            },
+            "type": "library",
+            "extra": {
+                "laminas": {
+                    "component": "SlmMail",
+                    "config-provider": "SlmMail\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SlmMail\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Roel van Duijnhoven",
+                    "email": "roel@jouwweb.nl",
+                    "homepage": "https://www.jouwweb.nl"
+                },
+                {
+                    "name": "Jurian Sluiman",
+                    "email": "jurian@juriansluiman.nl",
+                    "homepage": "http://juriansluiman.nl"
+                },
+                {
+                    "name": "Michaël Gallego",
+                    "email": "mic.gallego@gmail.com",
+                    "homepage": "http://www.michaelgallego.fr"
+                }
+            ],
+            "description": "Integration of various email service providers in the Laminas\\Mail",
+            "homepage": "https://github.com/Webador/SlmMail",
+            "keywords": [
+                "elastic email",
+                "elasticemail",
+                "email",
+                "laminas",
+                "mailgun",
+                "mandrill",
+                "mezzio",
+                "postage",
+                "postmark",
+                "send grid",
+                "sendgrid",
+                "transactional email"
+            ],
+            "support": {
+                "issues": "https://github.com/Webador/SlmMail/issues",
+                "source": "https://github.com/Webador/SlmMail/tree/v4.7.0"
+            },
+            "time": "2023-11-20T07:27:47+00:00"
+        },
+        {
             "name": "smalot/pdfparser",
             "version": "v2.12.5",
             "source": {
@@ -18685,6 +19013,104 @@
                 }
             ],
             "time": "2026-01-27T05:48:37+00:00"
+        },
+        {
+            "name": "psr/cache",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/cache.git",
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Cache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for caching libraries",
+            "keywords": [
+                "cache",
+                "psr",
+                "psr-6"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/cache/tree/3.0.0"
+            },
+            "time": "2021-02-03T23:26:27+00:00"
+        },
+        {
+            "name": "psr/cache",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/cache.git",
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/cache/zipball/aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "reference": "aa5030cfa5405eccfdcb1083ce040c2cb8d253bf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Cache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for caching libraries",
+            "keywords": [
+                "cache",
+                "psr",
+                "psr-6"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/cache/tree/3.0.0"
+            },
+            "time": "2021-02-03T23:26:27+00:00"
         },
         {
             "name": "rector/rector",

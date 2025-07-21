@@ -326,7 +326,7 @@ class Captcha
             'missingValue' => tra('Empty CAPTCHA value'),
             'badCaptcha' => tra('You have mistyped the anti-bot verification code. Please try again.')
         ];
-        if ($this->type === 'altcha' ) {
+        if ($this->type === 'altcha') {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
             return;
         } elseif (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
