@@ -179,9 +179,8 @@ FileETag MTime Size
     # Redirect drawio requests to the correct path
     RewriteRule ^img/lib/(.*)$ vendor/tikiwiki/diagram/img/lib/$1 [NC,L]
 
-    # -- Siggnature PDF assets -- #
-    RewriteRule ^tiki-signaturepdf.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/vendor/$1 [L]
-    RewriteRule ^tiki-signaturepdf.php/(.*)\.(.*)$ vendor/mercihabam/signaturepdf/public/$1.$2 [L]
+    # -- Signature PDF assets -- #
+    RewriteRule ^tiki-signaturepdf.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/public/vendor/$1 [L]
 
     # -- Apache Authorization Header -- #
     # Rewrite rules for passing authorization with Apache running in CGI or FastCGI mode
