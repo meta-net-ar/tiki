@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75023ba2c49f7a345a8c423d533da271",
+    "content-hash": "2fe1ccb10373db94ff61e5c900807c01",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -2607,17 +2607,17 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v1.4.5",
+            "version": "v1.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "b7686814aafc8c34416435ceb4fb9b2d569b9e14"
+                "reference": "54c208d834dc2b4d4be6d3f4b8758f69666e72e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://composer.tiki.org/dist/jason-munro/cypht/jason-munro-cypht-b7686814aafc8c34416435ceb4fb9b2d569b9e14-zip-12c49e.zip",
-                "reference": "b7686814aafc8c34416435ceb4fb9b2d569b9e14",
-                "shasum": "7948b76c3eabe9712ee674d359d6e67896b45f14"
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/54c208d834dc2b4d4be6d3f4b8758f69666e72e9",
+                "reference": "54c208d834dc2b4d4be6d3f4b8758f69666e72e9",
+                "shasum": ""
             },
             "require": {
                 "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
@@ -2676,7 +2676,15 @@
                 "webmail",
                 "webmail-client"
             ],
-            "time": "2024-12-19T09:45:08+00:00"
+            "support": {
+                "chat": "https://gitter.im/cypht-org/community",
+                "docs": "https://cypht.org/documentation.html",
+                "email": "jason@cypht.org",
+                "issues": "https://github.com/cypht-org/cypht/issues",
+                "source": "https://github.com/cypht-org/cypht/",
+                "wiki": "https://github.com/cypht-org/cypht/wiki"
+            },
+            "time": "2025-04-17T07:06:08+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",

@@ -328,7 +328,8 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "https://composer.tiki.org"
+            "url": "https://composer.tiki.org",
+            "exclude": ["jason-munro/cypht"]
         },
         {
             "type": "composer",
