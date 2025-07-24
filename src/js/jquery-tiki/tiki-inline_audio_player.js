@@ -1,4 +1,5 @@
 import moment from "moment";
+import "./handlers/files";
 
 $(".play-audio").on("click", async function () {
     $(this).addClass("loading");

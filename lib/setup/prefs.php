@@ -176,8 +176,8 @@ function get_default_prefs()
             'toolbar_global_comments' => '
                 bold, italic, underline, strike , - , link, smiley | help
             ',
-            'toolbar_trackers_comments' => '
-                bold, italic, underline, strike , - , link, smiley, linkfile | help
+            'toolbar_trackeritem_comments' => '
+                bold, italic, underline, strike , - , link, smiley, linkfile, filerecording | help
             ',
             'toolbar_sheet' => 'addrow, addrowbefore, addrowmulti, deleterow,-, addcolumn, addcolumnbefore, addcolumnmulti, deletecolumn,-,
                                 sheetgetrange, sheetrefresh, -, sheetfind | sheetclose, sheetsave, help/
