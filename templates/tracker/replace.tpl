@@ -83,11 +83,18 @@
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments"
+            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showComments">
                     {tr}Show comments in listing{/tr}
+                </label>
+            </div>
+            <div class="form-check depends" data-on="useComments">
+                <input type="checkbox" class="form-check-input" name="allowRecordingInComments" id="allowRecordingInComments" value="1"
+                        {if $info.allowRecordingInComments eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="allowRecordingInComments">
+                    {tr}Allow recording while writing comments{/tr}
                 </label>
             </div>
             <div class="form-check depends" data-on="useComments">

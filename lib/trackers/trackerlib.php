@@ -7269,6 +7269,7 @@ class TrackerLib extends TikiLib
             'ratingOptions' => $input->ratingOptions->text(),
             'useComments' => $input->useComments->int() ? 'y' : 'n',
             'showComments' => $input->showComments->int() ? 'y' : 'n',
+            'allowRecordingInComments' => $input->allowRecordingInComments->int() ? 'y' : 'n',
             'showLastComment' => $input->showLastComment->int() ? 'y' : 'n',
             'saveAndComment' => $input->saveAndComment->int() ? 'y' : 'n',
             'useAttachments' => $input->useAttachments->int() ? 'y' : 'n',

@@ -71,6 +71,7 @@ class Services_Comment_Controller
             'allow_archive'     => $this->canArchive($type, $objectId),
             'allow_moderate'    => $this->canModerate($type, $objectId),
             'allow_vote'        => $this->canVote($type, $objectId),
+            'allowRecording' => $input->allowRecording->word(),
         ];
 
         $paginationOnClick = "
@@ -351,6 +352,7 @@ class Services_Comment_Controller
             'return_url' => $return_url,
             'version' => $version,
             'diffInfo' => $diffInfo,
+            'allowRecording' => $input->allowRecording->word() == 'y',
         ];
     }
 

@@ -70,13 +70,14 @@ class ToolbarsList
 
         $string = preg_replace('/\s+/', '', $string);
         $objectId = $params['objectId'] ?? '';
+        $allowFileRecording = $params['allowRecording'] ?? false;
 
         foreach (explode('/', $string) as $line) {
             $bits = explode('|', $line);
             if (count($bits) > 1) {
-                $list->addLine(explode(',', $bits[0]), explode(',', $bits[1]), $objectId);
+                $list->addLine(explode(',', $bits[0]), explode(',', $bits[1]), $objectId, $allowFileRecording);
             } else {
-                $list->addLine(explode(',', $bits[0]), [], $objectId);
+                $list->addLine(explode(',', $bits[0]), [], $objectId, $allowFileRecording);
             }
         }
 
@@ -101,7 +102,7 @@ class ToolbarsList
         return true;
     }
 
-    private function addLine(array $tags, array $rtags = [], $objectId = ''): void
+    private function addLine(array $tags, array $rtags = [], $objectId = '', $allowFileRecording = false): void
     {
         $elements = [];
         $j = count($rtags) > 0 ? 2 : 1;
@@ -128,7 +129,8 @@ class ToolbarsList
                         $this->is_html,
                         $this->syntax === 'markdown',
                         $this->domElementId,
-                        $objectId
+                        $objectId,
+                        $allowFileRecording
                     ))
                     && $tag->isAccessible()
                 ) {

@@ -56,6 +56,7 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
             'allow_rating' => 'useRatings',
             'allow_comments' => 'useComments',
             'show_comments' => 'showComments',
+            'allow_recording_in_comments' => 'allowRecordingInComments',
             'show_last_comment' => 'showLastComment',
             'save_and_comment' => 'saveAndComment',
             'allow_attachments' => 'useAttachments',
