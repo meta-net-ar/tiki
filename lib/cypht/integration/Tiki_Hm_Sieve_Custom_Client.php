@@ -62,6 +62,11 @@ class Tiki_Hm_Sieve_Custom_Client
         // noop
     }
 
+    public function getCapabilities()
+    {
+        return [];
+    }
+
     public function removeScripts($name)
     {
 
