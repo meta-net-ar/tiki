@@ -283,11 +283,16 @@ function initialize_prefs($force = false)
         // Unserialize serialized preferences
         foreach ($serializedPreferences as $serializedPreference) {
             if (! empty($modified[$serializedPreference]) && ! is_array($modified[$serializedPreference])) {
-                $unserialized = @unserialize($modified[$serializedPreference]);
-                if ($unserialized === false) {
-                    Feedback::error(tr('Preference %0 failed to unserialize. Value was "%1"', $serializedPreference, $modified[$serializedPreference]));
+                $modifiedValue = $modified[$serializedPreference];
+                if (is_string($modifiedValue) && is_array(json_decode($modifiedValue, true)) && json_last_error() === JSON_ERROR_NONE) {
+                    $modified[$serializedPreference] = json_decode($modifiedValue, true);
                 } else {
-                    $modified[$serializedPreference] = $unserialized;
+                    $unserialized = @unserialize($modifiedValue);
+                    if ($unserialized === false) {
+                        Feedback::error(tr('Preference %0 failed to unserialize. Value was "%1"', $serializedPreference, $modifiedValue));
+                    } else {
+                        $modified[$serializedPreference] = $unserialized;
+                    }
                 }
             }
         }
