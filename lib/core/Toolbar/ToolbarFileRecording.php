@@ -23,7 +23,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
             ->setClass('qt-file-recording')
             ->addRequiredPreference('fgal_use_record_rtc_screen');
 
-        if (!$isWysiwyg) {
+        if (! $isWysiwyg) {
             $this->setupWikiJs();
         }
 
@@ -115,6 +115,11 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                     attrs: {
                         'data-tracker-files': 'true',
                     },
+                    onClick: function() {}
+                },
+                {
+                    text: tr('Stop recording'),
+                    type: 'secondary stop-recording d-none',
                     onClick: function() {}
                 }
             ]
