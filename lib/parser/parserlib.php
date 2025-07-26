@@ -2848,8 +2848,8 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         // Generate the final title text
-                        $title_text_base = substr($line, $hdrlevel + $addremove);
-                        $title_text = $current_title_num . $title_text_base;
+                        $title_text_base = ltrim(substr($line, $hdrlevel + $addremove));
+                        $title_text = $current_title_real_num . $title_text_base;
 
                         // Remove HTML tags from Tiki syntax
                         $title = preg_replace('#\<(.*?)\>#', '', $title_text);
