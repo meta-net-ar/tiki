@@ -9,9 +9,11 @@ class ToolbarFileRecording extends ToolbarUtilityItem
     private $id;
     private $recordingFieldId;
     private $recordingGalleryId;
+    private $trackerItemId;
 
-    public function __construct($isWysiwyg = false, $recordingFieldId = 0, $recordingGalleryId = 0)
+    public function __construct($objectId, $isWysiwyg = false, $recordingFieldId = 0, $recordingGalleryId = 0)
     {
+        $this->trackerItemId = $objectId;
         $this->recordingFieldId = $recordingFieldId;
         $this->recordingGalleryId = $recordingGalleryId;
         $this->id = $this->domElementId . '_toolbar-file-recording';
@@ -118,6 +120,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                         'data-tracker-files': 'true',
                         'data-field-id': '{$this->recordingFieldId}',
                         'data-gallery-id': '{$this->recordingGalleryId}',
+                        'data-tracker-item-id': '{$this->trackerItemId}',
                     },
                     onClick: function() {}
                 },

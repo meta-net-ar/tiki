@@ -107,7 +107,7 @@ abstract class ToolbarItem
         } elseif ($tagName == 'languagecheck') {
             return new ToolbarLanguageCheck();
         } elseif ($tagName == 'filerecording' && ($extraParams['allowRecording'] ?? false)) {
-            return new ToolbarFileRecording($wysiwyg, $extraParams['recordingFieldId'], $extraParams['recordingGalleryId']);
+            return new ToolbarFileRecording($objectId, $wysiwyg, $extraParams['recordingFieldId'], $extraParams['recordingGalleryId']);
         }
         return null;
     }

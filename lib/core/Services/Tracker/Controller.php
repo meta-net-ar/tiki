@@ -3313,4 +3313,44 @@ class Services_Tracker_Controller
             'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
+
+    public function actionSaveItemFile($input)
+    {
+        $trklib = TikiLib::lib('trk');
+
+        $itemId = $input->itemId->int();
+        $fieldId = $input->fieldId->int();
+        $fileId = $input->fileId->int();
+
+        if (! $itemId || ! $fieldId || ! $fileId) {
+            throw new Services_Exception_MissingValue('itemId or fieldId or fileId');
+        }
+
+        $item = Tracker_Item::fromId($itemId);
+        if (! $item) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $field = $trklib->get_tracker_field($fieldId);
+        if (! $field) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $trackerId = $item->getDefinition()->getId();
+
+        $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
+        $fieldValue = explode(',', $fieldHandler->getFieldData()['value']);
+        $fieldValue[] = $fileId;
+
+        $field['value'] = implode(',', $fieldValue);
+
+        $trklib->replace_item($trackerId, $itemId, [
+            'data' => [$field]
+        ]);
+
+        return [
+            'success' => true,
+            'value' => $field['value'],
+        ];
+    }
 }
