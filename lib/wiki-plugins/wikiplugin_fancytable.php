@@ -146,10 +146,17 @@ function wikiplugin_fancytable($data, $params)
     $pluginremove = [];
     static $iFancytable = 0;
     ++$iFancytable;
-    extract($params, EXTR_SKIP);
+    $plugininfo = wikiplugin_fancytable_info();
+    $defaults = [];
     $msg = '';
-    $class = $params['class'] ?? '';
 
+    foreach ($plugininfo['params'] as $key => $param) {
+        $defaults[$key] = $param['default'] ?? null;
+    }
+    // merge params with defaults as required $desc and $class are optional
+    // so $class and $desc may not be set in the params array
+    $params = array_merge($defaults, $params);
+    extract($params, EXTR_SKIP);
     // Check if sorting is desired
     $sortDesired = isset($sortable) && $sortable != 'n';
 
@@ -195,7 +202,7 @@ function wikiplugin_fancytable($data, $params)
             $msg = '<em>' . tra('Unable to load the jQuery Sortable Tables feature.') . '</em>';
         }
     }
-    if (isset($desc) && ! empty($desc)) {
+    if (! empty($desc)) {
         $desc = '<caption>' . $desc . '</caption>';
     }
     // Prepare table attributes
