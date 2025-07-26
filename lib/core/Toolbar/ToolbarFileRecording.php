@@ -6,12 +6,14 @@ use TikiLib;
 
 class ToolbarFileRecording extends ToolbarUtilityItem
 {
-    private $trackerItemId;
     private $id;
+    private $recordingFieldId;
+    private $recordingGalleryId;
 
-    public function __construct($trackerItemId, $isWysiwyg = false)
+    public function __construct($isWysiwyg = false, $recordingFieldId = 0, $recordingGalleryId = 0)
     {
-        $this->trackerItemId = $trackerItemId;
+        $this->recordingFieldId = $recordingFieldId;
+        $this->recordingGalleryId = $recordingGalleryId;
         $this->id = $this->domElementId . '_toolbar-file-recording';
         $this->setLabel(tra('Start recording'))
             ->setIcon('img/icons/file-manager.png')
@@ -114,6 +116,8 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                     type: 'primary start-recording',
                     attrs: {
                         'data-tracker-files': 'true',
+                        'data-field-id': '{$this->recordingFieldId}',
+                        'data-gallery-id': '{$this->recordingGalleryId}',
                     },
                     onClick: function() {}
                 },

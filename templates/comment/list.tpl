@@ -21,7 +21,7 @@
     {if $allow_post and $prefs.comments_sort_mode eq 'commentDate_desc'}
         <div class="submit">
             <div class="buttons comment-form {if $prefs.wiki_comments_form_displayed_default eq 'y'}autoshow{/if}">
-                <a class="btn btn-secondary custom-handling" href="{service controller=comment action=post type=$type objectId=$objectId allowRecording=$allowRecording}" data-target="#add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}">{tr}Post new comment{/tr}</a>
+                <a class="btn btn-secondary custom-handling" href="{service controller=comment action=post type=$type objectId=$objectId allowRecording=$allowRecording recordingFieldId=$recordingFieldId recordingGalleryId=$recordingGalleryId}" data-target="#add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}">{tr}Post new comment{/tr}</a>
             </div>
         </div>
         <div id="add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}" class="add-comment-zone"></div>
@@ -77,7 +77,7 @@
     {if $allow_post and $prefs.comments_sort_mode neq 'commentDate_desc'}
         <div class="submit">
             <div class="buttons comment-form {if $prefs.wiki_comments_form_displayed_default eq 'y'}autoshow{/if}">
-                <a class="btn btn-secondary custom-handling" href="{service controller=comment action=post type=$type objectId=$objectId allowRecording=$allowRecording}" role="button" data-target="#add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}">{tr}Post new comment{/tr}</a>
+                <a class="btn btn-secondary custom-handling" href="{service controller=comment action=post type=$type objectId=$objectId allowRecording=$allowRecording recordingFieldId=$recordingFieldId recordingGalleryId=$recordingGalleryId}" role="button" data-target="#add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}">{tr}Post new comment{/tr}</a>
             </div>
         </div>
         <div id="add-comment-zone-{$objectId|replace:' ':''|replace:',':''|escape:'attr'}" class="add-comment-zone"></div>

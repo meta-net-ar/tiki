@@ -71,7 +71,9 @@ class Services_Comment_Controller
             'allow_archive'     => $this->canArchive($type, $objectId),
             'allow_moderate'    => $this->canModerate($type, $objectId),
             'allow_vote'        => $this->canVote($type, $objectId),
-            'allowRecording' => $input->allowRecording->word(),
+            'allowRecording' => $input->allowRecording->bool(),
+            'recordingFieldId' => $input->recordingFieldId->int(),
+            'recordingGalleryId' => $input->recordingGalleryId->int(),
         ];
 
         $paginationOnClick = "
@@ -352,7 +354,9 @@ class Services_Comment_Controller
             'return_url' => $return_url,
             'version' => $version,
             'diffInfo' => $diffInfo,
-            'allowRecording' => $input->allowRecording->word() == 'y',
+            'allowRecording' => $input->allowRecording->bool(),
+            'recordingFieldId' => $input->recordingFieldId->int(),
+            'recordingGalleryId' => $input->recordingGalleryId->int(),
         ];
     }
 

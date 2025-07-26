@@ -244,6 +244,21 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             'cameraandaudio' => tr('Camera and audio'),
                         ],
                     ],
+                    'storeRecordingComments' => [
+                        'name' => tr('Store Recording Comments'),
+                        'description' => tr('Use this field as the storage for recording comments.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                        'depends' => [
+                            'field' => 'liveRecord',
+                            'op' => '!==',
+                            'value' => 'n',
+                        ]
+                    ],
                     'changeFileNameOnUpload' => [
                         'name' => tr('Change file name'),
                         'description' => tr('Change file name on uploaded files. Upload In Modal required.'),
@@ -391,6 +406,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
             'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
+            'storeRecordingComments' => $this->trackerField->getOption('storeRecordingComments'),
+
         ];
     }
 

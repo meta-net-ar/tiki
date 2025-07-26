@@ -91,13 +91,6 @@
                 </label>
             </div>
             <div class="form-check depends" data-on="useComments">
-                <input type="checkbox" class="form-check-input" name="allowRecordingInComments" id="allowRecordingInComments" value="1"
-                        {if $info.allowRecordingInComments eq 'y'} checked="checked"{/if}>
-                <label class="form-check-label" for="allowRecordingInComments">
-                    {tr}Allow recording while writing comments{/tr}
-                </label>
-            </div>
-            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showLastComment" id="showLastComment" value="1"
                         {if $info.showLastComment eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showLastComment">

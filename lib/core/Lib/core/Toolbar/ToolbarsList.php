@@ -70,14 +70,18 @@ class ToolbarsList
 
         $string = preg_replace('/\s+/', '', $string);
         $objectId = $params['objectId'] ?? '';
-        $allowFileRecording = $params['allowRecording'] ?? false;
+        $extraParams = [
+            'allowRecording' => $params['allowRecording'] ?? false,
+            'recordingFieldId' => $params['recordingFieldId'] ?? 0,
+            'recordingGalleryId' => $params['recordingGalleryId'] ?? 0,
+        ];
 
         foreach (explode('/', $string) as $line) {
             $bits = explode('|', $line);
             if (count($bits) > 1) {
-                $list->addLine(explode(',', $bits[0]), explode(',', $bits[1]), $objectId, $allowFileRecording);
+                $list->addLine(explode(',', $bits[0]), explode(',', $bits[1]), $objectId, $extraParams);
             } else {
-                $list->addLine(explode(',', $bits[0]), [], $objectId, $allowFileRecording);
+                $list->addLine(explode(',', $bits[0]), [], $objectId, $extraParams);
             }
         }
 
@@ -102,7 +106,7 @@ class ToolbarsList
         return true;
     }
 
-    private function addLine(array $tags, array $rtags = [], $objectId = '', $allowFileRecording = false): void
+    private function addLine(array $tags, array $rtags = [], $objectId = '', $extraParams = []): void
     {
         $elements = [];
         $j = count($rtags) > 0 ? 2 : 1;
@@ -130,7 +134,7 @@ class ToolbarsList
                         $this->syntax === 'markdown',
                         $this->domElementId,
                         $objectId,
-                        $allowFileRecording
+                        $extraParams
                     ))
                     && $tag->isAccessible()
                 ) {
