@@ -52,6 +52,7 @@ $table-color:                 var(--#{$prefix}body-color); // !default;
 $table-dark-color:            var(--#{$prefix}body-bg);
 
 // Forms
+$input-color:                           #073642; // Added for Element Plus
 $input-bg:                              #a9bdbd;
 $input-disabled-bg:                     #657b83;
 $input-group-addon-color:               #8B9C9C;

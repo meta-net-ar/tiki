@@ -17,6 +17,11 @@ $imagePathToImgDir: "../../../img/";
 //    background: $navbar-dark-bg;
 //}
 
+:root {
+    --tiki-input-bg: #{$input-bg};
+    --tiki-input-color: #{$input-color};
+}
+
 
 //.layout_social,
 //.layout_social_modules {

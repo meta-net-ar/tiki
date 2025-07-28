@@ -8,9 +8,23 @@
     --el-menu-border-color: var(--el-border-color);
     --el-text-color-regular: var(--bs-body-color); // Text of selector options
     --el-fill-color-light: var(--bs-secondary-bg); // Selected option and hover background color
-    --el-input-bg-color: var(--bs-body-bg); // This and --el-fill-color-blank are used for search input background
-    --el-fill-color-blank: var(--bs-body-bg);
+    --el-input-bg-color: var(--tiki-input-bg); // This and --el-fill-color-blank are used for search input background
+    --el-fill-color-blank: var(--tiki-input-bg);
     --el-font-size-base: var(--bs-body-font-size); // Font size of search input
+    .el-select__wrapper.is-filterable, // Placing these outside of :host didn't work, also declaring CSS variables within host but without classes didn't work.
+    .el-select-dropdown,
+    .el-select {
+        background: var(--tiki-input-bg) !important;
+        color: var(--tiki-input-color) !important;
+        --el-text-color-regular: var(--tiki-input-color) !important;
+        --el-text-color-placeholder: var(--tiki-input-color) !important;
+    }
+    .el-input__inner {
+        --el-text-color-regular: var(--tiki-input-color) !important;
+    }
+    .el-input {
+        --el-input-text-color: var(--tiki-input-color) !important;
+    }
 }
 
 .el-button {
