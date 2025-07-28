@@ -10,6 +10,7 @@ namespace Tiki\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Tiki\Search\Elastic\ElasticSearchIndexManager;
@@ -22,41 +23,64 @@ class IndexCleanupCommand extends Command
     {
         $this
             ->setName('index:cleanup')
-            ->setDescription('Deletes unused search indexes to free up space and maintain optimal search performance.');
+            ->setDescription('Deletes unused search indexes to free up space and maintain optimal search performance.')
+            ->addOption(
+                'index-to-remove',
+                'i',
+                InputOption::VALUE_REQUIRED,
+                'Specify a single index to remove'
+            )
+            ->addOption(
+                'all',
+                null,
+                InputOption::VALUE_NONE,
+                'Delete all indexes, ignoring prefix'
+            )
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'List indexes that would be removed, without actually deleting them'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-
-        $io->title('Index Cleanup Process...');
+        $io->title(tr('Index Cleanup Process...'));
 
         $unifiedSearchLib = TikiLib::lib('unifiedsearch');
         $currentIndexDetails = $unifiedSearchLib->getCurrentEngineDetails();
         list($engine, $version, $currentIndex) = $currentIndexDetails;
 
+        $options = [
+            'index-to-remove' => $input->getOption('index-to-remove'),
+            'all' => $input->getOption('all'),
+            'dry-run' => $input->getOption('dry-run')
+        ];
+
         switch ($engine) {
             case 'Elastic':
-                $this->cleanupElasticsearch($currentIndex, $io);
+                $this->cleanupElasticsearch($currentIndex, $io, $options);
                 break;
             case 'MySQL':
-                $this->cleanupMySQL($currentIndex, $io);
+                $this->cleanupMySQL($currentIndex, $io, $options);
                 break;
             default:
-                $io->error("Unsupported search backend: $engine");
-                return 1;
+                $io->error(tr('Unsupported search backend: %0', $engine));
+                return Command::FAILURE;
         }
 
-        $io->success('Index cleanup process completed successfully.');
-        return 0;
+        $io->success(tr('Index cleanup process completed.'));
+        return Command::SUCCESS;
     }
 
-    private function cleanupElasticsearch($currentIndex, SymfonyStyle $io)
+    private function cleanupElasticsearch(string $currentIndex, SymfonyStyle $io, array $options)
     {
         global $prefs;
 
-        if (! isset($prefs['unified_elastic_url']) || empty($prefs['unified_elastic_url']) || ! isset($prefs['unified_elastic_index_prefix']) || empty($prefs['unified_elastic_index_prefix'])) {
-            $io->error('Elasticsearch preferences are not properly defined.');
+        if (empty($prefs['unified_elastic_url']) || empty($prefs['unified_elastic_index_prefix'])) {
+            $io->error(tr('Elasticsearch preferences are not properly defined.'));
             return;
         }
 
@@ -64,35 +88,80 @@ class IndexCleanupCommand extends Command
             $indexPrefix = $prefs['unified_elastic_index_prefix'];
             $connUrl = $prefs['unified_elastic_url'];
             $manager = new ElasticSearchIndexManager($currentIndex, $indexPrefix, $connUrl);
-            $unUsedIndexes = $manager->getUnusedIndexes();
-            if (! count($unUsedIndexes)) {
-                $io->note('No unused indexes to delete.');
+
+            $indexToRemove = $options['index-to-remove'];
+            $dryRun = $options['dry-run'];
+            $removeAll = $options['all'];
+
+            // If a specific index is requested to be removed
+            if (! empty($indexToRemove)) {
+                if (! $manager->indexExists($indexToRemove)) {
+                    $io->error(tr('The specified Elasticsearch index does not exist: %0', $indexToRemove));
+                    return;
+                }
+                $manager->removeIndex($indexToRemove);
+                $io->note(tr('Deleted specified Elasticsearch index: %0', $indexToRemove));
                 return;
             }
-            foreach ($unUsedIndexes as $indexName) {
-                $manager->removeIndex($indexName);
-                $io->note("Deleted unused Elasticsearch index: $indexName");
+
+            // Get either all indexes or just the unused ones
+            $indexesToDelete = $manager->getIndexes(! empty($removeAll) ? false : true);
+
+            if (empty($indexesToDelete)) {
+                $io->note(tr('No Elastic Indexes To Delete.'));
+                return;
+            }
+
+            foreach ($indexesToDelete as $indexName) {
+                if (! empty($dryRun)) {
+                    $io->note(tr('Would delete index: %0', $indexName));
+                } else {
+                    $manager->removeIndex($indexName);
+                    $io->note(tr('Deleted unused Elasticsearch index: %0', $indexName));
+                }
             }
         } catch (\Exception $e) {
-            $io->error('An error occurred during Elasticsearch index cleanup: ' . $e->getMessage());
+            $io->error(tr('An error occurred during Elasticsearch index cleanup: %0', $e->getMessage()));
         }
     }
 
-    private function cleanupMySQL($currentIndex, SymfonyStyle $io)
+    private function cleanupMySQL(string $currentIndex, SymfonyStyle $io, array $options)
     {
         try {
             $mysqlManager = new MysqlSearchIndexManager($currentIndex);
-            $unusedIndexes = $mysqlManager->getUnusedIndexes();
-            if (! count($unusedIndexes)) {
-                $io->note('No unused indexes to delete.');
+            $indexToRemove = $options['index-to-remove'];
+            $dryRun = $options['dry-run'];
+            $removeAll = $options['all'];
+
+            // If a specific index is requested to be removed
+            if (! empty($indexToRemove)) {
+                if (! $mysqlManager->indexExists($indexToRemove)) {
+                    $io->error(tr('The specified MYSQL index does not exist: %0', $indexToRemove));
+                    return;
+                }
+                $mysqlManager->removeIndex($indexToRemove);
+                $io->note(tr('Deleted specified MYSQL index: %0', $indexToRemove));
                 return;
             }
-            foreach ($unusedIndexes as $indexName) {
-                $mysqlManager->removeIndex($indexName);
-                $io->note("Deleted unused MySQL index: $indexName");
+
+            // Get either all indexes or just the unused ones
+            $indexesToDelete = $mysqlManager->getIndexes(! empty($removeAll) ? false : true);
+
+            if (empty($indexesToDelete)) {
+                $io->note(tr('No MySQL Indexes To Delete.'));
+                return;
+            }
+
+            foreach ($indexesToDelete as $indexName) {
+                if (! empty($dryRun)) {
+                    $io->note(tr('Would delete MySQL index: %0', $indexName));
+                } else {
+                    $mysqlManager->removeIndex($indexName);
+                    $io->note(tr('Deleted unused MySQL index: %0', $indexName));
+                }
             }
         } catch (\Exception $e) {
-            $io->error('An error occurred during MySQL index cleanup: ' . $e->getMessage());
+            $io->error(tr('An error occurred during MySQL index cleanup: %0', $e->getMessage()));
         }
     }
 }
