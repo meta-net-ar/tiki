@@ -1041,6 +1041,8 @@ if ($prefs['error_tracking_enabled_js'] == 'y' &&  ! empty($prefs['error_trackin
             $script = <<<JS
             import {Sentry} from "@tiki-modules/sentryBrowser";
             Sentry.init({dsn: '$dsn', sampleRate: $sampleRate});
+            // Expose Sentry globally for components to use
+            window.Sentry = Sentry;
             JS;
         $headerlib->add_js_module($script, -10);
 }
