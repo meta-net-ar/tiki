@@ -256,8 +256,8 @@ if ($cdn_pref) {
 }
 if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-realtime.php') === false) {
     ini_set('session.cookie_path', str_replace("\\", "/", $tikiroot));
-    if ($start_session) {
-        // enabing silent sessions mean a session is only started when a cookie is presented
+    if ($start_session && ini_get('session.use_cookies')) {
+    // enabing silent sessions mean a session is only started when a cookie is presented
         $session_params = session_get_cookie_params();
         if (isset($prefs['session_protected']) && $prefs['session_protected'] == 'y') {
             $session_params['secure'] = true;
@@ -266,6 +266,7 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
             $session_params['secure'] = true;
             $session_params['samesite'] = 'None';
         }
+
         session_set_cookie_params([
             'lifetime' => $session_params['lifetime'],
             'path' => $tikiroot,
