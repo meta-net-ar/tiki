@@ -1144,7 +1144,7 @@ class UsersLib extends TikiLib
 
     public function _init_cas_client()
     {
-        global $prefs;
+        global $prefs, $base_url;
 
         // just make sure we're supposed to be here
         if ($prefs['auth_method'] != 'cas') {
@@ -1152,7 +1152,7 @@ class UsersLib extends TikiLib
         }
         if (self::$cas_initialized === false) {
             // initialize phpCAS
-            phpCAS::client($prefs['cas_version'], '' . $prefs['cas_hostname'], (int) $prefs['cas_port'], '' . $prefs['cas_path'], false);
+            phpCAS::client($prefs['cas_version'], '' . $prefs['cas_hostname'], (int) $prefs['cas_port'], '' . $prefs['cas_path'], $base_url);
             self::$cas_initialized = true;
         }
 
