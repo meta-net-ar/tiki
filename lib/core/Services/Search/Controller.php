@@ -31,22 +31,6 @@ class Services_Search_Controller
         $num_queries_before = $num_queries;
 
         $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-        $currentEngine = $unifiedsearchlib->getCurrentEngineDetails();
-        $unusedIndices = $unifiedsearchlib->listAllUnusedIndexes($currentEngine);
-
-        if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
-            $unusedIndicesMessage = "You have the following unused indexes:\n";
-            $unusedIndicesMessage .= '<ul>';
-            foreach ($unusedIndices['indices'] as $m => $indices) {
-                $unusedIndicesMessage .= "<li>" . $indices . "</li>";
-            }
-            $unusedIndicesMessage .= '</ul>';
-            $unusedIndicesMessage .= "If you don't need them (for debugging), run the following command:";
-            $unusedIndicesMessage .= "<ul><li>php console.php index:cleanup</li></ul>";
-            Feedback::note(['mes' => $unusedIndicesMessage]);
-        } elseif (isset($unusedIndices['error'])) {
-            Feedback::error(['mes' => tr($unusedIndices['error'])]);
-        }
 
         $access = TikiLib::lib('access');
         $stat = null;

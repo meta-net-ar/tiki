@@ -18,6 +18,12 @@ function prefs_unified_list()
             ],
             'default' => 'mysql',
         ],
+        'unified_check_unused_indexes' => [
+            'name' => tra('Check for unused indexes'),
+            'description' => tra('Check for unused indexes and remove them to free up space and maintain optimal search performance.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'unified_search_default_operator' => [
             'name' => tra('Default Boolean Operator'),
             'description' => tra('Use OR or AND as the default search operator.'),

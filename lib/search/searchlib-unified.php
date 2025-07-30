@@ -1897,17 +1897,17 @@ class UnifiedSearchLib
                     $indexPrefix = $prefs['unified_elastic_index_prefix'];
                     $connUrl = $prefs['unified_elastic_url'];
                     $manager = new ElasticSearchIndexManager($currentIndex, $indexPrefix, $connUrl);
-                    $indices['indices'] = $manager->getUnusedIndexes();
+                    $indices['indices'] = $manager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for Elasticsearch: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for Elasticsearch: %0', $e->getMessage());
                 }
                 break;
             case 'MySQL':
                 try {
                     $mysqlManager = new MysqlSearchIndexManager($currentIndex);
-                    $indices['indices'] = $mysqlManager->getUnusedIndexes();
+                    $indices['indices'] = $mysqlManager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for MYSQL: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for MYSQL: %0', $e->getMessage());
                 }
                 break;
             case 'Manticore':
@@ -1916,9 +1916,9 @@ class UnifiedSearchLib
                     $dsn = $prefs['unified_manticore_url'];
                     $pdoPort = $prefs['unified_manticore_mysql_port'] ?: 9306;
                     $manticoreManager = new ManticoreSearchIndexManager($currentIndex, $indexPrefix, $dsn, $pdoPort);
-                    $indices['indices'] = $manticoreManager->getUnusedIndexes();
+                    $indices['indices'] = $manticoreManager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for Manticore: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for Manticore: %0', $e->getMessage());
                 }
                 break;
             default:
