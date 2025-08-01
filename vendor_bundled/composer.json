@@ -161,7 +161,7 @@
         ""
     ],
     "require": {
-        "altcha-org/altcha": "^1.1",
+        "altcha-org/altcha": "~1.1",
         "bacon/bacon-qr-code": "~3.0",
         "bertoost/elasticemail-mailer": "~1.1",
         "bigbluebutton/bigbluebutton-api-php": "~2.3",
