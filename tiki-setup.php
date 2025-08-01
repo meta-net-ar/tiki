@@ -822,6 +822,9 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
+    if ($prefs['altcha_enabled'] === 'y') {
+        $headerlib->add_js_module('import altcha from "@altcha";');
+    }
 }
 
 if (! empty($prefs['header_custom_css'])) {

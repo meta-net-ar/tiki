@@ -135,6 +135,9 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/tiki-3d-model-viewer */
                 "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
 
+                /* src/js/tiki-altcha */
+                "@altcha" => $tikiUrl . JS_ASSETS_PATH . "/tiki-altcha.js",
+
                 /* src/js/tiki-figlet */
                 "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
 
@@ -185,9 +188,19 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
                 "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backtop.js",
 
-                /* src/js/wysiwyg */
-                "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/summernote.js",
-                "@wysiwyg/plugin" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/plugin.js",
+                /* tiki-3d-model-viewer */
+                "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
+
+                /* tiki-iot */
+                "@tiki-iot/tiki-iot-dashboard-all" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard-all.js",
+                "@tiki-iot/tiki-iot-dashboard" => $tikiUrl . JS_ASSETS_PATH . "/tiki-iot/tiki-iot-dashboard.js",
+
+                /* tiki-vue-sfc-loader */
+                "@tiki-vue-sfc-loader" => $tikiUrl . JS_ASSETS_PATH . "/tiki-vue-sfc-loader.js",
+
+                "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg-summernote.js",
+
+                "avatar-generator" => $tikiUrl . JS_ASSETS_PATH . "/avatar-generator.js",
             ]
         ];
     $importmapJson = json_encode($importmap, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);

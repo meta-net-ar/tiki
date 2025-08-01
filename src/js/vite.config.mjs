@@ -138,6 +138,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
         "tracker-rules": resolve(__dirname, "vue-mf/tracker-rules/src/tracker-rules.js"),
+        "tiki-altcha": resolve(__dirname, "tiki-altcha/altcha.js"),
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
@@ -305,7 +306,44 @@ export default defineConfig(({ command, mode }) => {
                     But make sure to look into the dist folder, so we don't add a bunch of useless stuff, but don't miss required support files (such as language files)
                     */
 
-                    /* Importmap polyfills used in path_js_importmap_generator module system */
+                    /* jquery_tiki */
+                    {
+                        src: "node_modules/altcha/dist/altcha.js",
+                        dest: "vendor_dist/altcha/dist",
+                    },
+                    {
+                        src: "node_modules/@event-calendar/core/dist/index.css",
+                        dest: "vendor_dist/@event-calendar/core/dist",
+                    },
+                    {
+                        src: "node_modules/boomerangjs/boomerang.js",
+                        dest: "vendor_dist/boomerangjs/",
+                    },
+                    {
+                        src: "node_modules/boomerangjs/plugins/rt.js",
+                        dest: "vendor_dist/boomerangjs/plugins",
+                    },
+                    {
+                        src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
+                        dest: "vendor_dist/bootstrap/dist/css",
+                    },
+                    {
+                        src: "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
+                        dest: "vendor_dist/bootstrap/dist/js",
+                    },
+                    {
+                        src: "node_modules/@popperjs/core/dist/esm/*",
+                        dest: "vendor_dist/@popperjs/core/dist/esm",
+                    },
+                    {
+                        src: "node_modules/bootstrap-icons/font/*",
+                        dest: "vendor_dist/bootstrap-icons/font",
+                    },
+                    {
+                        src: ["node_modules/timeago/jquery.timeago.js", "node_modules/timeago/locales"],
+                        dest: "vendor_dist/timeago/dist",
+                    },
+                    /* module system */
                     {
                         src: "node_modules/es-module-shims/dist/es-module-shims.js",
                         dest: "vendor_dist/es-module-shims/dist",

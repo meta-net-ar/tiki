@@ -30,12 +30,6 @@
         {if $captchalib->type eq 'altcha'}
             <input type="hidden" name="captcha[id]" id="captchaId" value="{$captchalib->generate()->challenge}">
             <div class="mb-3">
-            <script
-                async
-                defer
-                src="lib/captcha/altcha.min.js"
-                type="module"
-            ></script>
                 {$captchalib->render()}
             </div>
         {elseif $captchalib->type eq 'recaptcha' || $captchalib->type eq 'recaptcha20' || $captchalib->type eq 'recaptcha30'}
