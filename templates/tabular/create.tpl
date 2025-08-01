@@ -17,7 +17,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3" for="name">{tr}Name{/tr}</label>
             <div class="col-sm-9">
-                <input class="form-control" type="text" name="name" id="name" required>
+                <input class="form-control" type="text" name="name" id="name" value="{$format.name|escape}" required>
             </div>
         </div>
         <div class="mb-3 row">
@@ -30,7 +30,7 @@
             <label class="form-check-label col-sm-3" for="prefill">{tr}Initialize this format with the current tracker fields{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="prefill" id="prefill">
+                    <input class="form-check-input" type="checkbox" name="prefill" id="prefill" {if !empty($format.prefill)}checked{/if}>
                 </div>
             </div>
         </div>

@@ -66,13 +66,17 @@ class Services_Tracker_TabularController
     {
         Services_Exception_Denied::checkGlobal('tiki_p_tabular_admin');
 
+        $format = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (empty($input->trackerId->int())) {
-                Feedback::error(tr('No Tracker Selected.'));
+            $format["name"] = $input->name->text();
+            $format["prefill"] = $input->prefill->text();
+            if (empty($input->trackerId->int()) || empty($input->name->text())) {
+                Feedback::error(tr('Both Tracker ID and Name are required.'));
             } else {
                 $lib = TikiLib::lib('tabular');
 
-                $tabularId = $lib->create($input->name->text(), $input->trackerId->int(), $input->use_odbc->int() ? $input->odbc->none() : []);
+                $format["trackerId"] = $input->trackerId->int();
+                $tabularId = $lib->create($format["name"], $format["trackerId"], $input->use_odbc->int() ? $input->odbc->none() : []);
 
                 $forward = [
                     'controller' => 'tabular',
@@ -94,6 +98,7 @@ class Services_Tracker_TabularController
 
         return [
             'title' => tr('Create Import-Export Format'),
+            'format' => $format,
             'has_odbc' => function_exists('odbc_connect'),
         ];
     }
