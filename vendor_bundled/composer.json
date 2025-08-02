@@ -155,7 +155,7 @@
     "require": {
         "adodb/adodb-php": "^5.22.4",
         "avianey/jqdoublescroll": ">=1.0.0",
-        "bacon/bacon-qr-code": "^2.0.0",
+        "bacon/bacon-qr-code": "~3.0",
         "candy-chat/xmpp-prebind-php": "dev-master",
         "cboden/ratchet": "^0.4",
         "chrome-php/chrome": "^1.12",
