@@ -11,11 +11,12 @@ class ToolbarFileRecording extends ToolbarUtilityItem
     private $recordingGalleryId;
     private $trackerItemId;
 
-    public function __construct($objectId, $isWysiwyg = false, $recordingFieldId = 0, $recordingGalleryId = 0)
+    public function __construct($objectId, $domElementId, $isWysiwyg = false, $recordingFieldId = 0, $recordingGalleryId = 0)
     {
         $this->trackerItemId = $objectId;
         $this->recordingFieldId = $recordingFieldId;
         $this->recordingGalleryId = $recordingGalleryId;
+        $this->domElementId = $domElementId;
         $this->id = $this->domElementId . '_toolbar-file-recording';
         $this->setLabel(tra('Start recording'))
             ->setIcon('img/icons/file-manager.png')
@@ -121,6 +122,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                         'data-field-id': '{$this->recordingFieldId}',
                         'data-gallery-id': '{$this->recordingGalleryId}',
                         'data-tracker-item-id': '{$this->trackerItemId}',
+                        'data-area-id': '{$this->domElementId}'
                     },
                     onClick: function() {}
                 },
