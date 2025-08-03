@@ -430,14 +430,46 @@
         "test": "php ../lib/test/phpunit.php -c phpunit.xml.dist --colors=always"
     },
     "repositories": {
-        "tiki.org": {
+        "packagist.org": {
             "type": "composer",
-            "url": "https://composer.tiki.org",
-            "canonical": true
+            "url": "https://packagist.org",
+            "exclude": [
+                "pear/text_wiki_mediawiki"
+            ]
         },
         "asset-packagist.org": {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        "tiki.org": {
+            "type": "composer",
+            "url": "https://composer.tiki.org",
+            "canonical": false,
+            "only": [
+                "simile_timeline/simile_timeline",
+                "openannotation/annotator",
+                "jquery-plugins/reflection-jquery",
+                "jquery/jquery-sheet",
+                "umakantp/smartylint",
+                "bower-asset/wodo.texteditor",
+                "pear/text_wiki_mediawiki",
+                "css-tricks/anythingslider-themes",
+                "jquery-plugins/anythingslider",
+                "jquery-plugins/async",
+                "jquery-plugins/galleriffic",
+                "jquery-plugins/infinitecarousel",
+                "jquery-plugins/nestedsortable",
+                "jquery-plugins/tagcanvas",
+                "jquery/jquery-timepicker-addon",
+                "jquery/minicart",
+                "jquery/photoswipe",
+                "mrrio/jspdf",
+                "openlayers/openlayers",
+                "rangy/rangy",
+                "sam152/javascript-equal-height-responsive-rows",
+                "walkermatt/ol-layerswitcher"
+                
+            ]
         }
     }
 }
