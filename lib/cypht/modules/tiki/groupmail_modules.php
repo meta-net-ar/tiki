@@ -149,7 +149,7 @@ class Hm_Handler_take_groupmail extends Hm_Handler_Module
         // check if already taken
         $itemid = $trklib->get_item_id($this->get('trackerId'), $this->get('messageFId'), $realmsgid);
         if ($itemid > 0) {
-            Hm_Msgs::add('ERR' . tr('Sorry, that mail has been taken by another operator.'));
+            Hm_Msgs::add(tr('Sorry, that mail has been taken by another operator.'), 'warning');
             return;
         } else {
             $charset = $prefs['default_mail_charset'];
@@ -248,7 +248,7 @@ class Hm_Handler_put_back_groupmail extends Hm_Handler_Module
             $trklib->remove_tracker_item($itemid);
             $this->out('item_removed', true);
         } else {
-            Hm_Msgs::add('ERR' . tr('Tracker item not found!'));
+            Hm_Msgs::add(tr('Tracker item not found!'), 'danger');
         }
     }
 }

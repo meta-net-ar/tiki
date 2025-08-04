@@ -241,19 +241,19 @@ class Hm_Handler_add_to_calendar extends Hm_Handler_Module
 
         list($success, $form) = $this->process_form(['calendar_id']);
         if (! $success) {
-            Hm_Msgs::add("ERRNo calendar selected");
+            Hm_Msgs::add("No calendar selected", "warning");
             return;
         }
 
         $calendar = TikiLib::lib('calendar')->get_calendar($form['calendar_id']);
         if (! $calendar) {
-            Hm_Msgs::add("ERRSelected calendar is unavailable");
+            Hm_Msgs::add("Selected calendar is unavailable", "danger");
             return;
         }
 
         $perms = Perms::get('calendar', $form['calendar_id']);
         if (! $perms->add_events) {
-            Hm_Msgs::add("ERRInsufficient permissions to create the event in the selected calendar");
+            Hm_Msgs::add("Insufficient permissions to create the event in the selected calendar", "danger");
             return;
         }
 
@@ -303,13 +303,13 @@ class Hm_Handler_update_in_calendar extends Hm_Handler_Module
         $existing = TikiLib::lib('calendar')->find_by_uid(null, $data['uid']);
 
         if (! $existing) {
-            Hm_Msgs::add("ERRExisting event could not be found in your calendar");
+            Hm_Msgs::add("Existing event could not be found in your calendar", "danger");
             return;
         }
 
         $perms = Perms::get('event', $existing['calitemId']);
         if (! $perms->change_events) {
-            Hm_Msgs::add("ERRInsufficient permissions to update the event in the calendar");
+            Hm_Msgs::add("Insufficient permissions to update the event in the calendar", "danger");
             return;
         }
 

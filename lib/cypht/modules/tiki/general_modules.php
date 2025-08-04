@@ -81,7 +81,7 @@ class Hm_Handler_add_file_attachment extends Hm_Handler_Module
                 'size' => $tikifile->filesize
             ];
             if (! attach_file($tikifile->getContents(), $file, $this->config->get('attachment_dir'), $draft_id, $this)) {
-                Hm_Msgs::add('ERRAn error occurred attaching the file gallery file.');
+                Hm_Msgs::add('An error occurred attaching the file gallery file.', 'danger');
             }
         }
     }

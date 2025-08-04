@@ -26,13 +26,13 @@ if (! hm_exists('tiki_parse_message')) {
 
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add('Tracker field not found', 'danger');
             return;
         }
 
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('ERRTracker item not found');
+            Hm_Msgs::add('Tracker item not found', 'danger');
             return;
         }
         $item[$field['fieldId']] = $trk->get_item_value(null, $item['itemId'], $field['fieldId']);
@@ -41,7 +41,7 @@ if (! hm_exists('tiki_parse_message')) {
         $data = $handler->getFieldData();
 
         if (! isset($data['emails']) || ! is_array($data['emails'])) {
-            Hm_Msgs::add('ERRTracker field storage is broken or you are using the wrong field type');
+            Hm_Msgs::add('Tracker field storage is broken or you are using the wrong field type', 'danger');
             return;
         }
 
@@ -66,12 +66,12 @@ if (! hm_exists('tiki_parse_message')) {
         }
 
         if (! $email) {
-            Hm_Msgs::add('ERREmail not found in related tracker item');
+            Hm_Msgs::add('Email not found in related tracker item', 'warning');
             return;
         }
 
         if (empty($email['message_raw'])) {
-            Hm_Msgs::add('ERREmail could not be parsed');
+            Hm_Msgs::add('Email could not be parsed', 'warning');
             return;
         }
 
@@ -312,7 +312,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // smtp server details
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (! $smtp_details) {
-            Hm_Msgs::add('ERRCould not use the configured SMTP server');
+            Hm_Msgs::add('Could not use the configured SMTP server', 'danger');
             return false;
         }
 
@@ -328,7 +328,7 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // try to connect
         $smtp = Hm_SMTP_List::connect($smtp_id, false);
         if (! $smtp->authed()) {
-            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
             return false;
         }
 
@@ -342,14 +342,14 @@ if (! hm_exists('tiki_send_email_through_cypht')) {
         // get smtp recipients
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
-            Hm_Msgs::add("ERRNo valid receipts found");
+            Hm_Msgs::add("No valid receipts found", "warning");
             return false;
         }
 
         // send the message
         $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+            Hm_Msgs::add(sprintf("%s", $err_msg, "danger"));
             return false;
         }
 

@@ -31,7 +31,7 @@ class Hm_Output_tiki_filters_cron extends Hm_Output_Module
                 }
                 return false;
             } catch (Exception $e) {
-                Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
                 return false;
             }
         });
