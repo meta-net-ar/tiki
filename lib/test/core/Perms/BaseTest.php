@@ -97,6 +97,52 @@ class Perms_BaseTest extends TikiTestCase
         ];
     }
 
+    public function testResolverStrategyDifference()
+    {
+        global $prefs;
+        $old = $prefs['permission_scope_behavior'] ?? 'static';
+        $prefs['permission_scope_behavior'] = 'blending';
+
+        $resetFactories = function () {
+            $perms = new Perms();
+            $perms->setResolverFactories(
+                [
+                    new Perms_ResolverFactory_TestFactory(
+                        ['object'],
+                        [
+                            'test:a' => new Perms_Resolver_Static(['Registered' => ['view']]),
+                        ]
+                    ),
+                    new Perms_ResolverFactory_TestFactory(
+                        ['category'],
+                        [
+                            'test:1' => new Perms_Resolver_Static([
+                                'Anonymous' => ['view'],
+                                'Registered' => ['edit']
+                            ]),
+                        ]
+                    ),
+                ]
+            );
+            $perms->setGroups(['Registered']);
+            Perms::set($perms);
+        };
+        $resetFactories();
+
+        $accessor = Perms::get(['type' => 'test', 'object' => 'a', 'category' => 1]);
+        $this->assertTrue($accessor->edit);
+
+        Perms::getInstance()->clear();
+        $resetFactories();
+
+        $prefs['permission_scope_behavior'] = 'static';
+        $accessor = Perms::get(['type' => 'test', 'object' => 'a', 'category' => 1]);
+        $this->assertFalse($accessor->edit);
+
+        Perms::getInstance()->clear();
+        $prefs['permission_scope_behavior'] = $old;
+    }
+
     public function testResolverNotCalledTwiceWhenFound()
     {
         $mock = $this->createMock('Perms_ResolverFactory');

@@ -379,6 +379,11 @@ if (! empty($_SESSION['perms_clipboard'])) {
     }
 }
 
+if (! empty($_POST['preference_update'])) {
+    $tikilib->set_preference('permission_scope_behavior', $_POST['permission_scope_behavior']);
+    TikiLib::lib('cache')->invalidate('allperms');
+}
+
 // Prepare display
 // Get the individual object permissions if any
 $displayedPermissions = get_displayed_permissions();

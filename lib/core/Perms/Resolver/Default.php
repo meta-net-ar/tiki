@@ -34,6 +34,14 @@ class Perms_Resolver_Default implements Perms_Resolver
         return ['Anonymous', 'Registered'];
     }
 
+    /**
+     * This does not affect the current resolver as it always returns the same value
+     */
+    public function merge(?Perms_Resolver $another = null)
+    {
+        return;
+    }
+
     public function dump()
     {
         $result = [

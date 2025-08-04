@@ -41,4 +41,32 @@ class Perms_Resolver_StaticTest extends TikiTestCase
         $this->assertTrue($static->check('edit', ['Anonymous', 'Registered']));
         $this->assertEquals(['Anonymous', 'Registered'], $static->applicableGroups());
     }
+
+    public function testMergeStatic()
+    {
+        $static = new Perms_Resolver_Static(
+            ['Registered' => ['view']]
+        );
+        $another = new Perms_Resolver_Static([
+            'Anonymous' => ['view'],
+            'Registered' => ['edit']
+        ]);
+
+        $static->merge($another);
+
+        $this->assertTrue($static->check('edit', ['Anonymous', 'Registered']));
+        $this->assertEquals(['Anonymous' => ['view' => true], 'Registered' => ['view' => true, 'edit' => true]], $static->known());
+    }
+
+    public function testMergeStaticAndDefault()
+    {
+        $static = new Perms_Resolver_Static(
+            ['Registered' => ['view']]
+        );
+        $default = new Perms_Resolver_Default(true);
+
+        $static->merge($default);
+
+        $this->assertFalse($static->check('edit', ['Anonymous', 'Registered']));
+    }
 }

@@ -23,5 +23,16 @@ Alternatively, use the Send to URL field to display a specific page (relative to
             'default' => 'y',
             'tags' => ['basic'],
         ],
+        'permission_scope_behavior' => [
+            'name' => tra('Permission system behavior'),
+            'description' => tra('Traditional strict scope based permission system locks specific object permissions to the closest defined permission set for the object bubbling up through category and parent object permissions to the global set of permissions. The blending scope based permission system allows different levels of permissions to combine on a single object. It is an additive-only permission set, so if you want to restrict specific level permissions over a more permissive global level, you should use the traditional strict scope.'),
+            // TODO: add help icon, doc or dev help page to explain more and link from here
+            'type' => 'list',
+            'options' => [
+                'strict' => tr('Strict scope'),
+                'blending' => tr('Blending scope'),
+            ],
+            'default' => 'strict',
+        ],
     ];
 }

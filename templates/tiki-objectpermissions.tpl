@@ -240,6 +240,20 @@
         </form>
     {/tab}
 
+    {tab name="{tr}Permission Preferences{/tr}"}
+        <form method="post" action="{$smarty.server.SCRIPT_NAME}?{query}">
+        <div>
+            <input type="hidden" name="referer" value="{$referer|escape}">
+
+            {preference name=permission_scope_behavior visible="always"}
+
+            <div class="input_submit_container" style="text-align: center">
+                <input type="submit" class="btn btn-primary btn-sm" name="preference_update" value="{tr}Save{/tr}">
+            </div>
+        </div>
+        </form>
+    {/tab}
+
     {* Quickperms *}
 
     {if $prefs.feature_quick_object_perms eq 'y'}
