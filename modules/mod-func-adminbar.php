@@ -88,18 +88,5 @@ function module_adminbar($mod_reference, $module_params)
             });
         });
 ');
-    $swiper_js_path = SWIPER_DIST_PATH . '/swiper-bundle.min.js';
-    $swiper_css_path = SWIPER_DIST_PATH . '/swiper-bundle.min.css';
-    //checking for swiper existence
-    if (! file_exists($swiper_js_path)) {
-        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_js_path));
-        return;
-    }
-    if (! file_exists($swiper_css_path)) {
-        Feedback::error(tr('File %0 is missing, you need to execute npm run build', $swiper_css_path));
-        return;
-    }
-    $headerlib->add_cssfile($swiper_css_path)
-        ->add_jsfile($swiper_js_path);
     TikiLib::lib('smarty')->assign('recent_prefs', TikiLib::lib('prefs')->getRecent());
 }
