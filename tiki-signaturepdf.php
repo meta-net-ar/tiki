@@ -63,15 +63,15 @@ global $tikiroot;
 
 // alter relative paths (href, src, etc.) to absolute paths
 $out = preg_replace_callback(
-    '#(href|src)="([^"]+)"#',
+    '#(href|src|.*\.workerSrc)\s*=\s*([\'"])([^\'"]+)\2#',
     function ($matches) use ($tikiroot) {
-        $url = $matches[2];
+        $url = $matches[3];
         if (strpos($url, 'http') !== 0 && strpos($url, '#') !== 0) {
-            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+            $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
             $host = $_SERVER['HTTP_HOST'];
             $origin = $scheme . "://" . $host . $tikiroot;
             $newUrl = $origin . $url;
-            return $matches[1] . '="' . $newUrl . '"';
+            return $matches[1] . '=' . $matches[2] . $newUrl . $matches[2];
         }
         return $matches[0];
     },
