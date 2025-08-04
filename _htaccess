@@ -180,7 +180,15 @@ FileETag MTime Size
     RewriteRule ^img/lib/(.*)$ vendor/tikiwiki/diagram/img/lib/$1 [NC,L]
 
     # -- Signature PDF assets -- #
-    RewriteRule ^tiki-signaturepdf.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/public/vendor/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/public/vendor/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/js/(.*)$ vendor/mercihabam/signaturepdf/public/js/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/css/(.*)$ vendor/mercihabam/signaturepdf/public/css/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/public/(.*)$ public/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/img/(.*)$ img/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/lib/(.*)$ lib/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/lang/(.*)$ lang/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/themes/(.*)$ themes/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/vendor_bundled/(.*)$ vendor_bundled/$1 [L]
 
     # -- Apache Authorization Header -- #
     # Rewrite rules for passing authorization with Apache running in CGI or FastCGI mode
