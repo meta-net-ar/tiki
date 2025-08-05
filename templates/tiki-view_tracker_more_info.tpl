@@ -4,7 +4,7 @@
         {include file='header.tpl'}
     </head>
     <body{html_body_attributes}>
-        {if $prefs.feature_bidi eq 'y'}
+        {if Language::isRTL()}
             <table dir="rtl" ><tr><td>
         {/if}
         <div id="tiki-main" class="alert alert-info">
@@ -27,7 +27,7 @@
                 <a href="#" onclick="javascript:window.close();" class="link">{tr}close{/tr}</a>
             </div>
         </div>
-        {if $prefs.feature_bidi eq 'y'}
+        {if Language::isRTL()}
             </td></tr></table>
         {/if}
         {include file='footer.tpl'}

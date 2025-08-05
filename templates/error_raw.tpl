@@ -1,4 +1,4 @@
-{if $prefs.feature_bidi eq 'y'}
+{if Language::isRTL()}
 <table dir="rtl" ><tr><td>
 {/if}
 
@@ -12,6 +12,6 @@
         </div>
     </div>
 </div>
-{if $prefs.feature_bidi eq 'y'}
+{if Language::isRTL()}
 </td></tr></table>
 {/if}
