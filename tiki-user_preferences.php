@@ -384,7 +384,11 @@ if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_adm
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
-
+if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] == 'n') {
+    $prefs['change_password'] = 'n';
+    $warning = "New password fields are hidden on Intertiki clients.\nTo update your password, please log in directly to the Intertiki server.";
+    $smarty->assign('intertiki_no_password_change_warning', $warning);
+}
 
 $tfaSecret = $userlib->get_2_factor_secret($userwatch);
 if (isset($_POST['chgadmin']) && $access->checkCsrf()) {

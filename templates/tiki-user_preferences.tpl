@@ -667,6 +667,11 @@
                                 {/remarksbox}
                             {/if}
                         {/if}
+                        {if $intertiki_no_password_change_warning neq ''}
+                            {remarksbox type="tip" title="{tr}Information{/tr}" close="n"}
+                                {tr}{$intertiki_no_password_change_warning}{/tr}
+                            {/remarksbox}
+                        {/if}
                         <div class="tiki-form-group row">
                             <label class="col-md-4 col-form-label" for="username-autocomplete">
                                 {tr}Username:{/tr}
