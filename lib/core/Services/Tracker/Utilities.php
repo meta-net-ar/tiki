@@ -203,7 +203,16 @@ class Services_Tracker_Utilities
         $definition = Tracker_Definition::get($trackerId);
 
         //$fieldId = 0 when is a new field, e.g. when importing tracker structure
-        $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        try {
+            $field = ($fieldId === 0) ? [] : $definition->getField($fieldId);
+        } catch (RuntimeException $e) {
+            if ($fieldId > 0) {
+                // importing tracker field keeping the fieldId
+                $field = [];
+            } else {
+                throw $e;
+            }
+        }
         $trklib = TikiLib::lib('trk');
         $trklib->replace_tracker_field(
             $trackerId,
