@@ -325,15 +325,66 @@
         ],
         "test": "php ../lib/test/phpunit.php -c phpunit.xml.dist --colors=always"
     },
-    "repositories": [
-        {
+    "repositories": {
+        "packagist.org": {
             "type": "composer",
-            "url": "https://composer.tiki.org",
-            "exclude": ["jason-munro/cypht"]
+            "url": "https://packagist.org",
+            "exclude": [
+                "pear/text_wiki_mediawiki",
+                "itsjavi/bootstrap-colorpicker",
+                "openid/php-openid"
+            ]
         },
-        {
+        "asset-packagist.org": {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        "tiki.org": {
+            "type": "composer",
+            "url": "https://composer.tiki.org",
+            "canonical": false,
+            "only": [
+                "simile_timeline/simile_timeline",
+                "openannotation/annotator",
+                "jquery-plugins/reflection-jquery",
+                "jquery/jquery-sheet",
+                "umakantp/smartylint",
+                "bower-asset/wodo.texteditor",
+                "pear/text_wiki_mediawiki",
+                "sam152/javascript-equal-height-responsive-rows",
+                "avianey/jqdoublescroll",
+                "christian-vigh-phpclasses/pdftotext",
+                "codemirror/codemirror",
+                "css-tricks/anythingslider-themes",
+                "jquery-plugins/anythingslider",
+                "jquery-plugins/async",
+                "jquery-plugins/colorbox",
+                "jquery-plugins/fitvidjs",
+                "jquery-plugins/galleriffic",
+                "jquery-plugins/infinitecarousel",
+                "jquery-plugins/jquery-json",
+                "jquery-plugins/jquery-validation",
+                "jquery-plugins/media",
+                "jquery-plugins/nestedsortable",
+                "jquery-plugins/superfish",
+                "jquery-plugins/tagcanvas",
+                "jquery-plugins/treetable",
+                "jquery/jquery-timepicker-addon",
+                "jquery/md5",
+                "jquery/minicart",
+                "jquery/photoswipe",
+                "jquery-plugins/zoom",
+                "mrrio/jspdf",
+                "openlayers/openlayers",
+                "walkermatt/ol-layerswitcher",
+                "pear/xml_rpc",
+                "player/flv",
+                "player/mp3",
+                "rangy/rangy",
+                "svg-edit/svg-edit",
+                "itsjavi/bootstrap-colorpicker",
+                "openid/php-openid"
+            ]
         }
-    ]
+    }
 }
