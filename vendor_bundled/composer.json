@@ -282,7 +282,7 @@
         "mikey179/vfsstream": "^1",
         "overtrue/phplint": "^9.0.4",
         "phpcompatibility/php-compatibility": "^10.x-dev",
-        "phpcsstandards/phpcsutils": "^1.0.0-alpha3",
+        "phpcsstandards/phpcsutils": "^1.1.0",
         "phpstan/phpstan": "^1.10.57",
         "phpstan/phpstan-deprecation-rules": "^1.1.3",
         "phpunit/phpunit": "10.5.26",
@@ -468,7 +468,6 @@
                 "rangy/rangy",
                 "sam152/javascript-equal-height-responsive-rows",
                 "walkermatt/ol-layerswitcher"
-                
             ]
         }
     }
