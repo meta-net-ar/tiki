@@ -11,14 +11,38 @@
 
 require_once("tiki-setup.php");
 
+
 $serverEndpoint = $_SERVER['HTTP_HOST'] . str_replace('/tiki-signaturepdf.php', '/tiki-signaturepdf_handler.php', $_SERVER['REQUEST_URI']);
 $ch = curl_init($serverEndpoint);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    curl_setopt($ch, CURLOPT_POST, true);
+    if (! empty($_FILES)) {
+        $files = [];
+        foreach ($_FILES as $key => $file) {
+            if (is_array($file['name'])) {
+                foreach ($file['name'] as $index => $name) {
+                    $files[$key . '[' . $index . ']'] = new CURLFile($file['tmp_name'][$index], $file['type'][$index], $name);
+                }
+            } else {
+                $files[$key] = new CURLFile($file['tmp_name'], $file['type'], $file['name']);
+            }
+        }
+        $postData = array_merge($_POST, $files);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    } else {
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $_POST);
+    }
+}
+
 $response = curl_exec($ch);
 curl_close($ch);
 
 if ($response === false) {
     Feedback::error("Error fetching the page: " . curl_error($ch));
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo $response;
+    exit;
 }
 
 // if the request is for an asset, set the appropriate content type and output the content
@@ -63,7 +87,7 @@ global $tikiroot;
 
 // alter relative paths (href, src, etc.) to absolute paths
 $out = preg_replace_callback(
-    '#(href|src|.*\.workerSrc)\s*=\s*([\'"])([^\'"]+)\2#',
+    '#(href|src|action|.*\.workerSrc)\s*=\s*([\'"])([^\'"]+)\2#',
     function ($matches) use ($tikiroot) {
         $url = $matches[3];
         if (strpos($url, 'http') !== 0 && strpos($url, '#') !== 0) {
