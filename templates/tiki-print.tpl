@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="print_page_{$page_id}"{/if}>
+<html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if !empty($page_id)} id="print_page_{$page_id}"{/if}{if Language::isRTL()} dir="rtl"{/if}>
     <head>
 {include file='header.tpl'}
     </head>
