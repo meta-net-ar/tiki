@@ -589,7 +589,7 @@ class Services_User_Controller
                             'fields' => $extraFields
                         ],
                         'modal' => '1',
-                        'userGroups' => str_replace(['\'','&'], ['%39;','%26'], json_encode($userGroups)),
+                        'userGroups' => json_encode($userGroups),
                     ];
                 }
             } else {
