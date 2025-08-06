@@ -11,7 +11,6 @@
 
 require_once("tiki-setup.php");
 
-
 $serverEndpoint = $_SERVER['HTTP_HOST'] . str_replace('/tiki-signaturepdf.php', '/tiki-signaturepdf_handler.php', $_SERVER['REQUEST_URI']);
 $ch = curl_init($serverEndpoint);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -41,6 +40,7 @@ curl_close($ch);
 if ($response === false) {
     Feedback::error("Error fetching the page: " . curl_error($ch));
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: '. curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
     echo $response;
     exit;
 }
