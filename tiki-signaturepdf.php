@@ -34,51 +34,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$headers = [];
+
+curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($curl, $headerLine) use (&$headers) {
+    $parts = explode(':', $headerLine, 2);
+    if (count($parts) === 2) {
+        $key = strtolower(trim($parts[0]));
+        $value = trim($parts[1]);
+        $headers[$key] = $value;
+    }
+    return strlen($headerLine);
+});
+
 $response = curl_exec($ch);
 curl_close($ch);
 
 if ($response === false) {
     Feedback::error("Error fetching the page: " . curl_error($ch));
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: '. curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' || isAssetRequest()) {
+    // For POST requests and asset requests, set the appropriate headers and output the response irectly
+    foreach ($headers as $key => $value) {
+        header("$key: $value");
+    }
     echo $response;
     exit;
 }
 
-// if the request is for an asset, set the appropriate content type and output the content
-$url = preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-if (preg_match('/\.(pdf|jpg|jpeg|png|gif|css|js|mjs|woff2)$/', $url)) {
-    $ext = pathinfo($url, PATHINFO_EXTENSION);
-    switch ($ext) {
-        case 'pdf':
-            header('Content-Type: application/pdf');
-            break;
-        case 'jpg':
-        case 'jpeg':
-            header('Content-Type: image/jpeg');
-            break;
-        case 'png':
-            header('Content-Type: image/png');
-            break;
-        case 'gif':
-            header('Content-Type: image/gif');
-            break;
-        case 'css':
-            header('Content-Type: text/css');
-            break;
-        case 'js':
-        case 'mjs':
-            header('Content-Type: application/javascript');
-            break;
-        case 'woff2':
-            header('Content-Type: font/woff2');
-            break;
-        default:
-            header('Content-Type: text/plain');
-            break;
-    }
-    echo $response;
-    exit;
+function isAssetRequest()
+{
+    $url = preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
+    return preg_match('/\.(pdf|jpg|jpeg|png|gif|css|js|mjs|woff2)$/', $url);
 }
 
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $response);
