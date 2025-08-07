@@ -8,7 +8,17 @@ function smarty_function_trackerinput($params, $smarty)
 {
     $trklib = TikiLib::lib('trk');
 
-    $field = $params['field'];
+    if (isset($params['fieldId'])) {
+        $field = $trklib->get_tracker_field($params['fieldId']);
+        $field['ins_id'] = "ins_{$params['fieldId']}";
+        $handler = $trklib->get_field_handler($field, $item);
+        if ($handler) {
+            $field = array_merge($field, $handler->getFieldData());
+        }
+    } else {
+        $field = $params['field'];
+    }
+
     if (isset($params['item'])) {
         $item = $params['item'];
     } elseif (! empty($params['itemId'])) {
