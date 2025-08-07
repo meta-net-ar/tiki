@@ -34,6 +34,7 @@ class PatchSignaturepdf
         self::alterRoutes($packagePath);
         self::alterRootAssetSrc($packagePath);
         self::removeBootstrapDependency($packagePath);
+        self::deferAllScripts($packagePath); // Ensure that js is executed after Tiki's dependencies are loaded
     }
 
     public static function alterRoutes($packagePath)
@@ -83,5 +84,28 @@ class PatchSignaturepdf
         $commonContent = file_get_contents($commonFile);
         $commonContent = preg_replace('/<script src="[^"]*bootstrap\.bundle\.min\.js\?[^"]*"><\/script>/', '', $commonContent);
         file_put_contents($commonFile, $commonContent);
+    }
+
+    public static function deferAllScripts($packagePath)
+    {
+        $templatesDir = self::fixDS($packagePath . "/templates/");
+        $files = glob($templatesDir . '*.html.php');
+        $files = array_merge($files, glob($templatesDir . 'components/*.html.php'));
+
+        foreach ($files as $file) {
+            $content = file_get_contents($file);
+
+            $content = preg_replace_callback(
+                '/(<script\s+)(.*?)/is',
+                function ($matches) {
+                    if (strpos($matches[2], 'defer') === false && strpos($matches[2], 'type="module"') === false) {
+                        return $matches[1] . 'defer ' . $matches[2];
+                    }
+                    return $matches[0];
+                },
+                $content
+            );
+            file_put_contents($file, $content);
+        }
     }
 }
