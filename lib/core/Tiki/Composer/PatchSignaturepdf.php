@@ -33,6 +33,7 @@ class PatchSignaturepdf
 
         self::alterRoutes($packagePath);
         self::alterRootAssetSrc($packagePath);
+        self::removeBootstrapDependency($packagePath);
     }
 
     public static function alterRoutes($packagePath)
@@ -64,5 +65,23 @@ class PatchSignaturepdf
 
         $navContent = preg_replace('/src=["\']logo-small\.svg["\']/', 'src="tiki-signaturepdf.php/root/logo-small.svg"', $navContent);
         file_put_contents($navTabFile, $navContent);
+    }
+
+    public static function removeBootstrapDependency($packagePath)
+    {
+        $indexFile = self::fixDS($packagePath . '/templates/index.html.php');
+        $content = file_get_contents($indexFile);
+        $content = preg_replace('/<script src="[^"]*bootstrap\.bundle\.min\.js\?[^"]*"><\/script>/', '', $content);
+        file_put_contents($indexFile, $content);
+
+        $headerFile = self::fixDS($packagePath . '/templates/components/header.html.php');
+        $headerContent = file_get_contents($headerFile);
+        $headerContent = preg_replace('/<link href="[^"]*bootstrap\.[^"]*\.min\.css\?[^"]*" rel="stylesheet">/', '', $headerContent);
+        file_put_contents($headerFile, $headerContent);
+
+        $commonFile = self::fixDS($packagePath . '/templates/components/common.html.php');
+        $commonContent = file_get_contents($commonFile);
+        $commonContent = preg_replace('/<script src="[^"]*bootstrap\.bundle\.min\.js\?[^"]*"><\/script>/', '', $commonContent);
+        file_put_contents($commonFile, $commonContent);
     }
 }
