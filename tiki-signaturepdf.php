@@ -63,7 +63,7 @@ if ($response === false) {
 function isAssetRequest()
 {
     $url = preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-    return preg_match('/\.(pdf|jpg|jpeg|png|gif|css|js|mjs|woff2)$/', $url);
+    return preg_match('/\.(pdf|jpg|jpeg|png|gif|svg|css|js|mjs|woff2)$/', $url);
 }
 
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $response);

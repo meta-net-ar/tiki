@@ -183,6 +183,7 @@ FileETag MTime Size
     RewriteRule ^tiki-signaturepdf_handler.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/public/vendor/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/js/(.*)$ vendor/mercihabam/signaturepdf/public/js/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/css/(.*)$ vendor/mercihabam/signaturepdf/public/css/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/root/(.*)$ vendor/mercihabam/signaturepdf/public/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/public/(.*)$ public/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/img/(.*)$ img/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/lib/(.*)$ lib/$1 [L]

@@ -21,11 +21,18 @@ class PatchSignaturepdf
         $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
 
         $packagePath = $vendors . self::fixDS('/mercihabam/signaturepdf/');
+
+        // When uninstalling, do nothing
+        if (! is_dir($packagePath)) {
+            return;
+        }
+
         chmod($packagePath, 0755);
 
         copy($signaturepdf . 'config.ini', self::fixDS($packagePath . '/config/config.ini'));
 
         self::alterRoutes($packagePath);
+        self::alterRootAssetSrc($packagePath);
     }
 
     public static function alterRoutes($packagePath)
@@ -42,5 +49,20 @@ class PatchSignaturepdf
         );
 
         file_put_contents($entryPoint, $content);
+    }
+
+    public static function alterRootAssetSrc($packagePath)
+    {
+        $indexFile = self::fixDS($packagePath . '/templates/index.html.php');
+        $content = file_get_contents($indexFile);
+
+        $content = preg_replace('/src=["\']logo\.svg["\']/', 'src="tiki-signaturepdf.php/root/logo.svg"', $content);
+        file_put_contents($indexFile, $content);
+
+        $navTabFile = self::fixDS($packagePath . '/templates/components/navtab.html.php');
+        $navContent = file_get_contents($navTabFile);
+
+        $navContent = preg_replace('/src=["\']logo-small\.svg["\']/', 'src="tiki-signaturepdf.php/root/logo-small.svg"', $navContent);
+        file_put_contents($navTabFile, $navContent);
     }
 }
