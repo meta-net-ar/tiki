@@ -329,7 +329,7 @@
                                 </select>
                                 {ticket}
                                 <input type="hidden" name="trackerId" value="{$trackerId}">
-                                <input type="submit" class="btn btn-primary" onclick="if($('select.trackerbatchaction').children('option:selected').val() == 'delete')confirmPopup('{tr}Are you sure you want to delete the selected items?{/tr}')" name="act" value="{tr}OK{/tr}">
+                                <input type="submit" class="btn btn-primary js-confirm-delete" name="act" value="{tr}OK{/tr}">
                             </div>
                         </div>
                     {/if}
@@ -458,3 +458,29 @@
         {/tab}
     {/if}
 {/tabset}
+
+{jq}
+    const confirmDeleteMsg = '{tr}Are you sure you want to delete the selected items?{/tr}';
+    const selectItemMsg = '{tr}Please select at least one item.{/tr}';
+    // Target the batch delete button to add validation.
+    $('.js-confirm-delete').on('click', function(event) {
+        const form = $(this).closest('form');
+        const batchAction = form.find('select.trackerbatchaction').val();
+
+        // For any other action, the form submits normally without interference.
+        if (batchAction === 'delete') {
+            // Stop the default form submission to perform our checks.
+            event.preventDefault();
+
+            const itemsSelected = form.find('input[name="action[]"]:checked').length;
+
+            if (itemsSelected > 0) {
+                // Validation passed: proceed with the confirmation popup.
+                confirmPopup.call({event: event}, confirmDeleteMsg);
+            } else {
+                // Validation failed: show an feedback and do nothing else.
+                feedback(selectItemMsg,'warning');
+            }
+        }
+    });
+{/jq}
