@@ -8,3 +8,7 @@ window.bootstrap = bootstrap;
 </script>
 
 {$output_data}
+
+<script defer>
+var REVERSE_PROXY_URL = '{{$tikiroot}}'.slice(1) + REVERSE_PROXY_URL;
+</script>

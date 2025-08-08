@@ -63,24 +63,37 @@ if ($response === false) {
 function isAssetRequest()
 {
     $url = preg_replace('/\?.*/', '', $_SERVER['REQUEST_URI']);
-    return preg_match('/\.(pdf|jpg|jpeg|png|gif|svg|css|js|mjs|woff2)$/', $url);
+    return preg_match('/\.(pdf|jpg|jpeg|png|gif|svg|css|js|mjs|woff2|ttf)$/', $url);
 }
 
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $response);
 
 global $tikiroot;
 
+$scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$absoluteUrlBase = $scheme . "://" . $_SERVER['HTTP_HOST'] . $tikiroot;
+
 // alter relative paths (href, src, etc.) to absolute paths
 $out = preg_replace_callback(
-    '#(href|src|action|.*\.workerSrc)\s*=\s*([\'"])([^\'"]+)\2#',
-    function ($matches) use ($tikiroot) {
+    '#(href|src|action|.*\.workerSrc|url_font)\s*=\s*([\'"])([^\'"]+)\2#',
+    function ($matches) use ($absoluteUrlBase) {
         $url = $matches[3];
         if (strpos($url, 'http') !== 0 && strpos($url, '#') !== 0) {
-            $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-            $host = $_SERVER['HTTP_HOST'];
-            $origin = $scheme . "://" . $host . $tikiroot;
-            $newUrl = $origin . $url;
+            $newUrl = $absoluteUrlBase . $url;
             return $matches[1] . '=' . $matches[2] . $newUrl . $matches[2];
+        }
+        return $matches[0];
+    },
+    $out
+);
+// css font url() paths
+$out = preg_replace_callback(
+    '#url\(\s*([\'"]?)([^\'")]+)\1\s*\)#',
+    function ($matches) use ($absoluteUrlBase) {
+        $url = $matches[2];
+        if (strpos($url, 'http') !== 0 && strpos($url, '#') !== 0) {
+            $newUrl = $absoluteUrlBase . $url;
+            return 'url(' . $matches[1] . $newUrl . $matches[1] . ')';
         }
         return $matches[0];
     },
