@@ -383,7 +383,13 @@ class TaskLib extends TikiLib
                 $values[] = "%" . $find . "%";
                 $values[] = "%" . $find . "%";
             }
-            if ($show_trash == false) {
+            if ($show_trash) {
+                $query .= " OR ";
+                $query .= "( `t_history`.`deleted` IS NOT NULL AND  `t_head`.`last_version` = `t_history`.`task_version` AND `t_head`.`taskId` = `t_history`.`belongs_to` ";
+                $query .= "AND `t_head`.`user` = ? AND `t_head`.`creator` = ? ) ";
+                $values[] = $user;
+                $values[] = $user;
+            } else {
                 $query .= " AND ";
                 $query .= "( `t_history`.`deleted` IS NULL) ";
             }
