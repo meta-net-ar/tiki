@@ -1,4 +1,4 @@
-// Variables for TikiCorop theme
+// Variables for TikiCorp theme
 // Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
 // For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
 
@@ -123,7 +123,7 @@ $navbar-light-toggler-border-color: rgba($black, .1);//rgba(var(--#{$prefix}emph
 $navbar-light-brand-color:          $navbar-light-active-color;
 $navbar-light-brand-hover-color:    $navbar-light-active-color;
 
-$navbar-dark-color:                 rgba($white, .55);
+$navbar-dark-color:                 rgba($white, .85);
 $navbar-dark-hover-color:           rgba($white, .75);
 $navbar-dark-active-color:          $white;
 $navbar-dark-disabled-color:        rgba($white, .25);

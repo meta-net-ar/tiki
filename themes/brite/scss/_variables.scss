@@ -9,9 +9,7 @@
 
 //
 // Color system
-//
-$red-300: tint-color($red, 40%); // !default;
-$green-300: tint-color($green, 40%); // !default;
+
 
 // Options
 // Body
@@ -35,6 +33,7 @@ $form-feedback-invalid-color:       #E60F0F; // $danger !default;
 // Navs (copied from Bootstrap variables.scss to enable responsive color to links not in bg-dark or bg-light)
 $nav-link-color:                    var(--#{$prefix}link-color); // default
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color); // default
+$nav-link-font-size:                1.0rem; // Override the 1.2rem size specified by _bootswatch.scss (too large especially in vertical menus).
 
 // Navbar
 $navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65); // !default;  ---- base_files/tiki-selectors.scss:328 was causing conflict without this explicitly declared here

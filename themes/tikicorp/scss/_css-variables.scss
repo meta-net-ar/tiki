@@ -194,62 +194,62 @@
 :root, [data-bs-theme=light] {
     --tiki-page-bg-image:  url('#{$imagePath}christian-wiediger-ZiAwa7FV3OQ-unsplash-light.jpg');
     --tiki-main-footer-bg: var(--tiki-brand-bg-dark);
-    --tiki-brand-bg-dark: #0080bd;
- //   --tiki-theme-block-light-color: #{$body-color};
+    --tiki-brand-bg-dark: #006C9E;
 
     .tiki-brand-block-dark { //         Dark-background brand block in light color mode
         --tiki-brand-block-bg: var(--tiki-brand-bg-dark); // Background
         --tiki-brand-block-color:  #{$body-color-dark}; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-brand-block-link-color: #C7EBF9;
+        --tiki-brand-block-link-hover-color: #{$link-hover-color-dark};
     }
     .tiki-brand-block-light { //         Light-background brand block in light color mode
-        --tiki-brand-block-bg: #aaddf5; // Background
-        --tiki-brand-block-color: ; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-brand-block-bg: #DCF0F9; // Background
+        --tiki-brand-block-color: #{$body-color}; // Text, etc.
+        --tiki-brand-block-link-color: #346AB7;
+        --tiki-brand-block-link-hover-color: #{$link-hover-color};
     }
     .tiki-theme-block-dark { //         Dark-background theme block in light color mode
         --tiki-theme-block-bg: #191919; // Background
         --tiki-theme-block-color: #{$body-color-dark}; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-theme-block-link-color: #{$link-color-dark};
+        --tiki-theme-block-link-hover-color: #{$link-hover-color-dark};
     }
     .tiki-theme-block-light { //         Light-background theme block in light color mode
         --tiki-theme-block-bg: var(--bs-body-bg); // Background
-        --tiki-theme-block-color: #{body-secondary-color}; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-theme-block-color: var(--bs-body-color); // Text, etc.
+        --tiki-theme-block-link-color: #{$link-color};
+        --tiki-theme-block-link-hover-color: #{$link-hover-color};
     }
 }
 
 [data-bs-theme=dark] {  // Color mode
     --tiki-page-bg-image: url('#{$imagePath}christian-wiediger-ZiAwa7FV3OQ-unsplash-dark.jpg');
+//    --tiki-page-bg-image: url('#{$imagePath}bg-body.jpg'); // Use the original background image.
     --tiki-main-footer-bg: var(--tiki-brand-bg-dark);
 
     .tiki-brand-block-dark { //         Dark-background brand block in dark color mode
-        --tiki-brand-block-bg: var(--tiki-brand-bg-dark); // Background
-        --tiki-brand-block-color: #{$body-color-dark}; ; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-brand-block-bg: #024b6d ; // Background (same as tiki-brand-block-bg
+        --tiki-brand-block-color: #{$body-color-dark}; // Text, etc.
+        --tiki-brand-block-link-color: #98B7E1;
+        --tiki-theme-block-link-hover-color: #{$link-hover-color-dark};
     }
     .tiki-brand-block-light { //         Light-background brand block in dark color mode
-        --tiki-brand-block-bg: var(--tiki-brand-bg-dark); // Background
+        --tiki-brand-block-bg: #006C9EFF; //#007DB8; // var(--tiki-brand-bg-dark); // Background
         --tiki-brand-block-color: #{$white}; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-brand-block-link-color: #CCE8FF; //
+        --tiki-brand-block-link-hover-color: #{$link-hover-color};
     }
     .tiki-theme-block-dark { //         Dark-background theme block in dark color mode
-        --tiki-theme-block-bg: #191919; // Background
-        --tiki-theme-block-color: ; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-theme-block-bg: #024b6d; // Background
+        --tiki-theme-block-color: #{$body-color-dark}; // Text, etc.
+        --tiki-theme-block-link-color: #98B7E1; //
+        --tiki-theme-block-link-hover-color: #{$link-hover-color-dark};
     }
     .tiki-theme-block-light { //         Light-background theme block in dark color mode
-        --tiki-theme-block-bg: #4b4b4b; // Background
-        --tiki-theme-block-color: ; // Text, etc.
-        --bs-link-color: ; //
-        --bs-link-hover-color: ;
+        --tiki-theme-block-bg: var(--tiki-brand-bg-dark); // Background
+        --tiki-theme-block-color: #{$body-color-dark}; // Text, etc.
+        --tiki-theme-block-link-color: #CCE8FF; //
+        --tiki-theme-block-link-hover-color: #{$link-hover-color-dark};
     }
 
     --tiki-theme-block-light-color: #{$body-color-dark};

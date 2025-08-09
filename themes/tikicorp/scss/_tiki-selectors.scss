@@ -12,39 +12,23 @@ $imagePath: "../images/";
 
 //  Color system
 // Spacing
-@mixin grid-gutter-fix($gutter: 4rem) {
-    // Row adjustment
-    body:not(.tiki-admin) .row {
-        --bs-gutter-x: #{$gutter};
-        --bs-gutter-y: 0;
-        display: flex;
-        flex-wrap: wrap;
-        margin-right: calc(-0.5 * #{$gutter});
-        margin-left: calc(-0.5 * #{$gutter});
-        margin-top: calc(-1 * var(--bs-gutter-y));
-    }
 
-    // Column spacing
-    body:not(.tiki-admin) .row > * {
-        padding-right: calc(#{$gutter} * 0.5);
-        padding-left: calc(#{$gutter} * 0.5);
-        margin-top: var(--bs-gutter-y);
+@media (min-width: 992px) {
+    .col1 {
+        padding-left: 40px;
+        padding-right: 40px;
     }
-
-    // Optional container tweak
-    body:not(.tiki-admin) .container {
-        padding-left: calc(#{$gutter} * 0.5);
-        padding-right: calc(#{$gutter} * 0.5);
-        max-width: 100%;
-        overflow-x: hidden; // Prevent scroll, but only if layout is tight
+    .p-40y80x {
+        padding-left: 80px;
+        padding-right: 80px
     }
 }
 
-@include grid-gutter-fix(4rem);
-
-.p-80px {
-    padding: 80px;
+.p-40y80x {
+    padding-top: 40px;
+    padding-bottom: 40px;
 }
+
 
 //  Body (large elements
 body {
@@ -113,7 +97,7 @@ h1.pagetitle a {
 //  Tables
 //  Buttons
 // Use theme colors for active state - inspired by Morph theme
-.btn:not(.btn-link) {
+.btn {
     color: #fff;
     background-color: #61778F; // #6c839b;
     border: none;
@@ -165,6 +149,8 @@ h1.pagetitle a {
 }
 .btn-link {
     font-weight: 600;
+    background: transparent;
+    color: $link-color;
 }
 .btn-link:hover, .btn-link:active, .btn-link:active:focus {
     color: #212529;

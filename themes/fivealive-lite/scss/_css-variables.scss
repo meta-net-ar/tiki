@@ -138,8 +138,8 @@ header.navbar.fixed-top {
         border-width: 0;
     }
     button.accordion-button {
-        color: #fff; /// var(--tiki-admin-aside-nav-color) !important;
-        background: #28aae1; // var(--tiki-admin-aside-nav-bg) !important;
+        color: var(--tiki-admin-aside-nav-color) !important;
+        background: var(--tiki-admin-aside-nav-bg) !important;
     }
 }
 

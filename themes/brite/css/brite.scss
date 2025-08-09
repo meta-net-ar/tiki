@@ -16,8 +16,11 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 
+// The order of these imports was changed for this theme because the values for $primary and other colors weren't being used with the original order.
+@import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 @import "../scss/variables"; // 2. The first value declaration (the theme's) is used when it is declared in more than one imported file.
+@import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
 @import "../scss/variables-dark"; // 3. Values of dark variables if color modes are enabled.
 @import "../../../node_modules/bootswatch/dist/brite/variables"; // 4. Default Bootswatch theme variables.
 @import "../../default/scss/variables"; // 5. Adds default variables for any not declared by the theme variables file.
@@ -54,3 +57,5 @@
 .module.card .navbar { border: none; }
 
 .btn { margin-bottom: 0.5rem; }
+
+.btn.btn-link { color: var(--bs-body-color); text-decoration: none; }
