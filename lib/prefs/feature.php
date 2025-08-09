@@ -730,6 +730,15 @@ function prefs_feature_list($partial = false)
                 ]
             ]
         ],
+        'feature_signaturepdf' => [
+            'name' => tra('Signature PDF'),
+            'description' => tra('Allows users to sign sign and manipulate PDF documents.'),
+            'help' => 'Signature-PDF',
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['experimental'],
+            'view' => 'tiki-signature_pdf.php',
+        ],
         'feature_intertiki' => [
             'name' => tra('Intertiki'),
             'description' => tra('Allows several Tiki sites (slaves) to get authentication from a master Tiki site'),

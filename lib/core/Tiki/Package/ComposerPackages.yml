@@ -201,7 +201,7 @@ SignaturePDF:
     type: vcs
     url: "https://github.com/mercihabam/signaturepdf"
   requiredBy:
-    - feature_pdf_signature
+    - feature_signaturepdf
   requiredVersion: dev-master
   scripts:
     post-install-cmd:

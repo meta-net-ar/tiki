@@ -11,6 +11,9 @@
 
 require_once("tiki-setup.php");
 
+$access->check_feature('feature_signaturepdf');
+$access->check_user($user);
+
 $serverEndpoint = $_SERVER['HTTP_HOST'] . str_replace('/tiki-signaturepdf.php', '/tiki-signaturepdf_handler.php', $_SERVER['REQUEST_URI']);
 $ch = curl_init($serverEndpoint);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

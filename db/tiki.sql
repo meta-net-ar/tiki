@@ -1784,6 +1784,7 @@ INSERT INTO `tiki_menu_options` (`menuId`,`type`,`name`,`url`,`position`,`sectio
 (42,'s','PeerTube Video','tiki-list_peertube_entries.php',960,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,'video'),
 (42,'o','List PeerTube Media','tiki-list_peertube_entries.php',962,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_list_videos','',0,NULL),
 (42,'o','Upload PeerTube Video','tiki-peertube_upload.php',964,'feature_peertube','tiki_p_admin | tiki_p_admin_peertube | tiki_p_upload_videos','',0,NULL);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `icon`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Signature PDF', 'file-pdf', 'tiki-signaturepdf.php', 29, 'feature_signaturepdf', '', '', 0);
 
 DROP TABLE IF EXISTS `tiki_menus`;
 CREATE TABLE `tiki_menus` (

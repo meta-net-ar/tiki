@@ -106,6 +106,7 @@
                 <div class="admin clearfix mb-3 featurelist">
                     {preference name=feature_sheet}
                     {preference name=feature_directory}
+                    {preference name=feature_signaturepdf}
                     {preference name=feature_draw}
                     <div class="adminoptionboxchild" id="feature_draw_childcontainer">
                         {preference name=feature_draw_hide_buttons}
