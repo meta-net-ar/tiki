@@ -103,6 +103,8 @@ $out = preg_replace_callback(
     $out
 );
 
+TikiLib::lib('header')->add_js_module('import "@jquery-tiki/signaturepdf";');
+
 $smarty->assign('output_data', '<div class="inline-signaturepdf">' . $out . "</div>");
 
 $smarty->assign('mid', 'tiki-signaturepdf.tpl');
