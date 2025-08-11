@@ -363,6 +363,9 @@ function wikiplugin_cypht($data, $params)
         .inline-cypht { position: relative; }
     ");
 
+    // Ensure Bootstrap icons CSS is loaded for Cypht
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+
     /* get configuration */
     $config = new Tiki_Hm_Site_Config_File([], $session_prefix, $settings_per_page);
     $environment->define_default_constants($config);

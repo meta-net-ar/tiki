@@ -137,7 +137,9 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
     }
 }
 
-$smarty->assign('global_extend_layout', 'layouts/social/layout_webmail.tpl');
+$headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+
+$headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
 
 $smarty->display('tiki.tpl');
 

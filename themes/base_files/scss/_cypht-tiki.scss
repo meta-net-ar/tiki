@@ -265,6 +265,7 @@
     }
     .search_form > form {
         flex-wrap: wrap;
+        gap: 0.1rem !important;
     }
     .search_terms, .search_form select {
         width: auto !important;
@@ -298,6 +299,72 @@
 //
 .mobile {
     .inline-cypht {
+        .app-container {
+            padding: 20px 0;
+        }
+        nav.folder_cell {
+            position: fixed;
+            z-index: 9999;
+        }
+        .menu-toggle {
+            right: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            text-align: left;
+            top: 0;
+            padding: 15px 0 15px 20px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .mobile nav .menu-toggle {
+            right: 20px;
+            left: unset;
+            text-align: left;
+            top: 20px;
+            background: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            position: absolute;
+            z-index: 1001;
+            color: var(--bs-primary);
+          }
+
+        .mobile .nav-header {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        padding: 0;
+        border-bottom: 1px solid var(--bs-secondary-bg);
+        }
+        
+        .nav-header a {
+        margin: auto 45% auto auto;
+        }
+        
+        .mobile .nav-header .app-logo {
+        display: block;
+        height: 2rem;
+        width: auto;
+        padding: 0;
+        margin: 0;
+        }
+        
+        .mobile .nav-header .close-toggle {
+        position: static;
+        background: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        width: fit-content;
+        margin-left: 0;
+        padding: 15px 20px;
+        }
+        
+        .mobile .app-logo{
+        display: none;
+        }
+
         .content_cell {
             padding: 0;
             border: none;
@@ -366,15 +433,22 @@
 
         // mobile search
         .search_content {
-            padding-top: 0;
-            .content_title { display: block; padding-top: 20px; padding-bottom: 10px; }
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            .content_title { max-height: 500px; flex: 0 0 auto; margin-top: 0.5rem !important;}
+            .mobile .search_content .p-3 {
+                flex: 1 1 auto;
+                overflow: auto;
+              }
             .search_form {
-                display: block; padding: 0; font-size: 100%;
-                select { width: auto; margin: 5px; }
+                display: block; padding: 0; margin: 0 !important;
+                select { width: calc(50% - 0.5rem); margin: 5px; }
                 input[type=submit], input[type=button] { font-size: 80%; }
             }
             #search_terms { margin: 10px 3px 3px; width: 270px; max-width: 100%; }
-            .message_table { margin-top: 115px;    }
+            .message_table { margin-top: 0.1rem; }
         }
 
         .time_section input[type=date] { display: block; margin-bottom: 10px; }
@@ -414,8 +488,8 @@
         .msg_text { max-width: 100% !important; word-break: break-word; }
         .msg_text_inner { width: 100%; padding: 15px !important; }
         .msg_parts { table-layout: auto; }
-        .msg_controls { position: relative; left: 0 !important; height: auto; padding-top: 0; }
         .select2-container { min-width: 100px; }
+        .msg_controls { position: fixed; right: 1rem !important; top: 0.3rem; z-index: 1000; height: auto; padding-top: 0; }
         #list_controls_menu { background-color: var(--bs-body-bg); }
         #list_controls_menu.show { justify-content: center; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }
