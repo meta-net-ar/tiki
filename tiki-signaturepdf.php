@@ -103,7 +103,25 @@ $out = preg_replace_callback(
     $out
 );
 
+$defaultGalleryId = $prefs['home_file_gallery'];
+$canBrowseFileGalleries = Perms::get(['type' => 'file gallery', 'object' => $defaultGalleryId])->view_file_gallery;
+
+if ($prefs['fgal_elfinder_feature'] == 'y') {
+    include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
+    tikiElFinder::loadJSCSS();
+}
+
 TikiLib::lib('header')->add_js_module('import "@jquery-tiki/signaturepdf";');
+
+if ($canBrowseFileGalleries) {
+    TikiLib::lib('header')->add_js_module(<<<JS
+    import { handlePickFromFileGalleries } from "@jquery-tiki/signaturepdf";
+    handlePickFromFileGalleries({
+        defaultGalleryId: $defaultGalleryId
+    });
+    JS
+    );
+}
 
 $smarty->assign('output_data', '<div class="inline-signaturepdf">' . $out . "</div>");
 

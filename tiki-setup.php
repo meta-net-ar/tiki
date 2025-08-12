@@ -894,7 +894,7 @@ if ($prefs['feature_sefurl'] != 'y') {
             query.action = action;
         }
 
-        return "tiki-ajax_services.php?" + $.buildParams(query);
+        return tikiroot + "tiki-ajax_services.php?" + $.buildParams(query);
     };'
     );
 }
