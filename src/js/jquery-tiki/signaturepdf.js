@@ -32,6 +32,27 @@ export function handlePickFromFileGalleries(options) {
                 },
             });
         } else {
+            $.clickModal(
+                {
+                    size: "modal-lg",
+                    success: async function ({ files }) {
+                        const file = files[0];
+                        const fileRes = await fetch(window.tikiroot + "tiki-download_file.php?fileId=" + file.fileId);
+                        const blob = await fileRes.blob();
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(new File([blob], file.name, { type: file.mime }));
+                        const input = $("#input_pdf_upload")[0];
+                        input.files = dataTransfer.files;
+                        input.dispatchEvent(new Event("change", { bubbles: true }));
+                        $.closeModal();
+                    },
+                },
+                $.service("file", "browse", {
+                    galleryId: options.defaultGalleryId,
+                    type: "pdf",
+                    limit: 1,
+                })
+            ).call(this, e);
         }
     });
 }

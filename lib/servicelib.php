@@ -46,7 +46,7 @@ class ServiceLib
 
     public function getUrl($params)
     {
-        global $prefs;
+        global $prefs, $tikiroot;
         if (is_string($params) && ! empty($params)) {
             return TikiLib::tikiUrlOpt($params);
         }
@@ -58,9 +58,9 @@ class ServiceLib
                     'getUrl() called with array missing "controller" key. Use string parameter for direct URLs. Parameters: ' . json_encode($params),
                     E_USER_NOTICE
                 );
-                $url = 'tiki-ajax_services.php';
+                $url = $tikiroot . 'tiki-ajax_services.php';
             } else {
-                $url = "tiki-{$params['controller']}";
+                $url = $tikiroot . "tiki-{$params['controller']}";
 
                 if (isset($params['action'])) {
                     $url .= "-{$params['action']}";
@@ -72,7 +72,7 @@ class ServiceLib
                 unset($params['action']);
             }
         } else {
-            $url = 'tiki-ajax_services.php';
+            $url = $tikiroot . 'tiki-ajax_services.php';
         }
 
         if (! empty($params) && count($params)) {
