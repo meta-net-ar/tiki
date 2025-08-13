@@ -30,7 +30,7 @@ export function handleFileInput(input) {
 
         input.files = dataTransfer.files;
 
-        $(input).trigger("change");
+        input.dispatchEvent(new Event("change", { bubbles: true }));
     });
 }
 
