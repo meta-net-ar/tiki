@@ -66,7 +66,8 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
             'tracker_item_modify' => 'Search_Action_TrackerItemModify',
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
-            'categorize_object' => 'Search_Action_CategorizeObjectAction'
+            'categorize_object' => 'Search_Action_CategorizeObjectAction',
+            'export_pdf' => 'SearchActionExportPDF',
         ]
     );
 

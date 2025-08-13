@@ -192,6 +192,7 @@ class ConsoleApplicationBuilder
                 new UserCreateCommand(),
                 new UserUnlockCommand(),
                 new UsersListCommand(),
+                new PagePrintCommand(),
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
