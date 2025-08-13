@@ -1,3 +1,5 @@
+import fileToBase64 from "../helpers/fileToBase64";
+
 $("a:not(.inline-signaturepdf a)").each(function () {
     // Prevent routing Tiki links under /tiki-signaturepdf.php when rendering a subroute of the Signature PDF app
     $(this).attr("href", function (_, href) {
@@ -25,16 +27,6 @@ new MutationObserver((mutations) => {
     attributes: true,
     attributeFilter: ["disabled"],
 });
-
-// TODO: This should be outsourced to a general helper file from src/js/vue-widgets/element-plus-ui/src/helpers/fileGalUploader/fileToBase64.js
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-    });
-}
 
 downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
     e.preventDefault();

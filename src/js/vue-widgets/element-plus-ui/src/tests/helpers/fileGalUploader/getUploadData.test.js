@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test, vi } from "vitest";
 import getUploadData from "../../../helpers/fileGalUploader/getUploadData";
 import $ from "jquery";
-import * as fileToBase64 from "../../../helpers/fileGalUploader/fileToBase64";
+import * as fileToBase64 from "../../../../../../helpers/fileToBase64";
 import * as adjustImageSize from "../../../helpers/fileGalUploader/adjustImageSize";
 import { ElMessage } from "element-plus";
 

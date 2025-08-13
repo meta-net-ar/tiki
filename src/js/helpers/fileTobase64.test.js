@@ -1,5 +1,5 @@
-import { afterAll, beforeAll, describe, test, vi } from "vitest";
-import fileToBase64 from "../../../helpers/fileGalUploader/fileToBase64";
+import { describe, test, vi } from "vitest";
+import fileToBase64 from "./fileToBase64";
 import { waitFor } from "@testing-library/vue";
 
 const readAsDataURLMock = vi.fn();

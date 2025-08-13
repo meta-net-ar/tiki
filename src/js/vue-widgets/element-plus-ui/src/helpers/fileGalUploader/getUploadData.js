@@ -1,6 +1,6 @@
 import { ElMessage } from "element-plus";
 import adjustImageSize from "./adjustImageSize";
-import fileToBase64 from "./fileToBase64";
+import fileToBase64 from "../../../../../helpers/fileToBase64";
 
 export default async function (file, maxWidth, maxHeight) {
     const result = {
