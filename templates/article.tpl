@@ -93,7 +93,7 @@
             {elseif $isfloat eq 'n' and isset($topics[$topicId].image_size) and $topics[$topicId].image_size > 0}
         <div class="flex-grow-1 ms-3">
             {else}
-        <div class="articleheadingtext{if $isfloat eq 'n'}flex-grow-1 ms-3{/if}">
+        <div class="articleheadingtext{if $isfloat eq 'n'} flex-grow-1{/if}">
             {/if}
                 {if $article_attributes}
                     <div class="articleattributes">
