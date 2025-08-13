@@ -40,24 +40,30 @@ downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
     e.preventDefault();
     const downloadFnOriginal = download;
     download = async function (blob, filename) {
-        const base64 = await fileToBase64(blob);
-        // TODO: make this work
-        const fileId = new URLSearchParams(window.location.search).get("fileId");
+        const base64 = await fileToBase64(blob).catch(() => {
+            showMessage(tr("Error converting file to Base64"), "error")
+            return null
+        });
+        const formData = new FormData();
+        formData.append("data", base64.replace(/^data:.*?;base64,/, ""));
+        formData.append("name", decodeURIComponent(filename));
+        formData.append("type", blob.type);
+        formData.append("size", blob.size);
+        formData.append("ticket", $("input[name=ticket]").val());
         const res = await fetch($.service("file", "upload"), {
             method: "POST",
-            body: JSON.stringify({
-                data: base64,
-                update: true,
-                filename: filename,
-                type: blob.type,
-                fileId: fileId,
-            }),
+            body: formData,
         });
+
         if (!res.ok) {
-            showMessage(tr("Error saving file to File Galleries"), "error");
+            showMessage(
+                tr("Error saving file to File Galleries"),
+                "error"
+            );
         } else {
             showMessage(tr("File saved to File Galleries"), "success");
         }
+        
         download = downloadFnOriginal;
     };
     downloadButton[0].dispatchEvent(new Event("click", { bubbles: true }));
@@ -80,8 +86,6 @@ export function handlePickFromFileGalleries(options) {
                     input.files = dataTransfer.files;
                     input.dispatchEvent(new Event("change", { bubbles: true }));
                     $.closeModal();
-                    // TODO: Fix this to properly append the fileId to the URL after the upstream script has update the history
-                    history.pushState({}, "", window.location.pathname + `?fileId=${fileRes[0].fileId}`);
                 },
             });
         } else {
@@ -98,7 +102,6 @@ export function handlePickFromFileGalleries(options) {
                         input.files = dataTransfer.files;
                         input.dispatchEvent(new Event("change", { bubbles: true }));
                         $.closeModal();
-                        // TODO: Fix this to properly append the fileId to the URL after the upstream script has update the history
                         history.pushState({}, "", window.location.pathname + `?fileId=${file.fileId}`);
                     },
                 },

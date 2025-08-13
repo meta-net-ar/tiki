@@ -7,6 +7,7 @@ import * as bootstrap from "bootstrap";
 window.bootstrap = bootstrap;
 </script>
 
+{ticket}
 {$output_data}
 
 <script defer>
