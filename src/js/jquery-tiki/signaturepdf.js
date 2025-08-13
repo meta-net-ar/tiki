@@ -33,8 +33,8 @@ downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
     const downloadFnOriginal = download;
     download = async function (blob, filename) {
         const base64 = await fileToBase64(blob).catch(() => {
-            showMessage(tr("Error converting file to Base64"), "error")
-            return null
+            showMessage(tr("Error converting file to Base64"), "error");
+            return null;
         });
         const formData = new FormData();
         formData.append("data", base64.replace(/^data:.*?;base64,/, ""));
@@ -48,14 +48,11 @@ downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
         });
 
         if (!res.ok) {
-            showMessage(
-                tr("Error saving file to File Galleries"),
-                "error"
-            );
+            showMessage(tr("Error saving file to File Galleries"), "error");
         } else {
             showMessage(tr("File saved to File Galleries"), "success");
         }
-        
+
         download = downloadFnOriginal;
     };
     downloadButton[0].dispatchEvent(new Event("click", { bubbles: true }));
