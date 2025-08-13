@@ -43,7 +43,7 @@ class PatchSignaturepdf
         $content = file_get_contents($entryPoint);
 
         $content = preg_replace_callback(
-            '/(\$f3->route\(\s*\'[A-Z]+\s+\/)([^,\'"]*)([\'"],)/',
+            '/(\$f3->route\s*\(\s*\'[A-Z]+\s+\/)([^,\'"]*)([\'"],)/',
             function ($matches) {
                 return $matches[1] . 'tiki-signaturepdf_handler.php' . ($matches[2] ? '/' : '') . $matches[2] . $matches[3];
             },

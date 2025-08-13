@@ -56,8 +56,11 @@ if ($response === false) {
     Feedback::error("Error fetching the page: " . curl_error($ch));
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST' || isAssetRequest()) {
     // For POST requests and asset requests, set the appropriate headers and output the response irectly
+    $skipHeaders = ['content-length', 'transfer-encoding', 'content-encoding'];
     foreach ($headers as $key => $value) {
-        header("$key: $value");
+        if (! in_array($key, $skipHeaders)) {
+            header("$key: $value");
+        }
     }
     echo $response;
     exit;
@@ -72,7 +75,6 @@ function isAssetRequest()
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $response);
 
 global $tikiroot;
-
 $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
 $absoluteUrlBase = $scheme . "://" . $_SERVER['HTTP_HOST'] . $tikiroot;
 

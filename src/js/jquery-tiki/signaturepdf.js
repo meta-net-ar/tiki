@@ -18,6 +18,8 @@ export function handleSaveToFileGalleries() {
         .after(`<button class="btn btn-outline-primary" id="btn_pdf_upload_fgal" disabled="disabled">${tr("Save to file galleries")}</button>`);
     downloadButton.removeClass("mt-2");
 
+    if (!downloadButton.length) return;
+
     new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             const isDisabled = $(mutation.target).is(":disabled");
