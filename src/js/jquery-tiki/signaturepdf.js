@@ -12,53 +12,55 @@ $("a:not(.inline-signaturepdf a)").each(function () {
     });
 });
 
-$("#input_pdf_upload").after(`<button class="btn btn-outline-secondary" id="btn_pdf_upload_fgal">${tr("Choose from File Galleries")}</button>`);
-const downloadButton = $("form#form_pdf button#save")
-    .wrap(`<div class="btn-group mt-2" role="group"></div>`)
-    .after(`<button class="btn btn-outline-primary" id="btn_pdf_upload_fgal" disabled="disabled">${tr("Save to file galleries")}</button>`);
-downloadButton.removeClass("mt-2");
+export function handleSaveToFileGalleries() {
+    const downloadButton = $("form#form_pdf button#save")
+        .wrap(`<div class="btn-group mt-2" role="group"></div>`)
+        .after(`<button class="btn btn-outline-primary" id="btn_pdf_upload_fgal" disabled="disabled">${tr("Save to file galleries")}</button>`);
+    downloadButton.removeClass("mt-2");
 
-new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-        const isDisabled = $(mutation.target).is(":disabled");
-        $(mutation.target).next("button#btn_pdf_upload_fgal").prop("disabled", isDisabled);
+    new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            const isDisabled = $(mutation.target).is(":disabled");
+            $(mutation.target).next("button#btn_pdf_upload_fgal").prop("disabled", isDisabled);
+        });
+    }).observe(downloadButton[0], {
+        attributes: true,
+        attributeFilter: ["disabled"],
     });
-}).observe(downloadButton[0], {
-    attributes: true,
-    attributeFilter: ["disabled"],
-});
 
-downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
-    e.preventDefault();
-    const downloadFnOriginal = download;
-    download = async function (blob, filename) {
-        const base64 = await fileToBase64(blob).catch(() => {
-            showMessage(tr("Error converting file to Base64"), "error");
-            return null;
-        });
-        const formData = new FormData();
-        formData.append("data", base64.replace(/^data:.*?;base64,/, ""));
-        formData.append("name", decodeURIComponent(filename));
-        formData.append("type", blob.type);
-        formData.append("size", blob.size);
-        formData.append("ticket", $("input[name=ticket]").val());
-        const res = await fetch($.service("file", "upload"), {
-            method: "POST",
-            body: formData,
-        });
+    downloadButton.next("button#btn_pdf_upload_fgal").on("click", function (e) {
+        e.preventDefault();
+        const downloadFnOriginal = download;
+        download = async function (blob, filename) {
+            const base64 = await fileToBase64(blob).catch(() => {
+                showMessage(tr("Error converting file to Base64"), "error");
+                return null;
+            });
+            const formData = new FormData();
+            formData.append("data", base64.replace(/^data:.*?;base64,/, ""));
+            formData.append("name", decodeURIComponent(filename));
+            formData.append("type", blob.type);
+            formData.append("size", blob.size);
+            formData.append("ticket", $("input[name=ticket]").val());
+            const res = await fetch($.service("file", "upload"), {
+                method: "POST",
+                body: formData,
+            });
 
-        if (!res.ok) {
-            showMessage(tr("Error saving file to File Galleries"), "error");
-        } else {
-            showMessage(tr("File saved to File Galleries"), "success");
-        }
+            if (!res.ok) {
+                showMessage(tr("Error saving file to File Galleries"), "error");
+            } else {
+                showMessage(tr("File saved to File Galleries"), "success");
+            }
 
-        download = downloadFnOriginal;
-    };
-    downloadButton[0].dispatchEvent(new Event("click", { bubbles: true }));
-});
+            download = downloadFnOriginal;
+        };
+        downloadButton[0].dispatchEvent(new Event("click", { bubbles: true }));
+    });
+}
 
 export function handlePickFromFileGalleries(options) {
+    $("#input_pdf_upload").after(`<button class="btn btn-outline-secondary" id="btn_pdf_upload_fgal">${tr("Choose from File Galleries")}</button>`);
     $("#btn_pdf_upload_fgal").on("click", function (e) {
         e.preventDefault();
         if (window.openElFinderDialog) {

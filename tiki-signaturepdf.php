@@ -113,12 +113,13 @@ if ($prefs['fgal_elfinder_feature'] == 'y') {
 
 TikiLib::lib('header')->add_js_module('import "@jquery-tiki/signaturepdf";');
 
-if ($canBrowseFileGalleries) {
+if ($canBrowseFileGalleries && $prefs['feature_file_galleries'] == 'y') {
     TikiLib::lib('header')->add_js_module(<<<JS
-    import { handlePickFromFileGalleries } from "@jquery-tiki/signaturepdf";
+    import { handlePickFromFileGalleries, handleSaveToFileGalleries } from "@jquery-tiki/signaturepdf";
     handlePickFromFileGalleries({
         defaultGalleryId: $defaultGalleryId
     });
+    handleSaveToFileGalleries();
     JS
     );
 }
