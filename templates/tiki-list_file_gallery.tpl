@@ -23,28 +23,28 @@
                 </li>
                 <li class="dropdown-divider"></li>
                 {if $view neq 'admin' and $tiki_p_admin_file_galleries eq 'y'}
-                    <li class="dropdown-item">
-                        {self_link _icon_name="wrench" _text="{tr}Admin{/tr}" view="admin" galleryId=$galleryId}{/self_link}
+                    <li>
+                        {self_link _class="dropdown-item" _icon_name="wrench" _text="{tr}Admin{/tr}" view="admin" galleryId=$galleryId}{/self_link}
                     </li>
                 {/if}
                 {if $view neq 'browse'}
-                    <li class="dropdown-item">
-                        {self_link _icon_name="view" _text="{tr}Browse{/tr}" view="browse" galleryId=$galleryId}{/self_link}
+                    <li>
+                        {self_link _class="dropdown-item" _icon_name="view" _text="{tr}Browse{/tr}" view="browse" galleryId=$galleryId}{/self_link}
                     </li>
                 {/if}
                 {if $view neq 'finder' and $prefs.fgal_elfinder_feature eq 'y'}
-                    <li class="dropdown-item">
-                        {self_link _icon_name="file-archive-open" _text="{tr}Finder{/tr}" view="finder" galleryId=$galleryId}{/self_link}
+                    <li>
+                        {self_link _class="dropdown-item" _icon_name="file-archive-open" _text="{tr}Finder{/tr}" view="finder" galleryId=$galleryId}{/self_link}
                     </li>
                 {/if}
                 {if $view neq 'list'}
-                    <li class="dropdown-item">
-                        {self_link _icon_name="list" _text="{tr}List{/tr}" view="list" galleryId=$galleryId}{/self_link}
+                    <li>
+                        {self_link _class="dropdown-item" _icon_name="list" _text="{tr}List{/tr}" view="list" galleryId=$galleryId}{/self_link}
                     </li>
                 {/if}
                 {if $view neq 'page' and $filescount gt 0}
-                    <li class="dropdown-item">
-                        {self_link _icon_name="textfile" _text="{tr}Page{/tr}" view="page" galleryId=$galleryId}{/self_link}
+                    <li>
+                        {self_link _class="dropdown-item" _icon_name="textfile" _text="{tr}Page{/tr}" view="page" galleryId=$galleryId}{/self_link}
                     </li>
                 {/if}
             {/if}
@@ -55,36 +55,36 @@
             <li class="dropdown-divider"></li>
             {if $edit_mode neq 'y' or $dup_mode neq 'y'}
                 {if $tiki_p_create_file_galleries eq 'y' or (not empty($user) and $user eq $gal_info.user and $gal_info.type eq 'user' and $tiki_p_userfiles eq 'y')}
-                    <li class="dropdown-item">
-                        <a href="tiki-list_file_gallery.php?edit_mode=1&galleryId={$galleryId}">{icon name="edit"} {tr}Edit{/tr}</a>
+                    <li>
+                        <a href="tiki-list_file_gallery.php?edit_mode=1&galleryId={$galleryId}" class="dropdown-item">{icon name="edit"} {tr}Edit{/tr}</a>
                     </li>
                 {/if}
             {/if}
             {if $tiki_p_create_file_galleries eq 'y' and $dup_mode ne 'y' and $gal_info.type neq 'user' and $all_galleries|@count gt 0}
-                <li class="dropdown-item">
-                    <a href="tiki-list_file_gallery.php?dup_mode=1&galleryId={$galleryId}">{icon name="copy"} {tr}Duplicate{/tr}</a>
+                <li>
+                    <a href="tiki-list_file_gallery.php?dup_mode=1&galleryId={$galleryId}" class="dropdown-item">{icon name="copy"} {tr}Duplicate{/tr}</a>
                 </li>
             {/if}
             {if $gal_info.type eq 'direct'}
-                <li class="dropdown-item">
-                    <a href="tiki-list_file_gallery.php?sync=1&galleryId={$galleryId}">{icon name="redo"} {tr}Sync{/tr}</a>
+                <li>
+                    <a href="tiki-list_file_gallery.php?sync=1&galleryId={$galleryId}" class="dropdown-item">{icon name="redo"} {tr}Sync{/tr}</a>
                 </li>
             {/if}
             {if $tiki_p_assign_perm_file_gallery eq 'y'}
-                <li class="dropdown-item">
-                    {permission_link mode=text type="file gallery" permType="file galleries" id=$galleryId}
+                <li>
+                    {permission_link mode=text addclass="dropdown-item" type="file gallery" permType="file galleries" id=$galleryId}
                 </li>
             {/if}
             {if $prefs.feature_group_watches eq 'y' and ( $tiki_p_admin_users eq 'y' or $tiki_p_admin eq 'y' )}
-                <li class="dropdown-item">
+                <li>
                     {* links to a form so no confirm popup needed *}
-                    <a href="tiki-object_watches.php?objectId={$galleryId|escape:"url"}&amp;watch_event=file_gallery_changed&amp;objectType=File+Gallery&amp;objectName={$gal_info.name|escape:"url"}&amp;objectHref={'tiki-list_file_gallery.php?galleryId='|cat:$galleryId|escape:"url"}">
+                    <a href="tiki-object_watches.php?objectId={$galleryId|escape:"url"}&amp;watch_event=file_gallery_changed&amp;objectType=File+Gallery&amp;objectName={$gal_info.name|escape:"url"}&amp;objectHref={'tiki-list_file_gallery.php?galleryId='|cat:$galleryId|escape:"url"}" class="dropdown-item">
                         {icon name='watch-group'} {tr}Group monitor{/tr}
                     </a>
                 </li>
             {/if}
             {if $user and $prefs.feature_user_watches eq 'y'}
-                <li class="dropdown-item">
+                <li>
                     {if !isset($user_watching_file_gallery) or $user_watching_file_gallery eq 'n'}
                         <form action="tiki-list_file_gallery.php" method="post">
                             {ticket}
@@ -92,7 +92,7 @@
                             <input type="hidden" name="watch_event" value="file_gallery_changed">
                             <input type="hidden" name="watch_object" value="{$galleryId|escape:'attr'}">
                             <input type="hidden" name="watch_action" value="add">
-                            <button type="submit" class="btn btn-link link-list">
+                            <button type="submit" class="btn btn-link link-list dropdown-item">
                                 {icon name='watch'} {tr}Monitor{/tr}
                             </button>
                         </form>
@@ -103,7 +103,7 @@
                             <input type="hidden" name="watch_event" value="file_gallery_changed">
                             <input type="hidden" name="watch_object" value="{$galleryId|escape:'attr'}">
                             <input type="hidden" name="watch_action" value="remove">
-                            <button type="submit" class="btn btn-link link-list">
+                            <button type="submit" class="btn btn-link link-list dropdown-item">
                                 {icon name='stop-watching'} {tr}Stop monitoring{/tr}
                             </button>
                         </form>
@@ -111,26 +111,26 @@
                 </li>
             {/if}
             {if $prefs.feed_file_gallery eq 'y'}
-                <li class="dropdown-item">
+                <li>
                     {if $gal_info.type eq "podcast" or $gal_info.type eq "vidcast"}
-                        <a href="tiki-file_gallery_rss.php?galleryId={$galleryId}&amp;ver=PODCAST">
+                        <a href="tiki-file_gallery_rss.php?galleryId={$galleryId}&amp;ver=PODCAST" class="dropdown-item">
                             {icon name='rss'} {tr}RSS feed{/tr}
                         </a>
                     {else}
-                        <a href="tiki-file_gallery_rss.php?galleryId={$galleryId}">
+                        <a href="tiki-file_gallery_rss.php?galleryId={$galleryId}" class="dropdown-item">
                             {icon name='rss'} {tr}RSS feed{/tr}
                         </a>
                     {/if}
                 </li>
             {/if}
             {if $view eq 'browse'}
-                <li class="dropdown-item">
+                <li>
                     {if $show_details eq 'y'}
-                        <a href="{query _type='relative' show_details='n'}" title="{tr}Hide file information from list view{/tr}">
+                        <a href="{query _type='relative' show_details='n'}" title="{tr}Hide file information from list view{/tr}" class="dropdown-item">
                             {icon name='ban' align='right' alt="{tr}Hide file information from list view{/tr}"} {tr}Hide list view information{/tr}
                         </a>
                     {else}
-                        <a href="{query _type='relative' show_details='y'}" title="{tr}Show file information from list view{/tr}">
+                        <a href="{query _type='relative' show_details='y'}" title="{tr}Show file information from list view{/tr}" class="dropdown-item">
                             {icon name='view' align='right' alt="{tr}Show file information from list view{/tr}"} {tr}Show list view information{/tr}
                         </a>
                     {/if}
