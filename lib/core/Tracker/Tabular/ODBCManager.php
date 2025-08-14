@@ -63,8 +63,21 @@ class ODBCManager
         if (! empty($this->config['value_mappings'])) {
             $fields = array_merge($fields, array_keys($this->config['value_mappings']));
         }
-        $select = implode('", "', $fields);
-        $sql = "SELECT \"{$select}\" FROM {$this->config['table']} WHERE 1=1";
+        foreach ($fields as $k => $v) {
+            if (! strstr($v, '.')) {
+                $fields[$k] = $this->config['table'] . '.' . $v;
+            }
+        }
+        $select = implode('", "', str_replace('.', '"."', $fields));
+        $sql = "SELECT \"{$select}\" FROM {$this->config['table']}";
+        if (! empty($this->config['join_tables'])) {
+            foreach ($this->config['join_tables'] as $table => $joinFields) {
+                $sql .= " LEFT JOIN \"" . addslashes($table) . "\" ON " . implode(' AND ', array_map(function ($k, $v) use ($table) {
+                    return "\"" . addslashes($table) . "\".\"" . addslashes($k) . "\" = \"{$this->config['table']}\".\"" . addslashes($v) . "\"";
+                }, array_keys($joinFields), array_values($joinFields)));
+            }
+        }
+        $sql .= " WHERE 1=1";
         $bind = [];
         if ($modifiedField && $lastImport) {
             $sql .= " AND \"{$modifiedField}\" >= ?";
@@ -110,8 +123,10 @@ class ODBCManager
             $exists = false;
             $id = null;
         }
+        $joinFields = [];
         if ($exists) {
             $row = $this->fillFieldsFromConfig($row);
+            $joinFields = $this->removeJoinFields($row);
             foreach (array_chunk($row, 50, true) as $chunk) {
                 unset($chunk[$pk]);
                 if (empty($chunk)) {
@@ -145,6 +160,7 @@ class ODBCManager
                 $row = $fullRow;
             }
             $row = $this->fillFieldsFromConfig($row);
+            $joinFields = $this->removeJoinFields($row);
             $row = array_filter($row, function ($val) {
                 if (is_bool($val) || is_int($val) || is_float($val)) {
                     return true;
@@ -174,6 +190,40 @@ class ODBCManager
             }
         }
         $result['entry'] = $this->reverseMapFieldsFromConfig($result['entry']);
+        if ($joinFields) {
+            $tableFields = [];
+            foreach ($joinFields as $k => $v) {
+                $parts = explode('.', $k);
+                $table = array_shift($parts);
+                $field = array_shift($parts);
+                $tableFields[$table][$field] = $v;
+            }
+            foreach ($tableFields as $table => $fields) {
+                if (! empty($this->config['join_tables'][$table])) {
+                    foreach ($this->config['join_tables'][$table] as $remote => $local) {
+                        $idVal = $result['entry'][$local] ?? null;
+                        if ($idVal) {
+                            $sql = "SELECT * FROM \"" . addslashes($table) . "\" WHERE \"" . addslashes($remote) . "\" = ?";
+                            $rs = odbc_prepare($conn, $sql);
+                            odbc_execute($rs, [$idVal]);
+                            $result = odbc_fetch_array($rs);
+                            if ($result) {
+                                $sql = "UPDATE \"" . addslashes($table) . "\" SET " . implode(', ', array_map(function ($k) {
+                                    return "\"{$k}\" = ?";
+                                }, array_keys($fields))) . " WHERE \"" . addslashes($remote) . "\" = ?";
+                                $rs = odbc_prepare($conn, $sql);
+                                odbc_execute($rs, array_merge(array_values($fields), [$idVal]));
+                            } else {
+                                $fields[$remote] = $idVal;
+                                $sql = "INSERT INTO \"" . addslashes($table) . "\" (\"" . implode('","', array_keys($fields)) . "\") VALUES (" . implode(',', array_fill(0, count($fields), '?')) . ")";
+                                $rs = odbc_prepare($conn, $sql);
+                                odbc_execute($rs, array_values($fields));
+                            }
+                        }
+                    }
+                }
+            }
+        }
         $this->stopErrorHandler();
         return $result;
     }
@@ -513,5 +563,17 @@ class ODBCManager
             }
         }
         return $row;
+    }
+
+    private function removeJoinFields(array &$row): array
+    {
+        $joinFields = [];
+        foreach ($row as $k => $v) {
+            if (strstr($k, '.')) {
+                $joinFields[$k] = $v;
+                unset($row[$k]);
+            }
+        }
+        return $joinFields;
     }
 }

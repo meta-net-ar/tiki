@@ -365,5 +365,30 @@ class Manager
             $odbc_config = $old_config;
             return;
         }
+        try {
+            if (! empty($odbc_config['join_tables'])) {
+                $odbc_config['join_tables'] = json_decode($odbc_config['join_tables'], true, 512, JSON_THROW_ON_ERROR);
+                if (! is_array($odbc_config['join_tables'])) {
+                    throw new Exception('invalid format');
+                }
+                foreach ($odbc_config['join_tables'] as $key => $val) {
+                    if (! is_string($key)) {
+                        throw new Exception('invalid format');
+                    }
+                    if (! is_array($val)) {
+                        throw new Exception('invalid format');
+                    }
+                    foreach ($val as $remote => $local) {
+                        if (! is_scalar($remote) || ! is_scalar($local)) {
+                            throw new Exception('invalid format');
+                        }
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            Feedback::error(tr("Failed parsing Join Tables field: %0. Changes were not saved.", $e->getMessage()));
+            $odbc_config = $old_config;
+            return;
+        }
     }
 }
