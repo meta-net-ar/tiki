@@ -20,12 +20,7 @@ class ODBCSourceEntry implements SourceEntryInterface
         $values = [];
         $fields = $column->getRemoteFields();
         foreach ($fields as $field) {
-            if (isset($this->data[$field])) {
-                $value = $this->data[$field];
-            } else {
-                $value = null;
-            }
-            $values[] = $value;
+            $values[] = $this->getFieldDataFromRemoteField($field);
         }
         return $column->render($allow_multiple ? $values : $values[0], ['allow_multiple' => $allow_multiple]);
     }
@@ -34,8 +29,9 @@ class ODBCSourceEntry implements SourceEntryInterface
     {
         $fields = $column->getRemoteFields();
         foreach ($fields as $field) {
-            if (isset($this->data[$field])) {
-                return $this->data[$field];
+            $value = $this->getFieldDataFromRemoteField($field);
+            if ($value !== null) {
+                return $value;
             }
         }
         return null;
@@ -47,13 +43,27 @@ class ODBCSourceEntry implements SourceEntryInterface
         if (count($remoteFields) > 1) {
             $entry = [];
             foreach ($remoteFields as $remoteField) {
-                if (isset($this->data[$remoteField])) {
-                    $entry[] = $this->data[$remoteField];
+                $value = $this->getFieldDataFromRemoteField($remoteField);
+                if ($value !== null) {
+                    $entry[] = $value;
                 }
             }
         } else {
-            $entry = $this->data[$column->getRemoteField()] ?? null;
+            $entry = $this->getFieldDataFromRemoteField($column->getRemoteField());
         }
         $column->parseInto($info, $entry, $this->data);
+    }
+
+    protected function getFieldDataFromRemoteField($remoteField)
+    {
+        if (isset($this->data[$remoteField])) {
+            $value = $this->data[$remoteField];
+        } elseif (strstr($remoteField, '.')) {
+            $parts = explode('.', $remoteField);
+            $value = $this->data[array_pop($parts)] ?? null;
+        } else {
+            $value = null;
+        }
+        return $value;
     }
 }

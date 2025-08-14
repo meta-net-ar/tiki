@@ -74,6 +74,17 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Join Other Tables{/tr}
+                        <a class="tikihelp text-info" title="{tr}Join Other Tables:{/tr} {tr}Specify SQL join conditions to use to include other tables and their data in the result set. JSON format: { table: { remote_field_name: local_field_name}, ...}{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" type="text" name="odbc[join_tables]">{if $odbc_config.join_tables}{$odbc_config.join_tables|json_encode}{/if}</textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <label class="col-form-label col-sm-2 offset-sm-1">{tr}Sync deletes{/tr}</label>
                     <div class="col-sm-9">
                         <input class="form-check-input" type="checkbox" name="odbc[sync_deletes]" {if !empty($odbc_config.sync_deletes)}checked{/if} value="1">

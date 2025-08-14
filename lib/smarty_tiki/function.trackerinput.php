@@ -10,7 +10,10 @@ function smarty_function_trackerinput($params, $smarty)
 
     if (isset($params['fieldId'])) {
         $field = $trklib->get_tracker_field($params['fieldId']);
-        $field['ins_id'] = "ins_{$params['fieldId']}";
+        if (empty($field)) {
+            return tr('Field %0 not found', $params['fieldId']);
+        }
+        $field['ins_id'] = "ins_{$field['fieldId']}";
         $handler = $trklib->get_field_handler($field, $item);
         if ($handler) {
             $field = array_merge($field, $handler->getFieldData());
