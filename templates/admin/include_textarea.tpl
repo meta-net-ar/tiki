@@ -543,7 +543,7 @@
                                                 {tr}Parameter{/tr}
                                             </label>
                                             <div class="col-sm-5">
-                                                <input class="form-control" type="text" name="bodyparam[{$token|escape}][token]" id="bodyparam[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
+                                                <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="bodyparam[{$token|escape}][token]" id="bodyparam[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
                                             </div>
                                             <div class="col-sm-1">
                                                 {icon name='delete' class='text-danger delete-param tips btn btn-link' title="{tr}Delete this body parameter{/tr}"}
@@ -554,7 +554,7 @@
                                                 {tr}Encoding{/tr}
                                             </label>
                                             <div class="col-sm-6">
-                                                <select class="form-select" name="bodyparam[{$token|escape}][encoding]" id="bodyparam[{$token|escape}][encoding]">
+                                                <select class="form-select {if $token eq '__NEW__'} d-none{/if}" name="bodyparam[{$token|escape}][encoding]" id="bodyparam[{$token|escape}][encoding]">
                                                     {foreach ['none','html','url'] as $val}
                                                         <option value="{$val|escape}" {if $detail.encoding eq $val}selected="selected"{/if}>
                                                             {$val|escape}
@@ -568,7 +568,7 @@
                                                 {tr}Argument source (if different){/tr}
                                             </label>
                                             <div class="col-sm-6">
-                                                <input class="form-control" type="text" name="bodyparam[{$token|escape}][input]" id="bodyparam[{$token|escape}][input]" value="{$detail.input|escape}">
+                                                <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="bodyparam[{$token|escape}][input]" id="bodyparam[{$token|escape}][input]" value="{$detail.input|escape}">
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -576,7 +576,7 @@
                                                 {tr}Default value{/tr}
                                             </label>
                                             <div class="col-sm-6">
-                                                <input class="form-control" type="text" name="bodyparam[{$token|escape}][default]" id="bodyparam[{$token|escape}][default]" value="{$detail.default|escape}">
+                                                <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="bodyparam[{$token|escape}][default]" id="bodyparam[{$token|escape}][default]" value="{$detail.default|escape}">
                                             </div>
                                         </div>
                                         <hr>
@@ -600,7 +600,7 @@
                                             {tr}Parameter{/tr}
                                         </label>
                                         <div class="col-sm-7">
-                                            <input class="form-control" type="text" name="cparams[{$token|escape}][token]" id="cparams[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
+                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][token]" id="cparams[{$token|escape}][token]" value="{if $token neq '__NEW__'}{$token|escape}{/if}">
                                         </div>
                                         <div class="col-sm-1">
                                             {icon name='delete' class='text-danger delete-param tips btn btn-link' title="{tr}Delete this composed argument{/tr}"}
@@ -611,32 +611,32 @@
                                             {tr}Pattern{/tr}
                                         </label>
                                         <div class="col-sm-8">
-                                            <input class="form-control" type="text" name="cparams[{$token|escape}][pattern]" id="cparams[{$token|escape}][pattern]" value="{$detail.pattern|escape}">
+                                            <input class="form-control {if $token eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][pattern]" id="cparams[{$token|escape}][pattern]" value="{$detail.pattern|escape}">
                                         </div>
                                     </div>
-                                    <fieldset class="ms-5">
+                                    <fieldset class="ms-3 p-1">
                                         <legend class="h4">
                                             {tr}Composed parameters{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add composed parameter{/tr}'}
                                         </legend>
                                         {foreach $detail.params as $t => $d}
                                             <div class="clearfix param{if $t eq '__NEW__'} d-none{/if}">
                                                 <div class="mb-3 row">
-                                                    <label class="col-form-label col-sm-6" for="cparams[{$token|escape}][params][{$t|escape}][token]">
+                                                    <label class="col-form-label col-sm-4" for="cparams[{$token|escape}][params][{$t|escape}][token]">
                                                         {tr}Parameter{/tr}
                                                     </label>
-                                                    <div class="col-sm-5">
-                                                        <input class="form-control" type="text" name="cparams[{$token|escape}][params][{$t|escape}][token]" id="cparams[{$token|escape}][params][{$t|escape}][token]" value="{if $t neq '__NEW__'}{$t|escape}{/if}">
+                                                    <div class="col-sm-7">
+                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][token]" id="cparams[{$token|escape}][params][{$t|escape}][token]" value="{if $t neq '__NEW__'}{$t|escape}{/if}">
                                                     </div>
                                                     <div class="col-sm-1">
                                                         {icon name='delete' class='text-danger delete-param tips btn btn-link' title="{tr}Delete this composed parameter{/tr}"}
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
-                                                    <label class="col-form-label col-sm-6" for="cparams[{$token|escape}][pattern]">
+                                                    <label class="col-form-label col-sm-4" for="cparams[{$token|escape}][pattern]">
                                                         {tr}Encoding{/tr}
                                                     </label>
-                                                    <div class="col-sm-6">
-                                                        <select class="form-select" name="cparams[{$token|escape}][params][{$t|escape}][encoding]" id="cparams[{$token|escape}][pattern]">
+                                                    <div class="col-sm-8">
+                                                        <select class="form-select {if $t eq '__NEW__'} d-none{/if}" name="cparams[{$token|escape}][params][{$t|escape}][encoding]" id="cparams[{$token|escape}][pattern]">
                                                             {foreach ['none','html','url'] as $val}
                                                                 <option value="{$val|escape}" {if $d.encoding eq $val}selected="selected"{/if}>{$val|escape}</option>
                                                             {/foreach}
@@ -644,19 +644,19 @@
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
-                                                    <label class="col-form-label col-sm-6" for="cparams[{$token|escape}][params][{$t|escape}][input]">
+                                                    <label class="col-form-label col-sm-4" for="cparams[{$token|escape}][params][{$t|escape}][input]">
                                                         {tr}Argument source (if different):{/tr}
                                                     </label>
-                                                    <div class="col-sm-6">
-                                                        <input class="form-control" type="text" name="cparams[{$token|escape}][params][{$t|escape}][input]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.input|escape}"/>
+                                                    <div class="col-sm-8">
+                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][input]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.input|escape}"/>
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
-                                                    <label class="col-form-label col-sm-6" for="cparams[{$token|escape}][params][{$t|escape}][input]">
+                                                    <label class="col-form-label col-sm-4" for="cparams[{$token|escape}][params][{$t|escape}][input]">
                                                         {tr}Default value{/tr}
                                                     </label>
-                                                    <div class="col-sm-6">
-                                                        <input class="form-control" type="text" name="cparams[{$token|escape}][params][{$t|escape}][default]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.default|escape}"/>
+                                                    <div class="col-sm-8">
+                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][default]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.default|escape}"/>
                                                     </div>
                                                 </div>
                                                 <hr>
