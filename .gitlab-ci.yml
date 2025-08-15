@@ -840,16 +840,27 @@ composer-stability:
   needs:
     - composer
   script:
-    - php doc/devtools/check_composer_stability.php --ci
+    - |
+      set +e
+      php doc/devtools/check_composer_stability.php --ci
+      EXIT_CODE=$?
+      set -e
+      exit $EXIT_CODE
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
     - if: $CI_COMMIT_BRANCH == "master"
       when: never
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
     - when: manual
   artifacts:
-    when: always  # Always upload artifacts even if job fails
-  allow_failure: true  # Allow job to fail without failing the pipeline
+    when: always
+    reports:
+      junit: composer-stability-report.xml
+  allow_failure:
+    exit_codes: 
+    - 2
 
 composer-operator-check:
   stage: composer-stability
