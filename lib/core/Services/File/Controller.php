@@ -115,6 +115,8 @@ class Services_File_Controller
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
         $directoryPattern = $input->directoryPattern->text();
+        $objectId = $input->objectId->int();
+        $objectType = $input->objectType->text();
         $categlib = TikiLib::lib('categ');
         $categories = $fileId ? $categlib->get_object_categories('file', $fileId) : [];
 
@@ -196,7 +198,7 @@ class Services_File_Controller
                 $title = $title ?: $fileInfo['name'];
                 $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
             } else {
-                $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
+                $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern, $objectId, $objectType);
             }
         } else {
             $fileId = false;
