@@ -32,7 +32,7 @@ class ToolbarFileRecording extends ToolbarUtilityItem
             $this->setupWikiJs();
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/files";');
+        TikiLib::lib('header')->add_js_module('import { handRecordingTypeInputsState } from "@jquery-tiki/tracker-fields/files"; window.handRecordingTypeInputsState = handRecordingTypeInputsState;');
     }
 
     private function setupWikiJs()
@@ -56,42 +56,20 @@ class ToolbarFileRecording extends ToolbarUtilityItem
 
     private function getModalContent(): string
     {
-        $options = [
-            [
-                'type' => 'audio',
-                'label' => tra('Audio only'),
-                'icon' => 'microphone',
-            ],
-            [
-                'type' => 'screen',
-                'label' => tra('Screen only'),
-                'icon' => 'desktop',
-            ],
-            [
-                'type' => 'screenandaudio',
-                'label' => tra('Screen and audio'),
-                'icon' => 'desktop',
-            ],
-            [
-                'type' => 'cameraandaudio',
-                'label' => tra('Camera and audio'),
-                'icon' => 'camera',
-            ]
-        ];
-
-        $optionsHtml = implode('', array_map(function ($option) {
-            $iconHtml = smarty_function_icon(['name' => $option['icon']], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-            return <<<HTML
-            <div class="recording-type__item bg-secondary-subtle border rounded border-3 border-white p-2 d-flex flex-column align-items-center w-25" data-type="{$option['type']}" role="button">
-                <div class="fs-2">$iconHtml</div>
-                <div class="fw-light text-center">{$option['label']}</div>
-            </div>
-            HTML;
-        }, $options));
-
         return <<<HTML
         <div class="recording-type d-flex gap-2 flex-wrap justify-content-center">
-            $optionsHtml
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="recordMicrophone" name="microphone">
+                <label class="form-check-label" for="recordMicrophone">Microphone</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="recordScreen" name="screen">
+                <label class="form-check-label" for="recordScreen">Screen</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="recordCamera" name="camera">
+                <label class="form-check-label" for="recordCamera">Camera</label>
+            </div>
         </div>
         HTML;
     }
@@ -131,7 +109,10 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                     type: 'secondary stop-recording d-none',
                     onClick: function() {}
                 }
-            ]
+            ],
+            open: function() {
+                handRecordingTypeInputsState();
+            }
         })
         JS;
     }

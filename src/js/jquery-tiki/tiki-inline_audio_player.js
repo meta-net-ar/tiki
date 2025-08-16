@@ -132,3 +132,5 @@ function loadMetadata(audioElement) {
         });
     });
 }
+
+export { handRecordingTypeInputsState } from "./handlers/files.js";

@@ -1,10 +1,35 @@
-$("body").on("click", ".recording-type__item", function () {
-    const recordingType = $(this).data("type");
-    $(".recording-type__item").removeClass("border-success");
-    $(".recording-type__item").addClass("border-white");
+export function handRecordingTypeInputsState() {
+    $(".recording-type input").on("change", function () {
+        if ($(".recording-type #recordCamera").is(":checked")) {
+            $(".recording-type #recordScreen").prop("disabled", true);
+        } else {
+            $(".recording-type #recordScreen").prop("disabled", false);
+        }
 
-    $(this).removeClass("border-white");
-    $(this).addClass("border-success");
+        if ($(".recording-type #recordScreen").is(":checked")) {
+            $(".recording-type #recordCamera").prop("disabled", true);
+        } else {
+            $(".recording-type #recordCamera").prop("disabled", false);
+        }
 
-    $(this).closest(".modal").find(".start-recording").data("type", recordingType);
-});
+        const recordingTypes = [];
+        $(".recording-type input:checked").each(function () {
+            recordingTypes.push($(this).attr("name"));
+        });
+
+        const recordingType = recordingTypes.join(",");
+        setCookie("recordingType", recordingType, "", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
+
+        $(this).closest(".modal").find(".start-recording").data("type", recordingType);
+    });
+
+    const recordingType = getCookie("recordingType");
+    $(".recording-type input").each(function () {
+        if (recordingType && recordingType.includes($(this).attr("name"))) {
+            $(this).prop("checked", true);
+        } else {
+            $(this).prop("checked", false);
+        }
+        $(this).trigger("change");
+    });
+}
