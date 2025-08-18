@@ -301,7 +301,11 @@ class ODBCManager
     {
         $this->handleErrors();
         $conn = $this->getConnection();
-        $sql = "SELECT MAX(CAST(\"$field\" AS DECIMAL(20,0))) as last from {$this->config['table']} WHERE \"$field\" REGEXP '^[0-9]+$'";
+        if (stristr($this->config['dsn'], 'mysql') || stristr($this->config['dsn'], 'mariadb')) {
+            $sql = "SELECT MAX(CAST(\"$field\" AS SIGNED)) as last from {$this->config['table']} WHERE \"$field\" REGEXP '^[0-9]+$'";
+        } else {
+            $sql = "SELECT MAX(CAST(\"$field\" AS INT)) as last from {$this->config['table']} WHERE ISNUMERIC(\"$field\") = 1";
+        }
         $rs = odbc_prepare($conn, $sql);
         if ($rs) {
             odbc_execute($rs, []);
