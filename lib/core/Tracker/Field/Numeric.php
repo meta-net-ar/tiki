@@ -85,6 +85,16 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
                             1 => tr('Yes'),
                         ],
                     ],
+                    'incrementWithEmpty' => [
+                        'name' => tr('Increment with empty'),
+                        'description' => tr('Increment the value from the last item in database when the field is empty.'),
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -137,6 +147,19 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
     public function renderInput($context = [])
     {
         return $this->renderTemplate('trackerinput/numeric.tpl', $context);
+    }
+
+    public function handleSave($value, $oldValue)
+    {
+        if ($this->getOption('incrementWithEmpty') && empty($value)) {
+            $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            if (! $value) {
+                $value = 1;
+            } else {
+                $value += 1;
+            }
+        }
+        return ['value' => $value];
     }
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
