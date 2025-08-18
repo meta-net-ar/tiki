@@ -451,7 +451,7 @@ if (! hm_exists('append_to_msg_headers')) {
     function append_to_msg_headers($headers, $link)
     {
         $link = ' | ' . $link;
-        $headers = preg_replace('#</ul><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
+        $headers = preg_replace('#</div><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
 
         return $headers;
     }
