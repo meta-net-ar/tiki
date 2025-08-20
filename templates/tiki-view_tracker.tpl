@@ -336,7 +336,7 @@
                     {if $tiki_p_admin_trackers eq 'y'}
                         <div class="form-group row">
                             <div class="input-group min-width-customized">
-                                <select name="batchaction" class="form-control">
+                                <select name="batchaction" class="form-control trackerbatchaction">
                                     <option value="no_action" selected="selected">
                                         {tr}Select the action to be performed with checked{/tr}...
                                     </option>
@@ -350,7 +350,7 @@
                                 <span class="input-group-append">
                                     {ticket}
                                     <input type="hidden" name="trackerId" value="{$trackerId}">
-                                    <input type="submit" class="btn btn-primary" name="act" value="{tr}OK{/tr}">
+                                    <input type="submit" class="btn btn-primary js-confirm-delete" name="act" value="{tr}OK{/tr}">
                                 </span>
                             </div>
                         </div>
@@ -561,3 +561,25 @@
         {/tab}
     {/if}
 {/tabset}
+
+{jq}
+    const selectItemMsg = '{tr}Please select at least one item.{/tr}';
+    // Target the batch delete button to add validation.
+    $('.js-confirm-delete').on('click', function(event) {
+        const form = $(this).closest('form');
+        const batchAction = form.find('select.trackerbatchaction').val();
+
+        // For any other action, the form submits normally without interference.
+        if (batchAction === 'delete') {
+            
+            const itemsSelected = form.find('input[name="action[]"]:checked').length;
+            
+            if (itemsSelected == 0) {
+                // Stop the default form submission.
+                event.preventDefault();
+                // Validation failed: show an feedback and do nothing else.
+                feedback(selectItemMsg,'warning');
+            }
+        }
+    });
+{/jq}
