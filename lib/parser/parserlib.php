@@ -1408,9 +1408,14 @@ class ParserLib extends TikiDb_Bridge
         }
         // Close open lists
         if ($close_lists) {
+            $did_close_list = (count($listbeg) > 0);
             while (count($listbeg)) {
                 $data .= array_shift($listbeg);
                 $closed++;
+            }
+             global $prefs;
+            if ($did_close_list && $prefs['feature_wiki_paragraph_formatting'] == 'n') {
+                $data .= '<br />';
             }
         }
 
@@ -2452,6 +2457,7 @@ class ParserLib extends TikiDb_Bridge
         $all_anchors = [];
         $nb_last_hdr = 0;
         $nb_hdrs = 0;
+        $nb_lists = 0;
         $inTable = 0;
         $inPre = 0;
         $inComment = 0;
@@ -2468,7 +2474,8 @@ class ParserLib extends TikiDb_Bridge
             if (isset($current_title_num)) { // Exclude the first line
                 $data .= "\n";
             }
-
+            $flipper_html = '';
+            $child_list_html = '';
             $current_title_num = '';
             $numbering_remove = 0;
 
@@ -2595,42 +2602,43 @@ class ParserLib extends TikiDb_Bridge
                             $liclose = '';
                         }
                     } elseif ($listlevel > count($listbeg)) {
-                        $listyle = '';
                         while ($listlevel != count($listbeg)) {
+                            $data .= ($litype == '*' ? "<ul>" : "<ol>");
                             array_unshift($listbeg, ($litype == '*' ? '</ul>' : '</ol>'));
-                            if ($listlevel == count($listbeg)) {
-                                $listate = substr($line, $listlevel, 1);
-                                if (($listate == '+' || $listate == '-') && ! ($litype == '*' && ! strstr(current($listbeg), '</ul>') || $litype == '#' && ! strstr(current($listbeg), '</ol>'))) {
-                                    $thisid = 'id' . microtime(true) * 1000000;
-                                    if (! $this->option['wysiwyg']) {
-                                        $data .= '<br /><a id="flipper' . $thisid . '" class="link" href="javascript:flipWithSign(\'' . $thisid . '\')">[' . ($listate == '-' ? '+' : '-') . ']</a>';
-                                    }
-                                    $listyle = ' id="' . $thisid . '" style="display:' . ($listate == '+' || $this->option['wysiwyg'] ? 'block' : 'none') . ';"';
-                                    $addremove = 1;
-                                }
-                            }
-                            $data .= ($litype == '*' ? "<ul$listyle>" : "<ol$listyle>");
                         }
+                        $liclose = '';
+                    }
+                    if (count($listbeg) && substr(current($listbeg), 0, 5) != '</li>') {
                         $liclose = '';
                     }
                     if ($litype == '*' && ! strstr(current($listbeg), '</ul>') || $litype == '#' && ! strstr(current($listbeg), '</ol>')) {
                         $data .= array_shift($listbeg);
-                        $listyle = '';
-                        $listate = substr($line, $listlevel, 1);
-                        if (($listate == '+' || $listate == '-')) {
-                            $thisid = 'id' . microtime() * 1000000;
-                            if (! $this->option['wysiwyg']) {
-                                $data .= '<br /><a id="flipper' . $thisid . '" class="link" href="javascript:flipWithSign(\'' . $thisid . '\')">[' . ($listate == '-' ? '+' : '-') . ']</a>';
-                            }
-                            $listyle = ' id="' . $thisid . '" style="display:' . ($listate == '+' || $this->option['wysiwyg'] ? 'block' : 'none') . ';"';
-                            $addremove = 1;
-                        }
-                        $data .= ($litype == '*' ? "<ul$listyle>" : "<ol$listyle>");
+                        $data .= ($litype == '*' ? "<ul>" : "<ol>"); // Open a PLAIN list
                         $liclose = '';
-                        array_unshift($listbeg, ($litype == '*' ? '</li></ul>' : '</li></ol>'));
+                        array_unshift($listbeg, ($litype == '*' ? '</ul></li>' : '</ol></li>'));
                     }
-                    $line = $liclose . '<li>' . substr($line, $listlevel + $addremove);
-                    if (substr(current($listbeg), 0, 5) != '</li>') {
+
+                    // Step A: Check for +/- sign and PREPARE the HTML pieces in variables.
+                    $listate = substr($line, $listlevel, 1);
+                    if (($listate == '+' || $listate == '-')) {
+                        $nb_lists++;
+                        $thisid = 'id' . preg_replace('/[^a-zA-Z0-9]/', '', urlencode($this->option['page'] ?? '')) . $nb_lists;
+                        if (! $this->option['wysiwyg']) {
+                            // 1. Prepare the flipper link
+                            $flipper_html = '<a id="flipper' . $thisid . '" class="link" href="javascript:flipWithSign(\'' . $thisid . '\')">[' . ($listate == '-' ? '+' : '-') . ']</a>';
+                            // 2. Prepare the child list container with the correct style
+                            $child_list_html = ($litype == '*') ? '<ul id="' . $thisid . '" style="display:' . ($listate == '+' ? 'block' : 'none') . ';">' : '<ol id="' . $thisid . '" style="display:' . ($listate == '+' ? 'block' : 'none') . ';">';
+                        }
+                        $addremove = 1;
+                    }
+
+                    // Step B: ASSEMBLE the final line from the prepared pieces.
+                    $line = $liclose . '<li>' . $flipper_html . substr($line, $listlevel + $addremove) . $child_list_html;
+
+                     // Step C: MANAGE the state stack correctly and exclusively.
+                    if ($child_list_html) {
+                        array_unshift($listbeg, ($litype == '*' ? '</ul></li>' : '</ol></li>'));
+                    } elseif (! str_starts_with(current($listbeg), '</li>')) {
                         array_unshift($listbeg, '</li>' . array_shift($listbeg));
                     }
                 } elseif ($litype == '+') {
@@ -2660,7 +2668,9 @@ class ParserLib extends TikiDb_Bridge
                     // but not paragraph or div's. If we are
                     // closing a list, there really shouldn't be a
                     // paragraph open anyway.
-                    $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 0, 1, 0);
+                    if (trim($line) !== '') {
+                        $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 0, 1, 0);
+                    }
 
                     // Get count of (possible) header signs at start
                     $hdrlevel = $tikilib->how_many_at_start($line, '!');
@@ -2924,7 +2934,10 @@ class ParserLib extends TikiDb_Bridge
                                       // }
                                 }
                             } else {
-                                $line .= "<br />";
+                                // This is the legacy line break : Only add this break if we are NOT currently inside a list.
+                                if (count($listbeg) == 0) {
+                                    $line .= "<br />";
+                                }
                             }
                         }
                     }
@@ -2952,6 +2965,7 @@ class ParserLib extends TikiDb_Bridge
         }
 
         // Close open paragraph, lists, and div's
+
         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 1, 1);
 
         /*
