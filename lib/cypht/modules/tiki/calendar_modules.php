@@ -405,9 +405,9 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
         $headers = $this->get('msg_headers');
         if (! empty($event)) {
             $res = '';
-            $res .= sprintf('<tr class="header_event_dtstart"><th>%s</th><td>%s</td></tr>', tr('Event start'), TikiLib::lib('tiki')->get_long_datetime($event['start']));
-            $res .= sprintf('<tr class="header_event_dtend"><th>%s</th><td>%s</td></tr>', tr('Event end'), TikiLib::lib('tiki')->get_long_datetime($event['end']));
-            $res .= sprintf('<tr class="header_event_organizer"><th>%s</th><td>%s</td></tr>', tr('Organizer'), implode(", ", $event['real_organizers']));
+            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_dtstart"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Event start'), TikiLib::lib('tiki')->get_long_datetime($event['start']));
+            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_dtend"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Event end'), tr('Event end'), TikiLib::lib('tiki')->get_long_datetime($event['end']));
+            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_organizer"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Organizer'), tr('Organizer'), implode(", ", $event['real_organizers']));
             if ($prefs['feature_calendar'] == 'y' && $method != 'CANCEL') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
                 if (! $existing) {
@@ -417,19 +417,10 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                     foreach ($calendars['data'] as $row) {
                         $options[] = "<option value='" . $row['calendarId'] . "'>" . $row['name'] . "</option>";
                     }
-                    $res .= sprintf(
-                        '<tr class="header_event_addtocal"><th>%s</th><td class="header_links"><select name="calendarId" class="event_calendar_select">%s</select></td></tr>',
-                        tr('Add to calendar'),
-                        implode('', $options)
-                    );
+                    $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_addtocal"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12"><select name="calendarId" class="event_calendar_select">%s</select></div></div>', tr('Add to calendar'), implode('', $options));
                 } else {
                     $existing = TikiLib::lib('calendar')->get_item($existing['calitemId']);
-                    $res .= sprintf(
-                        '<tr><th>%s</th><td class="header_links"><a href="tiki-calendar.php?calitemId=%s" data-external="1">%s</a></td></tr>',
-                        tr('Event'),
-                        $existing['calitemId'],
-                        tr('View event in my calendar')
-                    );
+                    $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12 header_links"><a href="tiki-calendar.php?calitemId=%s" data-external="1">%s</a></div></div>', tr('Event'), $existing['calitemId'], tr('View event in my calendar'));
                     foreach (['start', 'end', 'name', 'description', 'participants'] as $field) {
                         $val1 = $existing[$field];
                         $val2 = $event[$field];
@@ -444,10 +435,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                             sort($val2);
                         }
                         if ($val1 != $val2) {
-                            $res .= sprintf(
-                                '<tr class="header_event_addtocal"><th>&nbsp;</th><td class="header_links"><a href="#" class="event_calendar_update">%s</a></td></tr>',
-                                tr('Update in my calendar')
-                            );
+                            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_addtocal"><div class="col-md-2"><span class="text-muted">&nbsp;</span></div><div class="col-md-10 col-12 header_links"><a href="#" class="event_calendar_update">%s</a></div></div>', tr('Update in my calendar'));
                             break;
                         }
                     }
@@ -468,9 +456,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         }
                     }
                 }
-                $res .= '<tr>
-                    <th><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></th>
-                </tr>';
+                $res .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><button class="btn btn-light rsvp-button" data-value="' . $partstat . '" data-comment="' . $comment . '">' . tr('RSVP') . '</button></div><div class="col-md-10 col-12"></div></div>';
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'REPLY') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
@@ -500,28 +486,16 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         $event_update_participant_class = 'event_participant_status_updated';
                         $event_update_participant_text = 'Participant status updated';
                     }
-
-
-                    $res .= sprintf(
-                        '<tr>
-                            <th colspan="2" class="header_links">
-                            <a href="#" class="' . $event_update_participant_class . '">%s</a>
-                            </th>
-                        </tr>',
-                        tr($event_update_participant_text)
-                    );
+                    $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2 header_links"><a href="#" class="' . $event_update_participant_class . '">%s</a></div><div class="col-md-10 col-12"></div></div>', tr($event_update_participant_text));
                 }
             }
             if ($prefs['feature_calendar'] == 'y' && $method == 'CANCEL') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
                 if ($existing) {
-                    $res .= sprintf(
-                        '<tr><th colspan="2" class="header_links"><a href="#" class="event_remove_from_calendar">%s</a></th></tr>',
-                        tr('Remove from calendar')
-                    );
+                    $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2 header_links"><a href="#" class="event_remove_from_calendar">%s</a></div><div class="col-md-10 col-12"></div></div>', tr('Remove from calendar'));
                 }
             }
-            $headers = preg_replace("#<tr><td[^>]*header_space[^>]*>.*?</td></tr>#", $res . "\\0", $headers);
+            $headers = preg_replace("#<div[^>]*event_calendar_section[^>]*>.*?</div>#", $res . "\\0", $headers);
         }
         $this->out('msg_headers', $headers, false);
     }
