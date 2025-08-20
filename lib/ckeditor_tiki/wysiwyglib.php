@@ -21,36 +21,101 @@ class WYSIWYGLib
         // Validate user permissions
         $tikilib = TikiLib::lib('tiki');
         if (! $tikilib->user_has_perm_on_object($user, $pageName, 'wiki page', 'edit')) {
-            // Check if the user has inline edit permissions
             if (! $tikilib->user_has_perm_on_object($user, $pageName, 'wiki page', 'edit_inline')) {
-                // User has no permission
                 return;
             }
         }
 
-        // If the page uses flagged revisions, check if the page can be edited.
-        //  Inline edit sessions can cross page boundaries, thus the page attempts to start in inline edit mode
+        // Flagged revisions check
         if ($prefs['flaggedrev_approval'] == 'y') {
             $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
             if ($flaggedrevisionlib->page_requires_approval($pageName)) {
                 if (! isset($_REQUEST['latest']) || $_REQUEST['latest'] != '1') {
-                    // The page cannot be edited
                     return;
                 }
             }
         }
 
         if (! empty(self::$ckEditor)) {
-            // Inline editor is already initialized
             return;
         }
         self::$ckEditor = 'ckeditor4';
 
         $headerlib = TikiLib::lib('header');
 
-        $headerlib->add_js_config('window.CKEDITOR_BASEPATH = "' . $tikiroot . 'vendor_bundled/vendor/ckeditor/ckeditor/";')
-            ->add_jsfile('vendor_bundled/vendor/ckeditor/ckeditor/ckeditor.js', true)
-            ->add_js('window.CKEDITOR.config._TikiRoot = "' . $tikiroot . '";', 1);
+        // Set up CKEditor configuration and plugin cleanup
+        $headerlib->add_js('
+            // Save config
+            window.CKEDITOR_BASEPATH = "' . $tikiroot . 'vendor_bundled/vendor/ckeditor/ckeditor/";
+            window.CKEDITOR_CONFIG = {
+                _TikiRoot: "' . $tikiroot . '"
+            };
+
+            // Force deregister vendor plugins before CKEditor loads
+            window.CKEDITOR_PREINIT = window.CKEDITOR_PREINIT || [];
+            window.CKEDITOR_PREINIT.push(function () {
+                // Clean up any existing plugins
+                ["tikilink", "externallink"].forEach(function(pluginName) {
+                    if (CKEDITOR.plugins.registered[pluginName]) {
+                        var pluginPath = CKEDITOR.plugins.registered[pluginName].path;
+                        if (pluginPath && pluginPath.indexOf("vendor_bundled/vendor/ckeditor/ckeditor/plugins/" + pluginName) !== -1) {
+                            delete CKEDITOR.plugins.registered[pluginName];
+                        }
+                    }
+                    if (CKEDITOR.plugins.external) {
+                        delete CKEDITOR.plugins.external[pluginName];
+                    }
+                });
+            });
+
+            // Register our custom plugins early with explicit paths
+            window.CKEDITOR_PREINIT.push(function () {
+                var tikiRoot = "' . $tikiroot . '";
+                var pluginPath = tikiRoot + "lib/ckeditor_tiki/plugins/_tikilink/";
+                CKEDITOR.plugins.addExternal(
+                    "tikilink",
+                    pluginPath,
+                    "plugin.js"
+                );
+                CKEDITOR.plugins.addExternal(
+                    "externallink",
+                    tikiRoot + "lib/ckeditor_tiki/plugins/_externallink/",
+                    "plugin.js"
+                );
+                CKEDITOR.config.extraPlugins = "tikilink,externallink";
+            });
+        ', 0);
+
+        // Load our custom plugins first
+        $headerlib->add_jsfile('lib/ckeditor_tiki/plugins/_tikilink/dialogs/tikilink.js', true);
+        $headerlib->add_jsfile('lib/ckeditor_tiki/plugins/_externallink/dialogs/externallink.js', true);
+        $headerlib->add_jsfile('lib/ckeditor_tiki/plugins/_tikilink/plugin.js', true);
+        $headerlib->add_jsfile('lib/ckeditor_tiki/plugins/_externallink/plugin.js', true);
+
+        // Load CKEditor script
+        $headerlib->add_jsfile('vendor_bundled/vendor/ckeditor/ckeditor/ckeditor.js', true);
+
+        // Post-load initialization
+        $headerlib->add_js('
+            if (typeof CKEDITOR !== "undefined") {
+                // Apply configuration
+                Object.assign(CKEDITOR.config, window.CKEDITOR_CONFIG);
+
+                // Verify plugin paths and reload if needed
+                ["tikilink", "externallink"].forEach(function(pluginName) {
+                    var plugin = CKEDITOR.plugins.get(pluginName);
+                    if (plugin) {
+                        var pluginPath = plugin.path;
+                        if (!pluginPath || pluginPath.indexOf("lib/ckeditor_tiki/plugins/_" + pluginName) === -1) {
+                            // Force reload our custom plugin
+                            CKEDITOR.plugins.load(pluginName, function() {
+                                console.log("Reloaded " + pluginName + " plugin");
+                            });
+                        }
+                    }
+                });
+            }
+        ', 2);
 
         // Inline editing config
         $skin = $prefs['wysiwyg_toolbar_skin'] != 'default' ? $prefs['wysiwyg_toolbar_skin'] : 'moono';
@@ -114,24 +179,35 @@ window.CKEDITOR.config.toolbar = ' . $cktools . ';
         global $tikiroot, $prefs;
         $headerlib = TikiLib::lib('header');
 
-
         $params['_toolbars'] = isset($params['_toolbars']) ? $params['_toolbars'] : 'y';
         if (empty($params['_wysiwyg'])) {
-            // needed for toolbars setup
             $params['_wysiwyg'] = 'y';
         }
 
-        $headerlib->add_js('window.CKEDITOR.config.extraPlugins = "' . $prefs['wysiwyg_extra_plugins'] . '";');
-        $headerlib->add_js_config('window.CKEDITOR_BASEPATH = "' . $tikiroot . 'vendor_bundled/vendor/ckeditor/ckeditor/";')
-            //// for js debugging - copy _source from ckeditor distribution to libs/ckeditor to use
-            //// note, this breaks ajax page load via wikitopline edit icon
+        // Set up base configuration
+        $headerlib->add_js('window.CKEDITOR.config.extraPlugins = "' . $prefs['wysiwyg_extra_plugins'] . '";')
+            ->add_js_config('window.CKEDITOR_BASEPATH = "' . $tikiroot . 'vendor_bundled/vendor/ckeditor/ckeditor/";')
             ->add_jsfile('vendor_bundled/vendor/ckeditor/ckeditor/ckeditor.js', true)
             ->add_js('window.CKEDITOR.config._TikiRoot = "' . $tikiroot . '";', 1);
+
+        // Register plugins before any editor instance is created
+        $headerlib->add_jsfile('lib/ckeditor_tiki/shared/performance-utils.js', true)
+        ->add_jsfile('lib/ckeditor_tiki/shared/context-manager.js', true)
+        ->add_js('
+            if (typeof CKEDITOR !== "undefined") {
+                // Register our custom plugins
+                CKEDITOR.plugins.addExternal("tikilink", "' . $tikiroot . 'lib/ckeditor_tiki/plugins/_tikilink/", "plugin.js");
+                CKEDITOR.plugins.addExternal("externallink", "' . $tikiroot . 'lib/ckeditor_tiki/plugins/_externallink/", "plugin.js");
+                CKEDITOR.config.extraPlugins = "tikilink,externallink";
+            }
+        ', 2)
+        ->add_jsfile('lib/ckeditor_tiki/plugins/_tikilink/plugin.js', true)
+        ->add_jsfile('lib/ckeditor_tiki/plugins/_externallink/plugin.js', true);
 
         if ($full_page) {
             $headerlib->add_jsfile('lib/ckeditor_tiki/tikilink_dialog.js');
             $headerlib->add_js(
-                'window.CKEDITOR.config.extraPlugins += (window.CKEDITOR.config.extraPlugins ? ",tikiplugin,autocomplete,textmatch" : "tikiplugin,autocomplete,textmatch" );
+                'window.CKEDITOR.config.extraPlugins += (window.CKEDITOR.config.extraPlugins ? ",tikiplugin,autocomplete,textmatch,tikilink,externallink" : "tikiplugin,autocomplete,textmatch,tikilink,externallink" );
                 window.CKEDITOR.plugins.addExternal( "tikiplugin", "' . $tikiroot . 'lib/ckeditor_tiki/plugins/tikiplugin/");',
                 5
             );
