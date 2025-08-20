@@ -1278,13 +1278,13 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractField implements \Tr
             $remoteSchema = null;
             $definition = Tracker_Definition::get($this->getOption('trackerId'));
             if ($definition) {
-                $tabular = null;
-                $tabularId = $definition->getConfiguration('tabularSync');
-                if ($tabularId) {
-                    $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
-                }
-                if ($tabular) {
-                    $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                try {
+                    $tabulars = $definition->getSynchronizedTabulars();
+                    if ($tabulars) {
+                        $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabulars[0]);
+                    }
+                } catch (Exception $e) {
+                    Feedback::error($e->getMessage());
                 }
             }
 

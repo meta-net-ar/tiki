@@ -444,4 +444,26 @@ class Tracker_Definition
 
         return true;
     }
+
+    public function getSynchronizedTabulars($type = null): array
+    {
+        $tabularIds = explode(',', $this->getConfiguration('tabularSync'));
+        $tabularIds = array_filter($tabularIds);
+        $tabularIds = array_map('intval', $tabularIds);
+        $tabulars = [];
+        foreach ($tabularIds as $tabularId) {
+            $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
+            if (empty($tabular['tabularId'])) {
+                throw new Exception(tr("Tracker remote synchronization configured with a import-export format that does not exist. Tracker: %0, Tabular: %1", $this->getId(), $tabularId));
+            }
+            if ($type == 'odbc' && empty($tabular['odbc_config'])) {
+                continue;
+            }
+            if ($type == 'api' && empty($tabular['api_config'])) {
+                continue;
+            }
+            $tabulars[] = $tabular;
+        }
+        return $tabulars;
+    }
 }

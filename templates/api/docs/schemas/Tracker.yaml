@@ -122,7 +122,7 @@ properties:
   formClasses:
     type: string
   tabularSync:
-    type: integer
+    type: string
   tabularSyncModifiedField:
     type: integer
   tabularSyncLastImport:
