@@ -20,8 +20,9 @@
                   type="submit"
                   name="status"
                   value="{$stdata.statuslink}"
-                  class="btn {if $status eq $stdata.statuslink}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1"
-                  aria-pressed="{if $status eq $stdata.statuslink}true{else}false{/if}"
+                  class="btn {if $stdata.class eq 'statuson'}btn-primary active{else}btn-outline-secondary{/if} d-flex align-items-center gap-1 js-status-toggle"
+                  data-letter="{$stdata.statuslink}"
+                  aria-pressed="{if $stdata.class eq 'statuson'}true{else}false{/if}"
                 >
                   {icon name="{$stdata.iconname}"}
                   <span>{$stdata.label}</span>
@@ -145,4 +146,28 @@
             </div>
         {/if}
     </div>
+    {jq}
+        (function(){
+            var order = ['o','p','c'];
+            $('.js-status-toggle').on('click', function(e){
+                if (!(e.ctrlKey || e.metaKey || e.shiftKey)) return;
+                e.preventDefault();
+                var form = this.form;
+                if (!form) return;
+                var letter = this.getAttribute('data-letter') || '';
+                var hidden = form.querySelector('input[type="hidden"][name="status"]');
+                if (!hidden) {
+                    hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'status';
+                    form.appendChild(hidden);
+                }
+                var current = hidden.value || '';
+                var set = new Set(current.split('').filter(Boolean));
+                if (set.has(letter)) { set.delete(letter); } else { set.add(letter); }
+                hidden.value = order.filter(function(ch){ return set.has(ch); }).join('');
+                form.submit();
+            });
+        })();
+    {/jq}
 </form>
