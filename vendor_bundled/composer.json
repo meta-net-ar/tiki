@@ -215,7 +215,7 @@
         "nolimits4web/swiper": "^4.2",
         "npm-asset/blueimp-file-upload": "^9.28",
         "npm-asset/boomerangjs": "^1.687",
-        "npm-asset/html2canvas": "^1.0.0-RC.5",
+        "npm-asset/html2canvas": "~1.4",
         "npm-asset/prefixfree": ">=1.0.10",
         "npm-asset/sass-svg-uri": "^1.0",
         "npm-asset/sentry--browser": "^6.0",
