@@ -94,52 +94,54 @@ class Manager
             return;
         }
 
-        $definition = \Tracker_Definition::get($args['trackerId']);
-        $tabularId = $definition->getConfiguration('tabularSync');
-        if (empty($tabularId)) {
-            return;
-        }
-        $tabular = $this->getInfo($tabularId);
-        if (empty($tabular['tabularId'])) {
-            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
-            return;
-        }
         $trklib = \TikiLib::lib('trk');
-        $schema = $this->getSchema($definition, $tabular);
 
+        $definition = \Tracker_Definition::get($args['trackerId']);
+        $tabulars = [];
         try {
-            if ($tabular['odbc_config']) {
-                $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-                $remote = $writer->sync($schema, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
-                foreach ($remote as $field => $value) {
-                    if (isset($args['values_by_permname'][$field])) {
-                        $differs = $value !== $args['values_by_permname'][$field];
-                    } elseif ($is_new) {
-                        $differs = true;
-                    } else {
-                        $differs = false;
-                    }
-                    if ($differs) {
-                        $field = $definition->getFieldFromPermName($field);
-                        $trklib->modify_field($args['object'], $field['fieldId'], $value);
-                    }
-                }
-            } elseif ($tabular['api_config']) {
-                global $jitRequest;
-                $remote_url = $jitRequest->tiki_skip_sync_url->raw();
-                if (TIKI_API && ! empty($tabular['api_config']['update_url']) && ! empty($remote_url) && stristr($tabular['api_config']['update_url'], $remote_url)) {
-                    // skip syncing back changes coming from the target host via the API
-                    return;
-                }
-                $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
-                $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-                $result = $writer->write($source);
-                if (! empty($result['errors'])) {
-                    throw new Exception($result['errors'][0]);
-                }
-            }
+            $tabulars = $definition->getSynchronizedTabulars();
         } catch (Exception $e) {
-            Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
+            Feedback::error($e->getMessage());
+            return;
+        }
+
+        foreach ($tabulars as $tabular) {
+            $schema = $this->getSchema($definition, $tabular);
+
+            try {
+                if ($tabular['odbc_config']) {
+                    $writer = new Writer\ODBCWriter($tabular['odbc_config']);
+                    $remote = $writer->sync($schema, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
+                    foreach ($remote as $field => $value) {
+                        if (isset($args['values_by_permname'][$field])) {
+                            $differs = $value !== $args['values_by_permname'][$field];
+                        } elseif ($is_new) {
+                            $differs = true;
+                        } else {
+                            $differs = false;
+                        }
+                        if ($differs) {
+                            $field = $definition->getFieldFromPermName($field);
+                            $trklib->modify_field($args['object'], $field['fieldId'], $value);
+                        }
+                    }
+                } elseif ($tabular['api_config']) {
+                    global $jitRequest;
+                    $remote_url = $jitRequest->tiki_skip_sync_url->raw();
+                    if (TIKI_API && ! empty($tabular['api_config']['update_url']) && ! empty($remote_url) && stristr($tabular['api_config']['update_url'], $remote_url)) {
+                        // skip syncing back changes coming from the target host via the API
+                        continue;
+                    }
+                    $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+                    $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+                    $result = $writer->write($source);
+                    if (! empty($result['errors'])) {
+                        throw new Exception($result['errors'][0]);
+                    }
+                }
+            } catch (Exception $e) {
+                Feedback::error(tr("Failed synchronizing local changes with remote data source. Please try making these changes again later or make the same changes remotely. Error: %0", $e->getMessage()));
+            }
         }
     }
 
@@ -150,49 +152,50 @@ class Manager
         }
 
         $definition = \Tracker_Definition::get($args['trackerId']);
-        $tabularId = $definition->getConfiguration('tabularSync');
-        if (empty($tabularId)) {
-            return;
-        }
-        $tabular = $this->getInfo($tabularId);
-        if (empty($tabular['tabularId'])) {
-            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
+        $tabulars = [];
+        try {
+            $tabulars = $definition->getSynchronizedTabulars();
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
             return;
         }
 
-        $schema = $this->getSchema($definition, $tabular);
+        foreach ($tabulars as $tabular) {
+            $schema = $this->getSchema($definition, $tabular);
 
-        if ($tabular['odbc_config']) {
-            if (empty($tabular['odbc_config']['sync_deletes'])) {
-                return;
-            }
-            foreach ($schema->getColumns() as $column) {
-                if ($column->isPrimaryKey()) {
-                    $field = $definition->getFieldFromPermName($column->getField());
-                    $id = $args['values'][$field['fieldId']] ?: null;
-                    if ($id) {
-                        try {
-                            $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-                            $writer->delete($column->getRemoteField(), $id);
-                        } catch (Exception $e) {
-                            Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
+            if ($tabular['odbc_config']) {
+                if (empty($tabular['odbc_config']['sync_deletes'])) {
+                    continue;
+                }
+                foreach ($schema->getColumns() as $column) {
+                    if ($column->isPrimaryKey()) {
+                        $field = $definition->getFieldFromPermName($column->getField());
+                        $id = $args['values'][$field['fieldId']] ?: null;
+                        if ($id) {
+                            try {
+                                $writer = new Writer\ODBCWriter($tabular['odbc_config']);
+                                $writer->delete($column->getRemoteField(), $id);
+                            } catch (Exception $e) {
+                                Feedback::error(tr("Failed synchronizing local item delete with remote data source. Remote item might get reimported. Please try deleting again later or delete the item remotely. Error: %0", $e->getMessage()));
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
-            }
-        } elseif ($tabular['api_config']) {
-            global $jitRequest;
-            $remote_url = $jitRequest->tiki_skip_sync_url->raw();
-            if (TIKI_API && ! empty($tabular['api_config']['delete_url']) && ! empty($remote_url) && stristr($tabular['api_config']['delete_url'], $remote_url)) {
-                // skip syncing back changes coming from the target host via the API
-                return;
-            }
-            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, null, $args['values']);
-            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-            $result = $writer->write($source, 'delete');
-            if (! empty($result['errors'])) {
-                throw new Exception($result['errors'][0]);
+            } elseif ($tabular['api_config']) {
+                global $jitRequest;
+                $remote_url = $jitRequest->tiki_skip_sync_url->raw();
+                if (TIKI_API && ! empty($tabular['api_config']['delete_url']) && ! empty($remote_url) && stristr($tabular['api_config']['delete_url'], $remote_url)) {
+                    // skip syncing back changes coming from the target host via the API
+                    continue;
+                }
+                $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, null, $args['values']);
+                $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+                $result = $writer->write($source, 'delete');
+                if (! empty($result['errors'])) {
+                    Feedback::error($result['errors'][0]);
+                    continue;
+                }
             }
         }
     }
@@ -207,27 +210,24 @@ class Manager
             return;
         }
 
-        if (! empty((int) $args['parentobject'])) {
-            $definition = \Tracker_Definition::get($args['parentobject']);
-            $tabularId = $definition->getConfiguration('tabularSync');
-        }
-
-        if (empty($tabularId)) {
-            return;
-        }
-
-        $tabular = $this->getInfo($tabularId);
-        if (empty($tabular['tabularId'])) {
-            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
-            return;
-        }
-
         $trklib = \TikiLib::lib('trk');
-        $schema = $this->getSchema($definition, $tabular);
-        if ($tabular['api_config']) {
-            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
-            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-            $writer->writeComment($args, $source);
+
+        $definition = \Tracker_Definition::get($args['parentobject']);
+        $tabulars = [];
+        try {
+            $tabulars = $definition->getSynchronizedTabulars();
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
+            return;
+        }
+
+        foreach ($tabulars as $tabular) {
+            $schema = $this->getSchema($definition, $tabular);
+            if ($tabular['api_config']) {
+                $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+                $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+                $writer->writeComment($args, $source);
+            }
         }
     }
 
@@ -241,26 +241,22 @@ class Manager
             return;
         }
 
-        if (! empty((int) $args['parentobject'])) {
-            $definition = \Tracker_Definition::get($args['parentobject']);
-            $tabularId = $definition->getConfiguration('tabularSync');
-        }
-        if (empty($tabularId)) {
+        $definition = \Tracker_Definition::get($args['parentobject']);
+        $tabulars = [];
+        try {
+            $tabulars = $definition->getSynchronizedTabulars();
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
             return;
         }
 
-        $tabular = $this->getInfo($tabularId);
-        if (empty($tabular['tabularId'])) {
-            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
-            return;
-        }
-
-        $schema = $this->getSchema($definition, $tabular);
-
-        if ($tabular['api_config']) {
-            $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
-            $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
-            $writer->writeComment($args, $source, 'delete');
+        foreach ($tabulars as $tabular) {
+            $schema = $this->getSchema($definition, $tabular);
+            if ($tabular['api_config']) {
+                $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
+                $writer = new \Tracker\Tabular\Writer\APIWriter($tabular['api_config'], $tabular['config']);
+                $writer->writeComment($args, $source, 'delete');
+            }
         }
     }
 
@@ -282,45 +278,48 @@ class Manager
             return true;
         }
 
-        $tabularId = $definition->getConfiguration('tabularSync', 0);
-        if (! $tabularId) {
+        $tabulars = [];
+        try {
+            $tabulars = $definition->getSynchronizedTabulars('odbc');
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
+            return true;
+        }
+
+        if (empty($tabulars)) {
             Feedback::error(tr("Tracker not configured for remote synchronization: %0", $trackerId));
             return true;
         }
 
-        $tabular = $this->getInfo($tabularId);
-        if (empty($tabular['tabularId'])) {
-            Feedback::error(tr("Import-Export not found: %0", $tabularId));
-            return true;
-        }
+        foreach ($tabulars as $tabular) {
+            $schema = $this->getSchema($definition, $tabular);
+            $item = \Tracker_Item::fromId($itemId);
+            $item = $item->getData();
+            $item = $item['fields'];
 
-        $schema = $this->getSchema($definition, $tabular);
-        $item = \Tracker_Item::fromId($itemId);
-        $item = $item->getData();
-        $item = $item['fields'];
+            try {
+                $writer = new Writer\ODBCWriter($tabular['odbc_config']);
+                $diff = $writer->compareRemote($schema, $itemId, $item);
 
-        try {
-            $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-            $diff = $writer->compareRemote($schema, $itemId, $item);
-
-            if ($diff) {
-                $error = tr("Remote item has changed since your last page load. Overwriting remote data is disabled. You can copy your changes to a safe place, reload the entry and make the changes again. Here's the difference:");
-                $error .= "\n" . tr("Field | Local | Remote");
-                foreach ($diff as $permName => $value) {
-                    $field = $definition->getFieldFromPermName($permName);
-                    \TikiLib::lib('trk')->modify_field($itemId, $field['fieldId'], $value);
-                    $local = $item[$permName];
-                    if (is_array($local)) {
-                        $local = implode(',', $local);
+                if ($diff) {
+                    $error = tr("Remote item has changed since your last page load. Overwriting remote data is disabled. You can copy your changes to a safe place, reload the entry and make the changes again. Here's the difference:");
+                    $error .= "\n" . tr("Field | Local | Remote");
+                    foreach ($diff as $permName => $value) {
+                        $field = $definition->getFieldFromPermName($permName);
+                        \TikiLib::lib('trk')->modify_field($itemId, $field['fieldId'], $value);
+                        $local = $item[$permName];
+                        if (is_array($local)) {
+                            $local = implode(',', $local);
+                        }
+                        $error .= "\n" . $field['name'] . ' | ' . $local . ' | ' . $value;
                     }
-                    $error .= "\n" . $field['name'] . ' | ' . $local . ' | ' . $value;
+                    return $error;
+                } else {
+                    return true;
                 }
-                return $error;
-            } else {
-                return true;
+            } catch (Exception $e) {
+                return tr("Failed ensuring remote item is up to date with local data. Please check remote server connectivity and try again. Error: %0", $e->getMessage());
             }
-        } catch (Exception $e) {
-            return tr("Failed ensuring remote item is up to date with local data. Please check remote server connectivity and try again. Error: %0", $e->getMessage());
         }
     }
 

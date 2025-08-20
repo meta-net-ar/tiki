@@ -295,27 +295,25 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
 
     private function syncFromSource()
     {
-        $definition = $this->getTrackerDefinition();
-        $tabularId = $definition->getConfiguration('tabularSync');
-        if (empty($tabularId)) {
-            return false;
-        }
-        $tabular = TikiLib::lib('tabular');
-        $info = $tabular->getInfo($tabularId);
-        if (empty($info['tabularId'])) {
-            Feedback::error(tr("Tracker remote synchronization configured with a import-export format that does not exist."));
-            return false;
-        }
-        if (empty($info['odbc_config'])) {
-            return false;
-        }
-        $schema = $tabular->getSchema($definition, $info);
-        foreach ($schema->getColumns() as $column) {
-            if ($column->getField() === $this->getConfiguration('permName')) {
-                $odbc_manager = new Tracker\Tabular\ODBCManager($info['odbc_config']);
-                return $odbc_manager->nextValue($column->getRemoteFIeld()) - 1;
+        try {
+            $definition = $this->getTrackerDefinition();
+            $tabulars = $definition->getSynchronizedTabulars('odbc');
+            if (empty($tabulars)) {
+                return false;
             }
+            foreach ($tabulars as $tabular) {
+                $schema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                foreach ($schema->getColumns() as $column) {
+                    if ($column->getField() === $this->getConfiguration('permName')) {
+                        $odbc_manager = new Tracker\Tabular\ODBCManager($tabular['odbc_config']);
+                        return $odbc_manager->nextValue($column->getRemoteField()) - 1;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
+            return false;
         }
-        return false;
     }
 }

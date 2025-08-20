@@ -572,12 +572,13 @@
         {if $prefs.tracker_tabular_enabled eq 'y' and $remoteTabulars}
             {accordion_group title="{tr}Remote synchronization{/tr}"}
                 <div class="mb-3 mx-0">
-                    <label for="tabularSync">{tr}Choose import-export format{/tr}</label>
-                    <select name="tabularSync" id="tabularSync" class="form-control">
+                    <label for="tabularSync">{tr}Choose import-export format(s){/tr}</label>
+                    <select name="tabularSync" id="tabularSync" class="form-control" multiple="multiple">
                         <option value="">{tr}None{/tr}</option>
+                        {assign var="tabularSyncArray" value=","|explode:$info.tabularSync}
                         {foreach item=tabular from=$remoteTabulars}
                             <option value="{$tabular.tabularId|escape}"
-                                {if $tabular.tabularId eq $info.tabularSync} selected="selected"{/if}>
+                                {if in_array($tabular.tabularId, $tabularSyncArray)} selected="selected"{/if}>
                                 {$tabular.name|escape}
                             </option>
                         {/foreach}
