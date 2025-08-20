@@ -610,6 +610,15 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
                 $info['fields'][$permName] = $value;
             });
 
+        $schema->addNew($permName, 'id-raw')
+            ->setLabel($name)
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            });
+
         return $schema;
     }
 
