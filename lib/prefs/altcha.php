@@ -6,10 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_altcha_list()
 {
-    $prefs = [];
+    $altchaPrefs = [];
 
+    // Altcha requires PHP 8.2+ (see https://github.com/altcha/altcha-php)
+    // Tiki's general minimum is 8.1, but this specific integration depends on 8.2 features.
     if (version_compare(PHP_VERSION, '8.2.0', '>=')) {
-        $prefs['altcha_enabled'] = [
+        $altchaPrefs['altcha_enabled'] = [
             'name' => tra('Use Altcha'),
             'description' => tra('Enable Altcha, a privacy-friendly CAPTCHA alternative to protect forms.'),
             'hint' => tra('You can self-host Altcha or use an existing instance like altcha.org.'),
@@ -18,7 +20,7 @@ function prefs_altcha_list()
             'type' => 'flag',
             'default' => 'n',
         ];
-        $prefs['altcha_hmac_key'] = [
+        $altchaPrefs['altcha_hmac_key'] = [
             'name' => tra('Altcha Hmac Key'),
             'type' => 'text',
             'description' => tra('Your Altcha Developper Secret Key'),
@@ -27,13 +29,14 @@ function prefs_altcha_list()
             'keywords' => 'captcha altcha',
         ];
     } else {
-        $prefs['altcha_incompatible'] = [
+        $altchaPrefs['altcha_incompatible'] = [
             'name' => tra('Altcha Not Available'),
             'description' => tra('Altcha requires PHP 8.2 or later. Your current version is ') . PHP_VERSION,
-            'type' => 'static',
+            'hint' => tra('Altcha cannot be enabled because your PHP version is too low. Upgrade PHP to use it.'),
+            'type' => 'flag',
             'keywords' => 'captcha altcha',
         ];
     }
 
-    return $prefs;
+    return $altchaPrefs;
 }
