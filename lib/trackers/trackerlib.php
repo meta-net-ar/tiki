@@ -3880,7 +3880,7 @@ class TrackerLib extends TikiLib
         //FIXME: perm filter ?
         $result = $this->fetchAll(
             'SELECT `name` FROM `tiki_trackers` WHERE `name` LIKE ?',
-            [$name . '%'],
+            ['%' . $name . '%'],
             10
         );
         $names = [];
