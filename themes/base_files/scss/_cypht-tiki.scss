@@ -256,6 +256,88 @@
         max-height: calc(90vh - 40px);
         overflow-y: auto;
     }
+    
+    /* Bootstrap-based message headers */
+    .msg_text * {
+        white-space: normal !important;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+    
+    .long_header {
+        display: none;
+    }
+    
+    .long_header[style*="display: block"],
+    .long_header[style*="display: flex"],
+    .long_header[style*="display: grid"] {
+        display: flex !important;
+        column-gap: 0.15rem;
+    }
+    
+    .long_header > div:nth-of-type(2) {
+        overflow-wrap: break-word !important;
+    }
+
+    .small_header .col-md-2,
+    .long_header .col-md-2 {
+        font-weight: 500;
+    }
+    
+    .small_header > div:nth-of-type(2),
+    .small_header > div:nth-of-type(2) > div {
+        display: flex;
+        column-gap: 0.15rem;
+    }
+    
+    .small_header {
+        display: flex;
+    }
+    
+    .all_headers {
+        display: inline-block;
+    }
+    
+    .small_headers {
+        display: none;
+    }
+    
+    /* Mobile responsive overrides for Bootstrap classes */
+    @media (max-width: 768px) {
+        .small_header {
+        display: flex;
+        flex-direction: row;
+        column-gap: 0.5rem;
+        flex-wrap: nowrap;
+        }
+    
+        .small_header > div {
+        flex: 0 0 auto;
+        padding: 0;
+        flex-wrap: wrap;
+        }
+    
+        .small_header .col-md-2 {
+        font-weight: bold;
+        white-space: nowrap;
+        width: fit-content !important;
+        }
+    
+        .long_header .col-md-2 {
+        font-weight: bold;
+        }
+    
+        .msg_actions a {
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        background-color: #f8f9fa;
+        text-decoration: none;
+        color: #495057;
+        font-size: 0.6rem;
+        margin-right: 0;
+        }
+    }
+    
     .collapsed ul {
         display: inherit;
     }
@@ -331,7 +413,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        .mobile nav .menu-toggle {
+        nav .menu-toggle {
             right: 20px;
             left: unset;
             text-align: left;
@@ -344,16 +426,17 @@
             color: var(--bs-primary);
           }
 
-        .mobile .nav-header {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: flex-end;
-        padding: 0;
-        border-bottom: 1px solid var(--bs-secondary-bg);
+        .nav-header {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            padding: 0;
+            border-bottom: 1px solid var(--bs-secondary-bg);
+            background-color: var(--bs-body-bg);
         }
         
         .nav-header a {
-        margin: auto 45% auto auto;
+            margin: auto 45% auto auto;
         }
         
         .mobile .nav-header .app-logo {
@@ -560,4 +643,10 @@
             max-width: 1420px;
         }
     }
+}
+
+html body.tiki.tiki-webmail #middle.container.container-std.middle {
+    width: 95% !important;
+    max-width: 95% !important;
+    min-width: 95% !important;
 }
