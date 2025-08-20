@@ -53,8 +53,16 @@ if (isset($_REQUEST["save"])) {
         } else {
             $restriction = 'n';
         }
+
+        $isUpdating = ! empty($_REQUEST["surveyId"]);
+
         $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $restriction, $_REQUEST["status"]);
         if ($sid) {
+            if ($isUpdating) {
+                Feedback::success(tr('Survey updated successfully.'));
+            } else {
+                Feedback::success(tr('Survey created successfully.'));
+            }
             $cat_type = 'survey';
             $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
             $cat_desc = substr($_REQUEST["description"], 0, 200);
@@ -81,6 +89,7 @@ if (! empty($_REQUEST["surveyId"])) {
 $smarty->assign('info', $info);
 if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $srvlib->remove_survey($_REQUEST["remove"]);
+    Feedback::success(tr('The survey has been deleted successfully.'));
 }
 if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = 'created_desc';
