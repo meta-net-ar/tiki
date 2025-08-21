@@ -126,47 +126,51 @@
             {tr}History{/tr}
         </h2>
     {/if}
-    <form id="pagehistory" action="tiki-pagehistory.php?page={$page}">
+    <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="multi mb-4 d-flex align-items-end justify-content-between flex-wrap gap-2">
         <input type="hidden" name="page" value="{$page|escape}">
         <input type="hidden" name="history_offset" value="{$history_offset}">
 
-        <div class="multi mb-4 d-flex align-items-end justify-content-between flex-wrap gap-2">
-            {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
-                <div class="translation w-50">
-                    <label for="tra_lang" class="form-label">{tr}Translation{/tr}</label>
-                    <select name="tra_lang" class="form-select">
-                        {section name=ix loop=$languages}
-                            <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
-                        {/section}
-                    </select>
-                </div>
+        {if $prefs.feature_multilingual eq 'y' and $tiki_p_edit eq 'y'}
+            <div class="translation w-50">
+                <label for="tra_lang" class="form-label">{tr}Translation{/tr}</label>
+                <select name="tra_lang" class="form-select">
+                    {section name=ix loop=$languages}
+                        <option value="{$languages[ix].value|escape}"{if $lang eq $languages[ix].value} selected="selected"{/if}>{$languages[ix].name}</option>
+                    {/section}
+                </select>
+            </div>
 
-                <div class="d-flex flex-grow-0 gap-2">
-                    <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
-                    {if $show_translation_history}
-                        <input type="hidden" name="show_translation_history" value="1">
-                        {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}
-                    {else}
-                        {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info"}
-                    {/if}
-                </div>
-
-            {/if}
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-sm-6">
-                <input type="checkbox" name="paginate" id="paginate"{if $paginate} checked="checked"{/if}>
-                <label for="paginate">{tr}Enable pagination{/tr}</label>
-                {if $paginate}
-                    <input type="text" name="history_pagesize" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
-                    <label for="history_pagesize">{tr}rows per page{/tr}</label>
+            <div class="d-flex flex-grow-0 gap-2">
+                <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
+                {if $show_translation_history}
+                    <input type="hidden" name="show_translation_history" value="1">
+                    {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}
+                {else}
+                    {button show_translation_history=1 _text="{tr}Show translation history{/tr}" _auto_args="*" _class="btn btn-info"}
                 {/if}
             </div>
-            <div class="col-sm-6">
-            {if ($prefs.default_wiki_diff_style ne "old") and $history}
-                <div class="input-group">
-                    <select class="form-select" name="diff_style">
+        {/if}
+    </form>
+
+        <div class="row mb-4">
+            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+                <input type="hidden" name="page" value="{$page|escape}">
+                <input type="hidden" name="history_offset" value="{$history_offset}">
+
+                    <input type="checkbox" name="paginate" id="paginate"{if $paginate} checked="checked"{/if}>
+                    <label for="paginate">{tr}Enable pagination{/tr}</label>
+                    {if $paginate}
+                        <input type="text" name="history_pagesize" role="search" id="history_pagesize" value="{$history_pagesize}" class="form-control form-control-sm" style="width: 5em; display: inline-block">
+                        <label for="history_pagesize">{tr}rows per page{/tr}</label>
+                    {/if}
+            </form>
+            <form id="pagehistory" action="tiki-pagehistory.php?page={$page}" class="col-sm-6">
+                <input type="hidden" name="page" value="{$page|escape}">
+                <input type="hidden" name="history_offset" value="{$history_offset}">
+
+                {if ($prefs.default_wiki_diff_style ne "old") and $history}
+                    <div class="input-group">
+                        <select class="form-select" name="diff_style">
                         <optgroup label="{tr}Simple{/tr}">
                             <option value="htmldiff" {if $diff_style == "htmldiff"}selected="selected"{/if}>
                                 {tr}HTML diff{/tr}
@@ -205,38 +209,37 @@
                             </option>
                         </optgroup>
                     </select>
-                        {jq}
-    $("form#pagehistory")
-        .each(function store_original_values(i, form){
-            form.originals = {};
+                            {jq}
+        $("form#pagehistory")
+            .each(function store_original_values(i, form){
+                form.originals = {};
 
-            $(form).find(':input').each(function(i, input){
-                var name = $(input).attr('name');
-                var value = $(input).val();
-                form.originals[name] = value;
+                $(form).find(':input').each(function(i, input){
+                    var name = $(input).attr('name');
+                    var value = $(input).val();
+                    form.originals[name] = value;
+                });
+            })
+            .on("submit", function submit_changed_values(evt){
+                var always = ['page', 'oldver'];
+                var originals = this.originals || {};
+
+                $(this).find(':input:enabled').each(function(i, input){
+                    var name = $(input).attr('name');
+                    var value = $(input).val();
+
+                    if(always.indexOf(name) === -1 && originals[name] === value) {
+                        $(input).attr('disabled', 'disabled')
+                                .prop('disabled', 'disabled');
+                    }
+                });
             });
-        })
-        .on("submit", function submit_changed_values(evt){
-            var always = ['page', 'oldver'];
-            var originals = this.originals || {};
-
-            $(this).find(':input:enabled').each(function(i, input){
-                var name = $(input).attr('name');
-                var value = $(input).val();
-
-                if(always.indexOf(name) === -1 && originals[name] === value) {
-                    $(input).attr('disabled', 'disabled')
-                            .prop('disabled', 'disabled');
-                }
-            });
-        });
-                        {/jq}
-                </div>
-                <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
-                {/if}
-            </div>
+                            {/jq}
+                    </div>
+                    <input type="hidden" name="show_all_versions" value="{$show_all_versions}">
+                    {/if}
         </div>
-            <div>
+        <div>
             <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
                 <table class="table table-condensed table-hover table-striped">
                     <tr>
@@ -517,6 +520,6 @@
                     {/pagination_links}
                 {/if}
             {/if}
+            </form>
         </div>
-    </form>
 {/if}
