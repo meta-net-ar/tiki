@@ -49,13 +49,19 @@ class Services_File_Controller
 
         $util = new Services_Utilities();
         if ($util->isActionPost()) {
-            if ($input->offsetExists('description')) {
+            if ($input->offsetExists('description') || $input->offsetExists('newfilename')) {
                 $files = $input->asArray('file');
                 $descriptions = $input->asArray('description');
-
+                $newfilenames = $input->asArray('newfilename');
                 foreach ($files as $c => $file) {
                     $fileInfo = $filegallib->get_file_info($file);
-
+                    if (isset($newfilenames[$c])) {
+                        $filegallib->update_file($fileInfo['fileId'], [
+                            'newfilename' => $newfilenames[$c],
+                            'filename' => $fileInfo['filename'],
+                            'lastModifUser' => $fileInfo['asuser'],
+                        ]);
+                    }
                     if (isset($descriptions[$c])) {
                         $filegallib->update_file($fileInfo['fileId'], [
                             'name' => $fileInfo['filename'],
@@ -78,6 +84,7 @@ class Services_File_Controller
             'addDecriptionOnUpload' => $input->addDecriptionOnUpload->int(),
             'admin_trackers'        => $perms->admin_trackers,
             'requireTitle'          => $input->requireTitle->text(),
+            'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
         ];
 

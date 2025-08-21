@@ -852,10 +852,19 @@ class FileGalLib extends TikiLib
      */
     public function update_file($id, $params)
     {
-        if (isset($params['name'])) {
+        if (! empty($params['name'])) {
             $params['name'] = strip_tags($params['name']);
         }
-        if (isset($params['description'])) {
+        // Change the file name when uploading via the Files type field of the Tracker
+        if (! empty($params['newfilename'])) {
+            $newfilename = strip_tags($params['newfilename']);
+            $params['name'] = $newfilename;
+            $extension = pathinfo($params['filename'], PATHINFO_EXTENSION);
+            $params['filename'] = $newfilename . '.' . $extension;
+            // Remove key newfilename
+            unset($params['newfilename']);
+        }
+        if (! empty($params['description'])) {
             $params['name'] = strip_tags($params['description']);
         }
         $params['lastModif'] = $this->now;

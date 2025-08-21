@@ -62,7 +62,7 @@
             {wikiplugin _name='vimeo' fromFieldId=$field.fieldId|escape fromItemId=$item.itemId|escape galleryId=$field.galleryId|escape}{/wikiplugin}
         {else}
             {if $field.options_map.uploadInModal neq 'n'}
-                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files">
+                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload changeFileNameOnUpload=$data.changeFileNameOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files">
                     {if $actual_limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
                 </a>
             {else}
