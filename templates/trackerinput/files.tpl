@@ -4,7 +4,7 @@
     {assign var=actual_limit value=$field.limit|default:100}
 {/if}
 <div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}" data-namefilter="{$field.namefilter|escape}" data-namefilter-error="{$field.namefilterError|escape}">
-    {if !empty($field.canUpload)}
+    {if (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem !== 'y') || (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem === 'y' && $field.canCreateGallery)}
         {if !empty($field.limit)}
             {remarksbox _type=info title="{tr}Attached files limitation{/tr}"}
                 {tr _0=$field.limit}The amount of files that can be attached to this item is limited to <strong>%0</strong>.{/tr}
@@ -100,8 +100,13 @@
             </fieldset>
         {/if}
     {else}
+        {if empty($field.canUpload)}
             {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
             {/remarksbox}
+        {else}
+            {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
+            {/remarksbox}
+        {/if}
     {/if}
 </div>
 

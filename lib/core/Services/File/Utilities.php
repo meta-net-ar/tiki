@@ -67,19 +67,23 @@ class Services_File_Utilities
                     $galleryId = $filegallib->duplicate_file_gallery($parentGalleryId, $dir, '', $parentGalleryId);
                 }
                 // also copy any direct permissions of the parent gallery
-                $objectFactory = Perms_Reflection_Factory::getDefaultFactory();
-                $parentObject = $objectFactory->get('file gallery', $parentGalleryId);
-                $perms = $parentObject->getDirectPermissions();
-                if ($perms->getPermissionArray()) {
-                    $object = $objectFactory->get('file gallery', $galleryId);
-                    $permissionApplier = new Perms_Applier();
-                    $permissionApplier->addObject($object);
-                    $permissionApplier->apply($perms);
-                }
+                $this->copyParentPermissions($parentGalleryId, $galleryId);
             }
             $parentGalleryId = $galleryId;
         }
-
         return $this->checkTargetGallery($parentGalleryId);
+    }
+
+    public function copyParentPermissions(int $parentGalleryId, int $galleryId): void
+    {
+        $objectFactory = Perms_Reflection_Factory::getDefaultFactory();
+        $parentObject = $objectFactory->get('file gallery', $parentGalleryId);
+        $perms = $parentObject->getDirectPermissions();
+        if ($perms->getPermissionArray()) {
+            $object = $objectFactory->get('file gallery', $galleryId);
+            $permissionApplier = new Perms_Applier();
+            $permissionApplier->addObject($object);
+            $permissionApplier->apply($perms);
+        }
     }
 }

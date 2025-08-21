@@ -163,6 +163,21 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         'filter' => 'int',
                         'profile_reference' => 'file_gallery',
                     ],
+                    'fileGalleryPerTrackerItem' => [
+                        'name' => tr('File Gallery per Tracker Item'),
+                        'description' => tr('Create a sub-gallery for each tracker item.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
+                    'fileGalleryPerTrackerItemName' => [
+                        'name' => tr('File Gallery per Tracker Item'),
+                        'description' => tr('Pattern of the name of sub-gallery to be created. Default value is "Field %fieldId% item %itemId%" where %fieldId% is the fieldId and %itemId% is the itemId. The gallery names will then be, for example "Events Photos item: 42".'),
+                        'filter' => 'text',
+                    ],
                     'indexGeometry' => [
                         'name' => tr('Index As Map Layer'),
                         'description' => tr('Index the files in a specific format for use in map searchlayers to display trails and features.'),
@@ -227,7 +242,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
     public function getFieldData(array $requestData = []): array
     {
-        global $prefs;
+        global $prefs, $user;
         $filegallib = TikiLib::lib('filegal');
 
         $galleryId = (int) $this->getOption('galleryId');
@@ -298,11 +313,18 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             Feedback::error(tr('Files field: Gallery #%0 not found', $galleryId));
             return [];
         }
+
+        //If fileGalleryPerTrackerItem is set to yes
+        if ($this->trackerField->getOption('fileGalleryPerTrackerItem')) {
+            //Check permissions related to a specific gallery object
+            $perms = Perms::get('file gallery', $galleryId);
+            $canCreateGallery = $perms->create_file_galleries;
+        }
+
         if ($prefs['feature_use_fgal_for_user_files'] !== 'y' || $galinfo['type'] !== 'user') {
             $perms = Perms::get('file gallery', $galleryId);
             $canUpload = $perms->upload_files;
         } else {
-            global $user;
             $perms = TikiLib::lib('tiki')->get_local_perms($user, $galleryId, 'file gallery', $galinfo, false);     //get_perm_object($galleryId, 'file gallery', $galinfo);
             $canUpload = $perms['tiki_p_upload_files'] === 'y';
         }
@@ -330,6 +352,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         return [
             'galleryId' => $galleryId,
             'canUpload' => $canUpload,
+            'canCreateGallery' => $canCreateGallery,
             'limit' => $count,
             'excessBehavior' => $excessBehavior,
             'files' => $fileInfo,
@@ -343,6 +366,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'gallerySearch' => $gallery_list,
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
+            'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
         ];
     }
 
@@ -625,6 +649,10 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
     public function handleSave($value, $oldValue)
     {
+        global $prefs, $user;
+        $filegallib = TikiLib::lib('filegal');
+        $relationlib = TikiLib::lib('relation');
+        $utilities = new Services_File_Utilities();
         $excessBehavior = $this->getOption('excessBehavior');
         $count = (int) $this->getOption('count');
 
@@ -643,6 +671,54 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
         $new = array_diff($fileIds, explode(',', (string) $oldValue));
         $remove = array_diff(explode(',', (string) $oldValue), $fileIds);
+        //If there new uploaded files
+        if (! empty($new) && $this->trackerField->getOption('fileGalleryPerTrackerItem') === 'y') {
+            //Create new gallery and move all uploaded files
+            $fieldId = $this->getConfiguration('fieldId');
+            $itemId = $this->getItemId();
+            $galleryName = 'Field ' . $fieldId . ' Item ' . $itemId; //By default the pattern of gallery to be created: Field [FIELD_ID] Item [ITEM_ID]
+            if (! empty($this->trackerField->getOption('fileGalleryPerTrackerItemName'))) {
+                $galleryName = $this->trackerField->getOption('fileGalleryPerTrackerItemName');
+                $galleryName = preg_replace(['/%fieldId%/', '/%itemId%/'], [$fieldId, $itemId], $galleryName, 1);
+            }
+
+            $parentId = (int) $this->trackerField->getOption('galleryId');
+            //If there is no gallery choosen we'll take 'File Galleries' as gallery where the new one will be added
+            if ($parentId == 0) {
+                $parentId = $prefs['fgal_root_id'];
+            }
+
+            // Get relations between the current item and the sub-galleries
+            $relations = $relationlib->get_relations_from('trackeritem', $itemId, 'tiki.filegallery.attach');
+            foreach ($relations as $relation) {
+                if ($relation['fieldId'] === $fieldId) {
+                    $galleryId = (int) $relation['itemId'];
+                    break;
+                }
+            }
+
+            // Create a sub-gallery if none exists for the current Field
+            if (empty($galleryId)) {
+                if ($parentId == $prefs['fgal_root_id']) {
+                    $galleryId = $filegallib->replace_file_gallery(['name' => $galleryName, 'user' => $user]);
+                } else {
+                    $galleryId = $filegallib->duplicate_file_gallery($parentId, $galleryName, '', $parentId);
+                }
+                // Copy any direct permissions of the parent gallery
+                $utilities->copyParentPermissions($parentId, $galleryId);
+                // Add relation between the item and the new sub-gallery
+                $relationlib->add_relation('tiki.filegallery.attach', 'trackeritem', $itemId, 'file gallery', $galleryId, false, $fieldId);
+            }
+
+            $gal_info = $filegallib->get_file_gallery($galleryId);
+
+            if (! empty($gal_info)) {
+                //Move all files to the dedicated gallery
+                $filegallib->moveFilesToNewGallery($fileIds, $gal_info['galleryId']);
+            } else {
+                throw new Exception(tr('Gallery ID %0 not found', $galleryId));
+            }
+        }
 
         $itemId = $this->getItemId();
 

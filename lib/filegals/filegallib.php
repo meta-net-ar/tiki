@@ -899,6 +899,18 @@ class FileGalLib extends TikiLib
         return $id;
     }
 
+    public function moveFilesToNewGallery($fileIds, $newGalleryId)
+    {
+        foreach ($fileIds as $fileId) {
+            if (! empty($newGalleryId)) {
+                $result = $this->set_file_gallery($fileId, $newGalleryId);
+                if (! $result && $result->numRows() !== 1) {
+                    throw new Exception(tr('An error occurred while moving file to the new gallery.'));
+                }
+            }
+        }
+    }
+
     public function change_file_handler($mime_type, $cmd)
     {
         $handlers = $this->table('tiki_file_handlers');
