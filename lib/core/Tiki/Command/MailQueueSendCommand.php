@@ -38,32 +38,36 @@ class MailQueueSendCommand extends Command
             $error = '';
 
             if ($mail && (get_class($mail) === 'Laminas\Mail\Message' || get_class($mail) === 'Zend\Mail\Message')) {
-                try {
-                    tiki_send_email($mail);
-                    $title = 'mail';
-                } catch (ZendMailException | SlmMailException $e) {
-                    $title = 'mail error';
-                    $error = $e->getMessage();
-                }
-
-                if ($error || $prefs['log_mail'] == 'y') {
-                    foreach ($mail->getTo() as $destination) {
-                        $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
-                    }
-                    foreach ($mail->getCc() as $destination) {
-                        $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
-                    }
-                    foreach ($mail->getBcc() as $destination) {
-                        $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
-                    }
-                }
-
-                if ($error) {
-                    $query = 'UPDATE tiki_mail_queue SET attempts = attempts + 1 WHERE messageId = ?';
-                    $output->writeln('Failed sending mail object id: ' . $message['messageId'] . ' (' . $error . ')');
+                $query = 'DELETE FROM tiki_mail_queue WHERE messageId = ?';
+                if (empty($this->collectRecipients($mail))) {
+                    $output->writeln('Deleted object id: ' . $message['messageId'] . ' (mail has no recipients)');
                 } else {
-                    $query = 'DELETE FROM tiki_mail_queue WHERE messageId = ?';
-                    $output->writeln('Sent.');
+                    try {
+                        tiki_send_email($mail);
+                        $title = 'mail';
+                    } catch (ZendMailException | SlmMailException $e) {
+                        $title = 'mail error';
+                        $error = $e->getMessage();
+                    }
+
+                    if ($error || $prefs['log_mail'] == 'y') {
+                        foreach ($mail->getTo() as $destination) {
+                            $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
+                        }
+                        foreach ($mail->getCc() as $destination) {
+                            $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
+                        }
+                        foreach ($mail->getBcc() as $destination) {
+                            $logslib->add_log($title, $error . "\n " . $destination->getEmail() . '/' . $mail->getSubject());
+                        }
+                    }
+
+                    if ($error) {
+                        $query = 'UPDATE tiki_mail_queue SET attempts = attempts + 1 WHERE messageId = ?';
+                        $output->writeln('Failed sending mail object id: ' . $message['messageId'] . ' (' . $error . ')');
+                    } else {
+                        $output->writeln('Sent.');
+                    }
                 }
 
                 \TikiDb::get()->query($query, [$message['messageId']]);
@@ -73,5 +77,20 @@ class MailQueueSendCommand extends Command
         }
         $output->writeln('Mail queue processed...');
         return Command::SUCCESS;
+    }
+
+    private function collectRecipients($mail)
+    {
+        $recipients = [];
+        foreach ($mail->getTo() as $destination) {
+            $recipients[] = $destination->getEmail();
+        }
+        foreach ($mail->getCc() as $destination) {
+            $recipients[] = $destination->getEmail();
+        }
+        foreach ($mail->getBcc() as $destination) {
+            $recipients[] = $destination->getEmail();
+        }
+        return $recipients;
     }
 }
