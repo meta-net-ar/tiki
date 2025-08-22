@@ -110,12 +110,6 @@ class UserRegistration extends Base
                 }
             }
         }
-        $outputtowiki = '';
-        $outputwiki = '';
-        if ($prefs['user_register_prettytracker_output'] == 'y') {
-            $outputtowiki = $prefs["user_register_prettytracker_outputtowiki"];
-            $outputwiki = $prefs["user_register_prettytracker_outputwiki"];
-        }
 
         $needs_validation_js = true;
         if ($registrationlib->merged_prefs['userTracker'] == 'y') {
@@ -140,62 +134,9 @@ class UserRegistration extends Base
                 if (! is_array($re['registrationUsersFieldIds'])) {
                     $re['registrationUsersFieldIds'] = explode(':', $re['registrationUsersFieldIds']);
                 }
-                if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
-                    if (substr($registrationlib->merged_prefs["user_register_prettytracker_tpl"], -4) == ".tpl") {
-                        $userTrackerData = wikiplugin_tracker(
-                            '',
-                            [
-                                'trackerId' => $re['usersTrackerId'],
-                                'fields' => $re['registrationUsersFieldIds'],
-                                'showdesc' => 'y',
-                                'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
-                                'embedded' => 'n',
-                                'action' => tra('Register'),
-                                'registration' => 'y',
-                                'tpl' => $registrationlib->merged_prefs["user_register_prettytracker_tpl"],
-                                'userField' => $re['usersFieldId'],
-                                'outputwiki' => $outputwiki,
-                                'outputtowiki' => $outputtowiki,
-                                'chosenGroup' => $chosenGroup,
-                                'skipUserCreation' => 'y',
-                            ]
-                        );
-                    } else {
-                        $userTrackerData = wikiplugin_tracker(
-                            '',
-                            [
-                                'trackerId' => $re['usersTrackerId'],
-                                'fields' => $re['registrationUsersFieldIds'],
-                                'showdesc' => 'y',
-                                'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
-                                'embedded' => 'n',
-                                'action' => tra('Register'),
-                                'registration' => 'y',
-                                'wiki' => $registrationlib->merged_prefs["user_register_prettytracker_tpl"],
-                                'userField' => $re['usersFieldId'],
-                                'outputwiki' => $outputwiki,
-                                'outputtowiki' => $outputtowiki,
-                                'chosenGroup' => $chosenGroup,
-                                'skipUserCreation' => 'y',
-                            ]
-                        );
-                    }
-                } else {
-                    $userTrackerData = wikiplugin_tracker(
-                        '',
-                        [
-                            'trackerId' => $re['usersTrackerId'],
-                            'fields' => $re['registrationUsersFieldIds'],
-                            'showdesc' => 'y',
-                            'showmandatory' => 'y',
-                            'embedded' => 'n',
-                            'action' => tra('Register'),
-                            'registration' => 'y',
-                            'userField' => $re['usersFieldId'],
-                            'chosenGroup' => $chosenGroup,
-                            'skipUserCreation' => 'y',
-                        ]
-                    );
+                if ($registrationlib->merged_prefs['user_add_tracker_item_once_validated'] != 'y') {
+                    $userTrackerData = self::getUserTrackerData($chosenGroup, $re);
+                    $smarty->assign('userTrackerData', $userTrackerData);
                 }
                 $tr = TikiLib::lib('trk')->get_tracker($re['usersTrackerId']);
                 if (! empty($tr['description'])) {
@@ -223,7 +164,6 @@ class UserRegistration extends Base
                     }
                 }
                 $user = ''; // reset $user for security reasons
-                $smarty->assign('userTrackerData', $userTrackerData);
             } elseif (isset($_REQUEST['name']) && ! empty($re['usersTrackerId']) && empty($re['registrationUsersFieldIds'])) {
                 // If user has been created in the first round and there is a user tracker specified but fields are not set - proceed anyway
                 $result = $registrationlib->register_new_user($_REQUEST);
@@ -246,5 +186,77 @@ class UserRegistration extends Base
 
         $smarty->assign('email_valid', 'y');
         return $smarty->fetch('user_registration.tpl');
+    }
+
+    public static function getUserTrackerData($chosenGroup, $groupInfo)
+    {
+        global $prefs;
+        $registrationlib = TikiLib::lib('registration');
+
+        $outputtowiki = '';
+        $outputwiki = '';
+        if ($prefs['user_register_prettytracker_output'] == 'y') {
+            $outputtowiki = $prefs["user_register_prettytracker_outputtowiki"];
+            $outputwiki = $prefs["user_register_prettytracker_outputwiki"];
+        }
+
+        if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
+            if (substr($registrationlib->merged_prefs["user_register_prettytracker_tpl"], -4) == ".tpl") {
+                $userTrackerData = wikiplugin_tracker(
+                    '',
+                    [
+                        'trackerId' => $groupInfo['usersTrackerId'],
+                        'fields' => $groupInfo['registrationUsersFieldIds'],
+                        'showdesc' => 'y',
+                        'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
+                        'embedded' => 'n',
+                        'action' => tra('Register'),
+                        'registration' => 'y',
+                        'tpl' => $registrationlib->merged_prefs["user_register_prettytracker_tpl"],
+                        'userField' => $groupInfo['usersFieldId'],
+                        'outputwiki' => $outputwiki,
+                        'outputtowiki' => $prefs["user_register_prettytracker_outputtowiki"],
+                        'chosenGroup' => $chosenGroup,
+                        'skipUserCreation' => 'y',
+                    ]
+                );
+            } else {
+                $userTrackerData = wikiplugin_tracker(
+                    '',
+                    [
+                        'trackerId' => $groupInfo['usersTrackerId'],
+                        'fields' => $groupInfo['registrationUsersFieldIds'],
+                        'showdesc' => 'y',
+                        'showmandatory' => (! empty($prefs["user_register_prettytracker_hide_mandatory"])) ? (($prefs["user_register_prettytracker_hide_mandatory"] == 'y') ? 'n' : 'y') : 'n',
+                        'embedded' => 'n',
+                        'action' => tra('Register'),
+                        'registration' => 'y',
+                        'wiki' => $registrationlib->merged_prefs["user_register_prettytracker_tpl"],
+                        'userField' => $groupInfo['usersFieldId'],
+                        'outputwiki' => $outputwiki,
+                        'outputtowiki' => $outputtowiki,
+                        'chosenGroup' => $chosenGroup,
+                        'skipUserCreation' => 'y',
+                    ]
+                );
+            }
+        } else {
+            $userTrackerData = wikiplugin_tracker(
+                '',
+                [
+                    'trackerId' => $groupInfo['usersTrackerId'],
+                    'fields' => $groupInfo['registrationUsersFieldIds'],
+                    'showdesc' => 'y',
+                    'showmandatory' => 'y',
+                    'embedded' => 'n',
+                    'action' => tra('Register'),
+                    'registration' => 'y',
+                    'userField' => $groupInfo['usersFieldId'],
+                    'chosenGroup' => $chosenGroup,
+                    'skipUserCreation' => 'y',
+                ]
+            );
+        }
+        return $userTrackerData;
     }
 }

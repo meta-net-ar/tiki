@@ -4,6 +4,8 @@
  * @package tikiwiki
  */
 
+use SmartyTiki\FunctionHandler\UserRegistration;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -111,6 +113,11 @@ if ($isvalid) {
     } elseif ($userAutoLoggedIn == true) {
         $access->redirect($prefs['tikiIndex'], tra("Account validated successfully."));
     } else {
+        if ($prefs['user_add_tracker_item_once_validated']) {
+            $chosenGroup = $_REQUEST['chosenGroup'] ?? '';
+            $groupInfo = $userlib->get_group_info($chosenGroup);
+            $smarty->assign('userTrackerData', UserRegistration::getUserTrackerData($chosenGroup, $groupInfo));
+        }
         $smarty->assign('msg', tra("Account validated successfully."));
         $smarty->assign('mid', 'tiki-information.tpl');
         $smarty->display("tiki.tpl");
