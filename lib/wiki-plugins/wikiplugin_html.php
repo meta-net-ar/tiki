@@ -60,6 +60,10 @@ function wikiplugin_html($data, $params)
         $html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
     }
     // exit($html);
+
+    // Purify $html before serving it
+    $html = TikiFilter::get('html')->filter($html);
+
     if (isset($params['tohead']) && $params['tohead'] == 1) {
         // Insert in HTML head rather than in body
         TikiLib::lib('header')->add_rawhtml($html);
