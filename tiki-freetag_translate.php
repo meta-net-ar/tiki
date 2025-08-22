@@ -7,7 +7,7 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'type'     => 'word',              //post
+            'type'     => 'text',              //post
             'objId'    => 'word',              //post
             'save'     => 'bool',              //post
             'newtag'   => 'string',            //post
