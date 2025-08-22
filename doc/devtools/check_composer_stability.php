@@ -1115,6 +1115,7 @@ if ($isCiMode) {
         }
 
         echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
+        echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     } elseif (! empty($baselineAnalysis['existingIssues'])) {
         echo "\n## ⚠️ Stability Issues Detected (Existing in Baseline)\n\n";
 
@@ -1164,6 +1165,7 @@ if ($isCiMode) {
         echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     } else {
         echo "\n## ✅ No Composer stability issues detected\n";
+        echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     }
     
     // Generate JUnit XML report for CI artifacts
