@@ -220,8 +220,11 @@ class Services_File_Controller
         $cat_desc = null;
         $cat_name = $name;
         $cat_href = "tiki-download_file.php?fileId=$fileId";
-        $_REQUEST['cat_categories'] = $categories;
-        $_REQUEST["cat_categorize"] = 'on';
+
+        if ($categories) {
+            $_REQUEST['cat_categories'] = $categories;
+            $_REQUEST["cat_categorize"] = 'on';
+        }
         include('categorize.php');
 
         $util->setTicket();
