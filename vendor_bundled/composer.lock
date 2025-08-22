@@ -3069,20 +3069,25 @@
         {
             "name": "h5p/h5p-core",
             "version": "1.28.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/h5p/h5p-php-library.git",
                 "reference": "2aeb0b83fa603e331381b3a6b8bf42c3773ba140"
+                "reference": "1afd89a8bd1df4843dd946a82aaff35d62fdc507"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/2aeb0b83fa603e331381b3a6b8bf42c3773ba140",
                 "reference": "2aeb0b83fa603e331381b3a6b8bf42c3773ba140",
+                "url": "https://api.github.com/repos/h5p/h5p-php-library/zipball/1afd89a8bd1df4843dd946a82aaff35d62fdc507",
+                "reference": "1afd89a8bd1df4843dd946a82aaff35d62fdc507",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -3124,8 +3129,10 @@
             "support": {
                 "issues": "https://github.com/h5p/h5p-php-library/issues",
                 "source": "https://github.com/h5p/h5p-php-library/tree/1.28.0"
+                "source": "https://github.com/h5p/h5p-php-library/tree/master"
             },
             "time": "2026-03-03T12:00:37+00:00"
+            "time": "2025-06-25T14:02:22+00:00"
         },
         {
             "name": "h5p/h5p-editor",
@@ -6565,16 +6572,16 @@
         },
         {
             "name": "manticoresoftware/manticoresearch-php",
-            "version": "4.0.1",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/manticoresoftware/manticoresearch-php.git",
-                "reference": "fe6ea1c5ddbfc79f0d31dfbeb0284a890c4c9687"
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/fe6ea1c5ddbfc79f0d31dfbeb0284a890c4c9687",
-                "reference": "fe6ea1c5ddbfc79f0d31dfbeb0284a890c4c9687",
+                "url": "https://api.github.com/repos/manticoresoftware/manticoresearch-php/zipball/02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
+                "reference": "02950b0f73ba8ad72d3f48bed4471b582b87ae8d",
                 "shasum": ""
             },
             "require": {
@@ -6586,7 +6593,7 @@
             "require-dev": {
                 "mockery/mockery": "*",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": ">=7.5 || ^10.5",
+                "phpunit/phpunit": ">=7.5 || ^9.6",
                 "slevomat/coding-standard": "^7.0",
                 "squizlabs/php_codesniffer": "^3.7"
             },
@@ -6631,7 +6638,7 @@
                 "issues": "https://github.com/manticoresoftware/manticoresearch-php/issues",
                 "source": "https://github.com/manticoresoftware/manticoresearch-php/"
             },
-            "time": "2025-03-31T12:51:13+00:00"
+            "time": "2024-10-31T10:38:53+00:00"
         },
         {
             "name": "marc-mabe/php-enum",
@@ -20110,6 +20117,7 @@
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "garethp/php-ews": 20,
+        "h5p/h5p-core": 20,
         "jason-munro/cypht": 20,
         "phpcompatibility/php-compatibility": 20,
         "phpcompatibility/phpcompatibility-paragonie": 20,
