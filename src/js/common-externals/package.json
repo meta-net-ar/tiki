@@ -37,7 +37,7 @@
     "select2": "^4.1.0-RC.0",
     "select2-bootstrap-5-theme": "^1.3",
     "pivottable": "^2.23.0",
-    "plotly.js": "^1.58.4",
+    "plotly.js": "^3.0.3",
     "reveal.js": "5.1.0",
     "sortablejs": "=1.14.0",
     "subtotal": "^1.11.0-alpha.0",
