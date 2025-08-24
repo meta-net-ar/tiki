@@ -83,7 +83,7 @@ $blockquote-footer-color:     #A3A3A3; // $gray-600 !default;
 // Tables
 // Buttons
 // Forms
-//$input-bg:                          var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
+$input-bg:                          var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
 $input-color:                       $body-color; // $gray-800 !default;
 //$input-border-color:                var(--#{$prefix}body-bg);
 
