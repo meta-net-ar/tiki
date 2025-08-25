@@ -921,6 +921,9 @@ composer-stability:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
+  # The stability checker returns 0=success, 1=new issues, 2=baseline warnings.
+  # GitLab runners use `set -e` by default, which stops on any non-zero code.
+  # Temporarily disabling `-e` lets us capture exit code 2, then re-enable it.
   script:
     - |
       set +e
