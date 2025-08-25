@@ -418,6 +418,7 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
                         $options[] = "<option value='" . $row['calendarId'] . "'>" . $row['name'] . "</option>";
                     }
                     $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_addtocal"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12"><select name="calendarId" class="event_calendar_select">%s</select></div></div>', tr('Add to calendar'), implode('', $options));
+                    $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex" id="event_calendar_to_rsvp" style="display:none"><div class="col-md-12"><span class="text-muted">%s</span><span class="text-danger">*</span><select class="event_calendar_select_rsvp">%s</select></div></div>', tr('Calendar'), implode('', array_slice($options, 1)));
                 } else {
                     $existing = TikiLib::lib('calendar')->get_item($existing['calitemId']);
                     $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12 header_links"><a href="tiki-calendar.php?calitemId=%s" data-external="1">%s</a></div></div>', tr('Event'), $existing['calitemId'], tr('View event in my calendar'));
