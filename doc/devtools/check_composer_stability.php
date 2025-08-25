@@ -22,17 +22,17 @@
  *   php check_composer_stability.php 28.x current # Compare 28.x with current branch
  *   php check_composer_stability.php current 29.x master # Compare current branch with 29.x and master
  *
- * Available versions: 24.x, 27.x, 28.x, 29.x, master, current
+ * Available versions: 27.x, 28.x, 29.x, master, current
  *
  * Output:
  * - Lists packages with unstable versions
  * - Shows actual version downgrades with specific version comparisons
  * - Provides a summary of all detected issues
  *
- * Exit codes:
+ * Exit codes (CI mode with --ci flag):
  *   0 - No stability issues detected
- *   1 - Current branch introduces stability issues (fail)
- *   2 - Only baseline issues present (warning)
+ *   1 - Current branch introduces new issues OR baseline has unmitigated issues [WARNING] (fail)
+ *   2 - Only baseline issues present and all are [MITIGATED] (warning, doesn't block)
  */
 
 require_once __DIR__ . '/../../path_constants.php';
@@ -41,14 +41,8 @@ require_once TIKI_VENDOR_BUNDLED_PATH . '/autoload.php';
 use Composer\Semver\VersionParser;
 use Composer\Semver\Comparator;
 
-/**
- * Global VersionParser instance for reuse across functions
- */
 static $versionParser = null;
 
-/**
- * Get or create the global VersionParser instance
- */
 function getVersionParser()
 {
     global $versionParser;
@@ -97,7 +91,6 @@ function getTargetBranch()
  */
 function getCurrentBranch()
 {
-    // In GitLab CI
     if (getenv('CI_COMMIT_REF_NAME')) {
         return getenv('CI_COMMIT_REF_NAME');
     }
@@ -132,24 +125,24 @@ function getCurrentTikiVersion()
 function getComposerJson($source)
 {
     if (empty($source['path']) && empty($source['url'])) {
-        echo "Error: No valid path or URL for composer.json\n";
-        return null;
+        return logError("No valid path or URL for composer.json");
     }
 
     if ($source['type'] === 'local' && ! empty($source['path'])) {
         if (! file_exists($source['path'])) {
-            echo "Error: Local composer.json not found at {$source['path']}\n";
-            return null;
+            return logError("Local composer.json not found at {$source['path']}");
         }
         $content = file_get_contents($source['path']);
         if ($content === false) {
-            echo "Error: Could not read local composer.json\n";
-            return null;
+            return logError("Could not read local composer.json");
         }
         $json = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            echo "Error: Invalid JSON in composer.json: " . json_last_error_msg() . "\n";
-            return null;
+            // Provide more specific error information
+            $errorMsg = "Invalid JSON in composer.json: " . json_last_error_msg();
+            $errorMsg .= "\nFile: {$source['path']}";
+            $errorMsg .= "\nLine: " . (json_last_error() === JSON_ERROR_SYNTAX ? "Syntax error" : "Unknown error");
+            return logError($errorMsg);
         }
         return $json;
     } elseif ($source['type'] === 'remote' && ! empty($source['url'])) {
@@ -162,13 +155,11 @@ function getComposerJson($source)
         ]);
         $content = file_get_contents($source['url'], false, $context);
         if ($content === false) {
-            echo "Error: Could not fetch remote composer.json from {$source['url']}\n";
-            return null;
+            return logError("Could not fetch remote composer.json from {$source['url']}");
         }
         $json = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            echo "Error: Invalid JSON in remote composer.json: " . json_last_error_msg() . "\n";
-            return null;
+            return logError("Invalid JSON in remote composer.json: " . json_last_error_msg());
         }
         return $json;
     }
@@ -176,11 +167,68 @@ function getComposerJson($source)
 }
 
 /**
+ * Get stability-ignore list from a composer.json
+ */
+function getStabilityIgnoreList($composerJson)
+{
+    if (! $composerJson || ! isset($composerJson['extra']['stability-ignore'])) {
+        return [];
+    }
+
+    return $composerJson['extra']['stability-ignore'];
+}
+
+/**
+ * Build stability ignore map for all versions
+ */
+function buildStabilityIgnoreMap($packageHistory)
+{
+    $ignoreMap = [];
+
+    // The _composer_json data is stored at the root level of packageHistory
+    if (isset($packageHistory['_composer_json'])) {
+        foreach ($packageHistory['_composer_json'] as $version => $composerJson) {
+            $ignoreMap[$version] = getStabilityIgnoreList($composerJson);
+        }
+    }
+
+    return $ignoreMap;
+}
+
+/**
+ * Check if a package is ignored for stability issues in a specific version
+ */
+function isPackageIgnored($package, $version, $ignoreMap)
+{
+    return isset($ignoreMap[$version][$package]);
+}
+
+/**
+ * Get ignore reason for a package in a specific version
+ */
+function getIgnoreReason($package, $version, $ignoreMap)
+{
+    if (! isPackageIgnored($package, $version, $ignoreMap)) {
+        return null;
+    }
+
+    $ignoreData = $ignoreMap[$version][$package];
+    $reason = isset($ignoreData['reason']) ? $ignoreData['reason'] : 'No reason provided';
+    $mitigation = isset($ignoreData['mitigation']) ? $ignoreData['mitigation'] : 'No mitigation details';
+
+    return [
+        'reason' => $reason,
+        'mitigation' => $mitigation,
+        'reviewed' => isset($ignoreData['reviewed']) ? $ignoreData['reviewed'] : 'Unknown'
+    ];
+}
+
+/**
  * Get all available Tiki versions in chronological order
  */
 function getAvailableTikiVersions()
 {
-    return ['24.x', '27.x', '28.x', '29.x', 'master'];
+    return ['27.x', '28.x', '29.x', 'master'];
 }
 
 /**
@@ -220,27 +268,19 @@ function getVersionsToCheck()
             // Replace 'current' with the actual current branch name
             if ($currentBranch) {
                 $versionsToCheck[] = $currentBranch;
-                if (! $ciMode) {
-                    echo "Info: 'current' replaced with '{$currentBranch}'\n";
-                }
+                logInfo("'current' replaced with '{$currentBranch}'");
             } else {
-                if (! $ciMode) {
-                    echo "Warning: Could not determine current branch, ignoring 'current' keyword\n";
-                }
+                logWarning("Could not determine current branch, ignoring 'current' keyword");
             }
         } elseif (in_array($arg, $availableVersions)) {
-            $versionsToCheck[] = $arg;
+                $versionsToCheck[] = $arg;
         } else {
-            if (! $ciMode) {
-                echo "Warning: Ignoring invalid version '$arg'. Available versions are: " . implode(', ', $availableVersions) . " or 'current'\n";
-            }
+                logWarning("Ignoring invalid version '$arg'. Available versions are: " . implode(', ', $availableVersions) . " or 'current'");
         }
     }
 
     if (empty($versionsToCheck)) {
-        if (! $ciMode) {
-            echo "Error: No valid versions specified. Using smart version ordering.\n";
-        }
+        logError("No valid versions specified. Using smart version ordering.");
         return getSmartVersionOrder();
     }
 
@@ -294,7 +334,6 @@ function getSmartVersionOrder()
             [$currentBranch],
             array_slice($orderedVersions, $targetPosition + 1)
         );
-
     }
 
     // Filter out any versions that don't exist in available versions, but keep the current branch
@@ -341,7 +380,7 @@ function isLessStable($version1, $version2)
 
         // If stabilities differ, compare stability levels
         if ($stability1 !== $stability2) {
-            $levels = ['dev', 'alpha', 'beta', 'RC', 'stable'];
+            $levels = array_keys(STABILITY_LEVELS);
             return array_search($stability1, $levels) < array_search($stability2, $levels);
         }
 
@@ -384,7 +423,6 @@ function getNormalizedBaseVersion(string $constraint): string
     }
 
     try {
-        // First try Composer's normalization
         $normalized = $parser->normalize($constraint);
 
         // Extract just the version part (without stability flags)
@@ -413,14 +451,9 @@ function getNormalizedBaseVersion(string $constraint): string
  */
 function getStabilityNumeric($stability)
 {
-    $levels = [
-        'dev' => 0,
-        'alpha' => 1,
-        'beta' => 2,
-        'RC' => 3,
-        'stable' => 4
-    ];
-    return $levels[$stability] ?? 4;
+    $levels = array_keys(STABILITY_LEVELS);
+    $numericLevels = array_flip($levels);
+    return $numericLevels[$stability] ?? 4;
 }
 
 /**
@@ -447,14 +480,251 @@ function getVersionConstraintType($version)
 }
 
 /**
+ * Sort versions by Tiki version order
+ */
+function sortVersionsByTikiOrder($versions, $versionsToCheck)
+{
+    // Ensure we have the correct structure and handle potential missing keys
+    if (empty($versions) || empty($versionsToCheck)) {
+        return $versions;
+    }
+
+    // Check if the versions array has the expected structure
+    $firstVersion = reset($versions);
+    if (! is_array($firstVersion) || ! isset($firstVersion['tiki_version'])) {
+        // If the structure is different, return as-is
+        return $versions;
+    }
+
+    usort($versions, function ($a, $b) use ($versionsToCheck) {
+        $order = array_flip($versionsToCheck);
+
+        $aVersion = $a['tiki_version'] ?? '';
+        $bVersion = $b['tiki_version'] ?? '';
+        // If either version is not in the order array, put it at the end
+        if (! isset($order[$aVersion])) {
+            return 1;
+        }
+        if (! isset($order[$bVersion])) {
+            return -1;
+        }
+
+        return $order[$aVersion] <=> $order[$bVersion];
+    });
+    return $versions;
+}
+
+/**
+ * Check if a version change is just a constraint style change
+ */
+function isConstraintStyleChange($prevBase, $currentBase)
+{
+    if (! $prevBase || ! $currentBase) {
+        return false;
+    }
+    $prevParts = explode('.', $prevBase);
+    $currentParts = explode('.', $currentBase);
+    return $prevParts[0] === $currentParts[0] && $prevParts[1] === $currentParts[1];
+}
+
+/**
+ * Determine package status (warnings and mitigation)
+ */
+function determinePackageStatus($package, $history, $ignoreMap)
+{
+    $hasWarnings = false;
+    $allVersionsMitigated = true;
+    $hasUnstableVersions = false;
+
+    foreach ($history as $tikiVersion => $constraint) {
+        if ($tikiVersion === '_metadata') {
+            continue;
+        }
+
+        $stability = extractStabilityFromVersion($constraint);
+        $versionMitigated = isPackageIgnored($package, $tikiVersion, $ignoreMap);
+
+        // Check for unstable versions
+        if ($stability !== 'stable') {
+            $hasUnstableVersions = true;
+
+            // If an unstable version is not mitigated, it's a warning
+            if (! $versionMitigated) {
+                $hasWarnings = true;
+            }
+        }
+
+        // For determining if all (unstable) versions are mitigated,
+        // only count unstable versions
+        if ($stability !== 'stable' && ! $versionMitigated) {
+            $allVersionsMitigated = false;
+        }
+    }
+
+    // If there are no unstable versions, allVersionsMitigated should be false
+    // (nothing to mitigate)
+    if (! $hasUnstableVersions) {
+        $allVersionsMitigated = false;
+    }
+
+    return ['hasWarnings' => $hasWarnings, 'allVersionsMitigated' => $allVersionsMitigated];
+}
+
+/**
+ * Check if a package is ignored in baseline versions
+ */
+function isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap)
+{
+    $currentBranch = getCurrentBranch();
+    if (! $currentBranch) {
+        return false;
+    }
+
+    foreach ($versionsToCheck as $version) {
+        if ($version !== $currentBranch && isPackageIgnored($package, $version, $ignoreMap)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Create regression info array
+ */
+function createRegressionInfo($package, $prev, $current, $prevVersion, $currentVersion)
+{
+    return [
+        'package' => $package,
+        'from_version' => $prev,
+        'from_tiki' => $prevVersion,
+        'to_version' => $current,
+        'to_tiki' => $currentVersion
+    ];
+}
+
+/**
+ * Check if version downgrade is mitigated
+ */
+function isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap)
+{
+    return isPackageIgnored($package, $fromVersion, $ignoreMap) &&
+           isPackageIgnored($package, $toVersion, $ignoreMap);
+}
+
+/**
+ * Build JUnit report data structure from existing issues
+ */
+function buildJUnitReportData($existingIssues)
+{
+    $junitIssues = [];
+
+    foreach ($existingIssues as $issue) {
+        $package = $issue['package'];
+        if (! isset($junitIssues[$package])) {
+            $junitIssues[$package] = [
+                'metadata' => [
+                    'has_regressions' => false,
+                    'has_unstable' => false
+                ]
+            ];
+        }
+
+        if (isset($issue['has_regression']) && $issue['has_regression']) {
+            $junitIssues[$package]['metadata']['has_regressions'] = true;
+        }
+        if (isset($issue['has_unstable']) && $issue['has_unstable']) {
+            $junitIssues[$package]['metadata']['has_unstable'] = true;
+        }
+    }
+
+    return $junitIssues;
+}
+
+/**
+ * Centralized error handling functions
+ */
+
+/**
+ * Log an error message with consistent formatting
+ * @param string $message The error message
+ * @param array $context Additional context data
+ * @param mixed $returnValue Value to return (default: null)
+ * @return mixed The return value
+ */
+function logError($message, $context = [], $returnValue = null)
+{
+    global $isCiMode;
+
+    if (! $isCiMode) {
+        echo "Error: {$message}\n";
+    }
+
+    return $returnValue;
+}
+
+/**
+ * Log a warning message with consistent formatting
+ * @param string $message The warning message
+ * @param array $context Additional context data
+ * @param mixed $returnValue Value to return (default: null)
+ * @return mixed The return value
+ */
+function logWarning($message, $context = [], $returnValue = null)
+{
+    global $isCiMode;
+
+    if (! $isCiMode) {
+        echo "Warning: {$message}\n";
+    }
+
+    return $returnValue;
+}
+
+/**
+ * Log an info message with consistent formatting
+ * @param string $message The info message
+ * @param array $context Additional context data
+ * @param mixed $returnValue Value to return (default: null)
+ * @return mixed The return value
+ */
+function logInfo($message, $context = [], $returnValue = null)
+{
+    global $isCiMode;
+
+    if (! $isCiMode) {
+        echo "Info: {$message}\n";
+    }
+
+    return $returnValue;
+}
+
+/**
  * Build complete package history across all versions
- * Using the efficient logic from the old code
  */
 function buildPackageHistory($versionsToCheck)
 {
     global $isCiMode;
     $packageHistory = [];
     $currentBranch = getCurrentBranch();
+
+    // Fetch composer data for all versions
+    $composerData = fetchComposerDataForVersions($versionsToCheck, $currentBranch);
+
+    // Build initial package structure
+    $packageHistory = buildInitialPackageStructure($composerData);
+
+    // Analyze stability and regressions
+    analyzePackageStabilityAndRegressions($packageHistory, $versionsToCheck);
+
+    return $packageHistory;
+}
+
+/**
+ * Fetch composer.json data for all versions
+ */
+function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
+{
+    $composerData = [];
 
     foreach ($versionsToCheck as $version) {
         $composer = null;
@@ -468,23 +738,45 @@ function buildPackageHistory($versionsToCheck)
                     'type' => 'local'
                 ]);
                 if ($composer) {
-                    echo "Using local composer.json for current branch: {$currentBranch}\n";
+                    logInfo("Using local composer.json for current branch: {$currentBranch}");
+                } else {
+                    logError("Failed to parse local composer.json. Please check for JSON syntax errors.");
+                    logError("File: {$localComposerPath}");
+                    logError("You can validate your JSON at: https://jsonlint.com/");
                 }
+            } else {
+                logError("Local composer.json not found at: {$localComposerPath}");
             }
-        }
-
-        if (! $composer) {
+        } else {
             $composer = getComposerJson([
                 'url' => "https://gitlab.com/tikiwiki/tiki/-/raw/$version/" . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . "/composer.json",
+                //file:///c:/laragon/www/tiki/mockcomposer/$version/composer.json
                 'type' => 'remote'
             ]);
         }
 
         if (! $composer || ! isset($composer['require'])) {
-            echo "Warning: Could not get composer.json for version $version\n";
+            logWarning("Could not get composer.json for version $version");
             continue;
         }
 
+        $composerData[$version] = $composer;
+    }
+
+    return $composerData;
+}
+
+/**
+ * Build initial package structure from composer data
+ */
+function buildInitialPackageStructure($composerData)
+{
+    $packageHistory = [];
+
+        // Store the composer.json data for stability-ignore processing
+    $packageHistory['_composer_json'] = $composerData;
+
+    foreach ($composerData as $version => $composer) {
         foreach ($composer['require'] as $package => $versionConstraint) {
             if ($package === 'php' || str_starts_with($package, 'ext-')) {
                 continue;
@@ -511,14 +803,24 @@ function buildPackageHistory($versionsToCheck)
         }
     }
 
+    return $packageHistory;
+}
+
+/**
+ * Analyze package stability and regressions
+ */
+function analyzePackageStabilityAndRegressions(&$packageHistory, $versionsToCheck)
+{
     foreach ($packageHistory as $package => &$history) {
+        // Skip packages that don't have metadata
+        if (! isset($history['_metadata']) || ! isset($history['_metadata']['versions'])) {
+            continue;
+        }
+
         $versions = $history['_metadata']['versions'];
 
         // Sort versions chronologically based on the order they were provided
-        usort($versions, function ($a, $b) use ($versionsToCheck) {
-            $order = array_flip($versionsToCheck);
-            return $order[$a['tiki_version']] <=> $order[$b['tiki_version']];
-        });
+        $versions = sortVersionsByTikiOrder($versions, $versionsToCheck);
 
         $highestStability = 0;
         $previousStability = null;
@@ -559,9 +861,7 @@ function buildPackageHistory($versionsToCheck)
                 $highestBase = getNormalizedBaseVersion($highestBaseVersion);
                 if ($highestBase && version_compare($currentBase, $highestBase) < 0) {
                     // Check if this is just a constraint style change
-                    $currentParts = explode('.', $currentBase);
-                    $highestParts = explode('.', $highestBase);
-                    if ($currentParts[0] === $highestParts[0] && $currentParts[1] === $highestParts[1]) {
+                    if (isConstraintStyleChange($currentBase, $highestBase)) {
                         continue; // Just a constraint style change
                     }
                     $history['_metadata']['has_regressions'] = true;
@@ -579,16 +879,42 @@ function buildPackageHistory($versionsToCheck)
 
         $history['_metadata']['max_stability'] = $highestStability;
     }
-
-    return $packageHistory;
 }
 
 /**
  * Print package version history with stability information
  */
-function printPackageHistory(string $package, array $history, string $icon = '⚠️'): void
+function printPackageHistory(string $package, array $history, string $icon = '⚠️', $ignoreMap = [], $currentVersion = null): void
 {
-    echo "\n{$icon} Package: {$package}\n";
+    // Check if package is ignored
+    $isIgnored = false;
+    if ($currentVersion === 'baseline') {
+        // Check if package is ignored in any baseline version
+        foreach ($ignoreMap as $version => $packages) {
+            if (isset($packages[$package])) {
+                $isIgnored = true;
+                break;
+            }
+        }
+    } elseif ($currentVersion && isset($ignoreMap[$currentVersion][$package])) {
+        // Check if package is ignored in specific version
+        $isIgnored = true;
+    }
+
+    // Determine overall package status based on version statuses
+    $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+    $hasWarnings = $packageStatus['hasWarnings'];
+    $allVersionsMitigated = $packageStatus['allVersionsMitigated'];
+
+    echo "\n{$icon} Package: {$package}";
+
+    // Determine final package status
+    if ($hasWarnings) {
+        echo " [WARNING]";
+    } elseif ($allVersionsMitigated) {
+        echo " [MITIGATED]";
+    }
+    echo "\n";
     echo "   Versions:\n";
 
     foreach ($history as $tikiVersion => $constraint) {
@@ -604,7 +930,21 @@ function printPackageHistory(string $package, array $history, string $icon = '�
             $stabilityText .= " - " . $constraintType;
         }
 
-        echo "   - Tiki {$tikiVersion}: {$constraint} ({$stabilityText})\n";
+        // Check if this specific version has the package mitigated
+        $versionMitigated = false;
+        if (isset($ignoreMap[$tikiVersion][$package])) {
+            $versionMitigated = true;
+        }
+
+        echo "   - Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
+
+        if ($versionMitigated) {
+            echo " [MITIGATED]";
+        } elseif ($stability !== 'stable') {
+            echo " [WARNING]";
+        }
+
+        echo "\n";
     }
 }
 
@@ -681,7 +1021,7 @@ function generateJUnitReport($issuesByPackage, $stableRegressions)
 /**
  * Generate report with complete version history
  */
-function generateReport($packageHistory, $versionsToCheck)
+function generateReport($packageHistory, $versionsToCheck, $ignoreMap = [])
 {
     global $isCiMode;
 
@@ -692,97 +1032,11 @@ function generateReport($packageHistory, $versionsToCheck)
         echo "\nPackage Stability Analysis:\n==================\n";
     }
 
-    $hasIssues = false;
-    $issuesByPackage = [];
-    $stableRegressions = [];
-
-    foreach ($packageHistory as $package => $history) {
-        $metadata = $history['_metadata'];
-        unset($history['_metadata']);
-
-        // Track packages with stable regressions separately
-        if ($metadata['has_stable_regressions']) {
-            $versions = $metadata['versions'];
-            usort($versions, function ($a, $b) use ($versionsToCheck) {
-                $order = array_flip($versionsToCheck);
-                return $order[$a['tiki_version']] <=> $order[$b['tiki_version']];
-            });
-
-            $regressionInfo = null;
-            for ($i = 1; $i < count($versions); $i++) {
-                $prev = $versions[$i - 1]['constraint'];
-                $current = $versions[$i]['constraint'];
-                $prevVersion = $versions[$i - 1]['tiki_version'];
-                $currentVersion = $versions[$i]['tiki_version'];
-
-                $prevBase = getNormalizedBaseVersion($prev);
-                $currentBase = getNormalizedBaseVersion($current);
-
-                if ($prevBase && $currentBase && version_compare($prevBase, $currentBase) > 0) {
-                    $prevParts = explode('.', $prevBase);
-                    $currentParts = explode('.', $currentBase);
-                    if ($prevParts[0] === $currentParts[0] && $prevParts[1] === $currentParts[1]) {
-                        continue; // Just a constraint style change
-                    }
-
-                    $regressionInfo = [
-                        'package' => $package,
-                        'from_version' => $prev,
-                        'from_tiki' => $prevVersion,
-                        'to_version' => $current,
-                        'to_tiki' => $currentVersion
-                    ];
-                    break;
-                }
-            }
-
-            if ($regressionInfo) {
-                $stableRegressions[$package] = [
-                    'history' => $history,
-                    'metadata' => $metadata,
-                    'regression_info' => $regressionInfo
-                ];
-                continue;
-            }
-        }
-
-        // Add to issuesByPackage if it has regressions or unstable versions
-        if ($metadata['has_regressions'] || $metadata['has_unstable']) {
-            $regressionInfo = null;
-            if ($metadata['has_regressions']) {
-                $versions = $metadata['versions'];
-                usort($versions, function ($a, $b) use ($versionsToCheck) {
-                    $order = array_flip($versionsToCheck);
-                    return $order[$a['tiki_version']] <=> $order[$b['tiki_version']];
-                });
-
-                for ($i = 1; $i < count($versions); $i++) {
-                    $prev = $versions[$i - 1]['constraint'];
-                    $current = $versions[$i]['constraint'];
-                    $prevVersion = $versions[$i - 1]['tiki_version'];
-                    $currentVersion = $versions[$i]['tiki_version'];
-
-                    if (isLessStable($current, $prev)) {
-                        $regressionInfo = [
-                            'package' => $package,
-                            'from_version' => $prev,
-                            'from_tiki' => $prevVersion,
-                            'to_version' => $current,
-                            'to_tiki' => $currentVersion
-                        ];
-                        break;
-                    }
-                }
-            }
-
-            $hasIssues = true;
-            $issuesByPackage[$package] = [
-                'history' => $history,
-                'metadata' => $metadata,
-                'regression_info' => $regressionInfo
-            ];
-        }
-    }
+    // Process package data to identify issues
+    $reportData = processPackageData($packageHistory, $versionsToCheck);
+    $hasIssues = $reportData['hasIssues'];
+    $issuesByPackage = $reportData['issuesByPackage'];
+    $stableRegressions = $reportData['stableRegressions'];
 
     if (! $isCiMode) {
         if (! $hasIssues && empty($stableRegressions)) {
@@ -790,56 +1044,10 @@ function generateReport($packageHistory, $versionsToCheck)
             return;
         }
 
-        // First show packages with unstable versions or stability regressions
-        if ($hasIssues) {
-            echo "\n❌ Stability issues detected in packages:\n";
-
-            foreach ($issuesByPackage as $package => $data) {
-                printPackageHistory($package, $data['history']);
-
-                if ($data['metadata']['has_regressions'] && isset($data['regression_info'])) {
-                    $info = $data['regression_info'];
-                    echo "\n   ❗ {$package} {$info['to_version']} in {$info['to_tiki']} is less stable than {$package} {$info['from_version']} in {$info['from_tiki']}\n";
-                }
-
-                if ($data['metadata']['has_unstable']) {
-                    echo "\n   ❗ Unstable versions used in this package's history\n";
-                }
-            }
-        }
-
-        // Then show packages with only stable versions but have actual regressions
-        if (! empty($stableRegressions)) {
-            echo "\n⚠️ Packages with stable version downgrades (potential regressions):\n";
-
-            foreach ($stableRegressions as $package => $data) {
-                printPackageHistory($package, $data['history'], '🔸');
-
-                if (isset($data['regression_info'])) {
-                    $info = $data['regression_info'];
-                    echo "\n   ❗ {$package} {$info['to_version']} in {$info['to_tiki']} is less stable than {$package} {$info['from_version']} in {$info['from_tiki']}\n";
-                }
-            }
-        }
-
-        echo "\nSummary of Issues:\n";
-        echo "-----------------\n";
-        echo "Packages with unstable versions: " .
-            count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_unstable'])) . "\n";
-        echo "Packages with stability regressions: " .
-            count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_regressions'])) . "\n";
-        echo "Packages with stable version downgrades: " .
-            count($stableRegressions) . "\n";
-    } else {
-        // CI mode: output is handled in main execution to avoid duplication
-        // Just generate JUnit report here
-        if ($hasIssues || ! empty($stableRegressions)) {
-            $junitReport = generateJUnitReport($issuesByPackage, $stableRegressions);
-            file_put_contents('composer-stability-report.xml', $junitReport);
-        } else {
-            $junitReport = generateJUnitReport([], []);
-            file_put_contents('composer-stability-report.xml', $junitReport);
-        }
+        // Generate detailed reports
+        generateStabilityIssuesReport($issuesByPackage, $versionsToCheck, $ignoreMap);
+        generateStableRegressionsReport($stableRegressions, $versionsToCheck, $ignoreMap);
+        generateIssuesSummary($issuesByPackage, $stableRegressions);
     }
 
     // Store results globally for exit code calculation
@@ -849,10 +1057,261 @@ function generateReport($packageHistory, $versionsToCheck)
 }
 
 /**
+ * Process package data to identify issues and regressions
+ */
+function processPackageData($packageHistory, $versionsToCheck)
+{
+    $hasIssues = false;
+    $issuesByPackage = [];
+    $stableRegressions = [];
+
+    foreach ($packageHistory as $package => $history) {
+        if (! isset($history['_metadata'])) {
+            continue;
+        }
+
+        $metadata = $history['_metadata'];
+        unset($history['_metadata']);
+
+        // Process stable regressions
+        $regressionInfo = processStableRegressions($package, $metadata, $history, $versionsToCheck);
+        if ($regressionInfo) {
+            $stableRegressions[$package] = [
+                'history' => $history,
+                'metadata' => $metadata,
+                'regression_info' => $regressionInfo
+            ];
+            continue;
+        }
+
+        // Process stability issues
+        $issueInfo = processStabilityIssues($package, $metadata, $history, $versionsToCheck);
+        if ($issueInfo !== null) {
+            $hasIssues = true;
+            $issuesByPackage[$package] = [
+                'history' => $history,
+                'metadata' => $metadata,
+                'regression_info' => $issueInfo
+            ];
+        }
+    }
+
+    return [
+        'hasIssues' => $hasIssues,
+        'issuesByPackage' => $issuesByPackage,
+        'stableRegressions' => $stableRegressions
+    ];
+}
+
+/**
+ * Process stable regressions for a package
+ */
+function processStableRegressions($package, $metadata, $history, $versionsToCheck)
+{
+    if (! $metadata['has_stable_regressions']) {
+        return null;
+    }
+
+    $versions = sortVersionsByTikiOrder($metadata['versions'], $versionsToCheck);
+
+    for ($i = 1; $i < count($versions); $i++) {
+        $prev = $versions[$i - 1]['constraint'];
+        $current = $versions[$i]['constraint'];
+        $prevVersion = $versions[$i - 1]['tiki_version'];
+        $currentVersion = $versions[$i]['tiki_version'];
+
+        $prevBase = getNormalizedBaseVersion($prev);
+        $currentBase = getNormalizedBaseVersion($current);
+
+        if ($prevBase && $currentBase && version_compare($prevBase, $currentBase) > 0) {
+            if (isConstraintStyleChange($prevBase, $currentBase)) {
+                continue; // Just a constraint style change
+            }
+
+            return createRegressionInfo($package, $prev, $current, $prevVersion, $currentVersion);
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Process stability issues for a package
+ */
+function processStabilityIssues($package, $metadata, $history, $versionsToCheck)
+{
+    if (! $metadata['has_regressions'] && ! $metadata['has_unstable']) {
+        return null;
+    }
+
+    $regressionInfo = null;
+    if ($metadata['has_regressions']) {
+        $versions = sortVersionsByTikiOrder($metadata['versions'], $versionsToCheck);
+
+        for ($i = 1; $i < count($versions); $i++) {
+            $prev = $versions[$i - 1]['constraint'];
+            $current = $versions[$i]['constraint'];
+            $prevVersion = $versions[$i - 1]['tiki_version'];
+            $currentVersion = $versions[$i]['tiki_version'];
+
+            if (isLessStable($current, $prev)) {
+                $regressionInfo = createRegressionInfo($package, $prev, $current, $prevVersion, $currentVersion);
+                break;
+            }
+        }
+    }
+
+    // Return regression info if available, or an empty array if just unstable versions
+    // This ensures packages with only unstable versions (no regressions) are still processed
+    return $regressionInfo ?: [];
+}
+
+/**
+ * Generate stability issues report
+ */
+function generateStabilityIssuesReport($issuesByPackage, $versionsToCheck, $ignoreMap)
+{
+    if (empty($issuesByPackage)) {
+        return;
+    }
+
+    echo "\n❌ Stability issues detected in packages:\n";
+
+    foreach ($issuesByPackage as $package => $data) {
+            // Check if this package is ignored in any baseline version
+        $isIgnored = isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap);
+
+        printPackageHistory($package, $data['history'], '⚠️', $ignoreMap, $isIgnored ? 'baseline' : 'current');
+
+        if ($data['metadata']['has_regressions'] && isset($data['regression_info'])) {
+            $info = $data['regression_info'];
+            echo "\n   ❗ {$package} {$info['to_version']} in {$info['to_tiki']} is less stable than {$package} {$info['from_version']} in {$info['from_tiki']}\n";
+        }
+
+        if ($data['metadata']['has_unstable']) {
+            echo "\n   ❗ Unstable versions used in this package's history\n";
+        }
+    }
+}
+
+/**
+ * Generate stable regressions report
+ */
+function generateStableRegressionsReport($stableRegressions, $versionsToCheck, $ignoreMap)
+{
+    if (empty($stableRegressions)) {
+        return;
+    }
+
+    echo "\n⚠️ Packages with stable version downgrades (potential regressions):\n";
+
+    foreach ($stableRegressions as $package => $data) {
+                // Check if this package is ignored in any baseline version
+        $isIgnored = isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap);
+
+                // For stable regressions, we need to determine the overall package status
+                // based on whether any versions have warnings (unstable and not mitigated)
+                // or if there are version downgrades that are not mitigated
+        $packageStatus = determinePackageStatus($package, $data['history'], $ignoreMap);
+        $hasWarnings = $packageStatus['hasWarnings'];
+        $allVersionsMitigated = $packageStatus['allVersionsMitigated'];
+        $hasUnmitigatedDowngrade = false;
+
+        // Check if the version downgrade itself is mitigated
+        if (isset($data['regression_info'])) {
+            $regressionInfo = $data['regression_info'];
+            $fromVersion = $regressionInfo['from_tiki'];
+            $toVersion = $regressionInfo['to_tiki'];
+
+            // If either the from or to version is not mitigated, the downgrade is not mitigated
+            $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+        }
+
+        // Determine the icon and status for the package
+        $icon = '🔸';
+        $status = '';
+        if ($hasWarnings || $hasUnmitigatedDowngrade) {
+            $icon = '⚠️';
+            $status = ' [WARNING]';
+        } elseif ($allVersionsMitigated) {
+            $status = ' [MITIGATED]';
+        }
+
+        echo "\n{$icon} Package: {$package}{$status}\n";
+        echo "   Versions:\n";
+
+        // Print individual version details
+        printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade, $ignoreMap);
+
+        if (isset($data['regression_info'])) {
+            $info = $data['regression_info'];
+            echo "\n   ❗ {$package} {$info['to_version']} in {$info['to_tiki']} is less stable than {$package} {$info['from_version']} in {$info['from_tiki']}\n";
+        }
+    }
+}
+
+/**
+ * Print version details for stable regressions
+ */
+function printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade, $ignoreMap)
+{
+    foreach ($data['history'] as $tikiVersion => $constraint) {
+        if ($tikiVersion === '_metadata') {
+            continue;
+        }
+
+        $stability = extractStabilityFromVersion($constraint);
+        $stabilityText = $stability;
+
+        if ($stability === 'stable') {
+            $constraintType = getVersionConstraintType($constraint);
+            $stabilityText .= " - " . $constraintType;
+        }
+
+        // Check if this specific version has the package mitigated
+        $versionMitigated = isPackageIgnored($package, $tikiVersion, $ignoreMap);
+
+        // Check if this version is part of an unmitigated downgrade
+        $isPartOfUnmitigatedDowngrade = false;
+        if (isset($data['regression_info']) && $hasUnmitigatedDowngrade) {
+            $regressionInfo = $data['regression_info'];
+            if ($tikiVersion === $regressionInfo['from_tiki'] || $tikiVersion === $regressionInfo['to_tiki']) {
+                $isPartOfUnmitigatedDowngrade = true;
+            }
+        }
+
+        echo "   - Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
+
+        if ($versionMitigated) {
+            echo " [MITIGATED]";
+        } elseif ($stability !== 'stable' || $isPartOfUnmitigatedDowngrade) {
+            echo " [WARNING]";
+        }
+
+        echo "\n";
+    }
+}
+
+/**
+ * Generate summary of all issues
+ */
+function generateIssuesSummary($issuesByPackage, $stableRegressions)
+{
+    echo "\nSummary of Issues:\n";
+    echo "-----------------\n";
+    echo "Packages with unstable versions: " .
+        count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_unstable'])) . "\n";
+    echo "Packages with stability regressions: " .
+        count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_regressions'])) . "\n";
+    echo "Packages with stable version downgrades: " .
+        count($stableRegressions) . "\n";
+}
+
+/**
  * Analyze current branch against baseline to determine if it introduces new issues
  * This helps CI pipelines fail only when the current branch is responsible
  */
-function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck)
+function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, $ignoreMap = [])
 {
     global $isCiMode;
     $currentBranch = getCurrentBranch();
@@ -870,190 +1329,33 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck)
     $existingIssues = [];
 
     foreach ($packageHistory as $package => $history) {
+        if (! isset($history['_metadata'])) {
+            continue;
+        }
+
         $metadata = $history['_metadata'];
 
-        // Check if this package has issues in stable branches (baseline)
-        $hasBaselineIssues = false;
-        $baselineStability = null;
-        $baselineVersion = null;
-
-        foreach ($stableVersions as $stableVersion) {
-            if (isset($history[$stableVersion])) {
-                $constraint = $history[$stableVersion];
-                $stability = extractStabilityFromVersion($constraint);
-
-                if ($stability !== 'stable') {
-                    $hasBaselineIssues = true;
-                    $baselineStability = $stability;
-                    $baselineVersion = $constraint;
-                }
-            }
+        // Analyze baseline issues for this package
+        $baselineAnalysis = analyzePackageBaseline($package, $history, $metadata, $stableVersions, $ignoreMap);
+        if ($baselineAnalysis) {
+            $existingIssues[] = $baselineAnalysis;
         }
 
-        if ($hasBaselineIssues) {
-            $existingIssues[] = [
-                'package' => $package,
-                'type' => 'existing_issue',
-                'stability' => $baselineStability,
-                'version' => $baselineVersion,
-                'tiki_version' => 'baseline'
-            ];
+        // Analyze current branch issues for this package
+        $currentBranchAnalysis = analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $baselineAnalysis, $ignoreMap);
+        if ($currentBranchAnalysis) {
+            $currentBranchIssues[] = $currentBranchAnalysis;
         }
 
-        // Check for stability regressions in baseline (not involving current branch)
-        if ($metadata['has_regressions']) {
-            $versions = $metadata['versions'];
-            usort($versions, function ($a, $b) use ($versionsToCheck) {
-                $order = array_flip($versionsToCheck);
-                return $order[$a['tiki_version']] <=> $order[$b['tiki_version']];
-            });
-
-            // Find stability regressions in baseline
-            $hasBaselineRegression = false;
-            for ($i = 1; $i < count($versions); $i++) {
-                $prev = $versions[$i - 1];
-                $current = $versions[$i];
-
-                // Skip if current branch is involved (handled separately)
-                if ($current['tiki_version'] === $currentBranch || $prev['tiki_version'] === $currentBranch) {
-                    continue;
-                }
-
-                $prevStability = extractStabilityFromVersion($prev['constraint']);
-                $currentStability = extractStabilityFromVersion($current['constraint']);
-
-                if (getStabilityNumeric($currentStability) < getStabilityNumeric($prevStability)) {
-                    $hasBaselineRegression = true;
-                    break; // Only need to know if there's a regression, not count each one
-                }
-            }
-
-            // Only add to existingIssues once per package if it has baseline regressions
-            if ($hasBaselineRegression) {
-                $existingIssues[] = [
-                    'package' => $package,
-                    'type' => 'existing_stability_regression',
-                    'from_stability' => 'baseline',
-                    'from_version' => 'baseline',
-                    'from_tiki' => 'baseline',
-                    'to_stability' => 'baseline',
-                    'to_version' => 'baseline',
-                    'to_tiki' => 'baseline'
-                ];
-            }
-        }
-
-        // Check current branch
-        if (isset($history[$currentBranch])) {
-            $currentConstraint = $history[$currentBranch];
-            $currentStability = extractStabilityFromVersion($currentConstraint);
-
-            if ($currentStability !== 'stable') {
-                if ($hasBaselineIssues) {
-                    // Issue exists in baseline - check if current branch makes it worse
-                    if (getStabilityNumeric($currentStability) < getStabilityNumeric($baselineStability)) {
-                        $currentBranchIssues[] = [
-                            'package' => $package,
-                            'type' => 'worsened_existing',
-                            'baseline_stability' => $baselineStability,
-                            'baseline_version' => $baselineVersion,
-                            'current_stability' => $currentStability,
-                            'current_version' => $currentConstraint
-                        ];
-                    }
-                    // Note: existing issues are already counted above when scanning baseline
-                } else {
-                    // New issue introduced by current branch
-                    $currentBranchIssues[] = [
-                        'package' => $package,
-                        'type' => 'new_issue',
-                        'stability' => $currentStability,
-                        'version' => $currentConstraint
-                    ];
-                }
-            }
-        }
-
-        // Check for version downgrades in current branch and baseline
-        if ($metadata['has_stable_regressions']) {
-            $versions = $metadata['versions'];
-            usort($versions, function ($a, $b) use ($versionsToCheck) {
-                $order = array_flip($versionsToCheck);
-                return $order[$a['tiki_version']] <=> $order[$b['tiki_version']];
-            });
-
-            // Find all downgrades (both in baseline and current branch)
-            for ($i = 1; $i < count($versions); $i++) {
-                $prev = $versions[$i - 1];
-                $current = $versions[$i];
-
-                    $prevBase = getNormalizedBaseVersion($prev['constraint']);
-                    $currentBase = getNormalizedBaseVersion($current['constraint']);
-
-                    if ($prevBase && $currentBase && version_compare($prevBase, $currentBase) > 0) {
-                    // Check if this is just a constraint style change
-                    $prevParts = explode('.', $prevBase);
-                    $currentParts = explode('.', $currentBase);
-                    if ($prevParts[0] === $currentParts[0] && $prevParts[1] === $currentParts[1]) {
-                        continue; // Just a constraint style change
-                    }
-
-                    if ($current['tiki_version'] === $currentBranch) {
-                        // Current branch introduces the downgrade
-                        $currentBranchIssues[] = [
-                            'package' => $package,
-                            'type' => 'version_downgrade',
-                            'from_version' => $prev['constraint'],
-                            'from_tiki' => $prev['tiki_version'],
-                            'to_version' => $current['constraint'],
-                            'to_tiki' => $currentBranch
-                        ];
-                                         } else {
-                         // Downgrade exists in baseline
-                         $existingIssues[] = [
-                             'package' => $package,
-                             'type' => 'existing_version_downgrade',
-                             'from_version' => $prev['constraint'],
-                             'from_tiki' => $prev['tiki_version'],
-                             'to_version' => $current['constraint'],
-                             'to_tiki' => $current['tiki_version']
-                        ];
-                    }
-                }
-            }
+        // Analyze version downgrades for this package
+        $downgradeAnalysis = analyzePackageVersionDowngrades($package, $history, $metadata, $versionsToCheck, $currentBranch, $ignoreMap);
+        if ($downgradeAnalysis) {
+            $existingIssues[] = $downgradeAnalysis;
         }
     }
 
-    // Aggregate existingIssues by package name to combine multiple issue types
-    if (!empty($existingIssues)) {
-        $aggregatedIssues = [];
-        
-        foreach ($existingIssues as $issue) {
-            $package = $issue['package'];
-            
-            if (! isset($aggregatedIssues[$package])) {
-                $aggregatedIssues[$package] = [
-                    'package' => $package,
-                    'types' => [],
-                    'has_unstable' => false,
-                    'has_regression' => false,
-                    'has_downgrade' => false
-                ];
-            }
-            
-            // Track the different types of issues for this package
-            if ($issue['type'] === 'existing_issue') {
-                $aggregatedIssues[$package]['has_unstable'] = true;
-            } elseif ($issue['type'] === 'existing_stability_regression') {
-                $aggregatedIssues[$package]['has_regression'] = true;
-            } elseif ($issue['type'] === 'existing_version_downgrade') {
-                $aggregatedIssues[$package]['has_downgrade'] = true;
-            }
-        }
-        
-        // Convert back to array format for counting
-        $existingIssues = array_values($aggregatedIssues);
-    }
+    // Aggregate existing issues by package name to combine multiple issue types
+    $existingIssues = aggregateExistingIssues($existingIssues);
 
     $shouldFail = ! empty($currentBranchIssues);
 
@@ -1069,10 +1371,341 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck)
     ];
 }
 
+/**
+ * Analyze baseline issues for a specific package
+ */
+function analyzePackageBaseline($package, $history, $metadata, $stableVersions, $ignoreMap)
+{
+    // Check if this package has issues in stable branches (baseline)
+    $baselineIssue = checkBaselineStabilityIssues($package, $history, $stableVersions, $ignoreMap);
+    if ($baselineIssue) {
+        return $baselineIssue;
+    }
+
+    // Check for stability regressions in baseline (not involving current branch)
+    $baselineRegression = checkBaselineStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap);
+    if ($baselineRegression) {
+        return $baselineRegression;
+    }
+
+    return null;
+}
+
+/**
+ * Check for stability issues in baseline versions
+ */
+function checkBaselineStabilityIssues($package, $history, $stableVersions, $ignoreMap)
+{
+    $hasBaselineIssues = false;
+    $baselineStability = null;
+    $baselineVersion = null;
+
+    foreach ($stableVersions as $stableVersion) {
+        if (isset($history[$stableVersion])) {
+            $constraint = $history[$stableVersion];
+            $stability = extractStabilityFromVersion($constraint);
+
+            if ($stability !== 'stable') {
+                $hasBaselineIssues = true;
+                $baselineStability = $stability;
+                $baselineVersion = $constraint;
+            }
+        }
+    }
+
+    if (! $hasBaselineIssues) {
+        return null;
+    }
+
+    // Check if this package is ignored in any baseline version
+    $ignoreInfo = checkPackageIgnoreStatus($package, $stableVersions, $ignoreMap);
+
+    return [
+        'package' => $package,
+        'type' => 'existing_issue',
+        'stability' => $baselineStability ?? 'unknown',
+        'version' => $baselineVersion ?? 'unknown',
+        'tiki_version' => 'baseline',
+        'is_ignored' => $ignoreInfo['is_ignored'],
+        'ignore_reason' => $ignoreInfo['ignore_reason']
+    ];
+}
+
+/**
+ * Check for stability regressions in baseline versions
+ */
+function checkBaselineStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap)
+{
+    if (! $metadata['has_regressions']) {
+        return null;
+    }
+
+    // Only look at versions that are in stableVersions (exclude current branch)
+    $stableVersionNames = array_keys($stableVersions);
+    $baselineVersions = array_filter($metadata['versions'], function ($version) use ($stableVersionNames) {
+        return in_array($version['tiki_version'], $stableVersionNames);
+    });
+
+    // Sort baseline versions chronologically
+    $baselineVersions = sortVersionsByTikiOrder($baselineVersions, $stableVersionNames);
+
+    // Find stability regressions ONLY in baseline (stable versions)
+    $hasBaselineRegression = false;
+    for ($i = 1; $i < count($baselineVersions); $i++) {
+        $prev = $baselineVersions[$i - 1];
+        $current = $baselineVersions[$i];
+
+        $prevStability = extractStabilityFromVersion($prev['constraint']);
+        $currentStability = extractStabilityFromVersion($current['constraint']);
+
+        if (getStabilityNumeric($currentStability) < getStabilityNumeric($prevStability)) {
+            $hasBaselineRegression = true;
+            break; // Only need to know if there's a regression, not count each one
+        }
+    }
+
+    if (! $hasBaselineRegression) {
+        return null;
+    }
+
+    // Check if this package is ignored in any baseline version
+    $ignoreInfo = checkPackageIgnoreStatus($package, $stableVersions, $ignoreMap);
+
+    return [
+        'package' => $package,
+        'type' => 'existing_stability_regression',
+        'from_stability' => 'baseline',
+        'from_version' => 'baseline',
+        'from_tiki' => 'baseline',
+        'to_stability' => 'baseline',
+        'to_version' => 'baseline',
+        'to_tiki' => 'baseline',
+        'is_ignored' => $ignoreInfo['is_ignored'],
+        'ignore_reason' => $ignoreInfo['ignore_reason']
+    ];
+}
+
+/**
+ * Check if a package is ignored in any of the specified versions
+ */
+function checkPackageIgnoreStatus($package, $versions, $ignoreMap)
+{
+    $isIgnored = false;
+    $ignoreReason = null;
+
+    foreach ($versions as $version) {
+        if (isPackageIgnored($package, $version, $ignoreMap)) {
+            $isIgnored = true;
+            $ignoreReason = getIgnoreReason($package, $version, $ignoreMap);
+            break;
+        }
+    }
+
+    return [
+        'is_ignored' => $isIgnored,
+        'ignore_reason' => $ignoreReason
+    ];
+}
+
+/**
+ * Analyze current branch issues for a specific package
+ */
+function analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $baselineAnalysis, $ignoreMap)
+{
+    if (! isset($history[$currentBranch])) {
+        return null;
+    }
+
+    $currentConstraint = $history[$currentBranch];
+    $currentStability = extractStabilityFromVersion($currentConstraint);
+
+    // Check for stability regressions (unstable versions)
+    if ($currentStability !== 'stable') {
+        if ($baselineAnalysis && $baselineAnalysis['stability'] !== 'stable') {
+            // Issue exists in baseline AND baseline is unstable - check if current branch makes it worse
+            $baselineStability = $baselineAnalysis['stability'] ?? 'unknown';
+            $baselineVersion = $baselineAnalysis['version'] ?? 'unknown';
+
+            if (getStabilityNumeric($currentStability) < getStabilityNumeric($baselineStability)) {
+                return [
+                    'package' => $package,
+                    'type' => 'worsened_existing',
+                    'baseline_stability' => $baselineStability,
+                    'baseline_version' => $baselineVersion,
+                    'current_stability' => $currentStability,
+                    'current_version' => $currentConstraint
+                ];
+            }
+            // Note: existing issues are already counted above when scanning baseline
+        } else {
+            // New issue introduced by current branch (either no baseline analysis or baseline was stable)
+            return [
+                'package' => $package,
+                'type' => 'new_issue',
+                'stability' => $currentStability,
+                'version' => $currentConstraint
+            ];
+        }
+    }
+
+    // Check for version downgrades (stable versions with lower numbers)
+    if ($currentStability === 'stable' && $metadata['has_stable_regressions']) {
+        $versions = sortVersionsByTikiOrder($metadata['versions'], array_keys($history));
+
+        // Find the highest stable version before current branch
+        $highestStableVersion = null;
+        $highestStableTikiVersion = null;
+
+        foreach ($versions as $version) {
+            if ($version['tiki_version'] === $currentBranch) {
+                break; // Stop at current branch
+            }
+
+            $stability = extractStabilityFromVersion($version['constraint']);
+            if ($stability === 'stable') {
+                $baseVersion = getNormalizedBaseVersion($version['constraint']);
+                if ($baseVersion && (! $highestStableVersion || version_compare($baseVersion, $highestStableVersion) > 0)) {
+                    $highestStableVersion = $baseVersion;
+                    $highestStableTikiVersion = $version['tiki_version'];
+                }
+            }
+        }
+
+        if ($highestStableVersion) {
+            $currentBaseVersion = getNormalizedBaseVersion($currentConstraint);
+            if ($currentBaseVersion && version_compare($currentBaseVersion, $highestStableVersion) < 0) {
+                // Check if this is just a constraint style change
+                if (! isConstraintStyleChange($currentBaseVersion, $highestStableVersion)) {
+                    // Check if this version downgrade is mitigated by ignore rules
+                    if (isVersionDowngradeMitigated($package, $highestStableTikiVersion, $currentBranch, $ignoreMap)) {
+                        return null; // Downgrade is mitigated
+                    }
+
+                    return [
+                        'package' => $package,
+                        'type' => 'new_version_downgrade',
+                        'from_version' => $highestStableVersion,
+                        'from_tiki' => $highestStableTikiVersion,
+                        'to_version' => $currentBaseVersion,
+                        'current_version' => $currentConstraint
+                    ];
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Analyze version downgrades for a specific package
+ */
+function analyzePackageVersionDowngrades($package, $history, $metadata, $versionsToCheck, $currentBranch, $ignoreMap)
+{
+    if (! $metadata['has_stable_regressions']) {
+        return null;
+    }
+
+    $versions = sortVersionsByTikiOrder($metadata['versions'], $versionsToCheck);
+
+    // Find all downgrades (both in baseline and current branch)
+    for ($i = 1; $i < count($versions); $i++) {
+        $prev = $versions[$i - 1];
+        $current = $versions[$i];
+
+        $prevBase = getNormalizedBaseVersion($prev['constraint']);
+        $currentBase = getNormalizedBaseVersion($current['constraint']);
+
+        if ($prevBase && $currentBase && version_compare($prevBase, $currentBase) > 0) {
+            // Check if this is just a constraint style change
+            if (isConstraintStyleChange($prevBase, $currentBase)) {
+                continue; // Just a constraint style change
+            }
+
+            if ($current['tiki_version'] === $currentBranch) {
+                // Current branch introduces the downgrade - this should be handled by analyzePackageCurrentBranch
+                continue;
+            } else {
+                // Downgrade exists in baseline
+                // Check if this package is ignored in the version where downgrade occurs
+                $isIgnored = isPackageIgnored($package, $current['tiki_version'], $ignoreMap);
+                $ignoreReason = $isIgnored ? getIgnoreReason($package, $current['tiki_version'], $ignoreMap) : null;
+
+                return [
+                    'package' => $package,
+                    'type' => 'existing_version_downgrade',
+                    'from_version' => $prev['constraint'],
+                    'from_tiki' => $prev['tiki_version'],
+                    'to_version' => $current['constraint'],
+                    'to_tiki' => $current['tiki_version'],
+                    'is_ignored' => $isIgnored,
+                    'ignore_reason' => $ignoreReason
+                ];
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Aggregate existing issues by package name to combine multiple issue types
+ */
+function aggregateExistingIssues($existingIssues)
+{
+    if (empty($existingIssues)) {
+        return [];
+    }
+
+    $aggregatedIssues = [];
+
+    foreach ($existingIssues as $issue) {
+        $package = $issue['package'];
+
+        if (! isset($aggregatedIssues[$package])) {
+            $aggregatedIssues[$package] = [
+                'package' => $package,
+                'types' => [],
+                'has_unstable' => false,
+                'has_regression' => false,
+                'has_downgrade' => false,
+                'is_ignored' => false,
+                'ignore_reason' => null
+            ];
+        }
+
+        // Track the different types of issues for this package
+        if ($issue['type'] === 'existing_issue') {
+            $aggregatedIssues[$package]['has_unstable'] = true;
+        } elseif ($issue['type'] === 'existing_stability_regression') {
+            $aggregatedIssues[$package]['has_regression'] = true;
+        } elseif ($issue['type'] === 'existing_version_downgrade') {
+            $aggregatedIssues[$package]['has_downgrade'] = true;
+        }
+
+        // Track ignore status (if any issue type is ignored, mark the package as ignored)
+        if (isset($issue['is_ignored']) && $issue['is_ignored']) {
+            $aggregatedIssues[$package]['is_ignored'] = true;
+            $aggregatedIssues[$package]['ignore_reason'] = $issue['ignore_reason'];
+        }
+
+        // For version downgrades, we need to track the from and to versions to determine if the downgrade is mitigated
+        if ($issue['type'] === 'existing_version_downgrade') {
+            $aggregatedIssues[$package]['from_version'] = $issue['from_version'];
+            $aggregatedIssues[$package]['from_tiki'] = $issue['from_tiki'];
+            $aggregatedIssues[$package]['to_version'] = $issue['to_version'];
+            $aggregatedIssues[$package]['to_tiki'] = $issue['to_tiki'];
+        }
+    }
+
+    // Convert back to array format for counting
+    return array_values($aggregatedIssues);
+}
+
 // Main execution
 $currentVersion = getCurrentTikiVersion();
 if (! $currentVersion) {
-    echo "Error: Could not determine current Tiki version.\n";
+    logError("Could not determine current Tiki version.");
     exit(1);
 }
 
@@ -1089,9 +1722,12 @@ echo "Comparing Tiki versions: " . implode(', ', $versionsToCheck) . "\n";
 
 $packageHistory = buildPackageHistory($versionsToCheck);
 
+// Build stability ignore map for all versions
+$ignoreMap = buildStabilityIgnoreMap($packageHistory);
+
 // Determine exit code based on CI mode and baseline analysis
 if ($isCiMode) {
-    $baselineAnalysis = analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck);
+    $baselineAnalysis = analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, $ignoreMap);
 
     // Handle CI mode output here to avoid duplication
     if ($baselineAnalysis['shouldFail']) {
@@ -1102,13 +1738,29 @@ if ($isCiMode) {
             foreach ($baselineAnalysis['newIssues'] as $issue) {
                 switch ($issue['type']) {
                     case 'new_issue':
-                        echo "- **{$issue['package']}**: New unstable version `{$issue['version']}` ({$issue['stability']})\n";
+                        $stability = $issue['stability'] ?? 'unknown';
+                        $version = $issue['version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability})\n";
                         break;
                     case 'worsened_existing':
-                        echo "- **{$issue['package']}**: Worsened stability from `{$issue['baseline_version']}` ({$issue['baseline_stability']}) to `{$issue['version']}` ({$issue['stability']})\n";
+                        $baselineStability = $issue['baseline_stability'] ?? 'unknown';
+                        $baselineVersion = $issue['baseline_version'] ?? 'unknown';
+                        $currentStability = $issue['current_stability'] ?? 'unknown';
+                        $currentVersion = $issue['current_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Made existing issue worse: from `{$baselineVersion}` ({$baselineStability}) to `{$currentVersion}` ({$currentStability})\n";
+                        break;
+                    case 'new_version_downgrade':
+                        $fromVersion = $issue['from_version'] ?? 'unknown';
+                        $toVersion = $issue['to_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Introduced version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
                         break;
                     case 'version_downgrade':
-                        echo "- **{$issue['package']}**: Version downgrade from `{$issue['from_version']}` to `{$issue['to_version']}\n";
+                        $fromVersion = $issue['from_version'] ?? 'unknown';
+                        $toVersion = $issue['to_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Existing version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
+                        break;
+                    default:
+                        echo "- **{$issue['package']}**: Unknown issue type: {$issue['type']}\n";
                         break;
                 }
             }
@@ -1117,7 +1769,42 @@ if ($isCiMode) {
         echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
         echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     } elseif (! empty($baselineAnalysis['existingIssues'])) {
-        echo "\n## ⚠️ Stability Issues Detected (Existing in Baseline)\n\n";
+        // Check if there are unmitigated warnings FIRST to determine the heading
+        // This includes both stability issues AND version downgrades
+        $hasWarnings = false;
+        foreach ($baselineAnalysis['existingIssues'] as $issue) {
+            $package = $issue['package'];
+            $history = $packageHistory[$package];
+
+            // Check for stability warnings (unstable versions not mitigated)
+            $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+            if ($packageStatus['hasWarnings']) {
+                $hasWarnings = true;
+                break;
+            }
+
+            // Check for unmitigated version downgrades
+            if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
+                    $fromVersion = $issue['from_tiki'];
+                    $toVersion = $issue['to_tiki'];
+                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+                    if ($hasUnmitigatedDowngrade) {
+                        $hasWarnings = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Display appropriate heading based on warning status
+        if ($hasWarnings) {
+            echo "\n## 🚨 Pipeline Failed: Unmitigated Stability Issues Detected\n\n";
+            echo "**Reason**: Baseline contains packages with [WARNING] tags (not mitigated).\n\n";
+        } else {
+            echo "\n## ⚠️ Stability Issues Detected (All Mitigated)\n\n";
+            echo "**Status**: All baseline issues are documented and mitigated.\n\n";
+        }
 
         // Separate stability issues from version downgrades
         $stabilityIssues = [];
@@ -1129,8 +1816,10 @@ if ($isCiMode) {
             }
 
             // Check if package has stability issues (unstable or regression)
-            if ((isset($issue['has_unstable']) && $issue['has_unstable']) || 
-                (isset($issue['has_regression']) && $issue['has_regression'])) {
+            if (
+                (isset($issue['has_unstable']) && $issue['has_unstable']) ||
+                (isset($issue['has_regression']) && $issue['has_regression'])
+            ) {
                 $stabilityIssues[] = $issue;
             }
         }
@@ -1149,6 +1838,21 @@ if ($isCiMode) {
                 }
 
                 echo implode(" & ", $issueTypes);
+
+                // Determine the actual package status using the same logic as non-CI mode
+                $package = $issue['package'];
+                $history = $packageHistory[$package];
+                $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+                $hasWarningsForPackage = $packageStatus['hasWarnings'];
+                $allVersionsMitigated = $packageStatus['allVersionsMitigated'];
+
+                // Determine final package status
+                if ($hasWarningsForPackage) {
+                    echo " [WARNING]";
+                } elseif ($allVersionsMitigated) {
+                    echo " [MITIGATED]";
+                }
+
                 echo "\n";
             }
         }
@@ -1156,59 +1860,102 @@ if ($isCiMode) {
         if (! empty($versionDowngrades)) {
             echo "\n### Version Downgrades (Existing):\n";
             foreach ($versionDowngrades as $issue) {
-                echo "- **{$issue['package']}**: Version downgrade detected\n";
+                echo "- **{$issue['package']}**: Version downgrade detected";
+
+                // Determine the actual package status using the aggregated issue data
+                $package = $issue['package'];
+                $hasWarningsForPackage = false;
+                $hasUnmitigatedDowngrade = false;
+
+                // Check if the version downgrade itself is mitigated
+                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
+                    $fromVersion = $issue['from_tiki'];
+                    $toVersion = $issue['to_tiki'];
+
+                    // If either the from or to version is not mitigated, the downgrade is not mitigated
+                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+                }
+
+                // Determine final package status
+                if ($hasWarningsForPackage || $hasUnmitigatedDowngrade) {
+                    echo " [WARNING]";
+                } elseif (isset($issue['is_ignored']) && $issue['is_ignored']) {
+                    echo " [MITIGATED]";
+                }
+
+                echo "\n";
             }
         }
 
-        echo "\n**Pipeline Warning**: Baseline stability issues detected, but current branch does not introduce new ones.\n";
-        echo "**Note**: These issues should be addressed in separate maintenance work.\n";
-        echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
+        // Display appropriate footer message based on warning status
+        if ($hasWarnings) {
+            echo "\n**Action Required**:\n";
+            echo "1. Fix the unstable package versions, OR\n";
+            echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
+            echo "   - `reason`: Why this unstable version is acceptable\n";
+            echo "   - `mitigation`: How you're handling the risk\n";
+            echo "   - `reviewed`: Date of review\n\n";
+            echo "**Tip**: Run `php doc/devtools/check_composer_stability.php` (without --ci) for detailed information.\n";
+        } else {
+            echo "\n**Pipeline Warning**: All baseline issues are properly mitigated.\n";
+            echo "**Note**: These mitigated issues are documented and tracked for future cleanup.\n";
+            echo "**Tip**: Run `php doc/devtools/check_composer_stability.php` (without --ci) for detailed information.\n";
+        }
     } else {
-        echo "\n## ✅ No Composer stability issues detected\n";
-        echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
+            echo "\n## ✅ No Composer stability issues detected\n";
+            echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
     }
-    
+
     // Generate JUnit XML report for CI artifacts
-    // Convert baseline analysis to JUnit format
-    $junitIssues = [];
-    $junitRegressions = [];
-    
-    foreach ($baselineAnalysis['existingIssues'] as $issue) {
-        $package = $issue['package'];
-        if (!isset($junitIssues[$package])) {
-            $junitIssues[$package] = [
-                'metadata' => [
-                    'has_regressions' => false,
-                    'has_unstable' => false
-                ]
-            ];
-        }
-        
-        if (isset($issue['has_regression']) && $issue['has_regression']) {
-            $junitIssues[$package]['metadata']['has_regressions'] = true;
-        }
-        if (isset($issue['has_unstable']) && $issue['has_unstable']) {
-            $junitIssues[$package]['metadata']['has_unstable'] = true;
-        }
-    }
-    
+    $junitIssues = buildJUnitReportData($baselineAnalysis['existingIssues']);
     $junitReport = generateJUnitReport($junitIssues, []);
     file_put_contents('composer-stability-report.xml', $junitReport);
-    
+
     // Exit codes:
-    // 1 = current branch introduces issues (fail)
-    // 2 = only baseline issues present (mark as warning in CI)
+    // 1 = current branch introduces issues OR existing issues have warnings (not mitigated) - FAIL
+    // 2 = only baseline issues present and ALL are mitigated - WARNING (doesn't block)
     // 0 = no issues
     $exitCode = 0;
     if ($baselineAnalysis['shouldFail']) {
         $exitCode = 1;
     } elseif (! empty($baselineAnalysis['existingIssues'])) {
-        $exitCode = 2;
+        // Check if there are any packages with warnings (stability issues OR version downgrades)
+        $hasWarnings = false;
+        foreach ($baselineAnalysis['existingIssues'] as $issue) {
+            $package = $issue['package'];
+            $history = $packageHistory[$package];
+
+            // Check for stability warnings (unstable versions not mitigated)
+            $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+            if ($packageStatus['hasWarnings']) {
+                    $hasWarnings = true;
+                break;
+            }
+
+            // Check for unmitigated version downgrades
+            if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
+                    $fromVersion = $issue['from_tiki'];
+                    $toVersion = $issue['to_tiki'];
+                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+                    if ($hasUnmitigatedDowngrade) {
+                        $hasWarnings = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($hasWarnings) {
+            $exitCode = 1; // FAIL if there are any packages with warnings (not mitigated)
+        } else {
+            $exitCode = 2; // WARNING if all existing issues are mitigated
+        }
     }
 
     exit($exitCode);
 } else {
     // Local mode: generate report and fail if any issues exist
-    generateReport($packageHistory, $versionsToCheck);
+    generateReport($packageHistory, $versionsToCheck, $ignoreMap);
     exit(empty($globalIssuesByPackage) && empty($globalStableRegressions) ? 0 : 1);
 }
