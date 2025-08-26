@@ -18,8 +18,8 @@ function wikiplugin_tour_info()
         'params' => [
             'element' => [
                 'name' => tra('Element'),
-                'required' => false,
-                'description' => tra('Element to show the popup on; if empty, use the plugin location itself'),
+                'required' => true,
+                'description' => tra('Element to show the popup on. It should be a valid CSS selector.'),
                 'since' => '15.0',
                 'filter' => 'text',
                 'default' => '',
@@ -60,7 +60,7 @@ function wikiplugin_tour_info()
             'tour_id' => [
                 'name' => tra('Tour ID'),
                 'required' => false,
-                'description' => tra('Set a tour ID to be able to only show the tour once. (Set only in the first step.)'),
+                'description' => tra('Set a tour ID to be able to  show the tour only once or use many steps. (This value should be identical for all steps of the same tour.)'),
                 'since' => '15.0',
                 'filter' => 'text',
                 'default' => 'default',
@@ -131,7 +131,7 @@ function wikiplugin_tour_info()
             'number_of_steps' => [
                 'name' => tra('Number of Steps'),
                 'required' => false,
-                'description' => tra('Number of steps in the tour. (Set only in the first step.)'),
+                'description' => tra('Number of steps in the tour. (Required only in the first step.)'),
                 'since' => '27.0',
                 'filter' => 'int',
                 'default' => '',
@@ -227,17 +227,18 @@ function wikiplugin_tour($data, $params)
     $TOUR_STEPS = "tour_steps_{$params['tour_id']}";
     $TOUR_NUMBER_OF_STEPS = "number_of_steps_{$params['tour_id']}";
 
-    $step = array_filter($params);
-    $content = TikiLib::lib('parser')->parse_data($data);
-    $step['content'] = $content;
-    $_SESSION[$TOUR_STEPS] = array_merge($_SESSION[$TOUR_STEPS] ?? [], [$step]);
-
     // first step
     if ($params['number_of_steps']) {
         $_SESSION[$TOUR_NUMBER_OF_STEPS] = $params['number_of_steps'];
         $unique = 'wptour_' . $_SESSION['id'];
         $_SESSION['startButtonId'] = $unique . '_restart';
+        $_SESSION[$TOUR_STEPS] = [];
     }
+
+    $step = array_filter($params);
+    $content = TikiLib::lib('parser')->parse_data($data);
+    $step['content'] = $content;
+    $_SESSION[$TOUR_STEPS] = array_merge($_SESSION[$TOUR_STEPS] ?? [], [$step]);
 
     $html = '';
 
