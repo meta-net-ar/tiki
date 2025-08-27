@@ -131,6 +131,8 @@ MathJax:
     - "wikiplugin_equation"
   requiredVersion: ^2.7
 MediaAlchemyst:
+  actions:
+    - remove
   licence: MIT
   licenceUrl: "https://github.com/alchemy-fr/Media-Alchemyst/blob/master/LICENSE"
   name: media-alchemyst/media-alchemyst
@@ -138,6 +140,17 @@ MediaAlchemyst:
     - wikiplugin_preview
     - ocr_enable
   requiredVersion: ^0.5.4
+  state: replaced
+  replacedBy:
+    - tikiwiki/media-alchemyst
+TikiWikiMediaAlchemyst:
+  licence: MIT
+  licenceUrl: "https://gitlab.com/tikiwiki/libraries/forks/Media-Alchemyst/blob/master/LICENSE"
+  name: tikiwiki/media-alchemyst
+  requiredBy:
+    - wikiplugin_preview
+    - ocr_enable
+  requiredVersion: ^4.2
 PDFjsViewer:
   licence: Apache-2.0
   licenceUrl: "https://github.com/oci-labs/pdfjs-dist-viewer-min/blob/main/LICENSE"

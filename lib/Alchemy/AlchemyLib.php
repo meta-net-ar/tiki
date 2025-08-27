@@ -41,7 +41,7 @@ class AlchemyLib
         global $prefs;
 
         if (! self::isLibraryAvailable()) {
-            \Feedback::error(tr('To use AlchemyLib Tiki needs the media-alchemyst/media-alchemyst package. If you do not have permission to install this package, ask the site administrator.'), true);
+            \Feedback::error(tr('To use AlchemyLib Tiki needs the tikiwiki/media-alchemyst package. If you do not have permission to install this package, ask the site administrator.'), true);
         }
 
         $drivers = new DriversContainer();
