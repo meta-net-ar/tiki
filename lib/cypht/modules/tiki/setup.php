@@ -321,5 +321,6 @@ return [
     'field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'auto_move' => FILTER_VALIDATE_BOOLEAN,
+    'is_manual_search' => FILTER_VALIDATE_BOOLEAN,
   ]
 ];
