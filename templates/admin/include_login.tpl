@@ -105,6 +105,7 @@
                 {preference name=userTracker}
                 <div class="adminoptionboxchild" id="userTracker_childcontainer">
                     {preference name=user_add_tracker_item_set_default_on}
+                    {preference name=user_add_tracker_item_once_validated}
                     {preference name=feature_userWizardDifferentUsersFieldIds}
                     <div class="adminoptionboxchild" id="feature_userWizardDifferentUsersFieldIds_childcontainer">
                         {preference name=feature_userWizardUsersFieldIds}

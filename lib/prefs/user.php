@@ -52,6 +52,16 @@ function prefs_user_list($partial = false)
                 'userTracker',
             ],
         ],
+        'user_add_tracker_item_once_validated' => [
+            'name' => tra('Add a user tracker item for new user once validated'),
+            'description' => tra('Add a user tracker item for new user once the email address has been validated. This is useful when you want to use the user tracker to store additional information about the user, but you want to make sure that the email address is valid before adding the user to the tracker.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => [
+                'userTracker',
+                'validateUsers',
+            ],
+        ],
         'user_tracker_infos' => [
             'name' => tra('Display user tracker information on the user information page'),
             'description' => tra('Display user tracker information on the user information page'),
