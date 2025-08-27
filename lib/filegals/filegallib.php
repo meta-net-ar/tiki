@@ -2818,8 +2818,8 @@ class FileGalLib extends TikiLib
         }
         $need_everything = ( $with_subgals_size && ( $sort_mode == 'size_asc' || $sort_mode == 'filesize_asc' ) );
         if (! $need_everything) {
-            $numQuery = preg_replace("/^SELECT.*?FROM/", "SELECT COUNT(*) FROM", $query);
-            $numQuery = preg_replace("/ ORDER BY .*$/", "", $numQuery);
+            $numQuery = preg_replace("/ ORDER BY .*$/", "", $query);
+            $numQuery = "SELECT COUNT(*) FROM (" . $numQuery . ") AS grouped";
             $numResults = $this->getOne($numQuery, $bindvars);
             $limit = $offset == -1 ? 0 : $offset;
             $limit .= ', ' . ($maxRecords == -1 ? PHP_INT_MAX : $maxRecords);

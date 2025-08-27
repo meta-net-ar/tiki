@@ -7,6 +7,7 @@
 namespace Tiki\FileGallery;
 
 use TikiLib;
+use Tiki\FileGallery\File as TikiFile;
 
 class SaveHandler
 {
@@ -212,12 +213,18 @@ class SaveHandler
             if ($archives['cant'] >= $count_archives) {
                 $toRemove = [];
 
-                foreach ($archives['data'] as $i => $values) {
+                // Remove only the oldest archived versions to keep the latest ones within the archive limit
+                $archivesToDelete = array_slice($archives['data'], 0, $archives['count'] - $count_archives);
+
+
+                foreach ($archivesToDelete as $values) {
                     $toRemove[] = $values['fileId'];
                     $definition->delete(new TikiFile($values));
                 }
 
                 $this->filesTable->deleteMultiple(['fileId' => $this->filesTable->in($toRemove)]);
+
+                \Feedback::success(tr('%0 archive(s) max allowed — %1 older version(s) have been deleted for file %2.', $count_archives, count($toRemove), $file->name));
             }
         }
         if ($prefs['fgal_keep_fileId'] != 'y') {
