@@ -126,6 +126,8 @@ function module_login_box($mod_reference, &$module_params)
             if (! $permsPrevious->admin) {
                 $can_switch_user = 'n';
             }
+            // restore the current "switched to" user's permissions
+            unset($permsContext);
         } else {
             $can_switch_user = 'n';
         }
