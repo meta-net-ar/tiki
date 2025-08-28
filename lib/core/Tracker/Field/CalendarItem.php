@@ -171,8 +171,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
                     if ($this->getOption('overrideCalendarItemTime')) {
                         $event['start'] = $start;
                         $event['end'] = $end;
-                        $client = new \Tiki\SabreDav\CaldavClient();
-                        $client->saveCalendarObject($event);
+                        $this->calendarLib->set_item($user, $calitemId, $data);
                     } else {
                         $value = (int) $event['start'];
                     }
