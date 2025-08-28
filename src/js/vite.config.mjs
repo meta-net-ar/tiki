@@ -526,8 +526,12 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/ol-layerswitcher/dist",
                     },
                     {
-                        src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/*.min.js"],
+                        src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/pivot.js"],
                         dest: "vendor_dist/pivottable/dist",
+                    },
+                    {
+                        src: "node_modules/patch-package/dist/*",
+                        dest: "vendor_dist/patch-package/dist",
                     },
                     {
                         src: "node_modules/plotly.js/dist/topojson*",
