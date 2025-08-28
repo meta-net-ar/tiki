@@ -25,7 +25,7 @@ class Service extends Base
             unset($params['_params']);
         }
 
-        if ($params['external']) {
+        if (isset($params['external']) && $params['external']) {
             \TikiLib::setExternalContext(true);
         }
 
