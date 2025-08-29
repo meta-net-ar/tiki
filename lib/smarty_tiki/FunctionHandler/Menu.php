@@ -122,7 +122,7 @@ class Menu extends Base
                         }
                         $catName = $formattedCategGroups[$attribute];
                         $element["name"] = str_replace("--groupname--", $catName, $element["name"]);
-                        $element["url"] = str_replace("--groupname--", $catName, $element["name"]);
+                        $element["url"] = str_replace("--groupname--", $catName, $element["url"]);
                         $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
                         $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
                     }
