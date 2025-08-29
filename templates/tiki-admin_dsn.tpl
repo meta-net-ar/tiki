@@ -210,8 +210,13 @@ $('#source-form').each(function () {
         reload = function () {
             $('option.added', form).remove();
             $.getJSON($.service('auth_source', 'list'), function (entries) {
+                const urlParams = new URLSearchParams(window.location.search);
                 $.each(entries, function (k, v) {
-                    $(form.existing).append($('<option class="added"/>').text(v));
+                    $(form.existing).append(
+                        $('<option class="added"/>')
+                            .text(v)
+                            .prop("selected", v === urlParams.get('identifier'))
+                    );
                 });
 
                 $(form.existing).trigger("change.select2");
@@ -238,7 +243,7 @@ $('#source-form').each(function () {
                 $(form.identifier).val(id);
                 $(form.method).val(data.method).trigger("change").trigger("change.select2");
                 $(form.url).val(data.url);
-                $(form.user).val(data.user);
+                $(form.user).val(data.user).trigger("change.select2");
 
                 switch (data.method) {
                 case 'basic':
