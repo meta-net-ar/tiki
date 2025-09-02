@@ -63,7 +63,7 @@ const remoteMethod = async (query) => {
     const data = await response.json();
     const loadedOptions = data.map(item => (typeof item === "string" ? { value: item, label: item }: item));
     const newOptions = [
-        ...options.value.filter(item => modelValue.value.includes(item.value)),
+        ...options.value.filter(item => modelValue.value?.includes(item.value)),
         ...loadedOptions,
     ];
     options.value = newOptions;
