@@ -4,20 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-namespace Tiki\Search\Action;
-
-use Exception;
-use JitFilter;
-use Perms;
-use Search_Action_Action;
-use Search_Action_Exception;
-use TikiLib;
-use Feedback;
 use Tiki\PagePdfExporter;
-use Tiki\FileGalLib;
 
-class SearchActionExportPDF implements Search_Action_Action
+class Search_Action_ExportPDF implements Search_Action_Action
 {
     protected array $definition = [];
 
