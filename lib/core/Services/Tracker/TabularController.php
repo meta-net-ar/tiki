@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class Services_Tracker_TabularController
 {
     public function setUp()
@@ -480,15 +481,25 @@ class Services_Tracker_TabularController
 
             return TikiLib::lib('tiki')->allocate_extra(
                 'tracker_import_items',
-                function () use ($writer, $source, $info) {
-                    $writer->write($source);
+                function () use ($writer, $source, $info, $schema) {
+                    $result = $writer->write($source);
 
                     unlink($_FILES['file']['tmp_name']);
 
                     $message = tr('Your import was completed successfully.');
 
                     if (TIKI_API) {
-                        return ['feedback' => $message];
+                        $data = [];
+                        $columns = $schema->getColumns();
+                        foreach ($result as $itemId) {
+                            $entry = new \Tracker\Tabular\Source\TrackerSourceEntry($itemId);
+                            $row = ['itemId' => $itemId];
+                            foreach ($columns as $column) {
+                                $row[$column->getLabel()] = $entry->render($column, false);
+                            }
+                            $data[] = $row;
+                        }
+                        return $data;
                     }
 
                     Feedback::success($message);
