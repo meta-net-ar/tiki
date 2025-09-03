@@ -114,22 +114,15 @@ function prefs_error_list()
             'default'     => 'There was an issue with your request, please try again later.',
             'help' => $generalPreferencesHelp,
         ],
-        'error_tidy_toggle_session' => [
-            'name'        => tra('Session-based Tidy toggle'),
-            'hint'       => tra('Allow admins and developers to disable Tidy HTML fixes per session. Markup errors will be displayed without Tidy fixes. Requires PHP Tidy extension to be loaded.'),
-            'description' => tra('Allow admins and developers to disable Tidy HTML fixes per session. Requires PHP Tidy extension.'),
+        'error_tidy_toggle' => [
+            'name'        => tra('Tidy HTML toggle'),
+            'hint'        => tra('Enable or disable Tidy HTML corrections. When enabled, markup errors are automatically corrected and not reported.'),
+            'description' => tra('Allows users to control Tidy HTML corrections. When enabled, markup errors are fixed silently; when disabled, raw markup errors are shown/reported for debugging.'),
+            'warning'     => tra('Requires the PHP Tidy extension.') . '<br>'
+                        . '<strong>' . tra('PHP Tidy status: ') . '</strong>'
+                        . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')),
             'type'        => 'flag',
-            'default'     => 'n',
-            'dependencies' => [
-                'php_tidy_extension_loaded'
-            ],
-        ],
-        'php_tidy_extension_loaded' => [
-            'name'        => tra('PHP Tidy extension loaded'),
-            'hint'       => tra('Indicates if the PHP Tidy extension is available. This is required for session-based Tidy toggling.'),
-            'description' => tra('Shows if PHP Tidy extension is available.'),
-            'type'        => 'flag',
-            'default'     => extension_loaded('tidy') ? 'y' : 'n',
+            'default'     => 'y',
         ],
     ];
 }
