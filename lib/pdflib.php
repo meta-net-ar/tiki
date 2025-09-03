@@ -1962,7 +1962,8 @@ TEXT;
  */
 function cleanHtml($html, $config = null, $encoding = 'utf8')
 {
-    if (extension_loaded('tidy') == true) {
+    global $prefs;
+    if (extension_loaded('tidy') == true && $prefs['error_tidy_toggle'] == 'y') {
         $default = [
             'clean' => true,
             'output-xhtml' => false,

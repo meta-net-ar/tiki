@@ -20,7 +20,7 @@ if (! extension_loaded('http') and ! extension_loaded('curl')) {
     Feedback::errorAndDie(tra('The pecl HTTP extension or the Curl extension is needed to replay the TikiTest'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
-$smarty->assign('tidy', extension_loaded('tidy'));
+$smarty->assign('tidy', extension_loaded('tidy') && $prefs['error_tidy_toggle'] == 'y');
 $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
@@ -143,7 +143,8 @@ function verif_url($url, $use_tidy = true)
         $buffer = $body;
     }
 
-    if (extension_loaded('tidy')) {
+    global $prefs;
+    if (extension_loaded('tidy') && $prefs['error_tidy_toggle'] == 'y') {
         $data = tidy_parse_string($data, [], 'utf8');
         $buffer = tidy_parse_string($buffer, [], 'utf8');
         if ($use_tidy) {

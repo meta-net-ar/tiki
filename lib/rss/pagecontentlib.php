@@ -64,7 +64,8 @@ class PageContentLib
 
     private function tidy($html)
     {
-        if (function_exists('tidy_parse_string')) {
+        global $prefs;
+        if (function_exists('tidy_parse_string') && $prefs['error_tidy_toggle'] == 'y') {
             $tidy = tidy_parse_string($html, [], 'UTF8');
             $tidy->cleanRepair();
             $html = $tidy->value;

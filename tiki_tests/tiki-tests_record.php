@@ -16,7 +16,7 @@ if ($tiki_p_admin_tikitests != 'y' and $tiki_p_edit_tikitests != 'y') {
     Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$smarty->assign('tidy', extension_loaded('tidy'));
+$smarty->assign('tidy', extension_loaded('tidy') && $prefs['error_tidy_toggle'] == 'y');
 $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
