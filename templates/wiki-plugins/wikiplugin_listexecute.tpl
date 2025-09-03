@@ -11,9 +11,9 @@
         {foreach from=$results item=entry}
             <li class="list-group-item list-group-item-action">
                 <input type="checkbox" class="checkbox_objects form-check-input me-1" aria-label="{tr}Select{/tr}" id="{$entry.object_type|replace:" ":"-"|escape}_{$entry.object_id|escape}" name="objects{$iListExecute}[]" value="{$entry.object_type|escape}:{$entry.object_id|escape}">
-                {if $entry.report_status eq 'success'}
+                {if isset($entry.report_status) && $entry.report_status eq 'success'}
                     {icon name='ok'}
-                {elseif $entry.report_status eq 'error'}
+                {elseif isset($entry.report_status) && $entry.report_status eq 'error'}
                     {icon name='error'}
                 {/if}
                 <label class="form-check-label stretched-link" for="{$entry.object_type|replace:" ":"-"|escape}_{$entry.object_id|escape}">{object_link type=$entry.object_type id=$entry.object_id backuptitle=$entry.title|escape}</label>

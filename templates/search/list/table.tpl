@@ -155,9 +155,9 @@
                 {if $actions}
                     <td>
                         <input type="checkbox" name="objects{$iListExecute}[]" class="checkbox_objects form-check-input" aria-label="{tr}Select{/tr}" value="{$row.object_type|escape}:{$row.object_id|escape}">
-                        {if $row.report_status eq 'success'}
+                        {if isset($entry.report_status) && $row.report_status eq 'success'}
                             {icon name='ok'}
-                        {elseif $row.report_status eq 'error'}
+                        {elseif isset($entry.report_status) && $row.report_status eq 'error'}
                             {icon name='error'}
                         {/if}
                     </td>
