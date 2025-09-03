@@ -122,6 +122,10 @@ class APIWriter
                 $result = false;
             }
 
+            if (is_array($result) && count($result) == 1 && ! empty($result[0])) {
+                $result = $result[0];
+            }
+
             if ($result && ! $id && method_exists($entry, 'backfillPK')) {
                 foreach (explode('.', $this->config['modify_data_path']) as $field) {
                     if ($field !== '' && $result[$field]) {
