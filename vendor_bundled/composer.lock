@@ -1089,62 +1089,6 @@
             "time": "2025-03-29T13:50:30+00:00"
         },
         {
-            "name": "candy-chat/xmpp-prebind-php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/candy-chat/xmpp-prebind-php.git",
-                "reference": "76f738299eaa26625abe6c2a7ec95465c7d92985"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/candy-chat/xmpp-prebind-php/zipball/76f738299eaa26625abe6c2a7ec95465c7d92985",
-                "reference": "76f738299eaa26625abe6c2a7ec95465c7d92985",
-                "shasum": ""
-            },
-            "require": {
-                "lib-libxml": "*",
-                "php": ">=5.3"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "lib/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Weibel"
-                },
-                {
-                    "name": "piotr",
-                    "email": "hello@piotr.cz"
-                },
-                {
-                    "name": "Alex Knol",
-                    "email": "alex@cobrowser.net"
-                }
-            ],
-            "description": "This class is for prebinding a XMPP Session with PHP.",
-            "homepage": "http://jolicode.com",
-            "keywords": [
-                "php",
-                "prebind",
-                "xmpp"
-            ],
-            "support": {
-                "issues": "https://github.com/candy-chat/xmpp-prebind-php/issues",
-                "source": "https://github.com/candy-chat/xmpp-prebind-php/tree/master"
-            },
-            "abandoned": true,
-            "time": "2015-02-26T17:32:01+00:00"
-        },
-        {
             "name": "cboden/ratchet",
             "version": "v0.4.4",
             "source": {
@@ -20103,7 +20047,6 @@
     "aliases": [],
     "minimum-stability": "RC",
     "stability-flags": {
-        "candy-chat/xmpp-prebind-php": 20,
         "garethp/php-ews": 20,
         "jason-munro/cypht": 20,
         "phpcompatibility/php-compatibility": 20,

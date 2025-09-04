@@ -71,6 +71,7 @@ function prefs_xmpp_list()
             'description' => tra('The authentication method to be used by XMPP client'),
             'keywords' => 'xmpp converse conversejs chat auth',
             'type' => 'list',
+            'help' => 'XMPP#Authentication_mode',
             'tags' => ['basic'],
             'default' => '',
             'options' => [
