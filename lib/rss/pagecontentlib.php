@@ -64,14 +64,8 @@ class PageContentLib
 
     private function tidy($html)
     {
-        global $prefs;
-        if (function_exists('tidy_parse_string') && $prefs['error_tidy_toggle'] == 'y') {
-            $tidy = tidy_parse_string($html, [], 'UTF8');
-            $tidy->cleanRepair();
-            $html = $tidy->value;
-        }
-
-        return $html;
+        $htmlTidyLib = TikiLib::lib('htmltidy');
+        return $htmlTidyLib->cleanHtml($html, [], 'UTF8', ['source' => 'rss_content']);
     }
 
     private function getUrls($url)

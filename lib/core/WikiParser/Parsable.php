@@ -427,6 +427,18 @@ if ( \$('#$id') ) {
             TikiLib::lib('parser')->core_options = [];
         }
 
+        // Validate final HTML output and report errors
+        if ($toplevel && ! empty($data) && is_string($data)) {
+            $htmlTidyLib = TikiLib::lib('htmltidy');
+            $context = [
+                'source' => 'wiki_parser',
+                'page' => $this->option['page'] ?? null,
+                'syntax' => $this->option['is_markdown'] ? 'markdown' : 'wiki',
+                'is_html' => $this->option['is_html'] ?? false
+            ];
+            $data = $htmlTidyLib->cleanHtml($data, null, 'utf8', $context);
+        }
+
         return $data;
     }
 
