@@ -153,6 +153,7 @@ class ConsoleApplicationBuilder
                 new FilesDeleteoldCommand(),
                 new FilesIndexCommand(),
                 new FilesMoveCommand(),
+                new FilesSubgalleriesCreateCommand(),
                 new IndexRebuildCommand(),
                 new IndexOptimizeCommand(),
                 new IndexCleanupCommand(),

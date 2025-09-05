@@ -2878,6 +2878,7 @@ lib/core/Tiki/Command/FilesBatchuploadCommand.php -text
 lib/core/Tiki/Command/FilesCopyCommand.php -text
 lib/core/Tiki/Command/FilesDeleteoldCommand.php -text
 lib/core/Tiki/Command/FilesMoveCommand.php -text
+lib/core/Tiki/Command/FilesSubgalleriesCreateCommand.php -text
 lib/core/Tiki/Command/FixBOMandUnixCommand.php -text
 lib/core/Tiki/Command/FixSVNKeyIdsCommand.php -text
 lib/core/Tiki/Command/GetStringsCommand.php -text

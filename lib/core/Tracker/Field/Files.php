@@ -682,8 +682,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
         $new = array_diff($fileIds, explode(',', (string) $oldValue));
         $remove = array_diff(explode(',', (string) $oldValue), $fileIds);
-        //If there new uploaded files
-        if (! empty($new) && $this->trackerField->getOption('fileGalleryPerTrackerItem') === 'y') {
+        //If the option to create sub-galleries and move files is enabled
+        if (! empty($value) && $this->trackerField->getOption('fileGalleryPerTrackerItem') === 'y') {
             //Create new gallery and move all uploaded files
             $fieldId = $this->getConfiguration('fieldId');
             $itemId = $this->getItemId();
