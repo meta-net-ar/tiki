@@ -53,6 +53,18 @@ function prefs_error_list()
             ],
             'help' => $generalPreferencesHelp,
         ],
+        'error_tracking_enabled_tidy' => [
+            'name'        => tra('Track HTML markup errors'),
+            'description' => tra('Enable integration with error tracking service(ex: Sentry, GlitchTip) for HTML markup errors.'),
+            'warning'     => tra('When Tidy extension is available and this is enabled, errors are reported to error tracking system.') . '<br>'
+                        . '<strong>' . tra('PHP Tidy status: ') . '</strong>'
+                        . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')),
+            'type'        => 'flag',
+            'default'     => 'n',
+            'dependencies' => [
+                'error_tracking_dsn'
+            ],
+        ],
         'error_tracking_dsn'         => [
             'name'        => tra('Data Source Name (DSN)'),
             'description' => tra('DSN used for connect to the error tracking service.'),
@@ -113,16 +125,6 @@ function prefs_error_list()
             'filter'      => 'text',
             'default'     => 'There was an issue with your request, please try again later.',
             'help' => $generalPreferencesHelp,
-        ],
-        'error_tidy_toggle' => [
-            'name'        => tra('Tidy HTML toggle'),
-            'hint'        => tra('Enable or disable Tidy HTML corrections. When enabled, markup errors are automatically corrected and not reported.'),
-            'description' => tra('Allows users to control Tidy HTML corrections. When enabled, markup errors are fixed silently; when disabled, raw markup errors are shown/reported for debugging.'),
-            'warning'     => tra('Requires the PHP Tidy extension.') . '<br>'
-                        . '<strong>' . tra('PHP Tidy status: ') . '</strong>'
-                        . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')),
-            'type'        => 'flag',
-            'default'     => 'y',
         ],
     ];
 }

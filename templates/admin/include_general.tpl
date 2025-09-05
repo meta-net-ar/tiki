@@ -113,7 +113,6 @@
                         {preference name=smarty_notice_reporting label="{tr}Include Smarty notices{/tr}"}
                     </div>
                 </div>
-                {preference name=error_tidy_toggle}
                 {preference name=error_generic_non_admins}
                 <div class="adminoptionboxchild" id="error_generic_non_admins_childcontainer">
                     {preference name=error_generic_message}
@@ -134,6 +133,7 @@
                     <div class="adminoptionboxchild">
                         {preference name=error_tracking_enabled_php}
                         {preference name=error_tracking_enabled_js}
+                        {preference name=error_tracking_enabled_tidy}
                     </div>
                 </div>
                 <div class="adminoptionbox">
