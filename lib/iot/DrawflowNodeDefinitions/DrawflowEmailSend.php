@@ -44,7 +44,7 @@ class DrawflowEmailSend implements DrawflowActionInterface
         return "
         <div class='{$this->node_identifier} draggable-node'>
             <div class='text-center'><span><span data-icon-name='envelope'></span>&nbsp;" . tra("Email Send") . "</span></div>
-            <input type='email' df-{$this->node_df_identifier} class='form-control' placeholder='" . tra("Enter email address") . "'>
+            <input type='email' df-{$this->node_df_identifier} needs-element-plus='false'  class='form-control' placeholder='" . tra("Enter email address") . "'>
         </div>
         <div class='draggable-node clone  bg-light px-2 py-1 border text-center w-100' data-inputs='{$this->n_input}' data-outputs='{$this->n_output}' data-for='{$this->node_identifier}'>
             <div class='node-mask' title='" . htmlentities($this->description, ENT_QUOTES) . "'>
