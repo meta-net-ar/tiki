@@ -14,7 +14,7 @@ if ($tiki_p_admin_tikitests != 'y' and $tiki_p_edit_tikitests != 'y') {
     Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
-$smarty->assign('tidy', extension_loaded('tidy') && $prefs['error_tidy_toggle'] == 'y');
+$smarty->assign('tidy', TikiLib::lib('htmltidy')->isTidyLoaded());
 $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
@@ -53,9 +53,9 @@ function enlight_xpath($url, $xpath)
         return tra('The page is empty');
     }
 
-    if (extension_loaded('tidy') && $prefs['error_tidy_toggle'] == 'y') {
-        $data = tidy_parse_string($data, [], 'utf8');
-        tidy_diagnose($data);
+    $htmlTidyLib = TikiLib::lib('htmltidy');
+    if ($htmlTidyLib->isTidyLoaded()) {
+        $data = $htmlTidyLib->cleanHtml($data, null, 'utf8', ['source' => 'test_xpath_show']);
     } else {
         if (! $loaded) {
             require_once('lib/htmlpurifier_tiki/HTMLPurifier.tiki.php');

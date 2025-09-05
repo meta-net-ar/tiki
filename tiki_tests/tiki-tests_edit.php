@@ -53,7 +53,9 @@ function get_url($url, $use_tidy = true)
     $referer = $url->getAttribute("referer");
 
     $result['data'] = $data;
-    if (extension_loaded("tidy")) {
+    $htmlTidyLib = TikiLib::lib('htmltidy');
+    
+    if ($htmlTidyLib->isTidyLoaded()) {
         $data = tidy_parse_string($data, [], 'utf8');
         tidy_diagnose($data);
         if ($use_tidy) {

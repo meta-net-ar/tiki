@@ -1962,32 +1962,8 @@ TEXT;
  */
 function cleanHtml($html, $config = null, $encoding = 'utf8')
 {
-    global $prefs;
-    if (extension_loaded('tidy') == true && $prefs['error_tidy_toggle'] == 'y') {
-        $default = [
-            'clean' => true,
-            'output-xhtml' => false,
-            'merge-divs' => false,
-            'show-body-only' => 'auto',
-            'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
-            'new-empty-tags' => 'embed keygen source track wbr',
-            'new-inline-tags' => 'svg audio command datalist embed mark menuitem meter output progress source time video wbr',
-            'repeated-attributes' => 'keep-first',
-            'drop-proprietary-attributes' => false,
-            'wrap' => 0,
-            'coerce-endtags' => true,
-            'quote-ampersand' => true,
-            'quote-marks' => false,
-            'drop-empty-elements' => false,
-        ];
-        $config = (is_array($config) == true) ? array_merge($default, $config) : $default;
-        $html_ = tidy_parse_string($html, $config, $encoding);
-        $html_->cleanRepair();
-
-        return (string) $html_;
-    }
-
-    return $html;
+    $htmlTidyLib = TikiLib::lib('htmltidy');
+    return $htmlTidyLib->cleanHtml($html, $config, $encoding, ['source' => 'pdf_generation']);
 }
 
 /**
