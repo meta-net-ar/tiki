@@ -627,6 +627,7 @@ export function generateToken(el) {
     window.crypto.getRandomValues(array);
     const token = Array.from(array, (dec) => ("00000000" + dec.toString(16)).slice(-8)).join("");
     $(el).siblings("input[name='access_token']").val(token);
+    $(el).siblings("el-input").attr("value", token); //When ElementPlus feature is enabled, the el-input is the one that user interact with
 }
 
 $(document).ready(function () {
