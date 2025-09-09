@@ -62,7 +62,10 @@ function wikiplugin_html($data, $params)
     // exit($html);
 
     // Purify $html before serving it
-    $html = TikiFilter::get('html')->filter($html);
+    global $prefs;
+    if (! empty($prefs['feature_htmlpurifier_output']) && $prefs['feature_htmlpurifier_output'] == 'y') {
+        $html = TikiFilter::get('html')->filter($html);
+    }
 
     if (isset($params['tohead']) && $params['tohead'] == 1) {
         // Insert in HTML head rather than in body
