@@ -49,7 +49,6 @@ watch(
             class="form-control form-control-sm"
             type="text"
             :placeholder="label"
-            :required="required"
             :aria-required="required"
             :aria-describedby="ariaDescribedBy"
             :aria-label="label"
