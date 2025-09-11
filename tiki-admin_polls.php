@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'               => [
@@ -223,11 +226,10 @@ if ($_REQUEST["pollId"]) {
 
 $smarty->assign('info', $info);
 $smarty->assign('options', $options);
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'publishDate_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'publishDate_desc',
+    ['tiki_polls']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'    => [
@@ -17,7 +20,7 @@ $inputConfiguration = [
             'remove'          => 'int',       //post
             'extwiki'         => 'text',       //post
             'find'            => 'text',       //post
-            'sort_mode'       => 'text',       //get
+            'sort_mode'       => 'word',       //get
             'offset'          => 'digits',     //get
         ],
     ],
@@ -84,11 +87,10 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $smarty->assign('info', $info);
     $smarty->assign('name', '');
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'extwikiId_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'extwikiId_desc',
+    ['tiki_extwiki']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -149,12 +152,10 @@ if (isset($_REQUEST["removesheet"]) && $access->checkCsrf()) {
 }
 $cat_objid = $_REQUEST['sheetId'];
 include_once('categorize_list.php');
-
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'title_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'title_asc',
+    ['tiki_sheets']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit

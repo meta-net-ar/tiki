@@ -7,7 +7,10 @@
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details
+
+use Tiki\SortModeValidator;
+
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -36,11 +39,12 @@ if (! isset($_REQUEST["days"])) {
 } else {
     $days = $_REQUEST["days"];
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'lastModif_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'lastModif_desc',
+    ['tiki_history', 'tiki_pages', 'tiki_actionlog'],
+    $histlib->pure_aliases
+) ?: 'lastModif_desc';
+
 $smarty->assign_by_ref('days', $days);
 $smarty->assign_by_ref('findwhat', $findwhat);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
