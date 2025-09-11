@@ -97,7 +97,7 @@
     
     .form-control, .form-control:focus {
         background-color: transparent;
-        border-color: var(--bs-body-bg);
+        border: var(--bs-border-width) solid var(--bs-border-color);
     }
     .search_content { 
         background-color: transparent;
