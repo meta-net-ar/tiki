@@ -92,3 +92,46 @@
     width: fit-content;
     border-radius: 8px;
 }
+
+.ui-datepicker {
+    z-index:9999 !important;
+}
+.fc .fc-scrollgrid, .fc .fc-scrollgrid table,
+.fc .fc-daygrid-body {
+    width: 100% !important;
+}
+.fc-daygrid-event-harness {
+    border-radius: 4px;
+    margin: 0px 3px 0px;
+}
+.fc-event {
+    display: block;
+    white-space: break-spaces;
+}
+.fc-daygrid-day-events .fc-event-time {
+    color: #ffffff;
+    font-weight: bold;
+}
+.fc-daygrid-day-events .fc-event-title {
+    color: #ffffff;
+    font-weight: normal;
+}
+.fc-timegrid-event .fc-event-time {
+    font-weight: bold;
+}
+.fc-timegrid-event .fc-event-title {
+    font-weight: normal;
+}
+@media only screen and (max-width: 767px) {
+    .fc-header-toolbar {
+        display: block !important;
+    }
+    .fc-header-toolbar .fc-toolbar-chunk .btn-group .btn {
+        padding: 0.375rem 0.1rem;
+    }
+}
+@media print {
+    .fc .fc-daygrid-day-top {
+        border-bottom: 1px solid #dee2e6;
+    }
+}
