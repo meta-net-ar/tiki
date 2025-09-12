@@ -2212,7 +2212,7 @@ class CalendarLib extends TikiLib
         if (empty($prefs['calendar_holidays'])) {
             return 0;
         }
-        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2)+1);
+        $events = $this->get_events($prefs['calendar_holidays'], [], null, min($ts1, $ts2), max($ts1, $ts2) + 1);
         $dates = [];
         foreach ($events as $event) {
             $start = $event['start'];
