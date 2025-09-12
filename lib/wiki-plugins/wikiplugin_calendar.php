@@ -100,27 +100,126 @@ function wikiplugin_calendar($data, $params)
         $params['viewnavbar'] = 'n';
     }
 
-    $module_reference = [
-        'moduleId' => null,
-        'name' => 'calendar_new',
-        'params' => [ 'calIds' => $params['calIds'],
-                            'viewnavbar' => $params['viewnavbar'],
-                            'viewlist' => $params['viewlist'],
-                            'viewmode' => $params['viewmode'],
-                            'nobox' => 'y' ],
-        'position' => null,
-        'ord' => null,
-    ];
+    $slotDuration = '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT);
 
-    $modlib = TikiLib::lib('mod');
+    $rawcals = $calendarlib->list_calendars();
+    TikiLib::lib('header')
+        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
+        ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    $rawcals['data'] = Perms::filter(
+        ['type' => 'calendar'],
+        'object',
+        $rawcals['data'],
+        [ 'object' => 'calendarId' ],
+        'view_calendar'
+    );
+
+    if (empty($rawcals['data'])) {
+        Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
+    }
+
+    $rawcals['data'] = array_filter($rawcals['data'], fn($current) => in_array($current['calendarId'], $params['calIds']));
+
+    switch ($params['viewmode']) {
+        case 'week':
+            $initialView = 'timeGridWeek';
+            break;
+        case 'day':
+            $initialView = 'timeGridDay';
+            break;
+        case 'month':
+            $initialView = 'dayGridMonth';
+            break;
+        default:
+            $initialView = 'dayGridMonth';
+    }
+    $viewstart = $_REQUEST['todate'] ?? $tikilib->now;
+    $viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+    $listevents = $calendarlib->list_raw_items(
+        $params['calIds'],
+        $user,
+        $viewstart,
+        $viewend,
+        0,
+        -1
+    );
+
+    $listevents = Perms::filter(
+        ['type' => 'calendaritem'],
+        'object',
+        $listevents,
+        ['object' => 'calitemId'],
+        ['view_events']
+    );
+    $defaultCalendarId = $params['calIds'][0];
+    $calendars = [];
+    $canEditAnything = false;
+
+    foreach ($rawcals['data'] as $calendar) {
+        $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
+        $calendars[$calendar['calendarId']] = $calendar;
+        // for week and day views
+        $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
+        $startOfDayHour = $startOfDayUnix / 3600;
+        $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
+        $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
+        $endOfDayUnix = (int)($calendar['endday'] ?? 0);
+        $endOfDayHour = $endOfDayUnix / 3600;
+        $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
+        $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
+
+        $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
+    }
+
+    $smarty->assign(
+        'fullCalendarParams',
+        [
+            'firstDayofWeek'   => 0,//$firstDayofWeek,
+            'display_timezone' => $prefs['display_timezone'],
+            'language'         => $prefs['language'],
+            'minHourOfDay'     => $minHourOfDay,
+            'maxHourOfDay'     => $maxHourOfDay,
+            'slotDuration'     => $slotDuration,
+            'initialView'      => $initialView,
+            'initialDate'      => date("Y-m-d"),
+        ]
+    );
+
+    $smarty->assign('displayedcals', $params['calIds']);
+    $thiscal = [];
+    $checkedCalIds = [];
+
+    if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
+        $defaultCalendarId = $_REQUEST["calIds"][0];
+    }
+
+    $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
+    $smarty->assign('calendars', $calendars);
+    $smarty->assign('viewlist', $params['viewlist']);
+
     $out = '';
-    if ($params['viewlist'] == 'table' || $params['viewlist'] == 'both') {
-        $out .= $modlib->execute_module($module_reference);
-    }
     if ($params['viewlist'] == 'list' || $params['viewlist'] == 'both') {
-        $module_reference['params']['viewlist'] = 'list';
-        $out .= "<div>" . $modlib->execute_module($module_reference) . "</div>";
-    }
+        $module_reference = [
+            'moduleId' => null,
+            'name' => 'calendar_new',
+            'params' => [ 'calIds' => $params['calIds'],
+                                'viewnavbar' => $params['viewnavbar'],
+                                'viewlist' => $params['viewlist'],
+                                'viewmode' => $params['viewmode'],
+                                'nobox' => 'y' ],
+            'position' => null,
+            'ord' => null,
+        ];
 
-    return "<div>$out</div>";
+        $modlib = TikiLib::lib('mod');
+        $out = '';
+        if ($params['viewlist'] == 'list' || $params['viewlist'] == 'both') {
+            $module_reference['params']['viewlist'] = 'list';
+            $out .= "<div>" . $modlib->execute_module($module_reference) . "</div>";
+        }
+    }
+    $smarty->assign('out', $out);
+    $smarty->assign('viewnavbar', $params['viewnavbar']);
+
+    return $smarty->fetch('wiki-plugins/wikiplugin_calendar.tpl');
 }
