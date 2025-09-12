@@ -110,8 +110,9 @@ class Manager
 
             try {
                 if ($tabular['odbc_config']) {
+                    $source = new \Tracker\Tabular\Source\TrackerItemSource($schema, $args['object']);
                     $writer = new Writer\ODBCWriter($tabular['odbc_config']);
-                    $remote = $writer->sync($schema, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
+                    $remote = $writer->sync($source, $args['object'], $args['old_values_by_permname'], $args['values_by_permname'], $is_new);
                     foreach ($remote as $field => $value) {
                         if (isset($args['values_by_permname'][$field])) {
                             $differs = $value !== $args['values_by_permname'][$field];
