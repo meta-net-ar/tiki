@@ -6966,7 +6966,7 @@ class TrackerLib extends TikiLib
             'logo' => $input->logo->text(),
             'useFormClasses' => $input->useFormClasses->int() ? 'y' : 'n',
             'formClasses' => $input->formClasses->text(),
-            'tabularSync' => implode(',', $input->tabularSync->asArray()),
+            'tabularSync' => implode(',', $input->asArray('tabularSync')),
             'tabularSyncModifiedField' => $input->tabularSyncModifiedField->int(),
             'tabularSyncLastImport' => $input->tabularSyncLastImport->int(),
             'tabularSyncLastImportSkipUpdate' => $input->tabularSyncLastImportSkipUpdate->int() ? 'y' : 'n',
