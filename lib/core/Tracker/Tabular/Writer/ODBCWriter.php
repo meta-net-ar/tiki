@@ -53,10 +53,21 @@ class ODBCWriter
     /**
      * Called after trackeritem save event, this method updates remote data source with local changes
      */
-    public function sync(\Tracker\Tabular\Schema $schema, int $item_id, array $old_values, array $new_values, &$is_new)
+    public function sync(\Tracker\Tabular\Source\TrackerItemSource $source, int $item_id, array $old_values, array $new_values, &$is_new)
     {
+        $schema = $source->getSchema();
         $schema->validate();
         $columns = $schema->getColumns();
+
+        // check the sync against the tabular source as default filters might filter out this entry and we don't want to sync in that case
+        $at_least_one_entry = false;
+        foreach ($source->getEntries() as $entry) {
+            $at_least_one_entry = true;
+            break;
+        }
+        if (! $at_least_one_entry) {
+            return [];
+        }
 
         // prepare the remote entry to replace - send only the following:
         // - changed values
