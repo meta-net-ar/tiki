@@ -592,11 +592,28 @@ class StatsLib extends TikiLib
     public function trackerStats()
     {
         $stats = [];
-        $stats["trackers"] = $this->query("show table status WHERE `Name` = 'tiki_trackers'", []);
-        $stats["tracker_fields"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_fields'", []);
-        $stats["tiki_tracker_items"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_items'", []);
-        $stats["tiki_tracker_item_attachments"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_item_attachments'", []);
-        $stats["tiki_tracker_options"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_options'", []);
+        $tables = [
+            'trackers' => 'tiki_trackers',
+            'tracker_fields' => 'tiki_tracker_fields',
+            'tiki_tracker_items' => 'tiki_tracker_items',
+            'tiki_tracker_item_attachments' => 'tiki_tracker_item_attachments',
+            'tiki_tracker_options' => 'tiki_tracker_options',
+        ];
+
+        foreach ($tables as $key => $table) {
+            // Accurate row count
+            $stats[$key]['rowCount'] = (int) $this->getOne("SELECT COUNT(*) FROM `$table`", []);
+
+            // Table size via SHOW TABLE STATUS
+            $stat = $this->query("SHOW TABLE STATUS WHERE `Name` = ?", [$table]);
+            $dataLength = 0;
+
+            if (isset($stat->result[0])) {
+                $dataLength = (int) $stat->result[0]['Data_length'];
+            }
+
+            $stats[$key]['dataLengthMb'] = $dataLength / 1024 / 1024;
+        }
         return $stats;
     }
 }

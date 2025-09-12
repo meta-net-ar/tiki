@@ -95,18 +95,6 @@ $smarty->assign_by_ref('quiz_stats', $quiz_stats);
 if ($prefs['feature_trackers'] == 'y') {
     // Retrieve trackers statistics and prepare extracted data for display.
     $tracker_stats = $statslib->trackerStats();
-    $tracker_stat_data = [];
-    foreach ($tracker_stats as $key => $stat) {
-        if (isset($stat->result[0])) {
-            $tracker_stat_data = $stat->result[0];
-            $extractedTrackerStatsData[$key] = [
-                'dataLengthMb' => $tracker_stat_data['Data_length'] / 1024 / 1024, // Get data lenght in Mb.
-                'rowCount' => $tracker_stat_data['Rows'] + 1 // Number of records + 1, because it starts with 0 index when counting.
-            ];
-        }
-    }
-
-    $tracker_stats = $extractedTrackerStatsData;
 } else {
     $tracker_stats = false;
 }
