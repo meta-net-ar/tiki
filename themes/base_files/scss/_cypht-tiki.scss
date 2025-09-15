@@ -93,12 +93,12 @@
             background-color: transparent;
         }
     }
-    
+
     .form-control, .form-control:focus {
         background-color: transparent;
         border: var(--bs-border-width) solid var(--bs-border-color);
     }
-    .search_content { 
+    .search_content {
         background-color: transparent;
     }
     a:not(.btn):hover {
@@ -299,18 +299,18 @@
         word-break: break-word;
         overflow-wrap: anywhere;
     }
-    
+
     .long_header {
         display: none;
     }
-    
+
     .long_header[style*="display: block"],
     .long_header[style*="display: flex"],
     .long_header[style*="display: grid"] {
         display: flex !important;
         column-gap: 0.15rem;
     }
-    
+
     .long_header > div:nth-of-type(2) {
         overflow-wrap: break-word !important;
     }
@@ -319,25 +319,25 @@
     .long_header .col-md-2 {
         font-weight: 500;
     }
-    
+
     .small_header > div:nth-of-type(2),
     .small_header > div:nth-of-type(2) > div {
         display: flex;
         column-gap: 0.15rem;
     }
-    
+
     .small_header {
         display: flex;
     }
-    
+
     .all_headers {
         display: inline-block;
     }
-    
+
     .small_headers {
         display: none;
     }
-    
+
     /* Mobile responsive overrides for Bootstrap classes */
     @media (max-width: 768px) {
         .small_header {
@@ -346,24 +346,24 @@
         column-gap: 0.5rem;
         flex-wrap: nowrap;
         }
-    
+
         .small_header > div {
         flex: 0 0 auto;
         padding: 0;
         flex-wrap: wrap;
         }
-    
+
         .small_header .col-md-2 {
         font-weight: bold;
         white-space: nowrap;
         width: fit-content !important;
         }
-    
+
         .long_header .col-md-2 {
         font-weight: bold;
         }
     }
-    
+
     .collapsed ul {
         display: inherit;
     }
@@ -377,7 +377,7 @@
     main .container {
         width: 100%;
     }
-    #imap_filter_form {        
+    #imap_filter_form {
         .imap_sort, .imap_sort + el-select, .imap_filter + el-select {
             width: 150px;
         }
