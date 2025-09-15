@@ -197,7 +197,9 @@ class Services_Category_Controller
             }
             //now add objects to the category
             if (count($filteredObjects)) {
+                $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
+                $this->logCatgorizedTrackeritems($return['objects'], $caterizedItemsInfos);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
@@ -255,7 +257,9 @@ class Services_Category_Controller
             }
             //now uncategorize objects that are in the category
             if (count($filteredObjects)) {
+                $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
+                $this->logCatgorizedTrackeritems($return['objects'], $caterizedItemsInfos);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
@@ -278,6 +282,38 @@ class Services_Category_Controller
                 'categId' => $categId,
                 'objects' => $objects,
             ];
+        }
+    }
+    public function getCaterizedTrackeritemsInfos($filteredObjects)
+    {
+        $trklib = TikiLib::lib('trk');
+        $caterizedItemsInfos = [];
+        foreach ($filteredObjects as $object) {
+            if ($object['type'] == 'trackeritem') {
+                $trackerId = $trklib->get_tracker_for_item($object['id']);
+                $definition = Tracker_Definition::get($trackerId);
+                if ($fieldIds = $definition->getCategorizedFields()) {
+                    foreach ($fieldIds as $fieldId) {
+                        $itemValue = $trklib->get_item_value($trackerId, $object['id'], $fieldId) ?? '';
+                        $caterizedItemsInfos[] = ["fieldId" => $fieldId, "itemId" => $object['id'],"itemValue" => $itemValue];
+                    }
+                }
+            }
+        }
+        return $caterizedItemsInfos;
+    }
+    public function logCatgorizedTrackeritems($categorizedObjects, $caterizedItemsInfos)
+    {
+        $trklib = TikiLib::lib('trk');
+        foreach ($categorizedObjects as $object) {
+            if ($object['type'] == 'trackeritem') {
+                foreach ($caterizedItemsInfos as $caterizedItemInfos) {
+                    if ($caterizedItemInfos['itemId'] == $object['id']) {
+                        $version = $trklib->last_log_version($caterizedItemInfos['itemId']) + 1;
+                        $trklib->log($version, $caterizedItemInfos['itemId'], $caterizedItemInfos['fieldId'], $caterizedItemInfos['itemValue']);
+                    }
+                }
+            }
         }
     }
 

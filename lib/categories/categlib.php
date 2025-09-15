@@ -530,7 +530,9 @@ class CategLib extends ObjectLib
         $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if ($prefs['feature_actionlog'] == 'y') {
             $logslib = TikiLib::lib('logs');
-            $logslib->add_action('Categorized', $info['itemId'], $info['type'], "categId=$categId", $user);
+            $trklib = TikiLib::lib('trk');
+            $version = $trklib->last_log_version($info['itemId']) + 1;
+            $logslib->add_action('Categorized', $info['itemId'], $info['type'], "$version", $user);
         }
         TikiLib::events()->trigger('tiki.object.categorized', [
             'object' => $info['itemId'],
@@ -556,7 +558,9 @@ class CategLib extends ObjectLib
         $info = TikiLib::lib('object')->get_object_via_objectid($catObjectId);
         if ($prefs['feature_actionlog'] == 'y') {
             $logslib = TikiLib::lib('logs');
-            $logslib->add_action('Uncategorized', $info['itemId'], $info['type'], "categId=$categId");
+            $trklib = TikiLib::lib('trk');
+            $version = $trklib->last_log_version($info['itemId']) + 1;
+            $logslib->add_action('Uncategorized', $info['itemId'], $info['type'], "$version");
         }
         TikiLib::events()->trigger('tiki.object.categorized', [
             'object' => $info['itemId'],
