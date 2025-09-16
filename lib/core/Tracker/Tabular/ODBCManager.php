@@ -44,14 +44,16 @@ class ODBCManager
             $result = odbc_fetch_array($rs);
         } else {
             $sql = "SELECT * FROM {$this->config['table']} WHERE " . implode(' AND ', array_map(function ($k, $v) {
-                return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+                return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
             }, array_keys($row), $row));
             $rs = odbc_prepare($conn, $sql);
             $params = array_filter(array_values($row));
             odbc_execute($rs, $params);
             $result = odbc_fetch_array($rs);
         }
-        $result = $this->reverseMapFieldsFromConfig($result);
+        if ($result) {
+            $result = $this->reverseMapFieldsFromConfig($result);
+        }
         $this->stopErrorHandler();
         return $result;
     }
@@ -240,7 +242,7 @@ class ODBCManager
             $sql = "UPDATE {$this->config['table']} SET " . implode(', ', array_map(function ($k) {
                 return "\"{$k}\" = ?";
             }, array_keys($chunk))) . " WHERE " . implode(' AND ', array_map(function ($k, $v) {
-                return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+                return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
             }, array_keys($existing), $existing));
             $rs = odbc_prepare($conn, $sql);
             $params = array_map(function ($v) {
@@ -256,7 +258,7 @@ class ODBCManager
             $existing[$k] = $v;
         }
         $sql = "SELECT * FROM {$this->config['table']} WHERE " . implode(' AND ', array_map(function ($k, $v) {
-            return empty($v) ? "\"{$k} IS NULL\"" : "\"{$k}\" = ?";
+            return empty($v) ? "\"{$k}\" IS NULL" : "\"{$k}\" = ?";
         }, array_keys($existing), $existing));
         $rs = odbc_prepare($conn, $sql);
         $params = array_filter(array_values($existing));
