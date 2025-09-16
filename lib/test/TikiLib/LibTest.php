@@ -18,6 +18,18 @@ class TikiLib_LibTest extends TikiTestCase
 
     public function testLibShouldReturnNullForInvalidClass(): void
     {
-        $this->assertThrowableMessage(tr("%0 library not found. This may be due to a typo or caused by a recent update.", 'invalidClass'), TikiLib::class . '::lib', 'invalidClass');
+        $this->expectException(\Exception::class); // expect an exception to be thrown
+        $this->expectExceptionMessage(tr("%0 library not found. This may be due to a typo or caused by a recent update.", 'invalidClass'), TikiLib::class . '::lib', 'invalidClass');
+        set_error_handler(function ($errno, $errstr) {
+            throw new \Exception($errstr); // throw an exception when an error occurs
+        });
+
+        try {
+            TikiLib::lib('invalidClass');
+        } catch (\Exception $e) {
+            throw $e; // rethrow the exception
+        } finally {
+            restore_error_handler(); // restore the previous error handler for the next tests
+        }
     }
 }

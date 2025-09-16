@@ -71,13 +71,6 @@ if (! $installer->tableExists('tiki_preferences')) {
     }
 }
 
-// These values are set on console.php
-// which is not executed by unit tests
-const DB_RUNNING = true;
-const DB_STATUS = true;
-const DB_TIKI_SETUP = true;
-const DB_SYNCHRONAL = true;
-
 $smarty = TikiLib::lib('smarty');
 $cachelib = TikiLib::lib('cache');
 $wikilib = TikiLib::lib('wiki');
