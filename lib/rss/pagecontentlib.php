@@ -65,7 +65,7 @@ class PageContentLib
     private function tidy($html)
     {
         $htmlTidyLib = TikiLib::lib('htmltidy');
-        return $htmlTidyLib->cleanHtml($html, [], 'UTF8', ['source' => 'rss_content']);
+        return $htmlTidyLib->validateHtmlMarkup($html, [], 'UTF8', ['source' => 'PageContentLib']);
     }
 
     private function getUrls($url)

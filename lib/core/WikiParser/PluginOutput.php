@@ -106,35 +106,12 @@ class WikiParser_PluginOutput
 
     public function toHtml($parseOptions = [])
     {
-        $result = '';
         switch ($this->format) {
             case 'wiki':
-                $result = $this->parse($this->data, $parseOptions);
-                break;
+                return $this->parse($this->data, $parseOptions);
             case 'html':
-                $result = $this->data;
-                break;
+                return $this->data;
         }
-
-        // Validate HTML output from plugins and report errors
-        if (! empty($result) && is_string($result)) {
-            $htmlTidyLib = TikiLib::lib('htmltidy');
-
-            // Get plugin context from debug backtrace if available
-            $context = ['source' => 'wiki_plugin_output'];
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
-
-            foreach ($trace as $frame) {
-                if (isset($frame['function']) && strpos($frame['function'], 'wikiplugin_') === 0) {
-                    $context['plugin'] = substr($frame['function'], 11); // Remove 'wikiplugin_' prefix
-                    break;
-                }
-            }
-
-            $result = $htmlTidyLib->cleanHtml($result, null, 'utf8', $context);
-        }
-
-        return $result;
     }
 
     private function parse($data, $parseOptions = [])

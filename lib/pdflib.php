@@ -1121,7 +1121,7 @@ HTML;
         $pdfSettings = [];
         if (! empty($html)) {
             //checking if pdf plugin is set and passed
-            $html = cleanHtml($html, null, 'utf8');
+            $html = validateHtmlMarkup($html, null, 'utf8');
             $doc = loadHTMLContent($html);
 
             $pdf = $doc->getElementsByTagName('pdfsettings')->item(0);
@@ -1204,7 +1204,7 @@ HTML;
     public function getPDFPages($html, $pdfSettings)
     {
         //checking if pdf page tag exists
-        $html = cleanHtml($html, null, 'utf8');
+        $html = validateHtmlMarkup($html, null, 'utf8');
         $doc = loadHTMLContent($html);
         $xpath = new DOMXpath($doc);
         //Getting pdf page custom pages from content
@@ -1270,7 +1270,7 @@ HTML;
 
     public function _getImages(&$html, &$tempImgArr)
     {
-        $html = cleanHtml($html, null, 'utf8');
+        $html = validateHtmlMarkup($html, null, 'utf8');
         $html = str_replace('&amp;#x', '&#x', $html);
         $doc = loadHTMLContent($html);
 
@@ -1354,7 +1354,7 @@ HTML;
         //Replace all word separators as this is already fixed with CSS
         $html = str_replace(["<wbr>", "<wbr/>"], "", $html);
 
-        $html = cleanHtml($html, null, 'utf8');
+        $html = validateHtmlMarkup($html, null, 'utf8');
         $doc = loadHTMLContent($html);
 
         $tables = $doc->getElementsByTagName('table');
@@ -1514,7 +1514,7 @@ HTML;
 
     public function fontawesome(&$html)
     {
-        $html = cleanHtml($html, null, 'utf8');
+        $html = validateHtmlMarkup($html, null, 'utf8');
         $doc = loadHTMLContent($html);
         $xpath = new DOMXpath($doc);
       //font awesome code insertion
@@ -1644,7 +1644,7 @@ TEXT;
     {
         global $base_url;
 
-        $content = cleanHtml($content, null, 'utf8');
+        $content = validateHtmlMarkup($content, null, 'utf8');
         $doc = loadHTMLContent($content);
         $anchors = $doc->getElementsByTagName('a');
         $len = $anchors->length;
@@ -1960,10 +1960,10 @@ TEXT;
  * big5, and shiftjis.
  * @return string
  */
-function cleanHtml($html, $config = null, $encoding = 'utf8')
+function validateHtmlMarkup($html, $config = null, $encoding = 'utf8')
 {
     $htmlTidyLib = TikiLib::lib('htmltidy');
-    return $htmlTidyLib->cleanHtml($html, $config, $encoding, ['source' => 'pdf_generation']);
+    return $htmlTidyLib->validateHtmlMarkup($html, $config, $encoding, ['source' => 'pdf_generation']);
 }
 
 /**
@@ -1991,7 +1991,7 @@ function loadHTMLContent($html)
 
 function cleanContent($content, $tagArr)
 {
-    $content = cleanHtml($content, null, 'utf8');
+    $content = validateHtmlMarkup($content, null, 'utf8');
     $doc = loadHTMLContent($content);
     $xpath = new DOMXpath($doc);
 

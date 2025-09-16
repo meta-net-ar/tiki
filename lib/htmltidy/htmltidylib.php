@@ -36,7 +36,7 @@ class HtmlTidyLib extends TikiDb_Bridge
      * @param array $context Additional context for error reporting
      * @return string Cleaned HTML or original HTML if tidy not available/enabled
      */
-    public function cleanHtml($html, $config = null, $encoding = 'utf8', $context = [])
+    public function validateHtmlMarkup($html, $config = null, $encoding = 'utf8', $context = [])
     {
         if (! $this->tidyAvailable) {
             return $html;

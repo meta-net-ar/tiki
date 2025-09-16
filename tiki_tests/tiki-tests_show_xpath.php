@@ -55,7 +55,7 @@ function enlight_xpath($url, $xpath)
 
     $htmlTidyLib = TikiLib::lib('htmltidy');
     if ($htmlTidyLib->isTidyLoaded()) {
-        $data = $htmlTidyLib->cleanHtml($data, null, 'utf8', ['source' => 'test_xpath_show']);
+        $data = $htmlTidyLib->validateHtmlMarkup($data, null, 'utf8', ['source' => 'test_xpath_show']);
     } else {
         if (! $loaded) {
             require_once('lib/htmlpurifier_tiki/HTMLPurifier.tiki.php');
