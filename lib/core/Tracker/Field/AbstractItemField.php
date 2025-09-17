@@ -581,7 +581,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
     /**
      * Get the tracker field object corresponding to this tracker item field object
      */
-    protected function getTrackerFieldInstance(): AbstractTrackerField
+    public function getTrackerFieldInstance(): AbstractTrackerField
     {
         return $this->trackerField;
     }

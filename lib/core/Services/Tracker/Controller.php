@@ -3206,26 +3206,36 @@ class Services_Tracker_Controller
             throw new Services_Exception_NotFound();
         }
 
+        /** @var Tracker_Field_EmailFolder $fieldHandler */
         $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
 
         if (! method_exists($fieldHandler, 'getFolders')) {
             throw new ServicesExceptionBadRequest(tr('Incorrect field type'));
         }
 
+        $trackerField = $fieldHandler->getTrackerFieldInstance();
         $folders = [];
 
-        foreach ($fieldHandler->getFolders() as $name => $label) {
-            if (empty($name)) {
-                continue;
+        if ($trackerField->getOption('useFolders')) {
+            foreach ($fieldHandler->getFolders() as $name => $label) {
+                if (empty($name)) {
+                    continue;
+                }
+                $folders[] = [
+                    'name' => $name,
+                    'label' => $label,
+                ];
             }
+        } else {
             $folders[] = [
-                'name' => $name,
-                'label' => $label,
+                'name' => 'inbox',
+                'label' => $trackerField->getOption('inboxName'),
             ];
         }
 
         return [
             'folders' => $folders,
+            'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
 }
