@@ -413,7 +413,30 @@ class Hm_Handler_tiki_presave_draft extends Hm_Handler_Module
     public function process()
     {
         $path = $this->request->get['list_path'];
-        if (strstr($path, 'tracker_folder_')) {
+        if (str_contains($path, 'tracker_folder_')) {
+            $path = str_replace('tracker_folder_', '', $path);
+            list ($itemId, $fieldId) = explode('_', $path);
+
+            $trk = TikiLib::lib('trk');
+
+            $item = $trk->get_item_info($itemId);
+            if (! $item) {
+                Hm_Msgs::add('Could not save draft to tracker item because the item was not found. id: ' . $itemId, 'warning');
+                return;
+            }
+
+            $field = $trk->get_field_info($fieldId);
+            if (! $field) {
+                Hm_Msgs::add('Could not save draft to tracker item because the field was not found.', 'warning');
+                return;
+            }
+
+            $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
+
+            if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
+                Hm_Msgs::add('Could not save draft to tracker item because folders are not configured for the current field.', 'warning');
+                return;
+            }
             $this->out('save_draft_to_imap', false);
         }
     }
@@ -448,6 +471,12 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
             Hm_Msgs::add('ERRTracker field not found');
+            return;
+        }
+
+        $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
+        if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
+            Hm_Msgs::add('Configure folders for this tracker field to save drafts', 'danger');
             return;
         }
 
