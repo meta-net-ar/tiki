@@ -90,7 +90,7 @@ function validate($params)
     $hashkey = $params->getParam(4);
     $hashkey = $hashkey->scalarval();
 
-    if (! isset($prefs['known_hosts'][$key]) or $prefs['known_hosts'][$key]['ip'] != $tikilib->get_ip_address()) {
+    if (! isset($prefs['known_hosts'][$key])) {
         $msg = tra('Invalid server key');
 
         if (! empty($prefs['intertiki_errfile'])) {
@@ -99,6 +99,31 @@ function validate($params)
 
         $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
         return new XML_RPC_Response(0, 101, $msg);
+    }
+
+    $ip = $tikilib->get_ip_address();
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        if(! isset($prefs['known_hosts'][$key]['ip6']) or $prefs['known_hosts'][$key]['ip6'] != $ip) {
+            $msg = tra('Unknown ipv6 for server key');
+
+            if (! empty($prefs['intertiki_errfile'])) {
+                logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
+            }
+
+            $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
+            return new XML_RPC_Response(0, 101, $msg);
+        }
+    } elseif (! isset($prefs['known_hosts'][$key]['ip']) or filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+         if($prefs['known_hosts'][$key]['ip'] != $ip) {
+            $msg = tra('Unknown ipv4 for server key');
+
+            if (! empty($prefs['intertiki_errfile'])) {
+                logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
+            }
+
+            $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
+            return new XML_RPC_Response(0, 101, $msg);
+        }
     }
 
     [$isvalid] = $userlib->validate_user($login, $pass);
