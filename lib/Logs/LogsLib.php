@@ -413,7 +413,7 @@ class LogsLib extends TikiLib
         // for previous compatibility
         // the new action are added with a if ($feature..)
         if (isset($prefs['feature_actionlog'])) {
-            if ($prefs['feature_actionlog'] == 'y') {
+            if ($prefs['feature_actionlog'] != 'y') {
                 return true;
             }
         }
