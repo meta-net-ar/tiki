@@ -1639,27 +1639,15 @@ function wikiplugin_trackerlist($data, $params)
         if (isset($_REQUEST["tr_sort_mode$iTRACKERLIST"])) {
             $sort_mode = $_REQUEST["tr_sort_mode$iTRACKERLIST"];
         } elseif (! isset($sort_mode)) {
-            // TODO refactor using \TrackerLib::get_default_sort_order
-            if (! empty($tracker_info['defaultOrderKey']) && is_numeric($tracker_info['defaultOrderKey'])) {
-                if ($tracker_info['defaultOrderKey'] == -1) {
-                    $sort_mode = 'lastModif';
-                } elseif ($tracker_info['defaultOrderKey'] == -2) {
-                    $sort_mode = 'created';
-                } elseif ($tracker_info['defaultOrderKey'] == -3) {
-                    $sort_mode = 'itemId';
-                } else {
-                    $sort_mode = 'f_' . $tracker_info['defaultOrderKey'];
-                }
-                if (isset($tracker_info['defaultOrderDir'])) {
-                    $sort_mode .= "_" . $tracker_info['defaultOrderDir'];
-                } else {
-                    $sort_mode .= "_asc";
-                }
-            } else {
-                $sort_mode = '';
-            }
-        } elseif ($sort_mode != 'created_asc' && $sort_mode != 'lastModif_asc' && $sort_mode != 'created_desc' && $sort_mode != 'lastModif_desc' && ! preg_match('/f_[0-9]+_(asc|desc)/', $sort_mode)) {
-            return tra('Incorrect param') . ' sort_mode';
+            $sort_mode = '';
+        }
+        $valid_static_modes = ['created_asc', 'created_desc', 'lastModif_asc', 'lastModif_desc'];
+        if (! empty($sort_mode) && ! in_array($sort_mode, $valid_static_modes) && ! preg_match('/^f_[1-9]\d*_(asc|desc)$/', $sort_mode)) {
+            $invalid_sort_mode_value = htmlspecialchars($sort_mode, ENT_QUOTES);
+            Feedback::warning(sprintf(tra('The provided sort mode "%s" is invalid. Falling back to the default sorting order.'), $invalid_sort_mode_value));
+            $sort_mode = $trklib->get_default_sort_order($tracker_info['trackerId']);
+        } elseif (empty($sort_mode)) {
+            $sort_mode = $trklib->get_default_sort_order($tracker_info['trackerId']);
         }
 
         $tr_sort_mode = $sort_mode;
