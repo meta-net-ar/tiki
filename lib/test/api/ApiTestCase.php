@@ -5,16 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-require_once(dirname(__FILE__) . '/ApiTestServer.php');
-use GuzzleHttp\Client;
-
 abstract class ApiTestCase extends TikiTestCase
 {
-    /**
-     * @var bool Whether the test server has been initialized for this class
-     */
-    private static $testServerInitialized = false;
-
     /**
      * @var \TikiDb The database connection used for API tests
      */
@@ -26,124 +18,248 @@ abstract class ApiTestCase extends TikiTestCase
     private static $adminApiToken = null;
 
     /**
-     * Returns the base URL for API requests.
-     * Always uses the test server for API integration tests.
-     *
-     * @return string The API base URL
+     * Path to the tiki-api.php file
      */
-    protected function getBaseUrl()
-    {
-        if (ApiTestServer::isRunning()) {
-            return ApiTestServer::getBaseUrl() . '/api/';  // Add /api/ with trailing slash for proper Guzzle URL combination
-        }
-
-        // Default fallback for API tests
-        return 'http://localhost:8000/api/';
-    }
+    private $tikiapiPath;
 
     /**
-     * Set up the API test server before running test class
+     * Set up the API test environment
      */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
-        if (! self::$testServerInitialized) {
-            if (ApiTestServer::start()) {
-                echo "API test server started successfully at " . ApiTestServer::getBaseUrl() . "\n";
-
-                if (ApiTestServer::waitForReady(10)) {
-                    echo "API test server is ready for requests\n";
-                    self::$testServerInitialized = true;
-
-                    // Create reusable admin API token for the test session
-                    $tokenlib = \TikiLib::lib('api_token');
-                    $token = $tokenlib->createToken([
-                        'type' => 'manual',
-                        'user' => 'admin'
-                    ]);
-                    self::$adminApiToken = $token['token'];
-                } else {
-                    throw new \RuntimeException("API test server failed to become ready within timeout");
-                }
-            } else {
-                throw new \RuntimeException("Failed to start API test server");
-            }
-        }
+        $tokenlib = \TikiLib::lib('api_token');
+        $token = $tokenlib->createToken([
+            'type' => 'manual',
+            'user' => 'admin'
+        ]);
+        self::$adminApiToken = $token['token'];
     }
 
-    /**
-     * Clean up the API test server after running test class
-     */
-    public static function tearDownAfterClass(): void
+    protected function setUp(): void
     {
-        if (self::$testServerInitialized) {            
-            if (ApiTestServer::stop()) {
-                echo "API test server stopped successfully\n";
-            } else {
-                echo "Warning: Failed to stop API test server cleanly\n";
-                ApiTestServer::cleanup(); // Force cleanup
-            }
-
-            self::$testServerInitialized = false;
-        }
-
-        parent::tearDownAfterClass();
+        parent::setUp();
+        $this->tikiapiPath = dirname(__FILE__) . '/tiki-api-wrapper.php';
+        $this->db = TikiDb::get();
     }
 
     /**
-     * Sends an HTTP request to the specified endpoint.
+     * Execute a request against the API by calling tiki-api.php in a subprocess
      *
-     * @param string $method The HTTP method to use (e.g., GET, POST, PUT, DELETE).
-     * @param string $endpoint The URL or endpoint to send the request to (should start with '/').
-     * @param string|null $permission The required permission level for the request (null for unauthenticated requests).
-     * @param array $data The data to send with the request (default: []).
-     * @param string $contentType The content type of the request data (default: 'application/json').
-     * @return \Psr\Http\Message\ResponseInterface The response from the HTTP request.
+     * @param string $method The HTTP method (GET, POST, PUT, DELETE)
+     * @param string $endpoint The API endpoint path (e.g., '/version', '/categories')
+     * @param string|null $permission The required permission level ('Admins', 'Editors', etc. or null for Anonymous)
+     * @param array $data The request data
+     * @param string $contentType The content type (default: 'application/json')
+     * @return array Response data including status code, headers, and body
      */
-    protected function makeHttpRequest($method, $endpoint, $permission = 'Admins', $data = [], $contentType = 'application/json')
+    protected function makeApiRequest($method, $endpoint, $permission = 'Admins', $data = [], $contentType = 'application/json')
     {
-        // For API integration tests, remove leading slash from endpoint to allow proper base_uri + endpoint combination
-        // Guzzle treats endpoints starting with '/' as absolute paths from host root
-        if (str_starts_with($endpoint, '/')) {
-            $endpoint = substr($endpoint, 1);
-        }
+        $env = $this->prepareRequestEnvironment($method, $endpoint, $permission, $data, $contentType);
+        
+        $response = $this->executeApiSubprocess($env);
+        
+        return $this->parseResponse($response);
+    }
 
-        $baseUrl = $this->getBaseUrl();
-
-        $clientConfig = [
-            'base_uri' => $baseUrl,
-            'headers' => [
-                'Content-Type' => $contentType,
-            ],
+    /**
+     * Prepare the environment variables for the API request
+     *
+     * @param string $method HTTP method
+     * @param string $endpoint API endpoint
+     * @param string|null $permission Permission level
+     * @param array $data Request data
+     * @param string $contentType Content type
+     * @return array Environment variables
+     */
+    private function prepareRequestEnvironment($method, $endpoint, $permission, $data, $contentType)
+    {
+        // Extract the route from the endpoint (remove leading slash)
+        $route = ltrim($endpoint, '/');
+        
+        // Base environment variables with all required $_SERVER keys
+        $env = [
+            'REQUEST_METHOD' => $method,
+            'REQUEST_URI' => '/api' . $endpoint,
+            'SCRIPT_NAME' => '/tiki-api.php',
+            'PATH_INFO' => $endpoint,
+            'CONTENT_TYPE' => $contentType,
+            'HTTP_ACCEPT' => 'application/json',
+            'SERVER_NAME' => 'localhost',
+            'SERVER_PORT' => '80',
+            'HTTPS' => '',
+            'HTTP_HOST' => 'localhost',
+            'HTTP_USER_AGENT' => 'TikiApiTest/1.0',
+            'REDIRECT_STATUS' => '200',
+            'REQUEST_SCHEME' => 'http',
+            'REMOTE_ADDR' => '127.0.0.1',
+            'REMOTE_HOST' => 'localhost',
         ];
 
-        // Add authentication if permission is provided
+        // Add authentication header if permission is provided
         if ($permission !== null) {
             $token = $this->getToken($permission);
-            $clientConfig['headers']['Authorization'] = 'Bearer ' . $token;
+            $env['HTTP_AUTHORIZATION'] = 'Bearer ' . $token;
         }
 
-        $client = new Client($clientConfig);
+        // Add the route parameter to GET data (this is what JitFilter expects)
+        $getData = array_merge(['route' => $route], $method === 'GET' ? $data : []);
+        $queryString = http_build_query($getData);
+        $env['QUERY_STRING'] = $queryString;
+        $env['REQUEST_URI'] .= '?' . $queryString;
 
-        // Determine request method and options
-        $options = [];
-        if ($method === 'GET' || $method === 'DELETE') {
-            $options['query'] = $data;
-        } else {
+        // Handle request data based on method and content type for POST/PUT/PATCH
+        if (in_array($method, ['POST', 'PUT', 'PATCH']) && ! empty($data)) {
             if ($contentType === 'application/json') {
-                $options['json'] = $data;
-            } else {
-                $options['form_params'] = $data;
+                $env['CONTENT_DATA'] = json_encode($data);
+                $env['CONTENT_LENGTH'] = strlen($env['CONTENT_DATA']);
+            } elseif ($contentType === 'application/x-www-form-urlencoded') {
+                $env['CONTENT_DATA'] = http_build_query($data);
+                $env['CONTENT_LENGTH'] = strlen($env['CONTENT_DATA']);
             }
         }
 
-        try {
-            $response = $client->request($method, $endpoint, $options);
-            return $response;
-        } catch (GuzzleHttp\Exception\ClientException $e) {
-            throw new \RuntimeException('Failed to make request: ' . $e->getMessage());
+        return $env;
+    }
+
+    /**
+     * Execute tiki-api.php in a subprocess with the prepared environment
+     *
+     * @param array $env Environment variables
+     * @return string Raw response output
+     */
+    protected function executeApiSubprocess($env)
+    {
+        $command = PHP_BINARY;
+
+        // Create process descriptor
+        $descriptorspec = [
+            0 => ['pipe', 'r'],  // stdin
+            1 => ['pipe', 'w'],  // stdout
+            2 => ['pipe', 'w'],  // stderr
+        ];
+
+        $processEnv = array_merge($_ENV, $env);
+
+        // Start the process
+        $fullCommand = $command . ' ' . escapeshellarg($this->tikiapiPath);
+        $process = proc_open($fullCommand, $descriptorspec, $pipes, null, $processEnv);
+
+        if (! is_resource($process)) {
+            throw new \RuntimeException('Failed to start API subprocess');
         }
+
+        // Send request data if present (for POST/PUT/PATCH requests)
+        if (isset($env['CONTENT_DATA'])) {
+            fwrite($pipes[0], $env['CONTENT_DATA']);
+        }
+        fclose($pipes[0]);
+
+        // Read response
+        $output = stream_get_contents($pipes[1]);
+        $errors = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+
+        if ($exitCode !== 0) {
+            $debugInfo = "\nCommand: $fullCommand\nExit code: $exitCode\nStderr: $errors\nStdout: " . substr($output, 0, 500);
+            throw new \RuntimeException("API subprocess failed with exit code $exitCode. Debug info: $debugInfo");
+        }
+
+        return $output;
+    }
+
+    /**
+     * Parse the raw response from the subprocess
+     * 
+     * Simplified parsing based on JSON response patterns:
+     * - Scenario 1: Valid JSON without code/message/errortitle = 200 OK
+     * - Scenario 2: Valid JSON with code/message/errortitle = Error response
+     * - Scenario 3: Invalid JSON = 500 Internal Server Error
+     *
+     * @param string $rawResponse Raw response data
+     * @return array Parsed response with status, headers, and body
+     */
+    protected function parseResponse($rawResponse)
+    {
+        // Clean up the response - remove any HTTP headers if present
+        $body = $this->extractJsonFromResponse($rawResponse);
+        
+        // Try to parse as JSON
+        $jsonDecoded = json_decode($body, true);
+        
+        if (json_last_error() === JSON_ERROR_NONE && is_array($jsonDecoded)) {
+            // Scenario 1 & 2: Valid JSON response
+            return $this->handleValidJsonResponse($jsonDecoded, $body);
+        } else {
+            // Scenario 3: Invalid JSON - unknown error
+            return $this->handleInvalidJsonResponse($body);
+        }
+    }
+
+    /**
+     * Extract JSON content from response, handling both raw JSON and HTTP response format
+     */
+    private function extractJsonFromResponse($rawResponse)
+    {
+        $body = trim($rawResponse);
+        
+        // If response contains HTTP headers, extract just the body
+        if (strpos($body, "\r\n\r\n") !== false) {
+            $parts = explode("\r\n\r\n", $body, 2);
+            $body = $parts[1] ?? $body;
+        } elseif (strpos($body, "\n\n") !== false) {
+            $parts = explode("\n\n", $body, 2);
+            $body = $parts[1] ?? $body;
+        }
+        
+        return trim($body);
+    }
+
+    /**
+     * Handle valid JSON response (Scenarios 1 & 2)
+     */
+    private function handleValidJsonResponse($jsonDecoded, $body)
+    {
+        // Check if this is an error response (has code, message, errortitle)
+        if (isset($jsonDecoded['code']) && isset($jsonDecoded['message']) && isset($jsonDecoded['errortitle'])) {
+            // Scenario 2: Error response with error details
+            $statusCode = is_numeric($jsonDecoded['code']) ? (int)$jsonDecoded['code'] : 500;
+            return [
+                'status_code' => $statusCode,
+                'headers' => [],
+                'body' => $body,
+                'parsed_body' => $jsonDecoded,
+            ];
+        } else {
+            // Scenario 1: Success response without error details
+            return [
+                'status_code' => 200,
+                'headers' => [],
+                'body' => $body,
+                'parsed_body' => $jsonDecoded,
+            ];
+        }
+    }
+
+    /**
+     * Handle invalid JSON response (Scenario 3) 
+     */
+    private function handleInvalidJsonResponse($body)
+    {
+        return [
+            'status_code' => 500,
+            'headers' => [],
+            'body' => $body,
+            'parsed_body' => [
+                'code' => 500,
+                'errortitle' => 'Invalid JSON Response',
+                'message' => 'The API returned a non-JSON response. This indicates an internal server error or unexpected output.',
+            ],
+        ];
     }
 
     /**
@@ -160,7 +276,8 @@ abstract class ApiTestCase extends TikiTestCase
             }
             return self::$adminApiToken;
         } else {
-            return 'xxxxxxxxxxxxxxxxxxxxxxx'; // TODO: Add token for other permission levels
+            // TODO: Add token creation for other permission levels
+            throw new \RuntimeException("Token creation for permission level '$permission' not implemented yet.");
         }
     }
 
@@ -172,9 +289,70 @@ abstract class ApiTestCase extends TikiTestCase
      */
     protected function cleanDatabaseTables(array $tables): void
     {
-        $this->db = TikiDb::get();
         foreach ($tables as $table) {
             $this->db->query("TRUNCATE TABLE $table");
         }
+    }
+
+    /**
+     * Assert that the response has the expected status code
+     *
+     * @param int $expectedCode Expected status code
+     * @param array $response Response array
+     * @param string $message Optional assertion message
+     */
+    protected function assertResponseStatus($expectedCode, $response, $message = '')
+    {
+        $this->assertEquals($expectedCode, $response['status_code'], $message ?: "Expected status code $expectedCode, got {$response['status_code']}");
+    }
+
+    /**
+     * Assert that the response body is valid JSON
+     *
+     * @param array $response Response array
+     * @param string $message Optional assertion message
+     */
+    protected function assertResponseIsJson($response, $message = '')
+    {
+        $this->assertIsArray($response['parsed_body'], $message ?: 'Response body is not valid JSON');
+    }
+
+    /**
+     * Assert that the response has a specific header
+     *
+     * @param string $headerName Header name
+     * @param array $response Response array
+     * @param string $expectedValue Optional expected header value
+     * @param string $message Optional assertion message
+     */
+    protected function assertResponseHasHeader($headerName, $response, $expectedValue = null, $message = '')
+    {
+        $this->assertArrayHasKey($headerName, $response['headers'], $message ?: "Response missing header: $headerName");
+        
+        if ($expectedValue !== null) {
+            $this->assertEquals($expectedValue, $response['headers'][$headerName], $message ?: "Header $headerName has unexpected value");
+        }
+    }
+
+    /**
+     * Get the parsed response body (as array if JSON)
+     *
+     * @param array $response Response array
+     * @return mixed Parsed response body
+     */
+    protected function getResponseBody($response)
+    {
+        return $response['parsed_body'];
+    }
+
+    /**
+     * Get the raw response body
+     *
+     * @param array $response Response array
+     * @return string Raw response body
+     */
+    protected function getRawResponseBody($response)
+    {
+        return $response['body'];
     }
 }
