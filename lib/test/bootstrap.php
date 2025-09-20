@@ -95,6 +95,7 @@ $_SESSION = [
 
 require_once(__DIR__ . '/TikiTestCase.php');
 require_once(__DIR__ . '/TestableTikiLib.php');
+require_once(__DIR__ . '/api/ApiTestCase.php');
 
 global $systemConfiguration;
 $systemConfiguration = new Config(['preference' => [], 'rules' => []], true);
