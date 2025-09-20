@@ -105,9 +105,7 @@
         text-decoration: $link-hover-decoration !important;
     }
     .content_title {
-        overflow: visible; min-height: 50px; max-height: 400px;
-        padding: 25px;
-        padding-bottom: 5px;
+        overflow: visible; min-height: 50px; max-height: 400px; padding: 15px;
     }
 
     .folders a, .subject a, .selected_menu a,
@@ -340,6 +338,13 @@
     .collapsed ul {
         display: inherit;
     }
+    nav.collapsed .menu-toggle {
+        right: 36%;
+    }
+    .folder_cell.collapsed .folder_list {
+        padding-right: 20px;
+    }
+
     main .container {
         width: 100%;
     }
@@ -364,6 +369,8 @@
     .search_terms, .search_form select {
         width: auto !important;
     }
+
+    .nux_welcome { margin-bottom: 15px; }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
@@ -386,6 +393,11 @@
         border-bottom: 1px solid $input-border-color;
         white-space: normal;
     }
+
+    #middle_outer {
+        margin-top: 15px !important;
+        .middle-wrapper { padding-top: 0; }
+    }
 }
 
 //
@@ -407,12 +419,12 @@
             z-index: 1000;
             text-align: left;
             top: 0;
-            padding: 15px 0 15px 20px;
+            padding: 10px 0 10px 20px;
             background: #fff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        nav .menu-toggle {
+        nav .menu-toggle:not(.close-toggle) {
             right: 20px;
             left: unset;
             text-align: left;
@@ -432,32 +444,6 @@
             padding: 0;
             border-bottom: 1px solid var(--bs-secondary-bg);
             background-color: var(--bs-body-bg);
-        }
-        
-        .nav-header a {
-            margin: auto 45% auto auto;
-        }
-        
-        .mobile .nav-header .app-logo {
-        display: block;
-        height: 2rem;
-        width: auto;
-        padding: 0;
-        margin: 0;
-        }
-        
-        .mobile .nav-header .close-toggle {
-        position: static;
-        background: none;
-        box-shadow: none;
-        backdrop-filter: none;
-        width: fit-content;
-        margin-left: 0;
-        padding: 15px 20px;
-        }
-        
-        .mobile .app-logo{
-        display: none;
         }
 
         .content_cell {
@@ -479,7 +465,7 @@
         .list_controls i.bi-filter-circle {
             position: absolute;
             right: 15px;
-            top: 20px;
+            top: 5px;
             font-size: 150%;
             z-index: 100;
         }
@@ -495,12 +481,13 @@
         .msg_headers th { width: 20%; }
 
         .sys_messages {
-            top: 0; right: 0; width: 100%; min-height: 5px;
+            top: 45px; right: 0; width: 100%; min-height: 5px;
             padding-bottom: 15px; white-space: normal;
         }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
+        .nux_welcome, .nux_help { margin: 0 0 20px; width: 100%; max-width: 100%; }
         .nux_dev_news table td { display: block; }
         .nux_dev_news table tr {
             &:not(:last-child) td:last-child {
@@ -524,6 +511,7 @@
 
         // mobile folders
         .folder_dialog { margin-left: 30px; width: 85%; }
+        .folder_list { border: inherit; border-radius: 0; }
         #imap_server_folder { width: 100%; }
 
         // mobile search
@@ -541,9 +529,12 @@
                 display: block; padding: 0; margin: 0 !important;
                 select { width: calc(50% - 0.5rem); margin: 5px; }
                 input[type=submit], input[type=button] { font-size: 80%; }
+                > form { gap: 0.5rem !important; }
             }
-            #search_terms { margin: 10px 3px 3px; width: 270px; max-width: 100%; }
+            #search_terms { margin: 10px 3px 3px; width: 100% !important; }
             .message_table { margin-top: 0.1rem; }
+            el-select { width: calc(50% - 0.5rem); }
+            .combined_sort + el-select { width: 150px; }
         }
 
         .time_section input[type=date] { display: block; margin-bottom: 10px; }
