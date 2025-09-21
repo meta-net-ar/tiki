@@ -127,25 +127,25 @@
 {/if}
 
 {* Interactive Translation Box *}
-<script type="text/javascript">
-    $(function() {
-        if ($("#intertrans-indicator").length > 0) {
-            $("header").addClass("navbar-with-intertrans");
-            $(".tiki-admin nav[role='banner']").addClass("navbar-with-intertrans");
-            $(".tiki-admin aside .navbar-wrapper.fixed-top").addClass("navbar-with-intertrans");
-            $(".tiki-admin .admin-content nav.admin-navbar").addClass("navbar-with-intertrans");
-            $("#middle_outer").addClass("middle-outer-with-intertrans");
-            $("[id*='bootstrap-modal'][role='dialog']").addClass("dialog-with-intertrans");
-        } else {
-            $("header").removeClass("navbar-with-intertrans");
-            $(".tiki-admin nav[role='banner']").removeClass("navbar-with-intertrans");
-            $(".tiki-admin aside .navbar-wrapper.fixed-top").removeClass("navbar-with-intertrans");
-            $(".tiki-admin .admin-content nav.admin-navbar").removeClass("navbar-with-intertrans");
-            $("#middle_outer").removeClass("middle-outer-with-intertrans");
-            $("[id*='bootstrap-modal'][role='dialog']").removeClass("dialog-with-intertrans");
-        }
-    });
-</script>
+    <script type="text/javascript">
+        $(function() {
+            if ($("#intertrans-indicator").length > 0) {
+                $("header").addClass("navbar-with-intertrans");
+                $(".tiki-admin nav[role='banner']").addClass("navbar-with-intertrans");
+                $(".tiki-admin aside .navbar-wrapper.fixed-top").addClass("navbar-with-intertrans");
+                $(".tiki-admin .admin-content nav.admin-navbar").addClass("navbar-with-intertrans");
+                $("#middle_outer").addClass("middle-outer-with-intertrans");
+                $("[id*='bootstrap-modal'][role='dialog']").addClass("dialog-with-intertrans");
+            } else {
+                $("header").removeClass("navbar-with-intertrans");
+                $(".tiki-admin nav[role='banner']").removeClass("navbar-with-intertrans");
+                $(".tiki-admin aside .navbar-wrapper.fixed-top").removeClass("navbar-with-intertrans");
+                $(".tiki-admin .admin-content nav.admin-navbar").removeClass("navbar-with-intertrans");
+                $("#middle_outer").removeClass("middle-outer-with-intertrans");
+                $("[id*='bootstrap-modal'][role='dialog']").removeClass("dialog-with-intertrans");
+            }
+        });
+    </script>
 
 {* Include mautic snipet code with mautic *}
 {if $prefs.site_mautic_enable eq 'y' && $prefs.wikiplugin_mautic eq 'y' && $prefs.site_mautic_tracking_script_location eq 'embed'}
