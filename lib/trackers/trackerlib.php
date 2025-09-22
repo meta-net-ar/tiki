@@ -5254,7 +5254,7 @@ class TrackerLib extends TikiLib
      * @param string $value value to add to the log.
      * @return void
      */
-    public function log(int $version, int $itemId, int $fieldId, string $value = '')
+    public function log($version, $itemId, $fieldId, $value = '')
     {
         if ($value === null) {
             $value = ''; // we want to log it after all, so change is in history
