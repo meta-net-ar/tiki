@@ -623,4 +623,9 @@ abstract class AbstractField implements FieldInterface, IndexableInterface
     {
         return '';
     }
+
+    public function isMainField(): bool
+    {
+        return ($this->getConfiguration('isMain') == 'y') ? true : false;
+    }
 }
