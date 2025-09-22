@@ -403,6 +403,14 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 ]];
             }
 
+            if ($selectFields = $query->getSelectionFields()) {
+                $sourcePart = [
+                    "_source" => $selectFields,
+                ];
+            } else {
+                $sourcePart = [];
+            }
+
             $indices = [$this->index];
 
             $foreign = array_map(function ($query) use ($builder) {
@@ -453,6 +461,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 $facetPart,
                 $rescorePart,
                 $postFilterPart,
+                $sourcePart,
                 [
                     "from" => $resultStart,
                     "size" => $resultCount,

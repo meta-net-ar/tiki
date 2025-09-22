@@ -124,6 +124,11 @@ class Search_Query_WikiBuilder
         $this->paginationArguments['max'] = max(1, (int) $value);
     }
 
+    public function wpquery_select_fields($query, $value)
+    {
+        $query->setSelectionFields(preg_split('/[, ]+/', $value));
+    }
+
     public function wpquery_filter_editable($query, $editableType, array $arguments)
     {
         $fields = $this->get_fields_from_arguments($arguments);
