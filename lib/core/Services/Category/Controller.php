@@ -199,7 +199,7 @@ class Services_Category_Controller
             if (count($filteredObjects)) {
                 $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $this->logCatgorizedTrackeritems($return['objects'], $caterizedItemsInfos);
+                $this->logActionCategorizeUncategorizeTrackeritem($return['objects'], $caterizedItemsInfos);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object added to category')
@@ -259,7 +259,7 @@ class Services_Category_Controller
             if (count($filteredObjects)) {
                 $caterizedItemsInfos = $this->getCaterizedTrackeritemsInfos($filteredObjects);
                 $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $this->logCatgorizedTrackeritems($return['objects'], $caterizedItemsInfos);
+                $this->logActionCategorizeUncategorizeTrackeritem($return['objects'], $caterizedItemsInfos);
                 $count = count($return['objects'] ?? []);
                 if ($count) {
                     $msg = $count === 1 ? tr('One object removed from category')
@@ -284,7 +284,13 @@ class Services_Category_Controller
             ];
         }
     }
-    public function getCaterizedTrackeritemsInfos($filteredObjects)
+    /**
+     * Takes a list of Items objects as a parameter and returns a list containing information about the trackeritem items that are categorized (fieldId, itemId, itemValue)
+     *
+     * @param array $filteredObjects Items objects.
+     * @return void
+     */
+    private function getCaterizedTrackeritemsInfos(array $filteredObjects)
     {
         $trklib = TikiLib::lib('trk');
         $caterizedItemsInfos = [];
@@ -302,7 +308,14 @@ class Services_Category_Controller
         }
         return $caterizedItemsInfos;
     }
-    public function logCatgorizedTrackeritems($categorizedObjects, $caterizedItemsInfos)
+    /**
+     * Saves the log when categorizing or uncategorizing a Trackeritem.
+     *
+     * @param array $categorizedObjects a list containing the trackeritem objects that have been either categorized or uncategorized for which the log must be added.
+     * @param array $caterizedItemsInfos a list containing information about the trackeritem items that are categorized (fieldId, itemId, itemValue).
+     * @return void
+     */
+    private function logActionCategorizeUncategorizeTrackeritem(array $categorizedObjects, array $caterizedItemsInfos)
     {
         $trklib = TikiLib::lib('trk');
         foreach ($categorizedObjects as $object) {
@@ -310,7 +323,7 @@ class Services_Category_Controller
                 foreach ($caterizedItemsInfos as $caterizedItemInfos) {
                     if ($caterizedItemInfos['itemId'] == $object['id']) {
                         $version = $trklib->last_log_version($caterizedItemInfos['itemId']) + 1;
-                        $trklib->log($version, $caterizedItemInfos['itemId'], $caterizedItemInfos['fieldId'], $caterizedItemInfos['itemValue']);
+                        $trklib->log((int) $version, (int) $caterizedItemInfos['itemId'], (int) $caterizedItemInfos['fieldId'], $caterizedItemInfos['itemValue']);
                     }
                 }
             }
