@@ -155,6 +155,17 @@ class Hm_Handler_event_rsvp_action extends Hm_Handler_Module
         // use specific text body for the reply
         $event = $this->get('calendar_event');
         $comment = $this->request->post['rsvp_comment'] ?? '';
+
+        // Extract sender name from headers
+        $from_name = 'User';
+        $headers = $this->get('msg_headers', []);
+        foreach ($headers as $name => $value) {
+            if (strtolower($name) == 'from') {
+                $from_name = (string)$value;
+                break;
+            }
+        }
+
         $body = "$from_name has $action the invitation to the following event: \n\n*{$event['name']}*";
         if ($comment) {
             $body .= "\n\nNote: $comment";
@@ -554,5 +565,96 @@ if (! hm_exists('get_calendar_part_imap')) {
         $mod->out('calendar_method', $method);
         $mod->out('calendar_event_raw', $event);
         $mod->out('formatted_calendar_event_description', $html);
+    }
+}
+
+/**
+ * Parse tracker-stored message and check for a calendar invitation
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_check_calendar_invitations_tiki extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->get('msg_struct')) {
+            get_calendar_part_tiki($this->get('msg_struct'), $this);
+        }
+
+        // If we have raw ICS data, denormalize to the event array Cypht/Tiki expect
+        if ($this->get('calendar_event_raw')) {
+            $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
+            $this->out('calendar_event', $event);
+        } else {
+            $event = null;
+        }
+
+        // Determine the recipient (like the IMAP handler does)
+        $recipient = null;
+        $headers = $this->get('msg_headers', []);
+        foreach ($headers as $name => $value) {
+            if (strtolower($name) == 'to') {
+                $recipient = (string) $value;
+            }
+        }
+        $this->out('recipient', $recipient);
+    }
+}
+
+/**
+ * Search tracker message structure for text/calendar parts and load the ICS content
+ * @subpackage tiki/functions
+ * @param array $struct message structure
+ * @param object $mod Hm_Handler_Module
+ * @return string
+ */
+if (! hm_exists('get_calendar_part_tiki')) {
+    function get_calendar_part_tiki($struct, $mod)
+    {
+        $part = false;
+        $method = null;
+
+        foreach ($struct as $id => $vals) {
+            if (is_array($vals) && isset($vals['type'])) {
+                if ($vals['type'] . '/' . $vals['subtype'] == 'text/calendar') {
+                    $part = $id;
+                    $method = $vals['attributes']['method'] ?? null;
+                }
+                if (isset($vals['subs'])) {
+                    $found = get_calendar_part_tiki($vals['subs'], $mod);
+                    if ($found) {
+                        return $found;
+                    }
+                }
+            } elseif (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
+                $found = get_calendar_part_tiki($vals['subs'], $mod);
+                if ($found) {
+                    return $found;
+                }
+            }
+        }
+
+        // No calendar part
+        if (! $part) {
+            return;
+        }
+
+        list($success, $form) = $mod->process_form(['imap_msg_uid', 'list_path']);
+        if ($success) {
+            $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
+            if ($email && ! empty($email['message_raw'])) {
+                $message = $email['message_raw'];
+                $mimePart = tiki_get_mime_part($message, $part);
+                if ($mimePart) {
+                    $event = $mimePart->getContent();
+                    $header = $mimePart->getHeader('Content-Type');
+                    if (! $method && $header && $header->hasParameter('method')) {
+                        $method = $header->getValueFor('method');
+                    }
+                    $mod->out('calendar_method', $method);
+                    $mod->out('calendar_event_raw', $event);
+                }
+            }
+        }
+        return $part;
     }
 }

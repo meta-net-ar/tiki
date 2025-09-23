@@ -72,6 +72,10 @@ add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'f
 add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
 add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'after');
 
+/* message page calendar invitation hooks (Tracker-stored) */
+add_handler('ajax_tiki_message_content', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_output('ajax_tiki_message_content', 'add_rsvp_actions', true, 'tiki', 'filter_message_headers', 'after');
+
 /* message page rsvp actions to an event */
 setup_base_ajax_page('ajax_rsvp_action', 'core');
 add_handler('ajax_rsvp_action', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
@@ -109,6 +113,39 @@ add_handler('ajax_remove_from_calendar', 'check_calendar_invitations_imap', true
 add_handler('ajax_remove_from_calendar', 'load_imap_servers_from_config', true, 'imap');
 add_handler('ajax_remove_from_calendar', 'imap_message_content', true, 'imap', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_remove_from_calendar', 'remove_from_calendar', true, 'tiki', 'imap_message_content', 'after');
+
+/* tracker message rsvp actions to an event */
+setup_base_ajax_page('ajax_tiki_rsvp_action', 'core');
+add_handler('ajax_tiki_rsvp_action', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_handler('ajax_tiki_rsvp_action', 'load_smtp_servers_from_config', true, 'smtp');
+add_handler('ajax_tiki_rsvp_action', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
+add_handler('ajax_tiki_rsvp_action', 'compose_profile_data', true, 'profiles', 'add_smtp_servers_to_page_data', 'after');
+add_handler('ajax_tiki_rsvp_action', 'tiki_message_content', true, 'tiki', 'compose_profile_data', 'after');
+add_handler('ajax_tiki_rsvp_action', 'event_rsvp_action', true, 'tiki', 'tiki_message_content', 'after');
+
+/* tracker message add to calendar function */
+setup_base_ajax_page('ajax_tiki_add_to_calendar', 'core');
+add_handler('ajax_tiki_add_to_calendar', 'tiki_message_content', true, 'tiki');
+add_handler('ajax_tiki_add_to_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_handler('ajax_tiki_add_to_calendar', 'add_to_calendar', true, 'tiki', 'check_calendar_invitations_tiki', 'after');
+
+/* tracker message update in calendar function */
+setup_base_ajax_page('ajax_tiki_update_in_calendar', 'core');
+add_handler('ajax_tiki_update_in_calendar', 'tiki_message_content', true, 'tiki');
+add_handler('ajax_tiki_update_in_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_handler('ajax_tiki_update_in_calendar', 'update_in_calendar', true, 'tiki', 'check_calendar_invitations_tiki', 'after');
+
+/* tracker message update participant status function */
+setup_base_ajax_page('ajax_tiki_update_participant_status', 'core');
+add_handler('ajax_tiki_update_participant_status', 'tiki_message_content', true, 'tiki');
+add_handler('ajax_tiki_update_participant_status', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_handler('ajax_tiki_update_participant_status', 'update_participant_status', true, 'tiki', 'check_calendar_invitations_tiki', 'after');
+
+/* tracker message remove event from calendar function */
+setup_base_ajax_page('ajax_tiki_remove_from_calendar', 'core');
+add_handler('ajax_tiki_remove_from_calendar', 'tiki_message_content', true, 'tiki');
+add_handler('ajax_tiki_remove_from_calendar', 'check_calendar_invitations_tiki', true, 'tiki', 'tiki_message_content', 'after');
+add_handler('ajax_tiki_remove_from_calendar', 'remove_from_calendar', true, 'tiki', 'check_calendar_invitations_tiki', 'after');
 
 /* debug mode and other settings updates */
 add_handler('settings', 'process_debug_mode', true, 'tiki', 'save_user_settings', 'before');
@@ -247,6 +284,11 @@ return [
     'ajax_update_in_calendar',
     'ajax_update_participant_status',
     'ajax_remove_from_calendar',
+    'ajax_tiki_rsvp_action',
+    'ajax_tiki_add_to_calendar',
+    'ajax_tiki_update_in_calendar',
+    'ajax_tiki_update_participant_status',
+    'ajax_tiki_remove_from_calendar',
     'ajax_move_to_tracker',
     'ajax_tiki_message_content',
     'ajax_tiki_delete_message',
