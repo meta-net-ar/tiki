@@ -469,7 +469,7 @@ if (! hm_exists('append_to_msg_headers')) {
     }
 }
 
-function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [], $avoidSubQueries = false)
+function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [])
 {
     global $prefs;
 
