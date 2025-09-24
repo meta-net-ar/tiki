@@ -323,8 +323,9 @@ return [
     'lookup' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'tracker_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'sort_mode' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'limit' => FILTER_VALIDATE_INT,
     'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'auto_move' => FILTER_VALIDATE_BOOLEAN,
-    'is_manual_search' => FILTER_VALIDATE_BOOLEAN,
   ]
 ];
