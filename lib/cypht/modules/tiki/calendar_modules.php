@@ -29,6 +29,9 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
         }
         if ($this->get('calendar_event_raw')) {
             $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
+            if ($this->get('formatted_calendar_event_description')) {
+                $event['description'] = $this->get('formatted_calendar_event_description');
+            }
             $this->out('calendar_event', $event);
         } else {
             $event = null;
@@ -512,13 +515,17 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
 if (! hm_exists('get_calendar_part_imap')) {
     function get_calendar_part_imap($struct, $mod)
     {
-        $event = $method = null;
+        $event = $method = $html = null;
         $part = false;
+        $htmlPart = false;
         foreach ($struct as $id => $vals) {
             if (is_array($vals) && isset($vals['type'])) {
                 if ($vals['type'] . '/' . $vals['subtype'] == 'text/calendar') {
                     $part = $id;
                     $method = $vals['attributes']['method'];
+                }
+                if ($vals['type'] . '/' . $vals['subtype'] == 'text/html') {
+                    $htmlPart = $id;
                 }
                 if (isset($vals['subs'])) {
                     return get_calendar_part_imap($vals['subs'], $mod);
@@ -537,9 +544,15 @@ if (! hm_exists('get_calendar_part_imap')) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $mod->cache);
             if ($mailbox->authed()) {
                 $event = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $part, true)[2];
+                if ($htmlPart) {
+                    $html = $mailbox->get_structured_message(hex2bin($form['folder']), $form['imap_msg_uid'], $htmlPart, true)[2];
+                    $html = sanitize_email_html($html);
+                    $html = format_msg_html($html);
+                }
             }
         }
         $mod->out('calendar_method', $method);
         $mod->out('calendar_event_raw', $event);
+        $mod->out('formatted_calendar_event_description', $html);
     }
 }
