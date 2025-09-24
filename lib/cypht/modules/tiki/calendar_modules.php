@@ -406,8 +406,8 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
         if (! empty($event)) {
             $res = '';
             $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_dtstart"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Event start'), TikiLib::lib('tiki')->get_long_datetime($event['start']));
-            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_dtend"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Event end'), tr('Event end'), TikiLib::lib('tiki')->get_long_datetime($event['end']));
-            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_organizer"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Organizer'), tr('Organizer'), implode(", ", $event['real_organizers']));
+            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_dtend"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Event end'), TikiLib::lib('tiki')->get_long_datetime($event['end']));
+            $res .= sprintf('<div class="row g-0 py-0 py-sm-1 small_header d-flex header_event_organizer"><div class="col-md-2"><span class="text-muted">%s</span></div><div class="col-md-10 col-12">%s</div></div>', tr('Organizer'), implode(", ", $event['real_organizers']));
             if ($prefs['feature_calendar'] == 'y' && $method != 'CANCEL') {
                 $existing = TikiLib::lib('calendar')->find_by_uid(null, $event['uid']);
                 if (! $existing) {
