@@ -1238,6 +1238,8 @@ class PdfGenerator
 
     private function checkLargeTables(&$doc)
     {
+        $xpath = new DOMXPath($doc);
+
         //new code to split table large cells
         foreach ($doc->getElementsByTagName('table') as $table) {
             // iterate over each row in the table
@@ -1245,18 +1247,16 @@ class PdfGenerator
             $cloneArr = [];
             foreach ($trs as $tr) {
                 $cloned = 0;
-                foreach ($tr->getElementsByTagName('td') as $td) { // get the columns in this row
-                    if (strlen($td->textContent) > 2000) {
-                        $longValue = $td->nodeValue;
-                        $breaktill = strpos($td->nodeValue, '.', 1000);
+                $directTds = $xpath->query('./td', $tr);
+                foreach ($directTds as $td) { // get the columns in this row
+                    $clones = $this->checkLongTd($td);
+                    if (count($clones)) {
                         if ($cloned == 0) {
-                            $cloneNode = $tr->cloneNode(true);
                             $cloned = 1;
-                            $cloneArr[] = ["node" => $cloneNode,'row' => $tr,'breaktill' => $breaktill];
+                            foreach ($clones as $clone) {
+                                $cloneArr[] = $clone;
+                            }
                         }
-                        $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
-                        $td->setAttribute("style:", "white-space: nowrap");
-                        $td->setAttribute("width", "20%");
                     }
                 }
             }
@@ -1267,6 +1267,33 @@ class PdfGenerator
             }
         }
         $html = @$doc->saveHTML();
+    }
+
+    private function checkLongTd(&$td)
+    {
+        $cloneArr = [];
+        $xpath = new DOMXPath($td->ownerDocument);
+        $directTds = $xpath->query('./td', $td);
+        if (count($directTds)) {
+            array_walk(iterator_to_array($directTds), function ($childTd) use (&$cloneArr) {
+                $cloneArr = array_merge($cloneArr, $this->checkLongTd($childTd));
+            });
+        }
+
+        if ($td->nodeType === XML_TEXT_NODE) {
+            if (strlen($td->textContent) > 2000) {
+                $longValue = $td->nodeValue;
+                $breaktill = strpos($td->nodeValue, '.', 1000);
+                $td->textContent = substr($longValue, 0, $breaktill) . '. (cont.)';
+                $td->setAttribute("style:", "white-space: nowrap");
+                $td->setAttribute("width", "20%");
+                $parentTr = $td->parentNode;
+                $cloneNode = $parentTr->cloneNode(true);
+                $cloneArr[] = ['breaktill' => $breaktill, 'node' => $cloneNode, 'row' => $parentTr];
+            }
+        }
+
+        return $cloneArr;
     }
 
     private function insertNewNodes(&$cloneData, &$table, $start = 1000)
