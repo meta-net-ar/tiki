@@ -130,7 +130,7 @@
         "rmm5t/jquery-timeago": "^1.5",
         "rubix/extras": "0.4.0-beta",
         "rubix/ml": "^0.4.0",
-        "sabre/dav": "~4.1.0",
+        "sabre/dav": "~4.7",
         "scssphp/scssphp": "^1.0.6",
         "sebastian/diff": "^3.0",
         "sentry/sdk": "^3.1",
