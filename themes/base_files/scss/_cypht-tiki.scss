@@ -253,7 +253,29 @@
         max-height: calc(90vh - 40px);
         overflow-y: auto;
     }
-    
+
+    .content_title {
+        .msg_controls {
+            flex-flow: wrap; margin-bottom: 10px;
+            a { text-decoration: none; }
+        }
+        .search_terms { width: 90% !important; margin: 0; padding: 4px 12px; }
+        .search_form {
+            padding-left: 0;
+            el-select { width: 45%; }
+        }
+        #imap_filter_form {
+            .imap_keyword, el-select { margin-right: 5px; }
+        }
+    }
+    .search_content {
+        .content_title {
+            flex-flow: wrap;
+            .msg_controls { margin-bottom: 0; }
+        }
+        .list_controls { position: absolute; top: 15px; right: 15px; }
+    }
+
     /* Bootstrap-based message headers */
     .msg_text * {
         white-space: normal !important;
@@ -460,13 +482,14 @@
             top: -7px;
             z-index: 2000;
             background-color: $body-bg !important;
+            .ctr_divider + div.dropdown { margin-top: 4px; }
         }
 
         .list_controls i.bi-filter-circle {
             position: absolute;
             right: 15px;
-            top: 5px;
-            font-size: 150%;
+            top: 10px;
+            font-size: 125%;
             z-index: 100;
         }
         .imap_filter_form { margin-left: 10px; margin-right: 10px; }
@@ -516,10 +539,6 @@
 
         // mobile search
         .search_content {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100vh;
             .content_title { max-height: 500px; flex: 0 0 auto; margin-top: 0.5rem !important;}
             .mobile .search_content .p-3 {
                 flex: 1 1 auto;
@@ -577,8 +596,9 @@
         .select2-container { min-width: 100px; }
         .msg_controls { position: fixed; right: 1rem !important; top: 0.3rem; z-index: 1000; height: auto; padding-top: 0; }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { justify-content: center; align-items: center; margin-top: 1rem; }
+        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 1rem; }
         .msg_text table { word-break: normal; }
+        .checkbox_cell { padding-top: 8px !important; }
 
         // groupmail
         .groupmail.message_table {
@@ -627,6 +647,15 @@
     }
 }
 
+html body.tiki.tiki-webmail #middle.container.container-std.middle {
+    width: 95% !important;
+    max-width: 95% !important;
+    min-width: 95% !important;
+}
+
+//
+// tablet and phone specific
+//
 @media screen and (min-width: 1200px) {
     .tiki-webmail {
         .container {
@@ -635,8 +664,20 @@
     }
 }
 
-html body.tiki.tiki-webmail #middle.container.container-std.middle {
-    width: 95% !important;
-    max-width: 95% !important;
-    min-width: 95% !important;
+@media (max-width: 768px) {
+    html body.tiki.tiki-webmail #middle.container.container-std.middle {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .mobile .inline-cypht {
+        .targets_section, .other_section,
+        .time_section, .source_section, .terms_section {
+            padding-left: 0px;
+        }
+        .submit_section { padding-left: 15px; }
+    }
 }
