@@ -7,9 +7,13 @@
 namespace Search\Manticore;
 
 use Manticoresearch\Exceptions\ExceptionInterface as ManticoreException;
+use Tiki\Profiling\DatabaseQueryLog;
 
 class Client
 {
+    public const UNIFIED_MANTICORE_READ_LOG_GROUP = "Unified index Manticore: Read";
+    public const UNIFIED_MANTICORE_WRITE_LOG_GROUP = "Unified index Manticore: Write";
+    public const UNIFIED_MANTICORE_UNKNOWN_LOG_GROUP = "Unified index Manticore: Read or Write";
     public $index;
     protected $dsn;
     protected $client;
@@ -40,6 +44,7 @@ class Client
 
     public function getStatus()
     {
+        $logHandle = DatabaseQueryLog::logStart('SHOW STATUS', null, self::UNIFIED_MANTICORE_READ_LOG_GROUP);
         try {
             $status = ['status' => 0];
             $result = $this->client->sql([
@@ -62,6 +67,8 @@ class Client
                 'status' => 0,
                 'error' => $e->getMessage(),
             ];
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
@@ -73,16 +80,20 @@ class Client
 
     public function getIndexStatus($index = '')
     {
+        $logHandle = DatabaseQueryLog::logStart('status()', null, self::UNIFIED_MANTICORE_READ_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->status();
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function createIndex($index, $definition, $settings = [], $silent = false)
+    public function createIndex(string $index, array $definition, array $settings = [], $silent = false)
     {
+        $logHandle = DatabaseQueryLog::logStart('create()', array_merge([$index], $definition), self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             $response = $index->create($definition, $settings, $silent);
@@ -91,21 +102,27 @@ class Client
             }
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function deleteIndex($index)
+    public function deleteIndex(string $index)
     {
+        $logHandle = DatabaseQueryLog::logStart('drop()', [$index], self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->drop(true);
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
     public function describe($index)
     {
+        $logHandle = DatabaseQueryLog::logStart('describe()', [$index], self::UNIFIED_MANTICORE_READ_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             $result = $index->describe();
@@ -113,7 +130,10 @@ class Client
             $result = [
                 'error' => $e->getMessage()
             ];
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
+
         if (empty($result['error']) && ! empty($result['data'])) {
             $mapping = [];
             foreach ($result['data'] as $row) {
@@ -128,28 +148,35 @@ class Client
         }
     }
 
-    public function alter($index, $operation, $field, $type)
+    public function alter(string $index, string $operation, string $field, string $type)
     {
+        $logHandle = DatabaseQueryLog::logStart('alter()', [$index, $operation, $field, $type], self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->alter($operation, $field, $type);
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function search($index, $query)
+    public function search(string $index, string $query)
     {
+        $logHandle = DatabaseQueryLog::logStart('search()', [$index, $query], self::UNIFIED_MANTICORE_READ_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->search($query);
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function storeQuery($index, $query, $name)
+    public function storeQuery(string $index, string $query, string $name)
     {
+        $logHandle = DatabaseQueryLog::logStart('pq()', [$index, $query, $name], self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $res = $this->client->pq()->doc([
                 'index' => $index . 'pq',
@@ -161,21 +188,27 @@ class Client
             return $res;
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function index($index, array $data)
+    public function index(string $index, array $data)
     {
+        $logHandle = DatabaseQueryLog::logStart('addDocument()', array_merge([$index], $data), self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->addDocument($data);
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function unindex($index, $type, $id)
+    public function unindex(string $index, string $type, $id)
     {
+        $logHandle = DatabaseQueryLog::logStart('deleteDocuments()', [$index, $type, $id], self::UNIFIED_MANTICORE_WRITE_LOG_GROUP);
         try {
             $index = $this->client->index($index);
             return $index->deleteDocuments([
@@ -184,11 +217,14 @@ class Client
             ]);
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 
-    public function document($index, $type, $id)
+    public function document(string $index, string $type, $id)
     {
+        $logHandle = DatabaseQueryLog::logStart('search()', [$index, $type, $id], self::UNIFIED_MANTICORE_READ_LOG_GROUP);
         try {
             $params = [
                 'body' => [
@@ -205,6 +241,8 @@ class Client
             return $result->current();
         } catch (ManticoreException $e) {
             throw new ClientException($e);
+        } finally {
+            DatabaseQueryLog::logEnd($logHandle);
         }
     }
 

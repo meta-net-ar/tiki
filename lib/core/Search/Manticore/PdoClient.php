@@ -9,6 +9,8 @@ namespace Search\Manticore;
 use Feedback;
 use PDO;
 use PDOException;
+use PDOStatement;
+use Tiki\Profiling\DatabaseQueryLog;
 
 class PdoClient
 {
@@ -17,7 +19,7 @@ class PdoClient
 
     protected $dsn;
     protected $port;
-    protected $pdo;
+    protected ?PDO $pdo;
     protected $debug;
     protected $log;
     protected $dataBuffer;
@@ -570,25 +572,32 @@ class PdoClient
         }
     }
 
-    protected function query($sql)
+    protected function query($sql): PDOStatement|false
     {
         $this->debug($sql);
-        return $this->pdo->query($sql);
-    }
-
-    protected function prepareAndExecute($sql, $params = [])
-    {
-        $this->debug($sql, $params);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        $logHandle = DatabaseQueryLog::logStart($sql, [], Client::UNIFIED_MANTICORE_UNKNOWN_LOG_GROUP);
+        $stmt = $this->pdo->query($sql);
+        DatabaseQueryLog::logEnd($logHandle);
         return $stmt;
     }
 
-    public function prepareAndExecuteWithRetry($sql, $params = [])
+    protected function prepareAndExecute($sql, $params = []): PDOStatement | false
     {
         $this->debug($sql, $params);
+        $logHandle = DatabaseQueryLog::logStart($sql, $params, Client::UNIFIED_MANTICORE_UNKNOWN_LOG_GROUP);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        DatabaseQueryLog::logEnd($logHandle);
+        return $stmt;
+    }
+
+    public function prepareAndExecuteWithRetry($sql, $params = []): PDOStatement | false
+    {
+        $this->debug($sql, $params);
+        $logHandle = DatabaseQueryLog::logStart($sql, $params, Client::UNIFIED_MANTICORE_UNKNOWN_LOG_GROUP);
         $stmt = $this->pdo->prepare($sql);
         $this->executeWithRetry($stmt, $params);
+        DatabaseQueryLog::logEnd($logHandle);
         return $stmt;
     }
 }
