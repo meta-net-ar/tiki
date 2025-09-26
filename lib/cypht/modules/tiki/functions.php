@@ -387,12 +387,13 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
             }
             $fields_without_folders[] = ['tracker_id' => $field['trackerId'], 'field_id' => $field['fieldId'], 'title' => "{$tracker['name']} - {$field['name']}"];
         }
-        $res = "<div class=\"d-inline-block\">";
+        $res = "<div class=\"" . ($class != 'move_to_trackers' ? 'dropdown ' : '') . "d-inline-block\">";
         if ($class != 'move_to_trackers') {
-            $res .= "<a class=\"hlink dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='true' data-bs-auto-close='outside'>" . $mod->trans($title) . "</a>";
             $res .= "<div class='" . $class . " dropdown-menu' aria-labelledby='$class'><div class='move_to_title'>" . $mod->trans($dropdown_title) . "</div>" . implode("<br>\n", $field_list) . "</div>";
         } else {
-            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary ms-2" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
+            $res .= "<a class=\"hlink text-decoration-none btn btn-sm btn-outline-secondary" . (! $message_view ? ' btn btn-sm btn-light border text-black-50' : '') . "\" id=\"{$class}\" href=\"#\" >" . $mod->trans($dropdown_title) . "</a>";
+            $res .= '<script type="text/javascript">var tiki_tracker_fields = ' . json_encode($fields_without_folders) . '</script>';
         }
         $res .= "</div>";
 
@@ -450,7 +451,6 @@ if (! hm_exists('bind_tracker_item_update_event')) {
 if (! hm_exists('append_to_msg_headers')) {
     function append_to_msg_headers($headers, $link)
     {
-        $link = ' | ' . $link;
         $headers = preg_replace('#</div><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
 
         return $headers;
