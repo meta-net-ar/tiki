@@ -81,10 +81,22 @@
                     <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
                 </div>
             </div>
+            {if !empty($trackerItems)}
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr}</label>
+                    <div class="col-sm-9 mb-0 pt-2">
+                        <ul>
+                            {foreach from=$trackerItems item=trackerItem}
+                                <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Created by{/tr}</label>
                 <div class="col-sm-9">
-                    <div class="summary" style="margin-bottom: 0; padding-top: 7px;">
+                    <div class="summary mb-0 pt-2">
                         {$calitem.user|escape}
                     </div>
 
