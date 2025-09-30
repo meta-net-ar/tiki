@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Process\Process;
+
 /**
  *
  * A wrapper for pdfimages, part of the poppler.freedesktop.org set of tools
@@ -40,7 +42,9 @@ class PdfImagesLib
      */
     public function setVersion()
     {
-        $output = shell_exec(escapeshellarg($this->binaryPath) . ' -v 2>&1');
+        $process = Process::fromShellCommandline(escapeshellarg($this->binaryPath) . ' -v 2>&1');
+        $process->run();
+        $output = $process->getOutput();
         preg_match('/[\d\.]+/', $output, $version);
 
         if (! empty($version[0])) {
@@ -124,8 +128,11 @@ class PdfImagesLib
             $arguments = ' -' . implode(' -', $this->arguments) . ' ';
         }
 
-        $error = shell_exec($this->binaryPath . $arguments . $this->source . ' ' . $this->destination . ' 2>&1');
-        if ($error) {
+        $process = Process::fromShellCommandline($this->binaryPath . $arguments . $this->source . ' ' . $this->destination);
+        $process->run();
+        $exitCode = $process->getExitCode();
+        $error = $process->getErrorOutput();
+        if ($exitCode !== 0) {
             throw new Exception($error);
         }
     }
