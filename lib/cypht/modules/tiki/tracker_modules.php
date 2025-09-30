@@ -373,6 +373,55 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         ]);
     }
 }
+
+/**
+ * Delete a draft message from EmailFolder field when successfully sent
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_tiki_delete_draft extends Hm_Handler_Module
+{
+    public $request;
+    public function process()
+    {
+        if (! $this->get('msg_sent')) {
+            return;
+        }
+
+        $path = $this->request->post['compose_msg_path'];
+        if (! str_contains($path, 'tracker_folder_')) {
+            return;
+        }
+
+        $draftId = $this->request->post['draft_id'];
+        if (! $draftId) {
+            return;
+        }
+
+        $path = str_replace('tracker_folder_', '', $path);
+        list ($itemId, $fieldId) = explode('_', $path);
+
+        $trk = TikiLib::lib('trk');
+        $item = $trk->get_item_info($itemId);
+        if (! $item) {
+            Hm_Msgs::add('Could not delete the saved draft. (Tracker item was not found)', 'danger');
+            return;
+        }
+        $field = $trk->get_field_info($fieldId);
+        if (! $field) {
+            Hm_Msgs::add('Could not delete the saved draft. (Tracker field not found)', 'danger');
+            return;
+        }
+        $field['value'] = [
+            'folder' => 'draft',
+            'delete' => $draftId,
+            'skip_trash' => true
+        ];
+        $trk->replace_item($item['trackerId'], $item['itemId'], [
+            'data' => [$field]
+        ]);
+    }
+}
+
 /**
  * Prevent saving a draft message to IMAP if it originated from a tracker
  * @subpackage tiki/handler
@@ -452,7 +501,7 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
             return;
         }
 
-        $fileId = $this->request->get['draft_id'];
+        $fileId = $this->request->post['draft_id'];
 
         $headers = $mime->get_headers();
         $msg = "Flags: \Draft\r\n" . $mime->get_mime_msg();
@@ -475,6 +524,13 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
             'folder' => 'draft',
             $action => $fileValue
         ];
+
+        TikiLib::events()->bind('tiki.trackeritem.update', function ($args) use ($fieldId) {
+            $drafts = json_decode($args['values'][$fieldId])->draft;
+            $currentDraft = end($drafts);
+            $this->out('draft_id', $currentDraft);
+        });
+
         $trk->replace_item($item['trackerId'], $item['itemId'], [
             'data' => [$field]
         ]);
