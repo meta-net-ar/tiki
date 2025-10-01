@@ -146,30 +146,19 @@
 
             {if isset($show_page) and $show_page eq 'y'}
                 {* don't show attachments button if feature disabled or no corresponding rights or no attached files and r/o*}
-
                 {if $prefs.feature_wiki_attachments == 'y'
                     && (
-                        $tiki_p_wiki_view_attachments == 'y'
-                        && (isset($atts_count) && $atts_count gt 0)
+                        ($tiki_p_wiki_view_attachments == 'y' && $atts_count|default:0 > 0)
                         || $tiki_p_wiki_attach_files == 'y'
                         || $tiki_p_wiki_admin_attachments == 'y')}
-
                     {capture assign=thistext}
                         {strip}
-                            {if (!isset($atts_count) or $atts_count == 0) || $tiki_p_wiki_attach_files == 'y'
-                                && $tiki_p_wiki_view_attachments == 'n' && $tiki_p_wiki_admin_attachments == 'n'}
-                                {tr}Files{/tr}
-                            {else}
-                                {tr}Files{/tr}
-                                &nbsp;<span class="atts_count badge bg-info">{$atts_count}</span>
-                            {/if}
+                            {tr}Files{/tr}
+                            <span class="atts_count badge bg-info">{$atts_count|default:0}</span>
                         {/strip}
                     {/capture}
-
-                    {if (isset($atts_count) and $atts_count gt 0) || $editable}
-                        {button href="#attachments" _flip_id="attzone{if isset($pagemd5)}{$pagemd5}{/if}" _type="secondary mb-2" _text=$thistext _flip_default_open=$prefs.w_displayed_default _flip_hide_text="n"}
-                    {/if}
-                {/if}{* attachments *}
+                    {button href="#attachments" _flip_id="attzone{if isset($pagemd5)}{$pagemd5}{/if}" _type="secondary mb-2" _text=$thistext _flip_default_open=$prefs.w_displayed_default _flip_hide_text="n"}
+                {/if} {* attachments *}
 
             {/if}
             {if $more_section|trim neq ''}
