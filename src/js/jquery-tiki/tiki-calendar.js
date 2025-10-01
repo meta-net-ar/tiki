@@ -7,12 +7,17 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import moment from "moment";
 
-$.fn.setupFullCalendar = function (fullCalendarParams) {
+$.fn.setupFullCalendar = function (
+    fullCalendarParams,
+    calendarContainer,
+    targetId = "calendar",
+    urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items"
+) {
     this.each(function () {
-        const calendarEl = document.getElementById("calendar");
+        const calendarEl = document.getElementById(targetId);
         $(calendarEl).tikiModal(tr("Loading..."));
 
-        window.calendar = new Calendar(calendarEl, {
+        calendarContainer[0] = new Calendar(calendarEl, {
             plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
             themeSystem: "bootstrap5",
             eventTimeFormat: {
@@ -30,7 +35,7 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
             },
             editable: true,
             selectable: true,
-            events: "tiki-ajax_services.php?controller=calendar&action=list_items",
+            events: urlEventSource,
             slotMinTime: fullCalendarParams.minHourOfDay,
             slotMaxTime: fullCalendarParams.maxHourOfDay,
             buttonText: {
@@ -213,7 +218,7 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
                 // If a date number is clicked, switch to Day View for the selected date.
                 // If any other part of the date cell is clicked, open a form to create a new event.
                 if (info.jsEvent.target.classList.contains("fc-daygrid-day-number")) {
-                    window.calendar.changeView("timeGridDay", info.dateStr);
+                    calendarContainer[0].changeView("timeGridDay", info.dateStr);
                 } else {
                     let $this = $(info.dayEl).tikiModal(" ");
                     const countCals = $("#filtercal ul li").length;
@@ -255,7 +260,7 @@ $.fn.setupFullCalendar = function (fullCalendarParams) {
             height: "auto",
         });
 
-        calendar.render();
+        calendarContainer[0].render();
     });
 };
 
